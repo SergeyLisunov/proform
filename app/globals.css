@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Load Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --pf-orange: #F97316;
+  --pf-orange-light: #FFF7ED;
+  --pf-orange-mid: #FFEDD5;
+  --pf-blue: #2563EB;
+  --pf-blue-light: #EFF6FF;
+  --pf-blue-mid: #DBEAFE;
+  --pf-green: #16A34A;
+  --pf-red: #DC2626;
+  --pf-purple: #7C3AED;
+  --pf-bg: #F8FAFC;
+  --pf-card: #FFFFFF;
+  --pf-border: #E2E8F0;
+  --pf-border-light: #F1F5F9;
+  --pf-text: #0F172A;
+  --pf-text-mid: #64748B;
+  --pf-text-light: #94A3B8;
+  --sidebar-w: 240px;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background-color: var(--pf-bg);
+  color: var(--pf-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.pf-num {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.pf-stat-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.pf-stat-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+@keyframes pf-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pf-page-enter { animation: pf-fade-up 0.28s ease both; }
+
+.pf-stagger > * { animation: pf-fade-up 0.28s ease both; }
+.pf-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.pf-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.pf-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.pf-stagger > *:nth-child(4) { animation-delay: 150ms; }

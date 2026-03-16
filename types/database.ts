@@ -1,0 +1,136 @@
+export type UserRole = 'athlete' | 'coach' | 'admin'
+
+export type Database = {
+  public: {
+    Tables: {
+      users: {
+        Row: {
+          id: string
+          auth_id: string | null
+          email: string
+          name: string
+          role: UserRole
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          auth_id?: string | null
+          email: string
+          name: string
+          role: UserRole
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['users']['Insert']>
+      }
+      athletes: {
+        Row: {
+          id: string
+          age: number | null
+          gender: string | null
+          weight_kg: number | null
+          height_cm: number | null
+          fitness_level: string | null
+          primary_sport: string | null
+          goal: string | null
+          hrv_baseline: number | null
+          rhr_baseline: number | null
+          profile_public: boolean
+          workouts_public: boolean
+          updated_at: string | null
+        }
+        Insert: Partial<Database['public']['Tables']['athletes']['Row']> & { id: string }
+        Update: Partial<Database['public']['Tables']['athletes']['Row']>
+      }
+      workouts: {
+        Row: {
+          id: string
+          athlete_id: string
+          event_date: string
+          event_type: string
+          activity_type: string | null
+          workout_time_of_day: string | null
+          start_time: string | null
+          activity_duration_min: number | null
+          activity_strain: number | null
+          avg_heart_rate: number | null
+          max_heart_rate: number | null
+          activity_calories: number | null
+          hr_zone_1_min: number | null
+          hr_zone_2_min: number | null
+          hr_zone_3_min: number | null
+          hr_zone_4_min: number | null
+          hr_zone_5_min: number | null
+          recovery_score: number | null
+          hrv: number | null
+          name: string | null
+          description: string | null
+          mood: number | null
+          is_public: boolean
+          cycle_type: string
+          trainer_comment: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['workouts']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['workouts']['Row']>
+      }
+      daily_metrics: {
+        Row: {
+          id: string
+          athlete_id: string
+          date: string
+          recovery_score: number | null
+          hrv: number | null
+          resting_heart_rate: number | null
+          sleep_hours: number | null
+          sleep_efficiency: number | null
+          day_strain: number | null
+          calories_burned: number | null
+          respiratory_rate: number | null
+          skin_temp_deviation: number | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['daily_metrics']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['daily_metrics']['Row']>
+      }
+      competitions: {
+        Row: {
+          id: string
+          athlete_id: string
+          date: string
+          name: string
+          distance: string | null
+          result: string | null
+          notes: string | null
+          is_public: boolean
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['competitions']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['competitions']['Row']>
+      }
+      workout_comments: {
+        Row: { id: string; workout_id: string; author_id: string; body: string; created_at: string }
+        Insert: Omit<Database['public']['Tables']['workout_comments']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['workout_comments']['Row']>
+      }
+      observation_diary: {
+        Row: { id: string; coach_id: string; athlete_id: string | null; date: string; note: string; tags: string[]; created_at: string }
+        Insert: Omit<Database['public']['Tables']['observation_diary']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['observation_diary']['Row']>
+      }
+      cycle_blocks: {
+        Row: { id: string; athlete_id: string; start_date: string; end_date: string; cycle_type: 'micro' | 'meso' | 'macro'; label: string | null; color: string; created_at: string }
+        Insert: Omit<Database['public']['Tables']['cycle_blocks']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['cycle_blocks']['Row']>
+      }
+      trainer_athletes: {
+        Row: { trainer_id: string; athlete_id: string; created_at: string }
+        Insert: { trainer_id: string; athlete_id: string }
+        Update: never
+      }
+    }
+    Functions: {
+      get_my_role: { Args: Record<never, never>; Returns: string }
+      get_my_user_id: { Args: Record<never, never>; Returns: string }
+    }
+  }
+}
