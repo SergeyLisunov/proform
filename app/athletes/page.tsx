@@ -1,56 +1,320 @@
 'use client'
-import { recoveryColor } from '@/lib/utils/data'
+import { useState } from 'react'
+import { useUser } from '@/lib/hooks/useUser'
+import { RecoveryRing } from '@/components/ui/RecoveryRing'
+import { DEMO_ATHLETES, DEMO_DIARY, DEMO_SESSIONS, RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
 import ApexChart from '@/components/charts/ApexChart'
-const AT_COLORS=['#2563EB','#F97316','#16A34A','#7C3AED']
-const athletes=[
-  {ini:'SK',name:'Sara Kowalski',sport:'Running',age:45,gender:'Female',level:'Beginner',recovery:42,hrv:47.2,rhr:45.8,sleep:7.8,sessions:10,uid:'USER_00011'},
-  {ini:'MW',name:'Marcus Weiden',sport:'Cycling',age:43,gender:'Male',level:'Intermediate',recovery:82,hrv:62.2,rhr:52.1,sleep:6.0,sessions:7,uid:'USER_00003'},
-  {ini:'JT',name:'James Thornton',sport:'Swimming',age:55,gender:'Male',level:'Intermediate',recovery:63,hrv:32.0,rhr:73.1,sleep:5.7,sessions:7,uid:'USER_00006'},
-  {ini:'LN',name:'Linh Nguyen',sport:'Weight Training',age:56,gender:'Female',level:'Beginner',recovery:80,hrv:106.5,rhr:55.8,sleep:6.1,sessions:14,uid:'USER_00001'},
-]
-const HRZ_W=[
-  [13.4,22.1,27.3,26.5,10.6],[10.5,21.0,29.3,29.6,9.5],
-  [10.5,19.9,28.0,29.7,11.9],[15.3,24.9,29.4,23.1,7.3],
-]
-const ZONE_COLORS=['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
-export default function AthletesPage() {
+
+type TabType = 'overview' | 'sessions' | 'diary' | 'marks'
+
+function AthleteCard({ athlete, onSelect, selected }: { athlete: typeof DEMO_ATHLETES[0]; onSelect: () => void; selected: boolean }) {
+  const rc = recoveryColor(athlete.recovery)
+  const rr = RISK_COLORS[athlete.risk]
+
   return (
-    <div className="flex flex-col gap-6 pf-page-enter">
-      <div>
-        <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Real WHOOP data · 100K records</p>
-        <h2 className="pf-num text-3xl text-slate-900">My Athletes</h2>
+    <div
+      onClick={onSelect}
+      className={[
+        'bg-card border rounded-xl p-4 cursor-pointer transition-all hover:shadow-sm',
+        selected ? 'border-orange-400 shadow-sm' : 'border-border hover:border-orange-200',
+      ].join(' ')}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num" style={{ background: rc + '20', color: rc }}>
+          {athlete.name.split(' ').map((n:string) => n[0]).join('')}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold text-foreground truncate">{athlete.name}</div>
+          <div className="text-2xs text-muted-foreground">{athlete.sport}</div>
+        </div>
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-2xs font-bold border" style={{ background: rr.bg, color: rr.text, borderColor: rr.border }}>
+          <i className={`ki-filled ${rr.icon} mr-0.5 text-[9px]`} />
+          {athlete.risk}
+        </span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {athletes.map((a,i)=>{
-          const rc=recoveryColor(a.recovery)
-          return (
-            <div key={a.uid} className="card rounded-2xl border border-[#E2E8F0] bg-white p-5 hover:shadow-sm transition-shadow cursor-pointer">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 pf-num text-xl font-bold" style={{background:AT_COLORS[i]+'20',color:AT_COLORS[i]}}>{a.ini}</div>
-                <div className="flex-1">
-                  <div className="font-semibold text-slate-900">{a.name}</div>
-                  <div className="text-xs text-slate-400">{a.sport} · {a.gender} · {a.age}y · {a.level}</div>
-                </div>
-                <div className="text-right">
-                  <div className="pf-num text-3xl leading-none" style={{color:rc}}>{a.recovery}%</div>
-                  <div className="text-[9px] text-slate-400">recovery</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                {[{v:a.hrv,u:'HRV ms',c:'#2563EB'},{v:a.rhr,u:'RHR bpm',c:'#DC2626'},{v:a.sleep,u:'Sleep h',c:'#7C3AED'},{v:a.sessions,u:'Sessions',c:'#64748B'}].map(({v,u,c})=>(
-                  <div key={u} className="bg-slate-50 rounded-xl p-2 text-center">
-                    <div className="pf-num text-lg leading-none" style={{color:c}}>{v}</div>
-                    <div className="text-[8px] text-slate-400 mt-1 uppercase tracking-wide">{u}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex h-2 rounded overflow-hidden" style={{gap:1}}>
-                {HRZ_W[i].map((pct,zi)=>pct>0?<div key={zi} style={{flex:pct,background:ZONE_COLORS[zi],minWidth:2}}/>:null)}
-              </div>
-              <div className="text-[9px] text-slate-400 mt-1">{a.uid} · Real WHOOP data</div>
+      <div className="flex items-center gap-3">
+        <RecoveryRing score={athlete.recovery} size={56} />
+        <div className="flex-1 space-y-1.5">
+          <div>
+            <div className="flex justify-between mb-0.5">
+              <span className="text-[9px] text-muted-foreground">HRV {athlete.hrv} ms</span>
             </div>
-          )
-        })}
+            <div className="h-1.5 bg-border rounded-full overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${Math.min(100, athlete.hrv)}%`, background: rc }} />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between mb-0.5">
+              <span className="text-[9px] text-muted-foreground">RHR {athlete.rhr} bpm</span>
+            </div>
+            <div className="h-1.5 bg-border rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-red-400" style={{ width: `${Math.max(0, 100 - (athlete.rhr - 40) * 3)}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-4 mt-3 pt-2.5 border-t border-border text-center">
+        <div className="flex-1">
+          <div className="pf-num text-lg text-foreground">{athlete.sessions}</div>
+          <div className="text-[9px] text-muted-foreground">sessions</div>
+        </div>
+        <div className="flex-1">
+          <div className="pf-num text-lg text-foreground">{athlete.streak}d</div>
+          <div className="text-[9px] text-muted-foreground">streak</div>
+        </div>
+        <div className="flex-1">
+          <div className="pf-num text-lg" style={{ color: rc }}>{athlete.recovery}%</div>
+          <div className="text-[9px] text-muted-foreground">recovery</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
+  const [tab, setTab] = useState<TabType>('overview')
+  const rc = recoveryColor(athlete.recovery)
+
+  const lineOpts = {
+    chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
+    stroke: { curve: 'smooth' as const, width: [2,2], dashArray: [0,4] },
+    colors: ['#F97316','#2563EB'],
+    xaxis: { categories: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: [{ labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } }, { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } }],
+    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
+    legend: { position: 'top' as const, fontFamily: 'DM Sans', fontSize: '12px' },
+    dataLabels: { enabled: false },
+    tooltip: { theme: 'light' },
+  }
+
+  const TABS: { id: TabType; label: string; icon: string }[] = [
+    { id: 'overview', label: 'Overview',  icon: 'ki-element-11' },
+    { id: 'sessions', label: 'Sessions',  icon: 'ki-abstract-26' },
+    { id: 'diary',    label: 'Diary',     icon: 'ki-notepad-edit' },
+    { id: 'marks',    label: 'Marks',     icon: 'ki-tag' },
+  ]
+
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
+      {/* Athlete header */}
+      <div className="px-5 py-4 border-b border-border flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold pf-num" style={{ background: rc + '20', color: rc }}>
+          {athlete.name.split(' ').map((n:string) => n[0]).join('')}
+        </div>
+        <div className="flex-1">
+          <h3 className="text-base font-semibold text-foreground">{athlete.name}</h3>
+          <p className="text-2xs text-muted-foreground">{athlete.sport} · Age {athlete.age} · {athlete.gender === 'F' ? 'Female' : 'Male'} · {athlete.id}</p>
+        </div>
+        <div className="flex gap-2">
+          <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+            <i className="ki-filled ki-message-text text-xs" />
+            Comment
+          </button>
+          <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
+            <i className="ki-filled ki-eye text-xs" />
+            Profile
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-border px-4">
+        {TABS.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={[
+              'flex items-center gap-1.5 px-3 py-3 text-2sm font-medium border-b-2 transition-colors',
+              tab === t.id ? 'border-orange-500 text-orange-600' : 'border-transparent text-muted-foreground hover:text-foreground',
+            ].join(' ')}
+          >
+            <i className={`ki-filled ${t.icon} text-xs`} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-5">
+        {tab === 'overview' && (
+          <div className="flex flex-col gap-4">
+            {/* KPIs */}
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+              {[
+                { label: 'Recovery', value: `${athlete.recovery}%`, color: rc },
+                { label: 'HRV',     value: `${athlete.hrv} ms`,   color: '#2563EB' },
+                { label: 'RHR',     value: `${athlete.rhr} bpm`,  color: '#EF4444' },
+                { label: 'Streak',  value: `${athlete.streak}d`,  color: '#7C3AED' },
+              ].map(k => (
+                <div key={k.label} className="bg-background border border-border rounded-xl p-3 text-center">
+                  <div className="pf-num text-2xl leading-none mb-0.5" style={{ color: k.color }}>{k.value}</div>
+                  <div className="text-2xs text-muted-foreground">{k.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Risk Cards */}
+            <div>
+              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Risk Assessment</div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: 'Overload Risk',       status: athlete.risk === 'high' ? 'high' : 'low',      icon: 'ki-warning-2' },
+                  { label: 'Under-Recovery',       status: athlete.recovery < 50 ? 'moderate' : 'low',   icon: 'ki-abstract-26' },
+                  { label: 'Instability Pattern',  status: 'low',                                         icon: 'ki-chart-line-up' },
+                  { label: 'Training Load',        status: athlete.streak > 10 ? 'moderate' : 'low',     icon: 'ki-abstract-31' },
+                ].map(r => {
+                  const rr = RISK_COLORS[r.status as keyof typeof RISK_COLORS]
+                  return (
+                    <div key={r.label} className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{ background: rr.bg, borderColor: rr.border }}>
+                      <i className={`ki-filled ${r.icon} text-sm`} style={{ color: rr.text }} />
+                      <div>
+                        <div className="text-2xs font-semibold" style={{ color: rr.text }}>{r.label}</div>
+                        <div className="text-[9px] text-muted-foreground capitalize">{r.status}</div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Trend chart */}
+            <div>
+              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Weekly Trend</div>
+              <ApexChart type="line"
+                series={[{ name: 'Strain', data: [8.2,11.5,7.1,14.2,10.8,6.3,12.1] }, { name: 'HRV (ms)', data: [44,47,45,41,48,50,47] }]}
+                options={lineOpts} height={160} />
+            </div>
+          </div>
+        )}
+
+        {tab === 'sessions' && (
+          <div className="divide-y divide-border -mx-5 -mb-5">
+            {DEMO_SESSIONS.slice(0,5).map((s,i) => {
+              const r = recoveryColor(s.recovery)
+              return (
+                <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/40">
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-foreground">{s.type}</div>
+                    <div className="text-2xs text-muted-foreground">{s.date} · {s.dur} min</div>
+                  </div>
+                  <div className="w-24 hidden sm:block">
+                    <div className="flex justify-between text-2xs mb-1">
+                      <span className="text-muted-foreground">Strain</span>
+                      <span className="font-bold text-foreground">{s.strain}</span>
+                    </div>
+                    <div className="h-1.5 bg-border rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-blue-500" style={{ width: `${(s.strain/20)*100}%` }} />
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="pf-num text-lg leading-none" style={{ color: r }}>{s.recovery}%</div>
+                    <div className="text-[9px] text-muted-foreground">recovery</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {tab === 'diary' && (
+          <div className="flex flex-col gap-3">
+            {DEMO_DIARY.map((d,i) => {
+              const rr = RISK_COLORS[d.risk as keyof typeof RISK_COLORS]
+              return (
+                <div key={i} className="p-3 rounded-xl border hover:border-orange-200 transition-colors" style={{ background: rr.bg + '40', borderColor: rr.border }}>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <span className="text-2sm font-semibold text-foreground">{d.title}</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full border shrink-0" style={{ background: rr.bg, color: rr.text, borderColor: rr.border }}>{d.risk}</span>
+                  </div>
+                  <p className="text-2xs text-foreground/70 leading-relaxed">{d.note}</p>
+                  <div className="text-[9px] text-muted-foreground mt-1.5">{d.date}</div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {tab === 'marks' && (
+          <div className="flex flex-col gap-3">
+            <div className="text-2xs text-muted-foreground">Coach marks applied to training sessions</div>
+            {Object.entries(COACH_MARKS).map(([key, mark]) => (
+              <div key={key} className="flex items-center justify-between px-3 py-2.5 rounded-xl border" style={{ background: mark.bg, borderColor: mark.text + '30' }}>
+                <div>
+                  <div className="text-2sm font-semibold" style={{ color: mark.text }}>{mark.label}</div>
+                  <div className="text-[9px] text-muted-foreground capitalize">{key.replace('_',' ')}</div>
+                </div>
+                <button className="px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all hover:opacity-80" style={{ background: mark.bg, color: mark.text, borderColor: mark.text + '40' }}>
+                  Apply
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default function AthletesPage() {
+  const { user } = useUser()
+  const [selected, setSelected] = useState(0)
+
+  if (user?.role !== 'coach' && user?.role !== 'admin') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+        <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
+          <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
+        </div>
+        <div className="text-center">
+          <p className="text-sm font-semibold text-foreground">Access Restricted</p>
+          <p className="text-2sm text-muted-foreground mt-1">This section is for coaches only.</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-5 pf-enter">
+      <div className="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Coaching Panel</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">My Athletes</h2>
+        </div>
+        <button className="kt-btn kt-btn-primary gap-2">
+          <i className="ki-filled ki-plus text-sm" />
+          Add Athlete
+        </button>
+      </div>
+
+      {/* Summary strip */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+        {[
+          { label: 'Athletes',    value: DEMO_ATHLETES.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
+          { label: 'Avg Recovery', value: `${Math.round(DEMO_ATHLETES.reduce((a,b) => a+b.recovery,0)/DEMO_ATHLETES.length)}%`, bg: 'bg-green-50 text-green-600', icon: 'ki-abstract-26' },
+          { label: 'At Risk',      value: DEMO_ATHLETES.filter(a => a.risk !== 'low').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-warning-2' },
+          { label: 'Active Today', value: 3, bg: 'bg-violet-50 text-violet-600', icon: 'ki-calendar' },
+        ].map(s => (
+          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
+              <i className={`ki-filled ${s.icon} text-base`} />
+            </div>
+            <div>
+              <div className="pf-num text-2xl text-foreground">{s.value}</div>
+              <div className="text-2xs text-muted-foreground">{s.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-4">
+        {/* Athlete list */}
+        <div className="flex flex-col gap-3">
+          {DEMO_ATHLETES.map((a, i) => (
+            <AthleteCard key={a.id} athlete={a} onSelect={() => setSelected(i)} selected={selected === i} />
+          ))}
+        </div>
+
+        {/* Detail panel */}
+        <AthleteDetail athlete={DEMO_ATHLETES[selected]} />
       </div>
     </div>
   )

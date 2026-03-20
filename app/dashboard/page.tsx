@@ -1,313 +1,378 @@
 'use client'
 import { useUser } from '@/lib/hooks/useUser'
-import { StatCard } from '@/components/ui/StatCard'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import ApexChart from '@/components/charts/ApexChart'
-import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_SESSIONS, DEMO_GROUP, TYPE_COLORS, recoveryColor } from '@/lib/utils/data'
+import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_SESSIONS, DEMO_GROUP, recoveryColor } from '@/lib/utils/data'
 
 const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
 const ZL = ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO₂max']
-const ZB = ['<120','120–140','140–160','160–175','175+']
-const AT = ['#2563EB','#F97316','#16A34A','#7C3AED']
 
-const areaOpts = (color: string) => ({
-  chart: { type: 'area' as const, toolbar: { show: false }, sparkline: { enabled: false }, animations: { enabled: false } },
-  stroke: { curve: 'smooth' as const, width: 1.5, colors: [color] },
-  fill: { type: 'gradient', gradient: { opacityFrom: 0.08, opacityTo: 0, stops: [0,100] } },
+const sparkOpts = (color: string) => ({
+  chart: { type: 'area' as const, toolbar: { show: false }, sparkline: { enabled: true }, animations: { enabled: false } },
+  stroke: { curve: 'smooth' as const, width: 2, colors: [color] },
+  fill: { type: 'gradient', gradient: { opacityFrom: 0.15, opacityTo: 0.0 } },
   colors: [color],
-  xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-  yaxis: { labels: { show: false } },
-  grid: { show: false },
   tooltip: { enabled: false },
   dataLabels: { enabled: false },
 })
 
-// ── ATHLETE ────────────────────────────────────────────
+const weekLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+
+function StatCard({ label, value, unit, icon, iconBg, delta, sub, sparkData, sparkColor }: {
+  label: string; value: string | number; unit?: string; icon: string; iconBg: string
+  delta?: number; sub?: string; sparkData?: number[]; sparkColor?: string
+}) {
+  return (
+    <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <span className="text-2sm text-muted-foreground font-medium">{label}</span>
+        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${iconBg}`}>
+          <i className={`ki-filled ${icon} text-base`} />
+        </div>
+      </div>
+      <div className="flex items-end gap-1.5">
+        <span className="pf-num text-4xl text-foreground leading-none">{value}</span>
+        {unit && <span className="text-sm text-muted-foreground mb-0.5 font-medium">{unit}</span>}
+        {delta !== undefined && (
+          <span className={`text-2xs font-bold ml-auto mb-1 ${delta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            {delta > 0 ? '+' : ''}{delta}%
+          </span>
+        )}
+      </div>
+      {sparkData && sparkColor && (
+        <div className="-mx-1">
+          <ApexChart type="area" series={[{ data: sparkData }]} options={sparkOpts(sparkColor)} height={48} />
+        </div>
+      )}
+      {sub && <p className="text-2xs text-muted-foreground">{sub}</p>}
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────
 function AthleteDash({ name }: { name: string }) {
   const rc = recoveryColor(42)
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }} className="pf-enter">
+  const hrv7d = [41, 44, 50, 48, 47, 45, 47]
+  const strain7d = [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1]
 
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+  const lineOpts = {
+    chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
+    stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 5] },
+    colors: ['#F97316', '#60A5FA'],
+    xaxis: { categories: weekLabels, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: [
+      { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
+      { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
+    ],
+    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
+    legend: { position: 'top' as const, fontSize: '12px', fontFamily: 'DM Sans' },
+    tooltip: { theme: 'light' },
+    dataLabels: { enabled: false },
+  }
+
+  return (
+    <div className="flex flex-col gap-6 pf-enter">
+      {/* Page header */}
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <div style={{ fontSize: 11, color: '#ADADB3', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
             USER_00011 · WHOOP Live
-          </div>
-          <h2 className="pf-num" style={{ fontSize: 38, color: '#0A0A0B', lineHeight: 1 }}>
-            Good morning,<br />{name.split(' ')[0]} 🏃
+          </p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">
+            Good morning, {name.split(' ')[0]} 🏃
           </h2>
         </div>
-        <RecoveryRing score={42} size={108} />
+        <RecoveryRing score={42} size={100} />
       </div>
 
-      {/* KPI row — editorial big numbers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,minmax(0,1fr))', gap: 12 }} className="pf-stagger">
-        <StatCard label="Avg HRV"     value={47.2}  unit="ms"   icon="ki-abstract-26"  iconColor="#2563EB" sub="WHOOP metric" />
-        <StatCard label="Resting HR"  value={45.8}  unit="bpm"  icon="ki-heart"         iconColor="#DC2626" delta={-3} />
-        <StatCard label="Avg Sleep"   value={7.8}   unit="hrs"  icon="ki-moon"          iconColor="#7C3AED" />
-        <StatCard label="Cal / Day"   value="3,415" unit="kcal" icon="ki-abstract-31"   iconColor="#F97316" delta={5} />
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
+        <StatCard
+          label="Avg HRV"
+          value={47.2} unit="ms"
+          icon="ki-abstract-26" iconBg="bg-blue-50 text-blue-600"
+          sub="WHOOP metric"
+          sparkData={hrv7d} sparkColor="#2563EB"
+        />
+        <StatCard
+          label="Resting HR"
+          value={45.8} unit="bpm"
+          icon="ki-heart" iconBg="bg-red-50 text-red-500"
+          delta={-3}
+          sparkData={[48,47,46,47,45,46,46]} sparkColor="#EF4444"
+        />
+        <StatCard
+          label="Avg Sleep"
+          value={7.8} unit="hrs"
+          icon="ki-moon" iconBg="bg-violet-50 text-violet-600"
+          sparkData={[7.2,8.1,7.5,8.3,7.8,8.0,7.8]} sparkColor="#7C3AED"
+        />
+        <StatCard
+          label="Cal / Day"
+          value="3,415" unit="kcal"
+          icon="ki-abstract-31" iconBg="bg-orange-50 text-orange-500"
+          delta={5}
+          sparkData={[3100,3400,3200,3500,3350,3600,3415]} sparkColor="#F97316"
+        />
       </div>
 
       {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-
-        {/* Strain area chart */}
-        <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        {/* Strain + HRV line chart */}
+        <div className="xl:col-span-2 bg-card border border-border rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Weekly Strain</div>
-              <div className="pf-num" style={{ fontSize: 44, color: '#0A0A0B', lineHeight: 1.1 }}>
-                {DEMO_WEEKLY[DEMO_WEEKLY.length-1].strain}
-              </div>
+              <h3 className="text-sm font-semibold text-foreground">Weekly Strain & HRV</h3>
+              <p className="text-2xs text-muted-foreground mt-0.5">Last 7 days vs baseline</p>
             </div>
-            <div style={{ fontSize: 11, color: '#16A34A', fontWeight: 600 }}>↑ 8% vs prev</div>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-2xs font-semibold text-orange-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+              This week
+            </span>
           </div>
           <ApexChart
-            type="area" height={90}
-            options={{ ...areaOpts('#F97316'),
-              xaxis: { categories: DEMO_WEEKLY.map(d => d.w), labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-            }}
-            series={[{ name: 'Strain', data: DEMO_WEEKLY.map(d => d.strain) }]}
+            type="line"
+            series={[
+              { name: 'Strain', data: strain7d },
+              { name: 'HRV (ms)', data: hrv7d },
+            ]}
+            options={lineOpts}
+            height={200}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            {DEMO_WEEKLY.map(d => <span key={d.w} style={{ fontSize: 9, color: '#ADADB3' }}>{d.w}</span>)}
-          </div>
         </div>
 
-        {/* Recovery 7-day line */}
-        <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
-            <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Recovery · 7 Days</div>
-              <div className="pf-num" style={{ fontSize: 44, color: rc, lineHeight: 1.1 }}>42%</div>
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#DC2626' }}>↓ Low zone</span>
+        {/* Recovery ring + metrics */}
+        <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4">
+          <h3 className="text-sm font-semibold text-foreground">Today's Recovery</h3>
+          <div className="flex items-center justify-center">
+            <RecoveryRing score={42} size={120} />
           </div>
-          <ApexChart
-            type="area" height={90}
-            options={{ ...areaOpts(rc),
-              xaxis: { categories: DEMO_DAILY.map(d => d.day), labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-            }}
-            series={[{ name: 'Recovery', data: DEMO_DAILY.map(d => d.recovery) }]}
-          />
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            {DEMO_DAILY.map(d => <span key={d.day} style={{ fontSize: 9, color: '#ADADB3' }}>{d.day}</span>)}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom row: HR Zones + Sessions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-
-        {/* HR zones */}
-        <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>HR Zone Distribution</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {ZL.map((z, i) => (
-              <div key={z}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: 1, background: ZC[i], display: 'inline-block' }} />
-                    <span style={{ fontSize: 11, color: '#3D3D40' }}>{z}</span>
-                    <span style={{ fontSize: 10, color: '#ADADB3' }}>{ZB[i]}</span>
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#0A0A0B' }}>{DEMO_HRZ[i]}%</span>
-                </div>
-                <div style={{ height: 4, background: '#F2F2F3', borderRadius: 2 }}>
-                  <div style={{ height: '100%', width: `${DEMO_HRZ[i] * 2}%`, background: ZC[i], borderRadius: 2, transition: 'width .4s ease' }} />
-                </div>
+          <div className="space-y-2.5">
+            {[
+              { label: 'Sleep Quality', val: '72%', color: '#F97316' },
+              { label: 'HRV Score',     val: '47 ms', color: '#2563EB' },
+              { label: 'Resting HR',    val: '46 bpm', color: '#EF4444' },
+            ].map(m => (
+              <div key={m.label} className="flex items-center justify-between">
+                <span className="text-2sm text-muted-foreground">{m.label}</span>
+                <span className="text-2sm font-semibold text-foreground">{m.val}</span>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Recent sessions */}
-        <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Recent Sessions</div>
-            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: '#FFF3E8', color: '#F97316' }}>Running</span>
+      {/* Recent Sessions */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">Recent Sessions</h3>
+          <a href="/diary" className="text-2xs font-semibold text-orange-500 hover:text-orange-600 transition-colors">View all →</a>
+        </div>
+        <div className="divide-y divide-border">
+          {DEMO_SESSIONS.slice(0, 5).map((s, i) => (
+            <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/50 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+                <i className="ki-filled ki-abstract-26 text-orange-500 text-sm" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-foreground truncate">{s.type}</div>
+                <div className="text-2xs text-muted-foreground">{s.dur} min · {s.date}</div>
+              </div>
+              <ZoneBar zones={s.z} height={28} />
+              <div className="text-right shrink-0">
+                <div className="text-sm font-bold text-foreground pf-num">{s.strain}</div>
+                <div className="text-2xs text-muted-foreground">strain</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ──────────────────────────────────────────────
+function CoachDash({ name }: { name: string }) {
+  const barOpts = {
+    chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
+    plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
+    colors: ['#F97316'],
+    xaxis: { categories: ['Sara K.', 'Marcus W.', 'James T.', 'Linh N.'], labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
+    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
+    tooltip: { theme: 'light' },
+    dataLabels: { enabled: false },
+  }
+
+  const athletes = [
+    { name: 'Sara Kowalski',   sport: 'Running',        recovery: 42, hrv: 47.2, status: 'warning' },
+    { name: 'Marcus Weiden',   sport: 'Cycling',        recovery: 82, hrv: 62.2, status: 'good' },
+    { name: 'James Thornton',  sport: 'Swimming',       recovery: 63, hrv: 32.0, status: 'ok' },
+    { name: 'Linh Nguyen',     sport: 'Weight Training',recovery: 80, hrv: 106.5,status: 'good' },
+  ]
+
+  return (
+    <div className="flex flex-col gap-6 pf-enter">
+      <div>
+        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Coach View</p>
+        <h2 className="pf-num text-[36px] text-foreground leading-none">
+          Welcome back, {name.split(' ')[0]} 👋
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
+        {[
+          { label: 'Active Athletes', value: '4',  icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Avg Team Recovery', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
+          { label: 'Sessions Today',   value: '3',  icon: 'ki-calendar',      bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Alerts',           value: '1',  icon: 'ki-notification',  bg: 'bg-red-50 text-red-500' },
+        ].map(c => (
+          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
+                <i className={`ki-filled ${c.icon} text-base`} />
+              </div>
+            </div>
+            <span className="pf-num text-4xl text-foreground">{c.value}</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {DEMO_SESSIONS.slice(0, 5).map((s, i) => {
-              const tc = TYPE_COLORS[s.type] ?? { bg: '#F7F7F8', text: '#7A7A80', icon: 'ki-abstract-26' }
-              const total = s.z.reduce((a: number, b: number) => a + b, 0) || 1
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="xl:col-span-2 bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">Athlete Status</h3>
+            <a href="/athletes" className="text-2xs font-semibold text-orange-500 hover:text-orange-600">Manage →</a>
+          </div>
+          <div className="divide-y divide-border">
+            {athletes.map(a => {
+              const rc = recoveryColor(a.recovery)
+              const statusIcon = a.status === 'good' ? 'ki-check-circle' : a.status === 'warning' ? 'ki-warning-2' : 'ki-information-2'
+              const statusColor = a.status === 'good' ? 'text-green-500' : a.status === 'warning' ? 'text-orange-500' : 'text-blue-500'
               return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: tc.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <i className={`ki-filled ${tc.icon}`} style={{ fontSize: 13, color: tc.text }} />
+                <div key={a.name} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/50 transition-colors">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num" style={{ background: rc + '20', color: rc }}>
+                    {a.name.split(' ').map((n:string) => n[0]).join('')}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#0A0A0B', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.type}</span>
-                      <span className="pf-num" style={{ fontSize: 18, color: s.strain >= 14 ? '#DC2626' : s.strain >= 10 ? '#F97316' : '#16A34A', flexShrink: 0, marginLeft: 8 }}>{s.strain}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-foreground">{a.name}</div>
+                    <div className="text-2xs text-muted-foreground">{a.sport}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="pf-num text-lg leading-none" style={{ color: rc }}>{a.recovery}%</div>
+                    <div className="text-2xs text-muted-foreground">recovery</div>
+                  </div>
+                  <div className="w-28 hidden sm:block">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-2xs text-muted-foreground">HRV</span>
+                      <span className="text-2xs font-bold text-foreground">{a.hrv} ms</span>
                     </div>
-                    <div style={{ height: 3, background: '#F2F2F3', borderRadius: 2, marginTop: 4 }}>
-                      <div style={{ display: 'flex', height: '100%', borderRadius: 2, overflow: 'hidden', gap: 0.5 }}>
-                        {s.z.map((v: number, zi: number) => v > 0 ? <div key={zi} style={{ flex: v/total*100, background: ZC[zi], minWidth: 1 }} /> : null)}
-                      </div>
+                    <div className="h-1.5 bg-border rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />
                     </div>
                   </div>
+                  <i className={`ki-filled ${statusIcon} text-base ${statusColor} shrink-0`} />
                 </div>
               )
             })}
           </div>
         </div>
+
+        <div className="bg-card border border-border rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-foreground mb-4">Recovery Distribution</h3>
+          <ApexChart
+            type="bar"
+            series={[{ name: 'Recovery %', data: [42, 82, 63, 80] }]}
+            options={barOpts}
+            height={200}
+          />
+        </div>
       </div>
     </div>
   )
 }
 
-// ── COACH ──────────────────────────────────────────────
-function CoachDash({ name }: { name: string }) {
-  const athletes = [
-    { ini:'SK', name:'Sara Kowalski',  sport:'Running',         recovery:42,  hrv:47.2,  rhr:45.8, col:'#2563EB' },
-    { ini:'MW', name:'Marcus Weiden',  sport:'Cycling',         recovery:82,  hrv:62.2,  rhr:52.1, col:'#F97316' },
-    { ini:'JT', name:'James Thornton', sport:'Swimming',        recovery:63,  hrv:32.0,  rhr:73.1, col:'#16A34A' },
-    { ini:'LN', name:'Linh Nguyen',    sport:'Wt. Training',    recovery:80,  hrv:106.5, rhr:55.8, col:'#7C3AED' },
-  ]
+// ──────────────────────────────────────────────
+function AdminDash({ name }: { name: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }} className="pf-enter">
+    <div className="flex flex-col gap-6 pf-enter">
       <div>
-        <div style={{ fontSize: 11, color: '#ADADB3', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>WHOOP Data · Coach View</div>
-        <h2 className="pf-num" style={{ fontSize: 38, color: '#0A0A0B', lineHeight: 1 }}>Coach Dashboard<br /><span style={{ color: '#ADADB3', fontSize: 26 }}>{name}</span></h2>
+        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
+        <h2 className="pf-num text-[36px] text-foreground leading-none">System Overview</h2>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,minmax(0,1fr))', gap: 12 }} className="pf-stagger">
-        <StatCard label="Athletes"       value={4}     icon="ki-people"       iconColor="#2563EB" />
-        <StatCard label="Avg Recovery"   value="67%"   icon="ki-abstract-26"  iconColor="#16A34A" />
-        <StatCard label="Avg HRV"        value={62}    unit="ms" icon="ki-heart" iconColor="#2563EB" sub="WHOOP" />
-        <StatCard label="Total Sessions" value={38}    icon="ki-abstract-17"  iconColor="#F97316" delta={11} />
-      </div>
-
-      {/* Group strain chart */}
-      <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
-          <div>
-            <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Group Day Strain · 8 Weeks</div>
-            <div style={{ fontSize: 12, color: '#7A7A80', marginTop: 2 }}>Real WHOOP day_strain · all athletes</div>
-          </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            {athletes.map((a, i) => (
-              <span key={a.ini} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#7A7A80' }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: AT[i], display: 'inline-block' }} />
-                {a.name.split(' ')[0]}
-              </span>
-            ))}
-          </div>
-        </div>
-        <ApexChart type="bar" height={200}
-          options={{
-            chart: { type: 'bar', toolbar: { show: false }, animations: { enabled: false } },
-            plotOptions: { bar: { borderRadius: 3, columnWidth: '60%' } },
-            colors: AT,
-            xaxis: { categories: DEMO_GROUP.map(d => d.w), labels: { style: { fontSize: '10px', colors: '#ADADB3' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-            yaxis: { labels: { style: { fontSize: '10px', colors: '#ADADB3' } } },
-            grid: { borderColor: '#F2F2F3', strokeDashArray: 4 },
-            legend: { show: false },
-            dataLabels: { enabled: false },
-            tooltip: { theme: 'light' },
-          }}
-          series={[
-            { name: 'Sara',   data: DEMO_GROUP.map(d => d.SK) },
-            { name: 'Marcus', data: DEMO_GROUP.map(d => d.MW) },
-            { name: 'James',  data: DEMO_GROUP.map(d => d.JT) },
-            { name: 'Linh',   data: DEMO_GROUP.map(d => d.LN) },
-          ]}
-        />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 12 }}>
-        {athletes.map((a, i) => {
-          const rc2 = recoveryColor(a.recovery)
-          return (
-            <div key={a.ini} style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '16px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: AT[i] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: AT[i], flexShrink: 0 }}>{a.ini}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, color: '#0A0A0B', fontSize: 13 }}>{a.name}</div>
-                  <div style={{ fontSize: 11, color: '#ADADB3' }}>{a.sport}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="pf-num" style={{ fontSize: 28, color: rc2, lineHeight: 1 }}>{a.recovery}%</div>
-                  <div style={{ fontSize: 9, color: '#ADADB3', textTransform: 'uppercase', letterSpacing: '0.06em' }}>recovery</div>
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 6 }}>
-                {[{ v: a.hrv, u: 'HRV ms', c: '#2563EB' }, { v: a.rhr, u: 'RHR bpm', c: '#DC2626' }, { v: '-', u: 'Sessions', c: '#7A7A80' }].map(({ v, u, c }) => (
-                  <div key={u} style={{ background: '#F7F7F8', borderRadius: 8, padding: '8px 8px', textAlign: 'center' }}>
-                    <div className="pf-num" style={{ fontSize: 18, color: c }}>{v}</div>
-                    <div style={{ fontSize: 8, color: '#ADADB3', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{u}</div>
-                  </div>
-                ))}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
+        {[
+          { label: 'Total Users',    value: '3',      icon: 'ki-people',       bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Athletes',       value: '1',      icon: 'ki-abstract-26',  bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Coaches',        value: '1',      icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
+          { label: 'WHOOP Records',  value: '100K',   icon: 'ki-chart-line-up',bg: 'bg-violet-50 text-violet-600' },
+        ].map(c => (
+          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
+                <i className={`ki-filled ${c.icon} text-base`} />
               </div>
             </div>
-          )
-        })}
+            <span className="pf-num text-4xl text-foreground">{c.value}</span>
+          </div>
+        ))}
       </div>
-    </div>
-  )
-}
 
-// ── ADMIN ───────────────────────────────────────────────
-function AdminDash() {
-  const tables = ['users','workouts','athletes','daily_metrics','cycle_blocks','competitions','workout_comments','observation_diary','trainer_athletes']
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }} className="pf-enter">
-      <div>
-        <div style={{ fontSize: 11, color: '#ADADB3', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>Supabase · atlet-pro · eu-central-1</div>
-        <h2 className="pf-num" style={{ fontSize: 38, color: '#0A0A0B' }}>Admin Overview</h2>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,minmax(0,1fr))', gap: 12 }} className="pf-stagger">
-        <StatCard label="Dataset"      value="100K" unit="records" icon="ki-abstract-28"  iconColor="#2563EB" />
-        <StatCard label="Unique Users" value={286}               icon="ki-people"        iconColor="#F97316" />
-        <StatCard label="DB Tables"    value={9}                 icon="ki-abstract-22"   iconColor="#16A34A" sub="All RLS enabled" />
-        <StatCard label="Migrations"   value={3}                 icon="ki-setting-2"     iconColor="#7C3AED" sub="All applied" highlight />
-      </div>
-      <div style={{ background: '#fff', border: '1.5px solid #EBEBEC', borderRadius: 14, padding: '20px 22px' }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>Schema — public</div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr>{['Table','RLS','Policies','Status'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '6px 12px', fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.08em', textTransform: 'uppercase', borderBottom: '1.5px solid #EBEBEC' }}>{h}</th>
-              ))}</tr>
-            </thead>
-            <tbody>
-              {tables.map((t, i) => (
-                <tr key={t} style={{ background: i%2 ? '#FAFAFA' : 'transparent' }}>
-                  <td style={{ padding: '9px 12px', fontFamily: 'monospace', fontSize: 12, color: '#0A0A0B', borderBottom: '1px solid #F2F2F3' }}>{t}</td>
-                  <td style={{ padding: '9px 12px', borderBottom: '1px solid #F2F2F3' }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 10, background: '#F0FDF4', color: '#16A34A' }}>ON</span>
-                  </td>
-                  <td style={{ padding: '9px 12px', fontSize: 12, color: '#7A7A80', borderBottom: '1px solid #F2F2F3' }}>
-                    {t === 'workouts' ? '4' : t === 'users' ? '3' : '2'}
-                  </td>
-                  <td style={{ padding: '9px 12px', borderBottom: '1px solid #F2F2F3' }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 10, background: '#EFF6FF', color: '#2563EB' }}>Active</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">System Health</h3>
+        </div>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { label: 'Supabase DB',       status: 'Online',  color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+            { label: 'WHOOP Data Sync',   status: 'Active',  color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+            { label: 'Auth Service',      status: 'Healthy', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+          ].map(s => (
+            <div key={s.label} className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
+              <span className={`w-2 h-2 rounded-full ${s.color} shrink-0`} />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-foreground">{s.label}</div>
+              </div>
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold border ${s.badge}`}>
+                {s.status}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
+
+      <div className="flex justify-center">
+        <a href="/admin" className="kt-btn kt-btn-primary gap-2">
+          <i className="ki-filled ki-setting-2 text-sm" />
+          Go to Admin Panel
+        </a>
+      </div>
     </div>
   )
 }
 
-// ── ROOT ────────────────────────────────────────────────
+// ──────────────────────────────────────────────
 export default function DashboardPage() {
   const { user, loading } = useUser()
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 12 }}>
-      <div style={{ width: 28, height: 28, border: '2px solid #EBEBEC', borderTopColor: '#F97316', borderRadius: '50%' }} className="pf-spin" />
-      <span style={{ fontSize: 12, color: '#ADADB3' }}>Loading dashboard…</span>
-    </div>
-  )
-  if (!user) return null
-  if (user.role === 'coach') return <CoachDash name={user.name} />
-  if (user.role === 'admin') return <AdminDash />
-  return <AthleteDash name={user.name} />
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+          <span className="text-2sm text-muted-foreground">Loading your data…</span>
+        </div>
+      </div>
+    )
+  }
+
+  const name = user?.name ?? 'Athlete'
+
+  if (user?.role === 'coach') return <CoachDash name={name} />
+  if (user?.role === 'admin') return <AdminDash name={name} />
+  return <AthleteDash name={name} />
 }
