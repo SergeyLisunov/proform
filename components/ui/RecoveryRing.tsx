@@ -1,5 +1,5 @@
 function recoveryColor(v: number) {
-  return v >= 67 ? '#16A34A' : v >= 34 ? '#F97316' : '#DC2626'
+  return v >= 67 ? '#22C55E' : v >= 34 ? '#F97316' : '#EF4444'
 }
 function recoveryLabel(v: number) {
   return v >= 67 ? 'Ready to train' : v >= 34 ? 'Moderate effort' : 'Take it easy'
@@ -8,32 +8,38 @@ function recoveryLabel(v: number) {
 interface RecoveryRingProps {
   score: number
   size?: number
+  dark?: boolean
 }
 
-export function RecoveryRing({ score, size = 100 }: RecoveryRingProps) {
-  const r = (size / 2) * 0.72
+export function RecoveryRing({ score, size = 110, dark = false }: RecoveryRingProps) {
+  const r = (size / 2) * 0.74
   const circ = 2 * Math.PI * r
   const dash = (score / 100) * circ
   const color = recoveryColor(score)
+  const bg = dark ? '#1c1c1f' : '#F4F4F5'
+  const textCol = dark ? '#fff' : '#09090B'
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative" style={{ width: size, height: size }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+      <div style={{ position: 'relative', width: size, height: size }}>
         <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#F1F5F9" strokeWidth={size * 0.1} />
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={bg} strokeWidth={size * 0.09} />
           <circle
             cx={size/2} cy={size/2} r={r} fill="none"
-            stroke={color} strokeWidth={size * 0.1}
+            stroke={color} strokeWidth={size * 0.09}
             strokeDasharray={`${dash} ${circ - dash}`}
             strokeLinecap="round"
-            style={{ transition: 'stroke-dasharray 0.6s ease' }}
+            style={{ transition: 'stroke-dasharray 0.6s ease, stroke 0.4s ease', filter: `drop-shadow(0 0 6px ${color}66)` }}
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="pf-num leading-none" style={{ fontSize: size * 0.28, color }}>{score}%</span>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+          <span className="pf-num" style={{ fontSize: size * 0.27, color, lineHeight: 1 }}>{score}</span>
+          <span style={{ fontSize: size * 0.09, color: dark ? '#52525B' : '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>%</span>
         </div>
       </div>
-      <span className="text-xs font-medium" style={{ color }}>{recoveryLabel(score)}</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+        {recoveryLabel(score)}
+      </span>
     </div>
   )
 }

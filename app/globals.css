@@ -2,62 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Load Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+/* ── Fonts ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
+/* ── Design tokens ──────────────────────────────── */
 :root {
-  --pf-orange: #F97316;
-  --pf-orange-light: #FFF7ED;
-  --pf-orange-mid: #FFEDD5;
-  --pf-blue: #2563EB;
-  --pf-blue-light: #EFF6FF;
-  --pf-blue-mid: #DBEAFE;
-  --pf-green: #16A34A;
-  --pf-red: #DC2626;
-  --pf-purple: #7C3AED;
-  --pf-bg: #F8FAFC;
-  --pf-card: #FFFFFF;
-  --pf-border: #E2E8F0;
-  --pf-border-light: #F1F5F9;
-  --pf-text: #0F172A;
-  --pf-text-mid: #64748B;
-  --pf-text-light: #94A3B8;
-  --sidebar-w: 240px;
+  /* Brand */
+  --orange:      #F97316;
+  --orange-dim:  #7c3810;
+  --blue:        #60A5FA;
+
+  /* Surface (light content area) */
+  --bg:          #F4F4F5;
+  --card:        #FFFFFF;
+  --border:      #E4E4E7;
+  --border-mid:  #D4D4D8;
+
+  /* Text */
+  --text-1:      #09090B;
+  --text-2:      #3F3F46;
+  --text-3:      #71717A;
+  --text-4:      #A1A1AA;
+
+  /* Sidebar (dark) */
+  --sb-bg:       #111113;
+  --sb-border:   #1c1c1f;
+  --sb-text:     #71717A;
+  --sb-text-dim: #3f3f46;
+
+  /* Semantic */
+  --green:       #22C55E;
+  --red:         #EF4444;
+  --purple:      #A78BFA;
+  --amber:       #FBBF24;
 }
 
+/* ── Base ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-  background-color: var(--pf-bg);
-  color: var(--pf-text);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.6;
 }
+button { font-family: inherit; }
 
+/* ── Bebas display numbers ──────────────────────── */
 .pf-num {
   font-family: 'Bebas Neue', 'Impact', sans-serif;
   letter-spacing: 0.02em;
+  line-height: 1;
 }
 
-.pf-stat-card {
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+/* ── Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
+
+/* ── Cards ──────────────────────────────────────── */
+.pf-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
 }
-.pf-stat-card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+
+/* ── Stat card hover ────────────────────────────── */
+.pf-stat {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  cursor: default;
+}
+.pf-stat:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   transform: translateY(-1px);
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-
+/* ── Page enter animation ───────────────────────── */
 @keyframes pf-fade-up {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.pf-page-enter { animation: pf-fade-up 0.28s ease both; }
+.pf-enter { animation: pf-fade-up 0.3s ease both; }
 
-.pf-stagger > * { animation: pf-fade-up 0.28s ease both; }
+/* Staggered children */
+.pf-stagger > * { animation: pf-fade-up 0.3s ease both; }
 .pf-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.pf-stagger > *:nth-child(2) { animation-delay: 50ms; }
-.pf-stagger > *:nth-child(3) { animation-delay: 100ms; }
-.pf-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.pf-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.pf-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.pf-stagger > *:nth-child(4) { animation-delay: 165ms; }
+.pf-stagger > *:nth-child(5) { animation-delay: 220ms; }
+.pf-stagger > *:nth-child(6) { animation-delay: 275ms; }
+
+/* ── Spin for loaders ───────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.pf-spin { animation: spin 0.7s linear infinite; }
+
+/* ── Zone bar ───────────────────────────────────── */
+.pf-zone { height: 6px; border-radius: 4px; overflow: hidden; display: flex; gap: 1px; }
+.pf-zone > div { min-width: 2px; transition: flex 0.3s ease; }
+
+/* ── Badge ──────────────────────────────────────── */
+.pf-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.04em;
+}
