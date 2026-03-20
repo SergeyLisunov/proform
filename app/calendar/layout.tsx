@@ -3,7 +3,7 @@ import TopBar from '@/components/layout/TopBar'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex grow w-full" style={{ background: '#F7F7F8', minHeight: '100vh' }}>
+    <div className="flex grow w-full" style={{ background: '#F4F4F5', minHeight: '100vh' }}>
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0 lg:ms-[240px]">
         <TopBar />
