@@ -2,64 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-
-:root {
-  --or:   #F97316;
-  --or-l: #FFF7ED;
-  --or-m: #FFEDD5;
-  --bl:   #2563EB;
-  --bl-l: #EFF6FF;
-  --bg:   #F4F4F5;
-  --card: #FFFFFF;
-  --bd:   #E4E4E7;
-  --bd-m: #D4D4D8;
-  --t1:   #09090B;
-  --t2:   #3F3F46;
-  --t3:   #71717A;
-  --t4:   #A1A1AA;
-  --gn:   #22C55E;
-  --rd:   #EF4444;
-  --pu:   #A78BFA;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--t1);
-  -webkit-font-smoothing: antialiased;
-  font-size: 14px;
-}
-button { font-family: inherit; }
+/* ProForm custom utilities on top of Metronic */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 .pf-num {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
   letter-spacing: 0.02em;
   line-height: 1;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 2px; }
+body {
+  font-family: 'DM Sans', var(--font-sans, system-ui), sans-serif;
+}
 
-@keyframes pf-up {
-  from { opacity: 0; transform: translateY(10px); }
+/* Animations */
+@keyframes pf-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.pf-enter { animation: pf-up 0.28s ease both; }
-.pf-stagger > * { animation: pf-up 0.28s ease both; }
+.pf-enter { animation: pf-fade-up 0.25s ease both; }
+.pf-stagger > * { animation: pf-fade-up 0.25s ease both; }
 .pf-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.pf-stagger > *:nth-child(2) { animation-delay: 60ms; }
-.pf-stagger > *:nth-child(3) { animation-delay: 120ms; }
-.pf-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.pf-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.pf-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.pf-stagger > *:nth-child(4) { animation-delay: 165ms; }
+.pf-stagger > *:nth-child(5) { animation-delay: 220ms; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .pf-spin { animation: spin 0.7s linear infinite; }
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-  50%       { opacity: .7; box-shadow: 0 0 0 4px rgba(34,197,94,0); }
-}
-.pf-pulse { animation: pulse-dot 2s ease infinite; }

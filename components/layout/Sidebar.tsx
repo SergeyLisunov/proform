@@ -1,4 +1,5 @@
 'use client'
+
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -6,19 +7,19 @@ import { useUser } from '@/lib/hooks/useUser'
 import type { UserRole } from '@/types/database'
 
 const NAV = [
-  { href: '/dashboard', icon: 'ki-element-11',     label: 'Dashboard',      roles: null },
-  { href: '/calendar',  icon: 'ki-calendar',        label: 'Calendar',       roles: null },
-  { href: '/diary',     icon: 'ki-book-open',       label: 'Training Diary', roles: ['athlete','admin'] as string[] },
-  { href: '/diary',     icon: 'ki-notepad-edit',    label: 'Obs. Diary',     roles: ['coach'] as string[] },
-  { href: '/analytics', icon: 'ki-chart-line-up',   label: 'Analytics',      roles: null },
-  { href: '/athletes',  icon: 'ki-people',          label: 'My Athletes',    roles: ['coach'] as string[] },
-  { href: '/admin',     icon: 'ki-setting-2',       label: 'Admin',          roles: ['admin'] as string[] },
+  { href: '/dashboard', icon: 'ki-element-11',   label: 'Dashboard',      roles: null },
+  { href: '/calendar',  icon: 'ki-calendar',      label: 'Calendar',       roles: null },
+  { href: '/diary',     icon: 'ki-book-open',     label: 'Training Diary', roles: ['athlete', 'admin'] as string[] },
+  { href: '/diary',     icon: 'ki-notepad-edit',  label: 'Obs. Diary',     roles: ['coach'] as string[] },
+  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Analytics',      roles: null },
+  { href: '/athletes',  icon: 'ki-people',        label: 'My Athletes',    roles: ['coach'] as string[] },
+  { href: '/admin',     icon: 'ki-setting-2',     label: 'Admin',          roles: ['admin'] as string[] },
 ]
 
-const ROLE_BADGE: Record<UserRole, { c: string; bg: string }> = {
-  athlete: { c: '#F97316', bg: '#fff3e8' },
-  coach:   { c: '#16A34A', bg: '#F0FDF4' },
-  admin:   { c: '#7C3AED', bg: '#F5F3FF' },
+const ROLE_COLORS: Record<UserRole, { text: string; bg: string }> = {
+  athlete: { text: '#F97316', bg: '#fff3e8' },
+  coach:   { text: '#16A34A', bg: '#F0FDF4' },
+  admin:   { text: '#7C3AED', bg: '#F5F3FF' },
 }
 
 export default function Sidebar() {
@@ -42,92 +43,110 @@ export default function Sidebar() {
     router.push('/auth/login')
   }
 
-  const rb = user ? ROLE_BADGE[user.role] : null
+  const rc = user ? ROLE_COLORS[user.role] : null
 
   return (
     <div
       id="sidebar"
+      className="kt-sidebar bg-background border-e border-e-border fixed top-0 bottom-0 z-20 hidden lg:flex flex-col items-stretch shrink-0"
       data-kt-drawer="true"
       data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
-      style={{
-        width: 232, flexShrink: 0,
-        background: '#fff',
-        borderRight: '1px solid #EBEBEC',
-        display: 'flex', flexDirection: 'column',
-        position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 20,
-      }}
-      className="hidden lg:flex"
+      style={{ '--kt-sidebar-border-color': '#F1F1F4' } as React.CSSProperties}
     >
-      {/* Logo */}
-      <div style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F2F2F3' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 30, height: 30, background: '#F97316', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <i className="ki-filled ki-abstract-26" style={{ color: '#fff', fontSize: 13 }} />
+      {/* Sidebar Header */}
+      <div className="kt-sidebar-header hidden lg:flex items-center justify-between px-6 shrink-0 border-b border-b-border" id="sidebar_header"
+        style={{ height: 'var(--header-height, 70px)' }}>
+        <Link href="/dashboard" className="flex items-center gap-2.5 no-underline">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: '#F97316' }}>
+            <i className="ki-filled ki-abstract-26 text-white text-sm" />
           </div>
-          <span className="pf-num" style={{ fontSize: 19, color: '#0A0A0B', letterSpacing: '0.05em' }}>ProForm</span>
-        </div>
+          <span className="pf-num text-xl text-foreground tracking-wide">ProForm</span>
+        </Link>
         <button
           id="sidebar_toggle"
+          className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline size-[30px]"
           data-kt-toggle="body"
           data-kt-toggle-class="kt-sidebar-collapse"
-          style={{ width: 24, height: 24, borderRadius: 5, background: 'transparent', border: '1px solid #EBEBEC', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ADADB3' }}
         >
-          <i className="ki-filled ki-black-left" style={{ fontSize: 10 }} />
+          <i className="ki-filled ki-black-left-line text-xs kt-toggle-active:rotate-180 transition-all duration-300" />
         </button>
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 10px' }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: '#ADADB3', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '4px 10px 8px' }}>Menu</div>
-        {visible.map(item => {
-          const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
-          return (
-            <Link key={item.href + item.label} href={item.href} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px', borderRadius: 9, marginBottom: 1,
-              background: active ? '#FFF3E8' : 'transparent',
-              borderLeft: `3px solid ${active ? '#F97316' : 'transparent'}`,
-              transition: 'all .12s',
-              color: 'inherit',
-            }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#F7F7F8' }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
-            >
-              <i className={`ki-filled ${item.icon}`} style={{ fontSize: 14, color: active ? '#F97316' : '#ADADB3', flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: active ? 600 : 400, color: active ? '#F97316' : '#3D3D40' }}>{item.label}</span>
-            </Link>
-          )
-        })}
+      {/* Sidebar Content */}
+      <div className="kt-sidebar-content flex grow shrink-0 py-4" id="sidebar_content">
+        <div
+          className="kt-scrollable-y-hover grow shrink-0 flex px-4"
+          data-kt-scrollable="true"
+          data-kt-scrollable-dependencies="#sidebar_header"
+          data-kt-scrollable-height="auto"
+          data-kt-scrollable-wrappers="#sidebar_content"
+          id="sidebar_scrollable"
+        >
+          <div className="kt-menu flex flex-col gap-0.5 grow" data-kt-menu="true">
 
-        {/* WHOOP badge */}
-        <div style={{ margin: '16px 4px 0', padding: '10px 12px', background: '#F7F7F8', border: '1px solid #EBEBEC', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#16A34A', flexShrink: 0 }} className="pf-pulse" />
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', letterSpacing: '0.07em', textTransform: 'uppercase', lineHeight: 1 }}>WHOOP Live</div>
-            <div style={{ fontSize: 10, color: '#ADADB3', marginTop: 2 }}>100,000 records</div>
+            {/* Section label */}
+            <div className="px-2 pt-1 pb-2">
+              <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Menu</span>
+            </div>
+
+            {/* Nav items */}
+            {visible.map(item => {
+              const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+              return (
+                <div key={item.href + item.label} className="kt-menu-item">
+                  <Link
+                    href={item.href}
+                    className={`kt-menu-link flex items-center gap-2.5 py-2.5 px-3 rounded-lg border text-sm font-medium transition-all ${
+                      active
+                        ? 'border-orange-200 text-orange-600 bg-orange-50'
+                        : 'border-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                  >
+                    <span className="kt-menu-icon flex items-center justify-center w-5 shrink-0">
+                      <i className={`ki-filled ${item.icon} text-base ${active ? 'text-orange-500' : 'text-muted-foreground'}`} />
+                    </span>
+                    <span className="kt-menu-title">{item.label}</span>
+                    {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />}
+                  </Link>
+                </div>
+              )
+            })}
+
+            {/* WHOOP badge */}
+            <div className="mt-4 mx-1 px-3 py-2.5 rounded-xl border" style={{ background: '#F0FDF4', borderColor: '#BBF7D0' }}>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
+                <div>
+                  <div className="text-2xs font-bold text-green-600 uppercase tracking-wide leading-none">WHOOP Live</div>
+                  <div className="text-2xs text-green-500 mt-0.5">100,000 records</div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* User */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid #F2F2F3' }}>
-        {user && rb && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-              background: rb.bg, border: `1.5px solid ${rb.c}30`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, color: rb.c,
-            }}>
+      {/* User footer */}
+      <div className="px-4 py-3 border-t border-t-border shrink-0">
+        {user && rc && (
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
+              style={{ background: rc.bg, color: rc.text, fontFamily: "'Bebas Neue', sans-serif" }}
+            >
               {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#0A0A0B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: rb.c, letterSpacing: '0.07em', textTransform: 'uppercase', marginTop: 1 }}>{user.role}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-foreground truncate">{user.name}</div>
+              <div className="text-2xs font-bold uppercase tracking-wide mt-0.5" style={{ color: rc.text }}>{user.role}</div>
             </div>
-            <button onClick={signOut} title="Sign out"
-              style={{ width: 26, height: 26, borderRadius: 6, background: 'transparent', border: '1px solid #EBEBEC', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ADADB3', flexShrink: 0 }}>
-              <i className="ki-filled ki-exit-right" style={{ fontSize: 11 }} />
+            <button
+              onClick={signOut}
+              className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost w-7 h-7 shrink-0"
+              title="Sign out"
+            >
+              <i className="ki-filled ki-exit-right text-xs text-muted-foreground" />
             </button>
           </div>
         )}
