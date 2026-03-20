@@ -1,13 +1,12 @@
 import Sidebar from '@/components/layout/Sidebar'
 import TopBar from '@/components/layout/TopBar'
-
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex grow w-full" style={{ background: '#F4F4F5', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#F7F7F8' }}>
       <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0 lg:ms-[240px]">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 0 }} className="lg:ms-[232px]">
         <TopBar />
-        <main className="flex-1 p-6">{children}</main>
+        <main style={{ flex: 1, padding: '24px' }}>{children}</main>
       </div>
     </div>
   )
