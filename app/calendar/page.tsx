@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, DEMO_CYCLES, CYCLE_COLORS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import { useUser } from '@/lib/hooks/useUser'
-import { createCalendarEvent, deleteCalendarEvent, EVENT_TYPES, type CalendarEvent, type EventType } from '@/services/calendar.service'
+import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, EVENT_TYPES, type CalendarEvent, type EventType } from '@/services/calendar.service'
 
 type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
@@ -342,11 +342,12 @@ function WeekView({ year, month, weekStart, onSelect, selected }: { year: number
 }
 
 // ── DETAIL PANEL ──────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
+function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEvent }: {
   dateStr: string
   savedEvents: CalendarEvent[]
   onAddEvent: (date: string) => void
   onDeleteEvent: (id: string) => void
+  onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
 }) {
   const session = DEMO_SESSIONS.find(s => s.date === dateStr)
   const comp = DEMO_COMPETITIONS.find(c => c.date === dateStr)
@@ -434,7 +435,7 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
             {savedEvents.filter(e => e.event_date === dateStr).map(ev => {
               const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
               return (
-                <div key={ev.id} className="flex items-start gap-2 px-2.5 py-2 rounded-lg border border-border hover:bg-accent/30 transition-colors group">
+                <div key={ev.id} onClick={() => onViewEvent?.(ev, 'view')} className="flex items-start gap-2 px-2.5 py-2 rounded-lg border border-border hover:bg-accent/30 transition-colors group cursor-pointer">
                   <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
                     <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
                   </div>
@@ -446,7 +447,7 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
                     {ev.notes && <div className="text-[10px] text-muted-foreground truncate mt-0.5">{ev.notes}</div>}
                   </div>
                   <button
-                    onClick={() => onDeleteEvent(ev.id)}
+                    onClick={e => { e.stopPropagation(); onDeleteEvent(ev.id) }}
                     className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
                   >
                     <i className="ki-filled ki-trash text-xs text-muted-foreground" />
@@ -472,49 +473,51 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
   )
 }
 
-// ── ADD EVENT DRAWER (right-side sheet) ───────────────────────────────────────
+// ── ADD / VIEW / EDIT EVENT DRAWER (right-side sheet) ─────────────────────────
 interface AddEventDrawerProps {
   initialDate: string
   ownerId: string
   onClose: () => void
   onCreated: (event: CalendarEvent) => void
+  mode?: 'create' | 'view' | 'edit'
+  initialEvent?: CalendarEvent
+  onUpdated?: (event: CalendarEvent) => void
+  onDeleted?: (id: string) => void
 }
 
-function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDrawerProps) {
+function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'create', initialEvent, onUpdated, onDeleted }: AddEventDrawerProps) {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [drawerMode, setDrawerMode] = useState<'create' | 'view' | 'edit'>(mode)
   const [form, setForm] = useState({
-    event_date: initialDate,
-    event_type: 'workout' as EventType,
-    title:      '',
-    notes:      '',
-    start_time: '',
-    end_time:   '',
+    event_date: initialEvent?.event_date ?? initialDate,
+    event_type: (initialEvent?.event_type ?? 'workout') as EventType,
+    title:      initialEvent?.title ?? '',
+    notes:      initialEvent?.notes ?? '',
+    start_time: initialEvent?.start_time ?? '',
+    end_time:   initialEvent?.end_time ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const titleRef = useRef<HTMLInputElement>(null)
 
-  // Mount → Portal available; then trigger slide-in animation
   useEffect(() => {
     setMounted(true)
     const t = setTimeout(() => setVisible(true), 10)
     return () => clearTimeout(t)
   }, [])
 
-  // Lock body scroll while open (typeof guard prevents SSR crash)
   useEffect(() => {
     if (typeof document === 'undefined') return
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  // Focus title on open
   useEffect(() => {
-    if (visible) setTimeout(() => titleRef.current?.focus(), 150)
-  }, [visible])
+    if (visible && drawerMode !== 'view') setTimeout(() => titleRef.current?.focus(), 150)
+  }, [visible, drawerMode])
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     window.addEventListener('keydown', handler)
@@ -526,14 +529,10 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
     setTimeout(onClose, 260)
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
     if (!form.title.trim()) { setError('Title is required'); return }
-    setSaving(true)
-    setError('')
-    // DEBUG: inspect owner_id before INSERT
-    console.log('owner_id being sent:', ownerId)
-    console.log('user object from useUser:', ownerId ? '(passed as prop)' : 'MISSING — user.id is undefined')
+    setSaving(true); setError('')
     const result = await createCalendarEvent({
       owner_id:   ownerId,
       event_date: form.event_date,
@@ -543,16 +542,39 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
       start_time: form.start_time || null,
       end_time:   form.end_time || null,
     })
-    if (!result) {
-      setError('Failed to save event. Check your Supabase RLS policies.')
-      setSaving(false)
-      return
-    }
+    if (!result) { setError('Failed to save event. Check your Supabase RLS policies.'); setSaving(false); return }
     onCreated(result)
     handleClose()
   }
 
+  async function handleUpdate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.title.trim()) { setError('Title is required'); return }
+    if (!initialEvent) return
+    setSaving(true); setError('')
+    const result = await updateCalendarEvent(initialEvent.id, {
+      event_date: form.event_date,
+      event_type: form.event_type,
+      title:      form.title.trim(),
+      notes:      form.notes.trim() || null,
+      start_time: form.start_time || null,
+      end_time:   form.end_time || null,
+    })
+    if (!result) { setError('Failed to update event.'); setSaving(false); return }
+    onUpdated?.(result)
+    handleClose()
+  }
+
+  async function handleDelete() {
+    if (!initialEvent) return
+    await deleteCalendarEvent(initialEvent.id)
+    onDeleted?.(initialEvent.id)
+    handleClose()
+  }
+
   const selectedType = EVENT_TYPES.find(t => t.value === form.event_type)
+
+  const headerTitle = drawerMode === 'create' ? 'Add Event' : drawerMode === 'edit' ? 'Edit Event' : (initialEvent?.title ?? 'Event')
 
   if (!mounted) return null
 
@@ -560,12 +582,9 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
     <div
       aria-modal="true"
       role="dialog"
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        display: 'flex', justifyContent: 'flex-end',
-      }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}
     >
-      {/* Backdrop — solid dark overlay, not transparent */}
+      {/* Backdrop */}
       <div
         onClick={handleClose}
         style={{
@@ -577,240 +596,197 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
         }}
       />
 
-      {/* Sheet panel sliding from the right */}
+      {/* Sheet panel */}
       <div
         style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 440,
-          height: '100%',
-          backgroundColor: 'white',
-          boxShadow: '-8px 0 40px rgba(0,0,0,0.18)',
-          display: 'flex',
-          flexDirection: 'column',
+          position: 'relative', width: '100%', maxWidth: 440, height: '100%',
+          backgroundColor: 'white', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)',
+          display: 'flex', flexDirection: 'column',
           transform: visible ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)',
         }}
       >
-        {/* Sheet header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px 16px',
-          borderBottom: '1px solid #E2E8F0',
-        }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #E2E8F0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {selectedType && (
-              <div style={{
-                width: 36, height: 36, borderRadius: 10,
-                background: selectedType.color + '18',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <i className={`ki-filled ${selectedType.icon}`}
-                  style={{ color: selectedType.color, fontSize: 16 }} />
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: selectedType.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <i className={`ki-filled ${selectedType.icon}`} style={{ color: selectedType.color, fontSize: 16 }} />
               </div>
             )}
             <div>
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>
-                Calendar
-              </p>
-              <h2 className="pf-num" style={{ fontSize: 22, color: '#0F172A', lineHeight: 1 }}>
-                Add Event
-              </h2>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>Calendar</p>
+              <h2 className="pf-num" style={{ fontSize: 22, color: '#0F172A', lineHeight: 1 }}>{headerTitle}</h2>
             </div>
           </div>
-          <button
-            onClick={handleClose}
-            className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
-            aria-label="Close"
-          >
+          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Close">
             <i className="ki-filled ki-cross" style={{ fontSize: 14 }} />
           </button>
         </div>
 
-        {/* Scrollable form body */}
+        {/* Body */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px 24px' }}>
-          {error && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '10px 14px', borderRadius: 12, marginBottom: 16,
-              background: '#FEF2F2', border: '1px solid #FECACA',
-              fontSize: 13, color: '#DC2626',
-            }}>
-              <i className="ki-filled ki-information-5" style={{ color: '#EF4444', flexShrink: 0 }} />
-              {error}
+
+          {/* ── VIEW MODE ── */}
+          {drawerMode === 'view' && initialEvent && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Type badge */}
+              {selectedType && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 20, background: selectedType.color + '12', border: `1.5px solid ${selectedType.color}30`, alignSelf: 'flex-start' }}>
+                  <i className={`ki-filled ${selectedType.icon}`} style={{ color: selectedType.color, fontSize: 12 }} />
+                  <span style={{ fontSize: 12, fontWeight: 700, color: selectedType.color }}>{selectedType.label}</span>
+                </div>
+              )}
+
+              {/* Fields */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <Field label="Title" value={initialEvent.title} />
+                <Field label="Date" value={new Date(initialEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} />
+                {(initialEvent.start_time || initialEvent.end_time) && (
+                  <Field label="Time" value={[initialEvent.start_time, initialEvent.end_time].filter(Boolean).join(' – ')} />
+                )}
+                {initialEvent.notes && <Field label="Notes" value={initialEvent.notes} multiline />}
+              </div>
+
+              {/* Confirm delete inline */}
+              {confirmDelete && (
+                <div style={{ padding: '14px 16px', borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginBottom: 10 }}>Delete this event?</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={handleDelete} style={{ flex: 1, padding: '9px 0', borderRadius: 10, background: '#DC2626', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                      Yes, delete
+                    </button>
+                    <button onClick={() => setConfirmDelete(false)} style={{ padding: '9px 14px', borderRadius: 10, background: '#F1F5F9', color: '#64748B', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              {!confirmDelete && (
+                <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
+                  <button
+                    onClick={() => setDrawerMode('edit')}
+                    style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: '#F97316', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                  >
+                    <i className="ki-filled ki-pencil" style={{ marginRight: 6, fontSize: 12 }} />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    style={{ padding: '11px 14px', borderRadius: 12, background: '#FEF2F2', color: '#DC2626', fontSize: 14, fontWeight: 600, border: '1.5px solid #FECACA', cursor: 'pointer' }}
+                  >
+                    <i className="ki-filled ki-trash" style={{ fontSize: 14 }} />
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* ── CREATE / EDIT MODE ── */}
+          {(drawerMode === 'create' || drawerMode === 'edit') && (
+            <>
+              {error && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, marginBottom: 16, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 13, color: '#DC2626' }}>
+                  <i className="ki-filled ki-information-5" style={{ color: '#EF4444', flexShrink: 0 }} />
+                  {error}
+                </div>
+              )}
 
-            {/* ── Event type grid ── */}
-            <div>
-              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-                Event type
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-                {EVENT_TYPES.map(t => {
-                  const active = form.event_type === t.value
-                  return (
-                    <button
-                      key={t.value}
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, event_type: t.value }))}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '8px 10px', borderRadius: 10, textAlign: 'left',
-                        border: active ? `2px solid ${t.color}` : '1.5px solid #E2E8F0',
-                        background: active ? t.color + '12' : '#FAFAFA',
-                        color: active ? t.color : '#64748B',
-                        fontSize: 11, fontWeight: 600,
-                        cursor: 'pointer', transition: 'all 0.15s',
-                      }}
-                    >
-                      <i className={`ki-filled ${t.icon}`} style={{ fontSize: 12, color: active ? t.color : '#94A3B8', flexShrink: 0 }} />
-                      {t.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+              <form onSubmit={drawerMode === 'edit' ? handleUpdate : handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-            {/* ── Title ── */}
-            <div>
-              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                Title <span style={{ color: '#F97316' }}>*</span>
-              </label>
-              <input
-                ref={titleRef}
-                type="text"
-                value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                required
-                placeholder="e.g. Morning run, City marathon…"
-                style={{
-                  width: '100%', borderRadius: 12,
-                  border: '1.5px solid #E2E8F0',
-                  padding: '10px 14px', fontSize: 14,
-                  outline: 'none', transition: 'border-color 0.15s',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={e => (e.target.style.borderColor = '#F97316')}
-                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
-              />
-            </div>
+                {/* Event type grid */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Event type</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                    {EVENT_TYPES.map(t => {
+                      const active = form.event_type === t.value
+                      return (
+                        <button key={t.value} type="button" onClick={() => setForm(f => ({ ...f, event_type: t.value }))}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 10px', borderRadius: 10, textAlign: 'left', border: active ? `2px solid ${t.color}` : '1.5px solid #E2E8F0', background: active ? t.color + '12' : '#FAFAFA', color: active ? t.color : '#64748B', fontSize: 11, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}>
+                          <i className={`ki-filled ${t.icon}`} style={{ fontSize: 12, color: active ? t.color : '#94A3B8', flexShrink: 0 }} />
+                          {t.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
 
-            {/* ── Date ── */}
-            <div>
-              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                Date
-              </label>
-              <input
-                type="date"
-                value={form.event_date}
-                onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
-                required
-                style={{
-                  width: '100%', borderRadius: 12,
-                  border: '1.5px solid #E2E8F0',
-                  padding: '10px 14px', fontSize: 14,
-                  outline: 'none', boxSizing: 'border-box',
-                }}
-                onFocus={e => (e.target.style.borderColor = '#F97316')}
-                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
-              />
-            </div>
+                {/* Title */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                    Title <span style={{ color: '#F97316' }}>*</span>
+                  </label>
+                  <input ref={titleRef} type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="e.g. Morning run, City marathon…"
+                    style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', transition: 'border-color 0.15s', boxSizing: 'border-box' }}
+                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
+                </div>
 
-            {/* ── Start / End time ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                  Start time
-                </label>
-                <input
-                  type="time"
-                  value={form.start_time}
-                  onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
-                  style={{
-                    width: '100%', borderRadius: 12,
-                    border: '1.5px solid #E2E8F0',
-                    padding: '10px 14px', fontSize: 14,
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = '#F97316')}
-                  onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                  End time
-                </label>
-                <input
-                  type="time"
-                  value={form.end_time}
-                  onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
-                  style={{
-                    width: '100%', borderRadius: 12,
-                    border: '1.5px solid #E2E8F0',
-                    padding: '10px 14px', fontSize: 14,
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = '#F97316')}
-                  onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
-                />
-              </div>
-            </div>
+                {/* Date */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Date</label>
+                  <input type="date" value={form.event_date} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} required
+                    style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
+                </div>
 
-            {/* ── Notes ── */}
-            <div>
-              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                Notes
-              </label>
-              <textarea
-                value={form.notes}
-                onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                rows={3}
-                placeholder="Optional notes…"
-                style={{
-                  width: '100%', borderRadius: 12,
-                  border: '1.5px solid #E2E8F0',
-                  padding: '10px 14px', fontSize: 14,
-                  outline: 'none', resize: 'none',
-                  boxSizing: 'border-box', fontFamily: 'inherit',
-                }}
-                onFocus={e => (e.target.style.borderColor = '#F97316')}
-                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
-              />
-            </div>
+                {/* Time */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Start time</label>
+                    <input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
+                      style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                      onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>End time</label>
+                    <input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
+                      style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                      onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
+                  </div>
+                </div>
 
-            {/* ── Actions (pinned at bottom of scrollable area) ── */}
-            <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
-              <button
-                type="submit"
-                disabled={saving}
-                style={{
-                  flex: 1, padding: '11px 0', borderRadius: 12,
-                  background: saving ? '#FDA96A' : '#F97316',
-                  color: '#fff', fontSize: 14, fontWeight: 600,
-                  border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.15s',
-                }}
-              >
-                {saving ? 'Saving…' : 'Save event'}
-              </button>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="kt-btn kt-btn-outline"
-                style={{ flexShrink: 0 }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+                {/* Notes */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Notes</label>
+                  <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} placeholder="Optional notes…"
+                    style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
+                  <button type="submit" disabled={saving}
+                    style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? '#FDA96A' : '#F97316', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', transition: 'background 0.15s' }}>
+                    {saving ? 'Saving…' : drawerMode === 'edit' ? 'Save changes' : 'Save event'}
+                  </button>
+                  <button type="button"
+                    onClick={() => drawerMode === 'edit' && initialEvent ? setDrawerMode('view') : handleClose()}
+                    className="kt-btn kt-btn-outline" style={{ flexShrink: 0 }}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>,
     document.body
+  )
+}
+
+// Small read-only field for view mode
+function Field({ label, value, multiline }: { label: string; value: string; multiline?: boolean }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <span style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+      {multiline
+        ? <p style={{ fontSize: 14, color: '#0F172A', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{value}</p>
+        : <span style={{ fontSize: 14, color: '#0F172A', fontWeight: 500 }}>{value}</span>
+      }
+    </div>
   )
 }
 
@@ -825,24 +801,36 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState<string | null>('2025-01-13')
   const [filterType, setFilterType] = useState<string>('all')
 
-  // Add Event modal
+  // Add / View / Edit Event drawer
   const [showAddEvent, setShowAddEvent] = useState(false)
   const [addEventDate, setAddEventDate] = useState<string>(today.toISOString().slice(0, 10))
   const [savedEvents, setSavedEvents] = useState<CalendarEvent[]>([])
+  const [eventDrawerEvent, setEventDrawerEvent] = useState<CalendarEvent | null>(null)
+  const [eventDrawerMode, setEventDrawerMode] = useState<'view' | 'edit'>('view')
 
   const openAddEvent = useCallback((date?: string) => {
     setAddEventDate(date ?? today.toISOString().slice(0, 10))
     setShowAddEvent(true)
   }, [today])
 
+  const openEventDrawer = useCallback((event: CalendarEvent, mode: 'view' | 'edit' = 'view') => {
+    setEventDrawerEvent(event)
+    setEventDrawerMode(mode)
+  }, [])
+
   const handleEventCreated = useCallback((event: CalendarEvent) => {
     setSavedEvents(prev => [...prev, event])
+  }, [])
+
+  const handleEventUpdated = useCallback((updated: CalendarEvent) => {
+    setSavedEvents(prev => prev.map(e => e.id === updated.id ? updated : e))
   }, [])
 
   const handleDeleteEvent = useCallback(async (id: string) => {
     await deleteCalendarEvent(id)
     setSavedEvents(prev => prev.filter(e => e.id !== id))
-  }, [])
+    if (eventDrawerEvent?.id === id) setEventDrawerEvent(null)
+  }, [eventDrawerEvent])
 
   // For week view
   const weekStart = useMemo(() => {
@@ -979,6 +967,7 @@ export default function CalendarPage() {
             savedEvents={savedEvents}
             onAddEvent={openAddEvent}
             onDeleteEvent={handleDeleteEvent}
+            onViewEvent={openEventDrawer}
           />
         )}
       </div>
@@ -991,7 +980,7 @@ export default function CalendarPage() {
             {savedEvents.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map(ev => {
               const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
               return (
-                <div key={ev.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border hover:bg-accent/30 group transition-colors">
+                <div key={ev.id} onClick={() => openEventDrawer(ev, 'view')} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border hover:bg-accent/30 group transition-colors cursor-pointer">
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
                     <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
                   </div>
@@ -1004,7 +993,7 @@ export default function CalendarPage() {
                     {ev.start_time && ` · ${ev.start_time}`}
                   </span>
                   <button
-                    onClick={() => handleDeleteEvent(ev.id)}
+                    onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }}
                     className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0"
                   >
                     <i className="ki-filled ki-trash text-xs text-muted-foreground" />
@@ -1049,6 +1038,20 @@ export default function CalendarPage() {
           ownerId={user.id}
           onClose={() => setShowAddEvent(false)}
           onCreated={handleEventCreated}
+        />
+      )}
+
+      {/* View / Edit Event Drawer */}
+      {eventDrawerEvent && user && (
+        <AddEventDrawer
+          initialDate={eventDrawerEvent.event_date}
+          ownerId={user.id}
+          mode={eventDrawerMode}
+          initialEvent={eventDrawerEvent}
+          onClose={() => setEventDrawerEvent(null)}
+          onCreated={handleEventCreated}
+          onUpdated={event => { handleEventUpdated(event); setEventDrawerEvent(null) }}
+          onDeleted={id => { handleDeleteEvent(id); setEventDrawerEvent(null) }}
         />
       )}
     </div>

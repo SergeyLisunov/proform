@@ -61,6 +61,30 @@ export async function createCalendarEvent(event: {
   return data
 }
 
+export async function updateCalendarEvent(id: string, data: {
+  event_date?: string
+  event_type?: EventType
+  title?: string
+  notes?: string | null
+  start_time?: string | null
+  end_time?: string | null
+}): Promise<CalendarEvent | null> {
+  const supabase = createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: result, error } = await (supabase as any)
+    .from('calendar_events')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single() as { data: CalendarEvent | null; error: { message: string } | null }
+
+  if (error) {
+    console.error('updateCalendarEvent error:', error.message)
+    return null
+  }
+  return result
+}
+
 export async function deleteCalendarEvent(id: string): Promise<void> {
   const supabase = createClient()
   await supabase.from('calendar_events').delete().eq('id', id)
