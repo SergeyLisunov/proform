@@ -10,18 +10,20 @@ import type { UserRole } from '@/types/database'
 
 const NAV = [
   { href: '/dashboard', icon: 'ki-element-11',   label: 'Dashboard',      roles: null },
-  { href: '/calendar',  icon: 'ki-calendar',      label: 'Calendar',       roles: null },
+  { href: '/calendar',  icon: 'ki-calendar',      label: 'Calendar',       roles: ['athlete', 'coach', 'admin'] as string[] },
   { href: '/diary',     icon: 'ki-book-open',     label: 'Training Diary', roles: ['athlete', 'admin'] as string[] },
   { href: '/diary',     icon: 'ki-notepad-edit',  label: 'Obs. Diary',     roles: ['coach'] as string[] },
-  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Analytics',      roles: null },
+  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Analytics',      roles: ['athlete', 'coach', 'admin'] as string[] },
   { href: '/athletes',  icon: 'ki-people',        label: 'My Athletes',    roles: ['coach', 'admin'] as string[] },
+  { href: '/org',       icon: 'ki-office-bag',    label: 'Организация',    roles: ['organization'] as string[] },
   { href: '/admin',     icon: 'ki-setting-2',     label: 'Admin',          roles: ['admin'] as string[] },
 ]
 
 const ROLES: { value: UserRole; label: string; icon: string; bg: string; text: string; border: string }[] = [
-  { value: 'athlete', label: 'Athlete', icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
-  { value: 'coach',   label: 'Coach',   icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
-  { value: 'admin',   label: 'Admin',   icon: 'ki-setting-2',    bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
+  { value: 'athlete',      label: 'Athlete',      icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  { value: 'coach',        label: 'Coach',        icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
+  { value: 'admin',        label: 'Admin',        icon: 'ki-setting-2',    bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
+  { value: 'organization', label: 'Organization', icon: 'ki-office-bag',   bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
 ]
 
 export default function Sidebar() {
@@ -35,7 +37,7 @@ export default function Sidebar() {
     if (!user) return false
     if (item.href === '/diary') {
       if (item.roles.includes('coach') && user.role === 'coach') return true
-      if (item.roles.includes('athlete') && user.role !== 'coach') return true
+      if (item.roles.includes('athlete') && (user.role === 'athlete' || user.role === 'admin')) return true
       return false
     }
     return item.roles.includes(user.role)
@@ -227,9 +229,10 @@ export default function Sidebar() {
                     <div className="flex-1">
                       <div className="text-sm font-semibold text-foreground">{role.label}</div>
                       <div className="text-2xs text-muted-foreground">
-                        {role.value === 'athlete' && 'Training diary, metrics, calendar'}
-                        {role.value === 'coach'   && 'Athlete coaching, diary, analysis'}
-                        {role.value === 'admin'   && 'System admin, users, audit logs'}
+                        {role.value === 'athlete'      && 'Training diary, metrics, calendar'}
+                        {role.value === 'coach'        && 'Athlete coaching, diary, analysis'}
+                        {role.value === 'admin'        && 'System admin, users, audit logs'}
+                        {role.value === 'organization' && 'Org dashboard, wall, newsletters'}
                       </div>
                     </div>
 

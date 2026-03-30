@@ -25,10 +25,17 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isPublic = request.nextUrl.pathname === '/'
+  const pathname = request.nextUrl.pathname
+  const isAuthRoute = pathname.startsWith('/auth')
+  const isPublic = pathname === '/'
 
-  if (!user && !isAuthRoute && !isPublic) {
+  // Public org pages: /[orgSlug] — single-segment paths that are not known app routes
+  const knownRoutes = ['/dashboard', '/calendar', '/diary', '/analytics', '/athletes', '/admin', '/org', '/auth', '/api']
+  const isOrgPublicPage =
+    !knownRoutes.some(r => pathname === r || pathname.startsWith(r + '/')) &&
+    /^\/[a-z0-9-]+$/.test(pathname)
+
+  if (!user && !isAuthRoute && !isPublic && !isOrgPublicPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
