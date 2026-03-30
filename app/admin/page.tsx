@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 
 type AdminTab = 'users' | 'audit' | 'system' | 'privacy'
@@ -60,6 +61,8 @@ export default function AdminPage() {
     { id: 'system',  label: 'System',     icon: 'ki-setting-2' },
   ]
 
+  // Quick link to /admin/orgs
+
   return (
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
@@ -71,6 +74,14 @@ export default function AdminPage() {
           <i className="ki-filled ki-people text-sm" />
           Assign Athlete
         </button>
+      </div>
+
+      {/* Quick links */}
+      <div className="flex gap-3 flex-wrap">
+        <Link href="/admin/orgs" className="kt-btn kt-btn-outline gap-2">
+          <i className="ki-filled ki-office-bag text-sm" />
+          Manage Organizations
+        </Link>
       </div>
 
       {/* Stats */}

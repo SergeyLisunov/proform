@@ -3,18 +3,24 @@ import { usePathname } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 
 const TITLES: Record<string, { title: string; sub: string }> = {
-  '/dashboard': { title: 'Dashboard',      sub: 'Overview of your training' },
-  '/calendar':  { title: 'Calendar',       sub: 'Training schedule & events' },
-  '/diary':     { title: 'Training Diary', sub: 'Sessions & observations' },
-  '/analytics': { title: 'Analytics',      sub: 'Performance insights' },
-  '/athletes':  { title: 'My Athletes',    sub: 'Coaching panel' },
-  '/admin':     { title: 'Admin Panel',    sub: 'System administration' },
+  '/dashboard':          { title: 'Dashboard',      sub: 'Overview of your training' },
+  '/calendar':           { title: 'Calendar',       sub: 'Training schedule & events' },
+  '/diary':              { title: 'Training Diary', sub: 'Sessions & observations' },
+  '/analytics':          { title: 'Analytics',      sub: 'Performance insights' },
+  '/athletes':           { title: 'My Athletes',    sub: 'Coaching panel' },
+  '/admin/orgs':         { title: 'Organizations',  sub: 'Verify and manage organizations' },
+  '/admin':              { title: 'Admin Panel',    sub: 'System administration' },
+  '/org/members':        { title: 'Members',        sub: 'Manage organization members' },
+  '/org/wall':           { title: 'Wall',           sub: 'Posts and announcements' },
+  '/org/newsletters':    { title: 'Newsletters',    sub: 'Mailing to members' },
+  '/org':                { title: 'Organization',   sub: 'Your organization dashboard' },
 }
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  athlete: { bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
-  coach:   { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
-  admin:   { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
+  athlete:      { bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  coach:        { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
+  admin:        { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
+  organization: { bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
 }
 
 export default function TopBar() {
