@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 
@@ -26,6 +27,13 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> 
 export default function TopBar() {
   const pathname = usePathname()
   const { user } = useUser()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   const meta = Object.entries(TITLES).find(([k]) => pathname === k || pathname.startsWith(k + '/'))?.[1]
   const title = meta?.title ?? 'ProForm'
   const sub = meta?.sub ?? ''
@@ -35,10 +43,12 @@ export default function TopBar() {
   return (
     <header
       id="header"
-      className="kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-card border-b border-b-border"
-      data-kt-sticky="true"
-      data-kt-sticky-class="shadow-sm"
-      data-kt-sticky-name="header"
+      className={[
+        'kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 transition-all duration-200',
+        scrolled
+          ? 'bg-card border-b border-b-border shadow-sm'
+          : 'bg-card/80 backdrop-blur-md border-b border-b-transparent',
+      ].join(' ')}
     >
       <div className="kt-container-fixed flex justify-between items-center px-5 lg:px-8 gap-4 w-full" id="headerContainer">
 
