@@ -8,7 +8,7 @@ import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_GROUP, DEMO_ATHLETES, DEMO_COMP
 
 const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
 const ZL = ['Z1','Z2','Z3','Z4','Z5']
-const PERIOD_OPTS = ['7d','30d','90d','Season']
+const PERIOD_OPTS = ['7д','30д','90д','Сезон']
 
 function CoachAnalytics() {
   const [period, setPeriod] = useState('30d')
@@ -28,7 +28,7 @@ function CoachAnalytics() {
   const loadCompare = {
     chart: { type: 'radar' as const, toolbar: { show: false }, animations: { enabled: false } },
     colors: ['#2563EB','#F97316','#16A34A','#7C3AED'],
-    xaxis: { categories: ['Strain','HRV','Recovery','Sessions','Sleep','Streak'] },
+    xaxis: { categories: ['Нагрузка','ВСР','Восстановление','Тренировки','Сон','Серия'] },
     yaxis: { show: false },
     grid: { padding: { top: 10, bottom: 10 } },
     legend: { position: 'bottom' as const, fontFamily: 'DM Sans', fontSize: '12px' },
@@ -40,8 +40,8 @@ function CoachAnalytics() {
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Team Analytics</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Coach Analytics</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Аналитика команды</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Аналитика тренера</h2>
         </div>
         <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-lg">
           {PERIOD_OPTS.map(p => (
@@ -55,10 +55,10 @@ function CoachAnalytics() {
       {/* Team KPIs */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: 'Avg Team Recovery', value: `${Math.round(DEMO_ATHLETES.reduce((a,b)=>a+b.recovery,0)/DEMO_ATHLETES.length)}%`, bg: 'bg-green-50 text-green-600', icon: 'ki-abstract-26' },
-          { label: 'Avg HRV',           value: `${(DEMO_ATHLETES.reduce((a,b)=>a+b.hrv,0)/DEMO_ATHLETES.length).toFixed(0)} ms`, bg: 'bg-blue-50 text-blue-600', icon: 'ki-heart-circle' },
-          { label: 'Athletes at Risk',  value: DEMO_ATHLETES.filter(a=>a.risk!=='low').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-warning-2' },
-          { label: 'Total Sessions',    value: DEMO_ATHLETES.reduce((a,b)=>a+b.sessions,0), bg: 'bg-violet-50 text-violet-600', icon: 'ki-calendar' },
+          { label: 'Ср. восстановление', value: `${Math.round(DEMO_ATHLETES.reduce((a,b)=>a+b.recovery,0)/DEMO_ATHLETES.length)}%`, bg: 'bg-green-50 text-green-600', icon: 'ki-abstract-26' },
+          { label: 'Ср. ВСР',           value: `${(DEMO_ATHLETES.reduce((a,b)=>a+b.hrv,0)/DEMO_ATHLETES.length).toFixed(0)} ms`, bg: 'bg-blue-50 text-blue-600', icon: 'ki-heart-circle' },
+          { label: 'В зоне риска',      value: DEMO_ATHLETES.filter(a=>a.risk!=='low').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-warning-2' },
+          { label: 'Всего тренировок',  value: DEMO_ATHLETES.reduce((a,b)=>a+b.sessions,0), bg: 'bg-violet-50 text-violet-600', icon: 'ki-calendar' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
@@ -90,7 +90,7 @@ function CoachAnalytics() {
                 </div>
                 <div className="flex-1">
                   <div className="text-2xs font-bold text-foreground">{a.sessions}</div>
-                  <div className="text-[9px] text-muted-foreground">sessions</div>
+                  <div className="text-[9px] text-muted-foreground">тренировок</div>
                 </div>
               </div>
             </div>
@@ -102,8 +102,8 @@ function CoachAnalytics() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-xl p-5">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Weekly Strain by Athlete</h3>
-            <p className="text-2xs text-muted-foreground mt-0.5">Comparison over 8 weeks</p>
+            <h3 className="text-sm font-semibold text-foreground">Недельная нагрузка по атлетам</h3>
+            <p className="text-2xs text-muted-foreground mt-0.5">Сравнение за 8 недель</p>
           </div>
           <ApexChart type="bar"
             series={[
@@ -117,8 +117,8 @@ function CoachAnalytics() {
 
         <div className="bg-card border border-border rounded-xl p-5">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Load Comparison Radar</h3>
-            <p className="text-2xs text-muted-foreground mt-0.5">Normalised athlete load metrics</p>
+            <h3 className="text-sm font-semibold text-foreground">Сравнение нагрузок (радар)</h3>
+            <p className="text-2xs text-muted-foreground mt-0.5">Нормализованные метрики атлетов</p>
           </div>
           <ApexChart type="radar"
             series={[
@@ -165,9 +165,9 @@ function AthleteAnalytics() {
   const donutOpts = {
     chart: { type: 'donut' as const, toolbar: { show: false }, animations: { enabled: false } },
     colors: ZC,
-    labels: ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO₂max'],
+    labels: ['Z1 Восстановление','Z2 Аэробная','Z3 Темп','Z4 Порог','Z5 VO₂max'],
     legend: { position: 'bottom' as const, fontSize: '12px', fontFamily: 'DM Sans' },
-    plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '13px', fontFamily: 'DM Sans', color: '#A1A1AA' } } } } },
+    plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Итого', fontSize: '13px', fontFamily: 'DM Sans', color: '#A1A1AA' } } } } },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
@@ -177,7 +177,7 @@ function AthleteAnalytics() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Sara Kowalski · USER_00011</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Analytics</h2>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Аналитика</h2>
         </div>
         <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-lg">
           {PERIOD_OPTS.map(p => (
@@ -191,10 +191,10 @@ function AthleteAnalytics() {
       {/* KPIs */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: '8-wk Avg Recovery', value: '62%',   bg: 'bg-green-50 text-green-600',  icon: 'ki-abstract-26' },
-          { label: 'Avg HRV',           value: '47 ms', bg: 'bg-blue-50 text-blue-600',    icon: 'ki-heart-circle' },
-          { label: 'Avg Strain',        value: '10.4',  bg: 'bg-orange-50 text-orange-500',icon: 'ki-chart-line-up' },
-          { label: 'Avg Sleep',         value: '7.8 h', bg: 'bg-violet-50 text-violet-600',icon: 'ki-moon' },
+          { label: 'Ср. восстановление', value: '62%',   bg: 'bg-green-50 text-green-600',  icon: 'ki-abstract-26' },
+          { label: 'Ср. ВСР',           value: '47 ms', bg: 'bg-blue-50 text-blue-600',    icon: 'ki-heart-circle' },
+          { label: 'Ср. нагрузка',      value: '10.4',  bg: 'bg-orange-50 text-orange-500',icon: 'ki-chart-line-up' },
+          { label: 'Ср. сон',           value: '7.8 ч', bg: 'bg-violet-50 text-violet-600',icon: 'ki-moon' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
@@ -211,28 +211,28 @@ function AthleteAnalytics() {
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-xl p-5">
-          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">Recovery & Strain</h3><p className="text-2xs text-muted-foreground mt-0.5">Daily trend this week</p></div>
+          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">Восстановление и нагрузка</h3><p className="text-2xs text-muted-foreground mt-0.5">Дневной тренд за неделю</p></div>
           <ApexChart type="area"
             series={[
-              { name: 'Recovery %', data: DEMO_DAILY.map(d=>d.recovery) },
-              { name: 'Strain',     data: DEMO_DAILY.map(d=>d.strain) },
+              { name: 'Восстановление %', data: DEMO_DAILY.map(d=>d.recovery) },
+              { name: 'Нагрузка',         data: DEMO_DAILY.map(d=>d.strain) },
             ]}
             options={areaOpts} height={200} />
         </div>
 
         <div className="bg-card border border-border rounded-xl p-5">
-          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">Sleep Breakdown</h3><p className="text-2xs text-muted-foreground mt-0.5">Deep / REM / Light</p></div>
+          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">Структура сна</h3><p className="text-2xs text-muted-foreground mt-0.5">Глубокий / REM / Лёгкий</p></div>
           <ApexChart type="bar"
             series={[
-              { name: 'Deep',  data: [1.2,1.5,0.9,1.8,1.3,2.0,1.5] },
-              { name: 'REM',   data: [1.8,2.1,1.5,2.2,1.9,2.3,2.0] },
-              { name: 'Light', data: [4.0,4.1,3.4,3.7,3.8,4.3,4.8] },
+              { name: 'Глубокий', data: [1.2,1.5,0.9,1.8,1.3,2.0,1.5] },
+              { name: 'REM',      data: [1.8,2.1,1.5,2.2,1.9,2.3,2.0] },
+              { name: 'Лёгкий',  data: [4.0,4.1,3.4,3.7,3.8,4.3,4.8] },
             ]}
             options={sleepBar} height={200} />
         </div>
 
         <div className="bg-card border border-border rounded-xl p-5">
-          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">HR Zone Distribution</h3><p className="text-2xs text-muted-foreground mt-0.5">Weekly time in each zone</p></div>
+          <div className="mb-3"><h3 className="text-sm font-semibold text-foreground">Распределение по зонам пульса</h3><p className="text-2xs text-muted-foreground mt-0.5">Время в каждой зоне за неделю</p></div>
           <ZoneBar zones={DEMO_HRZ} height={28} showLabels />
           <ApexChart type="donut" series={DEMO_HRZ} options={donutOpts} height={200} />
         </div>
@@ -240,10 +240,11 @@ function AthleteAnalytics() {
         {/* Competitions */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-border">
-            <h3 className="text-sm font-semibold text-foreground">Competition Results</h3>
+            <h3 className="text-sm font-semibold text-foreground">Результаты соревнований</h3>
           </div>
           <div className="divide-y divide-border">
             {DEMO_COMPETITIONS.map((c, i) => {
+              const statusLabel = c.status === 'completed' ? 'завершено' : c.status === 'planned' ? 'запланировано' : 'активно'
               const statusBg = c.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' : c.status === 'planned' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-orange-50 text-orange-700 border-orange-200'
               return (
                 <div key={i} className="flex items-center gap-3 px-5 py-3">
@@ -259,7 +260,7 @@ function AthleteAnalytics() {
                     </div>
                   )}
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className={`px-1.5 py-0.5 rounded-full text-2xs font-semibold border capitalize ${statusBg}`}>{c.status}</span>
+                    <span className={`px-1.5 py-0.5 rounded-full text-2xs font-semibold border capitalize ${statusBg}`}>{statusLabel}</span>
                     {c.pb && <span className="px-1.5 py-0.5 rounded-full text-2xs font-bold bg-orange-500 text-white">PB</span>}
                   </div>
                 </div>

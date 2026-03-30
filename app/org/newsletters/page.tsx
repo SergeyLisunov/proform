@@ -94,7 +94,7 @@ export default function OrgNewslettersPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Organization Access Required</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
       </div>
     )
   }
@@ -104,21 +104,21 @@ export default function OrgNewslettersPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Organization</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Newsletters</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Организация</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Рассылки</h2>
           <p className="text-2sm text-muted-foreground mt-1">{org?.org_name}</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          New newsletter
+          Новая рассылка
         </button>
       </div>
 
       {/* Sections */}
       {[
-        { title: 'Drafts', items: drafts, emptyMsg: 'No drafts' },
-        { title: 'Scheduled', items: scheduled, emptyMsg: 'No scheduled newsletters' },
-        { title: 'Sent', items: sent, emptyMsg: 'No sent newsletters yet' },
+        { title: 'Черновики', items: drafts, emptyMsg: 'Черновиков нет' },
+        { title: 'Запланированные', items: scheduled, emptyMsg: 'Запланированных рассылок нет' },
+        { title: 'Отправленные', items: sent, emptyMsg: 'Отправленных рассылок пока нет' },
       ].map(section => (
         <div key={section.title}>
           <div className="flex items-center gap-2 mb-3">
@@ -142,7 +142,7 @@ export default function OrgNewslettersPage() {
                           {nl.status}
                         </span>
                         <span className="text-2xs text-muted-foreground">
-                          To: {nl.target_roles.join(', ')}
+                          Кому: {nl.target_roles.join(', ')}
                         </span>
                       </div>
                       <h4 className="text-sm font-semibold text-foreground truncate">{nl.subject}</h4>
@@ -155,7 +155,7 @@ export default function OrgNewslettersPage() {
                           className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
                         >
                           <i className="ki-filled ki-send text-xs" />
-                          Send now
+                          Отправить
                         </button>
                       )}
                       {nl.status === 'sent' && (
@@ -164,7 +164,7 @@ export default function OrgNewslettersPage() {
                           className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
                         >
                           <i className="ki-filled ki-chart-line-up text-xs" />
-                          Stats
+                          Статистика
                         </Link>
                       )}
                     </div>
@@ -172,10 +172,10 @@ export default function OrgNewslettersPage() {
                   <div className="mt-3 pt-3 border-t border-border">
                     <span className="text-2xs text-muted-foreground">
                       {nl.sent_at
-                        ? `Sent ${new Date(nl.sent_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                        ? `Отправлено ${new Date(nl.sent_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`
                         : nl.scheduled_at
-                        ? `Scheduled for ${new Date(nl.scheduled_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`
-                        : `Created ${new Date(nl.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+                        ? `Запланировано на ${new Date(nl.scheduled_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                        : `Создано ${new Date(nl.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}`}
                     </span>
                   </div>
                 </div>
@@ -193,40 +193,40 @@ export default function OrgNewslettersPage() {
         >
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="pf-num text-xl text-foreground">New newsletter</h3>
+              <h3 className="pf-num text-xl text-foreground">Новая рассылка</h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Subject *</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Тема *</label>
                 <input
                   type="text"
                   value={form.subject}
                   onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
                   required
-                  placeholder="Newsletter subject"
+                  placeholder="Тема рассылки"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
                 />
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Body *</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Текст *</label>
                 <textarea
                   value={form.body}
                   onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                   required
                   rows={6}
-                  placeholder="Write your newsletter…"
+                  placeholder="Текст рассылки…"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none"
                 />
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Send to</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Кому</label>
                 <div className="flex gap-3">
                   {[
-                    { key: 'target_athlete', label: 'Athletes' },
-                    { key: 'target_coach',   label: 'Coaches' },
+                    { key: 'target_athlete', label: 'Атлеты' },
+                    { key: 'target_coach',   label: 'Тренеры' },
                   ].map(({ key, label }) => (
                     <label key={key} className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -242,7 +242,7 @@ export default function OrgNewslettersPage() {
               </div>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                  Schedule date (optional)
+                  Дата отправки (необязательно)
                 </label>
                 <input
                   type="datetime-local"
@@ -257,7 +257,7 @@ export default function OrgNewslettersPage() {
                   disabled={saving || !form.subject || !form.body}
                   className="kt-btn kt-btn-outline flex-1"
                 >
-                  {saving && saveAction === 'draft' ? 'Saving…' : 'Save draft'}
+                  {saving && saveAction === 'draft' ? 'Сохранение…' : 'Сохранить черновик'}
                 </button>
                 {form.scheduled_at && (
                   <button
@@ -265,7 +265,7 @@ export default function OrgNewslettersPage() {
                     disabled={saving || !form.subject || !form.body}
                     className="kt-btn kt-btn-outline flex-1"
                   >
-                    {saving && saveAction === 'schedule' ? 'Scheduling…' : 'Schedule'}
+                    {saving && saveAction === 'schedule' ? 'Планирование…' : 'Запланировать'}
                   </button>
                 )}
                 <button
@@ -273,7 +273,7 @@ export default function OrgNewslettersPage() {
                   disabled={saving || !form.subject || !form.body}
                   className="kt-btn kt-btn-primary flex-1"
                 >
-                  {saving && saveAction === 'send' ? 'Sending…' : 'Send now'}
+                  {saving && saveAction === 'send' ? 'Отправка…' : 'Отправить'}
                 </button>
               </div>
             </div>

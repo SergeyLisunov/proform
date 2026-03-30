@@ -15,9 +15,9 @@ const POST_TYPE_BADGE: Record<PostType, string> = {
 }
 
 const SPORT_LABELS: Record<string, string> = {
-  athletics: 'Athletics', swimming: 'Swimming', cycling: 'Cycling',
-  triathlon: 'Triathlon', football: 'Football', basketball: 'Basketball',
-  tennis: 'Tennis', volleyball: 'Volleyball', wrestling: 'Wrestling', other: 'Sport',
+  athletics: 'Лёгкая атлетика', swimming: 'Плавание', cycling: 'Велоспорт',
+  triathlon: 'Триатлон', football: 'Футбол', basketball: 'Баскетбол',
+  tennis: 'Теннис', volleyball: 'Волейбол', wrestling: 'Борьба', other: 'Спорт',
 }
 
 export default function OrgPublicPage() {
@@ -58,10 +58,10 @@ export default function OrgPublicPage() {
           <i className="ki-filled ki-office-bag text-2xl text-slate-400" />
         </div>
         <div className="text-center">
-          <h1 className="pf-num text-3xl text-foreground mb-2">Organization not found</h1>
-          <p className="text-muted-foreground text-sm">The page <code className="font-mono text-orange-600">/{orgSlug}</code> doesn&apos;t exist.</p>
+          <h1 className="pf-num text-3xl text-foreground mb-2">Организация не найдена</h1>
+          <p className="text-muted-foreground text-sm">Страница <code className="font-mono text-orange-600">/{orgSlug}</code> не существует.</p>
         </div>
-        <Link href="/auth/login" className="kt-btn kt-btn-primary">Go to ProForm</Link>
+        <Link href="/auth/login" className="kt-btn kt-btn-primary">Перейти в ProForm</Link>
       </div>
     )
   }
@@ -86,7 +86,7 @@ export default function OrgPublicPage() {
                 {org!.is_verified && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
                     <i className="ki-filled ki-verify text-xs" />
-                    Verified
+                    Проверено
                   </span>
                 )}
               </div>
@@ -116,7 +116,7 @@ export default function OrgPublicPage() {
           <section>
             <div className="flex items-center gap-2 mb-4">
               <span>📌</span>
-              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Pinned</h2>
+              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Закреплено</h2>
             </div>
             <div className="flex flex-col gap-3">
               {pinned.map(p => <PublicPostCard key={p.id} post={p} />)}
@@ -127,11 +127,11 @@ export default function OrgPublicPage() {
         {/* Feed */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Latest posts</h2>
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Последние публикации</h2>
           </div>
           {feed.length === 0 && pinned.length === 0 ? (
             <div className="bg-card border border-border rounded-xl px-5 py-12 text-center text-muted-foreground text-2sm">
-              No public posts yet.
+              Публичных публикаций пока нет.
             </div>
           ) : feed.length === 0 ? null : (
             <div className="flex flex-col gap-3">
@@ -145,7 +145,7 @@ export default function OrgPublicPage() {
       <div className="border-t border-border mt-10">
         <div className="max-w-3xl mx-auto px-5 py-6 flex items-center justify-between text-2xs text-muted-foreground">
           <span>Powered by <Link href="/" className="text-orange-600 font-semibold hover:underline">ProForm</Link></span>
-          <Link href="/auth/login" className="text-orange-600 font-semibold hover:underline">Sign in →</Link>
+          <Link href="/auth/login" className="text-orange-600 font-semibold hover:underline">Войти →</Link>
         </div>
       </div>
     </div>

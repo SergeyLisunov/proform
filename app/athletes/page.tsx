@@ -56,15 +56,15 @@ function AthleteCard({ athlete, onSelect, selected }: { athlete: typeof DEMO_ATH
       <div className="flex gap-4 mt-3 pt-2.5 border-t border-border text-center">
         <div className="flex-1">
           <div className="pf-num text-lg text-foreground">{athlete.sessions}</div>
-          <div className="text-[9px] text-muted-foreground">sessions</div>
+          <div className="text-[9px] text-muted-foreground">сессий</div>
         </div>
         <div className="flex-1">
-          <div className="pf-num text-lg text-foreground">{athlete.streak}d</div>
-          <div className="text-[9px] text-muted-foreground">streak</div>
+          <div className="pf-num text-lg text-foreground">{athlete.streak}д</div>
+          <div className="text-[9px] text-muted-foreground">серия</div>
         </div>
         <div className="flex-1">
           <div className="pf-num text-lg" style={{ color: rc }}>{athlete.recovery}%</div>
-          <div className="text-[9px] text-muted-foreground">recovery</div>
+          <div className="text-[9px] text-muted-foreground">восстановление</div>
         </div>
       </div>
     </div>
@@ -88,10 +88,10 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
   }
 
   const TABS: { id: TabType; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview',  icon: 'ki-element-11' },
-    { id: 'sessions', label: 'Sessions',  icon: 'ki-abstract-26' },
-    { id: 'diary',    label: 'Diary',     icon: 'ki-notepad-edit' },
-    { id: 'marks',    label: 'Marks',     icon: 'ki-tag' },
+    { id: 'overview', label: 'Обзор',       icon: 'ki-element-11' },
+    { id: 'sessions', label: 'Тренировки',  icon: 'ki-abstract-26' },
+    { id: 'diary',    label: 'Дневник',     icon: 'ki-notepad-edit' },
+    { id: 'marks',    label: 'Метки',       icon: 'ki-tag' },
   ]
 
   return (
@@ -103,16 +103,16 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
         </div>
         <div className="flex-1">
           <h3 className="text-base font-semibold text-foreground">{athlete.name}</h3>
-          <p className="text-2xs text-muted-foreground">{athlete.sport} · Age {athlete.age} · {athlete.gender === 'F' ? 'Female' : 'Male'} · {athlete.id}</p>
+          <p className="text-2xs text-muted-foreground">{athlete.sport} · Возраст {athlete.age} · {athlete.gender === 'F' ? 'Женщина' : 'Мужчина'} · {athlete.id}</p>
         </div>
         <div className="flex gap-2">
           <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
             <i className="ki-filled ki-message-text text-xs" />
-            Comment
+            Комментарий
           </button>
           <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
             <i className="ki-filled ki-eye text-xs" />
-            Profile
+            Профиль
           </button>
         </div>
       </div>
@@ -140,10 +140,10 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
             {/* KPIs */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
               {[
-                { label: 'Recovery', value: `${athlete.recovery}%`, color: rc },
-                { label: 'HRV',     value: `${athlete.hrv} ms`,   color: '#2563EB' },
-                { label: 'RHR',     value: `${athlete.rhr} bpm`,  color: '#EF4444' },
-                { label: 'Streak',  value: `${athlete.streak}d`,  color: '#7C3AED' },
+                { label: 'Восстановление', value: `${athlete.recovery}%`, color: rc },
+                { label: 'ВСР',          value: `${athlete.hrv} ms`,   color: '#2563EB' },
+                { label: 'ЧСС покоя',    value: `${athlete.rhr} bpm`,  color: '#EF4444' },
+                { label: 'Серия',        value: `${athlete.streak}д`,  color: '#7C3AED' },
               ].map(k => (
                 <div key={k.label} className="bg-background border border-border rounded-xl p-3 text-center">
                   <div className="pf-num text-2xl leading-none mb-0.5" style={{ color: k.color }}>{k.value}</div>
@@ -154,13 +154,13 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
 
             {/* Risk Cards */}
             <div>
-              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Risk Assessment</div>
+              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Оценка рисков</div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { label: 'Overload Risk',       status: athlete.risk === 'high' ? 'high' : 'low',      icon: 'ki-warning-2' },
-                  { label: 'Under-Recovery',       status: athlete.recovery < 50 ? 'moderate' : 'low',   icon: 'ki-abstract-26' },
-                  { label: 'Instability Pattern',  status: 'low',                                         icon: 'ki-chart-line-up' },
-                  { label: 'Training Load',        status: athlete.streak > 10 ? 'moderate' : 'low',     icon: 'ki-abstract-31' },
+                  { label: 'Риск перегрузки',     status: athlete.risk === 'high' ? 'high' : 'low',      icon: 'ki-warning-2' },
+                  { label: 'Недовосстановление',   status: athlete.recovery < 50 ? 'moderate' : 'low',   icon: 'ki-abstract-26' },
+                  { label: 'Нестабильность',       status: 'low',                                         icon: 'ki-chart-line-up' },
+                  { label: 'Тренировочная нагрузка', status: athlete.streak > 10 ? 'moderate' : 'low',   icon: 'ki-abstract-31' },
                 ].map(r => {
                   const rr = RISK_COLORS[r.status as keyof typeof RISK_COLORS]
                   return (
@@ -178,9 +178,9 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
 
             {/* Trend chart */}
             <div>
-              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Weekly Trend</div>
+              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Недельный тренд</div>
               <ApexChart type="line"
-                series={[{ name: 'Strain', data: [8.2,11.5,7.1,14.2,10.8,6.3,12.1] }, { name: 'HRV (ms)', data: [44,47,45,41,48,50,47] }]}
+                series={[{ name: 'Нагрузка', data: [8.2,11.5,7.1,14.2,10.8,6.3,12.1] }, { name: 'ВСР (ms)', data: [44,47,45,41,48,50,47] }]}
                 options={lineOpts} height={160} />
             </div>
           </div>
@@ -194,11 +194,11 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
                 <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/40">
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-foreground">{s.type}</div>
-                    <div className="text-2xs text-muted-foreground">{s.date} · {s.dur} min</div>
+                    <div className="text-2xs text-muted-foreground">{s.date} · {s.dur} мин</div>
                   </div>
                   <div className="w-24 hidden sm:block">
                     <div className="flex justify-between text-2xs mb-1">
-                      <span className="text-muted-foreground">Strain</span>
+                      <span className="text-muted-foreground">Нагрузка</span>
                       <span className="font-bold text-foreground">{s.strain}</span>
                     </div>
                     <div className="h-1.5 bg-border rounded-full overflow-hidden">
@@ -207,7 +207,7 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
                   </div>
                   <div className="text-right shrink-0">
                     <div className="pf-num text-lg leading-none" style={{ color: r }}>{s.recovery}%</div>
-                    <div className="text-[9px] text-muted-foreground">recovery</div>
+                    <div className="text-[9px] text-muted-foreground">восстановление</div>
                   </div>
                 </div>
               )
@@ -235,7 +235,7 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
 
         {tab === 'marks' && (
           <div className="flex flex-col gap-3">
-            <div className="text-2xs text-muted-foreground">Coach marks applied to training sessions</div>
+            <div className="text-2xs text-muted-foreground">Метки тренера для тренировочных сессий</div>
             {Object.entries(COACH_MARKS).map(([key, mark]) => (
               <div key={key} className="flex items-center justify-between px-3 py-2.5 rounded-xl border" style={{ background: mark.bg, borderColor: mark.text + '30' }}>
                 <div>
@@ -243,7 +243,7 @@ function AthleteDetail({ athlete }: { athlete: typeof DEMO_ATHLETES[0] }) {
                   <div className="text-[9px] text-muted-foreground capitalize">{key.replace('_',' ')}</div>
                 </div>
                 <button className="px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all hover:opacity-80" style={{ background: mark.bg, color: mark.text, borderColor: mark.text + '40' }}>
-                  Apply
+                  Применить
                 </button>
               </div>
             ))}
@@ -265,8 +265,8 @@ export default function AthletesPage() {
           <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-foreground">Access Restricted</p>
-          <p className="text-2sm text-muted-foreground mt-1">This section is for coaches only.</p>
+          <p className="text-sm font-semibold text-foreground">Доступ ограничен</p>
+          <p className="text-2sm text-muted-foreground mt-1">Этот раздел доступен только тренерам.</p>
         </div>
       </div>
     )
@@ -276,22 +276,22 @@ export default function AthletesPage() {
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Coaching Panel</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">My Athletes</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Панель тренера</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Мои атлеты</h2>
         </div>
         <button className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          Add Athlete
+          Добавить атлета
         </button>
       </div>
 
       {/* Summary strip */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: 'Athletes',    value: DEMO_ATHLETES.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
-          { label: 'Avg Recovery', value: `${Math.round(DEMO_ATHLETES.reduce((a,b) => a+b.recovery,0)/DEMO_ATHLETES.length)}%`, bg: 'bg-green-50 text-green-600', icon: 'ki-abstract-26' },
-          { label: 'At Risk',      value: DEMO_ATHLETES.filter(a => a.risk !== 'low').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-warning-2' },
-          { label: 'Active Today', value: 3, bg: 'bg-violet-50 text-violet-600', icon: 'ki-calendar' },
+          { label: 'Атлеты',           value: DEMO_ATHLETES.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
+          { label: 'Ср. восстановление', value: `${Math.round(DEMO_ATHLETES.reduce((a,b) => a+b.recovery,0)/DEMO_ATHLETES.length)}%`, bg: 'bg-green-50 text-green-600', icon: 'ki-abstract-26' },
+          { label: 'В зоне риска',      value: DEMO_ATHLETES.filter(a => a.risk !== 'low').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-warning-2' },
+          { label: 'Активны сегодня',   value: 3, bg: 'bg-violet-50 text-violet-600', icon: 'ki-calendar' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>

@@ -9,21 +9,21 @@ import { useUser } from '@/lib/hooks/useUser'
 import type { UserRole } from '@/types/database'
 
 const NAV = [
-  { href: '/dashboard', icon: 'ki-element-11',   label: 'Dashboard',      roles: null },
-  { href: '/calendar',  icon: 'ki-calendar',      label: 'Calendar',       roles: ['athlete', 'coach', 'admin'] as string[] },
-  { href: '/diary',     icon: 'ki-book-open',     label: 'Training Diary', roles: ['athlete', 'admin'] as string[] },
-  { href: '/diary',     icon: 'ki-notepad-edit',  label: 'Obs. Diary',     roles: ['coach'] as string[] },
-  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Analytics',      roles: ['athlete', 'coach', 'admin'] as string[] },
-  { href: '/athletes',  icon: 'ki-people',        label: 'My Athletes',    roles: ['coach', 'admin'] as string[] },
-  { href: '/org',       icon: 'ki-office-bag',    label: 'Организация',    roles: ['organization'] as string[] },
-  { href: '/admin',     icon: 'ki-setting-2',     label: 'Admin',          roles: ['admin'] as string[] },
+  { href: '/dashboard', icon: 'ki-element-11',   label: 'Главная',           roles: null },
+  { href: '/calendar',  icon: 'ki-calendar',      label: 'Календарь',         roles: ['athlete', 'coach', 'admin'] as string[] },
+  { href: '/diary',     icon: 'ki-book-open',     label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
+  { href: '/diary',     icon: 'ki-notepad-edit',  label: 'Дневник наблюдений', roles: ['coach'] as string[] },
+  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика',         roles: ['athlete', 'coach', 'admin'] as string[] },
+  { href: '/athletes',  icon: 'ki-people',        label: 'Мои атлеты',        roles: ['coach', 'admin'] as string[] },
+  { href: '/org',       icon: 'ki-office-bag',    label: 'Организация',       roles: ['organization'] as string[] },
+  { href: '/admin',     icon: 'ki-setting-2',     label: 'Администратор',     roles: ['admin'] as string[] },
 ]
 
 const ROLES: { value: UserRole; label: string; icon: string; bg: string; text: string; border: string }[] = [
-  { value: 'athlete',      label: 'Athlete',      icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
-  { value: 'coach',        label: 'Coach',        icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
-  { value: 'admin',        label: 'Admin',        icon: 'ki-setting-2',    bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
-  { value: 'organization', label: 'Organization', icon: 'ki-office-bag',   bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
+  { value: 'athlete',      label: 'Атлет',        icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  { value: 'coach',        label: 'Тренер',       icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
+  { value: 'admin',        label: 'Администратор', icon: 'ki-setting-2',    bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
+  { value: 'organization', label: 'Организация',  icon: 'ki-office-bag',   bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
 ]
 
 export default function Sidebar() {
@@ -94,22 +94,22 @@ export default function Sidebar() {
                 <div className="mx-1 mb-3 px-3 py-2 rounded-xl border flex items-center gap-2" style={{ background: currentRole.bg, borderColor: currentRole.border }}>
                   <i className={`ki-filled ${currentRole.icon} text-sm`} style={{ color: currentRole.text }} />
                   <div>
-                    <div className="text-2xs font-bold uppercase tracking-widest" style={{ color: currentRole.text }}>Viewing as</div>
+                    <div className="text-2xs font-bold uppercase tracking-widest" style={{ color: currentRole.text }}>Просмотр как</div>
                     <div className="text-2sm font-semibold" style={{ color: currentRole.text }}>{currentRole.label}</div>
                   </div>
                   <button
                     onClick={() => setShowRolePicker(true)}
                     className="ml-auto px-2 py-1 rounded-lg text-2xs font-semibold transition-all hover:opacity-80 border"
                     style={{ background: currentRole.text + '15', color: currentRole.text, borderColor: currentRole.border }}
-                    title="Switch role"
+                    title="Переключить роль"
                   >
-                    Switch
+                    Переключить
                   </button>
                 </div>
               )}
 
               <div className="px-2 pb-2">
-                <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Navigation</span>
+                <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Навигация</span>
               </div>
 
               {visible.map(item => {
@@ -166,7 +166,7 @@ export default function Sidebar() {
               <button
                 onClick={signOut}
                 className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost w-7 h-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Sign out"
+                title="Выйти"
               >
                 <i className="ki-filled ki-exit-right text-xs text-muted-foreground" />
               </button>
@@ -184,8 +184,8 @@ export default function Sidebar() {
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="pf-num text-xl text-foreground">Switch Role</h3>
-                <p className="text-2xs text-muted-foreground mt-0.5">Select a role to view the app from that perspective</p>
+                <h3 className="pf-num text-xl text-foreground">Переключить роль</h3>
+                <p className="text-2xs text-muted-foreground mt-0.5">Выберите роль для просмотра приложения с этой точки зрения</p>
               </div>
               <button
                 onClick={() => setShowRolePicker(false)}
@@ -229,17 +229,17 @@ export default function Sidebar() {
                     <div className="flex-1">
                       <div className="text-sm font-semibold text-foreground">{role.label}</div>
                       <div className="text-2xs text-muted-foreground">
-                        {role.value === 'athlete'      && 'Training diary, metrics, calendar'}
-                        {role.value === 'coach'        && 'Athlete coaching, diary, analysis'}
-                        {role.value === 'admin'        && 'System admin, users, audit logs'}
-                        {role.value === 'organization' && 'Org dashboard, wall, newsletters'}
+                        {role.value === 'athlete'      && 'Дневник тренировок, метрики, календарь'}
+                        {role.value === 'coach'        && 'Тренировки атлетов, дневник, анализ'}
+                        {role.value === 'admin'        && 'Системное администрирование, пользователи'}
+                        {role.value === 'organization' && 'Дашборд организации, стена, рассылки'}
                       </div>
                     </div>
 
                     {/* Active indicator */}
                     {isActive ? (
                       <span className="px-2 py-0.5 rounded-full text-2xs font-bold" style={{ background: role.text + '18', color: role.text }}>
-                        Active
+                        Активна
                       </span>
                     ) : (
                       <i className="ki-filled ki-right text-muted-foreground/40 text-xs" />
@@ -252,12 +252,12 @@ export default function Sidebar() {
             {switching && (
               <div className="flex items-center justify-center gap-2 mt-4 py-2">
                 <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
-                <span className="text-2sm text-muted-foreground">Switching role…</span>
+                <span className="text-2sm text-muted-foreground">Переключение роли…</span>
               </div>
             )}
 
             <p className="text-2xs text-muted-foreground/60 text-center mt-4">
-              Role changes take effect immediately and persist
+              Изменение роли вступает в силу немедленно
             </p>
           </div>
         </div>

@@ -6,9 +6,9 @@ import { getAllOrgs, verifyOrg } from '@/services/org.service'
 import type { Organization } from '@/types/org.types'
 
 const SPORT_LABELS: Record<string, string> = {
-  athletics: 'Athletics', swimming: 'Swimming', cycling: 'Cycling',
-  triathlon: 'Triathlon', football: 'Football', basketball: 'Basketball',
-  tennis: 'Tennis', volleyball: 'Volleyball', wrestling: 'Wrestling', other: 'Other',
+  athletics: 'Лёгкая атлетика', swimming: 'Плавание', cycling: 'Велоспорт',
+  triathlon: 'Триатлон', football: 'Футбол', basketball: 'Баскетбол',
+  tennis: 'Теннис', volleyball: 'Волейбол', wrestling: 'Борьба', other: 'Другое',
 }
 
 export default function AdminOrgsPage() {
@@ -49,8 +49,8 @@ export default function AdminOrgsPage() {
         <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
           <i className="ki-filled ki-shield-cross text-2xl text-red-400" />
         </div>
-        <p className="text-sm font-semibold text-foreground">Admin Access Required</p>
-        <p className="text-2sm text-muted-foreground">You don&apos;t have permission to access this area.</p>
+        <p className="text-sm font-semibold text-foreground">Требуются права администратора</p>
+        <p className="text-2sm text-muted-foreground">У вас нет доступа к этому разделу.</p>
       </div>
     )
   }
@@ -63,21 +63,21 @@ export default function AdminOrgsPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin · Organizations</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Organizations</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Администратор · Организации</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Организации</h2>
         </div>
         <div className="flex gap-3">
           <div className="bg-card border border-border rounded-xl px-4 py-2 text-center">
             <div className="pf-num text-2xl text-foreground">{orgs.length}</div>
-            <div className="text-2xs text-muted-foreground">Total</div>
+            <div className="text-2xs text-muted-foreground">Всего</div>
           </div>
           <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-2 text-center">
             <div className="pf-num text-2xl text-orange-600">{unverified.length}</div>
-            <div className="text-2xs text-orange-500">Pending</div>
+            <div className="text-2xs text-orange-500">Ожидают</div>
           </div>
           <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-center">
             <div className="pf-num text-2xl text-green-600">{verified.length}</div>
-            <div className="text-2xs text-green-500">Verified</div>
+            <div className="text-2xs text-green-500">Проверено</div>
           </div>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function AdminOrgsPage() {
       {unverified.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Pending verification</span>
+            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Ожидают проверки</span>
             <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 text-2xs font-bold">{unverified.length}</span>
           </div>
           <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -107,12 +107,12 @@ export default function AdminOrgsPage() {
       {/* Verified */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Verified organizations</span>
+          <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Проверенные организации</span>
           <span className="px-1.5 py-0.5 rounded-full bg-green-100 text-green-600 text-2xs font-bold">{verified.length}</span>
         </div>
         {verified.length === 0 ? (
           <div className="bg-card border border-border rounded-xl px-5 py-8 text-center text-muted-foreground text-2sm">
-            No verified organizations yet
+            Проверенных организаций пока нет
           </div>
         ) : (
           <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -142,7 +142,7 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
           {org.is_verified && (
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
               <i className="ki-filled ki-verify text-xs" />
-              Verified
+              Проверено
             </span>
           )}
         </div>
@@ -168,17 +168,17 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
           {verifying ? (
             <>
               <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full pf-spin" />
-              Verifying…
+              Проверка…
             </>
           ) : (
             <>
               <i className="ki-filled ki-verify text-xs" />
-              Verify
+              Верифицировать
             </>
           )}
         </button>
       ) : (
-        <span className="text-2xs text-green-600 font-semibold shrink-0">✓ Verified</span>
+        <span className="text-2xs text-green-600 font-semibold shrink-0">✓ Проверено</span>
       )}
     </div>
   )

@@ -70,7 +70,7 @@ export default function OrgWallPage() {
   async function handleTogglePin(post: WallPost) {
     const pinnedCount = posts.filter(p => p.is_pinned).length
     if (!post.is_pinned && pinnedCount >= 5) {
-      alert('Maximum 5 pinned posts allowed.')
+      alert('Максимум 5 закреплённых публикаций.')
       return
     }
     await togglePin(post.id, !post.is_pinned)
@@ -78,7 +78,7 @@ export default function OrgWallPage() {
   }
 
   async function handleDelete(postId: string) {
-    if (!confirm('Delete this post?')) return
+    if (!confirm('Удалить эту публикацию?')) return
     await softDeletePost(postId)
     setPosts(prev => prev.filter(p => p.id !== postId))
   }
@@ -95,7 +95,7 @@ export default function OrgWallPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Organization Access Required</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
       </div>
     )
   }
@@ -108,13 +108,13 @@ export default function OrgWallPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Organization</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Wall</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Организация</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Стена</h2>
           <p className="text-2sm text-muted-foreground mt-1">{org?.org_name}</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          New post
+          Новая публикация
         </button>
       </div>
 
@@ -123,7 +123,7 @@ export default function OrgWallPage() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm">📌</span>
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Pinned</span>
+            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Закреплено</span>
           </div>
           <div className="flex flex-col gap-3">
             {pinned.map(p => <PostCard key={p.id} post={p} onPin={() => handleTogglePin(p)} onDelete={() => handleDelete(p.id)} />)}
@@ -134,11 +134,11 @@ export default function OrgWallPage() {
       {/* Feed */}
       <div>
         <div className="mb-3">
-          <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">All posts</span>
+          <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Все публикации</span>
         </div>
         {feed.length === 0 && pinned.length === 0 ? (
           <div className="bg-card border border-border rounded-xl px-5 py-12 text-center text-muted-foreground text-2sm">
-            No posts yet. Create the first one!
+            Публикаций пока нет. Создайте первую!
           </div>
         ) : feed.length === 0 ? null : (
           <div className="flex flex-col gap-3">
@@ -155,7 +155,7 @@ export default function OrgWallPage() {
         >
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-2xl">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="pf-num text-xl text-foreground">New post</h3>
+              <h3 className="pf-num text-xl text-foreground">Новая публикация</h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
@@ -163,7 +163,7 @@ export default function OrgWallPage() {
             <form onSubmit={handleCreate} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Type</label>
+                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Тип</label>
                   <select
                     value={form.post_type}
                     onChange={e => setForm(f => ({ ...f, post_type: e.target.value as PostType }))}
@@ -175,43 +175,43 @@ export default function OrgWallPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Visible to</label>
+                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Видимость</label>
                   <select
                     value={form.visible_to}
                     onChange={e => setForm(f => ({ ...f, visible_to: e.target.value as PostVisibility }))}
                     className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 bg-background"
                   >
-                    <option value="all">Everyone (public)</option>
-                    <option value="members">Members only</option>
-                    <option value="coaches">Coaches only</option>
+                    <option value="all">Все (публично)</option>
+                    <option value="members">Только участники</option>
+                    <option value="coaches">Только тренеры</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Title *</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Заголовок *</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   required
-                  placeholder="Post title"
+                  placeholder="Заголовок публикации"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
                 />
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Body *</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Текст *</label>
                 <textarea
                   value={form.body}
                   onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                   required
                   rows={4}
-                  placeholder="Write your post…"
+                  placeholder="Текст публикации…"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none"
                 />
               </div>
               {(form.post_type === 'event') && (
                 <div>
-                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Event date</label>
+                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Дата события</label>
                   <input
                     type="date"
                     value={form.event_date}
@@ -222,9 +222,9 @@ export default function OrgWallPage() {
               )}
               <div className="flex gap-2 pt-1">
                 <button type="submit" disabled={saving} className="flex-1 kt-btn kt-btn-primary">
-                  {saving ? 'Saving…' : 'Publish post'}
+                  {saving ? 'Сохранение…' : 'Опубликовать'}
                 </button>
-                <button type="button" onClick={() => setShowCreate(false)} className="kt-btn kt-btn-outline">Cancel</button>
+                <button type="button" onClick={() => setShowCreate(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>
             </form>
           </div>
@@ -245,7 +245,7 @@ function PostCard({ post, onPin, onDelete }: { post: WallPost; onPin: () => void
               {post.post_type}
             </span>
             <span className="inline-flex px-2 py-0.5 rounded-full text-2xs font-medium bg-slate-100 text-slate-500 capitalize">
-              {post.visible_to === 'all' ? 'Public' : post.visible_to}
+              {post.visible_to === 'all' ? 'Публично' : post.visible_to === 'members' ? 'Участники' : 'Тренеры'}
             </span>
             {post.event_date && (
               <span className="text-2xs text-muted-foreground flex items-center gap-1">
@@ -260,14 +260,14 @@ function PostCard({ post, onPin, onDelete }: { post: WallPost; onPin: () => void
         <div className="flex gap-1 shrink-0">
           <button
             onClick={onPin}
-            title={post.is_pinned ? 'Unpin' : 'Pin'}
+            title={post.is_pinned ? 'Открепить' : 'Закрепить'}
             className={`kt-btn kt-btn-xs kt-btn-icon ${post.is_pinned ? 'kt-btn-primary' : 'kt-btn-outline'}`}
           >
             <i className="ki-filled ki-pin text-xs" />
           </button>
           <button
             onClick={onDelete}
-            title="Delete"
+            title="Удалить"
             className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline hover:!bg-red-50 hover:!border-red-200 hover:!text-red-600"
           >
             <i className="ki-filled ki-trash text-xs" />

@@ -46,7 +46,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Athlete Dashboard</p>
+          <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Дашборд атлета</p>
           <h2 className="pf-num text-3xl text-slate-900 mt-0.5">
             {name.split(' ')[0]} {recovery >= 67 ? '🏃' : recovery >= 34 ? '⚡' : '😴'}
           </h2>
@@ -60,18 +60,18 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
                 <span className="font-bold text-slate-800">{latest.hrv?.toFixed(1)} ms</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-16">Resting HR</span>
+                <span className="text-slate-400 w-16">ЧСС покоя</span>
                 <span className="font-bold text-slate-800">{latest.resting_heart_rate?.toFixed(1)} bpm</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-16">Strain</span>
+                <span className="text-slate-400 w-16">Нагрузка</span>
                 <span className="font-bold" style={{ color: strainColor(latest.day_strain ?? 0) }}>
                   {latest.day_strain?.toFixed(1)} · {strainLabel(latest.day_strain ?? 0)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-16">Sleep</span>
-                <span className="font-bold text-slate-800">{latest.sleep_hours?.toFixed(1)} hrs</span>
+                <span className="text-slate-400 w-16">Сон</span>
+                <span className="font-bold text-slate-800">{latest.sleep_hours?.toFixed(1)} ч</span>
               </div>
             </div>
           </div>
@@ -80,29 +80,29 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pf-stagger">
-        <StatCard label="Avg HRV" value={avg('hrv') ?? '—'} unit="ms" icon="ki-graph-up" iconColor="#2563EB" sub="WHOOP metric" />
-        <StatCard label="Resting HR" value={avg('resting_heart_rate') ?? '—'} unit="bpm" icon="ki-heart" iconColor="#DC2626" />
-        <StatCard label="Avg Sleep" value={avg('sleep_hours') ?? '—'} unit="hrs" icon="ki-moon" iconColor="#7C3AED" />
-        <StatCard label="Calories/day" value={avg('calories_burned') ? Math.round(avg('calories_burned')!).toLocaleString() : '—'} unit="kcal" icon="ki-abstract-26" iconColor="#F97316" />
+        <StatCard label="Ср. ВСР" value={avg('hrv') ?? '—'} unit="ms" icon="ki-graph-up" iconColor="#2563EB" sub="WHOOP метрика" />
+        <StatCard label="ЧСС покоя" value={avg('resting_heart_rate') ?? '—'} unit="bpm" icon="ki-heart" iconColor="#DC2626" />
+        <StatCard label="Ср. сон" value={avg('sleep_hours') ?? '—'} unit="ч" icon="ki-moon" iconColor="#7C3AED" />
+        <StatCard label="Калорий/день" value={avg('calories_burned') ? Math.round(avg('calories_burned')!).toLocaleString() : '—'} unit="ккал" icon="ki-abstract-26" iconColor="#F97316" />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-          <p className="pf-num text-lg text-slate-900 mb-0.5">Weekly Day Strain</p>
-          <p className="text-xs text-slate-400 mb-4">WHOOP day_strain · last 8 weeks</p>
+          <p className="pf-num text-lg text-slate-900 mb-0.5">Недельная нагрузка</p>
+          <p className="text-xs text-slate-400 mb-4">WHOOP day_strain · последние 8 недель</p>
           <StrainChart data={weeklyData} />
         </div>
 
         <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-          <p className="pf-num text-lg text-slate-900 mb-0.5">HR Zone Mix</p>
-          <p className="text-xs text-slate-400 mb-4">Aggregated · recent workouts</p>
+          <p className="pf-num text-lg text-slate-900 mb-0.5">Зоны пульса</p>
+          <p className="text-xs text-slate-400 mb-4">По последним тренировкам</p>
           {workouts?.length ? (() => {
             const totals = [1,2,3,4,5].map(z => workouts.reduce((s, w) => s + ((w as Record<string,number>)[`hr_zone_${z}_min`] ?? 0), 0))
             const grand = totals.reduce((a,b) => a+b, 0) || 1
             const pcts = totals.map(t => Math.round(t/grand*100))
             const COLORS = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
-            const LABELS = ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO₂max']
+            const LABELS = ['Z1 Восстановление','Z2 Аэробная','Z3 Темп','Z4 Порог','Z5 VO₂max']
             return (
               <div className="flex flex-col gap-3">
                 {LABELS.map((lbl,i) => (
@@ -120,22 +120,22 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
                 ))}
               </div>
             )
-          })() : <p className="text-sm text-slate-400">No workout data yet</p>}
+          })() : <p className="text-sm text-slate-400">Нет данных о тренировках</p>}
         </div>
       </div>
 
       {/* Recent sessions */}
       <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="pf-num text-lg text-slate-900">Recent Sessions</p>
+          <p className="pf-num text-lg text-slate-900">Последние тренировки</p>
           <Link href="/diary" className="text-xs text-[#2563EB] hover:underline font-medium flex items-center gap-1">
-            View all <i className="ki-filled ki-arrow-right text-[10px]" />
+            Показать все <i className="ki-filled ki-arrow-right text-[10px]" />
           </Link>
         </div>
         {!workouts?.length ? (
           <div className="text-center py-10 text-slate-400">
             <i className="ki-filled ki-book-open text-3xl mb-2 block" />
-            <p className="text-sm">No sessions yet. <Link href="/diary" className="text-[#2563EB] hover:underline">Log your first workout</Link></p>
+            <p className="text-sm">Тренировок пока нет. <Link href="/diary" className="text-[#2563EB] hover:underline">Добавить первую</Link></p>
           </div>
         ) : (
           <div className="divide-y divide-[#F1F5F9]">
@@ -158,15 +158,15 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-slate-400 flex-wrap">
                       <span>{fmtDate(w.event_date)}</span>
-                      {w.activity_duration_min && <span>{w.activity_duration_min}m</span>}
-                      {w.avg_heart_rate && <span>{w.avg_heart_rate} bpm avg</span>}
-                      {w.activity_calories && <span>{w.activity_calories} kcal</span>}
+                      {w.activity_duration_min && <span>{w.activity_duration_min} мин</span>}
+                      {w.avg_heart_rate && <span>{w.avg_heart_rate} bpm ср.</span>}
+                      {w.activity_calories && <span>{w.activity_calories} ккал</span>}
                     </div>
                     {zones.some(v=>(v??0)>0) && <div className="mt-2 w-40"><ZoneBar zones={zones} height={4}/></div>}
                   </div>
                   <div className="text-right shrink-0">
                     <div className="pf-num text-xl leading-none" style={{ color:strainColor(strain) }}>{strain.toFixed(1)}</div>
-                    <div className="text-[9px] text-slate-400 uppercase tracking-wider mt-0.5">strain</div>
+                    <div className="text-[9px] text-slate-400 uppercase tracking-wider mt-0.5">нагрузка</div>
                   </div>
                 </div>
               )
@@ -177,7 +177,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {comments?.length ? (
         <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-          <p className="pf-num text-lg text-slate-900 mb-4">Coach Notes</p>
+          <p className="pf-num text-lg text-slate-900 mb-4">Заметки тренера</p>
           <div className="flex flex-col gap-3">
             {comments.map((c,i) => (
               <div key={i} className="p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed" style={{ background:'#F8FAFC', borderLeft:'3px solid #F97316' }}>

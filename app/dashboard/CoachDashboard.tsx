@@ -32,28 +32,28 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
       <div>
-        <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Coach Dashboard</p>
+        <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Дашборд тренера</p>
         <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{name}</h2>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pf-stagger">
-        <StatCard label="My Athletes" value={athletes?.length ?? 0} icon="ki-people" iconColor="#2563EB" />
-        <StatCard label="Avg Recovery" value={avgRecovery + '%'} icon="ki-graph-up" iconColor={recoveryColor(avgRecovery)} />
-        <StatCard label="Diary Entries" value={diary?.length ?? 0} icon="ki-notepad-edit" iconColor="#7C3AED" sub="this week" />
-        <StatCard label="Athletes Connected" value={athleteIds.length} icon="ki-abstract-26" iconColor="#F97316" />
+        <StatCard label="Мои атлеты" value={athletes?.length ?? 0} icon="ki-people" iconColor="#2563EB" />
+        <StatCard label="Ср. восстановление" value={avgRecovery + '%'} icon="ki-graph-up" iconColor={recoveryColor(avgRecovery)} />
+        <StatCard label="Записей в дневнике" value={diary?.length ?? 0} icon="ki-notepad-edit" iconColor="#7C3AED" sub="эта неделя" />
+        <StatCard label="Атлетов подключено" value={athleteIds.length} icon="ki-abstract-26" iconColor="#F97316" />
       </div>
 
       {/* Athlete cards */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <p className="pf-num text-xl text-slate-900">My Athletes</p>
-          <Link href="/athletes" className="text-xs text-[#2563EB] hover:underline font-medium">Manage athletes →</Link>
+          <p className="pf-num text-xl text-slate-900">Мои атлеты</p>
+          <Link href="/athletes" className="text-xs text-[#2563EB] hover:underline font-medium">Управление атлетами →</Link>
         </div>
         {!athletes?.length ? (
           <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center text-slate-400">
             <i className="ki-filled ki-people text-4xl block mb-3" />
-            <p className="text-sm">No athletes assigned yet.</p>
-            <p className="text-xs mt-1">Contact your admin to link athletes to your account.</p>
+            <p className="text-sm">Атлеты ещё не назначены.</p>
+            <p className="text-xs mt-1">Обратитесь к администратору для привязки атлетов.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -68,7 +68,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                     </div>
                     <div>
                       <div className="font-semibold text-slate-800">{a.name}</div>
-                      <div className="text-xs text-slate-400">Athlete</div>
+                      <div className="text-xs text-slate-400">Атлет</div>
                     </div>
                     {m && <div className="ml-auto"><RecoveryRing score={Math.round(m.recovery)} size={60} /></div>}
                   </div>
@@ -83,7 +83,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                         ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400">No metrics data yet</p>
+                    <p className="text-xs text-slate-400">Нет данных метрик</p>
                   )}
                 </Link>
               )
@@ -95,11 +95,11 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
       {/* Observation diary */}
       <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="pf-num text-xl text-slate-900">Observation Diary</p>
-          <Link href="/diary" className="text-xs text-[#2563EB] hover:underline font-medium">View all →</Link>
+          <p className="pf-num text-xl text-slate-900">Дневник наблюдений</p>
+          <Link href="/diary" className="text-xs text-[#2563EB] hover:underline font-medium">Показать все →</Link>
         </div>
         {!diary?.length ? (
-          <p className="text-sm text-slate-400 py-4">No observations yet. <Link href="/diary" className="text-[#2563EB] hover:underline">Add your first note</Link></p>
+          <p className="text-sm text-slate-400 py-4">Наблюдений пока нет. <Link href="/diary" className="text-[#2563EB] hover:underline">Добавить первое</Link></p>
         ) : (
           <div className="flex flex-col gap-3">
             {diary.map((d) => {

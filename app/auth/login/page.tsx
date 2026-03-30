@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 const TEST_ACCOUNTS = [
-  { label: 'Athlete', email: 'athlete@proform.test', iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
-  { label: 'Coach',   email: 'coach@proform.test',   iconBg: 'bg-green-100',  iconColor: 'text-green-600' },
-  { label: 'Admin',   email: 'admin@proform.test',   iconBg: 'bg-violet-100', iconColor: 'text-violet-600' },
+  { label: 'Атлет',         email: 'athlete@proform.test', iconBg: 'bg-orange-100', iconColor: 'text-orange-600' },
+  { label: 'Тренер',        email: 'coach@proform.test',   iconBg: 'bg-green-100',  iconColor: 'text-green-600' },
+  { label: 'Администратор', email: 'admin@proform.test',   iconBg: 'bg-violet-100', iconColor: 'text-violet-600' },
 ]
 
 export default function LoginPage() {
@@ -87,8 +87,8 @@ export default function LoginPage() {
             <span className="pf-num text-xl text-foreground">ProForm</span>
           </div>
 
-          <h1 className="pf-num text-[38px] text-foreground leading-none mb-1">Sign in</h1>
-          <p className="text-2sm text-muted-foreground mb-8">Welcome back — your training data awaits</p>
+          <h1 className="pf-num text-[38px] text-foreground leading-none mb-1">Войти</h1>
+          <p className="text-2sm text-muted-foreground mb-8">Добро пожаловать — ваши данные тренировок ждут</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && (
@@ -99,7 +99,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Email</label>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Электронная почта</label>
               <input
                 type="email" required value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -107,7 +107,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Password</label>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Пароль</label>
               <input
                 type="password" required value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -120,20 +120,20 @@ export default function LoginPage() {
               className="mt-1 px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {loading ? (
-                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full pf-spin" /> Signing in…</>
+                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full pf-spin" /> Вход…</>
               ) : (
-                <>Sign in <i className="ki-filled ki-right text-xs" /></>
+                <>Войти <i className="ki-filled ki-right text-xs" /></>
               )}
             </button>
           </form>
 
           <p className="text-2sm text-muted-foreground mt-5 text-center">
-            No account? <Link href="/auth/register" className="text-orange-500 font-semibold hover:text-orange-600 no-underline">Create one</Link>
+            Нет аккаунта? <Link href="/auth/register" className="text-orange-500 font-semibold hover:text-orange-600 no-underline">Зарегистрироваться</Link>
           </p>
 
           {/* Quick access */}
           <div className="mt-6 p-4 bg-background rounded-xl border border-border">
-            <div className="text-2xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Quick access — test accounts</div>
+            <div className="text-2xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Быстрый доступ — тестовые аккаунты</div>
             <div className="flex flex-col gap-2">
               {TEST_ACCOUNTS.map(a => (
                 <button
@@ -149,12 +149,12 @@ export default function LoginPage() {
                     <div className="text-2sm font-semibold text-foreground leading-tight">{a.label}</div>
                     <div className="text-2xs text-muted-foreground font-mono">{a.email}</div>
                   </div>
-                  <span className="text-2xs text-muted-foreground/50">click to fill</span>
+                  <span className="text-2xs text-muted-foreground/50">нажмите для заполнения</span>
                 </button>
               ))}
             </div>
             <p className="text-2xs text-muted-foreground/50 mt-2.5">
-              Password for all: <code className="text-muted-foreground">proform123</code>
+              Пароль для всех: <code className="text-muted-foreground">proform123</code>
             </p>
           </div>
         </div>

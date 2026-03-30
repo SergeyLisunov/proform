@@ -3,17 +3,17 @@ import { usePathname } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 
 const TITLES: Record<string, { title: string; sub: string }> = {
-  '/dashboard':          { title: 'Dashboard',      sub: 'Overview of your training' },
-  '/calendar':           { title: 'Calendar',       sub: 'Training schedule & events' },
-  '/diary':              { title: 'Training Diary', sub: 'Sessions & observations' },
-  '/analytics':          { title: 'Analytics',      sub: 'Performance insights' },
-  '/athletes':           { title: 'My Athletes',    sub: 'Coaching panel' },
-  '/admin/orgs':         { title: 'Organizations',  sub: 'Verify and manage organizations' },
-  '/admin':              { title: 'Admin Panel',    sub: 'System administration' },
-  '/org/members':        { title: 'Members',        sub: 'Manage organization members' },
-  '/org/wall':           { title: 'Wall',           sub: 'Posts and announcements' },
-  '/org/newsletters':    { title: 'Newsletters',    sub: 'Mailing to members' },
-  '/org':                { title: 'Organization',   sub: 'Your organization dashboard' },
+  '/dashboard':          { title: 'Главная',              sub: 'Обзор ваших тренировок' },
+  '/calendar':           { title: 'Календарь',            sub: 'График и события' },
+  '/diary':              { title: 'Дневник тренировок',   sub: 'Сессии и наблюдения' },
+  '/analytics':          { title: 'Аналитика',            sub: 'Анализ показателей' },
+  '/athletes':           { title: 'Мои атлеты',           sub: 'Панель тренера' },
+  '/admin/orgs':         { title: 'Организации',          sub: 'Управление организациями' },
+  '/admin':              { title: 'Панель администратора', sub: 'Системное администрирование' },
+  '/org/members':        { title: 'Участники',            sub: 'Управление участниками' },
+  '/org/wall':           { title: 'Стена',                sub: 'Посты и объявления' },
+  '/org/newsletters':    { title: 'Рассылки',             sub: 'Рассылка участникам' },
+  '/org':                { title: 'Организация',          sub: 'Дашборд организации' },
 }
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -29,7 +29,7 @@ export default function TopBar() {
   const meta = Object.entries(TITLES).find(([k]) => pathname === k || pathname.startsWith(k + '/'))?.[1]
   const title = meta?.title ?? 'ProForm'
   const sub = meta?.sub ?? ''
-  const date = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+  const date = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   const rc = user ? ROLE_COLORS[user.role] : null
 
   return (

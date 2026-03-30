@@ -5,15 +5,15 @@ export type CalendarEvent = Database['public']['Tables']['calendar_events']['Row
 export type EventType = CalendarEvent['event_type']
 
 export const EVENT_TYPES: { value: EventType; label: string; icon: string; color: string }[] = [
-  { value: 'workout',     label: 'Workout',     icon: 'ki-abstract-26',  color: '#2563EB' },
-  { value: 'competition', label: 'Competition', icon: 'ki-crown',        color: '#F97316' },
-  { value: 'rest',        label: 'Rest',        icon: 'ki-moon',         color: '#16A34A' },
-  { value: 'note',        label: 'Note',        icon: 'ki-notepad-edit', color: '#64748B' },
-  { value: 'travel',      label: 'Travel',      icon: 'ki-airplane',     color: '#7C3AED' },
-  { value: 'medical',     label: 'Medical',     icon: 'ki-heart',        color: '#DC2626' },
-  { value: 'test',        label: 'Test',        icon: 'ki-chart-line-up',color: '#D97706' },
-  { value: 'camp',        label: 'Camp',        icon: 'ki-map',          color: '#0D9488' },
-  { value: 'other',       label: 'Other',       icon: 'ki-calendar',     color: '#94A3B8' },
+  { value: 'workout',     label: 'Тренировка',  icon: 'ki-abstract-26',  color: '#2563EB' },
+  { value: 'competition', label: 'Соревнование', icon: 'ki-crown',        color: '#F97316' },
+  { value: 'rest',        label: 'Отдых',       icon: 'ki-moon',         color: '#16A34A' },
+  { value: 'note',        label: 'Заметка',     icon: 'ki-notepad-edit', color: '#64748B' },
+  { value: 'travel',      label: 'Поездка',     icon: 'ki-airplane',     color: '#7C3AED' },
+  { value: 'medical',     label: 'Медицина',    icon: 'ki-heart',        color: '#DC2626' },
+  { value: 'test',        label: 'Тест',        icon: 'ki-chart-line-up',color: '#D97706' },
+  { value: 'camp',        label: 'Сборы',       icon: 'ki-map',          color: '#0D9488' },
+  { value: 'other',       label: 'Другое',      icon: 'ki-calendar',     color: '#94A3B8' },
 ]
 
 export async function getCalendarEvents(ownerId: string, from: string, to: string): Promise<CalendarEvent[]> {

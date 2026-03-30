@@ -12,10 +12,10 @@ const STATUS_BADGE: Record<MemberStatus, string> = {
 }
 
 const STATUS_OPTIONS: { value: MemberStatus | 'removed'; label: string }[] = [
-  { value: 'active',    label: 'Active' },
-  { value: 'pending',   label: 'Pending' },
-  { value: 'suspended', label: 'Suspended' },
-  { value: 'removed',   label: 'Remove' },
+  { value: 'active',    label: 'Активный' },
+  { value: 'pending',   label: 'Ожидает' },
+  { value: 'suspended', label: 'Приостановлен' },
+  { value: 'removed',   label: 'Удалить' },
 ]
 
 export default function OrgMembersPage() {
@@ -98,7 +98,7 @@ export default function OrgMembersPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Organization Access Required</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
       </div>
     )
   }
@@ -108,13 +108,13 @@ export default function OrgMembersPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Organization</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Members</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Организация</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Участники</h2>
           <p className="text-2sm text-muted-foreground mt-1">{org?.org_name}</p>
         </div>
         <button onClick={() => setShowInvite(true)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          Invite member
+          Пригласить
         </button>
       </div>
 
@@ -127,7 +127,7 @@ export default function OrgMembersPage() {
               onClick={() => setFilterRole(r)}
               className={`px-3 py-1.5 rounded-lg text-2xs font-semibold capitalize transition-colors ${filterRole === r ? 'bg-orange-500 text-white' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              {r === 'all' ? 'All roles' : r}
+              {r === 'all' ? 'Все роли' : r === 'athlete' ? 'Атлет' : 'Тренер'}
             </button>
           ))}
         </div>
@@ -138,7 +138,7 @@ export default function OrgMembersPage() {
               onClick={() => setFilterStatus(s)}
               className={`px-3 py-1.5 rounded-lg text-2xs font-semibold capitalize transition-colors ${filterStatus === s ? 'bg-orange-500 text-white' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              {s === 'all' ? 'All statuses' : s}
+              {s === 'all' ? 'Все статусы' : s === 'active' ? 'Активные' : s === 'pending' ? 'Ожидают' : 'Приостановлен'}
             </button>
           ))}
         </div>
@@ -148,13 +148,13 @@ export default function OrgMembersPage() {
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-5 py-3 border-b border-border flex items-center justify-between">
           <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {filtered.length} member{filtered.length !== 1 ? 's' : ''}
+            {filtered.length} {filtered.length === 1 ? 'участник' : filtered.length < 5 ? 'участника' : 'участников'}
           </span>
         </div>
 
         {filtered.length === 0 ? (
           <div className="px-5 py-12 text-center text-muted-foreground text-2sm">
-            No members match the selected filters.
+            Нет участников, соответствующих выбранным фильтрам.
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -199,7 +199,7 @@ export default function OrgMembersPage() {
         >
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="pf-num text-xl text-foreground">Invite member</h3>
+              <h3 className="pf-num text-xl text-foreground">Пригласить участника</h3>
               <button onClick={() => setShowInvite(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
@@ -210,7 +210,7 @@ export default function OrgMembersPage() {
                 <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                   <i className="ki-filled ki-check text-xl text-green-600" />
                 </div>
-                <p className="text-sm font-semibold text-foreground">Invitation sent!</p>
+                <p className="text-sm font-semibold text-foreground">Приглашение отправлено!</p>
               </div>
             ) : (
               <form onSubmit={handleInvite} className="flex flex-col gap-4">
@@ -229,21 +229,21 @@ export default function OrgMembersPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Role</label>
+                  <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Роль</label>
                   <select
                     value={inviteRole}
                     onChange={e => setInviteRole(e.target.value as 'athlete' | 'coach')}
                     className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 bg-background"
                   >
-                    <option value="athlete">Athlete</option>
-                    <option value="coach">Coach</option>
+                    <option value="athlete">Атлет</option>
+                    <option value="coach">Тренер</option>
                   </select>
                 </div>
                 <div className="flex gap-2 pt-1">
                   <button type="submit" disabled={inviteLoading} className="flex-1 kt-btn kt-btn-primary">
-                    {inviteLoading ? 'Sending…' : 'Send invitation'}
+                    {inviteLoading ? 'Отправка…' : 'Отправить приглашение'}
                   </button>
-                  <button type="button" onClick={() => setShowInvite(false)} className="kt-btn kt-btn-outline">Cancel</button>
+                  <button type="button" onClick={() => setShowInvite(false)} className="kt-btn kt-btn-outline">Отмена</button>
                 </div>
               </form>
             )}

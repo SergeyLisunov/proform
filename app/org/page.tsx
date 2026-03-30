@@ -61,8 +61,8 @@ export default function OrgDashboard() {
         <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
           <i className="ki-filled ki-office-bag text-2xl text-blue-400" />
         </div>
-        <p className="text-sm font-semibold text-foreground">Organization Access Required</p>
-        <p className="text-2sm text-muted-foreground">This section is only available for Organization accounts.</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-2sm text-muted-foreground">Этот раздел доступен только аккаунтам организаций.</p>
       </div>
     )
   }
@@ -73,8 +73,8 @@ export default function OrgDashboard() {
         <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
           <i className="ki-filled ki-office-bag text-2xl text-slate-400" />
         </div>
-        <p className="text-sm font-semibold text-foreground">Organization not found</p>
-        <p className="text-2sm text-muted-foreground">Your organization profile could not be loaded.</p>
+        <p className="text-sm font-semibold text-foreground">Организация не найдена</p>
+        <p className="text-2sm text-muted-foreground">Профиль организации не удалось загрузить.</p>
       </div>
     )
   }
@@ -87,11 +87,11 @@ export default function OrgDashboard() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Organization</p>
+            <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Организация</p>
             {org.is_verified && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
                 <i className="ki-filled ki-verify text-xs" />
-                Verified
+                Проверено
               </span>
             )}
           </div>
@@ -106,11 +106,11 @@ export default function OrgDashboard() {
           <Link href={`/${org.org_slug}`} target="_blank"
             className="kt-btn kt-btn-outline gap-2 text-sm">
             <i className="ki-filled ki-exit-right-corner text-xs" />
-            Public page
+            Публичная страница
           </Link>
           <Link href="/org/wall" className="kt-btn kt-btn-primary gap-2 text-sm">
             <i className="ki-filled ki-plus text-xs" />
-            New post
+            Новая публикация
           </Link>
         </div>
       </div>
@@ -118,9 +118,9 @@ export default function OrgDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 pf-stagger">
         {[
-          { label: 'Total members',   value: stats.total,    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Active coaches',  value: stats.coaches,  icon: 'ki-notepad-edit',  bg: 'bg-green-50 text-green-600' },
-          { label: 'Athletes',        value: stats.athletes, icon: 'ki-abstract-26',   bg: 'bg-orange-50 text-orange-600' },
+          { label: 'Всего участников', value: stats.total,    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Тренеров',        value: stats.coaches,  icon: 'ki-notepad-edit',  bg: 'bg-green-50 text-green-600' },
+          { label: 'Атлетов',         value: stats.athletes, icon: 'ki-abstract-26',   bg: 'bg-orange-50 text-orange-600' },
         ].map(c => (
           <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex items-center gap-4">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${c.bg}`}>
@@ -138,12 +138,12 @@ export default function OrgDashboard() {
         {/* Recent posts */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <h3 className="text-sm font-semibold text-foreground">Recent posts</h3>
-            <Link href="/org/wall" className="text-2xs font-semibold text-orange-600 hover:underline">View all →</Link>
+            <h3 className="text-sm font-semibold text-foreground">Последние публикации</h3>
+            <Link href="/org/wall" className="text-2xs font-semibold text-orange-600 hover:underline">Все →</Link>
           </div>
           <div className="divide-y divide-border">
             {posts.length === 0 ? (
-              <div className="px-5 py-8 text-center text-2sm text-muted-foreground">No posts yet</div>
+              <div className="px-5 py-8 text-center text-2sm text-muted-foreground">Публикаций пока нет</div>
             ) : posts.map(p => (
               <div key={p.id} className="px-5 py-3.5 flex items-start gap-3 hover:bg-accent/30 transition-colors">
                 <div className="flex-1 min-w-0">
@@ -167,11 +167,11 @@ export default function OrgDashboard() {
         {/* Last newsletter */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <h3 className="text-sm font-semibold text-foreground">Last newsletter</h3>
-            <Link href="/org/newsletters" className="text-2xs font-semibold text-orange-600 hover:underline">View all →</Link>
+            <h3 className="text-sm font-semibold text-foreground">Последняя рассылка</h3>
+            <Link href="/org/newsletters" className="text-2xs font-semibold text-orange-600 hover:underline">Все →</Link>
           </div>
           {!lastNl ? (
-            <div className="px-5 py-8 text-center text-2sm text-muted-foreground">No newsletters yet</div>
+            <div className="px-5 py-8 text-center text-2sm text-muted-foreground">Рассылок пока нет</div>
           ) : (
             <div className="p-5 flex flex-col gap-4">
               <div>
@@ -185,8 +185,8 @@ export default function OrgDashboard() {
                 <div className="text-sm font-semibold text-foreground">{lastNl.subject}</div>
                 <div className="text-2xs text-muted-foreground mt-0.5">
                   {lastNl.sent_at
-                    ? `Sent ${new Date(lastNl.sent_at).toLocaleDateString('ru-RU')}`
-                    : `Created ${new Date(lastNl.created_at).toLocaleDateString('ru-RU')}`}
+                    ? `Отправлено ${new Date(lastNl.sent_at).toLocaleDateString('ru-RU')}`
+                    : `Создано ${new Date(lastNl.created_at).toLocaleDateString('ru-RU')}`}
                 </div>
               </div>
               {lastNl.status === 'sent' && (
@@ -195,7 +195,7 @@ export default function OrgDashboard() {
                   className="text-2xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
                 >
                   <i className="ki-filled ki-chart-line-up text-xs" />
-                  View delivery stats →
+                  Статистика доставки →
                 </Link>
               )}
             </div>

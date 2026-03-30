@@ -9,22 +9,22 @@ import type { SportType } from '@/types/org.types'
 type RoleChoice = 'athlete' | 'coach' | 'organization'
 
 const ROLES: { value: RoleChoice; label: string; icon: string; desc: string }[] = [
-  { value: 'athlete',      label: 'Athlete',       icon: 'ki-abstract-26',  desc: 'Log training, track metrics' },
-  { value: 'coach',        label: 'Coach',          icon: 'ki-people',       desc: 'Manage athletes, leave notes' },
-  { value: 'organization', label: 'Organization',   icon: 'ki-office-bag',   desc: 'Sports club, federation, team' },
+  { value: 'athlete',      label: 'Атлет',        icon: 'ki-abstract-26',  desc: 'Дневник тренировок, метрики' },
+  { value: 'coach',        label: 'Тренер',        icon: 'ki-people',       desc: 'Управление атлетами, заметки' },
+  { value: 'organization', label: 'Организация',   icon: 'ki-office-bag',   desc: 'Спортивный клуб, федерация, команда' },
 ]
 
 const SPORT_TYPES: { value: SportType; label: string }[] = [
-  { value: 'athletics',  label: 'Athletics' },
-  { value: 'swimming',   label: 'Swimming' },
-  { value: 'cycling',    label: 'Cycling' },
-  { value: 'triathlon',  label: 'Triathlon' },
-  { value: 'football',   label: 'Football' },
-  { value: 'basketball', label: 'Basketball' },
-  { value: 'tennis',     label: 'Tennis' },
-  { value: 'volleyball', label: 'Volleyball' },
-  { value: 'wrestling',  label: 'Wrestling' },
-  { value: 'other',      label: 'Other' },
+  { value: 'athletics',  label: 'Лёгкая атлетика' },
+  { value: 'swimming',   label: 'Плавание' },
+  { value: 'cycling',    label: 'Велоспорт' },
+  { value: 'triathlon',  label: 'Триатлон' },
+  { value: 'football',   label: 'Футбол' },
+  { value: 'basketball', label: 'Баскетбол' },
+  { value: 'tennis',     label: 'Теннис' },
+  { value: 'volleyball', label: 'Волейбол' },
+  { value: 'wrestling',  label: 'Борьба' },
+  { value: 'other',      label: 'Другое' },
 ]
 
 function slugify(s: string) {
@@ -111,7 +111,7 @@ export default function RegisterPage() {
   }
 
   const totalSteps = role === 'organization' ? 3 : 2
-  const stepLabels = ['Choose role', 'Your details', ...(role === 'organization' ? ['Organization'] : [])]
+  const stepLabels = ['Выберите роль', 'Личные данные', ...(role === 'organization' ? ['Организация'] : [])]
 
   return (
     <div className="w-full max-w-[480px] pf-page-enter">
@@ -143,7 +143,7 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="pf-num text-2xl text-slate-900 mb-6">
-            {step === 1 ? 'How will you use ProForm?' : step === 2 ? 'Create your account' : 'Organization details'}
+            {step === 1 ? 'Как вы будете использовать ProForm?' : step === 2 ? 'Создать аккаунт' : 'Данные организации'}
           </h1>
 
           {error && (
@@ -183,18 +183,18 @@ export default function RegisterPage() {
             {step === 2 && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Full name</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Полное имя</label>
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     required
-                    placeholder="Alex Petrov"
+                    placeholder="Алексей Петров"
                     className="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Email</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Электронная почта</label>
                   <input
                     type="email"
                     value={email}
@@ -205,14 +205,14 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Password</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Пароль</label>
                   <input
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
                     minLength={8}
-                    placeholder="Min 8 characters"
+                    placeholder="Минимум 8 символов"
                     className="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition"
                   />
                 </div>
@@ -228,19 +228,19 @@ export default function RegisterPage() {
             {(step as number) === 3 && role === 'organization' && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Organization name *</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Название организации *</label>
                   <input
                     type="text"
                     value={orgName}
                     onChange={e => handleOrgNameChange(e.target.value)}
                     required
-                    placeholder="e.g. Moscow Athletic Club"
+                    placeholder="напр. Московский атлетический клуб"
                     className="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Slug (public URL)
+                    URL организации
                   </label>
                   <div className="flex items-center rounded-xl border border-[#E2E8F0] overflow-hidden focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-blue-100 transition">
                     <span className="px-3 py-3 text-xs text-slate-400 bg-slate-50 border-r border-[#E2E8F0] shrink-0">proform.app/</span>
@@ -255,7 +255,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sport type</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Вид спорта</label>
                   <select
                     value={sportType}
                     onChange={e => setSportType(e.target.value as SportType)}
@@ -267,12 +267,12 @@ export default function RegisterPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">City</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Город</label>
                   <input
                     type="text"
                     value={city}
                     onChange={e => setCity(e.target.value)}
-                    placeholder="Moscow"
+                    placeholder="Москва"
                     className="w-full rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition"
                   />
                 </div>
@@ -286,7 +286,7 @@ export default function RegisterPage() {
                   onClick={() => setStep(prev => (prev - 1) as 1 | 2 | 3)}
                   className="px-4 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 transition"
                 >
-                  Back
+                  Назад
                 </button>
               )}
               <button
@@ -296,20 +296,20 @@ export default function RegisterPage() {
                 style={{ background: loading ? '#FDA96A' : '#F97316' }}
               >
                 {loading
-                  ? 'Creating account…'
+                  ? 'Создание аккаунта…'
                   : step === 1
-                  ? 'Continue'
+                  ? 'Продолжить'
                   : role === 'organization' && step === 2
-                  ? 'Next: Org details'
-                  : 'Create account'}
+                  ? 'Далее: Данные организации'
+                  : 'Создать аккаунт'}
               </button>
             </div>
           </form>
 
           {step === 1 && (
             <p className="text-center text-sm text-slate-500 mt-5">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="text-[#2563EB] font-medium hover:underline">Sign in</Link>
+              Уже есть аккаунт?{' '}
+              <Link href="/auth/login" className="text-[#2563EB] font-medium hover:underline">Войти</Link>
             </p>
           )}
         </div>

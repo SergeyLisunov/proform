@@ -46,11 +46,11 @@ function YearView({ year, onSelect }: { year: number; onSelect: (date: string) =
           </div>
         ))}
         <div className="flex items-center gap-1.5 text-2xs text-muted-foreground ml-auto">
-          <span className="text-2xs text-muted-foreground">Strain intensity:</span>
+          <span className="text-2xs text-muted-foreground">Интенсивность:</span>
           {['#DBEAFE','#93C5FD','#3B82F6','#1D4ED8'].map((c,i) => (
             <span key={i} className="w-4 h-3 rounded-sm inline-block" style={{ background: c }} />
           ))}
-          <span className="text-2xs text-muted-foreground">High</span>
+          <span className="text-2xs text-muted-foreground">Высокая</span>
         </div>
       </div>
 
@@ -353,19 +353,19 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
   const comp = DEMO_COMPETITIONS.find(c => c.date === dateStr)
   const cycles = DEMO_CYCLES.filter(c => dateStr >= c.start && dateStr <= c.end)
   const d = new Date(dateStr)
-  const label = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  const label = d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4 h-full">
       <div>
-        <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Selected</div>
+        <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Выбрано</div>
         <h3 className="pf-num text-xl text-foreground">{label}</h3>
       </div>
 
       {/* Cycles */}
       {cycles.length > 0 && (
         <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Active Cycles</div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Активные циклы</div>
           <div className="flex flex-col gap-1.5">
             {cycles.map((c, i) => {
               const cc = CYCLE_COLORS[c.type as keyof typeof CYCLE_COLORS]
@@ -386,17 +386,17 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
       {/* Session */}
       {session && (
         <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Training Session</div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тренировка</div>
           <div className="p-3 rounded-xl border bg-blue-50 border-blue-200">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-semibold text-blue-800">{session.type}</span>
               <span className="pf-num text-lg text-blue-600">{session.strain}</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5 text-2xs mb-2">
-              <div className="flex justify-between"><span className="text-muted-foreground">Duration</span><span className="font-semibold">{session.dur} min</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg HR</span><span className="font-semibold">{session.avg_hr} bpm</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Calories</span><span className="font-semibold">{session.cal} kcal</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Recovery</span><span className="font-semibold" style={{ color: recoveryColor(session.recovery) }}>{session.recovery}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Длительность</span><span className="font-semibold">{session.dur} мин</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Ср. ЧСС</span><span className="font-semibold">{session.avg_hr} уд/мин</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Калории</span><span className="font-semibold">{session.cal} ккал</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Восстановление</span><span className="font-semibold" style={{ color: recoveryColor(session.recovery) }}>{session.recovery}%</span></div>
             </div>
             <ZoneBar zones={session.z} height={20} showLabels />
           </div>
@@ -406,7 +406,7 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
       {/* Competition */}
       {comp && (
         <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Competition</div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Соревнование</div>
           <div className="p-3 rounded-xl border bg-orange-50 border-orange-200">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">🏆</span>
@@ -418,8 +418,8 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
             </div>
             {comp.result && (
               <div className="flex gap-3 text-2xs">
-                <div><span className="text-muted-foreground">Result: </span><span className="font-bold text-foreground">{comp.result}</span></div>
-                {comp.position && <div><span className="text-muted-foreground">Position: </span><span className="font-bold text-foreground">#{comp.position}</span></div>}
+                <div><span className="text-muted-foreground">Результат: </span><span className="font-bold text-foreground">{comp.result}</span></div>
+                {comp.position && <div><span className="text-muted-foreground">Позиция: </span><span className="font-bold text-foreground">#{comp.position}</span></div>}
               </div>
             )}
             {!comp.result && <div className="text-2xs font-semibold px-2 py-1 rounded bg-orange-100 text-orange-700 capitalize">{comp.status}</div>}
@@ -430,7 +430,7 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
       {/* Saved calendar events for this date */}
       {savedEvents.filter(e => e.event_date === dateStr).length > 0 && (
         <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Events</div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">События</div>
           <div className="flex flex-col gap-1.5">
             {savedEvents.filter(e => e.event_date === dateStr).map(ev => {
               const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
@@ -462,10 +462,10 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
       {!session && !comp && cycles.length === 0 && savedEvents.filter(e => e.event_date === dateStr).length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
           <i className="ki-filled ki-calendar text-3xl text-muted-foreground/20 mb-2" />
-          <p className="text-2sm text-muted-foreground">No events</p>
+          <p className="text-2sm text-muted-foreground">Нет событий</p>
           <button onClick={() => onAddEvent(dateStr)} className="mt-3 kt-btn kt-btn-sm kt-btn-outline gap-1.5">
             <i className="ki-filled ki-plus text-xs" />
-            Add event
+            Добавить событие
           </button>
         </div>
       )}
@@ -574,7 +574,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
 
   const selectedType = EVENT_TYPES.find(t => t.value === form.event_type)
 
-  const headerTitle = drawerMode === 'create' ? 'Add Event' : drawerMode === 'edit' ? 'Edit Event' : (initialEvent?.title ?? 'Event')
+  const headerTitle = drawerMode === 'create' ? 'Добавить событие' : drawerMode === 'edit' ? 'Редактировать событие' : (initialEvent?.title ?? 'Событие')
 
   if (!mounted) return null
 
@@ -651,13 +651,13 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
               {/* Confirm delete inline */}
               {confirmDelete && (
                 <div style={{ padding: '14px 16px', borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginBottom: 10 }}>Delete this event?</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginBottom: 10 }}>Удалить это событие?</p>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={handleDelete} style={{ flex: 1, padding: '9px 0', borderRadius: 10, background: '#DC2626', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
-                      Yes, delete
+                      Да, удалить
                     </button>
                     <button onClick={() => setConfirmDelete(false)} style={{ padding: '9px 14px', borderRadius: 10, background: '#F1F5F9', color: '#64748B', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
-                      Cancel
+                      Отмена
                     </button>
                   </div>
                 </div>
@@ -671,7 +671,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                     style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: '#F97316', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}
                   >
                     <i className="ki-filled ki-pencil" style={{ marginRight: 6, fontSize: 12 }} />
-                    Edit
+                    Изменить
                   </button>
                   <button
                     onClick={() => setConfirmDelete(true)}
@@ -698,7 +698,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
 
                 {/* Event type grid */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Event type</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Тип события</label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
                     {EVENT_TYPES.map(t => {
                       const active = form.event_type === t.value
@@ -716,16 +716,16 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 {/* Title */}
                 <div>
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                    Title <span style={{ color: '#F97316' }}>*</span>
+                    Название <span style={{ color: '#F97316' }}>*</span>
                   </label>
-                  <input ref={titleRef} type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="e.g. Morning run, City marathon…"
+                  <input ref={titleRef} type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="например, Утренняя пробежка, Марафон…"
                     style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', transition: 'border-color 0.15s', boxSizing: 'border-box' }}
                     onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
                 </div>
 
                 {/* Date */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Date</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Дата</label>
                   <input type="date" value={form.event_date} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} required
                     style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
                     onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
@@ -734,13 +734,13 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 {/* Time */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Start time</label>
+                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Начало</label>
                     <input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
                       style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
                       onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>End time</label>
+                    <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Конец</label>
                     <input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
                       style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
                       onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
@@ -749,8 +749,8 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
 
                 {/* Notes */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Notes</label>
-                  <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} placeholder="Optional notes…"
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Заметки</label>
+                  <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} placeholder="Заметки (необязательно)…"
                     style={{ width: '100%', borderRadius: 12, border: '1.5px solid #E2E8F0', padding: '10px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
                     onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = '#E2E8F0')} />
                 </div>
@@ -759,12 +759,12 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
                   <button type="submit" disabled={saving}
                     style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? '#FDA96A' : '#F97316', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', transition: 'background 0.15s' }}>
-                    {saving ? 'Saving…' : drawerMode === 'edit' ? 'Save changes' : 'Save event'}
+                    {saving ? 'Сохранение…' : drawerMode === 'edit' ? 'Сохранить изменения' : 'Сохранить событие'}
                   </button>
                   <button type="button"
                     onClick={() => drawerMode === 'edit' && initialEvent ? setDrawerMode('view') : handleClose()}
                     className="kt-btn kt-btn-outline" style={{ flexShrink: 0 }}>
-                    Cancel
+                    Отмена
                   </button>
                 </div>
               </form>
@@ -861,10 +861,10 @@ export default function CalendarPage() {
   }
 
   const VIEWS: { id: ViewMode; label: string }[] = [
-    { id: 'week',    label: 'Week' },
-    { id: 'month',   label: 'Month' },
-    { id: 'quarter', label: 'Quarter' },
-    { id: 'year',    label: 'Year' },
+    { id: 'week',    label: 'Неделя' },
+    { id: 'month',   label: 'Месяц' },
+    { id: 'quarter', label: 'Квартал' },
+    { id: 'year',    label: 'Год' },
   ]
 
   // Stats for current period
@@ -877,21 +877,21 @@ export default function CalendarPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Training Schedule</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Calendar</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">График тренировок</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Календарь</h2>
         </div>
         <button onClick={() => openAddEvent(selected ?? undefined)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          Add Event
+          Добавить событие
         </button>
       </div>
 
       {/* Period stats strip */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Sessions', value: periodSessions, icon: 'ki-abstract-26', color: 'text-blue-600 bg-blue-50' },
-          { label: 'Avg Strain', value: avgStrain, icon: 'ki-chart-line-up', color: 'text-orange-600 bg-orange-50' },
-          { label: 'Total Cals', value: totalCals.toLocaleString(), icon: 'ki-abstract-31', color: 'text-green-600 bg-green-50' },
+          { label: 'Тренировки', value: periodSessions, icon: 'ki-abstract-26', color: 'text-blue-600 bg-blue-50' },
+          { label: 'Ср. нагрузка', value: avgStrain, icon: 'ki-chart-line-up', color: 'text-orange-600 bg-orange-50' },
+          { label: 'Всего ккал', value: totalCals.toLocaleString(), icon: 'ki-abstract-31', color: 'text-green-600 bg-green-50' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
@@ -975,7 +975,7 @@ export default function CalendarPage() {
       {/* Saved events strip — upcoming */}
       {savedEvents.length > 0 && (
         <div className="bg-card border border-border rounded-xl p-4">
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Your saved events</div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ваши события</div>
           <div className="flex flex-col gap-1.5">
             {savedEvents.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map(ev => {
               const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
@@ -989,7 +989,7 @@ export default function CalendarPage() {
                     {ev.notes && <span className="text-2xs text-muted-foreground ml-2 truncate">{ev.notes}</span>}
                   </div>
                   <span className="text-2xs text-muted-foreground shrink-0">
-                    {new Date(ev.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    {new Date(ev.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                     {ev.start_time && ` · ${ev.start_time}`}
                   </span>
                   <button
@@ -1007,13 +1007,13 @@ export default function CalendarPage() {
 
       {/* Legend */}
       <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-5 flex-wrap">
-        <span className="text-2xs font-bold text-muted-foreground uppercase tracking-wider">Legend</span>
+        <span className="text-2xs font-bold text-muted-foreground uppercase tracking-wider">Легенда</span>
         {[
-          { label: 'Workout',     color: '#3B82F6', type: 'square' },
-          { label: 'Competition', color: '#EA580C', type: 'circle' },
-          { label: 'Macrocycle',  color: CYCLE_COLORS.macro.text, type: 'bar' },
-          { label: 'Mesocycle',   color: CYCLE_COLORS.meso.text, type: 'bar' },
-          { label: 'Microcycle',  color: CYCLE_COLORS.micro.text, type: 'bar' },
+          { label: 'Тренировка',   color: '#3B82F6', type: 'square' },
+          { label: 'Соревнование', color: '#EA580C', type: 'circle' },
+          { label: 'Макроцикл',    color: CYCLE_COLORS.macro.text, type: 'bar' },
+          { label: 'Мезоцикл',     color: CYCLE_COLORS.meso.text, type: 'bar' },
+          { label: 'Микроцикл',    color: CYCLE_COLORS.micro.text, type: 'bar' },
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1.5">
             <span className={`w-3 h-3 rounded-${l.type === 'circle' ? 'full' : l.type === 'bar' ? '' : 'sm'} inline-block`} style={{ background: l.color }} />
@@ -1021,8 +1021,8 @@ export default function CalendarPage() {
           </div>
         ))}
         <div className="flex items-center gap-1.5 ml-auto">
-          <span className="text-2xs text-muted-foreground">Strain:</span>
-          {[['Low','#DBEAFE'],['Med','#93C5FD'],['High','#3B82F6'],['Peak','#1D4ED8']].map(([l,c]) => (
+          <span className="text-2xs text-muted-foreground">Нагрузка:</span>
+          {[['Низкая','#DBEAFE'],['Средняя','#93C5FD'],['Высокая','#3B82F6'],['Пик','#1D4ED8']].map(([l,c]) => (
             <span key={l} className="flex items-center gap-0.5">
               <span className="w-4 h-3 rounded-sm inline-block" style={{ background: c }} />
               <span className="text-[9px] text-muted-foreground">{l}</span>

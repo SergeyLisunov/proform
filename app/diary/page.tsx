@@ -4,7 +4,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import { DEMO_SESSIONS, DEMO_DIARY, TYPE_COLORS, RISK_COLORS, recoveryColor } from '@/lib/utils/data'
 
-const FILTER_OPTIONS = ['All', 'Running', 'Cycling', 'Swimming', 'Weight Training', 'Walking']
+const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
 const RISK_FILTER = ['all', 'low', 'moderate', 'high']
 const CATEGORY_FILTER = ['all', 'performance', 'health', 'motivation', 'technique']
 
@@ -23,22 +23,22 @@ function CoachDiary() {
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Observation Journal</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Coach Diary</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Журнал наблюдений</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Дневник тренера</h2>
         </div>
         <button onClick={() => setShowForm(true)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          New Entry
+          Новая запись
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: 'Total Entries', value: DEMO_DIARY.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-book-open' },
-          { label: 'High Risk',     value: DEMO_DIARY.filter(d => d.risk === 'high' || d.risk === 'critical').length, bg: 'bg-red-50 text-red-500', icon: 'ki-warning-2' },
-          { label: 'Moderate',      value: DEMO_DIARY.filter(d => d.risk === 'moderate').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-information-2' },
-          { label: 'On Track',      value: DEMO_DIARY.filter(d => d.risk === 'low').length, bg: 'bg-green-50 text-green-600', icon: 'ki-check-circle' },
+          { label: 'Всего записей', value: DEMO_DIARY.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-book-open' },
+          { label: 'Высокий риск',  value: DEMO_DIARY.filter(d => d.risk === 'high' || d.risk === 'critical').length, bg: 'bg-red-50 text-red-500', icon: 'ki-warning-2' },
+          { label: 'Умеренный',     value: DEMO_DIARY.filter(d => d.risk === 'moderate').length, bg: 'bg-orange-50 text-orange-500', icon: 'ki-information-2' },
+          { label: 'В норме',       value: DEMO_DIARY.filter(d => d.risk === 'low').length, bg: 'bg-green-50 text-green-600', icon: 'ki-check-circle' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
@@ -64,7 +64,7 @@ function CoachDiary() {
                   riskFilter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200',
                 ].join(' ')}
               >
-                {f === 'all' ? 'All Risk' : f}
+                {f === 'all' ? 'Все риски' : f}
               </button>
             )
           })}
@@ -77,7 +77,7 @@ function CoachDiary() {
                 catFilter === f ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:border-blue-200',
               ].join(' ')}
             >
-              {f === 'all' ? 'All Categories' : f}
+              {f === 'all' ? 'Все категории' : f}
             </button>
           ))}
         </div>
@@ -95,7 +95,7 @@ function CoachDiary() {
                     <span className="text-sm font-semibold text-foreground">{entry.title}</span>
                     <span className="text-2xs font-bold px-2 py-0.5 rounded-full border" style={{ background: rc.bg, color: rc.text, borderColor: rc.border }}>
                       <i className={`ki-filled ${rc.icon} mr-1 text-[10px]`} />
-                      {entry.risk.charAt(0).toUpperCase() + entry.risk.slice(1)} Risk
+                      {entry.risk.charAt(0).toUpperCase() + entry.risk.slice(1)} риск
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-border/60 text-muted-foreground capitalize">
                       {entry.category}
@@ -123,19 +123,19 @@ function CoachDiary() {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="pf-num text-xl text-foreground">New Diary Entry</h3>
+              <h3 className="pf-num text-xl text-foreground">Новая запись в дневник</h3>
               <button onClick={() => setShowForm(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
             <div className="flex flex-col gap-3">
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Title</label>
-                <input className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400" placeholder="Observation title..." />
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Заголовок</label>
+                <input className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400" placeholder="Заголовок наблюдения..." />
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Note</label>
-                <textarea rows={4} className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400 resize-none" placeholder="Detailed observation..." />
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Заметка</label>
+                <textarea rows={4} className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400 resize-none" placeholder="Подробное наблюдение..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -165,20 +165,20 @@ function CoachDiary() {
 
 // ── Athlete Training Diary ────────────────────────────────────────────────────
 function AthleteDiary() {
-  const [filter, setFilter] = useState('All')
+  const [filter, setFilter] = useState('Все')
   const [view, setView] = useState<'list'|'grid'>('list')
-  const sessions = filter === 'All' ? DEMO_SESSIONS : DEMO_SESSIONS.filter(s => s.type === filter)
+  const sessions = filter === 'Все' ? DEMO_SESSIONS : DEMO_SESSIONS.filter(s => s.type === filter)
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Training History</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">My Diary</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">История тренировок</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Мой дневник</h2>
         </div>
         <button className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
-          New Session
+          Новая тренировка
         </button>
       </div>
 
@@ -220,16 +220,16 @@ function AthleteDiary() {
                       <span className="text-sm font-semibold text-foreground">{s.type}</span>
                       <span className="px-1.5 py-0.5 rounded text-2xs font-medium bg-border/60 text-muted-foreground">{s.date}</span>
                     </div>
-                    <div className="text-2xs text-muted-foreground mt-0.5">{s.dur} min · {s.avg_hr} bpm · {s.cal} kcal</div>
+                    <div className="text-2xs text-muted-foreground mt-0.5">{s.dur} мин · {s.avg_hr} уд/мин · {s.cal} ккал</div>
                   </div>
                   <div className="w-36 hidden sm:block"><ZoneBar zones={s.z} height={24} /></div>
                   <div className="text-right shrink-0">
                     <div className="pf-num text-xl leading-none text-foreground">{s.strain}</div>
-                    <div className="text-2xs text-muted-foreground">strain</div>
+                    <div className="text-2xs text-muted-foreground">нагрузка</div>
                   </div>
                   <div className="text-right shrink-0 hidden md:block">
                     <div className="pf-num text-lg leading-none" style={{ color: rc }}>{s.recovery}%</div>
-                    <div className="text-2xs text-muted-foreground">recovery</div>
+                    <div className="text-2xs text-muted-foreground">восстановление</div>
                   </div>
                   <i className="ki-filled ki-right text-muted-foreground text-xs opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 </div>
@@ -252,17 +252,17 @@ function AthleteDiary() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-foreground">{s.type}</div>
-                  <div className="text-2xs text-muted-foreground mt-0.5">{s.dur} min · {s.cal} kcal</div>
+                  <div className="text-2xs text-muted-foreground mt-0.5">{s.dur} мин · {s.cal} ккал</div>
                 </div>
                 <ZoneBar zones={s.z} height={20} />
                 <div className="flex items-center justify-between pt-1 border-t border-border">
                   <div>
                     <div className="pf-num text-xl leading-none" style={{ color: rc }}>{s.recovery}%</div>
-                    <div className="text-2xs text-muted-foreground">recovery</div>
+                    <div className="text-2xs text-muted-foreground">восстановление</div>
                   </div>
                   <div className="text-right">
                     <div className="pf-num text-xl text-foreground leading-none">{s.strain}</div>
-                    <div className="text-2xs text-muted-foreground">strain</div>
+                    <div className="text-2xs text-muted-foreground">нагрузка</div>
                   </div>
                 </div>
               </div>

@@ -47,18 +47,18 @@ export default function AdminPage() {
           <i className="ki-filled ki-shield-cross text-2xl text-red-400" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-foreground">Admin Access Required</p>
-          <p className="text-2sm text-muted-foreground mt-1">You don't have permission to access this area.</p>
+          <p className="text-sm font-semibold text-foreground">Доступ запрещён</p>
+          <p className="text-2sm text-muted-foreground mt-1">У вас нет прав для доступа к этому разделу.</p>
         </div>
       </div>
     )
   }
 
   const TABS: { id: AdminTab; label: string; icon: string }[] = [
-    { id: 'users',   label: 'Users',      icon: 'ki-people' },
-    { id: 'privacy', label: 'Privacy',    icon: 'ki-lock' },
-    { id: 'audit',   label: 'Audit Log',  icon: 'ki-notepad-edit' },
-    { id: 'system',  label: 'System',     icon: 'ki-setting-2' },
+    { id: 'users',   label: 'Пользователи',     icon: 'ki-people' },
+    { id: 'privacy', label: 'Приватность',       icon: 'ki-lock' },
+    { id: 'audit',   label: 'Журнал действий',   icon: 'ki-notepad-edit' },
+    { id: 'system',  label: 'Система',           icon: 'ki-setting-2' },
   ]
 
   // Quick link to /admin/orgs
@@ -67,12 +67,12 @@ export default function AdminPage() {
     <div className="flex flex-col gap-5 pf-enter">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Administration</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Admin Panel</h2>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Администрирование</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Панель администратора</h2>
         </div>
         <button onClick={() => setShowAssign(true)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-people text-sm" />
-          Assign Athlete
+          Назначить атлета
         </button>
       </div>
 
@@ -80,17 +80,17 @@ export default function AdminPage() {
       <div className="flex gap-3 flex-wrap">
         <Link href="/admin/orgs" className="kt-btn kt-btn-outline gap-2">
           <i className="ki-filled ki-office-bag text-sm" />
-          Manage Organizations
+          Управление организациями
         </Link>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 pf-stagger">
         {[
-          { label: 'Total Users',   value: '3',    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Active Today',  value: '3',    icon: 'ki-check-circle',  bg: 'bg-green-50 text-green-600' },
-          { label: 'DB Tables',     value: '13',   icon: 'ki-data',          bg: 'bg-orange-50 text-orange-500' },
-          { label: 'WHOOP Records', value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
+          { label: 'Всего пользователей', value: '3',    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Активны сегодня',    value: '3',    icon: 'ki-check-circle',  bg: 'bg-green-50 text-green-600' },
+          { label: 'Таблиц БД',          value: '13',   icon: 'ki-data',          bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Записей WHOOP',      value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
         ].map(c => (
           <div key={c.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${c.bg}`}>
@@ -127,10 +127,10 @@ export default function AdminPage() {
           {tab === 'users' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground">User Management</h3>
+                <h3 className="text-sm font-semibold text-foreground">Управление пользователями</h3>
                 <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
                   <i className="ki-filled ki-plus text-xs" />
-                  New User
+                  Новый пользователь
                 </button>
               </div>
               <div className="divide-y divide-border -mx-5">
@@ -146,15 +146,15 @@ export default function AdminPage() {
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold capitalize ${ROLE_BADGE[u.role]}`}>{u.role}</span>
                     <div className="text-right hidden md:block shrink-0">
                       <div className="text-2xs text-foreground font-medium">{u.lastLogin}</div>
-                      <div className="text-[9px] text-muted-foreground">last login</div>
+                      <div className="text-[9px] text-muted-foreground">последний вход</div>
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <button className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline"><i className="ki-filled ki-pencil text-xs" /></button>
                       <select className="px-2 py-1 rounded-lg border border-border bg-background text-2xs text-muted-foreground outline-none focus:border-orange-400">
-                        <option>Change role</option>
-                        <option>athlete</option>
-                        <option>coach</option>
-                        <option>admin</option>
+                        <option>Сменить роль</option>
+                        <option>атлет</option>
+                        <option>тренер</option>
+                        <option>администратор</option>
                       </select>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default function AdminPage() {
           {/* PRIVACY TAB */}
           {tab === 'privacy' && (
             <div>
-              <div className="text-2xs text-muted-foreground mb-4">Privacy settings per athlete. Admins can view and override.</div>
+              <div className="text-2xs text-muted-foreground mb-4">Настройки приватности для атлетов. Администраторы могут просматривать и изменять.</div>
               <div className="space-y-4">
                 {USERS.filter(u => u.role === 'athlete').map(u => (
                   <div key={u.email} className="p-4 bg-background border border-border rounded-xl">
@@ -176,9 +176,9 @@ export default function AdminPage() {
                         <div key={resource} className="flex items-center justify-between px-3 py-2 bg-card border border-border rounded-lg">
                           <span className="text-2xs font-medium text-foreground capitalize">{resource}</span>
                           <select className="px-2 py-0.5 rounded border border-border bg-background text-2xs text-muted-foreground outline-none focus:border-orange-400">
-                            <option value="private">Private</option>
-                            <option value="coaches_only">Coaches only</option>
-                            <option value="public">Public</option>
+                            <option value="private">Приватно</option>
+                            <option value="coaches_only">Только тренеры</option>
+                            <option value="public">Публично</option>
                           </select>
                         </div>
                       ))}
@@ -193,10 +193,10 @@ export default function AdminPage() {
           {tab === 'audit' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground">Audit Log</h3>
+                <h3 className="text-sm font-semibold text-foreground">Журнал действий</h3>
                 <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
                   <i className="ki-filled ki-abstract-26 text-xs" />
-                  Export CSV
+                  Экспорт CSV
                 </button>
               </div>
               <div className="divide-y divide-border -mx-5">
@@ -224,12 +224,12 @@ export default function AdminPage() {
           {tab === 'system' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
-                { service: 'Supabase Database',   region: 'eu-central-1', status: 'Healthy',  uptime: '99.9%' },
-                { service: 'Authentication',       region: 'Global',       status: 'Healthy',  uptime: '100%' },
-                { service: 'WHOOP Data Sync',      region: 'eu-central-1', status: 'Active',   uptime: '99.7%' },
-                { service: 'Vercel Edge',          region: 'Global',       status: 'Healthy',  uptime: '100%' },
-                { service: 'Row Level Security',   region: 'DB Layer',     status: 'Enabled',  uptime: '100%' },
-                { service: 'Audit Logging',        region: 'DB Layer',     status: 'Active',   uptime: '100%' },
+                { service: 'Supabase Database',   region: 'eu-central-1', status: 'Работает', uptime: '99.9%' },
+                { service: 'Аутентификация',       region: 'Global',       status: 'Работает', uptime: '100%' },
+                { service: 'WHOOP Data Sync',      region: 'eu-central-1', status: 'Активно',  uptime: '99.7%' },
+                { service: 'Vercel Edge',          region: 'Global',       status: 'Работает', uptime: '100%' },
+                { service: 'Row Level Security',   region: 'DB Layer',     status: 'Включено', uptime: '100%' },
+                { service: 'Журнал действий',      region: 'DB Layer',     status: 'Активно',  uptime: '100%' },
               ].map(s => (
                 <div key={s.service} className="flex items-center gap-3 p-3.5 bg-background border border-border rounded-xl">
                   <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
@@ -253,27 +253,27 @@ export default function AdminPage() {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="pf-num text-xl text-foreground">Assign Athlete to Coach</h3>
+              <h3 className="pf-num text-xl text-foreground">Назначить атлета тренеру</h3>
               <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
             <div className="flex flex-col gap-3">
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Athlete</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Атлет</label>
                 <select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">
                   <option>Sara Kowalski (athlete@proform.test)</option>
                 </select>
               </div>
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Coach</label>
+                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Тренер</label>
                 <select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">
                   <option>Alex Trainer (coach@proform.test)</option>
                 </select>
               </div>
               <div className="flex gap-2 pt-1">
-                <button className="flex-1 kt-btn kt-btn-primary">Assign</button>
-                <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Cancel</button>
+                <button className="flex-1 kt-btn kt-btn-primary">Назначить</button>
+                <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>
             </div>
           </div>
