@@ -428,7 +428,7 @@ export default function SettingsPage() {
   const completeness = calcCompleteness(form)
 
   return (
-    <div className="flex flex-col gap-6 pf-enter max-w-3xl">
+    <div className="flex flex-col gap-6 pf-enter max-w-3xl mx-auto w-full">
 
       {/* ── Заголовок ── */}
       <div className="flex items-start justify-between flex-wrap gap-4">
