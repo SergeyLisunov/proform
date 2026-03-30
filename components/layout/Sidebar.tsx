@@ -1,4 +1,3 @@
-
 'use client'
 
 import Link from 'next/link'
@@ -20,10 +19,10 @@ const NAV = [
 ]
 
 const ROLES: { value: UserRole; label: string; icon: string; bg: string; text: string; border: string }[] = [
-  { value: 'athlete',      label: 'Атлет',        icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
-  { value: 'coach',        label: 'Тренер',       icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
+  { value: 'athlete',      label: 'Атлет',         icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  { value: 'coach',        label: 'Тренер',        icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   { value: 'admin',        label: 'Администратор', icon: 'ki-setting-2',    bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
-  { value: 'organization', label: 'Организация',  icon: 'ki-office-bag',   bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
+  { value: 'organization', label: 'Организация',   icon: 'ki-office-bag',   bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
 ]
 
 export default function Sidebar() {
@@ -31,6 +30,7 @@ export default function Sidebar() {
   const router = useRouter()
   const { user, switching, switchRole } = useUser()
   const [showRolePicker, setShowRolePicker] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
 
   const visible = NAV.filter(item => {
     if (!item.roles) return true
@@ -44,8 +44,14 @@ export default function Sidebar() {
   })
 
   async function signOut() {
-    await createClient().auth.signOut()
-    router.push('/auth/login')
+    setSigningOut(true)
+    try {
+      await createClient().auth.signOut()
+      router.push('/auth/login')
+    } catch (err) {
+      console.error('signOut error:', err)
+      setSigningOut(false)
+    }
   }
 
   const currentRole = ROLES.find(r => r.value === user?.role)
@@ -154,21 +160,38 @@ export default function Sidebar() {
         {/* User footer */}
         <div className="px-3 py-3 border-t border-t-border shrink-0">
           {user && currentRole && (
-            <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors group">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num"
-                style={{ background: currentRole.bg, color: currentRole.text }}>
-                {initials}
+            <div className="flex flex-col gap-2">
+              {/* User info */}
+              <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num"
+                  style={{ background: currentRole.bg, color: currentRole.text }}
+                >
+                  {initials}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-foreground truncate leading-tight">{user.name}</div>
+                  <div className="text-2xs text-muted-foreground font-mono truncate">{user.email}</div>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-foreground truncate leading-tight">{user.name}</div>
-                <div className="text-2xs text-muted-foreground font-mono truncate">{user.email}</div>
-              </div>
+
+              {/* Logout button — always visible */}
               <button
                 onClick={signOut}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost w-7 h-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Выйти"
+                disabled={signingOut}
+                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all disabled:opacity-60"
               >
-                <i className="ki-filled ki-exit-right text-xs text-muted-foreground" />
+                {signingOut ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>Выход…</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="ki-filled ki-exit-right text-sm shrink-0" />
+                    <span>Выйти</span>
+                  </>
+                )}
               </button>
             </div>
           )}
@@ -187,10 +210,7 @@ export default function Sidebar() {
                 <h3 className="pf-num text-xl text-foreground">Переключить роль</h3>
                 <p className="text-2xs text-muted-foreground mt-0.5">Выберите роль для просмотра приложения с этой точки зрения</p>
               </div>
-              <button
-                onClick={() => setShowRolePicker(false)}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
-              >
+              <button onClick={() => setShowRolePicker(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
@@ -210,22 +230,14 @@ export default function Sidebar() {
                     disabled={isActive || switching}
                     className={[
                       'flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all text-left',
-                      isActive
-                        ? 'cursor-default'
-                        : 'cursor-pointer hover:shadow-sm',
+                      isActive ? 'cursor-default' : 'cursor-pointer hover:shadow-sm',
                     ].join(' ')}
-                    style={{
-                      background:    isActive ? role.bg : '#FAFAFA',
-                      borderColor:   isActive ? role.border : '#E4E4E7',
-                    }}
+                    style={{ background: isActive ? role.bg : '#FAFAFA', borderColor: isActive ? role.border : '#E4E4E7' }}
                   >
-                    {/* Icon */}
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{ background: role.bg, border: `1px solid ${role.border}` }}>
                       <i className={`ki-filled ${role.icon} text-base`} style={{ color: role.text }} />
                     </div>
-
-                    {/* Label */}
                     <div className="flex-1">
                       <div className="text-sm font-semibold text-foreground">{role.label}</div>
                       <div className="text-2xs text-muted-foreground">
@@ -235,8 +247,6 @@ export default function Sidebar() {
                         {role.value === 'organization' && 'Дашборд организации, стена, рассылки'}
                       </div>
                     </div>
-
-                    {/* Active indicator */}
                     {isActive ? (
                       <span className="px-2 py-0.5 rounded-full text-2xs font-bold" style={{ background: role.text + '18', color: role.text }}>
                         Активна
