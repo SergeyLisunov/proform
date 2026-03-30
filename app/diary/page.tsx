@@ -5,6 +5,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
 import { getWorkouts, createWorkout } from '@/services/workouts.service'
 import type { Workout } from '@/services/workouts.service'
+import { createBrowserClient } from '@supabase/ssr'
 
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
 const RISK_FILTER = ['all', 'low', 'moderate', 'high']
@@ -59,7 +60,487 @@ const EMPTY_FORM: DrawerForm = {
   description: '',
 }
 
-// ── Coach Observation Diary ────────────────────────────────────────────────────
+// ── Supabase helper ────────────────────────────────────────────────────────────
+function getSupabase() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
+// ── View/Edit Workout Drawer ───────────────────────────────────────────────────
+function ViewEditDrawer({
+  workout,
+  onClose,
+  onUpdated,
+  onDeleted,
+}: {
+  workout: Workout
+  onClose: () => void
+  onUpdated: (w: Workout) => void
+  onDeleted: (id: string) => void
+}) {
+  const [mounted, setMounted] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [mode, setMode] = useState<'view' | 'edit'>('view')
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const [form, setForm] = useState<DrawerForm>({
+    activity_type: workout.activity_type ?? 'Другое',
+    name: workout.name ?? '',
+    event_date: workout.event_date ?? '',
+    start_time: workout.start_time ?? '',
+    activity_duration_min: workout.activity_duration_min != null ? String(workout.activity_duration_min) : '',
+    activity_strain: workout.activity_strain != null ? Number(workout.activity_strain) : 0,
+    avg_heart_rate: workout.avg_heart_rate != null ? String(workout.avg_heart_rate) : '',
+    max_heart_rate: workout.max_heart_rate != null ? String(workout.max_heart_rate) : '',
+    activity_calories: workout.activity_calories != null ? String(workout.activity_calories) : '',
+    mood: workout.mood ?? '',
+    description: workout.description ?? '',
+  })
+
+  useEffect(() => {
+    setMounted(true)
+    requestAnimationFrame(() => setVisible(true))
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleClose() {
+    setVisible(false)
+    setTimeout(onClose, 260)
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    try {
+      const sb = getSupabase()
+      const payload = {
+        name: form.name.trim() || null,
+        event_date: form.event_date,
+        activity_type: form.activity_type || null,
+        start_time: form.start_time || null,
+        activity_duration_min: form.activity_duration_min ? Number(form.activity_duration_min) : null,
+        activity_strain: form.activity_strain > 0 ? form.activity_strain : null,
+        avg_heart_rate: form.avg_heart_rate ? Number(form.avg_heart_rate) : null,
+        max_heart_rate: form.max_heart_rate ? Number(form.max_heart_rate) : null,
+        activity_calories: form.activity_calories ? Number(form.activity_calories) : null,
+        mood: form.mood || null,
+        description: form.description.trim() || null,
+        updated_at: new Date().toISOString(),
+      }
+      const { data, error } = await sb
+        .from('workouts')
+        .update(payload)
+        .eq('id', workout.id)
+        .select()
+        .single()
+      if (error) throw error
+      onUpdated(data as Workout)
+      setMode('view')
+    } catch (err) {
+      console.error('updateWorkout error:', err)
+      alert('Не удалось сохранить тренировку')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      const sb = getSupabase()
+      const { error } = await sb.from('workouts').delete().eq('id', workout.id)
+      if (error) throw error
+      onDeleted(workout.id)
+      handleClose()
+    } catch (err) {
+      console.error('deleteWorkout error:', err)
+      alert('Не удалось удалить тренировку')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  if (!mounted) return null
+
+  const ac = ACTIVITY_CONFIG[workout.activity_type ?? ''] ?? DEFAULT_AC
+  const displayName = workout.name || workout.activity_type || 'Тренировка'
+
+  const panel = (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={handleClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 9998,
+          background: 'rgba(15,23,42,0.65)',
+          backdropFilter: 'blur(3px)',
+          transition: 'opacity 0.26s',
+          opacity: visible ? 1 : 0,
+        }}
+      />
+
+      {/* Panel */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0,
+        width: 480, maxWidth: '100vw',
+        zIndex: 9999,
+        background: 'var(--card)',
+        borderLeft: '1px solid var(--border)',
+        display: 'flex', flexDirection: 'column',
+        transition: 'transform 0.26s cubic-bezier(.32,.72,0,1)',
+        transform: visible ? 'translateX(0)' : 'translateX(100%)',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          padding: '20px 24px 16px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          position: 'sticky', top: 0, background: 'var(--card)', zIndex: 1,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: ac.bg, border: `1px solid ${ac.border}`,
+            }}>
+              <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
+                {mode === 'view' ? workout.activity_type ?? 'Тренировка' : 'Редактирование'}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {mode === 'view' ? displayName : 'Изменить тренировку'}
+              </div>
+            </div>
+          </div>
+          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <i className="ki-filled ki-cross text-sm" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+          {mode === 'view' ? (
+            /* ── VIEW MODE ── */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* Strain / Recovery badges */}
+              {(workout.activity_strain != null || workout.recovery_score != null) && (
+                <div style={{
+                  display: 'flex', gap: 16, padding: '16px',
+                  background: 'var(--accent)', borderRadius: 14,
+                  border: '1px solid var(--border)',
+                }}>
+                  {workout.activity_strain != null && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div className="pf-num" style={{ fontSize: 28, fontWeight: 700, color: strainColor(Number(workout.activity_strain)), lineHeight: 1 }}>
+                        {Number(workout.activity_strain).toFixed(1)}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>strain</div>
+                    </div>
+                  )}
+                  {workout.activity_strain != null && workout.recovery_score != null && (
+                    <div style={{ width: 1, background: 'var(--border)' }} />
+                  )}
+                  {workout.recovery_score != null && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div className="pf-num" style={{ fontSize: 28, fontWeight: 700, color: '#22c55e', lineHeight: 1 }}>
+                        {Math.round(Number(workout.recovery_score))}%
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>recovery</div>
+                    </div>
+                  )}
+                  {workout.hrv != null && (
+                    <>
+                      <div style={{ width: 1, background: 'var(--border)' }} />
+                      <div style={{ textAlign: 'center' }}>
+                        <div className="pf-num" style={{ fontSize: 28, fontWeight: 700, color: '#a855f7', lineHeight: 1 }}>
+                          {Math.round(Number(workout.hrv))}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>HRV</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Info grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <InfoRow label="Дата" value={
+                  workout.event_date
+                    ? new Date(workout.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : null
+                } />
+                <InfoRow label="Тип" value={workout.activity_type} />
+                <InfoRow label="Длительность" value={workout.activity_duration_min ? `${workout.activity_duration_min} мин` : null} />
+                <InfoRow label="Калории" value={workout.activity_calories ? `${workout.activity_calories} ккал` : null} />
+                <InfoRow label="ЧСС средний" value={workout.avg_heart_rate ? `${Math.round(Number(workout.avg_heart_rate))} уд/мин` : null} />
+                <InfoRow label="ЧСС макс" value={workout.max_heart_rate ? `${Math.round(Number(workout.max_heart_rate))} уд/мин` : null} />
+                {workout.mood && <InfoRow label="Самочувствие" value={workout.mood} />}
+              </div>
+
+              {/* Description */}
+              {workout.description && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                    Заметки
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>
+                    {workout.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Created */}
+              {workout.created_at && (
+                <p style={{ fontSize: 11, color: 'var(--muted-foreground)', opacity: 0.6, margin: 0 }}>
+                  Создано: {new Date(workout.created_at).toLocaleString('ru-RU')}
+                </p>
+              )}
+            </div>
+          ) : (
+            /* ── EDIT MODE ── */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* Activity type */}
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+                  Тип активности
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                  {FORM_ACTIVITY_TYPES.map(at => {
+                    const cfg = ACTIVITY_CONFIG[at.value] ?? DEFAULT_AC
+                    const selected = form.activity_type === at.value
+                    return (
+                      <button
+                        key={at.value}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, activity_type: at.value }))}
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                          padding: '10px 8px', borderRadius: 12,
+                          border: `1.5px solid ${selected ? cfg.border : 'var(--border)'}`,
+                          background: selected ? cfg.bg : 'transparent',
+                          cursor: 'pointer', transition: 'all 0.15s',
+                        }}
+                      >
+                        <i className={`ki-filled ${at.icon} text-base`} style={{ color: selected ? cfg.text : 'var(--muted-foreground)' }} />
+                        <span style={{ fontSize: 10, fontWeight: 600, color: selected ? cfg.text : 'var(--muted-foreground)' }}>{at.value}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Name */}
+              <EditField label="Название" name="name" type="text" value={form.name} onChange={handleChange} placeholder="Утренняя пробежка..." />
+
+              {/* Date + time */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <EditField label="Дата *" name="event_date" type="date" value={form.event_date} onChange={handleChange} />
+                <EditField label="Начало" name="start_time" type="time" value={form.start_time} onChange={handleChange} />
+              </div>
+
+              {/* Duration + Strain */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <EditField label="Длительность (мин)" name="activity_duration_min" type="number" value={form.activity_duration_min} onChange={handleChange} placeholder="60" />
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Нагрузка (0–21)</label>
+                    <span className="pf-num" style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)' }}>{form.activity_strain.toFixed(1)}</span>
+                  </div>
+                  <input
+                    type="range" min="0" max="21" step="0.1"
+                    value={form.activity_strain}
+                    onChange={e => setForm(f => ({ ...f, activity_strain: Number(e.target.value) }))}
+                    className="w-full accent-orange-500"
+                  />
+                </div>
+              </div>
+
+              {/* HR + Calories */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                <EditField label="Ср. ЧСС" name="avg_heart_rate" type="number" value={form.avg_heart_rate} onChange={handleChange} placeholder="150" />
+                <EditField label="Макс. ЧСС" name="max_heart_rate" type="number" value={form.max_heart_rate} onChange={handleChange} placeholder="185" />
+                <EditField label="Калории" name="activity_calories" type="number" value={form.activity_calories} onChange={handleChange} placeholder="500" />
+              </div>
+
+              {/* Mood */}
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 8 }}>
+                  Самочувствие
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {MOODS.map(m => (
+                    <button
+                      key={m} type="button"
+                      onClick={() => setForm(f => ({ ...f, mood: f.mood === m ? '' : m }))}
+                      style={{
+                        width: 40, height: 40, borderRadius: 10, fontSize: 20,
+                        border: `1.5px solid ${form.mood === m ? '#fb923c' : 'var(--border)'}`,
+                        background: form.mood === m ? 'rgba(251,146,60,0.08)' : 'transparent',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>
+                  Заметки
+                </label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Ощущения, условия, наблюдения…"
+                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '16px 24px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex', gap: 10, flexShrink: 0,
+        }}>
+          {mode === 'view' ? (
+            <>
+              <button
+                onClick={() => setMode('edit')}
+                className="kt-btn kt-btn-primary"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                <i className="ki-filled ki-pencil text-xs" />
+                Редактировать
+              </button>
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  style={{
+                    padding: '8px 14px', borderRadius: 10, border: '1px solid #fecaca',
+                    background: 'transparent', color: '#ef4444', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600, transition: 'all 0.15s',
+                  }}
+                >
+                  <i className="ki-filled ki-trash text-sm" />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    style={{
+                      padding: '8px 14px', borderRadius: 10, background: '#ef4444',
+                      color: 'white', border: 'none', cursor: 'pointer',
+                      fontSize: 13, fontWeight: 600, opacity: deleting ? 0.6 : 1,
+                    }}
+                  >
+                    {deleting ? '...' : 'Удалить'}
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(false)}
+                    className="kt-btn kt-btn-outline"
+                  >
+                    Отмена
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="kt-btn kt-btn-primary"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                {saving ? (
+                  <><i className="ki-filled ki-loading animate-spin text-xs" /> Сохранение…</>
+                ) : (
+                  <><i className="ki-filled ki-check text-xs" /> Сохранить</>
+                )}
+              </button>
+              <button onClick={() => setMode('view')} className="kt-btn kt-btn-outline">
+                Отмена
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  )
+
+  return ReactDOM.createPortal(panel, document.body)
+}
+
+// ── helpers ────────────────────────────────────────────────────────────────────
+function strainColor(v: number): string {
+  if (v < 3) return '#22c55e'
+  if (v < 8) return '#84cc16'
+  if (v < 14) return '#eab308'
+  if (v < 18) return '#f97316'
+  return '#ef4444'
+}
+
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+  if (!value) return null
+  return (
+    <div>
+      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 13, color: 'var(--foreground)' }}>{value}</div>
+    </div>
+  )
+}
+
+function EditField({
+  label, name, type, value, onChange, placeholder,
+}: {
+  label: string; name: string; type: string;
+  value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>
+        {label}
+      </label>
+      <input
+        type={type} name={name} value={value} onChange={onChange} placeholder={placeholder}
+        className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+      />
+    </div>
+  )
+}
+
+// ── Coach Diary ────────────────────────────────────────────────────────────────
 function CoachDiary() {
   const [riskFilter, setRiskFilter] = useState('all')
   const [catFilter, setCatFilter] = useState('all')
@@ -83,7 +564,6 @@ function CoachDiary() {
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
           { label: 'Всего записей', value: DEMO_DIARY.length, bg: 'bg-blue-50 text-blue-600', icon: 'ki-book-open' },
@@ -103,15 +583,12 @@ function CoachDiary() {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex gap-1.5 flex-wrap">
           {RISK_FILTER.map(f => (
             <button key={f} onClick={() => setRiskFilter(f)}
-              className={[
-                'px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize',
-                riskFilter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200',
-              ].join(' ')}
+              className={['px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize',
+                riskFilter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}
             >
               {f === 'all' ? 'Все риски' : f}
             </button>
@@ -120,10 +597,8 @@ function CoachDiary() {
         <div className="flex gap-1.5 flex-wrap ml-auto">
           {CATEGORY_FILTER.map(f => (
             <button key={f} onClick={() => setCatFilter(f)}
-              className={[
-                'px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize',
-                catFilter === f ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:border-blue-200',
-              ].join(' ')}
+              className={['px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize',
+                catFilter === f ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:border-blue-200'].join(' ')}
             >
               {f === 'all' ? 'Все категории' : f}
             </button>
@@ -131,7 +606,6 @@ function CoachDiary() {
         </div>
       </div>
 
-      {/* Entries */}
       <div className="flex flex-col gap-3">
         {filtered.map((entry, i) => {
           const rc = RISK_COLORS[entry.risk as keyof typeof RISK_COLORS]
@@ -145,15 +619,11 @@ function CoachDiary() {
                       <i className={`ki-filled ${rc.icon} mr-1 text-[10px]`} />
                       {entry.risk.charAt(0).toUpperCase() + entry.risk.slice(1)} риск
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-border/60 text-muted-foreground capitalize">
-                      {entry.category}
-                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-border/60 text-muted-foreground capitalize">{entry.category}</span>
                   </div>
                   <div className="text-2xs text-muted-foreground">{entry.date} · Sara Kowalski</div>
                 </div>
-                <div className="flex gap-1.5 shrink-0">
-                  <button className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-pencil text-xs text-muted-foreground" /></button>
-                </div>
+                <button className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-pencil text-xs text-muted-foreground" /></button>
               </div>
               <p className="text-sm text-foreground/80 leading-relaxed mb-3">{entry.note}</p>
               <div className="flex items-center gap-2 flex-wrap">
@@ -166,7 +636,6 @@ function CoachDiary() {
         })}
       </div>
 
-      {/* New Entry Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-xl">
@@ -211,7 +680,7 @@ function CoachDiary() {
   )
 }
 
-// ── Athlete Training Diary ────────────────────────────────────────────────────
+// ── Athlete Diary ──────────────────────────────────────────────────────────────
 function AthleteDiary() {
   const { user } = useUser()
   const [filter, setFilter] = useState('Все')
@@ -219,6 +688,7 @@ function AthleteDiary() {
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
+  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
   const [toast, setToast] = useState(false)
 
   useEffect(() => {
@@ -238,6 +708,18 @@ function AthleteDiary() {
     setShowDrawer(false)
     setToast(true)
     setTimeout(() => setToast(false), 3000)
+  }
+
+  function handleUpdated(updated: Workout) {
+    setWorkouts(prev => prev.map(w => w.id === updated.id ? updated : w))
+    setSelectedWorkout(updated)
+    setToast(true)
+    setTimeout(() => setToast(false), 3000)
+  }
+
+  function handleDeleted(id: string) {
+    setWorkouts(prev => prev.filter(w => w.id !== id))
+    setSelectedWorkout(null)
   }
 
   if (loading) {
@@ -265,10 +747,8 @@ function AthleteDiary() {
       <div className="flex items-center gap-2 flex-wrap">
         {FILTER_OPTIONS.map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            className={[
-              'px-3 py-1.5 rounded-lg text-2sm font-medium border transition-all',
-              filter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200',
-            ].join(' ')}
+            className={['px-3 py-1.5 rounded-lg text-2sm font-medium border transition-all',
+              filter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}
           >
             {f}
           </button>
@@ -289,6 +769,7 @@ function AthleteDiary() {
           <p className="text-muted-foreground text-2sm">Тренировок пока нет. Создайте первую!</p>
         </div>
       ) : view === 'list' ? (
+        /* LIST VIEW */
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="divide-y divide-border">
             {filtered.map(w => {
@@ -299,7 +780,11 @@ function AthleteDiary() {
                 w.activity_calories && `${w.activity_calories} ккал`,
               ].filter(Boolean).join(' · ')
               return (
-                <div key={w.id} className="flex items-center gap-4 px-5 py-4 hover:bg-accent/40 transition-colors cursor-pointer group">
+                <div
+                  key={w.id}
+                  onClick={() => setSelectedWorkout(w)}
+                  className="flex items-center gap-4 px-5 py-4 hover:bg-accent/40 transition-colors cursor-pointer group"
+                >
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border" style={{ background: ac.bg, borderColor: ac.border }}>
                     <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
                   </div>
@@ -324,11 +809,16 @@ function AthleteDiary() {
           </div>
         </div>
       ) : (
+        /* GRID VIEW */
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(w => {
             const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
             return (
-              <div key={w.id} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer">
+              <div
+                key={w.id}
+                onClick={() => setSelectedWorkout(w)}
+                className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer"
+              >
                 <div className="flex items-center justify-between">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ background: ac.bg, borderColor: ac.border }}>
                     <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
@@ -366,12 +856,23 @@ function AthleteDiary() {
         </div>
       )}
 
+      {/* Add workout drawer */}
       <AddWorkoutDrawer
         open={showDrawer}
         onClose={() => setShowDrawer(false)}
         userId={user?.id ?? ''}
         onCreated={handleCreated}
       />
+
+      {/* View/edit drawer */}
+      {selectedWorkout && (
+        <ViewEditDrawer
+          workout={selectedWorkout}
+          onClose={() => setSelectedWorkout(null)}
+          onUpdated={handleUpdated}
+          onDeleted={handleDeleted}
+        />
+      )}
 
       {/* Toast */}
       {toast && (
@@ -384,7 +885,7 @@ function AthleteDiary() {
   )
 }
 
-// ── Add Workout Drawer ─────────────────────────────────────────────────────────
+// ── Add Workout Drawer (без изменений) ─────────────────────────────────────────
 function AddWorkoutDrawer({
   open, onClose, userId, onCreated,
 }: {
@@ -400,7 +901,6 @@ function AddWorkoutDrawer({
 
   useEffect(() => { setMounted(true) }, [])
 
-  // Reset form when drawer opens
   useEffect(() => {
     if (open) {
       setForm({ ...EMPTY_FORM, event_date: new Date().toISOString().slice(0, 10) })
@@ -447,36 +947,20 @@ function AddWorkoutDrawer({
 
   return ReactDOM.createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex' }}>
-      {/* Backdrop */}
       <div
         style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.65)' }}
         onClick={onClose}
       />
-      {/* Panel */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        height: '100%',
-        width: 480,
-        maxWidth: '100vw',
-        background: 'var(--card)',
-        borderLeft: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
+        position: 'absolute', top: 0, right: 0, height: '100%',
+        width: 480, maxWidth: '100vw',
+        background: 'var(--card)', borderLeft: '1px solid var(--border)',
+        display: 'flex', flexDirection: 'column', overflowY: 'auto',
       }}>
-        {/* Header */}
         <div style={{
-          padding: '20px 24px 16px',
-          borderBottom: '1px solid var(--border)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'sticky',
-          top: 0,
-          background: 'var(--card)',
-          zIndex: 1,
+          padding: '20px 24px 16px', borderBottom: '1px solid var(--border)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          position: 'sticky', top: 0, background: 'var(--card)', zIndex: 1,
         }}>
           <div>
             <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
@@ -491,36 +975,22 @@ function AddWorkoutDrawer({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} style={{ flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-
-          {/* ── Секция 1: Основное ── */}
           <div>
-            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-              Основное
-            </p>
-
-            {/* Activity type grid 2×3 */}
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Основное</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
               {FORM_ACTIVITY_TYPES.map(at => {
                 const ac = ACTIVITY_CONFIG[at.value] ?? DEFAULT_AC
                 const selected = form.activity_type === at.value
                 return (
-                  <button
-                    key={at.value}
-                    type="button"
+                  <button key={at.value} type="button"
                     onClick={() => setForm(f => ({ ...f, activity_type: at.value }))}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '10px 8px',
-                      borderRadius: 12,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                      padding: '10px 8px', borderRadius: 12,
                       border: `1.5px solid ${selected ? ac.border : 'var(--border)'}`,
                       background: selected ? ac.bg : 'transparent',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
+                      cursor: 'pointer', transition: 'all 0.15s',
                     }}
                   >
                     <i className={`ki-filled ${at.icon} text-base`} style={{ color: selected ? ac.text : 'var(--muted-foreground)' }} />
@@ -529,181 +999,83 @@ function AddWorkoutDrawer({
                 )
               })}
             </div>
-
-            {/* Name */}
             <div style={{ marginBottom: 12 }}>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                Название *
-              </label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                placeholder="Например: Утренняя пробежка"
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-              />
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Название *</label>
+              <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Например: Утренняя пробежка" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
               {errors.name && <p className="text-2xs text-red-500 mt-1">{errors.name}</p>}
             </div>
-
-            {/* Date + Start time */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Дата *</label>
-                <input
-                  type="date"
-                  value={form.event_date}
-                  onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
+                <input type="date" value={form.event_date} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
                 {errors.event_date && <p className="text-2xs text-red-500 mt-1">{errors.event_date}</p>}
               </div>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Начало</label>
-                <input
-                  type="time"
-                  value={form.start_time}
-                  onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
+                <input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
               </div>
             </div>
-
-            {/* Duration */}
             <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                Длительность (мин)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={form.activity_duration_min}
-                onChange={e => setForm(f => ({ ...f, activity_duration_min: e.target.value }))}
-                placeholder="60"
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-              />
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Длительность (мин)</label>
+              <input type="number" min="1" value={form.activity_duration_min} onChange={e => setForm(f => ({ ...f, activity_duration_min: e.target.value }))} placeholder="60" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
             </div>
           </div>
 
-          {/* ── Секция 2: Метрики ── */}
           <div>
-            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-              Метрики
-            </p>
-
-            {/* Strain slider */}
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Метрики</p>
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Нагрузка (0–21)</label>
                 <span className="pf-num text-xl text-foreground">{form.activity_strain.toFixed(1)}</span>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="21"
-                step="0.1"
-                value={form.activity_strain}
-                onChange={e => setForm(f => ({ ...f, activity_strain: Number(e.target.value) }))}
-                className="w-full accent-orange-500"
-              />
+              <input type="range" min="0" max="21" step="0.1" value={form.activity_strain} onChange={e => setForm(f => ({ ...f, activity_strain: Number(e.target.value) }))} className="w-full accent-orange-500" />
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                 <span className="text-2xs text-muted-foreground">Отдых</span>
                 <span className="text-2xs text-muted-foreground">Максимум</span>
               </div>
-              {errors.activity_strain && <p className="text-2xs text-red-500 mt-1">{errors.activity_strain}</p>}
             </div>
-
-            {/* HR + Calories */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Ср. ЧСС</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.avg_heart_rate}
-                  onChange={e => setForm(f => ({ ...f, avg_heart_rate: e.target.value }))}
-                  placeholder="150"
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
-                {errors.avg_heart_rate && <p className="text-2xs text-red-500 mt-1">{errors.avg_heart_rate}</p>}
+                <input type="number" min="1" value={form.avg_heart_rate} onChange={e => setForm(f => ({ ...f, avg_heart_rate: e.target.value }))} placeholder="150" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
               </div>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Макс. ЧСС</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.max_heart_rate}
-                  onChange={e => setForm(f => ({ ...f, max_heart_rate: e.target.value }))}
-                  placeholder="185"
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
-                {errors.max_heart_rate && <p className="text-2xs text-red-500 mt-1">{errors.max_heart_rate}</p>}
+                <input type="number" min="1" value={form.max_heart_rate} onChange={e => setForm(f => ({ ...f, max_heart_rate: e.target.value }))} placeholder="185" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
               </div>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Калории</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.activity_calories}
-                  onChange={e => setForm(f => ({ ...f, activity_calories: e.target.value }))}
-                  placeholder="500"
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
-                {errors.activity_calories && <p className="text-2xs text-red-500 mt-1">{errors.activity_calories}</p>}
+                <input type="number" min="1" value={form.activity_calories} onChange={e => setForm(f => ({ ...f, activity_calories: e.target.value }))} placeholder="500" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
               </div>
             </div>
-
-            {/* Mood */}
             <div style={{ marginTop: 16 }}>
               <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Самочувствие</label>
               <div style={{ display: 'flex', gap: 8 }}>
                 {MOODS.map(m => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, mood: f.mood === m ? '' : m }))}
+                  <button key={m} type="button" onClick={() => setForm(f => ({ ...f, mood: f.mood === m ? '' : m }))}
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
+                      width: 40, height: 40, borderRadius: 10,
                       border: `1.5px solid ${form.mood === m ? '#fb923c' : 'var(--border)'}`,
                       background: form.mood === m ? 'rgba(251,146,60,0.08)' : 'transparent',
-                      fontSize: 20,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.15s',
                     }}
-                  >
-                    {m}
-                  </button>
+                  >{m}</button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* ── Секция 3: Заметки ── */}
           <div>
-            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-              Заметки
-            </p>
-            <textarea
-              value={form.description}
-              onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              rows={4}
-              placeholder="Ощущения, условия, наблюдения…"
-              className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none"
-            />
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Заметки</p>
+            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={4} placeholder="Ощущения, условия, наблюдения…" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none" />
           </div>
 
-          {/* Submit */}
           <div style={{ display: 'flex', gap: 8, paddingBottom: 8 }}>
             <button type="submit" disabled={saving} className="flex-1 kt-btn kt-btn-primary">
               {saving ? 'Сохранение…' : 'Сохранить тренировку'}
             </button>
-            <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">
-              Отмена
-            </button>
+            <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
           </div>
         </form>
       </div>
