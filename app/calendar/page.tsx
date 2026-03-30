@@ -13,7 +13,13 @@ import {
   type CalendarEvent,
   type EventType,
 } from '@/services/calendar.service'
+import {
+  getCycleBlocks, getCycleDayTypes, setCycleDayType, deleteCycleDayType,
+  DAY_TYPE_CONFIG,
+  type CycleBlock, type DayType,
+} from '@/services/cycles.service'
 
+type CycleEntry = { start: string; end: string; type: string; label: string }
 type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
 const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -168,12 +174,14 @@ function QuarterView({ year, quarter, onSelect }: { year: number; quarter: numbe
 
 // ── MONTH VIEW ─────────────────────────────────────────────────────────────────
 function MonthView({
-  year, month, onSelect, selected, savedEvents,
+  year, month, onSelect, selected, savedEvents, cycles: propCycles, dayTypes,
 }: {
   year: number; month: number
   onSelect: (d: string) => void
   selected: string | null
-  savedEvents: CalendarEvent[]   // ← добавлен пропс
+  savedEvents: CalendarEvent[]
+  cycles?: CycleEntry[]
+  dayTypes?: Record<string, string>
 }) {
   const firstDay = new Date(year, month, 1).getDay()
   const offset   = (firstDay + 6) % 7
@@ -184,7 +192,8 @@ function MonthView({
   for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i+7))
   const today = todayISO()
 
-  const activeCycles = DEMO_CYCLES.filter(c => {
+  const cycles = propCycles ?? DEMO_CYCLES
+  const activeCycles = cycles.filter(c => {
     const cs = new Date(c.start), ce = new Date(c.end)
     const ms = new Date(year, month, 1), me = new Date(year, month+1, 0)
     return cs <= me && ce >= ms
@@ -265,11 +274,14 @@ function MonthView({
                     {dayEvents.length > 2 && (
                       <div className="text-[10px] text-muted-foreground px-1.5">+{dayEvents.length - 2}</div>
                     )}
-                    <div className="flex gap-0.5 justify-center">
-                      {DEMO_CYCLES.filter(c => c.type !== 'macro' && dateStr >= c.start && dateStr <= c.end).slice(0,2).map((c,ci) => {
+                    <div className="flex gap-0.5 justify-center items-center">
+                      {cycles.filter(c => c.type !== 'macro' && dateStr >= c.start && dateStr <= c.end).slice(0,2).map((c,ci) => {
                         const cc = CYCLE_COLORS[c.type as keyof typeof CYCLE_COLORS]
                         return <span key={ci} className="w-1.5 h-1.5 rounded-full" style={{ background: cc.text }} />
                       })}
+                      {dayTypes?.[dateStr] && (
+                        <span className="w-2 h-2 rounded-full ml-0.5" style={{ background: DAY_TYPE_CONFIG[dayTypes[dateStr] as DayType]?.color ?? '#94A3B8' }} />
+                      )}
                     </div>
                   </>
                 )}
@@ -284,13 +296,15 @@ function MonthView({
 
 // ── WEEK VIEW ──────────────────────────────────────────────────────────────────
 function WeekView({
-  weekStart, onSelect, selected, savedEvents,
+  weekStart, onSelect, selected, savedEvents, cycles: propCycles, dayTypes,
 }: {
   year: number; month: number
   weekStart: Date
   onSelect: (d: string) => void
   selected: string | null
-  savedEvents: CalendarEvent[]   // ← добавлен пропс
+  savedEvents: CalendarEvent[]
+  cycles?: CycleEntry[]
+  dayTypes?: Record<string, string>
 }) {
   const days = Array.from({length: 7}, (_, i) => {
     const d = new Date(weekStart)
@@ -304,9 +318,10 @@ function WeekView({
       {days.map((d, di) => {
         const dateStr  = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
         const session  = DEMO_SESSIONS.find(s => s.date === dateStr)
-        const comp     = DEMO_COMPETITIONS.find(c => c.date === dateStr)
-        const cycles   = DEMO_CYCLES.filter(c => c.type !== 'macro' && dateStr >= c.start && dateStr <= c.end)
-        const dayEvents = savedEvents.filter(e => e.event_date === dateStr)  // ← реальные события
+        const comp      = DEMO_COMPETITIONS.find(c => c.date === dateStr)
+        const dayCycles = (propCycles ?? DEMO_CYCLES).filter(c => c.type !== 'macro' && dateStr >= c.start && dateStr <= c.end)
+        const dayType   = dayTypes?.[dateStr]
+        const dayEvents = savedEvents.filter(e => e.event_date === dateStr)
         const isToday    = dateStr === today
         const isSelected = dateStr === selected
         return (
@@ -342,7 +357,7 @@ function WeekView({
                 </div>
               )
             })}
-            {cycles.map((c, ci) => {
+            {dayCycles.map((c, ci) => {
               const cc = CYCLE_COLORS[c.type as keyof typeof CYCLE_COLORS]
               return (
                 <div key={ci} className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border truncate" style={{ background: cc.bg, color: cc.text, borderColor: cc.border }}>
@@ -350,7 +365,15 @@ function WeekView({
                 </div>
               )
             })}
-            {!session && !comp && dayEvents.length === 0 && (
+            {dayType && (() => {
+              const dtc = DAY_TYPE_CONFIG[dayType as DayType]
+              return (
+                <div className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold border truncate" style={{ background: dtc.bg, color: dtc.color, borderColor: dtc.border }}>
+                  {dtc.label}
+                </div>
+              )
+            })()}
+            {!session && !comp && dayEvents.length === 0 && dayCycles.length === 0 && !dayType && (
               <div className="flex items-center justify-center h-12 text-muted-foreground/30">
                 <i className="ki-filled ki-minus text-xs" />
               </div>
@@ -363,16 +386,20 @@ function WeekView({
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEvent }: {
+function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEvent, cycles: propCycles, dayTypes, onSetDayType }: {
   dateStr: string
   savedEvents: CalendarEvent[]
   onAddEvent: (date: string) => void
   onDeleteEvent: (id: string) => void
   onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
+  cycles?: CycleEntry[]
+  dayTypes?: Record<string, string>
+  onSetDayType?: (date: string, dayType: DayType | null) => void
 }) {
   const session = DEMO_SESSIONS.find(s => s.date === dateStr)
   const comp    = DEMO_COMPETITIONS.find(c => c.date === dateStr)
-  const cycles  = DEMO_CYCLES.filter(c => dateStr >= c.start && dateStr <= c.end)
+  const cycles  = (propCycles ?? DEMO_CYCLES).filter(c => dateStr >= c.start && dateStr <= c.end)
+  const currentDayType = dayTypes?.[dateStr] as DayType | undefined
   // ← parseLocalDate убирает timezone-сдвиг
   const label   = parseLocalDate(dateStr).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
   const dayEvents = savedEvents.filter(e => e.event_date === dateStr)
@@ -383,6 +410,32 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
         <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Выбрано</div>
         <h3 className="pf-num text-xl text-foreground">{label}</h3>
       </div>
+      {/* Day type selector */}
+      {onSetDayType && (
+        <div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тип дня</div>
+          <div className="flex flex-wrap gap-1.5">
+            {(Object.entries(DAY_TYPE_CONFIG) as [DayType, typeof DAY_TYPE_CONFIG[DayType]][]).map(([key, cfg]) => {
+              const active = currentDayType === key
+              return (
+                <button
+                  key={key}
+                  onClick={() => onSetDayType(dateStr, active ? null : key)}
+                  className="px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all"
+                  style={{
+                    background:   active ? cfg.bg    : 'transparent',
+                    color:        active ? cfg.color : 'var(--muted-foreground)',
+                    borderColor:  active ? cfg.border : 'var(--border)',
+                  }}
+                >
+                  {cfg.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {cycles.length > 0 && (
         <div>
           <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Активные циклы</div>
@@ -469,7 +522,7 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent, onViewEv
           </div>
         </div>
       )}
-      {!session && !comp && cycles.length === 0 && dayEvents.length === 0 && (
+      {!session && !comp && cycles.length === 0 && dayEvents.length === 0 && !currentDayType && (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
           <i className="ki-filled ki-calendar text-3xl text-muted-foreground/20 mb-2" />
           <p className="text-2sm text-muted-foreground">Нет событий</p>
@@ -741,17 +794,39 @@ export default function CalendarPage() {
   const [eventDrawerEvent, setEventDrawerEvent] = useState<CalendarEvent | null>(null)
   const [eventDrawerMode,  setEventDrawerMode]  = useState<'view' | 'edit'>('view')
 
-  // ── FIX 2: загружаем события из БД при монтировании и при смене месяца ────
+  // ── Cycles & day types ────────────────────────────────────────────────────
+  const [cycleBlocks, setCycleBlocks] = useState<CycleBlock[]>([])
+  const [dayTypes,    setDayTypes]    = useState<Record<string, string>>({})
+
+  // ── Загрузка событий ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user?.id) return
     setEventsLoading(true)
-    // Загружаем ±1 месяц чтобы week-view на стыке месяцев тоже работал
     const from = `${year}-${String(month + 1).padStart(2, '0')}-01`
     const lastDay = new Date(year, month + 1, 0).getDate()
     const to   = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
     getCalendarEvents(user.id, from, to)
       .then(events => setSavedEvents(events))
       .finally(() => setEventsLoading(false))
+  }, [user?.id, year, month])
+
+  // ── Загрузка циклов ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.id) return
+    getCycleBlocks(user.id).then(setCycleBlocks)
+  }, [user?.id])
+
+  // ── Загрузка типов дней ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.id) return
+    const from = `${year}-${String(month + 1).padStart(2, '0')}-01`
+    const lastDay = new Date(year, month + 1, 0).getDate()
+    const to   = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+    getCycleDayTypes(user.id, from, to).then(types => {
+      const map: Record<string, string> = {}
+      types.forEach(t => { map[t.date] = t.day_type })
+      setDayTypes(prev => ({ ...prev, ...map }))
+    })
   }, [user?.id, year, month])
 
   const openAddEvent = useCallback((date?: string) => {
@@ -821,6 +896,22 @@ export default function CalendarPage() {
     { id: 'quarter', label: 'Квартал' },
     { id: 'year',    label: 'Год'     },
   ]
+
+  // Map real cycle blocks to the legacy { start, end, type, label } shape
+  const displayCycles: CycleEntry[] = cycleBlocks.length > 0
+    ? cycleBlocks.map(b => ({ start: b.start_date, end: b.end_date, type: b.type, label: b.label }))
+    : DEMO_CYCLES
+
+  const handleSetDayType = useCallback(async (date: string, dayType: DayType | null) => {
+    if (!user?.id) return
+    if (dayType === null) {
+      await deleteCycleDayType(user.id, date)
+      setDayTypes(prev => { const n = { ...prev }; delete n[date]; return n })
+    } else {
+      await setCycleDayType(user.id, date, dayType)
+      setDayTypes(prev => ({ ...prev, [date]: dayType }))
+    }
+  }, [user?.id])
 
   const periodSessions = DEMO_SESSIONS.length
   const avgStrain      = (DEMO_SESSIONS.reduce((a,s) => a + s.strain, 0) / DEMO_SESSIONS.length).toFixed(1)
@@ -904,7 +995,9 @@ export default function CalendarPage() {
             <MonthView
               year={year} month={month}
               onSelect={setSelected} selected={selected}
-              savedEvents={savedEvents}   // ← передаём реальные события
+              savedEvents={savedEvents}
+              cycles={displayCycles}
+              dayTypes={dayTypes}
             />
           )}
           {view === 'week' && (
@@ -912,7 +1005,9 @@ export default function CalendarPage() {
               year={year} month={month}
               weekStart={weekStart}
               onSelect={setSelected} selected={selected}
-              savedEvents={savedEvents}   // ← передаём реальные события
+              savedEvents={savedEvents}
+              cycles={displayCycles}
+              dayTypes={dayTypes}
             />
           )}
         </div>
@@ -923,6 +1018,9 @@ export default function CalendarPage() {
             onAddEvent={openAddEvent}
             onDeleteEvent={handleDeleteEvent}
             onViewEvent={openEventDrawer}
+            cycles={displayCycles}
+            dayTypes={dayTypes}
+            onSetDayType={handleSetDayType}
           />
         )}
       </div>
