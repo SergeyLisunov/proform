@@ -358,7 +358,12 @@ export default function TopBar() {
   const { user }   = useUser()
   const [showNotif, setShowNotif] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
-
+  const [scrolled, setScrolled] = useState(false)
+useEffect(() => {
+  const onScroll = () => setScrolled(window.scrollY > 0)
+  window.addEventListener('scroll', onScroll, { passive: true })
+  return () => window.removeEventListener('scroll', onScroll)
+}, [])
   const meta  = Object.entries(TITLES).find(([k]) => pathname === k || pathname.startsWith(k + '/'))?.[1]
   const title = meta?.title ?? 'ProForm'
   const sub   = meta?.sub   ?? ''
@@ -404,10 +409,10 @@ export default function TopBar() {
     <>
       <header
         id="header"
-        className="kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-card border-b border-b-border"
-        data-kt-sticky="true"
-        data-kt-sticky-class="shadow-sm"
-        data-kt-sticky-name="header"
+        <header
+  id="header"
+  className={`kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 border-b border-b-border transition-all duration-200 ${scrolled ? 'bg-card shadow-sm' : 'bg-card/80 backdrop-blur-md'}`}
+>
       >
         <div className="kt-container-fixed flex justify-between items-center px-5 lg:px-8 gap-4 w-full" id="headerContainer">
 
