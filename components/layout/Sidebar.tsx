@@ -15,6 +15,7 @@ const NAV = [
   { href: '/athletes',  icon: 'ki-people',        label: 'Мои атлеты',         roles: ['coach', 'admin'] as string[] },
   { href: '/org',       icon: 'ki-office-bag',    label: 'Организация',        roles: ['organization'] as string[] },
   { href: '/admin',     icon: 'ki-setting-2',     label: 'Администратор',      roles: ['admin'] as string[] },
+  { href: '/settings',  icon: 'ki-profile-circle', label: 'Мой профиль',         roles: ['athlete'] as string[] },
 ]
 
 // Метка роли для отображения в хедере сайдбара
