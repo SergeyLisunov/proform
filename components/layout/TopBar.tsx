@@ -410,7 +410,8 @@ export default function TopBar() {
     <>
       <header
         id="header"
-        className={`kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-card border-b border-b-border transition-shadow duration-200 ${scrolled ? 'shadow-sm' : 'shadow-none'}`}
+        className={`kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 border-b border-b-border transition-shadow duration-200 ${scrolled ? 'shadow-sm' : 'shadow-none'}`}
+        style={{ background: 'var(--card, white)' }}
       >
         <div className="kt-container-fixed flex justify-between items-center px-5 lg:px-8 gap-4 w-full" id="headerContainer">
 
