@@ -1,7 +1,9 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, DEMO_CYCLES, CYCLE_COLORS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
 import { ZoneBar } from '@/components/ui/ZoneBar'
+import { useUser } from '@/lib/hooks/useUser'
+import { createCalendarEvent, deleteCalendarEvent, EVENT_TYPES, type CalendarEvent, type EventType } from '@/services/calendar.service'
 
 type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
@@ -339,7 +341,12 @@ function WeekView({ year, month, weekStart, onSelect, selected }: { year: number
 }
 
 // ── DETAIL PANEL ──────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr }: { dateStr: string }) {
+function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
+  dateStr: string
+  savedEvents: CalendarEvent[]
+  onAddEvent: (date: string) => void
+  onDeleteEvent: (id: string) => void
+}) {
   const session = DEMO_SESSIONS.find(s => s.date === dateStr)
   const comp = DEMO_COMPETITIONS.find(c => c.date === dateStr)
   const cycles = DEMO_CYCLES.filter(c => dateStr >= c.start && dateStr <= c.end)
@@ -418,11 +425,43 @@ function DetailPanel({ dateStr }: { dateStr: string }) {
         </div>
       )}
 
-      {!session && !comp && cycles.length === 0 && (
+      {/* Saved calendar events for this date */}
+      {savedEvents.filter(e => e.event_date === dateStr).length > 0 && (
+        <div>
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Events</div>
+          <div className="flex flex-col gap-1.5">
+            {savedEvents.filter(e => e.event_date === dateStr).map(ev => {
+              const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
+              return (
+                <div key={ev.id} className="flex items-start gap-2 px-2.5 py-2 rounded-lg border border-border hover:bg-accent/30 transition-colors group">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
+                    <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-2xs font-semibold text-foreground truncate">{ev.title}</div>
+                    {ev.start_time && (
+                      <div className="text-[10px] text-muted-foreground">{ev.start_time}{ev.end_time ? ` – ${ev.end_time}` : ''}</div>
+                    )}
+                    {ev.notes && <div className="text-[10px] text-muted-foreground truncate mt-0.5">{ev.notes}</div>}
+                  </div>
+                  <button
+                    onClick={() => onDeleteEvent(ev.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+                  >
+                    <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {!session && !comp && cycles.length === 0 && savedEvents.filter(e => e.event_date === dateStr).length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
           <i className="ki-filled ki-calendar text-3xl text-muted-foreground/20 mb-2" />
           <p className="text-2sm text-muted-foreground">No events</p>
-          <button className="mt-3 kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+          <button onClick={() => onAddEvent(dateStr)} className="mt-3 kt-btn kt-btn-sm kt-btn-outline gap-1.5">
             <i className="ki-filled ki-plus text-xs" />
             Add event
           </button>
@@ -432,8 +471,183 @@ function DetailPanel({ dateStr }: { dateStr: string }) {
   )
 }
 
+// ── ADD EVENT MODAL ────────────────────────────────────────────────────────────
+interface AddEventModalProps {
+  initialDate: string
+  ownerId: string
+  onClose: () => void
+  onCreated: (event: CalendarEvent) => void
+}
+
+function AddEventModal({ initialDate, ownerId, onClose, onCreated }: AddEventModalProps) {
+  const [form, setForm] = useState({
+    event_date: initialDate,
+    event_type: 'workout' as EventType,
+    title:      '',
+    notes:      '',
+    start_time: '',
+    end_time:   '',
+  })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.title.trim()) { setError('Title is required'); return }
+    setSaving(true)
+    setError('')
+    const result = await createCalendarEvent({
+      owner_id:   ownerId,
+      event_date: form.event_date,
+      event_type: form.event_type,
+      title:      form.title.trim(),
+      notes:      form.notes.trim() || null,
+      start_time: form.start_time || null,
+      end_time:   form.end_time || null,
+    })
+    if (!result) {
+      setError('Failed to save event. Check your Supabase RLS policies.')
+      setSaving(false)
+      return
+    }
+    onCreated(result)
+    onClose()
+  }
+
+  const selected = EVENT_TYPES.find(t => t.value === form.event_type)
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            {selected && (
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: selected.color + '18' }}>
+                <i className={`ki-filled ${selected.icon} text-sm`} style={{ color: selected.color }} />
+              </div>
+            )}
+            <h3 className="pf-num text-xl text-foreground">Add Event</h3>
+          </div>
+          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <i className="ki-filled ki-cross text-sm" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 rounded-xl p-3 mb-4 bg-red-50 border border-red-200 text-sm text-red-600">
+            <i className="ki-filled ki-information-5 text-red-500 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Event type */}
+          <div>
+            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Event type</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {EVENT_TYPES.map(t => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, event_type: t.value }))}
+                  className={[
+                    'flex items-center gap-2 px-2.5 py-2 rounded-xl border text-left transition-all text-2xs font-semibold',
+                    form.event_type === t.value
+                      ? 'border-2'
+                      : 'border-border hover:border-slate-300 bg-background',
+                  ].join(' ')}
+                  style={form.event_type === t.value ? {
+                    borderColor: t.color,
+                    background: t.color + '12',
+                    color: t.color,
+                  } : {}}
+                >
+                  <i className={`ki-filled ${t.icon} text-xs shrink-0`} style={{ color: form.event_type === t.value ? t.color : undefined }} />
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Title */}
+          <div>
+            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Title *</label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              required
+              placeholder="e.g. Morning run, City marathon…"
+              className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
+            />
+          </div>
+
+          {/* Date + Time */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-1">
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Date</label>
+              <input
+                type="date"
+                value={form.event_date}
+                onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
+                required
+                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Start</label>
+              <input
+                type="time"
+                value={form.start_time}
+                onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
+                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">End</label>
+              <input
+                type="time"
+                value={form.end_time}
+                onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
+                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
+              />
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Notes</label>
+            <textarea
+              value={form.notes}
+              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+              rows={2}
+              placeholder="Optional notes…"
+              className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition resize-none"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={saving}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition"
+              style={{ background: saving ? '#FDA96A' : '#F97316' }}>
+              {saving ? 'Saving…' : 'Save event'}
+            </button>
+            <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // ── MAIN PAGE ──────────────────────────────────────────────────────────────────
 export default function CalendarPage() {
+  const { user } = useUser()
   const today = new Date()
   const [view, setView] = useState<ViewMode>('month')
   const [year, setYear] = useState(2025)
@@ -441,6 +655,25 @@ export default function CalendarPage() {
   const [quarter, setQuarter] = useState(1)
   const [selected, setSelected] = useState<string | null>('2025-01-13')
   const [filterType, setFilterType] = useState<string>('all')
+
+  // Add Event modal
+  const [showAddEvent, setShowAddEvent] = useState(false)
+  const [addEventDate, setAddEventDate] = useState<string>(today.toISOString().slice(0, 10))
+  const [savedEvents, setSavedEvents] = useState<CalendarEvent[]>([])
+
+  const openAddEvent = useCallback((date?: string) => {
+    setAddEventDate(date ?? today.toISOString().slice(0, 10))
+    setShowAddEvent(true)
+  }, [today])
+
+  const handleEventCreated = useCallback((event: CalendarEvent) => {
+    setSavedEvents(prev => [...prev, event])
+  }, [])
+
+  const handleDeleteEvent = useCallback(async (id: string) => {
+    await deleteCalendarEvent(id)
+    setSavedEvents(prev => prev.filter(e => e.id !== id))
+  }, [])
 
   // For week view
   const weekStart = useMemo(() => {
@@ -490,7 +723,7 @@ export default function CalendarPage() {
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Training Schedule</p>
           <h2 className="pf-num text-[36px] text-foreground leading-none">Calendar</h2>
         </div>
-        <button className="kt-btn kt-btn-primary gap-2">
+        <button onClick={() => openAddEvent(selected ?? undefined)} className="kt-btn kt-btn-primary gap-2">
           <i className="ki-filled ki-plus text-sm" />
           Add Event
         </button>
@@ -572,9 +805,47 @@ export default function CalendarPage() {
 
         {/* Detail panel — only for month/week */}
         {(view === 'month' || view === 'week') && selected && (
-          <DetailPanel dateStr={selected} />
+          <DetailPanel
+            dateStr={selected}
+            savedEvents={savedEvents}
+            onAddEvent={openAddEvent}
+            onDeleteEvent={handleDeleteEvent}
+          />
         )}
       </div>
+
+      {/* Saved events strip — upcoming */}
+      {savedEvents.length > 0 && (
+        <div className="bg-card border border-border rounded-xl p-4">
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Your saved events</div>
+          <div className="flex flex-col gap-1.5">
+            {savedEvents.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map(ev => {
+              const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
+              return (
+                <div key={ev.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border hover:bg-accent/30 group transition-colors">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
+                    <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-2sm font-semibold text-foreground truncate">{ev.title}</span>
+                    {ev.notes && <span className="text-2xs text-muted-foreground ml-2 truncate">{ev.notes}</span>}
+                  </div>
+                  <span className="text-2xs text-muted-foreground shrink-0">
+                    {new Date(ev.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    {ev.start_time && ` · ${ev.start_time}`}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteEvent(ev.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0"
+                  >
+                    <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-5 flex-wrap">
@@ -601,6 +872,16 @@ export default function CalendarPage() {
           ))}
         </div>
       </div>
+
+      {/* Add Event Modal */}
+      {showAddEvent && user && (
+        <AddEventModal
+          initialDate={addEventDate}
+          ownerId={user.id}
+          onClose={() => setShowAddEvent(false)}
+          onCreated={handleEventCreated}
+        />
+      )}
     </div>
   )
 }

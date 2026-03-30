@@ -127,7 +127,37 @@ export type Database = {
         Insert: { trainer_id: string; athlete_id: string }
         Update: never
       }
-    }
+      calendar_events: {
+        Row: {
+          id: string
+          owner_id: string
+          event_date: string
+          event_type: 'workout' | 'competition' | 'rest' | 'note' | 'travel' | 'medical' | 'test' | 'camp' | 'other'
+          title: string
+          notes: string | null
+          start_time: string | null
+          end_time: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          event_date: string
+          event_type: 'workout' | 'competition' | 'rest' | 'note' | 'travel' | 'medical' | 'test' | 'camp' | 'other'
+          title: string
+          notes?: string | null
+          start_time?: string | null
+          end_time?: string | null
+        }
+        Update: {
+          event_date?: string
+          event_type?: 'workout' | 'competition' | 'rest' | 'note' | 'travel' | 'medical' | 'test' | 'camp' | 'other'
+          title?: string
+          notes?: string | null
+          start_time?: string | null
+          end_time?: string | null
+        }
+      }
       organizations: {
         Row: {
           id: string
