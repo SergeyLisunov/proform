@@ -1,4 +1,4 @@
-export type UserRole = 'athlete' | 'coach' | 'admin'
+export type UserRole = 'athlete' | 'coach' | 'admin' | 'organization'
 
 export type Database = {
   public: {
@@ -126,6 +126,78 @@ export type Database = {
         Row: { trainer_id: string; athlete_id: string; created_at: string }
         Insert: { trainer_id: string; athlete_id: string }
         Update: never
+      }
+    }
+      organizations: {
+        Row: {
+          id: string
+          user_id: string
+          org_name: string
+          org_slug: string
+          sport_type: string | null
+          city: string | null
+          is_verified: boolean
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['organizations']['Row'], 'id' | 'created_at' | 'is_verified'> & { id?: string; is_verified?: boolean }
+        Update: Partial<Database['public']['Tables']['organizations']['Row']>
+      }
+      org_members: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          role: 'athlete' | 'coach'
+          status: 'active' | 'pending' | 'suspended'
+          joined_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['org_members']['Row'], 'id' | 'joined_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['org_members']['Row']>
+      }
+      wall_posts: {
+        Row: {
+          id: string
+          org_id: string
+          author_id: string
+          title: string
+          body: string
+          post_type: 'announcement' | 'event' | 'news' | 'result'
+          event_date: string | null
+          visible_to: 'all' | 'members' | 'coaches'
+          is_pinned: boolean
+          is_deleted: boolean
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['wall_posts']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['wall_posts']['Row']>
+      }
+      newsletters: {
+        Row: {
+          id: string
+          org_id: string
+          author_id: string
+          subject: string
+          body: string
+          target_roles: ('athlete' | 'coach')[]
+          status: 'draft' | 'sent' | 'scheduled'
+          scheduled_at: string | null
+          sent_at: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['newsletters']['Row'], 'id' | 'created_at'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['newsletters']['Row']>
+      }
+      newsletter_deliveries: {
+        Row: {
+          id: string
+          newsletter_id: string
+          recipient_id: string
+          status: 'pending' | 'delivered' | 'failed'
+          delivered_at: string | null
+          opened_at: string | null
+        }
+        Insert: Omit<Database['public']['Tables']['newsletter_deliveries']['Row'], 'id'> & { id?: string }
+        Update: Partial<Database['public']['Tables']['newsletter_deliveries']['Row']>
       }
     }
     Functions: {
