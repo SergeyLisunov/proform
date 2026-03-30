@@ -16,20 +16,16 @@ type AthleteProfile = {
   city:                  string | null
   country:               string | null
   bio:                   string | null
-  // Антропометрия
   height_cm:             number | null
   weight_kg:             number | null
-  // Спортивный профиль
   primary_sport:         string | null
   fitness_level:         string | null
   goal:                  string | null
   weekly_training_hours: number | null
-  // Физиологические показатели
   max_heart_rate:        number | null
   hrv_baseline:          number | null
   rhr_baseline:          number | null
   vo2max:                number | null
-  // Приватность
   profile_public:        boolean
   workouts_public:       boolean
 }
@@ -40,6 +36,7 @@ type FormData = {
   birth_date:            string
   gender:                string
   phone:                 string
+  email:                 string
   city:                  string
   country:               string
   bio:                   string
@@ -89,7 +86,6 @@ function sb() {
   )
 }
 
-/** Вычисляем возраст из birth_date на клиенте */
 function calcAge(birthDate: string | null): number | null {
   if (!birthDate) return null
   const birth = new Date(birthDate + 'T00:00:00')
@@ -100,14 +96,14 @@ function calcAge(birthDate: string | null): number | null {
   return age
 }
 
-/** Профиль → форма (числа в строки, null → '') */
-function profileToForm(p: AthleteProfile): FormData {
+function profileToForm(p: AthleteProfile, email: string): FormData {
   return {
     first_name:            p.first_name            ?? '',
     last_name:             p.last_name             ?? '',
     birth_date:            p.birth_date            ?? '',
     gender:                p.gender                ?? '',
     phone:                 p.phone                 ?? '',
+    email,
     city:                  p.city                  ?? '',
     country:               p.country               ?? '',
     bio:                   p.bio                   ?? '',
@@ -126,7 +122,6 @@ function profileToForm(p: AthleteProfile): FormData {
   }
 }
 
-/** Форма → payload для Supabase (строки в числа, '' → null) */
 function formToPayload(f: FormData, userId: string) {
   return {
     id:                    userId,
@@ -174,6 +169,9 @@ function validate(f: FormData): Errors {
     if (isNaN(d.getTime())) e.birth_date = 'Неверный формат даты'
     else if (d > now) e.birth_date = 'Дата рождения не может быть в будущем'
     else if (now.getFullYear() - d.getFullYear() > 100) e.birth_date = 'Проверьте год рождения'
+  }
+  if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
+    e.email = 'Неверный формат email'
   }
   if (f.max_heart_rate) {
     const v = parseInt(f.max_heart_rate, 10)
@@ -253,7 +251,6 @@ function Field({
   )
 }
 
-/** Карточка-плитка для выбора из списка */
 function OptionGrid<T extends string>({
   label, options, value, onChange, cols = 2,
 }: {
@@ -294,7 +291,6 @@ function OptionGrid<T extends string>({
   )
 }
 
-/** BMI вычисление */
 function BMICard({ height, weight }: { height: string; weight: string }) {
   const h = parseFloat(height)
   const w = parseFloat(weight)
@@ -332,6 +328,16 @@ export default function SettingsPage() {
   const [toast, setToast]       = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'personal' | 'sports' | 'physio' | 'privacy'>('personal')
 
+  // Смена пароля — отдельный стейт
+  const [pwCurrent,  setPwCurrent]  = useState('')
+  const [pwNew,      setPwNew]      = useState('')
+  const [pwConfirm,  setPwConfirm]  = useState('')
+  const [pwSaving,   setPwSaving]   = useState(false)
+  const [pwError,    setPwError]    = useState('')
+  const [showPwCurrent, setShowPwCurrent] = useState(false)
+  const [showPwNew,     setShowPwNew]     = useState(false)
+  const [showPwConfirm, setShowPwConfirm] = useState(false)
+
   // ── загрузка профиля ──────────────────────────────────────────────────────────
   const loadProfile = useCallback(async () => {
     if (!user?.id) return
@@ -343,11 +349,12 @@ export default function SettingsPage() {
         .eq('id', user.id)
         .single()
 
+      const email = user.email ?? ''
+
       if (data) {
         setProfile(data as AthleteProfile)
-        setForm(profileToForm(data as AthleteProfile))
+        setForm(profileToForm(data as AthleteProfile, email))
       } else {
-        // Профиля ещё нет — создаём пустую форму
         const empty: AthleteProfile = {
           id: user.id, first_name: null, last_name: null, birth_date: null,
           gender: null, phone: null, city: null, country: null, bio: null,
@@ -357,22 +364,21 @@ export default function SettingsPage() {
           vo2max: null, profile_public: false, workouts_public: false,
         }
         setProfile(empty)
-        setForm(profileToForm(empty))
+        setForm(profileToForm(empty, email))
       }
     } finally {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [user?.id, user?.email])
 
   useEffect(() => { loadProfile() }, [loadProfile])
 
-  // ── изменение поля формы ──────────────────────────────────────────────────────
   const handleChange = useCallback((name: keyof FormData, value: string | boolean) => {
     setForm(prev => prev ? { ...prev, [name]: value } : prev)
     setErrors(prev => { const e = { ...prev }; delete e[name]; return e })
   }, [])
 
-  // ── сохранение ────────────────────────────────────────────────────────────────
+  // ── сохранение профиля ────────────────────────────────────────────────────────
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form || !user?.id) return
@@ -382,14 +388,28 @@ export default function SettingsPage() {
 
     setSaving(true)
     try {
+      // 1. Сохраняем athletes таблицу
       const payload = formToPayload(form, user.id)
-      const { error } = await sb()
+      const { error: athleteError } = await sb()
         .from('athletes')
         .upsert(payload, { onConflict: 'id' })
+      if (athleteError) throw athleteError
 
-      if (error) throw error
+      // 2. Обновляем email и имя в users таблице если изменились
+      const updates: Record<string, string> = {}
+      if (form.email && form.email !== user.email) updates.email = form.email
+      const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
+      if (fullName) updates.name = fullName
 
-      // Optimistic update: сразу обновляем локальный профиль
+      if (Object.keys(updates).length > 0) {
+        // Обновляем в таблице users
+        await sb().from('users').update(updates).eq('id', user.id)
+        // Если email изменился — обновляем через auth
+        if (updates.email) {
+          await sb().auth.updateUser({ email: updates.email })
+        }
+      }
+
       setProfile(prev => prev ? { ...prev, ...payload } as AthleteProfile : prev)
       showToast('success', 'Профиль успешно сохранён')
     } catch (err: any) {
@@ -400,12 +420,35 @@ export default function SettingsPage() {
     }
   }
 
+  // ── смена пароля ──────────────────────────────────────────────────────────────
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault()
+    setPwError('')
+
+    if (!pwNew) { setPwError('Введите новый пароль'); return }
+    if (pwNew.length < 8) { setPwError('Минимум 8 символов'); return }
+    if (!/[A-Z]/.test(pwNew)) { setPwError('Нужна хотя бы одна заглавная буква'); return }
+    if (!/[0-9]/.test(pwNew)) { setPwError('Нужна хотя бы одна цифра'); return }
+    if (pwNew !== pwConfirm) { setPwError('Пароли не совпадают'); return }
+
+    setPwSaving(true)
+    try {
+      const { error } = await sb().auth.updateUser({ password: pwNew })
+      if (error) throw error
+      setPwCurrent(''); setPwNew(''); setPwConfirm('')
+      showToast('success', 'Пароль успешно изменён')
+    } catch (err: any) {
+      setPwError(err?.message ?? 'Не удалось изменить пароль')
+    } finally {
+      setPwSaving(false)
+    }
+  }
+
   function showToast(type: 'success' | 'error', msg: string) {
     setToast({ type, msg })
     setTimeout(() => setToast(null), 4000)
   }
 
-  // ── guard: только для атлетов ─────────────────────────────────────────────────
   if (user && user.role !== 'athlete' && user.role !== 'admin') {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -435,13 +478,12 @@ export default function SettingsPage() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-2xs text-muted-foreground hover:text-foreground transition-colors mb-2 no-underline">
-  <i className="ki-filled ki-left text-[10px]" /> На главную
-</Link>
-<p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Настройки</p>
-<h2 className="pf-num text-[36px] text-foreground leading-none">Профиль атлета</h2>
+            <i className="ki-filled ki-left text-[10px]" /> На главную
+          </Link>
+          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Настройки</p>
+          <h2 className="pf-num text-[36px] text-foreground leading-none">Профиль атлета</h2>
         </div>
         <div className="flex items-center gap-3">
-          {/* Прогресс заполнения */}
           <div className="text-right">
             <div className="text-2xs text-muted-foreground mb-1">Заполнено</div>
             <div className="flex items-center gap-2">
@@ -454,10 +496,9 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Карточка с краткой сводкой профиля ── */}
+      {/* ── Карточка с краткой сводкой ── */}
       {profile && (profile.first_name || profile.height_cm || profile.primary_sport) && (
         <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-5 flex-wrap">
-          {/* Аватар-инициалы */}
           <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center shrink-0">
             <span className="pf-num text-xl text-orange-500">
               {[profile.first_name?.[0], profile.last_name?.[0]].filter(Boolean).join('').toUpperCase() ||
@@ -477,9 +518,7 @@ export default function SettingsPage() {
                   {FITNESS_LEVELS.find(f => f.value === profile.fitness_level)?.label ?? profile.fitness_level}
                 </span>
               )}
-              {age !== null && (
-                <span className="text-2xs text-muted-foreground">{age} лет</span>
-              )}
+              {age !== null && <span className="text-2xs text-muted-foreground">{age} лет</span>}
               {profile.city && (
                 <span className="text-2xs text-muted-foreground">
                   <i className="ki-filled ki-map text-[10px] mr-0.5" />{profile.city}
@@ -487,7 +526,6 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
-          {/* Метрики */}
           <div className="flex items-center gap-4">
             {profile.height_cm && (
               <div className="text-center">
@@ -514,10 +552,10 @@ export default function SettingsPage() {
       {/* ── Табы ── */}
       <div className="flex items-center gap-0.5 p-1 bg-card border border-border rounded-lg self-start">
         {([
-          { id: 'personal', label: 'Личные данные',  icon: 'ki-profile-circle' },
-          { id: 'sports',   label: 'Спорт',           icon: 'ki-abstract-26' },
-          { id: 'physio',   label: 'Физиология',      icon: 'ki-heart' },
-          { id: 'privacy',  label: 'Приватность',     icon: 'ki-shield' },
+          { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle' },
+          { id: 'sports',   label: 'Спорт',          icon: 'ki-abstract-26' },
+          { id: 'physio',   label: 'Физиология',     icon: 'ki-heart' },
+          { id: 'privacy',  label: 'Приватность',    icon: 'ki-shield' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
             className={[
@@ -571,7 +609,11 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Field label="Телефон" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+7 900 000 00 00" error={errors.phone} />
+            {/* Телефон + Email */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Телефон" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+7 900 000 00 00" error={errors.phone} />
+              <Field label="Email"   name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com" error={errors.email} hint="Изменение потребует подтверждения" />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <Field label="Город" name="city" value={form.city} onChange={handleChange} placeholder="Москва" error={errors.city} />
@@ -694,7 +736,6 @@ export default function SettingsPage() {
                 min="20" max="100" step="0.1" hint="Из теста или устройства" />
             </div>
 
-            {/* Инфо-блок */}
             <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
               <div className="flex items-start gap-2">
                 <i className="ki-filled ki-information-2 text-blue-500 text-sm mt-0.5 shrink-0" />
@@ -736,14 +777,8 @@ export default function SettingsPage() {
                   <input type="checkbox" checked={form[item.key]}
                     onChange={e => handleChange(item.key, e.target.checked as any)}
                     className="sr-only" />
-                  <div className={[
-                    'w-10 h-6 rounded-full transition-colors',
-                    form[item.key] ? 'bg-orange-500' : 'bg-border',
-                  ].join(' ')} />
-                  <div className={[
-                    'absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform',
-                    form[item.key] ? 'translate-x-5' : 'translate-x-1',
-                  ].join(' ')} />
+                  <div className={['w-10 h-6 rounded-full transition-colors', form[item.key] ? 'bg-orange-500' : 'bg-border'].join(' ')} />
+                  <div className={['absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform', form[item.key] ? 'translate-x-5' : 'translate-x-1'].join(' ')} />
                 </div>
               </label>
             ))}
@@ -767,13 +802,118 @@ export default function SettingsPage() {
         </div>
       </form>
 
+      {/* ── СМЕНА ПАРОЛЯ ── отдельная форма, не в submit основной ── */}
+      <div className="bg-card border border-border rounded-xl p-6 flex flex-col gap-5">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+            <i className="ki-filled ki-lock text-red-500 text-sm" />
+          </div>
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Смена пароля</h3>
+        </div>
+
+        <form onSubmit={handlePasswordChange} className="flex flex-col gap-4">
+          {/* Новый пароль */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Новый пароль
+              </label>
+              <div className="relative">
+                <input
+                  type={showPwNew ? 'text' : 'password'}
+                  value={pwNew}
+                  onChange={e => { setPwNew(e.target.value); setPwError('') }}
+                  placeholder="Минимум 8 символов"
+                  className="w-full px-3 py-2.5 pr-10 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/10 transition-all"
+                />
+                <button type="button" onClick={() => setShowPwNew(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                  <i className={`ki-filled ${showPwNew ? 'ki-eye-slash' : 'ki-eye'} text-sm`} />
+                </button>
+              </div>
+              {/* Индикатор силы */}
+              {pwNew && (
+                <div className="flex gap-1 mt-1.5">
+                  {[
+                    pwNew.length >= 8,
+                    /[A-Z]/.test(pwNew),
+                    /[0-9]/.test(pwNew),
+                    /[^A-Za-z0-9]/.test(pwNew),
+                  ].map((ok, i) => (
+                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${ok ? 'bg-orange-400' : 'bg-border'}`} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                Повторите пароль
+              </label>
+              <div className="relative">
+                <input
+                  type={showPwConfirm ? 'text' : 'password'}
+                  value={pwConfirm}
+                  onChange={e => { setPwConfirm(e.target.value); setPwError('') }}
+                  placeholder="Повторите новый пароль"
+                  className={[
+                    'w-full px-3 py-2.5 pr-10 rounded-xl border bg-background text-sm outline-none transition-all',
+                    pwConfirm && pwConfirm !== pwNew
+                      ? 'border-red-400 focus:ring-2 focus:ring-red-200'
+                      : 'border-input focus:border-orange-400 focus:ring-2 focus:ring-orange-500/10',
+                  ].join(' ')}
+                />
+                <button type="button" onClick={() => setShowPwConfirm(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                  <i className={`ki-filled ${showPwConfirm ? 'ki-eye-slash' : 'ki-eye'} text-sm`} />
+                </button>
+              </div>
+              {pwConfirm && pwConfirm !== pwNew && (
+                <p className="text-2xs text-red-500 mt-1">Пароли не совпадают</p>
+              )}
+            </div>
+          </div>
+
+          {/* Требования */}
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {[
+              { ok: pwNew.length >= 8,          label: '8+ символов' },
+              { ok: /[A-Z]/.test(pwNew),         label: 'Заглавная буква' },
+              { ok: /[0-9]/.test(pwNew),         label: 'Цифра' },
+              { ok: /[^A-Za-z0-9]/.test(pwNew),  label: 'Спецсимвол' },
+            ].map(r => (
+              <span key={r.label} className={`flex items-center gap-1 text-[11px] transition-colors ${pwNew ? (r.ok ? 'text-green-600' : 'text-muted-foreground') : 'text-muted-foreground'}`}>
+                <i className={`ki-filled ${r.ok && pwNew ? 'ki-check-circle text-green-500' : 'ki-information-2'} text-[10px]`} />
+                {r.label}
+              </span>
+            ))}
+          </div>
+
+          {pwError && (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-2xs">
+              <i className="ki-filled ki-information-5 text-sm shrink-0" />
+              {pwError}
+            </div>
+          )}
+
+          <div>
+            <button type="submit" disabled={pwSaving || !pwNew || pwNew !== pwConfirm}
+              className="px-5 py-2.5 rounded-xl bg-foreground hover:bg-foreground/80 text-background text-sm font-semibold transition-all flex items-center gap-2 disabled:opacity-40">
+              {pwSaving ? (
+                <><span className="w-4 h-4 border-2 border-background border-t-transparent rounded-full pf-spin" /> Сохранение…</>
+              ) : (
+                <><i className="ki-filled ki-lock text-xs" /> Изменить пароль</>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
       {/* ── Toast ── */}
       {toast && (
         <div className={[
           'fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter',
-          toast.type === 'success'
-            ? 'bg-foreground text-background'
-            : 'bg-red-500 text-white',
+          toast.type === 'success' ? 'bg-foreground text-background' : 'bg-red-500 text-white',
         ].join(' ')}>
           <i className={`ki-filled ${toast.type === 'success' ? 'ki-check-circle text-green-400' : 'ki-information-5 text-white'}`} />
           {toast.msg}
@@ -789,7 +929,7 @@ function calcCompleteness(f: FormData): number {
     'first_name', 'last_name', 'birth_date', 'gender',
     'height_cm', 'weight_kg',
     'primary_sport', 'fitness_level', 'goal',
-    'city',
+    'city', 'email',
   ]
   const filled = fields.filter(k => {
     const v = f[k]
