@@ -79,7 +79,7 @@ export default function Sidebar() {
           data-kt-toggle="body"
           data-kt-toggle-class="kt-sidebar-collapse"
         >
-          <i className="ki-filled ki-black-left-line text-xs kt-toggle-active:rotate-180 transition-all duration-300" />
+          <i className="ki-filled ki-black-left-line text-xs kt-toggle-active:rotate-180 transition-all duration-300 hidden" />
         </button>
       </div>
 
@@ -95,8 +95,7 @@ export default function Sidebar() {
         >
           <div className="kt-menu flex flex-col gap-0.5 grow" data-kt-menu="true">
 
-            {/* Роль пользователя — только для чтения, без переключателя */}
-            {roleInfo && (
+            {roleInfo && false && (
               <div
                 className="mx-1 mb-3 px-3 py-2 rounded-xl border flex items-center gap-2"
                 style={{ background: roleInfo.bg, borderColor: roleInfo.text + '30' }}
