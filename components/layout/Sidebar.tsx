@@ -73,13 +73,13 @@ export default function Sidebar() {
           <span className="pf-num text-[20px] text-foreground tracking-wide">ProForm</span>
         </Link>
         <button
-          id="sidebar_toggle"
-          className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline size-[30px]"
-          data-kt-toggle="body"
-          data-kt-toggle-class="kt-sidebar-collapse"
-        >
-          <i className="ki-filled ki-black-left-line text-xs kt-toggle-active:rotate-180 transition-all duration-300 hidden" />
-        </button>
+            id="sidebar_toggle"
+            className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline size-[30px]"
+            onClick={() => document.body.classList.toggle('kt-sidebar-collapse')}
+            title="Свернуть меню"
+          >
+            <i className="ki-filled ki-black-left-line text-xs transition-all duration-300" />
+          </button>
       </div>
 
       {/* Navigation */}
