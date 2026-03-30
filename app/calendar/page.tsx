@@ -502,8 +502,9 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
     return () => clearTimeout(t)
   }, [])
 
-  // Lock body scroll while open
+  // Lock body scroll while open (typeof guard prevents SSR crash)
   useEffect(() => {
+    if (typeof document === 'undefined') return
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
@@ -530,6 +531,9 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDr
     if (!form.title.trim()) { setError('Title is required'); return }
     setSaving(true)
     setError('')
+    // DEBUG: inspect owner_id before INSERT
+    console.log('owner_id being sent:', ownerId)
+    console.log('user object from useUser:', ownerId ? '(passed as prop)' : 'MISSING — user.id is undefined')
     const result = await createCalendarEvent({
       owner_id:   ownerId,
       event_date: form.event_date,
