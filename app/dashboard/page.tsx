@@ -2,7 +2,8 @@
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
-import ApexChart from '@/components/charts/ApexChart'
+import dynamic from 'next/dynamic'
+const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_SESSIONS, DEMO_GROUP, recoveryColor } from '@/lib/utils/data'
 
 const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
