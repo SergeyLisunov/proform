@@ -1,5 +1,6 @@
 'use client'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, DEMO_CYCLES, CYCLE_COLORS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import { useUser } from '@/lib/hooks/useUser'
@@ -471,15 +472,17 @@ function DetailPanel({ dateStr, savedEvents, onAddEvent, onDeleteEvent }: {
   )
 }
 
-// ── ADD EVENT MODAL ────────────────────────────────────────────────────────────
-interface AddEventModalProps {
+// ── ADD EVENT DRAWER (right-side sheet) ───────────────────────────────────────
+interface AddEventDrawerProps {
   initialDate: string
   ownerId: string
   onClose: () => void
   onCreated: (event: CalendarEvent) => void
 }
 
-function AddEventModal({ initialDate, ownerId, onClose, onCreated }: AddEventModalProps) {
+function AddEventDrawer({ initialDate, ownerId, onClose, onCreated }: AddEventDrawerProps) {
+  const [mounted, setMounted] = useState(false)
+  const [visible, setVisible] = useState(false)
   const [form, setForm] = useState({
     event_date: initialDate,
     event_type: 'workout' as EventType,
@@ -490,6 +493,37 @@ function AddEventModal({ initialDate, ownerId, onClose, onCreated }: AddEventMod
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const titleRef = useRef<HTMLInputElement>(null)
+
+  // Mount → Portal available; then trigger slide-in animation
+  useEffect(() => {
+    setMounted(true)
+    const t = setTimeout(() => setVisible(true), 10)
+    return () => clearTimeout(t)
+  }, [])
+
+  // Lock body scroll while open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  // Focus title on open
+  useEffect(() => {
+    if (visible) setTimeout(() => titleRef.current?.focus(), 150)
+  }, [visible])
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  })
+
+  function handleClose() {
+    setVisible(false)
+    setTimeout(onClose, 260)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -511,137 +545,268 @@ function AddEventModal({ initialDate, ownerId, onClose, onCreated }: AddEventMod
       return
     }
     onCreated(result)
-    onClose()
+    handleClose()
   }
 
-  const selected = EVENT_TYPES.find(t => t.value === form.event_type)
+  const selectedType = EVENT_TYPES.find(t => t.value === form.event_type)
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+      aria-modal="true"
+      role="dialog"
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        display: 'flex', justifyContent: 'flex-end',
+      }}
     >
-      <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            {selected && (
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: selected.color + '18' }}>
-                <i className={`ki-filled ${selected.icon} text-sm`} style={{ color: selected.color }} />
+      {/* Backdrop — solid dark overlay, not transparent */}
+      <div
+        onClick={handleClose}
+        style={{
+          position: 'absolute', inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(3px)',
+          transition: 'opacity 0.25s ease',
+          opacity: visible ? 1 : 0,
+        }}
+      />
+
+      {/* Sheet panel sliding from the right */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: 440,
+          height: '100%',
+          backgroundColor: 'white',
+          boxShadow: '-8px 0 40px rgba(0,0,0,0.18)',
+          display: 'flex',
+          flexDirection: 'column',
+          transform: visible ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)',
+        }}
+      >
+        {/* Sheet header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '20px 24px 16px',
+          borderBottom: '1px solid #E2E8F0',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {selectedType && (
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: selectedType.color + '18',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <i className={`ki-filled ${selectedType.icon}`}
+                  style={{ color: selectedType.color, fontSize: 16 }} />
               </div>
             )}
-            <h3 className="pf-num text-xl text-foreground">Add Event</h3>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>
+                Calendar
+              </p>
+              <h2 className="pf-num" style={{ fontSize: 22, color: '#0F172A', lineHeight: 1 }}>
+                Add Event
+              </h2>
+            </div>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
+          <button
+            onClick={handleClose}
+            className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+            aria-label="Close"
+          >
+            <i className="ki-filled ki-cross" style={{ fontSize: 14 }} />
           </button>
         </div>
 
-        {error && (
-          <div className="flex items-center gap-2 rounded-xl p-3 mb-4 bg-red-50 border border-red-200 text-sm text-red-600">
-            <i className="ki-filled ki-information-5 text-red-500 shrink-0" />
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Event type */}
-          <div>
-            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Event type</label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {EVENT_TYPES.map(t => (
-                <button
-                  key={t.value}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, event_type: t.value }))}
-                  className={[
-                    'flex items-center gap-2 px-2.5 py-2 rounded-xl border text-left transition-all text-2xs font-semibold',
-                    form.event_type === t.value
-                      ? 'border-2'
-                      : 'border-border hover:border-slate-300 bg-background',
-                  ].join(' ')}
-                  style={form.event_type === t.value ? {
-                    borderColor: t.color,
-                    background: t.color + '12',
-                    color: t.color,
-                  } : {}}
-                >
-                  <i className={`ki-filled ${t.icon} text-xs shrink-0`} style={{ color: form.event_type === t.value ? t.color : undefined }} />
-                  {t.label}
-                </button>
-              ))}
+        {/* Scrollable form body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px 24px' }}>
+          {error && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '10px 14px', borderRadius: 12, marginBottom: 16,
+              background: '#FEF2F2', border: '1px solid #FECACA',
+              fontSize: 13, color: '#DC2626',
+            }}>
+              <i className="ki-filled ki-information-5" style={{ color: '#EF4444', flexShrink: 0 }} />
+              {error}
             </div>
-          </div>
+          )}
 
-          {/* Title */}
-          <div>
-            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Title *</label>
-            <input
-              type="text"
-              value={form.title}
-              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              required
-              placeholder="e.g. Morning run, City marathon…"
-              className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
-            />
-          </div>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-          {/* Date + Time */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-1">
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Date</label>
+            {/* ── Event type grid ── */}
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                Event type
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                {EVENT_TYPES.map(t => {
+                  const active = form.event_type === t.value
+                  return (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, event_type: t.value }))}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '8px 10px', borderRadius: 10, textAlign: 'left',
+                        border: active ? `2px solid ${t.color}` : '1.5px solid #E2E8F0',
+                        background: active ? t.color + '12' : '#FAFAFA',
+                        color: active ? t.color : '#64748B',
+                        fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', transition: 'all 0.15s',
+                      }}
+                    >
+                      <i className={`ki-filled ${t.icon}`} style={{ fontSize: 12, color: active ? t.color : '#94A3B8', flexShrink: 0 }} />
+                      {t.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* ── Title ── */}
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                Title <span style={{ color: '#F97316' }}>*</span>
+              </label>
+              <input
+                ref={titleRef}
+                type="text"
+                value={form.title}
+                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                required
+                placeholder="e.g. Morning run, City marathon…"
+                style={{
+                  width: '100%', borderRadius: 12,
+                  border: '1.5px solid #E2E8F0',
+                  padding: '10px 14px', fontSize: 14,
+                  outline: 'none', transition: 'border-color 0.15s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => (e.target.style.borderColor = '#F97316')}
+                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
+              />
+            </div>
+
+            {/* ── Date ── */}
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                Date
+              </label>
               <input
                 type="date"
                 value={form.event_date}
                 onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
                 required
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
+                style={{
+                  width: '100%', borderRadius: 12,
+                  border: '1.5px solid #E2E8F0',
+                  padding: '10px 14px', fontSize: 14,
+                  outline: 'none', boxSizing: 'border-box',
+                }}
+                onFocus={e => (e.target.style.borderColor = '#F97316')}
+                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
               />
             </div>
-            <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Start</label>
-              <input
-                type="time"
-                value={form.start_time}
-                onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
-              />
-            </div>
-            <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">End</label>
-              <input
-                type="time"
-                value={form.end_time}
-                onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition"
-              />
-            </div>
-          </div>
 
-          {/* Notes */}
-          <div>
-            <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-              rows={2}
-              placeholder="Optional notes…"
-              className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition resize-none"
-            />
-          </div>
+            {/* ── Start / End time ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                  Start time
+                </label>
+                <input
+                  type="time"
+                  value={form.start_time}
+                  onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
+                  style={{
+                    width: '100%', borderRadius: 12,
+                    border: '1.5px solid #E2E8F0',
+                    padding: '10px 14px', fontSize: 14,
+                    outline: 'none', boxSizing: 'border-box',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#F97316')}
+                  onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                  End time
+                </label>
+                <input
+                  type="time"
+                  value={form.end_time}
+                  onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))}
+                  style={{
+                    width: '100%', borderRadius: 12,
+                    border: '1.5px solid #E2E8F0',
+                    padding: '10px 14px', fontSize: 14,
+                    outline: 'none', boxSizing: 'border-box',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#F97316')}
+                  onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
+                />
+              </div>
+            </div>
 
-          {/* Actions */}
-          <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-              style={{ background: saving ? '#FDA96A' : '#F97316' }}>
-              {saving ? 'Saving…' : 'Save event'}
-            </button>
-            <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Cancel</button>
-          </div>
-        </form>
+            {/* ── Notes ── */}
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                Notes
+              </label>
+              <textarea
+                value={form.notes}
+                onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                rows={3}
+                placeholder="Optional notes…"
+                style={{
+                  width: '100%', borderRadius: 12,
+                  border: '1.5px solid #E2E8F0',
+                  padding: '10px 14px', fontSize: 14,
+                  outline: 'none', resize: 'none',
+                  boxSizing: 'border-box', fontFamily: 'inherit',
+                }}
+                onFocus={e => (e.target.style.borderColor = '#F97316')}
+                onBlur={e => (e.target.style.borderColor = '#E2E8F0')}
+              />
+            </div>
+
+            {/* ── Actions (pinned at bottom of scrollable area) ── */}
+            <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
+              <button
+                type="submit"
+                disabled={saving}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12,
+                  background: saving ? '#FDA96A' : '#F97316',
+                  color: '#fff', fontSize: 14, fontWeight: 600,
+                  border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.15s',
+                }}
+              >
+                {saving ? 'Saving…' : 'Save event'}
+              </button>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="kt-btn kt-btn-outline"
+                style={{ flexShrink: 0 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -873,9 +1038,9 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Add Event Modal */}
+      {/* Add Event Drawer */}
       {showAddEvent && user && (
-        <AddEventModal
+        <AddEventDrawer
           initialDate={addEventDate}
           ownerId={user.id}
           onClose={() => setShowAddEvent(false)}
