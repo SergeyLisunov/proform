@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 
@@ -14,6 +15,14 @@ const TITLES: Record<string, { title: string; sub: string }> = {
   '/org/wall':           { title: 'Стена',                sub: 'Посты и объявления' },
   '/org/newsletters':    { title: 'Рассылки',             sub: 'Рассылка участникам' },
   '/org':                { title: 'Организация',          sub: 'Дашборд организации' },
+  '/settings':           { title: 'Профиль атлета',       sub: 'Личные данные и антропометрия' },
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  athlete:      'Атлет',
+  coach:        'Тренер',
+  admin:        'Админ',
+  organization: 'Орг',
 }
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -28,9 +37,35 @@ export default function TopBar() {
   const { user } = useUser()
   const meta = Object.entries(TITLES).find(([k]) => pathname === k || pathname.startsWith(k + '/'))?.[1]
   const title = meta?.title ?? 'ProForm'
-  const sub = meta?.sub ?? ''
-  const date = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
-  const rc = user ? ROLE_COLORS[user.role] : null
+  const sub   = meta?.sub   ?? ''
+  const date  = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+  const rc    = user ? ROLE_COLORS[user.role] : null
+
+  // Плашка пользователя — кликабельна только для атлета (ведёт в /settings)
+  const isAthlete = user?.role === 'athlete'
+
+  const userPill = user && rc ? (
+    <div
+      className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-all"
+      style={{ background: rc.bg, borderColor: rc.border }}
+    >
+      <div
+        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+        style={{ background: rc.text + '20', color: rc.text, fontFamily: "'Bebas Neue', sans-serif" }}
+      >
+        {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+      </div>
+      <span className="text-2sm font-semibold" style={{ color: rc.text }}>
+        {user.name.split(' ')[0]}
+      </span>
+      <span className="text-2xs uppercase font-bold opacity-60" style={{ color: rc.text }}>
+        {ROLE_LABELS[user.role] ?? user.role}
+      </span>
+      {isAthlete && (
+        <i className="ki-filled ki-pencil text-[10px] opacity-40" style={{ color: rc.text }} />
+      )}
+    </div>
+  ) : null
 
   return (
     <header
@@ -55,34 +90,36 @@ export default function TopBar() {
 
         {/* Right */}
         <div className="flex items-center gap-2">
-          {/* Date */}
+          {/* Дата */}
           <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background border border-border">
             <i className="ki-filled ki-calendar text-xs text-muted-foreground" />
             <span className="text-2xs text-muted-foreground">{date}</span>
           </div>
 
           {/* WHOOP live */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-2xs font-bold uppercase tracking-wide"
-            style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', color: '#16A34A' }}>
+          <div
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-2xs font-bold uppercase tracking-wide"
+            style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', color: '#16A34A' }}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             Live
           </div>
 
-          {/* Notifications */}
+          {/* Уведомления */}
           <button className="kt-btn kt-btn-icon kt-btn-ghost relative">
             <i className="ki-filled ki-notification-on text-base" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-orange-400" />
           </button>
 
-          {/* User pill */}
-          {user && rc && (
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-full border cursor-default" style={{ background: rc.bg, borderColor: rc.border }}>
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: rc.text + '20', color: rc.text, fontFamily: "'Bebas Neue', sans-serif" }}>
-                {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
-              </div>
-              <span className="text-2sm font-semibold" style={{ color: rc.text }}>{user.name.split(' ')[0]}</span>
-              <span className="text-2xs uppercase font-bold opacity-60" style={{ color: rc.text }}>{user.role}</span>
-            </div>
+          {/* Плашка пользователя:
+              - атлет → кликабельная ссылка на /settings
+              - остальные → просто отображение */}
+          {isAthlete ? (
+            <Link href="/settings" className="no-underline hover:opacity-80 transition-opacity">
+              {userPill}
+            </Link>
+          ) : (
+            userPill
           )}
         </div>
       </div>
