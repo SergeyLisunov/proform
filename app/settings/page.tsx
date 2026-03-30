@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useEffect, useState, useCallback } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -433,8 +434,11 @@ export default function SettingsPage() {
       {/* ── Заголовок ── */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Настройки</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Профиль атлета</h2>
+          <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-2xs text-muted-foreground hover:text-foreground transition-colors mb-2 no-underline">
+  <i className="ki-filled ki-left text-[10px]" /> На главную
+</Link>
+<p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Настройки</p>
+<h2 className="pf-num text-[36px] text-foreground leading-none">Профиль атлета</h2>
         </div>
         <div className="flex items-center gap-3">
           {/* Прогресс заполнения */}
