@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
@@ -27,7 +27,6 @@ const ROLES: { value: UserRole; label: string; icon: string; bg: string; text: s
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
   const { user, switching, switchRole } = useUser()
   const [showRolePicker, setShowRolePicker] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -47,7 +46,8 @@ export default function Sidebar() {
     setSigningOut(true)
     try {
       await createClient().auth.signOut()
-      router.push('/auth/login')
+      // жёсткая перезагрузка — сбрасывает кэш middleware и router
+      window.location.href = '/auth/login'
     } catch (err) {
       console.error('signOut error:', err)
       setSigningOut(false)
