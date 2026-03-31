@@ -17,6 +17,7 @@ const NAV = [
   { href: '/athletes',  icon: 'ki-people',         label: 'Мои атлеты',         roles: ['coach', 'admin'] as string[] },
   { href: '/org',       icon: 'ki-office-bag',     label: 'Организация',        roles: ['organization'] as string[] },
   { href: '/admin',     icon: 'ki-setting-2',      label: 'Администратор',      roles: ['admin'] as string[] },
+  { href: '/admin/crm', icon: 'ki-graph-3', label: 'CRM', roles: ['admin'] as string[] },
 ]
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
