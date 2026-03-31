@@ -1037,13 +1037,14 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
       const {createBrowserClient} = await import('@supabase/ssr')
       const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
       await sb.from('workouts').insert({
-        athlete_id: ownerId,
-        event_date: form.event_date,
-        event_type: 'workout',
-        name: form.title.trim(),
-        description: form.notes.trim()||null,
-        start_time: form.start_time||null,
-        is_public: false,
+        athlete_id:    ownerId,
+        event_date:    form.event_date,
+        event_type:    'workout',
+        activity_type: 'Другое',
+        name:          form.title.trim(),
+        description:   form.notes.trim()||null,
+        start_time:    form.start_time||null,
+        is_public:     false,
       })
     }
     onCreated(r);handleClose()
@@ -1261,8 +1262,10 @@ export default function CalendarPage() {
     }
   }
 
-  const avgStrain = (DEMO_SESSIONS.reduce((a,s)=>a+s.strain,0)/DEMO_SESSIONS.length).toFixed(1)
-  const totalCals = DEMO_SESSIONS.reduce((a,s)=>a+s.cal,0)
+  const avgStrain = monthWorkouts.length
+    ? (monthWorkouts.reduce((a, w) => a + Number(w.activity_strain ?? 0), 0) / monthWorkouts.filter(w => w.activity_strain != null).length || 0).toFixed(1)
+    : '—'
+  const totalCals = monthWorkouts.reduce((a, w) => a + (w.activity_calories ?? 0), 0)
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
