@@ -307,7 +307,7 @@ function ViewEditDrawer({
     avg_heart_rate:       workout.avg_heart_rate != null ? String(workout.avg_heart_rate) : '',
     max_heart_rate:       workout.max_heart_rate != null ? String(workout.max_heart_rate) : '',
     activity_calories:    workout.activity_calories != null ? String(workout.activity_calories) : '',
-    mood: workout.mood != null ? (MOODS[Number(workout.mood) - 1] ?? '') : '',
+    mood: workout.mood != null ? (MOODS[Number(workout.mood)] ?? '') : '',
     description:          workout.description ?? '',
   })
 
@@ -340,7 +340,7 @@ function ViewEditDrawer({
         avg_heart_rate: form.avg_heart_rate ? Number(form.avg_heart_rate) : null,
         max_heart_rate: form.max_heart_rate ? Number(form.max_heart_rate) : null,
         activity_calories: form.activity_calories ? Number(form.activity_calories) : null,
-        mood: form.mood ? MOODS.indexOf(form.mood) + 1 : null,
+        mood: form.mood ? MOODS.indexOf(form.mood) : null,
         description: form.description.trim() || null,
         updated_at: new Date().toISOString(),
       }
