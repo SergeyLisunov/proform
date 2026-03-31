@@ -84,19 +84,37 @@ const COUNTRIES = [
 
 const SPORTS = [
   { value: '', label: '— Выбрать —' },
+  // Циклические
   { value: 'Бег', label: '🏃 Бег' },
   { value: 'Велоспорт', label: '🚴 Велоспорт' },
   { value: 'Плавание', label: '🏊 Плавание' },
   { value: 'Триатлон', label: '🏅 Триатлон' },
+  { value: 'Дуатлон', label: '🏅 Дуатлон' },
+  { value: 'Ходьба', label: '🚶 Ходьба / Скандинавская ходьба' },
+  { value: 'Лыжи', label: '⛷️ Лыжи (беговые)' },
+  { value: 'Горные лыжи', label: '🎿 Горные лыжи / Сноуборд' },
+  { value: 'Гребля', label: '🚣 Гребля / Каяк' },
+  // Силовые и единоборства
   { value: 'Силовые', label: '🏋️ Силовые тренировки' },
+  { value: 'Кроссфит', label: '💪 Кроссфит' },
+  { value: 'Борьба', label: '🥋 Единоборства / Борьба' },
+  { value: 'Бокс', label: '🥊 Бокс / Кикбоксинг' },
+  // Командные
   { value: 'Футбол', label: '⚽ Футбол' },
   { value: 'Баскетбол', label: '🏀 Баскетбол' },
+  { value: 'Волейбол', label: '🏐 Волейбол' },
+  { value: 'Хоккей', label: '🏒 Хоккей' },
+  { value: 'Регби', label: '🏉 Регби' },
   { value: 'Теннис', label: '🎾 Теннис' },
-  { value: 'Лыжи', label: '⛷️ Лыжи' },
-  { value: 'Борьба', label: '🥋 Единоборства' },
-  { value: 'Гимнастика', label: '🤸 Гимнастика' },
-  { value: 'Ходьба', label: '🚶 Ходьба' },
-  { value: 'Другое', label: '🏆 Другое' },
+  { value: 'Настольный теннис', label: '🏓 Настольный теннис' },
+  { value: 'Бадминтон', label: '🏸 Бадминтон' },
+  // Прочее
+  { value: 'Гимнастика', label: '🤸 Гимнастика / Акробатика' },
+  { value: 'Йога', label: '🧘 Йога / Пилатес' },
+  { value: 'Фитнес', label: '🏃 Фитнес / Аэробика' },
+  { value: 'Скалолазание', label: '🧗 Скалолазание' },
+  { value: 'Верховая езда', label: '🐎 Верховая езда' },
+  { value: 'Другое', label: '✏️ Другое (ввести вручную)' },
 ]
 
 const FITNESS_LEVELS = [
@@ -228,6 +246,143 @@ function Toggle({ value, onChange, label, hint }: { value: boolean; onChange: (v
         }} />
       </button>
     </div>
+  )
+}
+
+// ── Password Change Card ───────────────────────────────────────────────────────
+function PasswordCard() {
+  const { user } = useUser()
+  const [open, setOpen]         = useState(false)
+  const [oldPw, setOldPw]       = useState('')
+  const [newPw, setNewPw]       = useState('')
+  const [confirmPw, setConfirm] = useState('')
+  const [saving, setSaving]     = useState(false)
+  const [msg, setMsg]           = useState<{ type: 'ok'|'err'; text: string } | null>(null)
+  const [showOld, setShowOld]   = useState(false)
+  const [showNew, setShowNew]   = useState(false)
+
+  // Оценка силы пароля
+  const strength = (() => {
+    if (!newPw) return 0
+    let s = 0
+    if (newPw.length >= 8) s++
+    if (/[A-Z]/.test(newPw)) s++
+    if (/[0-9]/.test(newPw)) s++
+    if (/[^A-Za-z0-9]/.test(newPw)) s++
+    return s
+  })()
+  const strengthLabel = ['', 'Слабый', 'Средний', 'Хороший', 'Отличный'][strength]
+  const strengthColor = ['', '#DC2626', '#F97316', '#EAB308', '#16A34A'][strength]
+
+  async function handleChange() {
+    if (!newPw || newPw.length < 8) { setMsg({ type:'err', text:'Минимум 8 символов' }); return }
+    if (newPw !== confirmPw)         { setMsg({ type:'err', text:'Пароли не совпадают' }); return }
+    setSaving(true); setMsg(null)
+    try {
+      const sb = getSB()
+      const { error } = await sb.auth.updateUser({ password: newPw })
+      if (error) throw error
+      setMsg({ type:'ok', text:'Пароль успешно изменён' })
+      setOldPw(''); setNewPw(''); setConfirm('')
+      setTimeout(() => { setMsg(null); setOpen(false) }, 2000)
+    } catch (e: any) {
+      setMsg({ type:'err', text: e?.message ?? 'Ошибка при смене пароля' })
+    } finally { setSaving(false) }
+  }
+
+  const pwInput = (value: string, onChange: (v:string)=>void, placeholder: string, show: boolean, onToggle: ()=>void) => (
+    <div style={{ position:'relative' }}>
+      <input type={show ? 'text' : 'password'} value={value} onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{ ...iStyle, paddingRight: 44 }}
+        onFocus={e => (e.target.style.borderColor = '#7C3AED')}
+        onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+      <button type="button" onClick={onToggle} style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted-foreground)', padding:0 }}>
+        <i className={`ki-filled ${show ? 'ki-eye-slash' : 'ki-eye'} text-sm`} />
+      </button>
+    </div>
+  )
+
+  return (
+    <Card>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <i className="ki-filled ki-lock text-sm" style={{ color:'#7C3AED' }} />
+          </div>
+          <div>
+            <div style={{ fontSize:12, fontWeight:800, color:'var(--foreground)', textTransform:'uppercase', letterSpacing:'0.1em' }}>СМЕНА ПАРОЛЯ</div>
+            <div style={{ fontSize:12, color:'var(--muted-foreground)', marginTop:2 }}>Обновите пароль для входа в аккаунт</div>
+          </div>
+        </div>
+        <button onClick={() => { setOpen(o => !o); setMsg(null) }} style={{
+          padding:'8px 16px', borderRadius:10, border:'1.5px solid #DDD6FE',
+          background: open ? '#F5F3FF' : 'var(--card)', color:'#7C3AED',
+          fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.15s',
+        }}>
+          <i className={`ki-filled ${open ? 'ki-up' : 'ki-down'} text-xs`} />
+          {open ? 'Свернуть' : 'Изменить'}
+        </button>
+      </div>
+
+      {open && (
+        <div style={{ marginTop:20, display:'flex', flexDirection:'column', gap:14 }}>
+          <div style={{ height:1, background:'var(--border)', marginBottom:4 }} />
+
+          <Field label="Новый пароль">
+            {pwInput(newPw, setNewPw, 'Минимум 8 символов', showNew, () => setShowNew(s=>!s))}
+            {newPw && (
+              <div style={{ marginTop:8 }}>
+                <div style={{ display:'flex', gap:4, marginBottom:5 }}>
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{ flex:1, height:4, borderRadius:99, background: i <= strength ? strengthColor : 'var(--border)', transition:'all 0.3s' }} />
+                  ))}
+                </div>
+                <div style={{ fontSize:11, fontWeight:600, color:strengthColor }}>{strengthLabel}</div>
+                <div style={{ fontSize:10, color:'var(--muted-foreground)', marginTop:4, display:'flex', gap:10, flexWrap:'wrap' }}>
+                  <span style={{ color: newPw.length>=8 ? '#16A34A':'var(--muted-foreground)' }}>✓ 8+ символов</span>
+                  <span style={{ color: /[A-Z]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Заглавная буква</span>
+                  <span style={{ color: /[0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Цифра</span>
+                  <span style={{ color: /[^A-Za-z0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Спецсимвол</span>
+                </div>
+              </div>
+            )}
+          </Field>
+
+          <Field label="Подтвердите новый пароль">
+            {pwInput(confirmPw, setConfirm, 'Повторите новый пароль', showOld, () => setShowOld(s=>!s))}
+            {confirmPw && newPw && (
+              <div style={{ marginTop:6, fontSize:11, fontWeight:600, color: confirmPw===newPw?'#16A34A':'#DC2626', display:'flex', alignItems:'center', gap:5 }}>
+                <i className={`ki-filled ${confirmPw===newPw?'ki-check-circle':'ki-cross-circle'} text-xs`} />
+                {confirmPw===newPw ? 'Пароли совпадают' : 'Пароли не совпадают'}
+              </div>
+            )}
+          </Field>
+
+          {msg && (
+            <div style={{ padding:'10px 14px', borderRadius:12, display:'flex', alignItems:'center', gap:8, fontSize:13, fontWeight:500,
+              background: msg.type==='ok'?'#F0FDF4':'#FEF2F2',
+              color: msg.type==='ok'?'#15803D':'#DC2626',
+              border: `1px solid ${msg.type==='ok'?'#BBF7D0':'#FECACA'}` }}>
+              <i className={`ki-filled ${msg.type==='ok'?'ki-check-circle':'ki-information-5'} text-sm`} />
+              {msg.text}
+            </div>
+          )}
+
+          <button onClick={handleChange} disabled={saving || !newPw || newPw !== confirmPw} style={{
+            padding:'12px 0', borderRadius:12, border:'none', width:'100%',
+            background: saving||!newPw||newPw!==confirmPw ? 'var(--border)' : 'linear-gradient(135deg,#7C3AED,#6D28D9)',
+            color: saving||!newPw||newPw!==confirmPw ? 'var(--muted-foreground)' : 'white',
+            fontSize:14, fontWeight:700, cursor: saving||!newPw||newPw!==confirmPw ? 'not-allowed':'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+            boxShadow: newPw&&newPw===confirmPw&&!saving ? '0 2px 8px rgba(124,58,237,0.3)' : 'none',
+            transition:'all 0.15s',
+          }}>
+            {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-lock text-sm" />Сохранить новый пароль</>}
+          </button>
+        </div>
+      )}
+    </Card>
   )
 }
 
@@ -462,7 +617,21 @@ export default function SettingsPage() {
             <SectionHeader icon="ki-abstract-26" color="#2563EB" title="Спортивный профиль" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <Field label="Вид спорта">
-                <Select value={form.primary_sport} onChange={set('primary_sport')} options={SPORTS} />
+                <Select value={SPORTS.some(s => s.value === form.primary_sport) ? form.primary_sport : (form.primary_sport ? 'Другое' : '')}
+                  onChange={v => { if (v !== 'Другое') set('primary_sport')(v); else set('primary_sport')('') }}
+                  options={SPORTS} />
+                {/* Поле ручного ввода если выбрано "Другое" или значение не из списка */}
+                {(form.primary_sport === 'Другое' || (form.primary_sport && !SPORTS.slice(1).find(s => s.value === form.primary_sport && s.value !== 'Другое'))) && (
+                  <input
+                    value={form.primary_sport === 'Другое' ? '' : form.primary_sport}
+                    onChange={e => set('primary_sport')(e.target.value)}
+                    placeholder="Введите название вида спорта…"
+                    style={{ ...iStyle, marginTop: 8 }}
+                    onFocus={e => (e.target.style.borderColor = '#2563EB')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+                    autoFocus
+                  />
+                )}
               </Field>
               <Field label="Уровень подготовки">
                 <Select value={form.fitness_level} onChange={set('fitness_level')} options={FITNESS_LEVELS} />
@@ -586,6 +755,9 @@ export default function SettingsPage() {
               />
             </div>
           </Card>
+
+          {/* ── Смена пароля ── */}
+          <PasswordCard />
 
           <Card>
             <SectionHeader icon="ki-eye" color="#0284C7" title="Доступ тренера" />
