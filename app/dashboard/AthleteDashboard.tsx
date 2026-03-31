@@ -5,7 +5,11 @@ import { ZoneBar } from '@/components/ui/ZoneBar'
 import { recoveryColor, strainColor, strainLabel, fmtDate } from '@/lib/utils/recovery'
 import StrainChart from './StrainChart'
 import Link from 'next/link'
-import AthleteProfileCard from '@/components/ui/AthleteProfileCard'
+import dynamic from 'next/dynamic'
+const AthleteProfileCard = dynamic(
+  () => import('@/components/ui/AthleteProfileCard'),
+  { ssr: false }
+)
 
 const TYPE_COLOR: Record<string, string> = {
   Running: '#2563EB', Cycling: '#16A34A', Swimming: '#7C3AED', HIIT: '#DC2626',
