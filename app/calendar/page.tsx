@@ -5,16 +5,40 @@ import { createPortal } from 'react-dom'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import { useUser } from '@/lib/hooks/useUser'
+import { createBrowserClient } from '@supabase/ssr'
 import {
   getCalendarEvents, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent,
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
+import type { Workout } from '@/services/workouts.service'
 import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
   type CycleBlock, type CycleType, type CycleDay, type DayType, type UpdateCycleInput,
 } from '@/services/cycles.service'
+
+function getWS() {
+  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+}
+async function getWorkoutsForMonth(athleteId: string, from: string, to: string): Promise<Workout[]> {
+  const { data } = await getWS().from('workouts').select('*').eq('athlete_id', athleteId).gte('event_date', from).lte('event_date', to).order('event_date', { ascending: false })
+  return (data ?? []) as Workout[]
+}
+
+const ACTIVITY_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
+  'Бег':       { icon: 'ki-abstract-26',  color: '#2563EB', bg: '#EFF6FF' },
+  'Велоспорт': { icon: 'ki-technology-4', color: '#EA580C', bg: '#FFF7ED' },
+  'Плавание':  { icon: 'ki-abstract-14',  color: '#0284C7', bg: '#E0F2FE' },
+  'Силовые':   { icon: 'ki-abstract-45',  color: '#9333EA', bg: '#FAF5FF' },
+  'Ходьба':    { icon: 'ki-map',          color: '#16A34A', bg: '#F0FDF4' },
+  'Другое':    { icon: 'ki-abstract-26',  color: '#64748B', bg: '#F8FAFC' },
+}
+function getActivityCfg(t: string | null) { return ACTIVITY_ICONS[t ?? ''] ?? ACTIVITY_ICONS['Другое'] }
+function fmtDur(min: number | null | undefined): string {
+  if (!min) return ''
+  return min < 60 ? `${min} мин` : `${Math.floor(min/60)}ч${min%60?` ${min%60}м`:''}`
+}
 
 type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
@@ -741,9 +765,9 @@ function QuarterView({ year, quarter, onSelect, cycles }: { year: number; quarte
   )
 }
 
-function MonthView({ year, month, onSelect, selected, savedEvents, cycles, cycleDaysMap }: {
+function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts, cycles, cycleDaysMap }: {
   year: number; month: number; onSelect: (d: string) => void; selected: string | null
-  savedEvents: CalendarEvent[]; cycles: CycleBlock[]; cycleDaysMap: Record<string, DayType>
+  savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]; cycleDaysMap: Record<string, DayType>
 }) {
   const fd=(new Date(year,month,1).getDay()+6)%7; const days=new Date(year,month+1,0).getDate()
   const cells: (number|null)[] = [...Array(fd).fill(null), ...Array.from({length:days},(_,i)=>i+1)]
@@ -752,6 +776,12 @@ function MonthView({ year, month, onSelect, selected, savedEvents, cycles, cycle
   const today = todayISO()
   const activeCycles = cycles.filter(c => parseLocalDate(c.start_date)<=new Date(year,month+1,0)&&parseLocalDate(c.end_date)>=new Date(year,month,1))
   const eventsByDate = useMemo(() => { const m: Record<string,CalendarEvent[]>={}; savedEvents.forEach(ev=>{if(!m[ev.event_date])m[ev.event_date]=[]; m[ev.event_date].push(ev)}); return m }, [savedEvents])
+  // Группируем реальные тренировки по дате
+  const workoutsByDate = useMemo(() => {
+    const m: Record<string, Workout[]> = {}
+    monthWorkouts.forEach(w => { if (!w.event_date) return; if (!m[w.event_date]) m[w.event_date] = []; m[w.event_date].push(w) })
+    return m
+  }, [monthWorkouts])
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden pf-enter">
       {activeCycles.length>0&&<div className="px-4 py-2 border-b border-border flex flex-wrap gap-1.5">
@@ -762,21 +792,30 @@ function MonthView({ year, month, onSelect, selected, savedEvents, cycles, cycle
         <div key={wi} className="grid grid-cols-7 border-b border-border last:border-b-0">
           {week.map((day,di)=>{
             const ds=day?`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`:''
-            const ses=day?DEMO_SESSIONS.find(s=>s.date===ds):null; const comp=day?DEMO_COMPETITIONS.find(c=>c.date===ds):null
             const evs=day?(eventsByDate[ds]??[]):[]
+            const dayWks=day?(workoutsByDate[ds]??[]):[]
             const cd=day?cycleDaysMap[ds]:undefined; const cdcfg=cd?DAY_TYPE_CFG[cd]:null
             const inC=day?cycles.find(c=>ds>=c.start_date&&ds<=c.end_date):null; const ccfg=inC?CYCLE_TYPE_CFG[inC.type]:null
             const isT=ds===today; const isSel=ds===selected
+            // Цвет ячейки на основе максимальной нагрузки за день
+            const maxStrain = dayWks.length > 0 ? Math.max(...dayWks.map(w => Number(w.activity_strain ?? 0))) : 0
+            const cellBg = ccfg ? ccfg.bg : (maxStrain > 0 ? strainColor(maxStrain) + '40' : undefined)
             return <div key={di} onClick={()=>day&&onSelect(ds)}
               className={['min-h-[90px] p-1.5 border-e border-e-border last:border-e-0 transition-colors', day?'cursor-pointer':'bg-background/40', isSel?'bg-orange-50/80':day?'hover:bg-accent/50':''].join(' ')}
-              style={{ borderLeft: ccfg?`3px solid ${ccfg.text}`:undefined }}>
+              style={{ borderLeft: ccfg?`3px solid ${ccfg.text}`:undefined, background: isSel ? undefined : cellBg }}>
               {day&&<>
                 <div className={['w-7 h-7 rounded-lg flex items-center justify-center text-2sm font-semibold mb-1 mx-auto', isT?'bg-orange-500 text-white':isSel?'bg-orange-100 text-orange-600':'text-foreground'].join(' ')}>{day}</div>
                 {cdcfg&&<div className="mb-0.5 px-1 py-0.5 rounded text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfg.bg,color:cdcfg.color}}><i className={`ki-filled ${cdcfg.icon} text-[8px]`}/>{cdcfg.label.slice(0,8)}</div>}
-                {ses&&<div className="mb-1 px-1.5 py-0.5 rounded text-[10px] font-medium truncate" style={{background:strainColor(ses.strain),color:'#1D4ED8'}}>{ses.type.slice(0,3)} · {ses.strain}</div>}
-                {comp&&<div className="mb-1 px-1.5 py-0.5 rounded text-[10px] font-medium truncate" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}>🏆 {comp.name.slice(0,12)}</div>}
-                {evs.slice(0,2).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,12)}</div> })}
-                {evs.length>2&&<div className="text-[10px] text-muted-foreground px-1.5">+{evs.length-2}</div>}
+                {/* Реальные тренировки */}
+                {dayWks.slice(0,2).map(w => {
+                  const ac = getActivityCfg(w.activity_type)
+                  return <div key={w.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold truncate flex items-center gap-1" style={{background:ac.bg,color:ac.color}}>
+                    <i className={`ki-filled ${ac.icon} text-[9px] shrink-0`}/>{(w.name??w.activity_type??'').slice(0,10)}{w.activity_strain!=null&&<span className="ml-auto font-bold">{Number(w.activity_strain).toFixed(0)}</span>}
+                  </div>
+                })}
+                {dayWks.length>2&&<div className="text-[10px] text-muted-foreground px-1.5">+{dayWks.length-2} трен.</div>}
+                {/* События из calendar_events (только не-workout) */}
+                {evs.filter(ev=>ev.event_type!=='workout').slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
               </>}
             </div>
           })}
@@ -821,19 +860,21 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, cycles, cycleDay
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle }: {
-  dateStr: string; savedEvents: CalendarEvent[]; cycles: CycleBlock[]
+function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle }: {
+  dateStr: string; savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]
   cycleDaysMap: Record<string, DayType>
   onAddEvent: (date: string) => void; onDeleteEvent: (id: string) => void
   onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
   onOpenCycle?: (cycle: CycleBlock) => void
 }) {
-  const session = DEMO_SESSIONS.find(s => s.date === dateStr)
-  const comp    = DEMO_COMPETITIONS.find(c => c.date === dateStr)
   const activeCycles = cycles.filter(c => dateStr >= c.start_date && dateStr <= c.end_date)
   const cycleDay = cycleDaysMap[dateStr]; const cdcfg = cycleDay ? DAY_TYPE_CFG[cycleDay] : null
   const label = parseLocalDate(dateStr).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
   const dayEvents = savedEvents.filter(e => e.event_date === dateStr)
+  // Реальные тренировки из workouts таблицы
+  const dayWorkouts = monthWorkouts.filter(w => w.event_date === dateStr)
+
+  const isEmpty = activeCycles.length === 0 && dayEvents.length === 0 && dayWorkouts.length === 0 && !cdcfg
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4 h-full">
@@ -885,37 +926,46 @@ function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, o
           </div>
         </div>
       )}
-      {session && (
+
+      {/* ── Реальные тренировки из workouts ── */}
+      {dayWorkouts.length > 0 && (
         <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тренировка</div>
-          <div className="p-3 rounded-xl border bg-blue-50 border-blue-200">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-semibold text-blue-800">{session.type}</span>
-              <span className="pf-num text-lg text-blue-600">{session.strain}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5 text-2xs mb-2">
-              <div className="flex justify-between"><span className="text-muted-foreground">Длительность</span><span className="font-semibold">{session.dur} мин</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Калории</span><span className="font-semibold">{session.cal} ккал</span></div>
-            </div>
-            <ZoneBar zones={session.z} height={20} showLabels />
+          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тренировки</div>
+          <div className="flex flex-col gap-2">
+            {dayWorkouts.map(w => {
+              const ac = getActivityCfg(w.activity_type)
+              const MOODS = ['😴','😕','😐','🙂','🔥']
+              return (
+                <div key={w.id} className="flex items-start gap-2.5 p-3 rounded-xl border border-border bg-accent/30 hover:bg-accent/60 transition-colors">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: ac.bg }}>
+                    <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-foreground truncate">{w.name ?? w.activity_type ?? 'Тренировка'}</span>
+                      {w.mood != null && w.mood >= 0 && <span className="text-sm">{MOODS[w.mood]}</span>}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 flex flex-wrap gap-2">
+                      {w.activity_duration_min && <span>{fmtDur(w.activity_duration_min)}</span>}
+                      {w.activity_calories && <span>{w.activity_calories} ккал</span>}
+                      {w.avg_heart_rate && <span>{w.avg_heart_rate} уд/мин</span>}
+                    </div>
+                  </div>
+                  {w.activity_strain != null && (
+                    <div className="text-right shrink-0">
+                      <div className="pf-num text-xl leading-none font-bold" style={{ color: strainColor(Number(w.activity_strain)) }}>
+                        {Number(w.activity_strain).toFixed(1)}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">нагрузка</div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
-      {comp && (
-        <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Соревнование</div>
-          <div className="p-3 rounded-xl border bg-orange-50 border-orange-200">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🏆</span>
-              <div>
-                <div className="text-sm font-semibold text-orange-800">{comp.name}</div>
-                <div className="text-2xs text-orange-600">{comp.location} · {comp.distance}</div>
-              </div>
-              {comp.pb && <span className="ml-auto text-2xs font-bold px-1.5 py-0.5 rounded bg-orange-500 text-white">PB</span>}
-            </div>
-          </div>
-        </div>
-      )}
+
       {dayEvents.length > 0 && (
         <div>
           <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">События</div>
@@ -941,7 +991,7 @@ function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, o
           </div>
         </div>
       )}
-      {!session && !comp && activeCycles.length === 0 && dayEvents.length === 0 && (
+      {isEmpty ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
           <i className="ki-filled ki-calendar text-3xl text-muted-foreground/20 mb-2" />
           <p className="text-2sm text-muted-foreground">Нет событий</p>
@@ -949,6 +999,10 @@ function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, o
             <i className="ki-filled ki-plus text-xs" />Добавить событие
           </button>
         </div>
+      ) : (
+        <button onClick={() => onAddEvent(dateStr)} className="mt-auto kt-btn kt-btn-sm kt-btn-outline gap-1.5 w-full">
+          <i className="ki-filled ki-plus text-xs" />Добавить событие
+        </button>
       )}
     </div>
   )
@@ -1081,6 +1135,7 @@ export default function CalendarPage() {
   const [showAddCycle, setShowAddCycle] = useState(false)
   const [addEventDate, setAddEventDate] = useState(_today)
   const [savedEvents,  setSavedEvents]  = useState<CalendarEvent[]>([])
+  const [monthWorkouts, setMonthWorkouts] = useState<Workout[]>([])
   const [cycles,       setCycles]       = useState<CycleBlock[]>([])
   const [cycleDays,    setCycleDays]    = useState<CycleDay[]>([])
   const [loading,      setLoading]      = useState(false)
@@ -1102,7 +1157,8 @@ export default function CalendarPage() {
       getCalendarEvents(user.id, from, to),
       getCycles(user.id, from, to),
       getCycleDays(user.id, from, to),
-    ]).then(([evs, cs, cds]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds) })
+      getWorkoutsForMonth(user.id, from, to),
+    ]).then(([evs, cs, cds, wks]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds); setMonthWorkouts(wks) })
       .finally(() => setLoading(false))
   }, [user?.id, year, month])
 
@@ -1168,34 +1224,31 @@ export default function CalendarPage() {
 
   const VIEWS: {id:ViewMode;label:string}[] = [{id:'week',label:'Неделя'},{id:'month',label:'Месяц'},{id:'quarter',label:'Квартал'},{id:'year',label:'Год'}]
 
-  // ── ДИНАМИЧЕСКИЙ СЧЁТЧИК ТРЕНИРОВОК ─────────────────────────────────────────
+  // ── ДИНАМИЧЕСКИЙ СЧЁТЧИК ТРЕНИРОВОК (реальные данные) ───────────────────────
   const periodSessions = useMemo(() => {
     try {
+      if (view === 'month') {
+        return monthWorkouts.filter(w => {
+          if (!w.event_date) return false
+          const d = parseLocalDate(w.event_date)
+          return d.getFullYear() === year && d.getMonth() === month
+        }).length
+      }
       if (view === 'week') {
         const ws = weekStart
         const we = new Date(ws); we.setDate(we.getDate() + 6)
         const wsISO = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
         const weISO = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
-        return DEMO_SESSIONS.filter(s => s.date >= wsISO && s.date <= weISO).length
+        return monthWorkouts.filter(w => w.event_date && w.event_date >= wsISO && w.event_date <= weISO).length
       }
-      if (view === 'month') {
-        return DEMO_SESSIONS.filter(s => {
-          const d = parseLocalDate(s.date)
-          return d.getFullYear() === year && d.getMonth() === month
-        }).length
-      }
+      // quarter / year — используем DEMO_SESSIONS т.к. monthWorkouts загружается только за текущий месяц
       if (view === 'quarter') {
-        const qStart = (quarter - 1) * 3
-        const qEnd   = qStart + 2
-        return DEMO_SESSIONS.filter(s => {
-          const d = parseLocalDate(s.date)
-          return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd
-        }).length
+        const qStart = (quarter - 1) * 3; const qEnd = qStart + 2
+        return DEMO_SESSIONS.filter(s => { const d = parseLocalDate(s.date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
       }
-      // year
       return DEMO_SESSIONS.filter(s => parseLocalDate(s.date).getFullYear() === year).length
     } catch { return 0 }
-  }, [view, year, month, quarter, weekStart])
+  }, [view, year, month, quarter, weekStart, monthWorkouts])
 
   // Подпись периода для KPI плашки «Тренировки»
   const kpiLabel = () => {
@@ -1318,11 +1371,11 @@ export default function CalendarPage() {
         <div>
           {view==='year'    && <YearView year={year} onSelect={setSelected} cycles={cycles}/>}
           {view==='quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles}/>}
-          {view==='month'   && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap}/>}
+          {view==='month'   && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap}/>}
           {view==='week'    && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap}/>}
         </div>
         {(view==='month'||view==='week') && selected && (
-          <DetailPanel dateStr={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap}
+          <DetailPanel dateStr={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap}
             onAddEvent={openAddEvent} onDeleteEvent={handleDeleteEvent} onViewEvent={openEventDrawer} onOpenCycle={setCycleDrawer}/>
         )}
       </div>
