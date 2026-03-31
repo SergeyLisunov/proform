@@ -8,21 +8,20 @@ function sb() {
 }
 
 export type CycleType = 'macro' | 'meso' | 'micro'
-
 export type DayType = 'training' | 'competition' | 'rest' | 'travel' | 'active_rest'
 
+// Тип соответствует реальной схеме БД (athlete_id, cycle_type)
 export type CycleBlock = {
   id:          string
-  user_id:     string
+  athlete_id:  string
   label:       string
-  type:        CycleType
+  cycle_type:  CycleType
   start_date:  string
   end_date:    string
   description: string | null
   goal:        string | null
   color:       string | null
   created_at:  string
-  updated_at:  string
 }
 
 export type CycleDay = {
@@ -35,25 +34,34 @@ export type CycleDay = {
 }
 
 export type CreateCycleInput = {
-  user_id:     string
-  label:       string
-  type:        CycleType
-  start_date:  string
-  end_date:    string
+  user_id:      string   // передаём как user_id, вставляем как athlete_id
+  label:        string
+  type:         CycleType
+  start_date:   string
+  end_date:     string
   description?: string
-  goal?:       string
-  days?:       { day_date: string; day_type: DayType; notes?: string }[]
+  goal?:        string
+  days?:        { day_date: string; day_type: DayType; notes?: string }[]
+}
+
+// Нормализация для единого интерфейса в компонентах
+export function normalizeCycle(raw: any): CycleBlock & { type: CycleType; user_id: string } {
+  return {
+    ...raw,
+    type:    raw.cycle_type,
+    user_id: raw.athlete_id,
+  }
 }
 
 // ── CRUD ──────────────────────────────────────────────────────────────────────
 
-export async function getCycles(userId: string, from?: string, to?: string): Promise<CycleBlock[]> {
-  let q = sb().from('cycle_blocks').select('*').eq('user_id', userId)
+export async function getCycles(userId: string, from?: string, to?: string): Promise<(CycleBlock & { type: CycleType; user_id: string })[]> {
+  let q = sb().from('cycle_blocks').select('*').eq('athlete_id', userId)
   if (from) q = q.gte('end_date', from)
   if (to)   q = q.lte('start_date', to)
   const { data, error } = await q.order('start_date', { ascending: true })
   if (error) { console.error('getCycles error:', error); return [] }
-  return (data ?? []) as CycleBlock[]
+  return (data ?? []).map(normalizeCycle)
 }
 
 export async function getCycleDays(userId: string, from?: string, to?: string): Promise<CycleDay[]> {
@@ -65,21 +73,28 @@ export async function getCycleDays(userId: string, from?: string, to?: string): 
   return (data ?? []) as CycleDay[]
 }
 
-export async function createCycle(input: CreateCycleInput): Promise<CycleBlock | null> {
-  const { days, ...cycleData } = input
+export async function createCycle(input: CreateCycleInput): Promise<(CycleBlock & { type: CycleType; user_id: string }) | null> {
+  const { days, user_id, type, ...rest } = input
   const { data, error } = await sb()
     .from('cycle_blocks')
-    .insert({ ...cycleData, description: cycleData.description || null, goal: cycleData.goal || null })
+    .insert({
+      athlete_id:  user_id,
+      cycle_type:  type,
+      label:       rest.label,
+      start_date:  rest.start_date,
+      end_date:    rest.end_date,
+      description: rest.description || null,
+      goal:        rest.goal || null,
+    })
     .select()
     .single()
   if (error) { console.error('createCycle error:', error); return null }
-  const cycle = data as CycleBlock
+  const cycle = normalizeCycle(data)
 
-  // Вставляем дни если переданы
   if (days && days.length > 0) {
     const rows = days.map(d => ({
       cycle_id: cycle.id,
-      user_id:  input.user_id,
+      user_id,
       day_date: d.day_date,
       day_type: d.day_type,
       notes:    d.notes || null,
@@ -88,17 +103,6 @@ export async function createCycle(input: CreateCycleInput): Promise<CycleBlock |
     if (daysErr) console.error('createCycleDays error:', daysErr)
   }
   return cycle
-}
-
-export async function updateCycle(id: string, updates: Partial<Omit<CycleBlock, 'id' | 'user_id' | 'created_at'>>): Promise<CycleBlock | null> {
-  const { data, error } = await sb()
-    .from('cycle_blocks')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single()
-  if (error) { console.error('updateCycle error:', error); return null }
-  return data as CycleBlock
 }
 
 export async function deleteCycle(id: string): Promise<boolean> {
@@ -128,9 +132,9 @@ export const CYCLE_TYPE_CFG: Record<CycleType, { label: string; bg: string; text
 }
 
 export const DAY_TYPE_CFG: Record<DayType, { label: string; icon: string; color: string; bg: string }> = {
-  training:    { label: 'Тренировка',    icon: 'ki-abstract-26',  color: '#2563EB', bg: '#EFF6FF' },
-  competition: { label: 'Соревнование',  icon: 'ki-award',        color: '#DC2626', bg: '#FEF2F2' },
-  rest:        { label: 'Отдых',         icon: 'ki-moon',         color: '#16A34A', bg: '#F0FDF4' },
-  travel:      { label: 'В дороге',      icon: 'ki-map',          color: '#7C3AED', bg: '#F5F3FF' },
-  active_rest: { label: 'Актив. отдых',  icon: 'ki-heart',        color: '#0891B2', bg: '#ECFEFF' },
+  training:    { label: 'Тренировка',   icon: 'ki-abstract-26', color: '#2563EB', bg: '#EFF6FF' },
+  competition: { label: 'Соревнование', icon: 'ki-award',       color: '#DC2626', bg: '#FEF2F2' },
+  rest:        { label: 'Отдых',        icon: 'ki-moon',        color: '#16A34A', bg: '#F0FDF4' },
+  travel:      { label: 'В дороге',     icon: 'ki-map',         color: '#7C3AED', bg: '#F5F3FF' },
+  active_rest: { label: 'Актив. отдых', icon: 'ki-heart',       color: '#0891B2', bg: '#ECFEFF' },
 }
