@@ -4,6 +4,7 @@ import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import dynamic from 'next/dynamic'
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
+const AthleteProfileCard = dynamic(() => import('@/components/ui/AthleteProfileCard'), { ssr: false })
 import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_SESSIONS, DEMO_GROUP, recoveryColor } from '@/lib/utils/data'
 
 const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
@@ -74,6 +75,10 @@ function AthleteDash({ name }: { name: string }) {
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
+
+      {/* ── PROFILE CARD ── */}
+      <AthleteProfileCard />
+
       {/* Page header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
