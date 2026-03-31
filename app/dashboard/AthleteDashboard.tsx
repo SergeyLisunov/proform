@@ -5,6 +5,7 @@ import { ZoneBar } from '@/components/ui/ZoneBar'
 import { recoveryColor, strainColor, strainLabel, fmtDate } from '@/lib/utils/recovery'
 import StrainChart from './StrainChart'
 import Link from 'next/link'
+import AthleteProfileCard from '@/components/ui/AthleteProfileCard'
 
 const TYPE_COLOR: Record<string, string> = {
   Running: '#2563EB', Cycling: '#16A34A', Swimming: '#7C3AED', HIIT: '#DC2626',
@@ -43,6 +44,10 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
+
+      {/* ── PROFILE CARD ── */}
+      <AthleteProfileCard />
+
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
