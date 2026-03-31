@@ -509,9 +509,11 @@ export function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan>('pro')
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32, minHeight: '80vh', justifyContent: 'center' }} className="pf-enter">
+    <div className="pf-enter">
+      {/* Центрирующий контейнер */}
+      <div style={{ maxWidth: 860, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Кнопка назад */}
-      <div style={{ width: '100%', maxWidth: 860 }}>
+      <div>
         <a href="/dashboard" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '8px 14px', borderRadius: 12,
@@ -533,7 +535,7 @@ export function PricingPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, width: '100%', maxWidth: 860 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, width: '100%' }}>
         {PLANS.map(p => {
           const isPopular = !!p.popular
           return (
@@ -606,6 +608,7 @@ export function PricingPage() {
       {showModal && (
         <PricingModal onClose={() => setShowModal(false)} highlightPlan={selectedPlan} />
       )}
+      </div>
     </div>
   )
 }
