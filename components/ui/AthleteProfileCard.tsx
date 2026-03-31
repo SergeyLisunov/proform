@@ -1,11 +1,9 @@
 'use client'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
-import Cropper from 'react-easy-crop'
-import type { Area, Point } from 'react-easy-crop'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type AthleteProfile = {
@@ -32,39 +30,19 @@ function fmtHours(min: number) {
   return `${Math.floor(min / 60)}ч`
 }
 
-// ── Crop helpers ───────────────────────────────────────────────────────────────
-const createImage = (url: string): Promise<HTMLImageElement> =>
-  new Promise((resolve, reject) => {
-    const img = new Image()
-    img.addEventListener('load', () => resolve(img))
-    img.addEventListener('error', reject)
-    img.setAttribute('crossOrigin', 'anonymous')
-    img.src = url
-  })
-
-async function getCroppedBlob(imageSrc: string, crop: Area): Promise<Blob> {
-  const image = await createImage(imageSrc)
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')!
-  canvas.width  = crop.width
-  canvas.height = crop.height
-  ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height)
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Crop failed')), 'image/jpeg', 0.92)
-  })
-}
-
-// ── Avatar Crop Modal ──────────────────────────────────────────────────────────
+// ── Avatar Crop Modal (pure Canvas, no external deps) ─────────────────────────
 function AvatarCropModal({ file, onClose, onCropped }: {
   file: File; onClose: () => void; onCropped: (f: File) => void
 }) {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
-  const [imgUrl]  = useState(() => URL.createObjectURL(file))
-  const [crop,    setCrop]    = useState<Point>({ x: 0, y: 0 })
-  const [zoom,    setZoom]    = useState(1)
-  const [croppedArea, setCroppedArea] = useState<Area | null>(null)
-  const [saving, setSaving]   = useState(false)
+  const [zoom, setZoom] = useState(1)
+  const [saving, setSaving] = useState(false)
+  const canvasRef  = useRef<HTMLCanvasElement>(null)
+  const imgRef     = useRef<HTMLImageElement | null>(null)
+  const objUrl     = useRef(URL.createObjectURL(file))
+  const cropRef    = useRef({ x: 0, y: 0, size: 0 })
+  const dragRef    = useRef<{ sx: number; sy: number; cx: number; cy: number } | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -72,53 +50,117 @@ function AvatarCropModal({ file, onClose, onCropped }: {
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     window.addEventListener('keydown', onKey)
+    const img = new window.Image()
+    img.onload = () => {
+      imgRef.current = img
+      const side = Math.min(img.width, img.height)
+      cropRef.current = { x: (img.width - side) / 2, y: (img.height - side) / 2, size: side }
+      redraw()
+    }
+    img.src = objUrl.current
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
-      URL.revokeObjectURL(imgUrl)
+      URL.revokeObjectURL(objUrl.current)
     }
   }, []) // eslint-disable-line
 
   function handleClose() { setVisible(false); setTimeout(onClose, 260) }
 
-  const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
-    setCroppedArea(croppedPixels)
-  }, [])
+  function getScale() {
+    const canvas = canvasRef.current!; const img = imgRef.current!
+    const s = Math.min(canvas.width / img.width, canvas.height / img.height)
+    return { scale: s, offX: (canvas.width - img.width * s) / 2, offY: (canvas.height - img.height * s) / 2 }
+  }
+
+  function redraw() {
+    const canvas = canvasRef.current; const img = imgRef.current
+    if (!canvas || !img) return
+    const ctx = canvas.getContext('2d')!
+    const W = canvas.width; const H = canvas.height
+    const { scale, offX, offY } = getScale()
+    const { x, y, size } = cropRef.current
+    const cx = offX + x * scale; const cy = offY + y * scale; const cs = size * scale
+    ctx.clearRect(0, 0, W, H)
+    // Dimmed full image
+    ctx.globalAlpha = 0.35
+    ctx.drawImage(img, offX, offY, img.width * scale, img.height * scale)
+    ctx.globalAlpha = 1
+    // Bright crop circle
+    ctx.save()
+    ctx.beginPath(); ctx.arc(cx + cs / 2, cy + cs / 2, cs / 2, 0, Math.PI * 2); ctx.clip()
+    ctx.drawImage(img, offX, offY, img.width * scale, img.height * scale)
+    ctx.restore()
+    // Orange border
+    ctx.beginPath(); ctx.arc(cx + cs / 2, cy + cs / 2, cs / 2, 0, Math.PI * 2)
+    ctx.strokeStyle = '#F97316'; ctx.lineWidth = 3; ctx.stroke()
+  }
+
+  function clamp() {
+    const img = imgRef.current!; const { size } = cropRef.current
+    cropRef.current.x = Math.max(0, Math.min(img.width - size, cropRef.current.x))
+    cropRef.current.y = Math.max(0, Math.min(img.height - size, cropRef.current.y))
+  }
+
+  function evPos(e: React.PointerEvent) {
+    const r = canvasRef.current!.getBoundingClientRect()
+    const ratio = canvasRef.current!.width / r.width
+    return { px: (e.clientX - r.left) * ratio, py: (e.clientY - r.top) * ratio }
+  }
+
+  function onDown(e: React.PointerEvent) {
+    const { px, py } = evPos(e)
+    dragRef.current = { sx: px, sy: py, cx: cropRef.current.x, cy: cropRef.current.y }
+    canvasRef.current!.setPointerCapture(e.pointerId)
+  }
+
+  function onMove(e: React.PointerEvent) {
+    if (!dragRef.current || !imgRef.current) return
+    const { px, py } = evPos(e)
+    const { scale } = getScale()
+    cropRef.current.x = dragRef.current.cx - (px - dragRef.current.sx) / scale
+    cropRef.current.y = dragRef.current.cy - (py - dragRef.current.sy) / scale
+    clamp(); redraw()
+  }
+
+  function onUp() { dragRef.current = null }
+
+  function applyZoom(z: number) {
+    const img = imgRef.current!
+    const side = Math.min(img.width, img.height)
+    const newSize = side / z
+    const cx = cropRef.current.x + cropRef.current.size / 2
+    const cy = cropRef.current.y + cropRef.current.size / 2
+    cropRef.current = { x: cx - newSize / 2, y: cy - newSize / 2, size: newSize }
+    clamp(); setZoom(z); redraw()
+  }
 
   async function handleApply() {
-    if (!croppedArea) return
+    if (!imgRef.current) return
     setSaving(true)
     try {
-      const blob = await getCroppedBlob(imgUrl, croppedArea)
-      const croppedFile = new File([blob], file.name, { type: 'image/jpeg' })
-      onCropped(croppedFile)
+      const { x, y, size } = cropRef.current
+      const img = imgRef.current
+      const OUT = 400
+      const c = document.createElement('canvas'); c.width = OUT; c.height = OUT
+      c.getContext('2d')!.drawImage(img, x, y, size, size, 0, 0, OUT, OUT)
+      const blob = await new Promise<Blob>((res, rej) =>
+        c.toBlob(b => b ? res(b) : rej(new Error('blob failed')), 'image/jpeg', 0.92))
+      onCropped(new File([blob], file.name, { type: 'image/jpeg' }))
       handleClose()
-    } catch (e) {
-      console.error('crop error', e)
-      alert('Ошибка при кадрировании')
-    } finally {
-      setSaving(false)
-    }
+    } catch (e) { console.error(e); alert('Ошибка кадрирования') }
+    finally { setSaving(false) }
   }
 
   if (!mounted) return null
 
   return ReactDOM.createPortal(
     <div style={{ position:'fixed',inset:0,zIndex:10000,display:'flex',alignItems:'center',justifyContent:'center',padding:20 }}>
-      {/* Backdrop */}
       <div onClick={handleClose} style={{ position:'absolute',inset:0,background:'rgba(15,23,42,0.75)',backdropFilter:'blur(8px)',opacity:visible?1:0,transition:'opacity 0.26s' }} />
-
-      {/* Modal */}
-      <div style={{
-        position:'relative', zIndex:1, background:'var(--card)', borderRadius:24,
-        width:480, maxWidth:'95vw', overflow:'hidden',
-        boxShadow:'0 40px 120px rgba(0,0,0,0.35)',
-        transform:visible?'scale(1) translateY(0)':'scale(0.95) translateY(16px)',
-        opacity:visible?1:0, transition:'transform 0.26s cubic-bezier(.32,.72,0,1), opacity 0.26s',
-      }}>
+      <div style={{ position:'relative',zIndex:1,background:'var(--card)',borderRadius:24,width:460,maxWidth:'95vw',overflow:'hidden',boxShadow:'0 40px 120px rgba(0,0,0,0.35)',transform:visible?'scale(1)':'scale(0.95)',opacity:visible?1:0,transition:'all 0.26s cubic-bezier(.32,.72,0,1)' }}>
         {/* Header */}
-        <div style={{ padding:'18px 22px 14px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+        <div style={{ padding:'18px 22px 14px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between' }}>
+          <div style={{ display:'flex',alignItems:'center',gap:10 }}>
             <div style={{ width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,#F97316,#EA580C)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
               <i className="ki-filled ki-picture text-white text-sm" />
             </div>
@@ -127,70 +169,32 @@ function AvatarCropModal({ file, onClose, onCropped }: {
               <h3 style={{ fontSize:16,fontWeight:800,color:'var(--foreground)',margin:'2px 0 0',letterSpacing:'-0.02em',lineHeight:1 }}>Кадрировать фото</h3>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
-          </button>
+          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
         </div>
-
-        {/* Cropper area */}
-        <div style={{ position:'relative', width:'100%', aspectRatio:'1', background:'#0f172a' }}>
-          <Cropper
-            image={imgUrl}
-            crop={crop}
-            zoom={zoom}
-            aspect={1}
-            cropShape="round"
-            showGrid={false}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
-            style={{
-              containerStyle: { borderRadius:0 },
-              cropAreaStyle: { border:'3px solid #F97316', boxShadow:'0 0 0 9999px rgba(15,23,42,0.6)' },
-            }}
-          />
-          {/* Zoom badge */}
-          <div style={{ position:'absolute', bottom:12, right:12, background:'rgba(15,23,42,0.7)', backdropFilter:'blur(6px)', borderRadius:8, padding:'4px 10px', fontSize:11, fontWeight:700, color:'white' }}>
-            {zoom.toFixed(1)}×
-          </div>
-        </div>
-
-        {/* Zoom slider */}
-        <div style={{ padding:'14px 22px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', gap:12 }}>
+        {/* Canvas */}
+        <canvas ref={canvasRef} width={420} height={420}
+          style={{ display:'block',width:'100%',background:'#0f172a',cursor:'grab',touchAction:'none',userSelect:'none' }}
+          onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} />
+        {/* Zoom */}
+        <div style={{ padding:'14px 22px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:12 }}>
           <i className="ki-filled ki-minus text-xs text-muted-foreground" />
-          <input type="range" min={1} max={3} step={0.05} value={zoom}
-            onChange={e => setZoom(Number(e.target.value))}
-            style={{ flex:1, accentColor:'#F97316', cursor:'pointer' }} />
+          <input type="range" min={1} max={4} step={0.05} value={zoom}
+            onChange={e => applyZoom(Number(e.target.value))}
+            style={{ flex:1,accentColor:'#F97316',cursor:'pointer' }} />
           <i className="ki-filled ki-plus text-xs text-muted-foreground" />
-          <span style={{ fontSize:11,fontWeight:700,color:'var(--muted-foreground)',minWidth:30,textAlign:'right' }}>
-            {zoom.toFixed(1)}×
-          </span>
+          <span style={{ fontSize:11,fontWeight:700,color:'var(--muted-foreground)',minWidth:32,textAlign:'right' }}>{zoom.toFixed(1)}×</span>
         </div>
-
         {/* Hint */}
-        <div style={{ padding:'10px 22px', display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ padding:'10px 22px',display:'flex',alignItems:'center',gap:8 }}>
           <i className="ki-filled ki-information-5 text-xs" style={{ color:'#94A3B8',flexShrink:0 }} />
-          <p style={{ fontSize:11,color:'var(--muted-foreground)',margin:0 }}>
-            Перетащите и масштабируйте изображение. Результат будет обрезан по кругу.
-          </p>
+          <p style={{ fontSize:11,color:'var(--muted-foreground)',margin:0 }}>Перетаскивайте фото и масштабируйте слайдером. Оранжевый круг — область аватарки.</p>
         </div>
-
         {/* Footer */}
-        <div style={{ padding:'12px 22px 20px', display:'flex', gap:10 }}>
-          <button onClick={handleApply} disabled={saving || !croppedArea} style={{
-            flex:1, padding:'12px 0', borderRadius:12, border:'none',
-            background:'linear-gradient(135deg,#F97316,#EA580C)', color:'white',
-            fontSize:14, fontWeight:700, cursor:saving?'not-allowed':'pointer',
-            display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-            boxShadow:'0 2px 8px rgba(249,115,22,0.35)', opacity:saving?0.7:1, transition:'all 0.15s',
-          }}>
-            {saving
-              ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Применение…</>
-              : <><i className="ki-filled ki-check text-sm" />Применить</>}
+        <div style={{ padding:'12px 22px 20px',display:'flex',gap:10 }}>
+          <button onClick={handleApply} disabled={saving} style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',background:'linear-gradient(135deg,#F97316,#EA580C)',color:'white',fontSize:14,fontWeight:700,cursor:saving?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 2px 8px rgba(249,115,22,0.35)',opacity:saving?0.7:1,transition:'all 0.15s' }}>
+            {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-check text-sm" />Применить</>}
           </button>
-          <button onClick={handleClose} style={{ padding:'12px 18px', borderRadius:12, border:'1.5px solid var(--border)', background:'transparent', color:'var(--muted-foreground)', fontSize:14, fontWeight:600, cursor:'pointer' }}>
-            Отмена
-          </button>
+          <button onClick={handleClose} style={{ padding:'12px 18px',borderRadius:12,border:'1.5px solid var(--border)',background:'transparent',color:'var(--muted-foreground)',fontSize:14,fontWeight:600,cursor:'pointer' }}>Отмена</button>
         </div>
       </div>
     </div>,
