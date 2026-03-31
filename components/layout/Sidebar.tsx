@@ -2,19 +2,21 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
+import { createBrowserClient } from '@supabase/ssr'
 
 const NAV = [
-  { href: '/dashboard', icon: 'ki-element-11',   label: 'Главная',            roles: null },
-  { href: '/calendar',  icon: 'ki-calendar',      label: 'Календарь',          roles: ['athlete', 'coach', 'admin'] as string[] },
-  { href: '/diary',     icon: 'ki-book-open',     label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
-  { href: '/diary',     icon: 'ki-notepad-edit',  label: 'Дневник наблюдений', roles: ['coach'] as string[] },
-  { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика',          roles: ['athlete', 'coach', 'admin'] as string[] },
-  { href: '/athletes',  icon: 'ki-people',        label: 'Мои атлеты',         roles: ['coach', 'admin'] as string[] },
-  { href: '/org',       icon: 'ki-office-bag',    label: 'Организация',        roles: ['organization'] as string[] },
-  { href: '/admin',     icon: 'ki-setting-2',     label: 'Администратор',      roles: ['admin'] as string[] },
+  { href: '/dashboard', icon: 'ki-element-11',    label: 'Главная',            roles: null },
+  { href: '/calendar',  icon: 'ki-calendar',       label: 'Календарь',          roles: ['athlete', 'coach', 'admin'] as string[] },
+  { href: '/diary',     icon: 'ki-book-open',      label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
+  { href: '/diary',     icon: 'ki-notepad-edit',   label: 'Дневник наблюдений', roles: ['coach'] as string[] },
+  { href: '/messages',  icon: 'ki-message-text-2', label: 'Сообщения',          roles: ['athlete', 'coach'] as string[] },
+  { href: '/analytics', icon: 'ki-chart-line-up',  label: 'Аналитика',          roles: ['athlete', 'coach', 'admin'] as string[] },
+  { href: '/athletes',  icon: 'ki-people',         label: 'Мои атлеты',         roles: ['coach', 'admin'] as string[] },
+  { href: '/org',       icon: 'ki-office-bag',     label: 'Организация',        roles: ['organization'] as string[] },
+  { href: '/admin',     icon: 'ki-setting-2',      label: 'Администратор',      roles: ['admin'] as string[] },
 ]
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
@@ -24,10 +26,54 @@ const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> =
   organization: { label: 'Организация',   bg: '#EFF6FF', text: '#2563EB' },
 }
 
+function getSB() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
 export default function Sidebar() {
   const pathname = usePathname()
   const { user } = useUser()
   const [signingOut, setSigningOut] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  // Счётчик непрочитанных сообщений
+  useEffect(() => {
+    if (!user || (user.role !== 'athlete' && user.role !== 'coach')) return
+    const sb = getSB()
+
+    async function loadUnread() {
+      const { data: chats } = await sb
+        .from('chats')
+        .select('id')
+        .or(`athlete_id.eq.${user!.id},coach_id.eq.${user!.id}`)
+
+      if (!chats?.length) { setUnreadCount(0); return }
+
+      const chatIds = chats.map((c: { id: string }) => c.id)
+      const { count } = await sb
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .in('chat_id', chatIds)
+        .eq('is_read', false)
+        .neq('sender_id', user!.id)
+
+      setUnreadCount(count ?? 0)
+    }
+
+    loadUnread()
+
+    // Realtime обновление счётчика
+    const channel = sb
+      .channel('sidebar-unread')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => loadUnread())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, () => loadUnread())
+      .subscribe()
+
+    return () => { sb.removeChannel(channel) }
+  }, [user])
 
   const visible = NAV.filter(item => {
     if (!item.roles) return true
@@ -50,8 +96,6 @@ export default function Sidebar() {
       setSigningOut(false)
     }
   }
-
-  const roleInfo = user ? (ROLE_LABELS[user.role] ?? ROLE_LABELS.athlete) : null
 
   return (
     <div
@@ -88,6 +132,9 @@ export default function Sidebar() {
 
             {visible.map(item => {
               const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'))
+              const isMessages = item.href === '/messages'
+              const showBadge = isMessages && unreadCount > 0
+
               return (
                 <div key={item.href + item.label} className="kt-menu-item">
                   <Link
@@ -103,19 +150,30 @@ export default function Sidebar() {
                       <i className={`ki-filled ${item.icon} text-[15px] ${active ? 'text-orange-500' : 'text-muted-foreground'}`} />
                     </span>
                     <span className="kt-menu-title flex-1">{item.label}</span>
-                    {active && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />}
+                    {showBadge ? (
+                      <span style={{
+                        minWidth: 18, height: 18, borderRadius: 9,
+                        background: '#f97316', color: 'white',
+                        fontSize: 10, fontWeight: 700,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: '0 4px',
+                      }}>
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    ) : active ? (
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+                    ) : null}
                   </Link>
                 </div>
               )
             })}
 
             <div className="grow" />
-
           </div>
         </div>
       </div>
 
-      {/* Footer — только кнопка выхода */}
+      {/* Footer */}
       <div className="px-3 py-3 border-t border-t-border shrink-0">
         <button
           onClick={signOut}
