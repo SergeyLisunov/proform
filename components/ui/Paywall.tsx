@@ -509,7 +509,7 @@ export function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan>('pro')
 
   return (
-    <div className="flex flex-col gap-8 pf-enter">
+    <div className="flex flex-col gap-8 pf-enter items-center">
       <div className="text-center">
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тарифы</p>
         <h1 className="pf-num text-[40px] text-foreground leading-none mb-3" style={{ letterSpacing: '-0.03em' }}>
@@ -520,7 +520,7 @@ export function PricingPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, maxWidth: 760, margin: '0 auto', width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, maxWidth: 820, margin: '0 auto', width: '100%' }}>
         {PLANS.map(p => {
           const isPopular = !!p.popular
           return (
