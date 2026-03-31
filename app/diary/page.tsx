@@ -585,6 +585,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
         await sb.from('calendar_events').insert({
           owner_id:   userId,
           event_date: form.event_date,
+          start_date: form.event_date,
           event_type: 'workout',
           title:      form.name.trim(),
           notes:      form.description.trim() || null,
