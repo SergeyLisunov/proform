@@ -705,7 +705,7 @@ function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: stri
                   return (
                     <div key={di} onClick={() => onSelect(ds)}
                       className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
-                      title={dateStr}
+                      title={ds}
                       style={{ background: cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC'), outline: cc ? `1px solid ${cc.border}` : 'none' }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
 {ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
