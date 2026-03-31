@@ -9,7 +9,7 @@ import {
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
 import {
-  getCycles, getCycleDays, createCycle, deleteCycle, upsertCycleDay,
+  getCycles, getCycleDays, createCycle, updateCycle, deleteCycle, upsertCycleDay,
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
   type CycleBlock, type CycleType, type CycleDay, type DayType,
 } from '@/services/cycles.service'
@@ -673,11 +673,12 @@ function WeekView({ year, month, weekStart, onSelect, selected, savedEvents, cyc
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent }: {
+function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onViewCycle }: {
   dateStr: string; savedEvents: CalendarEvent[]; cycles: CycleBlock[]
   cycleDaysMap: Record<string, DayType>
   onAddEvent: (date: string) => void; onDeleteEvent: (id: string) => void
   onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
+  onViewCycle?: (cycle: CycleBlock) => void
 }) {
   const session  = DEMO_SESSIONS.find(s => s.date === dateStr)
   const comp     = DEMO_COMPETITIONS.find(c => c.date === dateStr)
@@ -717,7 +718,7 @@ function DetailPanel({ dateStr, savedEvents, cycles, cycleDaysMap, onAddEvent, o
               const total = diffDays(c.start_date, c.end_date) + 1
               const passed = Math.min(total, diffDays(c.start_date, dateStr) + 1)
               return (
-                <div key={i} className="flex flex-col gap-1.5 px-2.5 py-2 rounded-lg border" style={{ background: cc.bg, borderColor: cc.border }}>
+                <div key={i} onClick={() => onViewCycle?.(c)} className="flex flex-col gap-1.5 px-2.5 py-2 rounded-lg border cursor-pointer hover:opacity-80 transition-opacity" style={{ background: cc.bg, borderColor: cc.border }}>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full" style={{ background: cc.text }} />
                     <div className="flex-1">
@@ -940,6 +941,215 @@ function FieldView({ label, value, multiline }: { label: string; value: string; 
   )
 }
 
+// ── CYCLE DETAIL DRAWER ────────────────────────────────────────────────────────
+function CycleDetailDrawer({ cycle, onClose, onUpdated, onDeleted }: {
+  cycle: CycleBlock
+  onClose: () => void
+  onUpdated: (c: CycleBlock) => void
+  onDeleted: (id: string) => void
+}) {
+  const [mounted, setMounted]   = useState(false)
+  const [visible, setVisible]   = useState(false)
+  const [mode, setMode]         = useState<'view' | 'edit'>('view')
+  const [saving, setSaving]     = useState(false)
+  const [error, setError]       = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const [label,       setLabel]       = useState(cycle.label)
+  const [type,        setType]        = useState<CycleType>(cycle.type)
+  const [startDate,   setStartDate]   = useState(cycle.start_date)
+  const [endDate,     setEndDate]     = useState(cycle.end_date)
+  const [goal,        setGoal]        = useState(cycle.goal ?? '')
+  const [description, setDescription] = useState(cycle.description ?? '')
+
+  useEffect(() => {
+    setMounted(true)
+    const t = setTimeout(() => setVisible(true), 10)
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
+    window.addEventListener('keydown', onKey)
+    return () => { clearTimeout(t); window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, []) // eslint-disable-line
+
+  function handleClose() { setVisible(false); setTimeout(onClose, 260) }
+
+  async function handleSave() {
+    if (!label.trim()) { setError('Введите название'); return }
+    if (startDate > endDate) { setError('Дата начала должна быть раньше конца'); return }
+    setSaving(true); setError('')
+    try {
+      const result = await updateCycle(cycle.id, { label: label.trim(), type, start_date: startDate, end_date: endDate, goal: goal || null, description: description || null })
+      if (!result) { setError('Не удалось обновить цикл'); setSaving(false); return }
+      onUpdated(result)
+      handleClose()
+    } finally { setSaving(false) }
+  }
+
+  async function handleDelete() {
+    await deleteCycle(cycle.id)
+    onDeleted(cycle.id)
+    handleClose()
+  }
+
+  const cfg = CYCLE_TYPE_CFG[type]
+  const viewCfg = CYCLE_TYPE_CFG[cycle.type]
+  const total  = diffDays(cycle.start_date, cycle.end_date) + 1
+  const passed = Math.max(0, Math.min(total, diffDays(cycle.start_date, todayISO()) + 1))
+
+  if (!mounted) return null
+  return createPortal(
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
+      <div onClick={handleClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0 }} />
+      <div style={{ position: 'relative', width: '100%', maxWidth: 480, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: viewCfg.bg, border: `1px solid ${viewCfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <i className="ki-filled ki-abstract-26" style={{ color: viewCfg.text, fontSize: 16 }} />
+            </div>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{viewCfg.label}</p>
+              <h2 className="pf-num" style={{ fontSize: 20, color: 'var(--foreground)', lineHeight: 1 }}>
+                {mode === 'view' ? cycle.label : 'Редактировать цикл'}
+              </h2>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {mode === 'view' && (
+              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+                <i className="ki-filled ki-pencil" style={{ fontSize: 12 }} />Изменить
+              </button>
+            )}
+            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross" style={{ fontSize: 14 }} /></button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+          {mode === 'view' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Прогресс */}
+              <div style={{ padding: '16px', borderRadius: 14, background: viewCfg.bg, border: `1px solid ${viewCfg.border}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: viewCfg.text }}>Прогресс</span>
+                  <span className="pf-num" style={{ fontSize: 18, color: viewCfg.text }}>{passed}/{total} дн.</span>
+                </div>
+                <div style={{ height: 8, borderRadius: 8, background: 'rgba(255,255,255,0.6)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 8, background: viewCfg.text, width: `${(passed / total) * 100}%`, transition: 'width 0.4s' }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: 'var(--muted-foreground)' }}>
+                  <span>{cycle.start_date}</span>
+                  <span>{cycle.end_date}</span>
+                </div>
+              </div>
+
+              {/* Поля */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <FieldView label="Тип цикла" value={viewCfg.label + ' · ' + viewCfg.desc} />
+                {cycle.goal && <FieldView label="Цель" value={cycle.goal} />}
+                {cycle.description && <FieldView label="Описание" value={cycle.description} multiline />}
+                <FieldView label="Длительность" value={`${total} дней · ${Math.ceil(total / 7)} недель`} />
+              </div>
+
+              {/* Delete */}
+              {confirmDelete ? (
+                <div style={{ padding: '14px 16px', borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginBottom: 10 }}>Удалить цикл «{cycle.label}»?</p>
+                  <p style={{ fontSize: 11, color: '#EF4444', marginBottom: 12 }}>Все назначения дней цикла также будут удалены.</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={handleDelete} style={{ flex: 1, padding: '9px 0', borderRadius: 10, background: '#DC2626', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>Да, удалить</button>
+                    <button onClick={() => setConfirmDelete(false)} style={{ padding: '9px 14px', borderRadius: 10, background: '#F1F5F9', color: '#64748B', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>Отмена</button>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={() => setConfirmDelete(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, border: '1.5px solid #FECACA', background: '#FEF2F2', color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
+                  <i className="ki-filled ki-trash" style={{ fontSize: 14 }} />Удалить цикл
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {error && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}><i className="ki-filled ki-information-5" style={{ flexShrink: 0 }} />{error}</div>}
+
+              {/* Тип */}
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Тип цикла</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                  {(Object.entries(CYCLE_TYPE_CFG) as [CycleType, typeof CYCLE_TYPE_CFG[CycleType]][]).map(([key, c]) => (
+                    <button key={key} type="button" onClick={() => setType(key)}
+                      style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, padding: '10px 12px', borderRadius: 12, border: type === key ? `2px solid ${c.border}` : '1.5px solid var(--border)', background: type === key ? c.bg : 'transparent', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: type === key ? c.text : 'var(--foreground)' }}>{c.label}</span>
+                      <span style={{ fontSize: 10, color: 'var(--muted-foreground)', lineHeight: 1.3 }}>{c.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Название */}
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Название <span style={{ color: '#F97316' }}>*</span></label>
+                <input type="text" value={label} onChange={e => { setLabel(e.target.value); setError('') }}
+                  style={{ width: '100%', borderRadius: 12, border: '1.5px solid var(--border)', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--background)', color: 'var(--foreground)' }}
+                  onFocus={e => (e.target.style.borderColor = cfg.text)} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+              </div>
+
+              {/* Даты */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Дата начала</label>
+                  <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setError('') }}
+                    style={{ width: '100%', borderRadius: 12, border: '1.5px solid var(--border)', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--background)', color: 'var(--foreground)' }}
+                    onFocus={e => (e.target.style.borderColor = cfg.text)} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Дата конца</label>
+                  <input type="date" value={endDate} min={startDate} onChange={e => { setEndDate(e.target.value); setError('') }}
+                    style={{ width: '100%', borderRadius: 12, border: '1.5px solid var(--border)', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--background)', color: 'var(--foreground)' }}
+                    onFocus={e => (e.target.style.borderColor = cfg.text)} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+              </div>
+
+              {/* Цель */}
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Цель цикла</label>
+                <input type="text" value={goal} onChange={e => setGoal(e.target.value)}
+                  placeholder="Например: набор базы, пиковая форма к старту…"
+                  style={{ width: '100%', borderRadius: 12, border: '1.5px solid var(--border)', padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--background)', color: 'var(--foreground)' }}
+                  onFocus={e => (e.target.style.borderColor = cfg.text)} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+              </div>
+
+              {/* Описание */}
+              <div>
+                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Описание</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
+                  placeholder="Дополнительные заметки о цикле…"
+                  style={{ width: '100%', borderRadius: 12, border: '1.5px solid var(--border)', padding: '10px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: 'var(--background)', color: 'var(--foreground)' }}
+                  onFocus={e => (e.target.style.borderColor = cfg.text)} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer (edit mode) */}
+        {mode === 'edit' && (
+          <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8, flexShrink: 0 }}>
+            <button onClick={handleSave} disabled={saving}
+              style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
+              {saving ? 'Сохранение…' : '✓ Сохранить'}
+            </button>
+            <button onClick={() => { setMode('view'); setError(''); setLabel(cycle.label); setType(cycle.type); setStartDate(cycle.start_date); setEndDate(cycle.end_date); setGoal(cycle.goal ?? ''); setDescription(cycle.description ?? '') }}
+              style={{ padding: '11px 16px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              Отмена
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  )
+}
+
 // ── MAIN PAGE ──────────────────────────────────────────────────────────────────
 export default function CalendarPage() {
   const { user } = useUser()
@@ -955,6 +1165,7 @@ export default function CalendarPage() {
 
   const [showAddEvent,     setShowAddEvent]     = useState(false)
   const [showAddCycle,     setShowAddCycle]      = useState(false)
+  const [cycleDetailItem,  setCycleDetailItem]  = useState<CycleBlock | null>(null)
   const [addEventDate,     setAddEventDate]     = useState<string>(_today)
   const [savedEvents,      setSavedEvents]      = useState<CalendarEvent[]>([])
   const [cycles,           setCycles]           = useState<CycleBlock[]>([])
@@ -1019,6 +1230,14 @@ export default function CalendarPage() {
     setSelected(cycle.start_date)
     const d = parseLocalDate(cycle.start_date)
     setYear(d.getFullYear()); setMonth(d.getMonth())
+  }, [])
+
+  const handleCycleUpdated = useCallback((updated: CycleBlock) => {
+    setCycles(prev => prev.map(c => c.id === updated.id ? updated : c))
+  }, [])
+
+  const handleCycleDeleted = useCallback((id: string) => {
+    setCycles(prev => prev.filter(c => c.id !== id))
   }, [])
 
   const weekStart = useMemo(() => {
@@ -1103,13 +1322,16 @@ export default function CalendarPage() {
             const total  = diffDays(c.start_date, c.end_date) + 1
             const passed = Math.max(0, Math.min(total, diffDays(c.start_date, _today) + 1))
             return (
-              <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{ background: cc.bg, borderColor: cc.border }}>
+              <button key={c.id} onClick={() => setCycleDetailItem(c)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border hover:opacity-80 transition-opacity cursor-pointer"
+                style={{ background: cc.bg, borderColor: cc.border }}>
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ background: cc.text }} />
-                <div>
+                <div style={{ textAlign: 'left' }}>
                   <div className="text-2xs font-bold" style={{ color: cc.text }}>{c.label}</div>
                   <div className="text-[10px] text-muted-foreground">{c.start_date} → {c.end_date} · {passed}/{total} дн.</div>
                 </div>
-              </div>
+                <i className="ki-filled ki-right text-[9px]" style={{ color: cc.text, opacity: 0.5, marginLeft: 2 }} />
+              </button>
             )
           })}
         </div>
@@ -1159,7 +1381,7 @@ export default function CalendarPage() {
           {view === 'week'    && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
         </div>
         {(view === 'month' || view === 'week') && selected && (
-          <DetailPanel dateStr={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} onAddEvent={openAddEvent} onDeleteEvent={handleDeleteEvent} onViewEvent={openEventDrawer} />
+          <DetailPanel dateStr={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} onAddEvent={openAddEvent} onDeleteEvent={handleDeleteEvent} onViewEvent={openEventDrawer} onViewCycle={setCycleDetailItem} />
         )}
       </div>
 
@@ -1229,6 +1451,9 @@ export default function CalendarPage() {
       )}
       {showAddCycle && user && (
         <CycleDrawer initialDate={selected ?? _today} userId={user.id} onClose={() => setShowAddCycle(false)} onCreated={handleCycleCreated} />
+      )}
+      {cycleDetailItem && (
+        <CycleDetailDrawer cycle={cycleDetailItem} onClose={() => setCycleDetailItem(null)} onUpdated={c => { handleCycleUpdated(c); setCycleDetailItem(null) }} onDeleted={id => { handleCycleDeleted(id); setCycleDetailItem(null) }} />
       )}
     </div>
   )
