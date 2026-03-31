@@ -853,12 +853,32 @@ function AthleteDiary() {
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">История тренировок</p>
           <h2 className="pf-num text-[36px] text-foreground leading-none">Мой дневник</h2>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowPDF(true)} className="kt-btn kt-btn-outline gap-2">
-            <i className="ki-filled ki-file-down text-sm" />Экспорт PDF
+        <div className="flex items-center gap-2.5">
+          <button onClick={() => setShowPDF(true)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '9px 18px', borderRadius: 12,
+            border: '1.5px solid #CBD5E1',
+            background: 'var(--card)',
+            color: '#475569',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#94A3B8'; (e.currentTarget as HTMLButtonElement).style.color = '#1e293b' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#CBD5E1'; (e.currentTarget as HTMLButtonElement).style.color = '#475569' }}>
+            <i className="ki-filled ki-file-down" style={{ fontSize: 14, color: '#64748B' }} />
+            Экспорт PDF
           </button>
-          <button onClick={() => setShowDrawer(true)} className="kt-btn kt-btn-primary gap-2">
-            <i className="ki-filled ki-plus text-sm" />Новая тренировка
+          <button onClick={() => setShowDrawer(true)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '9px 18px', borderRadius: 12,
+            border: '1.5px solid #FED7AA',
+            background: 'linear-gradient(135deg, #F97316, #EA580C)',
+            color: 'white',
+            fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
+          }}>
+            <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
+            Новая тренировка
           </button>
         </div>
       </div>
