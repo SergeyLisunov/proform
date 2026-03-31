@@ -108,11 +108,9 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [editStep, setEditStep] = useState<'info' | 'days'>('info')
 
-  // Дни цикла из БД
   const [cycleDaysList, setCycleDaysList] = useState<CycleDay[]>([])
   const [daysLoading, setDaysLoading] = useState(false)
 
-  // Edit form
   const [label,       setLabel]       = useState(cycle.label)
   const [type,        setType]        = useState<CycleType>(cycle.type)
   const [startDate,   setStartDate]   = useState(cycle.start_date)
@@ -134,7 +132,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     window.addEventListener('keydown', onKey)
-    // Загружаем дни
     setDaysLoading(true)
     getCycleDaysByCycle(cycle.id).then(days => {
       setCycleDaysList(days)
@@ -163,9 +160,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
       const updates: UpdateCycleInput = { label: label.trim(), type, start_date: startDate, end_date: endDate, description: description || null, goal: goal || null }
       const result = await updateCycle(cycle.id, updates)
       if (!result) { setError('Не удалось сохранить'); setSaving(false); return }
-
-      // Синхронизируем дни: удаляем старые, вставляем новые
-      // Удаляем все дни этого цикла и вставляем заново
       for (const d of cycleDaysList) {
         await deleteCycleDay(cycle.id, d.day_date)
       }
@@ -194,7 +188,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
   const passed = Math.max(0, Math.min(total, diffDays(cycle.start_date, todayISO()) + 1))
   const progress = Math.round((passed / total) * 100)
 
-  // Статистика дней
   const dayStat = Object.values(dayMap).reduce((acc, t) => { acc[t] = (acc[t] ?? 0) + 1; return acc }, {} as Record<string, number>)
 
   return createPortal(
@@ -202,7 +195,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
       <div onClick={handleClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0 }} />
       <div style={{ position: 'relative', width: '100%', maxWidth: 520, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
 
-        {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: viewCfg.bg, border: `1px solid ${viewCfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -225,7 +217,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           </div>
         </div>
 
-        {/* Edit tabs */}
         {mode === 'edit' && (
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
             {[{ id: 'info', label: '1. Параметры' }, { id: 'days', label: '2. Дни цикла' }].map(s => (
@@ -237,14 +228,10 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           </div>
         )}
 
-        {/* Body */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
 
-          {/* ── VIEW MODE ── */}
           {mode === 'view' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-              {/* Прогресс */}
               <div style={{ padding: '16px', borderRadius: 14, background: viewCfg.bg, border: `1px solid ${viewCfg.border}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div>
@@ -261,7 +248,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                 </div>
               </div>
 
-              {/* Основная инфо */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <InfoBlock label="Начало" value={parseLocalDate(cycle.start_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })} />
                 <InfoBlock label="Конец" value={parseLocalDate(cycle.end_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })} />
@@ -272,7 +258,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
               {cycle.goal && <InfoBlock label="Цель" value={cycle.goal} />}
               {cycle.description && <InfoBlock label="Описание" value={cycle.description} multiline />}
 
-              {/* Статистика дней */}
               {daysLoading ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
                   <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -298,7 +283,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                 </div>
               )}
 
-              {/* Удаление */}
               {confirmDelete ? (
                 <div style={{ padding: '14px 16px', borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginBottom: 10 }}>Удалить этот цикл? Все метки дней тоже удалятся.</p>
@@ -316,7 +300,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
             </div>
           )}
 
-          {/* ── EDIT MODE: STEP 1 ── */}
           {mode === 'edit' && editStep === 'info' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div>
@@ -374,7 +357,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
             </div>
           )}
 
-          {/* ── EDIT MODE: STEP 2 ── */}
           {mode === 'edit' && editStep === 'days' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0 }}>Кликните по дню чтобы назначить тип.</p>
@@ -415,7 +397,6 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           )}
         </div>
 
-        {/* Footer */}
         {mode === 'edit' && (
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
             {error && (
@@ -670,7 +651,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
   )
 }
 
-// ── YEAR/QUARTER/MONTH/WEEK VIEWS (compact) ────────────────────────────────────
+// ── YEAR/QUARTER/MONTH/WEEK VIEWS ─────────────────────────────────────────────
 function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: string) => void; cycles: CycleBlock[] }) {
   const today = todayISO()
   return (
@@ -709,11 +690,11 @@ function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: stri
                       title={ds}
                       style={{ background: cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC'), outline: cc ? `1px solid ${cc.border}` : 'none' }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
-{ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
-<span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-  {parseLocalDate(ds).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
-</span>
-</div>
+                      {ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                        {parseLocalDate(ds).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                      </span>
+                    </div>
                   )
                 })}
               </div>
@@ -1123,7 +1104,6 @@ export default function CalendarPage() {
 
   const handleCycleUpdated = useCallback((updated: CycleBlock) => {
     setCycles(prev => prev.map(c => c.id === updated.id ? updated : c))
-    // Перезагружаем дни цикла
     if (user?.id) {
       const from = `${year}-${String(month+1).padStart(2,'0')}-01`
       const lastDay = new Date(year, month+1, 0).getDate()
@@ -1165,7 +1145,47 @@ export default function CalendarPage() {
   }
 
   const VIEWS: {id:ViewMode;label:string}[] = [{id:'week',label:'Неделя'},{id:'month',label:'Месяц'},{id:'quarter',label:'Квартал'},{id:'year',label:'Год'}]
-  const periodSessions = DEMO_SESSIONS.length
+
+  // ── ДИНАМИЧЕСКИЙ СЧЁТЧИК ТРЕНИРОВОК ─────────────────────────────────────────
+  const periodSessions = useMemo(() => {
+    try {
+      if (view === 'week') {
+        const ws = weekStart
+        const we = new Date(ws); we.setDate(we.getDate() + 6)
+        const wsISO = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
+        const weISO = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
+        return DEMO_SESSIONS.filter(s => s.date >= wsISO && s.date <= weISO).length
+      }
+      if (view === 'month') {
+        return DEMO_SESSIONS.filter(s => {
+          const d = parseLocalDate(s.date)
+          return d.getFullYear() === year && d.getMonth() === month
+        }).length
+      }
+      if (view === 'quarter') {
+        const qStart = (quarter - 1) * 3
+        const qEnd   = qStart + 2
+        return DEMO_SESSIONS.filter(s => {
+          const d = parseLocalDate(s.date)
+          return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd
+        }).length
+      }
+      // year
+      return DEMO_SESSIONS.filter(s => parseLocalDate(s.date).getFullYear() === year).length
+    } catch { return 0 }
+  }, [view, year, month, quarter, weekStart])
+
+  // Подпись периода для KPI плашки «Тренировки»
+  const kpiLabel = () => {
+    switch (view) {
+      case 'week':    return 'За неделю'
+      case 'month':   return 'За месяц'
+      case 'quarter': return 'За квартал'
+      case 'year':    return 'За год'
+      default:        return 'Тренировки'
+    }
+  }
+
   const avgStrain = (DEMO_SESSIONS.reduce((a,s)=>a+s.strain,0)/DEMO_SESSIONS.length).toFixed(1)
   const totalCals = DEMO_SESSIONS.reduce((a,s)=>a+s.cal,0)
 
@@ -1187,36 +1207,36 @@ export default function CalendarPage() {
       </div>
 
       {/* KPI */}
-<div className="grid grid-cols-3 gap-3">
-  <Link href="/diary" className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-blue-300 hover:shadow-sm transition-all no-underline group cursor-pointer">
-    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-blue-600 bg-blue-50 group-hover:bg-blue-100 transition-colors">
-      <i className="ki-filled ki-abstract-26 text-base" />
-    </div>
-    <div>
-      <div className="pf-num text-2xl text-foreground leading-none">{periodSessions}</div>
-      <div className="text-2xs text-muted-foreground">Тренировки</div>
-    </div>
-    <i className="ki-filled ki-right text-xs text-blue-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-  </Link>
-  <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-orange-600 bg-orange-50">
-      <i className="ki-filled ki-chart-line-up text-base" />
-    </div>
-    <div>
-      <div className="pf-num text-2xl text-foreground leading-none">{avgStrain}</div>
-      <div className="text-2xs text-muted-foreground">Ср. нагрузка</div>
-    </div>
-  </div>
-  <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-green-600 bg-green-50">
-      <i className="ki-filled ki-abstract-31 text-base" />
-    </div>
-    <div>
-      <div className="pf-num text-2xl text-foreground leading-none">{totalCals.toLocaleString()}</div>
-      <div className="text-2xs text-muted-foreground">Всего ккал</div>
-    </div>
-  </div>
-</div>
+      <div className="grid grid-cols-3 gap-3">
+        <Link href="/diary" className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-blue-300 hover:shadow-sm transition-all no-underline group cursor-pointer">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-blue-600 bg-blue-50 group-hover:bg-blue-100 transition-colors">
+            <i className="ki-filled ki-abstract-26 text-base" />
+          </div>
+          <div>
+            <div className="pf-num text-2xl text-foreground leading-none">{periodSessions}</div>
+            <div className="text-2xs text-muted-foreground">{kpiLabel()}</div>
+          </div>
+          <i className="ki-filled ki-right text-xs text-blue-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Link>
+        <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-orange-600 bg-orange-50">
+            <i className="ki-filled ki-chart-line-up text-base" />
+          </div>
+          <div>
+            <div className="pf-num text-2xl text-foreground leading-none">{avgStrain}</div>
+            <div className="text-2xs text-muted-foreground">Ср. нагрузка</div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-green-600 bg-green-50">
+            <i className="ki-filled ki-abstract-31 text-base" />
+          </div>
+          <div>
+            <div className="pf-num text-2xl text-foreground leading-none">{totalCals.toLocaleString()}</div>
+            <div className="text-2xs text-muted-foreground">Всего ккал</div>
+          </div>
+        </div>
+      </div>
 
       {/* Циклы — кликабельные плашки */}
       {cycles.length > 0 && (
