@@ -333,20 +333,30 @@ export default function SettingsPage() {
   const activeTab = TABS.find(t => t.id === tab)!
 
   return (
-    <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 760 }}>
+    <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
 
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
+          {/* Кнопка назад — только стрелка */}
           <Link href="/dashboard" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            fontSize: 12, fontWeight: 600, color: 'var(--muted-foreground)',
-            textDecoration: 'none', marginBottom: 10,
-            transition: 'color 0.15s',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 10,
+            border: '1.5px solid var(--border)', background: 'var(--card)',
+            color: 'var(--muted-foreground)', textDecoration: 'none',
+            marginBottom: 14, transition: 'all 0.15s',
           }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F97316')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted-foreground)')}>
-            <i className="ki-filled ki-left text-xs" />На главную
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F97316'
+              ;(e.currentTarget as HTMLAnchorElement).style.color = '#F97316'
+              ;(e.currentTarget as HTMLAnchorElement).style.background = '#FFF7ED'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'
+              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--muted-foreground)'
+              ;(e.currentTarget as HTMLAnchorElement).style.background = 'var(--card)'
+            }}>
+            <i className="ki-filled ki-left" style={{ fontSize: 13 }} />
           </Link>
           <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
             Настройки
