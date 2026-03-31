@@ -1271,12 +1271,32 @@ export default function CalendarPage() {
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">График тренировок</p>
           <h2 className="pf-num text-[36px] text-foreground leading-none">Календарь</h2>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowAddCycle(true)} className="kt-btn kt-btn-outline gap-2">
-            <i className="ki-filled ki-abstract-26 text-sm" />Создать цикл
+        <div className="flex items-center gap-2.5">
+          <button onClick={() => setShowAddCycle(true)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '9px 18px', borderRadius: 12,
+            border: '1.5px solid #C7D2FE',
+            background: 'var(--card)',
+            color: '#4F46E5',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(79,70,229,0.12)',
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#EEF2FF' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--card)' }}>
+            <i className="ki-filled ki-abstract-26" style={{ fontSize: 14, color: '#6366F1' }} />
+            Создать цикл
           </button>
-          <button onClick={() => openAddEvent(selected ?? undefined)} className="kt-btn kt-btn-primary gap-2">
-            <i className="ki-filled ki-plus text-sm" />Добавить событие
+          <button onClick={() => openAddEvent(selected ?? undefined)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '9px 18px', borderRadius: 12,
+            border: '1.5px solid #FED7AA',
+            background: 'linear-gradient(135deg, #F97316, #EA580C)',
+            color: 'white',
+            fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
+          }}>
+            <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
+            Добавить событие
           </button>
         </div>
       </div>
