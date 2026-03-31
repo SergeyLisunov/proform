@@ -971,7 +971,29 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
   useEffect(()=>{if(visible&&drawerMode!=='view')setTimeout(()=>titleRef.current?.focus(),150)},[visible,drawerMode])
   useEffect(()=>{const h=(e:KeyboardEvent)=>{if(e.key==='Escape')handleClose()};window.addEventListener('keydown',h);return()=>window.removeEventListener('keydown',h)})
   function handleClose(){setVisible(false);setTimeout(onClose,260)}
-  async function handleCreate(e:React.FormEvent){e.preventDefault();if(!form.title.trim()){setError('Название обязательно');return};setSaving(true);setError('');const r=await createCalendarEvent({owner_id:ownerId,event_date:form.event_date,event_type:form.event_type,title:form.title.trim(),notes:form.notes.trim()||null,start_time:form.start_time||null,end_time:form.end_time||null});if(!r){setError('Не удалось сохранить.');setSaving(false);return};onCreated(r);handleClose()}
+  async function handleCreate(e:React.FormEvent){
+    e.preventDefault()
+    if(!form.title.trim()){setError('Название обязательно');return}
+    setSaving(true);setError('')
+    // Создаём событие в calendar_events
+    const r=await createCalendarEvent({owner_id:ownerId,event_date:form.event_date,event_type:form.event_type,title:form.title.trim(),notes:form.notes.trim()||null,start_time:form.start_time||null,end_time:form.end_time||null})
+    if(!r){setError('Не удалось сохранить.');setSaving(false);return}
+    // Если тип = тренировка — также создаём запись в workouts (для дневника)
+    if(form.event_type === 'workout'){
+      const {createBrowserClient} = await import('@supabase/ssr')
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      await sb.from('workouts').insert({
+        athlete_id: ownerId,
+        event_date: form.event_date,
+        event_type: 'workout',
+        name: form.title.trim(),
+        description: form.notes.trim()||null,
+        start_time: form.start_time||null,
+        is_public: false,
+      })
+    }
+    onCreated(r);handleClose()
+  }
   async function handleUpdate(e:React.FormEvent){e.preventDefault();if(!form.title.trim()||!initialEvent){setError('Название обязательно');return};setSaving(true);setError('');const r=await updateCalendarEvent(initialEvent.id,{event_date:form.event_date,event_type:form.event_type,title:form.title.trim(),notes:form.notes.trim()||null,start_time:form.start_time||null,end_time:form.end_time||null});if(!r){setError('Не удалось обновить.');setSaving(false);return};onUpdated?.(r);handleClose()}
   async function handleDelete(){if(!initialEvent)return;await deleteCalendarEvent(initialEvent.id);onDeleted?.(initialEvent.id);handleClose()}
   const selType=EVENT_TYPES.find(t=>t.value===form.event_type)
