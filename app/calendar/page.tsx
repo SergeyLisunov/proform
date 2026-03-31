@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
