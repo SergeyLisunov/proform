@@ -41,9 +41,10 @@ function SocialEditModal({ profile, onClose, onSaved }: {
     if (!user) return
     setSaving(true)
     const sb = getSB()
-    await sb.from('athletes').update({
+    await sb.from('athletes').upsert({
+      id: user.id,
       instagram_url: ig || null, twitter_url: tw || null, threads_url: th || null,
-    }).eq('id', user.id)
+    }, { onConflict: 'id' })
     onSaved({ instagram_url: ig || null, twitter_url: tw || null, threads_url: th || null })
     setSaving(false); onClose()
   }
@@ -114,13 +115,14 @@ export default function AthleteProfileCard() {
     const sb = getSB()
     async function load() {
       const [{ data: ath }, { data: wks }] = await Promise.all([
-        sb.from('athletes').select('*').eq('id', user!.id).single(),
+        // maybeSingle() возвращает null вместо ошибки 406 если строки нет
+        sb.from('athletes').select('*').eq('id', user!.id).maybeSingle(),
         sb.from('workouts').select('activity_duration_min,activity_strain,event_date').eq('athlete_id', user!.id),
       ])
       const p: AthleteProfile = {
         name: user!.name ?? user!.email ?? 'Атлет',
         email: user!.email ?? '',
-        sport_type: ath?.sport_type ?? null,
+        sport_type: ath?.primary_sport ?? null,  // колонка primary_sport, не sport_type
         weight_kg: ath?.weight_kg ?? null,
         height_cm: ath?.height_cm ?? null,
         avatar_url: ath?.avatar_url ?? null,
@@ -156,8 +158,11 @@ export default function AthleteProfileCard() {
       const { error: upErr } = await sb.storage.from(bucket).upload(path, file, { upsert: true })
       if (upErr) throw upErr
       const { data: { publicUrl } } = sb.storage.from(bucket).getPublicUrl(path)
-      await sb.from('athletes').update({ [field]: publicUrl }).eq('id', user.id)
-      setProfile(p => p ? { ...p, [field]: publicUrl } : p)
+      // Добавляем timestamp чтобы браузер не брал закешированную пустую картинку
+      const urlWithCache = `${publicUrl}?v=${Date.now()}`
+      // upsert на случай если строки в athletes ещё нет
+      await sb.from('athletes').upsert({ id: user.id, [field]: urlWithCache }, { onConflict: 'id' })
+      setProfile(p => p ? { ...p, [field]: urlWithCache } : p)
     } catch (err) {
       console.error('upload error:', err)
       alert('Ошибка загрузки файла')
