@@ -1,332 +1,651 @@
 'use client'
-import { useEffect, useState } from 'react'
-import ReactDOM from 'react-dom'
+import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 
-type MemberRole = 'athlete' | 'coach'
-type MemberStatus = 'active' | 'pending' | 'suspended' | 'removed'
-
-type Member = {
-  id: string
-  user_id: string
-  member_role: MemberRole
-  status: MemberStatus
-  joined_at: string | null
-  created_at: string
-  user_name: string
-  user_email: string
-}
-
-function sb() {
+// ── Supabase ───────────────────────────────────────────────────────────────────
+function getSB() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 }
 
-const ROLE_CFG = {
-  athlete: { label: 'Спортсмен', icon: 'ki-abstract-26',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
-  coach:   { label: 'Тренер',    icon: 'ki-notepad-edit', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
+// ── Типы ──────────────────────────────────────────────────────────────────────
+type Tab = 'personal' | 'sport' | 'physio' | 'privacy'
+
+type FormData = {
+  // Личные
+  first_name: string
+  last_name: string
+  birth_date: string
+  gender: string
+  phone: string
+  email: string
+  city: string
+  country: string
+  bio: string
+  // Спорт
+  primary_sport: string
+  club: string
+  fitness_level: string
+  goal: string
+  weekly_training_hours: string
+  // Физиология
+  height_cm: string
+  weight_kg: string
+  max_heart_rate: string
+  lactate_threshold_hr: string
+  vo2max: string
+  hrv_baseline: string
+  rhr_baseline: string
+  // Приватность
+  profile_public: boolean
+  workouts_public: boolean
 }
 
-const STATUS_CFG: Record<MemberStatus, { label: string; dot: string; badge: string }> = {
-  active:    { label: 'Активен',   dot: 'bg-green-500',  badge: 'bg-green-50 text-green-700 border-green-200'   },
-  pending:   { label: 'Ожидает',   dot: 'bg-yellow-400', badge: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
-  suspended: { label: 'Заморожен', dot: 'bg-orange-400', badge: 'bg-orange-50 text-orange-700 border-orange-200' },
-  removed:   { label: 'Удалён',    dot: 'bg-red-400',    badge: 'bg-red-50 text-red-700 border-red-200'          },
+const EMPTY_FORM: FormData = {
+  first_name: '', last_name: '', birth_date: '', gender: '', phone: '', email: '',
+  city: '', country: '', bio: '',
+  primary_sport: '', club: '', fitness_level: '', goal: '', weekly_training_hours: '',
+  height_cm: '', weight_kg: '', max_heart_rate: '', lactate_threshold_hr: '',
+  vo2max: '', hrv_baseline: '', rhr_baseline: '',
+  profile_public: true, workouts_public: false,
 }
 
-function InviteDrawer({ orgId, onClose, onInvited }: {
-  orgId: string
-  onClose: () => void
-  onInvited: (m: Member) => void
-}) {
-  const [mounted, setMounted] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const [role, setRole] = useState<MemberRole>('athlete')
-  const [email, setEmail] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [err, setErr] = useState('')
+// ── Конфиги ───────────────────────────────────────────────────────────────────
+const TABS: { id: Tab; label: string; icon: string; color: string }[] = [
+  { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'sport',    label: 'Спорт',         icon: 'ki-abstract-26',    color: '#2563EB' },
+  { id: 'physio',   label: 'Физиология',    icon: 'ki-heart',          color: '#E11D48' },
+  { id: 'privacy',  label: 'Приватность',   icon: 'ki-shield-tick',    color: '#16A34A' },
+]
 
-  useEffect(() => {
-    setMounted(true)
-    requestAnimationFrame(() => setVisible(true))
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
-    window.addEventListener('keydown', onKey)
-    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
-  }, []) // eslint-disable-line
+const GENDERS = [
+  { value: '', label: '— Выбрать —' },
+  { value: 'male', label: 'Мужской' },
+  { value: 'female', label: 'Женский' },
+  { value: 'other', label: 'Другой' },
+]
 
-  function handleClose() { setVisible(false); setTimeout(onClose, 260) }
+const COUNTRIES = [
+  { value: '', label: '— Выбрать —' },
+  { value: 'RU', label: '🇷🇺 Россия' },
+  { value: 'BY', label: '🇧🇾 Беларусь' },
+  { value: 'KZ', label: '🇰🇿 Казахстан' },
+  { value: 'UA', label: '🇺🇦 Украина' },
+  { value: 'US', label: '🇺🇸 США' },
+  { value: 'DE', label: '🇩🇪 Германия' },
+  { value: 'FR', label: '🇫🇷 Франция' },
+  { value: 'GB', label: '🇬🇧 Великобритания' },
+  { value: 'OTHER', label: '🌍 Другая' },
+]
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email.trim()) { setErr('Email обязателен'); return }
-    setSaving(true); setErr('')
-    try {
-      const supabase = sb()
-      const { data: userRow } = await supabase
-        .from('users').select('id, email, name')
-        .eq('email', email.trim().toLowerCase()).single()
+const SPORTS = [
+  { value: '', label: '— Выбрать —' },
+  { value: 'Бег', label: '🏃 Бег' },
+  { value: 'Велоспорт', label: '🚴 Велоспорт' },
+  { value: 'Плавание', label: '🏊 Плавание' },
+  { value: 'Триатлон', label: '🏅 Триатлон' },
+  { value: 'Силовые', label: '🏋️ Силовые тренировки' },
+  { value: 'Футбол', label: '⚽ Футбол' },
+  { value: 'Баскетбол', label: '🏀 Баскетбол' },
+  { value: 'Теннис', label: '🎾 Теннис' },
+  { value: 'Лыжи', label: '⛷️ Лыжи' },
+  { value: 'Борьба', label: '🥋 Единоборства' },
+  { value: 'Гимнастика', label: '🤸 Гимнастика' },
+  { value: 'Ходьба', label: '🚶 Ходьба' },
+  { value: 'Другое', label: '🏆 Другое' },
+]
 
-      if (!userRow) {
-        setErr('Пользователь не найден. Попросите их сначала зарегистрироваться в ProForm.')
-        setSaving(false); return
-      }
+const FITNESS_LEVELS = [
+  { value: '', label: '— Выбрать —' },
+  { value: 'beginner', label: 'Начинающий' },
+  { value: 'amateur', label: 'Любитель' },
+  { value: 'intermediate', label: 'Средний уровень' },
+  { value: 'advanced', label: 'Продвинутый' },
+  { value: 'professional', label: 'Профессионал' },
+]
 
-      const { data: existing } = await supabase
-        .from('org_members').select('id').eq('org_id', orgId).eq('user_id', userRow.id).single()
+const GOALS = [
+  { value: '', label: '— Выбрать —' },
+  { value: 'weight_loss', label: 'Снижение веса' },
+  { value: 'muscle_gain', label: 'Набор мышечной массы' },
+  { value: 'endurance', label: 'Выносливость' },
+  { value: 'speed', label: 'Скорость' },
+  { value: 'competition', label: 'Соревнования' },
+  { value: 'health', label: 'Здоровье и самочувствие' },
+  { value: 'technique', label: 'Техника и мастерство' },
+  { value: 'fun', label: 'Удовольствие от спорта' },
+]
 
-      if (existing) { setErr('Этот пользователь уже участник организации.'); setSaving(false); return }
+// ── Подсчёт заполненности ─────────────────────────────────────────────────────
+function calcCompletion(f: FormData): number {
+  const fields = [
+    f.first_name, f.last_name, f.birth_date, f.gender, f.phone,
+    f.city, f.country, f.bio,
+    f.primary_sport, f.fitness_level, f.goal,
+    f.height_cm, f.weight_kg, f.max_heart_rate, f.vo2max,
+  ]
+  const filled = fields.filter(v => v && String(v).trim() !== '').length
+  return Math.round((filled / fields.length) * 100)
+}
 
-      const { data: member, error: insertErr } = await supabase
-        .from('org_members')
-        .insert({ org_id: orgId, user_id: userRow.id, member_role: role, status: 'active', joined_at: new Date().toISOString() })
-        .select().single()
+// ── Компоненты полей ──────────────────────────────────────────────────────────
+const iStyle: React.CSSProperties = {
+  width: '100%', borderRadius: 12,
+  border: '1.5px solid var(--border)',
+  padding: '11px 14px', fontSize: 14,
+  outline: 'none', background: 'var(--background)',
+  color: 'var(--foreground)', boxSizing: 'border-box',
+  transition: 'border-color 0.15s',
+}
 
-      if (insertErr) throw insertErr
-      onInvited({ id: member.id, user_id: member.user_id, member_role: member.member_role, status: member.status, joined_at: member.joined_at, created_at: member.created_at, user_name: userRow.name ?? email, user_email: userRow.email })
-      handleClose()
-    } catch (e: any) {
-      setErr(e?.message ?? 'Ошибка при добавлении')
-    } finally { setSaving(false) }
-  }
-
-  if (!mounted) return null
-
-  return ReactDOM.createPortal(
-    <>
-      <div onClick={handleClose} style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.26s', opacity: visible ? 1 : 0 }} />
-      <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 440, maxWidth: '100vw', zIndex: 9999, background: 'var(--card)', borderLeft: '1px solid var(--border)', display: 'flex', flexDirection: 'column', transition: 'transform 0.26s cubic-bezier(.32,.72,0,1)', transform: visible ? 'translateX(0)' : 'translateX(100%)' }}>
-        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>Организация</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--foreground)' }}>Добавить участника</div>
-          </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Роль</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {(['athlete', 'coach'] as MemberRole[]).map(r => {
-                const cfg = ROLE_CFG[r]; const sel = role === r
-                return (
-                  <button key={r} type="button" onClick={() => setRole(r)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${sel ? cfg.border : 'var(--border)'}`, background: sel ? cfg.bg : 'transparent', cursor: 'pointer', transition: 'all 0.15s' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cfg.bg, border: `1px solid ${cfg.border}`, flexShrink: 0 }}>
-                      <i className={`ki-filled ${cfg.icon} text-sm`} style={{ color: cfg.text }} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: sel ? cfg.text : 'var(--foreground)' }}>{cfg.label}</div>
-                      <div style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>{r === 'athlete' ? 'Тренировки, метрики' : 'Наблюдение, пометки'}</div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>Email *</label>
-            <input type="email" required value={email} onChange={e => { setEmail(e.target.value); setErr('') }} placeholder="athlete@example.com" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
-            <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 5 }}>Пользователь должен быть зарегистрирован в ProForm</p>
-            {err && <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 8, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>{err}</div>}
-          </div>
-
-          <div style={{ padding: '12px 14px', borderRadius: 10, background: 'var(--accent)', border: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-              <i className="ki-filled ki-information-2 text-blue-500 text-sm mt-0.5 shrink-0" />
-              <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.5 }}>После добавления участник сразу получит доступ к разделам организации согласно своей роли.</p>
-            </div>
-          </div>
-        </form>
-
-        <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', gap: 10 }}>
-          <button onClick={handleSubmit as any} disabled={saving} className="kt-btn kt-btn-primary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            {saving ? <><i className="ki-filled ki-loading animate-spin text-xs" /> Добавление…</> : <><i className="ki-filled ki-check text-xs" /> Добавить участника</>}
-          </button>
-          <button onClick={handleClose} className="kt-btn kt-btn-outline">Отмена</button>
-        </div>
-      </div>
-    </>,
-    document.body
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        {label}
+      </label>
+      {children}
+      {hint && <span style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: -2 }}>{hint}</span>}
+    </div>
   )
 }
 
-export default function OrgPage() {
+function Input({ value, onChange, type = 'text', placeholder, min, max }: {
+  value: string; onChange: (v: string) => void; type?: string; placeholder?: string; min?: string; max?: string
+}) {
+  return (
+    <input type={type} value={value} onChange={e => onChange(e.target.value)}
+      placeholder={placeholder} min={min} max={max} style={iStyle}
+      onFocus={e => (e.target.style.borderColor = '#F97316')}
+      onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+  )
+}
+
+function Select({ value, onChange, options }: {
+  value: string; onChange: (v: string) => void
+  options: { value: string; label: string }[]
+}) {
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)}
+      style={{ ...iStyle, cursor: 'pointer' }}
+      onFocus={e => (e.target.style.borderColor = '#F97316')}
+      onBlur={e => (e.target.style.borderColor = 'var(--border)')}>
+      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  )
+}
+
+// ── Section header ─────────────────────────────────────────────────────────────
+function SectionHeader({ icon, color, title }: { icon: string; color: string; title: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+      <div style={{ width: 32, height: 32, borderRadius: 10, background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
+      </div>
+      <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>
+        {title}
+      </h3>
+    </div>
+  )
+}
+
+// ── Карточка блока ─────────────────────────────────────────────────────────────
+function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{
+      background: 'var(--card)', border: '1px solid var(--border)',
+      borderRadius: 20, padding: '24px 28px', ...style
+    }}>
+      {children}
+    </div>
+  )
+}
+
+// ── Toggle ─────────────────────────────────────────────────────────────────────
+function Toggle({ value, onChange, label, hint }: { value: boolean; onChange: (v: boolean) => void; label: string; hint: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', marginBottom: 3 }}>{label}</div>
+        <div style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>{hint}</div>
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange(!value)}
+        style={{
+          width: 48, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer',
+          background: value ? '#F97316' : 'var(--border)',
+          position: 'relative', flexShrink: 0, transition: 'background 0.2s',
+        }}>
+        <span style={{
+          position: 'absolute', top: 3, width: 20, height: 20, borderRadius: '50%',
+          background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+          left: value ? 25 : 3, transition: 'left 0.2s',
+        }} />
+      </button>
+    </div>
+  )
+}
+
+// ── Главный компонент ──────────────────────────────────────────────────────────
+export default function SettingsPage() {
   const { user } = useUser()
-  const [members, setMembers] = useState<Member[]>([])
+  const [tab, setTab] = useState<Tab>('personal')
+  const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [loading, setLoading] = useState(true)
-  const [roleFilter, setRoleFilter] = useState<'all' | MemberRole>('all')
-  const [statusFilter, setStatusFilter] = useState<'all' | MemberStatus>('all')
-  const [search, setSearch] = useState('')
-  const [showInvite, setShowInvite] = useState(false)
-  const [toast, setToast] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
-  const orgId = user?.id ?? ''
+  // Загрузка данных
+  useEffect(() => {
+    if (!user?.id) return
+    const sb = getSB()
+    async function load() {
+      const [{ data: ath }, { data: usr }] = await Promise.all([
+        sb.from('athletes').select('*').eq('id', user!.id).maybeSingle(),
+        sb.from('users').select('*').eq('id', user!.id).maybeSingle(),
+      ])
+      setForm({
+        first_name: ath?.first_name ?? usr?.name?.split(' ')[0] ?? '',
+        last_name:  ath?.last_name  ?? usr?.name?.split(' ')[1] ?? '',
+        birth_date: ath?.birth_date ?? '',
+        gender:     ath?.gender ?? '',
+        phone:      ath?.phone ?? '',
+        email:      usr?.email ?? '',
+        city:       ath?.city ?? '',
+        country:    ath?.country ?? '',
+        bio:        ath?.bio ?? '',
+        primary_sport:       ath?.primary_sport ?? '',
+        club:                ath?.club ?? '',
+        fitness_level:       ath?.fitness_level ?? '',
+        goal:                ath?.goal ?? '',
+        weekly_training_hours: ath?.weekly_training_hours ? String(ath.weekly_training_hours) : '',
+        height_cm:           ath?.height_cm ? String(ath.height_cm) : '',
+        weight_kg:           ath?.weight_kg ? String(ath.weight_kg) : '',
+        max_heart_rate:      ath?.max_heart_rate ? String(ath.max_heart_rate) : '',
+        lactate_threshold_hr: ath?.lactate_threshold_hr ? String(ath.lactate_threshold_hr) : '',
+        vo2max:              ath?.vo2max ? String(ath.vo2max) : '',
+        hrv_baseline:        ath?.hrv_baseline ? String(ath.hrv_baseline) : '',
+        rhr_baseline:        ath?.rhr_baseline ? String(ath.rhr_baseline) : '',
+        profile_public:  ath?.profile_public  ?? true,
+        workouts_public: ath?.workouts_public ?? false,
+      })
+      setLoading(false)
+    }
+    load()
+  }, [user?.id])
 
-  useEffect(() => { if (orgId) loadMembers() }, [orgId]) // eslint-disable-line
+  const set = useCallback((key: keyof FormData) => (value: string | boolean) => {
+    setForm(prev => ({ ...prev, [key]: value }))
+  }, [])
 
-  async function loadMembers() {
-    setLoading(true)
-    try {
-      const { data, error } = await sb()
-        .from('org_members')
-        .select('id, user_id, member_role, status, joined_at, created_at, users!inner(name, email)')
-        .eq('org_id', orgId)
-        .neq('status', 'removed')
-        .order('created_at', { ascending: false })
-      if (error) throw error
-      setMembers((data ?? []).map((m: any) => ({ id: m.id, user_id: m.user_id, member_role: m.member_role, status: m.status, joined_at: m.joined_at, created_at: m.created_at, user_name: m.users?.name ?? '—', user_email: m.users?.email ?? '—' })))
-    } catch (e) { console.error(e) } finally { setLoading(false) }
+  async function handleSave() {
+    if (!user?.id) return
+    setSaving(true)
+    const sb = getSB()
+    const payload = {
+      id: user.id,
+      first_name:   form.first_name || null,
+      last_name:    form.last_name  || null,
+      birth_date:   form.birth_date || null,
+      gender:       form.gender     || null,
+      phone:        form.phone      || null,
+      city:         form.city       || null,
+      country:      form.country    || null,
+      bio:          form.bio        || null,
+      primary_sport:        form.primary_sport        || null,
+      club:                 form.club                 || null,
+      fitness_level:        form.fitness_level        || null,
+      goal:                 form.goal                 || null,
+      weekly_training_hours: form.weekly_training_hours ? Number(form.weekly_training_hours) : null,
+      height_cm:            form.height_cm  ? Number(form.height_cm)  : null,
+      weight_kg:            form.weight_kg  ? Number(form.weight_kg)  : null,
+      max_heart_rate:       form.max_heart_rate       ? Number(form.max_heart_rate)       : null,
+      lactate_threshold_hr: form.lactate_threshold_hr ? Number(form.lactate_threshold_hr) : null,
+      vo2max:               form.vo2max      ? Number(form.vo2max)      : null,
+      hrv_baseline:         form.hrv_baseline ? Number(form.hrv_baseline) : null,
+      rhr_baseline:         form.rhr_baseline ? Number(form.rhr_baseline) : null,
+      profile_public:  form.profile_public,
+      workouts_public: form.workouts_public,
+      updated_at: new Date().toISOString(),
+    }
+    await sb.from('athletes').upsert(payload, { onConflict: 'id' })
+    // Обновляем имя пользователя в таблице users
+    const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
+    if (fullName) await sb.from('users').update({ name: fullName }).eq('id', user.id)
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
   }
 
-  async function changeStatus(memberId: string, newStatus: MemberStatus) {
-    const { error } = await sb().from('org_members').update({ status: newStatus }).eq('id', memberId)
-    if (error) { alert('Ошибка при изменении статуса'); return }
-    setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: newStatus } : m).filter(m => m.status !== 'removed'))
-    showToastMsg(newStatus === 'removed' ? 'Участник удалён' : 'Статус обновлён')
-  }
+  const completion = calcCompletion(form)
 
-  function showToastMsg(msg: string) { setToast(msg); setTimeout(() => setToast(''), 3000) }
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
-  const filtered = members.filter(m => {
-    if (roleFilter !== 'all' && m.member_role !== roleFilter) return false
-    if (statusFilter !== 'all' && m.status !== statusFilter) return false
-    if (search) { const q = search.toLowerCase(); if (!m.user_name.toLowerCase().includes(q) && !m.user_email.toLowerCase().includes(q)) return false }
-    return true
-  })
-
-  const total = members.length
-  const athletes = members.filter(m => m.member_role === 'athlete').length
-  const coaches = members.filter(m => m.member_role === 'coach').length
-  const pending = members.filter(m => m.status === 'pending').length
-
-  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" /></div>
+  const activeTab = TABS.find(t => t.id === tab)!
 
   return (
-    <div className="flex flex-col gap-5 pf-enter">
-      <div className="flex items-start justify-between flex-wrap gap-4">
+    <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 760 }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Панель организации</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Участники</h2>
+          <Link href="/dashboard" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontSize: 12, fontWeight: 600, color: 'var(--muted-foreground)',
+            textDecoration: 'none', marginBottom: 10,
+            transition: 'color 0.15s',
+          }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#F97316')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted-foreground)')}>
+            <i className="ki-filled ki-left text-xs" />На главную
+          </Link>
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
+            Настройки
+          </p>
+          <h1 className="pf-num" style={{ fontSize: 34, color: 'var(--foreground)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            Профиль атлета
+          </h1>
         </div>
-        <button onClick={() => setShowInvite(true)} className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-plus text-sm" /> Добавить участника
-        </button>
-      </div>
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-        {[
-          { label: 'Всего участников', value: total,    bg: 'bg-blue-50 text-blue-600',    icon: 'ki-people'      },
-          { label: 'Спортсменов',      value: athletes, bg: 'bg-orange-50 text-orange-500', icon: 'ki-abstract-26' },
-          { label: 'Тренеров',         value: coaches,  bg: 'bg-green-50 text-green-600',   icon: 'ki-notepad-edit'},
-          { label: 'Ожидают',          value: pending,  bg: 'bg-yellow-50 text-yellow-600', icon: 'ki-time'        },
-        ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
-              <i className={`ki-filled ${s.icon} text-base`} />
-            </div>
-            <div>
-              <div className="pf-num text-2xl text-foreground">{s.value}</div>
-              <div className="text-2xs text-muted-foreground">{s.label}</div>
-            </div>
+        {/* Прогресс заполненности */}
+        <div style={{ textAlign: 'right', minWidth: 140 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+            Заполнено
           </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по имени или email…" className="w-full pl-9 pr-4 py-2 rounded-lg border border-input bg-card text-sm outline-none focus:border-orange-400" />
-        </div>
-        <div className="flex gap-1.5">
-          {(['all', 'athlete', 'coach'] as const).map(f => (
-            <button key={f} onClick={() => setRoleFilter(f)} className={['px-3 py-1.5 rounded-lg text-2sm font-medium border transition-all', roleFilter === f ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}>
-              {f === 'all' ? 'Все роли' : f === 'athlete' ? 'Спортсмены' : 'Тренеры'}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-1.5">
-          {(['all', 'active', 'pending', 'suspended'] as const).map(f => (
-            <button key={f} onClick={() => setStatusFilter(f)} className={['px-3 py-1.5 rounded-lg text-2sm font-medium border transition-all', statusFilter === f ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:border-blue-200'].join(' ')}>
-              {f === 'all' ? 'Все статусы' : STATUS_CFG[f as MemberStatus].label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl px-5 py-16 text-center">
-          <i className="ki-filled ki-people text-3xl text-slate-300 mb-3 block" />
-          <p className="text-muted-foreground text-2sm">{members.length === 0 ? 'Участников пока нет. Добавьте первого!' : 'Никто не подходит под фильтры'}</p>
-        </div>
-      ) : (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="grid grid-cols-[1fr_130px_110px_140px] gap-4 px-5 py-3 border-b border-border bg-muted/30">
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Участник</span>
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Роль</span>
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Статус</span>
-            <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Действия</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
+            <div style={{ width: 100, height: 6, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%', borderRadius: 999,
+                background: completion >= 80 ? '#16A34A' : completion >= 40 ? '#F97316' : '#E11D48',
+                width: `${completion}%`, transition: 'width 0.4s ease',
+              }} />
+            </div>
+            <span className="pf-num" style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)' }}>{completion}%</span>
           </div>
-          <div className="divide-y divide-border">
-            {filtered.map(m => {
-              const rc = ROLE_CFG[m.member_role]
-              const sc = STATUS_CFG[m.status]
-              const initials = m.user_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
-              return (
-                <div key={m.id} className="grid grid-cols-[1fr_130px_110px_140px] gap-4 px-5 py-3.5 items-center hover:bg-accent/30 transition-colors">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num" style={{ background: rc.bg, color: rc.text }}>{initials}</div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-foreground truncate">{m.user_name}</div>
-                      <div className="text-2xs text-muted-foreground font-mono truncate">{m.user_email}</div>
-                    </div>
+        </div>
+      </div>
+
+      {/* ── Tabs ── */}
+      <div style={{ display: 'flex', gap: 6, padding: 5, background: 'var(--accent)', borderRadius: 16, border: '1px solid var(--border)' }}>
+        {TABS.map(t => {
+          const active = tab === t.id
+          return (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                padding: '10px 8px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                fontSize: 12, fontWeight: active ? 700 : 600,
+                background: active ? 'var(--card)' : 'transparent',
+                color: active ? t.color : 'var(--muted-foreground)',
+                boxShadow: active ? '0 1px 6px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.15s',
+              }}>
+              <i className={`ki-filled ${t.icon}`} style={{ fontSize: 14, color: active ? t.color : 'var(--muted-foreground)' }} />
+              <span className="hidden sm:inline">{t.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* ── Content ── */}
+
+      {/* ═══════════════ ЛИЧНЫЕ ДАННЫЕ ═══════════════ */}
+      {tab === 'personal' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card>
+            <SectionHeader icon="ki-profile-circle" color="#F97316" title="Личные данные" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Имя">
+                <Input value={form.first_name} onChange={set('first_name')} placeholder="Иван" />
+              </Field>
+              <Field label="Фамилия">
+                <Input value={form.last_name} onChange={set('last_name')} placeholder="Иванов" />
+              </Field>
+              <Field label="Дата рождения">
+                <Input value={form.birth_date} onChange={set('birth_date')} type="date" />
+              </Field>
+              <Field label="Пол">
+                <Select value={form.gender} onChange={set('gender')} options={GENDERS} />
+              </Field>
+              <Field label="Телефон">
+                <Input value={form.phone} onChange={set('phone')} placeholder="+7 900 000 00 00" type="tel" />
+              </Field>
+              <Field label="Email" hint="Изменение потребует подтверждения">
+                <input value={form.email} readOnly style={{ ...iStyle, opacity: 0.6, cursor: 'not-allowed' }} />
+              </Field>
+              <Field label="Город">
+                <Input value={form.city} onChange={set('city')} placeholder="Москва" />
+              </Field>
+              <Field label="Страна">
+                <Select value={form.country} onChange={set('country')} options={COUNTRIES} />
+              </Field>
+            </div>
+          </Card>
+
+          <Card>
+            <SectionHeader icon="ki-message-text" color="#8B5CF6" title="О себе" />
+            <Field label="Расскажите о себе">
+              <textarea
+                value={form.bio} onChange={e => set('bio')(e.target.value)}
+                rows={4} placeholder="Расскажите о себе, опыте, целях…"
+                style={{ ...iStyle, resize: 'none', fontFamily: 'inherit' }}
+                onFocus={e => (e.target.style.borderColor = '#F97316')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </Field>
+          </Card>
+        </div>
+      )}
+
+      {/* ═══════════════ СПОРТ ═══════════════ */}
+      {tab === 'sport' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card>
+            <SectionHeader icon="ki-abstract-26" color="#2563EB" title="Спортивный профиль" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Вид спорта">
+                <Select value={form.primary_sport} onChange={set('primary_sport')} options={SPORTS} />
+              </Field>
+              <Field label="Уровень подготовки">
+                <Select value={form.fitness_level} onChange={set('fitness_level')} options={FITNESS_LEVELS} />
+              </Field>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <Field label="Цель тренировок">
+                <Select value={form.goal} onChange={set('goal')} options={GOALS} />
+              </Field>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <Field label="Часов тренировок в неделю" hint="Среднее количество часов">
+                <Input value={form.weekly_training_hours} onChange={set('weekly_training_hours')}
+                  type="number" placeholder="8" min="0" max="40" />
+              </Field>
+            </div>
+          </Card>
+
+          <Card>
+            <SectionHeader icon="ki-people" color="#0284C7" title="Клуб / Организация" />
+            <Field label="Клуб или спортивная организация" hint="Название клуба, команды или организации, к которой вы относитесь">
+              <div style={{ position: 'relative' }}>
+                <i className="ki-filled ki-people" style={{
+                  position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                  color: 'var(--muted-foreground)', fontSize: 14, pointerEvents: 'none',
+                }} />
+                <input
+                  value={form.club} onChange={e => set('club')(e.target.value)}
+                  placeholder="Например: ЦСКА, Динамо, Nike Running Club…"
+                  style={{ ...iStyle, paddingLeft: 40 }}
+                  onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+              </div>
+            </Field>
+            <div style={{
+              marginTop: 16, padding: '14px 16px', borderRadius: 14,
+              background: '#EFF6FF', border: '1px solid #BFDBFE',
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+            }}>
+              <i className="ki-filled ki-information-5" style={{ color: '#2563EB', flexShrink: 0, marginTop: 1 }} />
+              <div style={{ fontSize: 12, color: '#1D4ED8', lineHeight: 1.5 }}>
+                Если ваша организация зарегистрирована в ProForm, вы можете получить приглашение и автоматически
+                привязаться к ней. Обратитесь к администратору организации.
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ═══════════════ ФИЗИОЛОГИЯ ═══════════════ */}
+      {tab === 'physio' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card>
+            <SectionHeader icon="ki-abstract-31" color="#E11D48" title="Антропометрия" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Рост (см)" hint="100 – 250 см">
+                <Input value={form.height_cm} onChange={set('height_cm')} type="number" placeholder="175" min="100" max="250" />
+              </Field>
+              <Field label="Вес (кг)" hint="30 – 300 кг">
+                <Input value={form.weight_kg} onChange={set('weight_kg')} type="number" placeholder="70" min="30" max="300" />
+              </Field>
+            </div>
+          </Card>
+
+          <Card>
+            <SectionHeader icon="ki-heart" color="#E11D48" title="Кардио-параметры" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Макс. ЧСС (уд/мин)" hint="Максимальная частота сердечных сокращений">
+                <Input value={form.max_heart_rate} onChange={set('max_heart_rate')} type="number" placeholder="185" min="100" max="230" />
+              </Field>
+              <Field label="Лакт. порог ЧСС" hint="ЧСС на лактатном пороге">
+                <Input value={form.lactate_threshold_hr} onChange={set('lactate_threshold_hr')} type="number" placeholder="160" min="60" max="220" />
+              </Field>
+              <Field label="VO2max (мл/кг/мин)" hint="Максимальное потребление кислорода">
+                <Input value={form.vo2max} onChange={set('vo2max')} type="number" placeholder="50" min="20" max="90" />
+              </Field>
+              <Field label="ЧСС покоя (уд/мин)" hint="ЧСС в состоянии покоя">
+                <Input value={form.rhr_baseline} onChange={set('rhr_baseline')} type="number" placeholder="55" min="30" max="100" />
+              </Field>
+              <Field label="HRV базовый (мс)" hint="Вариабельность сердечного ритма">
+                <Input value={form.hrv_baseline} onChange={set('hrv_baseline')} type="number" placeholder="45" min="10" max="200" />
+              </Field>
+            </div>
+            {/* Подсказки */}
+            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {[
+                { label: 'VO2max', icon: 'ki-chart-line-up', color: '#16A34A', hint: 'Отличный: >55, Хороший: 45–55, Средний: 35–45' },
+                { label: 'HRV', icon: 'ki-heart', color: '#E11D48', hint: 'Норма: 20–100 мс. Выше — лучше восстановление' },
+              ].map(h => (
+                <div key={h.label} style={{ padding: '10px 14px', borderRadius: 12, background: h.color + '0D', border: `1px solid ${h.color}25` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <i className={`ki-filled ${h.icon} text-xs`} style={{ color: h.color }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: h.color }}>{h.label}</span>
                   </div>
-                  <div>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-2xs font-semibold border" style={{ background: rc.bg, color: rc.text, borderColor: rc.border }}>
-                      <i className={`ki-filled ${rc.icon} text-[10px]`} />{rc.label}
-                    </span>
-                  </div>
-                  <div>
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-2xs font-semibold border ${sc.badge}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />{sc.label}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {m.status === 'active' && (
-                      <button onClick={() => changeStatus(m.id, 'suspended')} className="px-2.5 py-1.5 rounded-lg border border-orange-200 text-orange-600 bg-orange-50 hover:bg-orange-100 text-2xs font-semibold transition-all" title="Заморозить">
-                        <i className="ki-filled ki-pause text-xs" />
-                      </button>
-                    )}
-                    {(m.status === 'suspended' || m.status === 'pending') && (
-                      <button onClick={() => changeStatus(m.id, 'active')} className="px-2.5 py-1.5 rounded-lg border border-green-200 text-green-600 bg-green-50 hover:bg-green-100 text-2xs font-semibold transition-all" title="Активировать">
-                        <i className="ki-filled ki-check text-xs" />
-                      </button>
-                    )}
-                    <button onClick={() => { if (confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} className="px-2.5 py-1.5 rounded-lg border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 text-2xs font-semibold transition-all" title="Удалить">
-                      <i className="ki-filled ki-trash text-xs" />
-                    </button>
-                  </div>
+                  <p style={{ fontSize: 10, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.5 }}>{h.hint}</p>
                 </div>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+          </Card>
         </div>
       )}
 
-      {showInvite && (
-        <InviteDrawer orgId={orgId} onClose={() => setShowInvite(false)}
-          onInvited={m => { setMembers(prev => [m, ...prev]); showToastMsg('Участник добавлен!') }} />
-      )}
+      {/* ═══════════════ ПРИВАТНОСТЬ ═══════════════ */}
+      {tab === 'privacy' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card>
+            <SectionHeader icon="ki-shield-tick" color="#16A34A" title="Настройки приватности" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <Toggle
+                value={form.profile_public}
+                onChange={v => set('profile_public')(v)}
+                label="Публичный профиль"
+                hint="Другие пользователи могут видеть ваш профиль, имя и спортивный вид"
+              />
+              <div style={{ height: 1, background: 'var(--border)' }} />
+              <Toggle
+                value={form.workouts_public}
+                onChange={v => set('workouts_public')(v)}
+                label="Публичные тренировки"
+                hint="Тренеры и другие атлеты могут видеть ваш дневник тренировок"
+              />
+            </div>
+          </Card>
 
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-foreground text-background text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter">
-          <i className="ki-filled ki-check-circle text-green-400" />{toast}
+          <Card>
+            <SectionHeader icon="ki-eye" color="#0284C7" title="Доступ тренера" />
+            <div style={{ padding: '14px 16px', borderRadius: 14, background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <i className="ki-filled ki-verify text-sm" style={{ color: '#16A34A' }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>Тренер имеет доступ</span>
+              </div>
+              <p style={{ fontSize: 12, color: '#166534', margin: 0, lineHeight: 1.5 }}>
+                Если вы добавлены в программу тренера, он видит ваши тренировки и может оставлять комментарии.
+                Вы можете отозвать доступ в настройках тренера.
+              </p>
+            </div>
+          </Card>
+
+          <Card style={{ background: 'var(--accent)' }}>
+            <SectionHeader icon="ki-trash" color="#DC2626" title="Опасная зона" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', marginBottom: 3 }}>Удалить аккаунт</div>
+                <div style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>Безвозвратное удаление всех данных</div>
+              </div>
+              <button style={{
+                padding: '9px 18px', borderRadius: 12,
+                border: '1.5px solid #FECACA', background: '#FEF2F2',
+                color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 7, transition: 'all 0.15s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEE2E2' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEF2F2' }}
+                onClick={() => alert('Функция в разработке')}>
+                <i className="ki-filled ki-trash text-sm" />Удалить аккаунт
+              </button>
+            </div>
+          </Card>
         </div>
       )}
+
+      {/* ── Кнопка сохранения ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 8 }}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '12px 28px', borderRadius: 14, border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
+            background: saved
+              ? 'linear-gradient(135deg, #16A34A, #15803D)'
+              : 'linear-gradient(135deg, #F97316, #EA580C)',
+            color: 'white', fontSize: 14, fontWeight: 700,
+            boxShadow: saved
+              ? '0 3px 12px rgba(22,163,74,0.35)'
+              : '0 3px 12px rgba(249,115,22,0.35)',
+            opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
+          }}>
+          {saving ? (
+            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</>
+          ) : saved ? (
+            <><i className="ki-filled ki-check text-sm" />Сохранено ✓</>
+          ) : (
+            <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
+          )}
+        </button>
+        {saved && (
+          <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600, animation: 'fadeIn 0.3s ease' }}>
+            Данные обновлены
+          </span>
+        )}
+      </div>
+
     </div>
   )
 }
