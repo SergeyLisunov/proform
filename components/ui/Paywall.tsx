@@ -509,7 +509,20 @@ export function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan>('pro')
 
   return (
-    <div className="flex flex-col gap-8 pf-enter items-center">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32, minHeight: '80vh', justifyContent: 'center' }} className="pf-enter">
+      {/* Кнопка назад */}
+      <div style={{ width: '100%', maxWidth: 860 }}>
+        <a href="/dashboard" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '8px 14px', borderRadius: 12,
+          border: '1px solid var(--border)', background: 'var(--card)',
+          color: 'var(--muted-foreground)', fontSize: 13, fontWeight: 600,
+          textDecoration: 'none', transition: 'all 0.15s',
+        }}>
+          <i className="ki-filled ki-arrow-left text-sm" />
+          На главную
+        </a>
+      </div>
       <div className="text-center">
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тарифы</p>
         <h1 className="pf-num text-[40px] text-foreground leading-none mb-3" style={{ letterSpacing: '-0.03em' }}>
@@ -520,7 +533,7 @@ export function PricingPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, maxWidth: 820, margin: '0 auto', width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, width: '100%', maxWidth: 860 }}>
         {PLANS.map(p => {
           const isPopular = !!p.popular
           return (
