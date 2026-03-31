@@ -579,7 +579,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
       avg_heart_rate: form.avg_heart_rate ? Number(form.avg_heart_rate) : null,
       max_heart_rate: form.max_heart_rate ? Number(form.max_heart_rate) : null,
       activity_calories: form.activity_calories ? Number(form.activity_calories) : null,
-      mood: form.mood ? MOODS.indexOf(form.mood) + 1 : null,
+      mood: form.mood ? MOODS.indexOf(form.mood) : null,
     })
     setSaving(false)
     if (workout) onCreated(workout)
