@@ -7,6 +7,9 @@ import { getWorkouts, createWorkout } from '@/services/workouts.service'
 import type { Workout } from '@/services/workouts.service'
 import { createBrowserClient } from '@supabase/ssr'
 import { WorkoutLimitBadge } from '@/components/ui/Paywall'
+import dynamic from 'next/dynamic'
+
+const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'), { ssr: false })
 
 // ── константы ──────────────────────────────────────────────────────────────────
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
@@ -808,6 +811,7 @@ function AthleteDiary() {
   const [workouts,        setWorkouts]       = useState<Workout[]>([])
   const [loading,         setLoading]        = useState(true)
   const [showDrawer,      setShowDrawer]     = useState(false)
+  const [showPDF,         setShowPDF]        = useState(false)
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
   const [toast,           setToast]          = useState(false)
 
@@ -849,9 +853,14 @@ function AthleteDiary() {
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">История тренировок</p>
           <h2 className="pf-num text-[36px] text-foreground leading-none">Мой дневник</h2>
         </div>
-        <button onClick={() => setShowDrawer(true)} className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-plus text-sm" />Новая тренировка
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowPDF(true)} className="kt-btn kt-btn-outline gap-2">
+            <i className="ki-filled ki-file-down text-sm" />Экспорт PDF
+          </button>
+          <button onClick={() => setShowDrawer(true)} className="kt-btn kt-btn-primary gap-2">
+            <i className="ki-filled ki-plus text-sm" />Новая тренировка
+          </button>
+        </div>
       </div>
 
       <WorkoutLimitBadge />
@@ -974,6 +983,8 @@ function AthleteDiary() {
       {selectedWorkout && (
         <ViewEditDrawer workout={selectedWorkout} onClose={() => setSelectedWorkout(null)} onUpdated={handleUpdated} onDeleted={handleDeleted} />
       )}
+
+      {showPDF && <WorkoutPDFExport onClose={() => setShowPDF(false)} />}
 
       {/* Toast */}
       {toast && (
