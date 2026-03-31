@@ -34,7 +34,6 @@ const FORM_ACTIVITY_TYPES = [
 
 const MOODS = ['😴', '😕', '😐', '🙂', '🔥']
 
-// Периоды аналитики
 type Period = '1w' | '2w' | '1m' | '3m'
 const PERIODS: { id: Period; label: string; days: number }[] = [
   { id: '1w', label: '1 неделя',  days: 7   },
@@ -87,7 +86,6 @@ function strainColor(v: number): string {
   return '#ef4444'
 }
 
-/** Возвращает дату N дней назад (начало дня, без смещения TZ) */
 function daysAgo(n: number): Date {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
@@ -95,7 +93,6 @@ function daysAgo(n: number): Date {
   return d
 }
 
-/** Парсим "YYYY-MM-DD" без смещения timezone */
 function parseDate(s: string): Date {
   return new Date(s + 'T00:00:00')
 }
@@ -131,7 +128,6 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
     const avgMin    = count ? Math.round(totalMin / count) : 0
     const avgStrain = count ? filtered.reduce((s, w) => s + (w.activity_strain ?? 0), 0) / count : 0
 
-    // По типам
     const byType: Record<string, number> = {}
     filtered.forEach(w => {
       const t = w.activity_type ?? 'Другое'
@@ -144,7 +140,6 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden">
-      {/* Period tabs */}
       <div className="flex items-center gap-0.5 p-1.5 border-b border-border">
         <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mr-1">Период:</span>
         {PERIODS.map(p => (
@@ -160,7 +155,6 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
         ))}
       </div>
 
-      {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 divide-x divide-border">
         {[
           {
@@ -206,9 +200,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
         ))}
       </div>
 
-      {/* Mini activity bar */}
       {stats.count > 0 && stats.totalMin > 0 && (() => {
-        // группируем по типу
         const byType: Record<string, number> = {}
         stats.filtered.forEach(w => {
           const t = w.activity_type ?? 'Другое'
@@ -239,7 +231,6 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
         )
       })()}
 
-      {/* Empty state */}
       {stats.count === 0 && (
         <div className="px-4 pb-4 text-center py-4">
           <p className="text-2xs text-muted-foreground">Нет тренировок за выбранный период</p>
@@ -400,7 +391,6 @@ function ViewEditDrawer({
         <div style={{ flex:1,overflowY:'auto',padding:'20px 24px' }}>
           {mode === 'view' ? (
             <div style={{ display:'flex',flexDirection:'column',gap:20 }}>
-              {/* Strain / Recovery badges */}
               {(workout.activity_strain != null || workout.activity_duration_min != null) && (
                 <div style={{ display:'flex',gap:16,padding:'16px',background:'var(--accent)',borderRadius:14,border:'1px solid var(--border)' }}>
                   {workout.activity_strain != null && (
@@ -436,7 +426,7 @@ function ViewEditDrawer({
                 <InfoRow label="Калории" value={workout.activity_calories ? `${workout.activity_calories} ккал` : null} />
                 <InfoRow label="ЧСС средний" value={workout.avg_heart_rate ? `${Math.round(Number(workout.avg_heart_rate))} уд/мин` : null} />
                 <InfoRow label="ЧСС макс" value={workout.max_heart_rate ? `${Math.round(Number(workout.max_heart_rate))} уд/мин` : null} />
-                {workout.mood && <InfoRow label="Самочувствие" value={workout.mood} />}
+                {workout.mood != null && <InfoRow label="Самочувствие" value={MOODS[workout.mood] ?? null} />}
               </div>
               {workout.description && (
                 <div>
@@ -567,6 +557,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
     e.preventDefault()
     if (!validate()) return
     setSaving(true)
+
+    // 1. Создаём запись в workouts (основной источник для дневника)
     const workout = await createWorkout({
       athlete_id: userId,
       event_date: form.event_date,
@@ -582,6 +574,25 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
       activity_calories: form.activity_calories ? Number(form.activity_calories) : null,
       mood: form.mood ? MOODS.indexOf(form.mood) : null,
     })
+
+    // 2. Синхронизируем в calendar_events (чтобы тренировка отображалась в календаре)
+    if (workout) {
+      try {
+        const sb = getSupabase()
+        await sb.from('calendar_events').insert({
+          owner_id:   userId,
+          event_date: form.event_date,
+          event_type: 'workout',
+          title:      form.name.trim(),
+          notes:      form.description.trim() || null,
+          start_time: form.start_time || null,
+        })
+      } catch (err) {
+        // Некритичная ошибка — дневник уже сохранён, просто логируем
+        console.warn('calendar_events sync error:', err)
+      }
+    }
+
     setSaving(false)
     if (workout) onCreated(workout)
   }
@@ -805,7 +816,6 @@ function AthleteDiary() {
     getWorkouts(user.id).then(data => { setWorkouts(data); setLoading(false) })
   }, [user])
 
-  // Фильтр по типу
   const filtered = filter === 'Все' ? workouts : workouts.filter(w => (w.activity_type ?? 'Другое') === filter)
 
   function handleCreated(w: Workout) {
@@ -844,10 +854,7 @@ function AthleteDiary() {
         </button>
       </div>
 
-      {/* ── PAYWALL BADGE ── */}
       <WorkoutLimitBadge />
-
-      {/* ── АНАЛИТИКА ── */}
       <AnalyticsBlock workouts={workouts} />
 
       {/* Filters + view toggle */}
@@ -882,7 +889,6 @@ function AthleteDiary() {
           )}
         </div>
       ) : view === 'list' ? (
-        /* LIST VIEW */
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="divide-y divide-border">
             {filtered.map(w => {
@@ -902,13 +908,13 @@ function AthleteDiary() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-foreground">{w.name}</span>
                       <span className="px-1.5 py-0.5 rounded text-2xs font-medium bg-border/60 text-muted-foreground">{fmtDate(w.event_date)}</span>
-                      {w.mood && <span className="text-base leading-none">{w.mood}</span>}
+                      {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
                     </div>
                     {meta && <div className="text-2xs text-muted-foreground mt-0.5">{meta}</div>}
                   </div>
                   {w.activity_strain != null && (
                     <div className="text-right shrink-0">
-                      <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{w.activity_strain}</div>
+                      <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{Number(w.activity_strain).toFixed(1)}</div>
                       <div className="text-2xs text-muted-foreground">нагрузка</div>
                     </div>
                   )}
@@ -919,7 +925,6 @@ function AthleteDiary() {
           </div>
         </div>
       ) : (
-        /* GRID VIEW */
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(w => {
             const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
@@ -931,7 +936,7 @@ function AthleteDiary() {
                     <i className={`ki-filled ${ac.icon} text-sm`} style={{ color:ac.text }} />
                   </div>
                   <div className="flex items-center gap-2">
-                    {w.mood && <span className="text-base leading-none">{w.mood}</span>}
+                    {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
                     <span className="text-2xs font-medium text-muted-foreground">{fmtDate(w.event_date)}</span>
                   </div>
                 </div>
@@ -945,7 +950,7 @@ function AthleteDiary() {
                   <div className="flex items-center justify-between pt-1 border-t border-border">
                     {w.activity_strain != null && (
                       <div>
-                        <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{w.activity_strain}</div>
+                        <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{Number(w.activity_strain).toFixed(1)}</div>
                         <div className="text-2xs text-muted-foreground">нагрузка</div>
                       </div>
                     )}
