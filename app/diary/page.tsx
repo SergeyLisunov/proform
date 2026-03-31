@@ -113,7 +113,7 @@ function fmtDate(s: string | null | undefined): string {
 }
 
 // ── ANALYTICS BLOCK ────────────────────────────────────────────────────────────
-function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
+function AnalyticsBlock({ workouts, onFilter }: { workouts: Workout[]; onFilter?: (type: string) => void }) {
   const [period, setPeriod] = useState<Period>('1w')
 
   const stats = useMemo(() => {
@@ -193,7 +193,9 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
             bg: (stats.topType && ACTIVITY_CONFIG[stats.topType]?.bg) ?? '#F8FAFC',
           },
         ].map(s => (
-          <div key={s.label} className="p-4 flex flex-col gap-2">
+          <div key={s.label}
+  onClick={() => s.label === 'Осн. активность' && stats.topType && onFilter?.(stats.topType)}
+  className={['p-4 flex flex-col gap-2 transition-colors', s.label === 'Осн. активность' && stats.topType ? 'cursor-pointer hover:bg-accent/50' : ''].join(' ')}>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
               <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
             </div>
@@ -844,7 +846,7 @@ function AthleteDiary() {
       </div>
 
       {/* ── АНАЛИТИКА ── */}
-      <AnalyticsBlock workouts={workouts} />
+      <AnalyticsBlock workouts={workouts} onFilter={type => setFilter(type)} />
 
       {/* Filters + view toggle */}
       <div className="flex items-center gap-2 flex-wrap">
