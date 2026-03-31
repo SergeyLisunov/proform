@@ -1,4 +1,5 @@
 'use client'
+import { PlanGuard } from '@/components/ui/Paywall'
 import { useState } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
