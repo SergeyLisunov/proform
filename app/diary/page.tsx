@@ -6,6 +6,7 @@ import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
 import { getWorkouts, createWorkout } from '@/services/workouts.service'
 import type { Workout } from '@/services/workouts.service'
 import { createBrowserClient } from '@supabase/ssr'
+import { WorkoutLimitBadge } from '@/components/ui/Paywall'
 
 // ── константы ──────────────────────────────────────────────────────────────────
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
@@ -842,6 +843,9 @@ function AthleteDiary() {
           <i className="ki-filled ki-plus text-sm" />Новая тренировка
         </button>
       </div>
+
+      {/* ── PAYWALL BADGE ── */}
+      <WorkoutLimitBadge />
 
       {/* ── АНАЛИТИКА ── */}
       <AnalyticsBlock workouts={workouts} />
