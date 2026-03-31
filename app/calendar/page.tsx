@@ -1186,23 +1186,36 @@ export default function CalendarPage() {
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Тренировки',   value: periodSessions,            icon: 'ki-abstract-26',  color: 'text-blue-600 bg-blue-50' },
-          { label: 'Ср. нагрузка', value: avgStrain,                 icon: 'ki-chart-line-up', color: 'text-orange-600 bg-orange-50' },
-          { label: 'Всего ккал',   value: totalCals.toLocaleString(), icon: 'ki-abstract-31',  color: 'text-green-600 bg-green-50' },
-        ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
-              <i className={`ki-filled ${s.icon} text-base`} />
-            </div>
-            <div>
-              <div className="pf-num text-2xl text-foreground leading-none">{s.value}</div>
-              <div className="text-2xs text-muted-foreground">{s.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+<div className="grid grid-cols-3 gap-3">
+  <Link href="/diary" className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-blue-300 hover:shadow-sm transition-all no-underline group cursor-pointer">
+    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-blue-600 bg-blue-50 group-hover:bg-blue-100 transition-colors">
+      <i className="ki-filled ki-abstract-26 text-base" />
+    </div>
+    <div>
+      <div className="pf-num text-2xl text-foreground leading-none">{periodSessions}</div>
+      <div className="text-2xs text-muted-foreground">Тренировки</div>
+    </div>
+    <i className="ki-filled ki-right text-xs text-blue-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+  </Link>
+  <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-orange-600 bg-orange-50">
+      <i className="ki-filled ki-chart-line-up text-base" />
+    </div>
+    <div>
+      <div className="pf-num text-2xl text-foreground leading-none">{avgStrain}</div>
+      <div className="text-2xs text-muted-foreground">Ср. нагрузка</div>
+    </div>
+  </div>
+  <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-green-600 bg-green-50">
+      <i className="ki-filled ki-abstract-31 text-base" />
+    </div>
+    <div>
+      <div className="pf-num text-2xl text-foreground leading-none">{totalCals.toLocaleString()}</div>
+      <div className="text-2xs text-muted-foreground">Всего ккал</div>
+    </div>
+  </div>
+</div>
 
       {/* Циклы — кликабельные плашки */}
       {cycles.length > 0 && (
