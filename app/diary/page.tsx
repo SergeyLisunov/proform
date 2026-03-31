@@ -113,7 +113,7 @@ function fmtDate(s: string | null | undefined): string {
 }
 
 // ── ANALYTICS BLOCK ────────────────────────────────────────────────────────────
-function AnalyticsBlock({ workouts, onFilter }: { workouts: Workout[]; onFilter?: (type: string) => void }) {
+function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
   const [period, setPeriod] = useState<Period>('1w')
 
   const stats = useMemo(() => {
@@ -193,9 +193,7 @@ function AnalyticsBlock({ workouts, onFilter }: { workouts: Workout[]; onFilter?
             bg: (stats.topType && ACTIVITY_CONFIG[stats.topType]?.bg) ?? '#F8FAFC',
           },
         ].map(s => (
-          <div key={s.label}
-  onClick={() => { if (onFilter && stats.topType) onFilter(stats.topType) }}
-  className={['p-4 flex flex-col gap-2 transition-colors', s.label === 'Осн. активность' && stats.topType ? 'cursor-pointer hover:bg-accent/50' : ''].join(' ')}>
+          <div key={s.label} className="p-4 flex flex-col gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
               <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
             </div>
@@ -581,7 +579,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
       avg_heart_rate: form.avg_heart_rate ? Number(form.avg_heart_rate) : null,
       max_heart_rate: form.max_heart_rate ? Number(form.max_heart_rate) : null,
       activity_calories: form.activity_calories ? Number(form.activity_calories) : null,
-      mood: form.mood || null,
+      mood: form.mood ? MOODS.indexOf(form.mood) + 1 : null,
     })
     setSaving(false)
     if (workout) onCreated(workout)
@@ -846,7 +844,7 @@ function AthleteDiary() {
       </div>
 
       {/* ── АНАЛИТИКА ── */}
-      <AnalyticsBlock workouts={workouts} onFilter={type => setFilter(type)} />
+      <AnalyticsBlock workouts={workouts} />
 
       {/* Filters + view toggle */}
       <div className="flex items-center gap-2 flex-wrap">
