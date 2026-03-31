@@ -419,7 +419,7 @@ export default function AthleteProfileCard() {
         <div style={{ padding:'0 24px 24px' }}>
 
           {/* Avatar row */}
-          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginTop:-44 }}>
+          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'flex-start', marginTop:-44 }}>
 
             {/* Avatar — клик открывает кроппер */}
             <div style={{ position:'relative' }}>
@@ -480,19 +480,6 @@ export default function AthleteProfileCard() {
               <span style={{ position:'absolute', bottom:6, right:6, width:16, height:16, borderRadius:'50%', background:'#22c55e', border:'3px solid var(--card)' }} />
             </div>
 
-            {/* Settings link */}
-            <Link href="/settings" style={{
-              display:'flex', alignItems:'center', gap:6, marginBottom:6,
-              padding:'7px 14px', borderRadius:10,
-              border:'1px solid var(--border)', background:'var(--card)',
-              color:'var(--muted-foreground)', fontSize:12, fontWeight:600,
-              textDecoration:'none', transition:'all 0.15s',
-            }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='#F97316';(e.currentTarget as HTMLAnchorElement).style.color='#F97316'}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='var(--border)';(e.currentTarget as HTMLAnchorElement).style.color='var(--muted-foreground)'}}>
-              <i className="ki-filled ki-setting-2" style={{ fontSize:12 }} />
-              Настройки
-            </Link>
           </div>
 
           {/* Name & meta */}
