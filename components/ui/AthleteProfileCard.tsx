@@ -220,7 +220,7 @@ export default function AthleteProfileCard() {
         {/* ── Content zone ── */}
         <div style={{ padding:'0 24px 24px' }}>
 
-          {/* Avatar + Socials row */}
+          {/* Avatar row — только аватар, без соцсетей */}
           <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginTop:-44 }}>
 
             {/* Avatar with upload */}
@@ -267,103 +267,19 @@ export default function AthleteProfileCard() {
               <span style={{ position:'absolute', bottom:6, right:6, width:16, height:16, borderRadius:'50%', background:'#22c55e', border:'3px solid var(--card)' }} />
             </div>
 
-            {/* Social buttons */}
-            <div style={{ display:'flex', gap:8, paddingBottom:6, alignItems:'center' }}>
-
-              {/* Instagram */}
-              {profile.instagram_url ? (
-                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" title="Instagram"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888)',
-                    border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
-                    boxShadow:'0 2px 8px rgba(220,39,67,0.35)', transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                    <rect x="2" y="2" width="20" height="20" rx="5"/>
-                    <circle cx="12" cy="12" r="4"/>
-                    <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
-                  </svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить Instagram"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#f09433';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2">
-                    <rect x="2" y="2" width="20" height="20" rx="5"/>
-                    <circle cx="12" cy="12" r="4"/>
-                    <circle cx="17.5" cy="6.5" r="1" fill="#CBD5E1" stroke="none"/>
-                  </svg>
-                </button>
-              )}
-
-              {/* X / Twitter */}
-              {profile.twitter_url ? (
-                <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" title="X / Twitter"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'#000', border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
-                    boxShadow:'0 2px 8px rgba(0,0,0,0.25)', transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="white">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить X / Twitter"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#CBD5E1">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </button>
-              )}
-
-              {/* Threads */}
-              {profile.threads_url ? (
-                <a href={profile.threads_url} target="_blank" rel="noopener noreferrer" title="Threads"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'#101010', border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
-                    boxShadow:'0 2px 8px rgba(0,0,0,0.25)', transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="white">
-                    <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/>
-                  </svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить Threads"
-                  style={{ width:38, height:38, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center',
-                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
-                  }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="#CBD5E1">
-                    <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/>
-                  </svg>
-                </button>
-              )}
-
-              {/* Кнопка редактирования соцсетей (карандаш) */}
-              <button onClick={() => setShowSocial(true)} title="Редактировать соцсети"
-                style={{ width:34, height:34, borderRadius:9, display:'flex', alignItems:'center', justifyContent:'center',
-                  background:'var(--accent)', border:'1px solid var(--border)', cursor:'pointer', flexShrink:0, transition:'all 0.18s', marginLeft:2,
-                }}
-                onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#F97316';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
-                onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--border)';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                <i className="ki-filled ki-pencil" style={{ fontSize:12, color:'var(--muted-foreground)' }} />
-              </button>
-
-            </div>
+            {/* Пустой спейсер — кнопки настроек справа */}
+            <Link href="/settings" style={{
+              display:'flex', alignItems:'center', gap:6, marginBottom:6,
+              padding:'7px 14px', borderRadius:10,
+              border:'1px solid var(--border)', background:'var(--card)',
+              color:'var(--muted-foreground)', fontSize:12, fontWeight:600,
+              textDecoration:'none', transition:'all 0.15s',
+            }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='#F97316';(e.currentTarget as HTMLAnchorElement).style.color='#F97316'}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='var(--border)';(e.currentTarget as HTMLAnchorElement).style.color='var(--muted-foreground)'}}>
+              <i className="ki-filled ki-setting-2" style={{ fontSize:12 }} />
+              Настройки
+            </Link>
           </div>
 
           {/* Name & meta */}
@@ -385,6 +301,104 @@ export default function AthleteProfileCard() {
                 {profile.weight_kg && <span style={{ fontSize:12, color:'var(--muted-foreground)', display:'flex', alignItems:'center', gap:4 }}><span>⚖️</span>{profile.weight_kg} кг</span>}
               </div>
             )}
+
+            {/* ── Соцсети — под именем, никогда не заходят на фон ── */}
+            <div style={{ display:'flex', gap:8, marginTop:12, alignItems:'center' }}>
+
+              {/* Instagram */}
+              {profile.instagram_url ? (
+                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" title="Instagram"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888)',
+                    border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
+                    boxShadow:'0 2px 8px rgba(220,39,67,0.3)', transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
+                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
+                    <rect x="2" y="2" width="20" height="20" rx="5"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
+                  </svg>
+                </a>
+              ) : (
+                <button onClick={() => setShowSocial(true)} title="Добавить Instagram"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#f09433';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2">
+                    <rect x="2" y="2" width="20" height="20" rx="5"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <circle cx="17.5" cy="6.5" r="1" fill="#CBD5E1" stroke="none"/>
+                  </svg>
+                </button>
+              )}
+
+              {/* X / Twitter */}
+              {profile.twitter_url ? (
+                <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" title="X / Twitter"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'#000', border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
+                    boxShadow:'0 2px 8px rgba(0,0,0,0.2)', transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
+                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+              ) : (
+                <button onClick={() => setShowSocial(true)} title="Добавить X / Twitter"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="#CBD5E1">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </button>
+              )}
+
+              {/* Threads */}
+              {profile.threads_url ? (
+                <a href={profile.threads_url} target="_blank" rel="noopener noreferrer" title="Threads"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'#101010', border:'none', cursor:'pointer', flexShrink:0, textDecoration:'none',
+                    boxShadow:'0 2px 8px rgba(0,0,0,0.2)', transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
+                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
+                    <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/>
+                  </svg>
+                </a>
+              ) : (
+                <button onClick={() => setShowSocial(true)} title="Добавить Threads"
+                  style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center',
+                    background:'var(--accent)', border:'1.5px dashed #CBD5E1', cursor:'pointer', flexShrink:0, transition:'all 0.18s',
+                  }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#CBD5E1">
+                    <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/>
+                  </svg>
+                </button>
+              )}
+
+              {/* Карандаш — редактировать соцсети */}
+              <button onClick={() => setShowSocial(true)} title="Редактировать соцсети"
+                style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center',
+                  background:'var(--accent)', border:'1px solid var(--border)', cursor:'pointer', flexShrink:0, transition:'all 0.18s', marginLeft:2,
+                }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#F97316';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--border)';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
+                <i className="ki-filled ki-pencil" style={{ fontSize:11, color:'var(--muted-foreground)' }} />
+              </button>
+
+            </div>
           </div>
 
           {/* Stats grid */}
