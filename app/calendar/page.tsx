@@ -704,11 +704,15 @@ function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: stri
                   const cc = inC ? CYCLE_TYPE_CFG[inC.type] : null
                   return (
                     <div key={di} onClick={() => onSelect(ds)}
-                      className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all relative"
+                      className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
+                      title={dateStr}
                       style={{ background: cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC'), outline: cc ? `1px solid ${cc.border}` : 'none' }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
-                      {ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
-                    </div>
+{ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
+<span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+  {parseLocalDate(ds).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+</span>
+</div>
                   )
                 })}
               </div>
@@ -1238,7 +1242,7 @@ export default function CalendarPage() {
           <span className="pf-num text-lg text-foreground min-w-[160px] text-center">{periodLabel()}</span>
           <button onClick={nextPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><i className="ki-filled ki-right text-xs"/></button>
         </div>
-        <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today) }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+        <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
           <i className="ki-filled ki-calendar text-xs"/>Сегодня
         </button>
         <div className="ml-auto flex items-center gap-1.5 flex-wrap">
