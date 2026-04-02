@@ -394,6 +394,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   // Загрузка данных
   useEffect(() => {
@@ -441,6 +442,7 @@ export default function SettingsPage() {
   async function handleSave() {
     if (!user?.id) return
     setSaving(true)
+    setSaveError(null)
     const sb = getSB()
     const payload = {
       id: user.id,
@@ -468,13 +470,23 @@ export default function SettingsPage() {
       workouts_public: form.workouts_public,
       updated_at: new Date().toISOString(),
     }
-    await sb.from('athletes').upsert(payload, { onConflict: 'id' })
-    // Обновляем имя пользователя в таблице users
-    const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
-    if (fullName) await sb.from('users').update({ name: fullName }).eq('id', user.id)
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    try {
+      const { error: athErr } = await sb.from('athletes').upsert(payload, { onConflict: 'id' })
+      if (athErr) throw athErr
+      // Обновляем имя пользователя в таблице users
+      const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
+      if (fullName) {
+        const { error: usrErr } = await sb.from('users').update({ name: fullName }).eq('id', user.id)
+        if (usrErr) throw usrErr
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (e: any) {
+      setSaveError(e?.message ?? 'Ошибка при сохранении')
+      setTimeout(() => setSaveError(null), 5000)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const completion = calcCompletion(form)
@@ -806,10 +818,14 @@ export default function SettingsPage() {
             padding: '12px 28px', borderRadius: 14, border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
             background: saved
               ? 'linear-gradient(135deg, #16A34A, #15803D)'
+              : saveError
+              ? 'linear-gradient(135deg, #DC2626, #B91C1C)'
               : 'linear-gradient(135deg, #F97316, #EA580C)',
             color: 'white', fontSize: 14, fontWeight: 700,
             boxShadow: saved
               ? '0 3px 12px rgba(22,163,74,0.35)'
+              : saveError
+              ? '0 3px 12px rgba(220,38,38,0.35)'
               : '0 3px 12px rgba(249,115,22,0.35)',
             opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
           }}>
@@ -824,6 +840,12 @@ export default function SettingsPage() {
         {saved && (
           <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600, animation: 'fadeIn 0.3s ease' }}>
             Данные обновлены
+          </span>
+        )}
+        {saveError && (
+          <span style={{ fontSize: 13, color: '#DC2626', fontWeight: 600, animation: 'fadeIn 0.3s ease', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <i className="ki-filled ki-information-5 text-sm" />
+            {saveError}
           </span>
         )}
       </div>
