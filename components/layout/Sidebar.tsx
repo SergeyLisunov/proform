@@ -142,7 +142,11 @@ export default function Sidebar() {
       data-kt-drawer="true"
       data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
     >
-      <div className="kt-sidebar-header hidden lg:flex flex-col gap-4 px-4 pt-5 pb-4 shrink-0" id="sidebar_header">
+      <div
+        className="kt-sidebar-header hidden lg:flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
+        id="sidebar_header"
+        style={{ height: 'auto' }}
+      >
         <Link href="/dashboard" className="flex items-center gap-3 no-underline group rounded-2xl border border-border/70 bg-background/80 px-3 py-3 shadow-sm transition-all hover:border-orange-200 hover:bg-orange-50/70">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 shadow-md shadow-orange-500/20 ring-1 ring-orange-200/60 shrink-0 transition-transform group-hover:scale-[1.02]">
             <i className="ki-filled ki-abstract-26 text-white text-base" />
@@ -158,7 +162,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <div className="flex flex-col items-start gap-2 rounded-2xl border border-border/60 bg-muted/20 px-3 py-2">
+        <div className="flex flex-col items-start gap-2.5 rounded-2xl border border-border/60 bg-muted/20 px-3 py-3">
           <span
             className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold"
             style={{

@@ -88,3 +88,9 @@
 - Re-verified the ninth pass with:
   - `./node_modules/.bin/eslint app/diary/page.tsx`
   - `npm run build`
+- Applied a sidebar header overflow fix:
+  - traced the overlap to Metronic's global `.kt-sidebar-header` desktop height forcing the custom header into `60px`
+  - restored auto header height so the logo/status block no longer spills into the first navigation item
+- Re-verified the sidebar header fix with:
+  - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
+  - `npm run build`
