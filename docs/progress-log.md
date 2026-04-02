@@ -36,3 +36,10 @@
 - Re-verified the third pass with:
   - `./node_modules/.bin/eslint app/calendar/page.tsx`
   - `npm run build`
+- Completed the fourth auth consistency pass:
+  - redesigned the registration shell to match the updated login experience
+  - improved step hierarchy, role cards, account setup clarity, athlete profile grouping, and success state
+  - preserved the multi-step signup flow and Supabase signup/profile payload logic
+- Re-verified the fourth pass with:
+  - `./node_modules/.bin/eslint app/auth/register/page.tsx`
+  - `npm run build`
