@@ -38,6 +38,7 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isAuthRoute && !isPublic && !isOrgPublicPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
+    url.searchParams.set('redirectTo', `${pathname}${request.nextUrl.search}`)
     return NextResponse.redirect(url)
   }
 
