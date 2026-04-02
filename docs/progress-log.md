@@ -64,3 +64,10 @@
 - Re-verified the sidebar fix with:
   - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
   - `npm run build`
+- Completed the seventh athlete diary pass:
+  - redesigned the athlete diary hero around faster workout capture and clearer recent-activity context
+  - rebuilt the add-workout drawer into a stronger quick-capture flow with clearer sections for essentials, intensity, and context
+  - preserved the existing `createWorkout` flow, validation behavior, and `calendar_events` sync after save
+- Re-verified the seventh pass with:
+  - `./node_modules/.bin/eslint app/diary/page.tsx`
+  - `npm run build`

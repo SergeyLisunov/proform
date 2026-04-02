@@ -603,92 +603,285 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
 
   if (!mounted || !open) return null
 
+  const selectedCfg = ACTIVITY_CONFIG[form.activity_type] ?? DEFAULT_AC
+  const quickSummary = [
+    form.activity_type,
+    form.activity_duration_min ? `${form.activity_duration_min} мин` : 'Длительность не задана',
+    form.activity_strain > 0 ? `${form.activity_strain.toFixed(1)} strain` : 'Нагрузка не задана',
+  ]
+  const inputClass = (hasError = false) => [
+    'w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all bg-background',
+    hasError
+      ? 'border-red-300 text-foreground focus:border-red-400 focus:ring-4 focus:ring-red-500/10'
+      : 'border-input text-foreground focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10',
+  ].join(' ')
+
   return ReactDOM.createPortal(
-    <div style={{ position:'fixed',inset:0,zIndex:9999,display:'flex' }}>
-      <div style={{ position:'absolute',inset:0,background:'rgba(15,23,42,0.65)' }} onClick={onClose} />
-      <div style={{ position:'absolute',top:0,right:0,height:'100%',width:480,maxWidth:'100vw',background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',overflowY:'auto' }}>
-        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'var(--card)',zIndex:1 }}>
-          <div>
-            <p style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:4 }}>Новая тренировка</p>
-            <h3 style={{ fontSize:20,fontWeight:700,color:'var(--foreground)',margin:0 }}>Добавить запись</h3>
+    <div className="fixed inset-0 z-[9999] flex">
+      <button
+        type="button"
+        aria-label="Закрыть форму добавления тренировки"
+        className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
+      <div className="absolute inset-y-0 right-0 flex w-full max-w-[540px] flex-col border-l border-border bg-card shadow-[0_20px_80px_rgba(15,23,42,0.18)]">
+        <div className="border-b border-border bg-card px-6 py-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
+                Quick Capture
+              </div>
+              <h3 className="mt-3 pf-num text-[30px] leading-none text-foreground">Добавить тренировку</h3>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+                Сначала сохраните главное: тип, дату и нагрузку. Остальные метрики можно быстро добавить сразу в этом же потоке.
+              </p>
+            </div>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><i className="ki-filled ki-cross text-sm" /></button>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+          <div
+            className="mt-4 rounded-[24px] border p-4"
+            style={{
+              background: `linear-gradient(135deg, ${selectedCfg.bg} 0%, rgba(255,255,255,0.96) 100%)`,
+              borderColor: selectedCfg.border,
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border"
+                style={{ background: selectedCfg.bg, borderColor: selectedCfg.border }}
+              >
+                <i className={`ki-filled ${selectedCfg.icon} text-base`} style={{ color: selectedCfg.text }} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Текущий шаблон</div>
+                <div className="mt-1 text-base font-semibold text-foreground">{form.name.trim() || form.activity_type}</div>
+                <div className="mt-1 text-xs text-muted-foreground">Форма собирается вокруг самого важного, чтобы добавить запись за несколько секунд.</div>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {quickSummary.map(item => (
+                <span key={item} className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold text-foreground shadow-sm">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
         </div>
 
-        <form onSubmit={handleSubmit} style={{ flex:1,padding:'20px 24px',display:'flex',flexDirection:'column',gap:24 }}>
-          <div>
-            <p style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:12 }}>Тип активности</p>
-            <div style={{ display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:16 }}>
-              {FORM_ACTIVITY_TYPES.map(at => {
-                const ac = ACTIVITY_CONFIG[at.value] ?? DEFAULT_AC; const sel = form.activity_type === at.value
-                return (
-                  <button key={at.value} type="button" onClick={() => setForm(f=>({...f,activity_type:at.value}))}
-                    style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:'10px 8px',borderRadius:12,border:`1.5px solid ${sel?ac.border:'var(--border)'}`,background:sel?ac.bg:'transparent',cursor:'pointer',transition:'all 0.15s' }}>
-                    <i className={`ki-filled ${at.icon} text-base`} style={{ color:sel?ac.text:'var(--muted-foreground)' }} />
-                    <span style={{ fontSize:10,fontWeight:600,color:sel?ac.text:'var(--muted-foreground)' }}>{at.value}</span>
-                  </button>
-                )
-              })}
-            </div>
-            <div style={{ marginBottom:12 }}>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Название *</label>
-              <input type="text" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Например: Утренняя пробежка" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
-              {errors.name && <p className="text-2xs text-red-500 mt-1">{errors.name}</p>}
-            </div>
-            <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12 }}>
+        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+              <div className="mb-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Основное</div>
+                <h4 className="mt-1 text-base font-semibold text-foreground">Быстрый захват тренировки</h4>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Сначала выберите активность и заполните обязательные поля. Это даст рабочую запись даже без дополнительных метрик.</p>
+              </div>
+              <div className="grid grid-cols-3 gap-2.5">
+                {FORM_ACTIVITY_TYPES.map(at => {
+                  const ac = ACTIVITY_CONFIG[at.value] ?? DEFAULT_AC
+                  const sel = form.activity_type === at.value
+                  return (
+                    <button
+                      key={at.value}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, activity_type: at.value }))}
+                      className={`flex flex-col items-center gap-2 rounded-2xl border px-3 py-3 transition-all ${
+                        sel ? 'shadow-sm' : 'hover:border-border hover:bg-card'
+                      }`}
+                      style={{
+                        borderColor: sel ? ac.border : 'var(--border)',
+                        background: sel ? ac.bg : 'transparent',
+                      }}
+                    >
+                      <i className={`ki-filled ${at.icon} text-base`} style={{ color: sel ? ac.text : 'var(--muted-foreground)' }} />
+                      <span className="text-[11px] font-semibold" style={{ color: sel ? ac.text : 'var(--muted-foreground)' }}>
+                        {at.value}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="mt-4 grid gap-4">
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Название *</label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder="Например: Утренняя пробежка"
+                    className={inputClass(Boolean(errors.name))}
+                  />
+                  {errors.name && <p className="mt-1.5 text-2xs font-medium text-red-500">{errors.name}</p>}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Дата *</label>
+                    <input
+                      type="date"
+                      value={form.event_date}
+                      onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
+                      className={inputClass(Boolean(errors.event_date))}
+                    />
+                    {errors.event_date && <p className="mt-1.5 text-2xs font-medium text-red-500">{errors.event_date}</p>}
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Начало</label>
+                    <input
+                      type="time"
+                      value={form.start_time}
+                      onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))}
+                      className={inputClass()}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность (мин)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.activity_duration_min}
+                    onChange={e => setForm(f => ({ ...f, activity_duration_min: e.target.value }))}
+                    placeholder="60"
+                    className={inputClass()}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+              <div className="mb-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Интенсивность</div>
+                <h4 className="mt-1 text-base font-semibold text-foreground">Нагрузка и метрики</h4>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Заполните то, что уже знаете, чтобы дневник и аналитика были полезнее сразу после сохранения.</p>
+              </div>
+
+              <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Нагрузка</div>
+                  <div className="mt-2 pf-num text-2xl" style={{ color: strainColor(form.activity_strain) }}>{form.activity_strain.toFixed(1)}</div>
+                </div>
+                <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Длительность</div>
+                  <div className="mt-2 text-lg font-semibold text-foreground">{form.activity_duration_min ? `${form.activity_duration_min} мин` : '—'}</div>
+                </div>
+                <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Пульс</div>
+                  <div className="mt-2 text-lg font-semibold text-foreground">{form.avg_heart_rate ? `${form.avg_heart_rate} уд/мин` : '—'}</div>
+                </div>
+              </div>
+
+              <div className="mb-5">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <label className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Нагрузка (0–21)</label>
+                  <span className="pf-num text-xl text-foreground">{form.activity_strain.toFixed(1)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="21"
+                  step="0.1"
+                  value={form.activity_strain}
+                  onChange={e => setForm(f => ({ ...f, activity_strain: Number(e.target.value) }))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Ср. ЧСС</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.avg_heart_rate}
+                    onChange={e => setForm(f => ({ ...f, avg_heart_rate: e.target.value }))}
+                    placeholder="150"
+                    className={inputClass()}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Макс. ЧСС</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.max_heart_rate}
+                    onChange={e => setForm(f => ({ ...f, max_heart_rate: e.target.value }))}
+                    placeholder="185"
+                    className={inputClass()}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Калории</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.activity_calories}
+                    onChange={e => setForm(f => ({ ...f, activity_calories: e.target.value }))}
+                    placeholder="500"
+                    className={inputClass()}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+              <div className="mb-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Контекст</div>
+                <h4 className="mt-1 text-base font-semibold text-foreground">Самочувствие и заметки</h4>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Небольшой контекст помогает потом читать историю тренировок как связный дневник, а не только как список чисел.</p>
+              </div>
+
               <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Дата *</label>
-                <input type="date" value={form.event_date} onChange={e=>setForm(f=>({...f,event_date:e.target.value}))} className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
-                {errors.event_date && <p className="text-2xs text-red-500 mt-1">{errors.event_date}</p>}
+                <label className="mb-2 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Самочувствие</label>
+                <div className="flex gap-2">
+                  {MOODS.map(m => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, mood: f.mood === m ? '' : m }))}
+                      className="flex h-11 w-11 items-center justify-center rounded-xl border text-[20px] transition-all"
+                      style={{
+                        borderColor: form.mood === m ? '#fb923c' : 'var(--border)',
+                        background: form.mood === m ? 'rgba(251,146,60,0.08)' : 'transparent',
+                      }}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div>
-                <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Начало</label>
-                <input type="time" value={form.start_time} onChange={e=>setForm(f=>({...f,start_time:e.target.value}))} className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
+
+              <div className="mt-4">
+                <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Заметки</label>
+                <textarea
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  rows={4}
+                  placeholder="Ощущения, условия, наблюдения…"
+                  className={`${inputClass()} resize-none`}
+                />
               </div>
-            </div>
-            <div>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Длительность (мин)</label>
-              <input type="number" min="1" value={form.activity_duration_min} onChange={e=>setForm(f=>({...f,activity_duration_min:e.target.value}))} placeholder="60" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
-            </div>
+            </section>
           </div>
 
-          <div>
-            <p style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:12 }}>Метрики</p>
-            <div style={{ marginBottom:16 }}>
-              <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6 }}>
-                <label className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Нагрузка (0–21)</label>
-                <span className="pf-num text-xl text-foreground">{form.activity_strain.toFixed(1)}</span>
+          <div className="border-t border-border bg-card px-6 py-4">
+            <div className="flex items-center justify-between gap-4 rounded-[22px] border border-border bg-background/70 px-4 py-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-foreground">Готово к сохранению</div>
+                <div className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Запись попадет в дневник и синхронизируется с календарем после сохранения.
+                </div>
               </div>
-              <input type="range" min="0" max="21" step="0.1" value={form.activity_strain} onChange={e=>setForm(f=>({...f,activity_strain:Number(e.target.value)}))} className="w-full accent-orange-500" />
-            </div>
-            <div style={{ display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12 }}>
-              <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Ср. ЧСС</label><input type="number" min="1" value={form.avg_heart_rate} onChange={e=>setForm(f=>({...f,avg_heart_rate:e.target.value}))} placeholder="150" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" /></div>
-              <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Макс. ЧСС</label><input type="number" min="1" value={form.max_heart_rate} onChange={e=>setForm(f=>({...f,max_heart_rate:e.target.value}))} placeholder="185" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" /></div>
-              <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Калории</label><input type="number" min="1" value={form.activity_calories} onChange={e=>setForm(f=>({...f,activity_calories:e.target.value}))} placeholder="500" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" /></div>
-            </div>
-            <div style={{ marginTop:16 }}>
-              <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Самочувствие</label>
-              <div style={{ display:'flex',gap:8 }}>
-                {MOODS.map(m => (
-                  <button key={m} type="button" onClick={() => setForm(f=>({...f,mood:f.mood===m?'':m}))}
-                    style={{ width:40,height:40,borderRadius:10,border:`1.5px solid ${form.mood===m?'#fb923c':'var(--border)'}`,background:form.mood===m?'rgba(251,146,60,0.08)':'transparent',fontSize:20,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s' }}>
-                    {m}
-                  </button>
-                ))}
+              <div className="flex shrink-0 items-center gap-2">
+                <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
+                <button type="submit" disabled={saving} className="kt-btn kt-btn-primary min-w-[176px] justify-center">
+                  {saving ? 'Сохранение…' : 'Сохранить тренировку'}
+                </button>
               </div>
             </div>
-          </div>
-
-          <div>
-            <p style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:12 }}>Заметки</p>
-            <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} rows={4} placeholder="Ощущения, условия, наблюдения…" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none" />
-          </div>
-
-          <div style={{ display:'flex',gap:8,paddingBottom:8 }}>
-            <button type="submit" disabled={saving} className="flex-1 kt-btn kt-btn-primary">
-              {saving ? 'Сохранение…' : 'Сохранить тренировку'}
-            </button>
-            <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
           </div>
         </form>
       </div>
@@ -822,6 +1015,18 @@ function AthleteDiary() {
   }, [user])
 
   const filtered = filter === 'Все' ? workouts : workouts.filter(w => (w.activity_type ?? 'Другое') === filter)
+  const lastSevenDays = daysAgo(7)
+  const recentCount = workouts.filter(w => w.event_date && parseDate(w.event_date) >= lastSevenDays).length
+  const totalMinutes = workouts.reduce((sum, workout) => sum + (workout.activity_duration_min ?? 0), 0)
+  const latestWorkout = [...workouts]
+    .filter(w => w.event_date)
+    .sort((a, b) => parseDate(b.event_date!).getTime() - parseDate(a.event_date!).getTime())[0]
+  const strongestActivity = workouts.reduce<Record<string, number>>((acc, workout) => {
+    const type = workout.activity_type ?? 'Другое'
+    acc[type] = (acc[type] ?? 0) + 1
+    return acc
+  }, {})
+  const topActivity = Object.entries(strongestActivity).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
 
   function handleCreated(w: Workout) {
     setWorkouts(prev => [w, ...prev])
@@ -848,41 +1053,67 @@ function AthleteDiary() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      {/* Header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">История тренировок</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Мой дневник</h2>
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.14),_transparent_36%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_56%,#FFF4EC_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-7">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
+                Athlete Diary
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Quick Add Flow
+              </span>
+            </div>
+            <p className="mt-4 text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">История тренировок</p>
+            <h2 className="mt-2 pf-num text-[clamp(2.2rem,4vw,3.9rem)] leading-[0.94] text-foreground">Мой дневник</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Добавляйте тренировку сразу после сессии, фиксируйте самочувствие и держите историю нагрузки под рукой в одном рабочем пространстве.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">За 7 дней</div>
+                <div className="mt-2 pf-num text-[28px] leading-none text-foreground">{recentCount}</div>
+                <div className="mt-2 text-2xs text-muted-foreground">тренировок за последнюю неделю</div>
+              </div>
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Общий объем</div>
+                <div className="mt-2 text-xl font-semibold text-foreground">{totalMinutes ? fmtDuration(totalMinutes) : '—'}</div>
+                <div className="mt-2 text-2xs text-muted-foreground">суммарное время по сохраненным записям</div>
+              </div>
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Основной тип</div>
+                <div className="mt-2 text-xl font-semibold text-foreground">{topActivity}</div>
+                <div className="mt-2 text-2xs text-muted-foreground">
+                  {latestWorkout ? `последняя запись ${fmtDate(latestWorkout.event_date)}` : 'добавьте первую тренировку'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex w-full max-w-[340px] flex-col gap-3 rounded-[26px] border border-border bg-white/85 p-4 shadow-sm">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Быстрый старт</div>
+              <div className="mt-2 text-base font-semibold text-foreground">Сохраните тренировку, пока ощущения свежие</div>
+              <div className="mt-2 text-xs leading-5 text-muted-foreground">
+                Новый flow помогает быстро занести главное: активность, дату, длительность, нагрузку и короткий контекст.
+              </div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F97316,#EA580C)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)] transition-transform hover:translate-y-[-1px]">
+                <i className="ki-filled ki-plus text-sm" />
+                Новая тренировка
+              </button>
+              <button
+                onClick={() => setShowPDF(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:text-slate-800"
+              >
+                <i className="ki-filled ki-file-down text-sm" />
+                Экспорт PDF
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2.5">
-          <button onClick={() => setShowPDF(true)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7,
-            padding: '9px 18px', borderRadius: 12,
-            border: '1.5px solid #CBD5E1',
-            background: 'var(--card)',
-            color: '#475569',
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#94A3B8'; (e.currentTarget as HTMLButtonElement).style.color = '#1e293b' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#CBD5E1'; (e.currentTarget as HTMLButtonElement).style.color = '#475569' }}>
-            <i className="ki-filled ki-file-down" style={{ fontSize: 14, color: '#64748B' }} />
-            Экспорт PDF
-          </button>
-          <button onClick={() => setShowDrawer(true)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7,
-            padding: '9px 18px', borderRadius: 12,
-            border: '1.5px solid #FED7AA',
-            background: 'linear-gradient(135deg, #F97316, #EA580C)',
-            color: 'white',
-            fontSize: 13, fontWeight: 700, cursor: 'pointer',
-            transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
-          }}>
-            <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
-            Новая тренировка
-          </button>
-        </div>
-      </div>
+      </section>
 
       <WorkoutLimitBadge />
       <AnalyticsBlock workouts={workouts} />
