@@ -36,7 +36,7 @@ git push origin main
 
 ## Obsidian Knowledge Vault
 
-Хранилище знаний: `/Users/ТВОЁ_ИМЯ/Downloads/proform-vault/`
+Хранилище знаний: `/Users/sergeylisunov/Downloads/proform-vault/`
 
 ### При старте сессии
 1. Прочитай `00-home/index.md` — карта всех заметок
