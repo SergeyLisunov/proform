@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -151,23 +151,46 @@ function calcCompletion(f: FormData): number {
 }
 
 // ── Компоненты полей ──────────────────────────────────────────────────────────
-const iStyle: React.CSSProperties = {
-  width: '100%', borderRadius: 12,
-  border: '1.5px solid var(--border)',
-  padding: '11px 14px', fontSize: 14,
-  outline: 'none', background: 'var(--background)',
-  color: 'var(--foreground)', boxSizing: 'border-box',
-  transition: 'border-color 0.15s',
+const inputClassName =
+  'w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/60 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
+
+const textareaClassName = `${inputClassName} resize-none font-inherit`
+
+const iStyle: CSSProperties = {
+  width: '100%',
+  borderRadius: 16,
+  border: '1px solid var(--border)',
+  padding: '12px 16px',
+  fontSize: 14,
+  outline: 'none',
+  background: 'var(--background)',
+  color: 'var(--foreground)',
+  boxSizing: 'border-box',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+const tabDescriptions: Record<Tab, string> = {
+  personal: 'Контактные данные, базовый профиль и short bio для рабочего пространства.',
+  sport: 'Вид спорта, цели подготовки и контекст клуба для персонализации рекомендаций.',
+  physio: 'Антропометрия и кардио-метрики для более точной аналитики и зон нагрузки.',
+  privacy: 'Контроль доступа к профилю, тренировкам и настройкам безопасности аккаунта.',
+}
+
+const tabHighlights: Record<Tab, string[]> = {
+  personal: ['Имя и контактные данные', 'Локация и дата рождения', 'Краткий профиль спортсмена'],
+  sport: ['Основная дисциплина', 'Уровень и цели подготовки', 'Клуб или спортивная организация'],
+  physio: ['Рост и вес', 'ЧСС, HRV и VO2max', 'База для тренерской аналитики'],
+  privacy: ['Видимость профиля', 'Публичность тренировок', 'Безопасность и пароль'],
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </label>
       {children}
-      {hint && <span style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: -2 }}>{hint}</span>}
+      {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
     </div>
   )
 }
@@ -177,9 +200,7 @@ function Input({ value, onChange, type = 'text', placeholder, min, max }: {
 }) {
   return (
     <input type={type} value={value} onChange={e => onChange(e.target.value)}
-      placeholder={placeholder} min={min} max={max} style={iStyle}
-      onFocus={e => (e.target.style.borderColor = '#F97316')}
-      onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+      placeholder={placeholder} min={min} max={max} className={inputClassName} />
   )
 }
 
@@ -189,9 +210,7 @@ function Select({ value, onChange, options }: {
 }) {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
-      style={{ ...iStyle, cursor: 'pointer' }}
-      onFocus={e => (e.target.style.borderColor = '#F97316')}
-      onBlur={e => (e.target.style.borderColor = 'var(--border)')}>
+      className={`${inputClassName} cursor-pointer`}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   )
@@ -200,11 +219,14 @@ function Select({ value, onChange, options }: {
 // ── Section header ─────────────────────────────────────────────────────────────
 function SectionHeader({ icon, color, title }: { icon: string; color: string; title: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 10, background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div className="mb-5 flex items-center gap-3">
+      <div
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+        style={{ background: `${color}18` }}
+      >
         <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
       </div>
-      <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>
+      <h3 className="m-0 text-xs font-extrabold uppercase tracking-[0.16em] text-foreground">
         {title}
       </h3>
     </div>
@@ -212,12 +234,12 @@ function SectionHeader({ icon, color, title }: { icon: string; color: string; ti
 }
 
 // ── Карточка блока ─────────────────────────────────────────────────────────────
-function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function Card({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
-    <div style={{
-      background: 'var(--card)', border: '1px solid var(--border)',
-      borderRadius: 20, padding: '24px 28px', ...style
-    }}>
+    <div
+      className={`rounded-[28px] border border-border bg-card p-6 shadow-[0_10px_35px_rgba(15,23,42,0.04)] sm:p-7 ${className}`}
+      style={style}
+    >
       {children}
     </div>
   )
@@ -226,24 +248,19 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 // ── Toggle ─────────────────────────────────────────────────────────────────────
 function Toggle({ value, onChange, label, hint }: { value: boolean; onChange: (v: boolean) => void; label: string; hint: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+    <div className="flex items-start justify-between gap-4">
       <div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', marginBottom: 3 }}>{label}</div>
-        <div style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>{hint}</div>
+        <div className="mb-1 text-sm font-semibold text-foreground">{label}</div>
+        <div className="text-xs leading-relaxed text-muted-foreground">{hint}</div>
       </div>
       <button
         type="button"
         onClick={() => onChange(!value)}
-        style={{
-          width: 48, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer',
-          background: value ? '#F97316' : 'var(--border)',
-          position: 'relative', flexShrink: 0, transition: 'background 0.2s',
-        }}>
-        <span style={{
-          position: 'absolute', top: 3, width: 20, height: 20, borderRadius: '50%',
-          background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-          left: value ? 25 : 3, transition: 'left 0.2s',
-        }} />
+        className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${value ? 'bg-orange-500' : 'bg-border'}`}
+      >
+        <span
+          className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-all ${value ? 'left-6' : 'left-1'}`}
+        />
       </button>
     </div>
   )
@@ -305,8 +322,8 @@ function PasswordCard() {
 
   return (
     <Card>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
           <div style={{ width:32, height:32, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <i className="ki-filled ki-lock text-sm" style={{ color:'#7C3AED' }} />
           </div>
@@ -315,19 +332,22 @@ function PasswordCard() {
             <div style={{ fontSize:12, color:'var(--muted-foreground)', marginTop:2 }}>Обновите пароль для входа в аккаунт</div>
           </div>
         </div>
-        <button onClick={() => { setOpen(o => !o); setMsg(null) }} style={{
-          padding:'8px 16px', borderRadius:10, border:'1.5px solid #DDD6FE',
-          background: open ? '#F5F3FF' : 'var(--card)', color:'#7C3AED',
-          fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.15s',
-        }}>
+        <button
+          onClick={() => { setOpen(o => !o); setMsg(null) }}
+          className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all ${
+            open
+              ? 'border-violet-200 bg-violet-50 text-violet-700'
+              : 'border-border bg-background text-violet-700 hover:border-violet-200 hover:bg-violet-50'
+          }`}
+        >
           <i className={`ki-filled ${open ? 'ki-up' : 'ki-down'} text-xs`} />
           {open ? 'Свернуть' : 'Изменить'}
         </button>
       </div>
 
       {open && (
-        <div style={{ marginTop:20, display:'flex', flexDirection:'column', gap:14 }}>
-          <div style={{ height:1, background:'var(--border)', marginBottom:4 }} />
+        <div className="mt-5 flex flex-col gap-4">
+          <div className="mb-1 h-px bg-border" />
 
           <Field label="Новый пароль">
             {pwInput(newPw, setNewPw, 'Минимум 8 символов', showNew, () => setShowNew(s=>!s))}
@@ -369,15 +389,15 @@ function PasswordCard() {
             </div>
           )}
 
-          <button onClick={handleChange} disabled={saving || !newPw || newPw !== confirmPw} style={{
-            padding:'12px 0', borderRadius:12, border:'none', width:'100%',
-            background: saving||!newPw||newPw!==confirmPw ? 'var(--border)' : 'linear-gradient(135deg,#7C3AED,#6D28D9)',
-            color: saving||!newPw||newPw!==confirmPw ? 'var(--muted-foreground)' : 'white',
-            fontSize:14, fontWeight:700, cursor: saving||!newPw||newPw!==confirmPw ? 'not-allowed':'pointer',
-            display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-            boxShadow: newPw&&newPw===confirmPw&&!saving ? '0 2px 8px rgba(124,58,237,0.3)' : 'none',
-            transition:'all 0.15s',
-          }}>
+          <button
+            onClick={handleChange}
+            disabled={saving || !newPw || newPw !== confirmPw}
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition-all ${
+              saving || !newPw || newPw !== confirmPw
+                ? 'cursor-not-allowed bg-border text-muted-foreground'
+                : 'bg-[linear-gradient(135deg,#7C3AED,#6D28D9)] text-white shadow-[0_8px_20px_rgba(124,58,237,0.24)]'
+            }`}
+          >
             {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-lock text-sm" />Сохранить новый пароль</>}
           </button>
         </div>
@@ -389,6 +409,7 @@ function PasswordCard() {
 // ── Главный компонент ──────────────────────────────────────────────────────────
 export default function SettingsPage() {
   const { user } = useUser()
+  const userId = user?.id
   const [tab, setTab] = useState<Tab>('personal')
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [loading, setLoading] = useState(true)
@@ -397,12 +418,12 @@ export default function SettingsPage() {
 
   // Загрузка данных
   useEffect(() => {
-    if (!user?.id) return
+    if (!userId) return
     const sb = getSB()
     async function load() {
       const [{ data: ath }, { data: usr }] = await Promise.all([
-        sb.from('athletes').select('*').eq('id', user!.id).maybeSingle(),
-        sb.from('users').select('*').eq('id', user!.id).maybeSingle(),
+        sb.from('athletes').select('*').eq('id', userId).maybeSingle(),
+        sb.from('users').select('*').eq('id', userId).maybeSingle(),
       ])
       setForm({
         first_name: ath?.first_name ?? usr?.name?.split(' ')[0] ?? '',
@@ -432,18 +453,18 @@ export default function SettingsPage() {
       setLoading(false)
     }
     load()
-  }, [user?.id])
+  }, [userId])
 
   const set = useCallback((key: keyof FormData) => (value: string | boolean) => {
     setForm(prev => ({ ...prev, [key]: value }))
   }, [])
 
   async function handleSave() {
-    if (!user?.id) return
+    if (!userId) return
     setSaving(true)
     const sb = getSB()
     const payload = {
-      id: user.id,
+      id: userId,
       first_name:   form.first_name || null,
       last_name:    form.last_name  || null,
       birth_date:   form.birth_date || null,
@@ -471,7 +492,7 @@ export default function SettingsPage() {
     await sb.from('athletes').upsert(payload, { onConflict: 'id' })
     // Обновляем имя пользователя в таблице users
     const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
-    if (fullName) await sb.from('users').update({ name: fullName }).eq('id', user.id)
+    if (fullName) await sb.from('users').update({ name: fullName }).eq('id', userId)
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
@@ -486,89 +507,176 @@ export default function SettingsPage() {
   )
 
   const activeTab = TABS.find(t => t.id === tab)!
+  const completionTone = completion >= 80 ? '#16A34A' : completion >= 40 ? '#F97316' : '#E11D48'
+  const completionLabel =
+    completion >= 80 ? 'Профиль выглядит сильным и почти готов к работе с тренером.' :
+    completion >= 40 ? 'База уже собрана, но есть поля, которые усилят аналитику.' :
+    'Заполните ключевые данные, чтобы рекомендации и аналитика были точнее.'
 
   return (
-    <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
-
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          {/* Кнопка назад — только стрелка */}
-          <Link href="/dashboard" style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 10,
-            border: '1.5px solid var(--border)', background: 'var(--card)',
-            color: 'var(--muted-foreground)', textDecoration: 'none',
-            marginBottom: 14, transition: 'all 0.15s',
-          }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F97316'
-              ;(e.currentTarget as HTMLAnchorElement).style.color = '#F97316'
-              ;(e.currentTarget as HTMLAnchorElement).style.background = '#FFF7ED'
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'
-              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--muted-foreground)'
-              ;(e.currentTarget as HTMLAnchorElement).style.background = 'var(--card)'
-            }}>
-            <i className="ki-filled ki-left" style={{ fontSize: 13 }} />
-          </Link>
-          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
-            Настройки
-          </p>
-          <h1 className="pf-num" style={{ fontSize: 34, color: 'var(--foreground)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-            Профиль атлета
-          </h1>
-        </div>
-
-        {/* Прогресс заполненности */}
-        <div style={{ textAlign: 'right', minWidth: 140 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
-            Заполнено
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
-            <div style={{ width: 100, height: 6, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', borderRadius: 999,
-                background: completion >= 80 ? '#16A34A' : completion >= 40 ? '#F97316' : '#E11D48',
-                width: `${completion}%`, transition: 'width 0.4s ease',
-              }} />
+    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 pf-enter">
+      <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.16),_transparent_34%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_54%,#FFF4EC_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.06)] sm:p-8">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700">
+                Athlete Workspace
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                Settings Hub
+              </span>
             </div>
-            <span className="pf-num" style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)' }}>{completion}%</span>
+            <div className="mt-4 flex items-start gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-white/80 text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+              >
+                <i className="ki-filled ki-left text-sm" />
+              </Link>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Настройки</p>
+                <h1 className="pf-num mt-1 text-[clamp(2.2rem,4vw,4rem)] leading-[0.95] text-foreground">
+                  Профиль атлета
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Управляйте персональными данными, спортивным контекстом, физиологией и приватностью в одном рабочем пространстве.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
+            <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Заполнено</div>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${completion}%`, background: completionTone }}
+                  />
+                </div>
+                <span className="pf-num text-xl text-foreground">{completion}%</span>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">{completionLabel}</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Текущий фокус</div>
+              <div className="mt-2 text-lg font-semibold text-foreground">{activeTab.label}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">{tabDescriptions[activeTab.id]}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── Tabs ── */}
-      <div style={{ display: 'flex', gap: 6, padding: 5, background: 'var(--accent)', borderRadius: 16, border: '1px solid var(--border)' }}>
-        {TABS.map(t => {
-          const active = tab === t.id
-          return (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-                padding: '10px 8px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                fontSize: 12, fontWeight: active ? 700 : 600,
-                background: active ? 'var(--card)' : 'transparent',
-                color: active ? t.color : 'var(--muted-foreground)',
-                boxShadow: active ? '0 1px 6px rgba(0,0,0,0.08)' : 'none',
-                transition: 'all 0.15s',
-              }}>
-              <i className={`ki-filled ${t.icon}`} style={{ fontSize: 14, color: active ? t.color : 'var(--muted-foreground)' }} />
-              <span className="hidden sm:inline">{t.label}</span>
-            </button>
-          )
-        })}
-      </div>
+      <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="flex flex-col gap-4">
+          <div className="rounded-[28px] border border-border bg-card p-4 shadow-sm">
+            <div className="mb-3 px-1">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Навигация</div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">Переключайтесь между блоками профиля и добивайте заполненность без потери контекста.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {TABS.map(t => {
+                const active = tab === t.id
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
+                    className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                      active
+                        ? 'border-orange-200 bg-orange-50 shadow-sm'
+                        : 'border-transparent bg-background hover:border-border hover:bg-accent/60'
+                    }`}
+                  >
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: `${t.color}18` }}
+                    >
+                      <i className={`ki-filled ${t.icon} text-sm`} style={{ color: t.color }} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className={`text-sm font-semibold ${active ? 'text-foreground' : 'text-foreground'}`}>{t.label}</div>
+                      <div className="mt-1 text-[11px] leading-4 text-muted-foreground">{tabDescriptions[t.id]}</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-border bg-card p-4 shadow-sm">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Что внутри</div>
+            <ul className="mt-3 flex flex-col gap-2">
+              {tabHighlights[activeTab.id].map((highlight) => (
+                <li key={highlight} className="flex items-start gap-2 rounded-2xl bg-accent/40 px-3 py-2 text-sm text-foreground">
+                  <i className="ki-filled ki-check-circle mt-0.5 text-xs text-orange-500" />
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-[28px] border border-border bg-card p-4 shadow-sm">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Статус сохранения</div>
+            <div className="mt-3 rounded-2xl border border-border bg-background px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <i className={`ki-filled ${saved ? 'ki-check-circle' : saving ? 'ki-loading' : 'ki-shield-tick'} text-sm ${saved ? 'text-emerald-600' : saving ? 'text-orange-500' : 'text-blue-600'}`} />
+                {saving ? 'Идет сохранение' : saved ? 'Изменения сохранены' : 'Можно обновлять профиль'}
+              </div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {saving
+                  ? 'Данные отправляются в профиль спортсмена и таблицу пользователей.'
+                  : saved
+                    ? 'Профиль обновлен и готов для дальнейшей настройки.'
+                    : 'Когда закончите с блоком, сохраните изменения одним действием.'}
+              </p>
+            </div>
+          </div>
+        </aside>
+
+        <div className="flex flex-col gap-6">
+          <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-2xl">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Active Section</div>
+                <h2 className="mt-2 text-2xl font-semibold text-foreground">{activeTab.label}</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{tabDescriptions[activeTab.id]}</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Completion: {completion}%
+                </div>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all ${
+                    saving
+                      ? 'cursor-not-allowed bg-border text-muted-foreground'
+                      : saved
+                        ? 'bg-[linear-gradient(135deg,#16A34A,#15803D)] text-white shadow-[0_10px_24px_rgba(22,163,74,0.25)]'
+                        : 'bg-[linear-gradient(135deg,#F97316,#EA580C)] text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]'
+                  }`}
+                >
+                  {saving ? (
+                    <><div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Сохранение…</>
+                  ) : saved ? (
+                    <><i className="ki-filled ki-check text-sm" />Сохранено</>
+                  ) : (
+                    <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </section>
 
       {/* ── Content ── */}
 
       {/* ═══════════════ ЛИЧНЫЕ ДАННЫЕ ═══════════════ */}
       {tab === 'personal' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="flex flex-col gap-4">
           <Card>
             <SectionHeader icon="ki-profile-circle" color="#F97316" title="Личные данные" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Имя">
                 <Input value={form.first_name} onChange={set('first_name')} placeholder="Иван" />
               </Field>
@@ -585,7 +693,7 @@ export default function SettingsPage() {
                 <Input value={form.phone} onChange={set('phone')} placeholder="+7 900 000 00 00" type="tel" />
               </Field>
               <Field label="Email" hint="Изменение потребует подтверждения">
-                <input value={form.email} readOnly style={{ ...iStyle, opacity: 0.6, cursor: 'not-allowed' }} />
+                <input value={form.email} readOnly className={`${inputClassName} cursor-not-allowed opacity-60`} />
               </Field>
               <Field label="Город">
                 <Input value={form.city} onChange={set('city')} placeholder="Москва" />
@@ -602,9 +710,7 @@ export default function SettingsPage() {
               <textarea
                 value={form.bio} onChange={e => set('bio')(e.target.value)}
                 rows={4} placeholder="Расскажите о себе, опыте, целях…"
-                style={{ ...iStyle, resize: 'none', fontFamily: 'inherit' }}
-                onFocus={e => (e.target.style.borderColor = '#F97316')}
-                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                className={textareaClassName} />
             </Field>
           </Card>
         </div>
@@ -612,10 +718,10 @@ export default function SettingsPage() {
 
       {/* ═══════════════ СПОРТ ═══════════════ */}
       {tab === 'sport' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="flex flex-col gap-4">
           <Card>
             <SectionHeader icon="ki-abstract-26" color="#2563EB" title="Спортивный профиль" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Вид спорта">
                 <Select value={SPORTS.some(s => s.value === form.primary_sport) ? form.primary_sport : (form.primary_sport ? 'Другое' : '')}
                   onChange={v => { if (v !== 'Другое') set('primary_sport')(v); else set('primary_sport')('') }}
@@ -637,12 +743,12 @@ export default function SettingsPage() {
                 <Select value={form.fitness_level} onChange={set('fitness_level')} options={FITNESS_LEVELS} />
               </Field>
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div className="mt-4">
               <Field label="Цель тренировок">
                 <Select value={form.goal} onChange={set('goal')} options={GOALS} />
               </Field>
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div className="mt-4">
               <Field label="Часов тренировок в неделю" hint="Среднее количество часов">
                 <Input value={form.weekly_training_hours} onChange={set('weekly_training_hours')}
                   type="number" placeholder="8" min="0" max="40" />
@@ -683,10 +789,10 @@ export default function SettingsPage() {
 
       {/* ═══════════════ ФИЗИОЛОГИЯ ═══════════════ */}
       {tab === 'physio' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="flex flex-col gap-4">
           <Card>
             <SectionHeader icon="ki-abstract-31" color="#E11D48" title="Антропометрия" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Рост (см)" hint="100 – 250 см">
                 <Input value={form.height_cm} onChange={set('height_cm')} type="number" placeholder="175" min="100" max="250" />
               </Field>
@@ -698,7 +804,7 @@ export default function SettingsPage() {
 
           <Card>
             <SectionHeader icon="ki-heart" color="#E11D48" title="Кардио-параметры" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Макс. ЧСС (уд/мин)" hint="Максимальная частота сердечных сокращений">
                 <Input value={form.max_heart_rate} onChange={set('max_heart_rate')} type="number" placeholder="185" min="100" max="230" />
               </Field>
@@ -716,7 +822,7 @@ export default function SettingsPage() {
               </Field>
             </div>
             {/* Подсказки */}
-            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
               {[
                 { label: 'VO2max', icon: 'ki-chart-line-up', color: '#16A34A', hint: 'Отличный: >55, Хороший: 45–55, Средний: 35–45' },
                 { label: 'HRV', icon: 'ki-heart', color: '#E11D48', hint: 'Норма: 20–100 мс. Выше — лучше восстановление' },
@@ -736,17 +842,17 @@ export default function SettingsPage() {
 
       {/* ═══════════════ ПРИВАТНОСТЬ ═══════════════ */}
       {tab === 'privacy' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="flex flex-col gap-4">
           <Card>
             <SectionHeader icon="ki-shield-tick" color="#16A34A" title="Настройки приватности" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div className="flex flex-col gap-5">
               <Toggle
                 value={form.profile_public}
                 onChange={v => set('profile_public')(v)}
                 label="Публичный профиль"
                 hint="Другие пользователи могут видеть ваш профиль, имя и спортивный вид"
               />
-              <div style={{ height: 1, background: 'var(--border)' }} />
+              <div className="h-px bg-border" />
               <Toggle
                 value={form.workouts_public}
                 onChange={v => set('workouts_public')(v)}
@@ -773,7 +879,7 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          <Card style={{ background: 'var(--accent)' }}>
+          <Card className="bg-accent">
             <SectionHeader icon="ki-trash" color="#DC2626" title="Опасная зона" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
               <div>
@@ -796,38 +902,40 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* ── Кнопка сохранения ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 8 }}>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '12px 28px', borderRadius: 14, border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
-            background: saved
-              ? 'linear-gradient(135deg, #16A34A, #15803D)'
-              : 'linear-gradient(135deg, #F97316, #EA580C)',
-            color: 'white', fontSize: 14, fontWeight: 700,
-            boxShadow: saved
-              ? '0 3px 12px rgba(22,163,74,0.35)'
-              : '0 3px 12px rgba(249,115,22,0.35)',
-            opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
-          }}>
-          {saving ? (
-            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</>
-          ) : saved ? (
-            <><i className="ki-filled ki-check text-sm" />Сохранено ✓</>
-          ) : (
-            <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
-          )}
-        </button>
-        {saved && (
-          <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 600, animation: 'fadeIn 0.3s ease' }}>
-            Данные обновлены
-          </span>
-        )}
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-border bg-card px-5 py-4 shadow-sm">
+            <div>
+              <div className="text-sm font-semibold text-foreground">Завершили блок?</div>
+              <p className="mt-1 text-xs text-muted-foreground">Сохраните изменения, чтобы обновить карточку спортсмена и связанный профиль пользователя.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              {saved && (
+                <span className="text-sm font-semibold text-emerald-600">
+                  Данные обновлены
+                </span>
+              )}
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all ${
+                  saving
+                    ? 'cursor-not-allowed bg-border text-muted-foreground'
+                    : saved
+                      ? 'bg-[linear-gradient(135deg,#16A34A,#15803D)] text-white shadow-[0_10px_24px_rgba(22,163,74,0.25)]'
+                      : 'bg-[linear-gradient(135deg,#F97316,#EA580C)] text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]'
+                }`}
+              >
+                {saving ? (
+                  <><div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Сохранение…</>
+                ) : saved ? (
+                  <><i className="ki-filled ki-check text-sm" />Сохранено</>
+                ) : (
+                  <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
   )
 }

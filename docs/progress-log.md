@@ -50,3 +50,10 @@
 - Re-verified the fifth pass with:
   - `./node_modules/.bin/eslint app/messages/page.tsx app/athletes/page.tsx`
   - `npm run build`
+- Completed the sixth workspace consistency pass:
+  - redesigned `analytics` into stronger athlete and coach workspaces with hero sections, summary strips, grouped chart surfaces, and clearer insight framing
+  - rebuilt `org` into an organization command center with a denser hero, KPI strip, action rail, and more intentional content cards
+  - reshaped `settings` into a profile workspace with a navigation rail, section context, stronger save/progress feedback, and a more consistent shell around the existing Supabase flows
+- Re-verified the sixth pass with:
+  - `./node_modules/.bin/eslint app/analytics/page.tsx app/org/page.tsx app/settings/page.tsx`
+  - `npm run build`
