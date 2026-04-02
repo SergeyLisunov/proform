@@ -13,3 +13,11 @@
 - Re-verified the changes with:
   - `npx eslint app/auth/login/page.tsx lib/supabase/middleware.ts`
   - `npm run build`
+- Installed `superpowers` locally from `obra/superpowers` using the native Codex skill discovery flow:
+  - repository cloned to `~/.codex/superpowers`
+  - symlink created at `~/.agents/skills/superpowers`
+  - Codex restart is still required for automatic skill discovery in new sessions
+- Reviewed the provided Metronic Tailwind HTML starter kit and selected the first reference targets for adoption:
+  - auth flows: `layout-1` and `layout-10`
+  - dashboard information density: `layout-9`
+  - calendar and event-oriented navigation cues: `layout-14` and `layout-7`
