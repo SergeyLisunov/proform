@@ -78,3 +78,13 @@
 - Re-verified the eighth pass with:
   - `./node_modules/.bin/eslint app/diary/page.tsx`
   - `npm run build`
+
+## 2026-04-03
+
+- Completed the ninth athlete diary pass:
+  - added same-type comparison cues to diary cards by looking up the previous workout of the same activity type on the client
+  - surfaced compact comparison chips for strain, duration, and average heart rate in both list and grid cards
+  - added neutral fallback states when a workout is the first of its type or lacks comparable metrics
+- Re-verified the ninth pass with:
+  - `./node_modules/.bin/eslint app/diary/page.tsx`
+  - `npm run build`

@@ -121,6 +121,17 @@ function fmtFullDate(s: string | null | undefined): string {
 type DiaryGroup = 'Сегодня' | 'Эта неделя' | 'Ранее'
 const DIARY_GROUPS: DiaryGroup[] = ['Сегодня', 'Эта неделя', 'Ранее']
 
+type ComparisonDirection = 'up' | 'down' | 'flat'
+type ComparisonCue = {
+  key: string
+  text: string
+  direction: ComparisonDirection
+}
+type WorkoutComparison = {
+  previous: Workout | null
+  cues: ComparisonCue[]
+}
+
 function getDiaryGroup(date: string | null | undefined): DiaryGroup {
   if (!date) return 'Ранее'
   const parsed = parseDate(date)
@@ -129,6 +140,54 @@ function getDiaryGroup(date: string | null | undefined): DiaryGroup {
   if (parsed.getTime() === today.getTime()) return 'Сегодня'
   if (parsed >= daysAgo(7)) return 'Эта неделя'
   return 'Ранее'
+}
+
+function getWorkoutSortTime(workout: Workout): number {
+  const eventTime = workout.event_date ? parseDate(workout.event_date).getTime() : 0
+  const createdTime = workout.created_at ? new Date(workout.created_at).getTime() : 0
+  return eventTime || createdTime
+}
+
+function buildComparisonCue(
+  key: 'strain' | 'duration' | 'heart_rate',
+  current: number | null | undefined,
+  previous: number | null | undefined
+): ComparisonCue | null {
+  if (current == null || previous == null) return null
+
+  const delta = current - previous
+  const absDelta = Math.abs(delta)
+
+  if (key === 'strain') {
+    if (absDelta < 0.3) return { key, text: 'нагрузка ровно', direction: 'flat' }
+    return {
+      key,
+      text: `нагрузка ${delta > 0 ? '+' : ''}${delta.toFixed(1)}`,
+      direction: delta > 0 ? 'up' : 'down',
+    }
+  }
+
+  if (key === 'duration') {
+    if (absDelta < 5) return { key, text: 'время ровно', direction: 'flat' }
+    return {
+      key,
+      text: `время ${delta > 0 ? '+' : ''}${Math.round(delta)} мин`,
+      direction: delta > 0 ? 'up' : 'down',
+    }
+  }
+
+  if (absDelta < 3) return { key, text: 'ЧСС ровно', direction: 'flat' }
+  return {
+    key,
+    text: `ЧСС ${delta > 0 ? '+' : ''}${Math.round(delta)}`,
+    direction: delta > 0 ? 'up' : 'down',
+  }
+}
+
+function getComparisonCueClasses(direction: ComparisonDirection): string {
+  if (direction === 'up') return 'border-orange-200 bg-orange-50 text-orange-700'
+  if (direction === 'down') return 'border-sky-200 bg-sky-50 text-sky-700'
+  return 'border-slate-200 bg-slate-50 text-slate-600'
 }
 
 // ── ANALYTICS BLOCK ────────────────────────────────────────────────────────────
@@ -1143,6 +1202,29 @@ function AthleteDiary() {
       .map(group => ({ label: group, items: grouped[group] }))
       .filter(group => group.items.length > 0)
   }, [filtered])
+  const workoutComparisons = useMemo(() => {
+    const sortedAsc = [...workouts].sort((a, b) => getWorkoutSortTime(a) - getWorkoutSortTime(b))
+    const lastSeenByType: Record<string, Workout | undefined> = {}
+    const comparisonMap: Record<string, WorkoutComparison> = {}
+
+    sortedAsc.forEach(workout => {
+      const type = workout.activity_type ?? 'Другое'
+      const previous = lastSeenByType[type] ?? null
+      comparisonMap[workout.id] = {
+        previous,
+        cues: previous
+          ? [
+              buildComparisonCue('strain', workout.activity_strain, previous.activity_strain),
+              buildComparisonCue('duration', workout.activity_duration_min, previous.activity_duration_min),
+              buildComparisonCue('heart_rate', workout.avg_heart_rate, previous.avg_heart_rate),
+            ].filter(Boolean) as ComparisonCue[]
+          : [],
+      }
+      lastSeenByType[type] = workout
+    })
+
+    return comparisonMap
+  }, [workouts])
 
   function handleCreated(w: Workout) {
     setWorkouts(prev => [w, ...prev])
@@ -1349,6 +1431,7 @@ function AthleteDiary() {
               <div className="space-y-3">
                 {group.items.map(w => {
                   const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
+                  const comparison = workoutComparisons[w.id]
                   const chips = [
                     w.activity_duration_min ? fmtDuration(w.activity_duration_min) : null,
                     w.avg_heart_rate ? `${w.avg_heart_rate} уд/мин` : null,
@@ -1376,6 +1459,35 @@ function AthleteDiary() {
                               {chip}
                             </span>
                           ))}
+                        </div>
+                        <div className="mt-3">
+                          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            {comparison?.previous
+                              ? `Сравнение с записью ${fmtDate(comparison.previous.event_date)}`
+                              : 'Сравнение по типу'}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {comparison?.previous ? (
+                              comparison.cues.length > 0 ? (
+                                comparison.cues.map(cue => (
+                                  <span
+                                    key={`${w.id}-${cue.key}`}
+                                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getComparisonCueClasses(cue.direction)}`}
+                                  >
+                                    {cue.text}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                                  нет общих метрик для сравнения
+                                </span>
+                              )
+                            ) : (
+                              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                                первая запись этого типа
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="mt-3 text-sm leading-6 text-muted-foreground">
                           {w.description?.trim() ? w.description : 'Откройте карточку, чтобы добавить заметки и скорректировать детали сессии.'}
@@ -1405,6 +1517,7 @@ function AthleteDiary() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map(w => {
             const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
+            const comparison = workoutComparisons[w.id]
             return (
               <button
                 key={w.id}
@@ -1431,6 +1544,35 @@ function AthleteDiary() {
                           {item}
                         </span>
                       ))}
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-border bg-background/80 p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {comparison?.previous
+                      ? `Сравнение с ${fmtDate(comparison.previous.event_date)}`
+                      : 'Сравнение по типу'}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {comparison?.previous ? (
+                      comparison.cues.length > 0 ? (
+                        comparison.cues.map(cue => (
+                          <span
+                            key={`${w.id}-${cue.key}`}
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getComparisonCueClasses(cue.direction)}`}
+                          >
+                            {cue.text}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                          нет общих метрик
+                        </span>
+                      )
+                    ) : (
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                        первая запись этого типа
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-border bg-background/80 p-4">
