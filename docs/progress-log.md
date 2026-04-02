@@ -71,3 +71,10 @@
 - Re-verified the seventh pass with:
   - `./node_modules/.bin/eslint app/diary/page.tsx`
   - `npm run build`
+- Completed the eighth athlete diary pass:
+  - rebuilt the athlete history area into a stronger workspace with a denser toolbar, current-selection summary, and grouped timeline sections
+  - upgraded list and grid workout cards to surface load, mood, metrics, and short context without opening the drawer
+  - redesigned the workout detail drawer into a stronger athlete review surface while preserving the existing edit, save, and delete behavior
+- Re-verified the eighth pass with:
+  - `./node_modules/.bin/eslint app/diary/page.tsx`
+  - `npm run build`

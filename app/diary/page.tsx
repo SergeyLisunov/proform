@@ -113,6 +113,24 @@ function fmtDate(s: string | null | undefined): string {
   return parseDate(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 }
 
+function fmtFullDate(s: string | null | undefined): string {
+  if (!s) return '—'
+  return parseDate(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+type DiaryGroup = 'Сегодня' | 'Эта неделя' | 'Ранее'
+const DIARY_GROUPS: DiaryGroup[] = ['Сегодня', 'Эта неделя', 'Ранее']
+
+function getDiaryGroup(date: string | null | undefined): DiaryGroup {
+  if (!date) return 'Ранее'
+  const parsed = parseDate(date)
+  const today = daysAgo(0)
+
+  if (parsed.getTime() === today.getTime()) return 'Сегодня'
+  if (parsed >= daysAgo(7)) return 'Эта неделя'
+  return 'Ранее'
+}
+
 // ── ANALYTICS BLOCK ────────────────────────────────────────────────────────────
 function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
   const [period, setPeriod] = useState<Period>('1w')
@@ -256,26 +274,6 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   )
 }
 
-function EditField({
-  label, name, type, value, onChange, placeholder,
-}: {
-  label: string; name: string; type: string;
-  value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-}) {
-  return (
-    <div>
-      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>
-        {label}
-      </label>
-      <input
-        type={type} name={name} value={value} onChange={onChange} placeholder={placeholder}
-        className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-      />
-    </div>
-  )
-}
-
 // ── VIEW/EDIT DRAWER ───────────────────────────────────────────────────────────
 function ViewEditDrawer({
   workout, onClose, onUpdated, onDeleted,
@@ -366,135 +364,227 @@ function ViewEditDrawer({
 
   const ac = ACTIVITY_CONFIG[workout.activity_type ?? ''] ?? DEFAULT_AC
   const displayName = workout.name || workout.activity_type || 'Тренировка'
+  const inputClass = 'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
+  const quickFacts = [
+    workout.activity_duration_min != null
+      ? { label: 'Длительность', value: fmtDuration(workout.activity_duration_min), tone: '#F97316' }
+      : null,
+    workout.activity_strain != null
+      ? { label: 'Нагрузка', value: Number(workout.activity_strain).toFixed(1), tone: strainColor(Number(workout.activity_strain)) }
+      : null,
+    workout.avg_heart_rate != null
+      ? { label: 'Ср. ЧСС', value: `${Math.round(Number(workout.avg_heart_rate))}`, tone: '#EF4444' }
+      : null,
+    workout.activity_calories != null
+      ? { label: 'Калории', value: `${workout.activity_calories} ккал`, tone: '#2563EB' }
+      : null,
+  ].filter(Boolean) as { label: string; value: string; tone: string }[]
 
   return ReactDOM.createPortal(
     <>
       <div onClick={handleClose} style={{ position:'fixed',inset:0,zIndex:9998,background:'rgba(15,23,42,0.65)',backdropFilter:'blur(3px)',transition:'opacity 0.26s',opacity:visible?1:0 }} />
-      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:480,maxWidth:'100vw',zIndex:9999,background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
+      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:520,maxWidth:'100vw',zIndex:9999,background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
 
-        {/* Header */}
-        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'var(--card)',zIndex:1 }}>
-          <div style={{ display:'flex',alignItems:'center',gap:12,minWidth:0 }}>
-            <div style={{ width:40,height:40,borderRadius:12,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:ac.bg,border:`1px solid ${ac.border}` }}>
-              <i className={`ki-filled ${ac.icon} text-sm`} style={{ color:ac.text }} />
-            </div>
-            <div style={{ minWidth:0 }}>
-              <div style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:2 }}>
-                {mode==='view' ? (workout.activity_type ?? 'Тренировка') : 'Редактирование'}
+        <div className="sticky top-0 z-[1] border-b border-border bg-card/95 px-6 py-5 backdrop-blur">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border"
+                style={{ background: ac.bg, borderColor: ac.border }}
+              >
+                <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
               </div>
-              <div style={{ fontSize:15,fontWeight:700,color:'var(--foreground)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>
-                {mode==='view' ? displayName : 'Изменить тренировку'}
+              <div className="min-w-0">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  {mode === 'view' ? 'Workout Detail' : 'Редактирование'}
+                </div>
+                <div className="mt-1 truncate text-base font-semibold text-foreground">
+                  {mode === 'view' ? displayName : 'Изменить тренировку'}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {workout.activity_type ?? 'Тренировка'} · {fmtFullDate(workout.event_date)}
+                </div>
               </div>
             </div>
+            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><i className="ki-filled ki-cross text-sm" /></button>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
         </div>
 
-        {/* Body */}
         <div style={{ flex:1,overflowY:'auto',padding:'20px 24px' }}>
           {mode === 'view' ? (
-            <div style={{ display:'flex',flexDirection:'column',gap:20 }}>
-              {(workout.activity_strain != null || workout.activity_duration_min != null) && (
-                <div style={{ display:'flex',gap:16,padding:'16px',background:'var(--accent)',borderRadius:14,border:'1px solid var(--border)' }}>
-                  {workout.activity_strain != null && (
-                    <div style={{ textAlign:'center' }}>
-                      <div className="pf-num" style={{ fontSize:28,fontWeight:700,color:strainColor(Number(workout.activity_strain)),lineHeight:1 }}>{Number(workout.activity_strain).toFixed(1)}</div>
-                      <div style={{ fontSize:10,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginTop:2 }}>нагрузка</div>
+            <div className="flex flex-col gap-5">
+              <section
+                className="rounded-[28px] border p-5 shadow-sm"
+                style={{
+                  background: `linear-gradient(135deg, ${ac.bg} 0%, rgba(255,255,255,0.98) 100%)`,
+                  borderColor: ac.border,
+                }}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
+                      Athlete Session
+                    </div>
+                    <h3 className="mt-3 text-[28px] font-semibold leading-none text-foreground">{displayName}</h3>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                        {fmtFullDate(workout.event_date)}
+                      </span>
+                      {workout.start_time && (
+                        <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                          {workout.start_time}
+                        </span>
+                      )}
+                      {workout.mood != null && workout.mood >= 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                          Самочувствие {MOODS[workout.mood]}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border bg-white/80 shadow-sm"
+                    style={{ borderColor: ac.border }}
+                  >
+                    <i className={`ki-filled ${ac.icon} text-lg`} style={{ color: ac.text }} />
+                  </div>
+                </div>
+
+                {quickFacts.length > 0 && (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {quickFacts.map(fact => (
+                      <div key={fact.label} className="rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm">
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{fact.label}</div>
+                        <div className="mt-2 pf-num text-[26px] leading-none" style={{ color: fact.tone }}>{fact.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Структура сессии</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <InfoRow label="Дата" value={fmtFullDate(workout.event_date)} />
+                  <InfoRow label="Тип" value={workout.activity_type} />
+                  <InfoRow label="Начало" value={workout.start_time} />
+                  <InfoRow label="Длительность" value={workout.activity_duration_min ? fmtDuration(workout.activity_duration_min) : null} />
+                </div>
+              </section>
+
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Нагрузка и физиология</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <InfoRow label="Нагрузка" value={workout.activity_strain != null ? Number(workout.activity_strain).toFixed(1) : null} />
+                  <InfoRow label="Калории" value={workout.activity_calories ? `${workout.activity_calories} ккал` : null} />
+                  <InfoRow label="ЧСС средний" value={workout.avg_heart_rate ? `${Math.round(Number(workout.avg_heart_rate))} уд/мин` : null} />
+                  <InfoRow label="ЧСС макс" value={workout.max_heart_rate ? `${Math.round(Number(workout.max_heart_rate))} уд/мин` : null} />
+                </div>
+              </section>
+
+              {(workout.description || workout.created_at) && (
+                <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                  <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Контекст</div>
+                  {workout.description ? (
+                    <p className="m-0 whitespace-pre-wrap text-sm leading-6 text-foreground">{workout.description}</p>
+                  ) : (
+                    <p className="m-0 text-sm text-muted-foreground">Заметки не добавлены.</p>
+                  )}
+                  {workout.created_at && (
+                    <div className="mt-4 text-xs text-muted-foreground/80">
+                      Создано {new Date(workout.created_at).toLocaleString('ru-RU')}
                     </div>
                   )}
-                  {workout.activity_duration_min != null && (
-                    <>
-                      {workout.activity_strain != null && <div style={{ width:1,background:'var(--border)' }} />}
-                      <div style={{ textAlign:'center' }}>
-                        <div className="pf-num" style={{ fontSize:28,fontWeight:700,color:'#F97316',lineHeight:1 }}>{fmtDuration(workout.activity_duration_min)}</div>
-                        <div style={{ fontSize:10,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginTop:2 }}>длительность</div>
-                      </div>
-                    </>
-                  )}
-                  {workout.avg_heart_rate != null && (
-                    <>
-                      <div style={{ width:1,background:'var(--border)' }} />
-                      <div style={{ textAlign:'center' }}>
-                        <div className="pf-num" style={{ fontSize:28,fontWeight:700,color:'#EF4444',lineHeight:1 }}>{Math.round(Number(workout.avg_heart_rate))}</div>
-                        <div style={{ fontSize:10,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginTop:2 }}>уд/мин ср.</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-              <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:16 }}>
-                <InfoRow label="Дата" value={workout.event_date ? parseDate(workout.event_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}) : null} />
-                <InfoRow label="Тип" value={workout.activity_type} />
-                <InfoRow label="Длительность" value={workout.activity_duration_min ? fmtDuration(workout.activity_duration_min) : null} />
-                <InfoRow label="Калории" value={workout.activity_calories ? `${workout.activity_calories} ккал` : null} />
-                <InfoRow label="ЧСС средний" value={workout.avg_heart_rate ? `${Math.round(Number(workout.avg_heart_rate))} уд/мин` : null} />
-                <InfoRow label="ЧСС макс" value={workout.max_heart_rate ? `${Math.round(Number(workout.max_heart_rate))} уд/мин` : null} />
-                {workout.mood != null && <InfoRow label="Самочувствие" value={MOODS[workout.mood] ?? null} />}
-              </div>
-              {workout.description && (
-                <div>
-                  <div style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:6 }}>Заметки</div>
-                  <p style={{ fontSize:13,color:'var(--foreground)',lineHeight:1.6,margin:0,whiteSpace:'pre-wrap' }}>{workout.description}</p>
-                </div>
-              )}
-              {workout.created_at && (
-                <p style={{ fontSize:11,color:'var(--muted-foreground)',opacity:0.6,margin:0 }}>
-                  Создано: {new Date(workout.created_at).toLocaleString('ru-RU')}
-                </p>
+                </section>
               )}
             </div>
           ) : (
-            <div style={{ display:'flex',flexDirection:'column',gap:20 }}>
-              <div>
-                <div style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:10 }}>Тип активности</div>
-                <div style={{ display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8 }}>
+            <div className="flex flex-col gap-5">
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                <div className="mb-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Основное</div>
+                  <h4 className="mt-1 text-base font-semibold text-foreground">Редактирование тренировки</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-2.5">
                   {FORM_ACTIVITY_TYPES.map(at => {
                     const cfg = ACTIVITY_CONFIG[at.value] ?? DEFAULT_AC; const sel = form.activity_type === at.value
                     return (
                       <button key={at.value} type="button" onClick={() => setForm(f=>({...f,activity_type:at.value}))}
-                        style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:'10px 8px',borderRadius:12,border:`1.5px solid ${sel?cfg.border:'var(--border)'}`,background:sel?cfg.bg:'transparent',cursor:'pointer',transition:'all 0.15s' }}>
+                        style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:'10px 8px',borderRadius:16,border:`1.5px solid ${sel?cfg.border:'var(--border)'}`,background:sel?cfg.bg:'transparent',cursor:'pointer',transition:'all 0.15s' }}>
                         <i className={`ki-filled ${at.icon} text-base`} style={{ color:sel?cfg.text:'var(--muted-foreground)' }} />
                         <span style={{ fontSize:10,fontWeight:600,color:sel?cfg.text:'var(--muted-foreground)' }}>{at.value}</span>
                       </button>
                     )
                   })}
                 </div>
-              </div>
-              <EditField label="Название" name="name" type="text" value={form.name} onChange={handleChange} placeholder="Утренняя пробежка..." />
-              <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12 }}>
-                <EditField label="Дата *" name="event_date" type="date" value={form.event_date} onChange={handleChange} />
-                <EditField label="Начало" name="start_time" type="time" value={form.start_time} onChange={handleChange} />
-              </div>
-              <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12 }}>
-                <EditField label="Длительность (мин)" name="activity_duration_min" type="number" value={form.activity_duration_min} onChange={handleChange} placeholder="60" />
-                <div>
-                  <div style={{ display:'flex',justifyContent:'space-between',marginBottom:6 }}>
-                    <label style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em' }}>Нагрузка (0–21)</label>
-                    <span className="pf-num" style={{ fontSize:16,fontWeight:700,color:'var(--foreground)' }}>{form.activity_strain.toFixed(1)}</span>
+                <div className="mt-4 grid gap-4">
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Название</label>
+                    <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Утренняя пробежка..." className={inputClass} />
                   </div>
-                  <input type="range" min="0" max="21" step="0.1" value={form.activity_strain} onChange={e=>setForm(f=>({...f,activity_strain:Number(e.target.value)}))} className="w-full accent-orange-500" />
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Дата *</label>
+                      <input type="date" name="event_date" value={form.event_date} onChange={handleChange} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Начало</label>
+                      <input type="time" name="start_time" value={form.start_time} onChange={handleChange} className={inputClass} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность (мин)</label>
+                      <input type="number" name="activity_duration_min" value={form.activity_duration_min} onChange={handleChange} placeholder="60" className={inputClass} />
+                    </div>
+                    <div>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <label className="block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Нагрузка (0-21)</label>
+                        <span className="pf-num text-base text-foreground">{form.activity_strain.toFixed(1)}</span>
+                      </div>
+                      <div className="rounded-2xl border border-input bg-background px-4 py-4">
+                        <input type="range" min="0" max="21" step="0.1" value={form.activity_strain} onChange={e=>setForm(f=>({...f,activity_strain:Number(e.target.value)}))} className="w-full accent-orange-500" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div style={{ display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12 }}>
-                <EditField label="Ср. ЧСС" name="avg_heart_rate" type="number" value={form.avg_heart_rate} onChange={handleChange} placeholder="150" />
-                <EditField label="Макс. ЧСС" name="max_heart_rate" type="number" value={form.max_heart_rate} onChange={handleChange} placeholder="185" />
-                <EditField label="Калории" name="activity_calories" type="number" value={form.activity_calories} onChange={handleChange} placeholder="500" />
-              </div>
-              <div>
-                <label style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:8 }}>Самочувствие</label>
-                <div style={{ display:'flex',gap:8 }}>
-                  {MOODS.map(m => (
-                    <button key={m} type="button" onClick={() => setForm(f=>({...f,mood:f.mood===m?'':m}))}
-                      style={{ width:40,height:40,borderRadius:10,fontSize:20,border:`1.5px solid ${form.mood===m?'#fb923c':'var(--border)'}`,background:form.mood===m?'rgba(251,146,60,0.08)':'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s' }}>
-                      {m}
-                    </button>
-                  ))}
+              </section>
+
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                <div className="mb-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Метрики и контекст</div>
+                  <h4 className="mt-1 text-base font-semibold text-foreground">Физиология и ощущения</h4>
                 </div>
-              </div>
-              <div>
-                <label style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:6 }}>Заметки</label>
-                <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Ощущения, условия, наблюдения…" className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none" />
-              </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Ср. ЧСС</label>
+                    <input type="number" name="avg_heart_rate" value={form.avg_heart_rate} onChange={handleChange} placeholder="150" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Макс. ЧСС</label>
+                    <input type="number" name="max_heart_rate" value={form.max_heart_rate} onChange={handleChange} placeholder="185" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Калории</label>
+                    <input type="number" name="activity_calories" value={form.activity_calories} onChange={handleChange} placeholder="500" className={inputClass} />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="mb-2 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Самочувствие</label>
+                  <div className="flex gap-2">
+                    {MOODS.map(m => (
+                      <button key={m} type="button" onClick={() => setForm(f=>({...f,mood:f.mood===m?'':m}))}
+                        style={{ width:44,height:44,borderRadius:14,fontSize:20,border:`1.5px solid ${form.mood===m?'#fb923c':'var(--border)'}`,background:form.mood===m?'rgba(251,146,60,0.08)':'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s' }}>
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Заметки</label>
+                  <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Ощущения, условия, наблюдения..." className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 resize-none" />
+                </div>
+              </section>
             </div>
           )}
         </div>
@@ -1027,6 +1117,32 @@ function AthleteDiary() {
     return acc
   }, {})
   const topActivity = Object.entries(strongestActivity).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
+  const filteredSummary = useMemo(() => {
+    const minutes = filtered.reduce((sum, workout) => sum + (workout.activity_duration_min ?? 0), 0)
+    const avgStrainSource = filtered.filter(workout => workout.activity_strain != null)
+    const avgStrain = avgStrainSource.length
+      ? avgStrainSource.reduce((sum, workout) => sum + Number(workout.activity_strain ?? 0), 0) / avgStrainSource.length
+      : null
+    const withNotesItems = filtered.filter(workout => workout.description?.trim())
+    const withNotes = withNotesItems.length
+    const latestNote = withNotesItems.find(workout => workout.event_date) ?? null
+
+    return { minutes, avgStrain, withNotes, latestNote }
+  }, [filtered])
+  const groupedWorkouts = useMemo(() => {
+    const grouped = DIARY_GROUPS.reduce<Record<DiaryGroup, Workout[]>>((acc, group) => {
+      acc[group] = []
+      return acc
+    }, { 'Сегодня': [], 'Эта неделя': [], 'Ранее': [] })
+
+    filtered.forEach(workout => {
+      grouped[getDiaryGroup(workout.event_date)].push(workout)
+    })
+
+    return DIARY_GROUPS
+      .map(group => ({ label: group, items: grouped[group] }))
+      .filter(group => group.items.length > 0)
+  }, [filtered])
 
   function handleCreated(w: Workout) {
     setWorkouts(prev => [w, ...prev])
@@ -1045,8 +1161,16 @@ function AthleteDiary() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+      <div className="flex min-h-[420px] items-center justify-center">
+        <div className="flex w-full max-w-xl flex-col items-center gap-4 rounded-[28px] border border-orange-100 bg-[linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_60%,#FFF4EC_100%)] px-8 py-12 text-center shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-orange-100">
+            <div className="h-7 w-7 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-foreground">Загружаем историю тренировок</div>
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">Собираем последние записи, чтобы показать нагрузку и контекст за сессии.</div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -1118,112 +1242,216 @@ function AthleteDiary() {
       <WorkoutLimitBadge />
       <AnalyticsBlock workouts={workouts} />
 
-      {/* Filters + view toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {FILTER_OPTIONS.map(f => (
-          <button key={f} onClick={() => setFilter(f)}
-            className={['px-3 py-1.5 rounded-lg text-2sm font-medium border transition-all', filter===f?'bg-orange-50 border-orange-200 text-orange-600':'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}>
-            {f}
-          </button>
-        ))}
-        <div className="ml-auto flex items-center gap-1 p-1 bg-card border border-border rounded-lg">
-          <button onClick={() => setView('list')} className={`px-2.5 py-1.5 rounded-md transition-all ${view==='list'?'bg-orange-50 text-orange-600':'text-muted-foreground'}`}>
-            <i className="ki-filled ki-row-horizontal text-sm" />
-          </button>
-          <button onClick={() => setView('grid')} className={`px-2.5 py-1.5 rounded-md transition-all ${view==='grid'?'bg-orange-50 text-orange-600':'text-muted-foreground'}`}>
-            <i className="ki-filled ki-element-grid text-sm" />
-          </button>
-        </div>
-      </div>
+      <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
+                History Workspace
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                {filtered.length} записей
+              </span>
+            </div>
+            <h3 className="mt-3 text-[26px] font-semibold leading-none text-foreground">История и разбор тренировок</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Фильтруйте записи по активности, быстро считывайте нагрузку и открывайте отдельную тренировку для редактирования и заметок.
+            </p>
+          </div>
 
-      {/* Empty state */}
-      {filtered.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl px-5 py-16 text-center">
-          <i className="ki-filled ki-calendar text-3xl text-slate-300 mb-3 block" />
-          <p className="text-muted-foreground text-2sm mb-3">
-            {workouts.length === 0 ? 'Тренировок пока нет. Создайте первую!' : 'Нет тренировок по выбранному фильтру.'}
-          </p>
-          {workouts.length === 0 && (
-            <button onClick={() => setShowDrawer(true)} className="kt-btn kt-btn-primary gap-2 mx-auto">
-              <i className="ki-filled ki-plus text-sm" />Добавить тренировку
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex items-center gap-1 rounded-2xl border border-border bg-background p-1">
+              <button onClick={() => setView('list')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='list'?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground'}`}>
+                <i className="ki-filled ki-row-horizontal mr-1.5 text-sm" />
+                Список
+              </button>
+              <button onClick={() => setView('grid')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='grid'?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground'}`}>
+                <i className="ki-filled ki-element-grid mr-1.5 text-sm" />
+                Сетка
+              </button>
+            </div>
+            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-100">
+              <i className="ki-filled ki-plus text-sm" />
+              Новая тренировка
             </button>
-          )}
-        </div>
-      ) : view === 'list' ? (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="divide-y divide-border">
-            {filtered.map(w => {
-              const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
-              const meta = [
-                w.activity_duration_min && fmtDuration(w.activity_duration_min),
-                w.avg_heart_rate && `${w.avg_heart_rate} уд/мин`,
-                w.activity_calories && `${w.activity_calories} ккал`,
-              ].filter(Boolean).join(' · ')
-              return (
-                <div key={w.id} onClick={() => setSelectedWorkout(w)}
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-accent/40 transition-colors cursor-pointer group">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border" style={{ background:ac.bg,borderColor:ac.border }}>
-                    <i className={`ki-filled ${ac.icon} text-sm`} style={{ color:ac.text }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-foreground">{w.name}</span>
-                      <span className="px-1.5 py-0.5 rounded text-2xs font-medium bg-border/60 text-muted-foreground">{fmtDate(w.event_date)}</span>
-                      {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
-                    </div>
-                    {meta && <div className="text-2xs text-muted-foreground mt-0.5">{meta}</div>}
-                  </div>
-                  {w.activity_strain != null && (
-                    <div className="text-right shrink-0">
-                      <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{Number(w.activity_strain).toFixed(1)}</div>
-                      <div className="text-2xs text-muted-foreground">нагрузка</div>
-                    </div>
-                  )}
-                  <i className="ki-filled ki-right text-muted-foreground text-xs opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                </div>
-              )
-            })}
           </div>
         </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {FILTER_OPTIONS.map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className={['rounded-full border px-3 py-2 text-sm font-semibold transition-all', filter===f?'border-orange-200 bg-orange-50 text-orange-700 shadow-sm':'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground'].join(' ')}>
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-background/80 p-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">В текущей выборке</div>
+            <div className="mt-2 pf-num text-[28px] leading-none text-foreground">{filtered.length}</div>
+            <div className="mt-2 text-2xs text-muted-foreground">тренировок попадает в активный фильтр</div>
+          </div>
+          <div className="rounded-2xl border border-border bg-background/80 p-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Объем</div>
+            <div className="mt-2 text-xl font-semibold text-foreground">{filteredSummary.minutes ? fmtDuration(filteredSummary.minutes) : '—'}</div>
+            <div className="mt-2 text-2xs text-muted-foreground">
+              {filteredSummary.avgStrain != null
+                ? `средняя нагрузка ${filteredSummary.avgStrain.toFixed(1)}`
+                : 'добавьте нагрузку, чтобы видеть среднее значение'}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-background/80 p-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Контекст</div>
+            <div className="mt-2 text-xl font-semibold text-foreground">{filteredSummary.withNotes}</div>
+            <div className="mt-2 text-2xs text-muted-foreground">
+              {filteredSummary.latestNote
+                ? `записей с заметками, последняя ${fmtDate(filteredSummary.latestNote.event_date)}`
+                : 'пока нет заметок в выбранной подборке'}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {filtered.length === 0 ? (
+        <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[20px] bg-orange-50 text-orange-500">
+            <i className="ki-filled ki-calendar text-2xl" />
+          </div>
+          <div className="mt-4 text-lg font-semibold text-foreground">
+            {workouts.length === 0 ? 'История тренировок пока пуста' : 'По этому фильтру тренировок пока нет'}
+          </div>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+            {workouts.length === 0
+              ? 'Добавьте первую тренировку, чтобы дневник начал собирать нагрузку, метрики и заметки по сессиям.'
+              : 'Смените фильтр активности или создайте новую запись, чтобы история оставалась полной.'}
+          </p>
+          <div className="mt-5 flex justify-center">
+            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F97316,#EA580C)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)]">
+              <i className="ki-filled ki-plus text-sm" />
+              Добавить тренировку
+            </button>
+          </div>
+        </div>
+      ) : view === 'list' ? (
+        <div className="flex flex-col gap-5">
+          {groupedWorkouts.map(group => (
+            <section key={group.label} className="rounded-[26px] border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Группа истории</div>
+                  <div className="mt-1 text-lg font-semibold text-foreground">{group.label}</div>
+                </div>
+                <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">
+                  {group.items.length} записей
+                </div>
+              </div>
+              <div className="space-y-3">
+                {group.items.map(w => {
+                  const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
+                  const chips = [
+                    w.activity_duration_min ? fmtDuration(w.activity_duration_min) : null,
+                    w.avg_heart_rate ? `${w.avg_heart_rate} уд/мин` : null,
+                    w.activity_calories ? `${w.activity_calories} ккал` : null,
+                  ].filter(Boolean)
+                  return (
+                    <button
+                      key={w.id}
+                      type="button"
+                      onClick={() => setSelectedWorkout(w)}
+                      className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-white hover:shadow-sm sm:p-5"
+                    >
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
+                        <i className={`ki-filled ${ac.icon} text-base`} style={{ color:ac.text }} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-base font-semibold text-foreground">{w.name || w.activity_type || 'Тренировка'}</span>
+                          <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">{fmtDate(w.event_date)}</span>
+                          {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(chips.length > 0 ? chips : ['Метрики не добавлены']).map(chip => (
+                            <span key={chip} className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                              {chip}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-sm leading-6 text-muted-foreground">
+                          {w.description?.trim() ? w.description : 'Откройте карточку, чтобы добавить заметки и скорректировать детали сессии.'}
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-2">
+                        {w.activity_strain != null ? (
+                          <div className="rounded-2xl border border-border bg-card px-3 py-2 text-right">
+                            <div className="pf-num text-[24px] leading-none" style={{ color: strainColor(Number(w.activity_strain)) }}>{Number(w.activity_strain).toFixed(1)}</div>
+                            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">нагрузка</div>
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl border border-dashed border-border px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                            нет strain
+                          </div>
+                        )}
+                        <i className="ki-filled ki-right text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map(w => {
             const ac = ACTIVITY_CONFIG[w.activity_type ?? ''] ?? DEFAULT_AC
             return (
-              <div key={w.id} onClick={() => setSelectedWorkout(w)}
-                className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3 hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ background:ac.bg,borderColor:ac.border }}>
-                    <i className={`ki-filled ${ac.icon} text-sm`} style={{ color:ac.text }} />
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => setSelectedWorkout(w)}
+                className="flex flex-col gap-4 rounded-[26px] border border-border bg-card p-5 text-left transition-all hover:border-orange-200 hover:shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
+                    <i className={`ki-filled ${ac.icon} text-base`} style={{ color:ac.text }} />
                   </div>
                   <div className="flex items-center gap-2">
                     {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
-                    <span className="text-2xs font-medium text-muted-foreground">{fmtDate(w.event_date)}</span>
+                    <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">{fmtDate(w.event_date)}</span>
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">{w.name}</div>
-                  <div className="text-2xs text-muted-foreground mt-0.5">
-                    {[w.activity_duration_min && fmtDuration(w.activity_duration_min), w.activity_calories && `${w.activity_calories} ккал`].filter(Boolean).join(' · ')}
+                  <div className="text-base font-semibold text-foreground">{w.name || w.activity_type || 'Тренировка'}</div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {[w.activity_duration_min ? fmtDuration(w.activity_duration_min) : null, w.activity_calories ? `${w.activity_calories} ккал` : null, w.avg_heart_rate ? `${w.avg_heart_rate} уд/мин` : null]
+                      .filter(Boolean)
+                      .map(item => (
+                        <span key={item} className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                          {item}
+                        </span>
+                      ))}
                   </div>
                 </div>
-                {(w.activity_strain != null || w.avg_heart_rate != null) && (
-                  <div className="flex items-center justify-between pt-1 border-t border-border">
-                    {w.activity_strain != null && (
-                      <div>
-                        <div className="pf-num text-xl leading-none" style={{ color:strainColor(Number(w.activity_strain)) }}>{Number(w.activity_strain).toFixed(1)}</div>
-                        <div className="text-2xs text-muted-foreground">нагрузка</div>
-                      </div>
-                    )}
-                    {w.avg_heart_rate != null && (
-                      <div className="text-right">
-                        <div className="pf-num text-xl text-foreground leading-none">{w.avg_heart_rate}</div>
-                        <div className="text-2xs text-muted-foreground">уд/мин</div>
-                      </div>
-                    )}
+                <div className="rounded-2xl border border-border bg-background/80 p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Короткий контекст</div>
+                  <div className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {w.description?.trim() ? w.description : 'Откройте тренировку, чтобы добавить заметки и отредактировать детали.'}
                   </div>
-                )}
-              </div>
+                </div>
+                <div className="flex items-end justify-between border-t border-border pt-3">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Нагрузка</div>
+                    <div className="mt-2 pf-num text-[26px] leading-none" style={{ color: w.activity_strain != null ? strainColor(Number(w.activity_strain)) : '#94A3B8' }}>
+                      {w.activity_strain != null ? Number(w.activity_strain).toFixed(1) : '—'}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">ЧСС</div>
+                    <div className="mt-2 pf-num text-[26px] leading-none text-foreground">{w.avg_heart_rate ?? '—'}</div>
+                  </div>
+                </div>
+              </button>
             )
           })}
         </div>
