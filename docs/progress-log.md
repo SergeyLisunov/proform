@@ -21,3 +21,11 @@
   - auth flows: `layout-1` and `layout-10`
   - dashboard information density: `layout-9`
   - calendar and event-oriented navigation cues: `layout-14` and `layout-7`
+- Completed the second Metronic-inspired product pass:
+  - rebuilt the main sidebar into a clearer role-aware shell with stronger section grouping and account context
+  - recomposed athlete, coach, and admin dashboards with denser hero sections, better KPI hierarchy, and cleaner activity/status blocks
+  - preserved existing route logic, role gating, unread counters, and sign-out/auth behavior
+- Re-verified the second pass with:
+  - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
+  - `./node_modules/.bin/eslint app/dashboard/page.tsx`
+  - `npm run build`

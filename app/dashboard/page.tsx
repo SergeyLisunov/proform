@@ -1,14 +1,12 @@
 'use client'
+import type { ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import dynamic from 'next/dynamic'
+import { recoveryColor, DEMO_SESSIONS } from '@/lib/utils/data'
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const AthleteProfileCard = dynamic(() => import('@/components/ui/AthleteProfileCard'), { ssr: false })
-import { DEMO_WEEKLY, DEMO_DAILY, DEMO_HRZ, DEMO_SESSIONS, DEMO_GROUP, recoveryColor } from '@/lib/utils/data'
-
-const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
-const ZL = ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO₂max']
 
 const sparkOpts = (color: string) => ({
   chart: { type: 'area' as const, toolbar: { show: false }, sparkline: { enabled: true }, animations: { enabled: false } },
@@ -19,25 +17,48 @@ const sparkOpts = (color: string) => ({
   dataLabels: { enabled: false },
 })
 
-const weekLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+function Surface({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`overflow-hidden rounded-2xl border border-border bg-card shadow-sm ${className}`}>
+      {children}
+    </div>
+  )
+}
+
+function SectionHeader({ eyebrow, title, subtitle, action }: {
+  eyebrow: string; title: string; subtitle?: string; action?: ReactNode
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <p className="text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{eyebrow}</p>
+        <h3 className="mt-1 text-base font-semibold text-foreground">{title}</h3>
+        {subtitle && <p className="mt-1 text-xs leading-5 text-muted-foreground">{subtitle}</p>}
+      </div>
+      {action}
+    </div>
+  )
+}
 
 function StatCard({ label, value, unit, icon, iconBg, delta, sub, sparkData, sparkColor }: {
   label: string; value: string | number; unit?: string; icon: string; iconBg: string
   delta?: number; sub?: string; sparkData?: number[]; sparkColor?: string
 }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <span className="text-2sm text-muted-foreground font-medium">{label}</span>
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${iconBg}`}>
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm md:p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
+        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${iconBg}`}>
           <i className={`ki-filled ${icon} text-base`} />
         </div>
       </div>
       <div className="flex items-end gap-1.5">
-        <span className="pf-num text-4xl text-foreground leading-none">{value}</span>
-        {unit && <span className="text-sm text-muted-foreground mb-0.5 font-medium">{unit}</span>}
+        <span className="pf-num text-[clamp(2rem,3vw,2.75rem)] leading-none text-foreground">{value}</span>
+        {unit && <span className="mb-0.5 text-sm font-medium text-muted-foreground">{unit}</span>}
         {delta !== undefined && (
-          <span className={`text-2xs font-bold ml-auto mb-1 ${delta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+          <span className={`ml-auto mb-1 inline-flex items-center rounded-full px-2 py-1 text-[11px] font-bold ${delta >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
             {delta > 0 ? '+' : ''}{delta}%
           </span>
         )}
@@ -52,11 +73,66 @@ function StatCard({ label, value, unit, icon, iconBg, delta, sub, sparkData, spa
   )
 }
 
+function SmallSignal({ label, value, hint, icon, tone }: {
+  label: string; value: string; hint: string; icon: string; tone: string
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-background/70 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+          <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
+          <p className="mt-1 text-2xs text-muted-foreground">{hint}</p>
+        </div>
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tone}`}>
+          <i className={`ki-filled ${icon} text-sm`} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
+  title: string; meta: string; strain: string | number; zones: number[]; iconBg: string; icon: string; accent: string
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:bg-accent/40">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <i className={`ki-filled ${icon} text-sm ${accent}`} />
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="truncate text-sm font-semibold text-foreground">{title}</h4>
+            <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+              Logged
+            </span>
+          </div>
+          <p className="mt-1 text-2xs text-muted-foreground">{meta}</p>
+          <div className="mt-3">
+            <ZoneBar zones={zones} height={26} />
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="pf-num text-xl leading-none text-foreground">{strain}</div>
+          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">strain</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ──────────────────────────────────────────────
 function AthleteDash({ name }: { name: string }) {
+  const firstName = name.split(' ')[0]
   const rc = recoveryColor(42)
   const hrv7d = [41, 44, 50, 48, 47, 45, 47]
   const strain7d = [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1]
+  const athleteSignals = [
+    { label: 'Next session', value: 'Easy aerobic', hint: 'Keep the next block in Z2 and cap spikes.', icon: 'ki-abstract-14', tone: 'bg-blue-50 text-blue-600' },
+    { label: 'Sleep', value: '7.8 hrs', hint: 'On target for recovery-supportive volume.', icon: 'ki-moon', tone: 'bg-violet-50 text-violet-600' },
+    { label: 'HRV trend', value: '+2.1 ms', hint: '7-day average is stable and improving.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
+  ]
 
   const lineOpts = {
     chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
@@ -75,25 +151,48 @@ function AthleteDash({ name }: { name: string }) {
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
-
-      {/* ── PROFILE CARD ── */}
-      <AthleteProfileCard />
-
-      {/* Page header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
-            USER_00011 · WHOOP Live
-          </p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">
-            Good morning, {name.split(' ')[0]} 🏃
-          </h2>
+      <Surface className="p-5 md:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
+            Athlete View
+          </span>
+          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            WHOOP Live
+          </span>
+          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Updated 6m ago
+          </span>
         </div>
-        <RecoveryRing score={42} size={100} />
-      </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
+        <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Daily pulse</p>
+            <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
+              Good morning, {firstName}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+              Recovery is at 42%. Today favors control over intensity, with an easy aerobic ceiling and a clear stop point if strain jumps.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
+            <RecoveryRing score={42} size={96} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Readiness</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">42 / 100</p>
+              <p className="mt-1 text-xs text-muted-foreground">Best fit: recovery or low-stress aerobic work.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <SmallSignal label="Sleep" value="7.8 hrs" hint="Enough to support a stable training day." icon="ki-moon" tone="bg-violet-50 text-violet-600" />
+          <SmallSignal label="Load ceiling" value="Moderate" hint="Protect the day by keeping volume controlled." icon="ki-abstract-31" tone="bg-orange-50 text-orange-600" />
+          <SmallSignal label="HRV trend" value="47 ms" hint="Still above the week average and holding." icon="ki-abstract-26" tone="bg-blue-50 text-blue-600" />
+        </div>
+      </Surface>
+
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
         <StatCard
           label="Avg HRV"
           value={47.2} unit="ms"
@@ -106,93 +205,128 @@ function AthleteDash({ name }: { name: string }) {
           value={45.8} unit="bpm"
           icon="ki-heart" iconBg="bg-red-50 text-red-500"
           delta={-3}
-          sparkData={[48,47,46,47,45,46,46]} sparkColor="#EF4444"
+          sparkData={[48, 47, 46, 47, 45, 46, 46]} sparkColor="#EF4444"
         />
         <StatCard
           label="Avg Sleep"
           value={7.8} unit="hrs"
           icon="ki-moon" iconBg="bg-violet-50 text-violet-600"
-          sparkData={[7.2,8.1,7.5,8.3,7.8,8.0,7.8]} sparkColor="#7C3AED"
+          sparkData={[7.2, 8.1, 7.5, 8.3, 7.8, 8.0, 7.8]} sparkColor="#7C3AED"
         />
         <StatCard
           label="Cal / Day"
           value="3,415" unit="kcal"
           icon="ki-abstract-31" iconBg="bg-orange-50 text-orange-500"
           delta={5}
-          sparkData={[3100,3400,3200,3500,3350,3600,3415]} sparkColor="#F97316"
+          sparkData={[3100, 3400, 3200, 3500, 3350, 3600, 3415]} sparkColor="#F97316"
         />
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        {/* Strain + HRV line chart */}
-        <div className="xl:col-span-2 bg-card border border-border rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">Weekly Strain & HRV</h3>
-              <p className="text-2xs text-muted-foreground mt-0.5">Last 7 days vs baseline</p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-2xs font-semibold text-orange-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-              This week
-            </span>
-          </div>
-          <ApexChart
-            type="line"
-            series={[
-              { name: 'Strain', data: strain7d },
-              { name: 'HRV (ms)', data: hrv7d },
-            ]}
-            options={lineOpts}
-            height={200}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Training signal"
+            title="Weekly strain and HRV"
+            subtitle="A single chart, two metrics, and the context coaches usually need first."
+            action={(
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                This week
+              </span>
+            )}
           />
-        </div>
-
-        {/* Recovery ring + metrics */}
-        <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4">
-          <h3 className="text-sm font-semibold text-foreground">Today's Recovery</h3>
-          <div className="flex items-center justify-center">
-            <RecoveryRing score={42} size={120} />
+          <div className="mt-4">
+            <ApexChart
+              type="line"
+              series={[
+                { name: 'Strain', data: strain7d },
+                { name: 'HRV (ms)', data: hrv7d },
+              ]}
+              options={lineOpts}
+              height={220}
+            />
           </div>
-          <div className="space-y-2.5">
+        </Surface>
+
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Insight"
+            title="Today’s focus"
+            subtitle="Keep load controlled and let recovery lead the day."
+          />
+          <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50/60 p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">Primary action: stay aerobic</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Recovery is mid-range, HRV is stable, and strain has been swinging enough to justify a calmer session.
+                </p>
+              </div>
+              <span className="inline-flex shrink-0 items-center rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
+                Moderate
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 space-y-3">
+            {athleteSignals.map(signal => (
+              <SmallSignal key={signal.label} {...signal} />
+            ))}
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-3">
             {[
-              { label: 'Sleep Quality', val: '72%', color: '#F97316' },
-              { label: 'HRV Score',     val: '47 ms', color: '#2563EB' },
-              { label: 'Resting HR',    val: '46 bpm', color: '#EF4444' },
-            ].map(m => (
-              <div key={m.label} className="flex items-center justify-between">
-                <span className="text-2sm text-muted-foreground">{m.label}</span>
-                <span className="text-2sm font-semibold text-foreground">{m.val}</span>
+              { label: 'Sleep debt', value: 'Low', color: 'text-emerald-600' },
+              { label: 'Session cap', value: '45-60m', color: 'text-foreground' },
+              { label: 'Risk', value: 'Manageable', color: 'text-orange-600' },
+            ].map(item => (
+              <div key={item.label} className="rounded-xl border border-border bg-background/70 p-3 text-center">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</div>
+                <div className={`pf-num mt-2 text-lg font-semibold ${item.color}`}>{item.value}</div>
               </div>
             ))}
           </div>
-        </div>
+        </Surface>
       </div>
 
-      {/* Recent Sessions */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-foreground">Recent Sessions</h3>
-          <a href="/diary" className="text-2xs font-semibold text-orange-500 hover:text-orange-600 transition-colors">View all →</a>
-        </div>
-        <div className="divide-y divide-border">
-          {DEMO_SESSIONS.slice(0, 5).map((s, i) => (
-            <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/50 transition-colors">
-              <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
-                <i className="ki-filled ki-abstract-26 text-orange-500 text-sm" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-foreground truncate">{s.type}</div>
-                <div className="text-2xs text-muted-foreground">{s.dur} min · {s.date}</div>
-              </div>
-              <ZoneBar zones={s.z} height={28} />
-              <div className="text-right shrink-0">
-                <div className="text-sm font-bold text-foreground pf-num">{s.strain}</div>
-                <div className="text-2xs text-muted-foreground">strain</div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+        <Surface className="p-0">
+          <div className="border-b border-border px-5 py-4 md:px-6">
+            <SectionHeader
+              eyebrow="Profile"
+              title="Athlete snapshot"
+              subtitle="Keep the richer profile card visible, but out of the hero rail."
+            />
+          </div>
+          <div className="p-3 md:p-4">
+            <AthleteProfileCard />
+          </div>
+        </Surface>
+
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Activity"
+            title="Recent sessions"
+            subtitle="Clean rhythm, readable details, and the strain number last."
+            action={(
+              <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
+                View all →
+              </a>
+            )}
+          />
+          <div className="mt-4 space-y-3">
+            {DEMO_SESSIONS.slice(0, 5).map((s, i) => (
+              <ActivityRow
+                key={i}
+                title={s.type}
+                meta={`${s.dur} min · ${s.date}`}
+                strain={s.strain}
+                zones={s.z}
+                iconBg="bg-orange-50"
+                icon="ki-abstract-26"
+                accent="text-orange-500"
+              />
+            ))}
+          </div>
+        </Surface>
       </div>
     </div>
   )
@@ -200,6 +334,7 @@ function AthleteDash({ name }: { name: string }) {
 
 // ──────────────────────────────────────────────
 function CoachDash({ name }: { name: string }) {
+  const firstName = name.split(' ')[0]
   const barOpts = {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
@@ -212,88 +347,168 @@ function CoachDash({ name }: { name: string }) {
   }
 
   const athletes = [
-    { name: 'Sara Kowalski',   sport: 'Running',        recovery: 42, hrv: 47.2, status: 'warning' },
-    { name: 'Marcus Weiden',   sport: 'Cycling',        recovery: 82, hrv: 62.2, status: 'good' },
-    { name: 'James Thornton',  sport: 'Swimming',       recovery: 63, hrv: 32.0, status: 'ok' },
-    { name: 'Linh Nguyen',     sport: 'Weight Training',recovery: 80, hrv: 106.5,status: 'good' },
+    { name: 'Sara Kowalski', sport: 'Running', recovery: 42, hrv: 47.2, status: 'warning' },
+    { name: 'Marcus Weiden', sport: 'Cycling', recovery: 82, hrv: 62.2, status: 'good' },
+    { name: 'James Thornton', sport: 'Swimming', recovery: 63, hrv: 32.0, status: 'ok' },
+    { name: 'Linh Nguyen', sport: 'Weight Training', recovery: 80, hrv: 106.5, status: 'good' },
+  ]
+
+  const watchlist = athletes.filter(a => a.recovery < 70)
+  const coachSignals = [
+    { label: 'Today', value: '3 active sessions', hint: 'Enough volume for the roster without crowding recovery.', icon: 'ki-calendar', tone: 'bg-blue-50 text-blue-600' },
+    { label: 'Alert load', value: '1 athlete', hint: 'One athlete needs a stricter cap before the next block.', icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
+    { label: 'Avg recovery', value: '67%', hint: 'The group is usable, but not yet ready for aggressive work.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
   ]
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
-      <div>
-        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Coach View</p>
-        <h2 className="pf-num text-[36px] text-foreground leading-none">
-          Welcome back, {name.split(' ')[0]} 👋
-        </h2>
-      </div>
+      <Surface className="p-5 md:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-green-700">
+            Coach View
+          </span>
+          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Team Pulse
+          </span>
+          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            4 athletes in rotation
+          </span>
+        </div>
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
-        {[
-          { label: 'Active Athletes', value: '4',  icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Avg Team Recovery', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
-          { label: 'Sessions Today',   value: '3',  icon: 'ki-calendar',      bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Alerts',           value: '1',  icon: 'ki-notification',  bg: 'bg-red-50 text-red-500' },
-        ].map(c => (
-          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
-                <i className={`ki-filled ${c.icon} text-base`} />
-              </div>
-            </div>
-            <span className="pf-num text-4xl text-foreground">{c.value}</span>
+        <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Coach desk</p>
+            <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
+              Welcome back, {firstName}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+              The team is trending stable, but one athlete still needs tighter load control. Use the day to steer volume, not chase it.
+            </p>
           </div>
+
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
+            <RecoveryRing score={67} size={96} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Team recovery</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">67%</p>
+              <p className="mt-1 text-xs text-muted-foreground">Use as a baseline for session selection today.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {coachSignals.map(signal => (
+            <SmallSignal key={signal.label} {...signal} />
+          ))}
+        </div>
+      </Surface>
+
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
+        {[
+          { label: 'Active Athletes', value: '4', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Avg Team Recovery', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
+          { label: 'Sessions Today', value: '3', icon: 'ki-calendar', bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Alerts', value: '1', icon: 'ki-notification', bg: 'bg-red-50 text-red-500' },
+        ].map(c => (
+          <StatCard
+            key={c.label}
+            label={c.label}
+            value={c.value}
+            icon={c.icon}
+            iconBg={c.bg}
+          />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 bg-card border border-border rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">Athlete Status</h3>
-            <a href="/athletes" className="text-2xs font-semibold text-orange-500 hover:text-orange-600">Manage →</a>
-          </div>
-          <div className="divide-y divide-border">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Roster"
+            title="Athlete status"
+            subtitle="This keeps the team list readable at a glance: recovery first, HRV second, status last."
+            action={(
+              <a href="/athletes" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
+                Manage →
+              </a>
+            )}
+          />
+          <div className="mt-4 space-y-3">
             {athletes.map(a => {
               const rc = recoveryColor(a.recovery)
               const statusIcon = a.status === 'good' ? 'ki-check-circle' : a.status === 'warning' ? 'ki-warning-2' : 'ki-information-2'
               const statusColor = a.status === 'good' ? 'text-green-500' : a.status === 'warning' ? 'text-orange-500' : 'text-blue-500'
               return (
-                <div key={a.name} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/50 transition-colors">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold pf-num" style={{ background: rc + '20', color: rc }}>
-                    {a.name.split(' ').map((n:string) => n[0]).join('')}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-foreground">{a.name}</div>
-                    <div className="text-2xs text-muted-foreground">{a.sport}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="pf-num text-lg leading-none" style={{ color: rc }}>{a.recovery}%</div>
-                    <div className="text-2xs text-muted-foreground">recovery</div>
-                  </div>
-                  <div className="w-28 hidden sm:block">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-2xs text-muted-foreground">HRV</span>
-                      <span className="text-2xs font-bold text-foreground">{a.hrv} ms</span>
+                <div key={a.name} className="rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:bg-accent/40">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold pf-num" style={{ background: rc + '20', color: rc }}>
+                      {a.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
-                    <div className="h-1.5 bg-border rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="text-sm font-semibold text-foreground">{a.name}</div>
+                        <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                          {a.sport}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-2xs text-muted-foreground">HRV {a.hrv} ms · recovery drives the line</div>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border">
+                        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="pf-num text-xl leading-none" style={{ color: rc }}>{a.recovery}%</div>
+                      <i className={`ki-filled ${statusIcon} text-base ${statusColor}`} />
                     </div>
                   </div>
-                  <i className={`ki-filled ${statusIcon} text-base ${statusColor} shrink-0`} />
                 </div>
               )
             })}
           </div>
-        </div>
+        </Surface>
 
-        <div className="bg-card border border-border rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Recovery Distribution</h3>
-          <ApexChart
-            type="bar"
-            series={[{ name: 'Recovery %', data: [42, 82, 63, 80] }]}
-            options={barOpts}
-            height={200}
-          />
+        <div className="grid gap-4">
+          <Surface className="p-5 md:p-6">
+            <SectionHeader
+              eyebrow="Team map"
+              title="Recovery distribution"
+              subtitle="A compact bar view for quick comparison across the roster."
+            />
+            <div className="mt-4">
+              <ApexChart
+                type="bar"
+                series={[{ name: 'Recovery %', data: [42, 82, 63, 80] }]}
+                options={barOpts}
+                height={220}
+              />
+            </div>
+          </Surface>
+
+          <Surface className="p-5 md:p-6">
+            <SectionHeader
+              eyebrow="Watchlist"
+              title="Athletes to adjust"
+              subtitle={`${watchlist.length} athlete${watchlist.length === 1 ? '' : 's'} are below the preferred recovery band.`}
+            />
+            <div className="mt-4 space-y-3">
+              {watchlist.map(a => {
+                const rc = recoveryColor(a.recovery)
+                return (
+                  <div key={a.name} className="rounded-xl border border-border bg-background/70 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-foreground">{a.name}</div>
+                        <div className="mt-1 text-2xs text-muted-foreground">{a.sport} · HRV {a.hrv} ms</div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="pf-num text-lg leading-none" style={{ color: rc }}>{a.recovery}%</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">recovery</div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </Surface>
         </div>
       </div>
     </div>
@@ -302,60 +517,113 @@ function CoachDash({ name }: { name: string }) {
 
 // ──────────────────────────────────────────────
 function AdminDash({ name }: { name: string }) {
+  const firstName = name.split(' ')[0]
+
   return (
     <div className="flex flex-col gap-6 pf-enter">
-      <div>
-        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
-        <h2 className="pf-num text-[36px] text-foreground leading-none">System Overview</h2>
-      </div>
-
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
-        {[
-          { label: 'Total Users',    value: '3',      icon: 'ki-people',       bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Athletes',       value: '1',      icon: 'ki-abstract-26',  bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Coaches',        value: '1',      icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
-          { label: 'WHOOP Records',  value: '100K',   icon: 'ki-chart-line-up',bg: 'bg-violet-50 text-violet-600' },
-        ].map(c => (
-          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
-                <i className={`ki-filled ${c.icon} text-base`} />
-              </div>
-            </div>
-            <span className="pf-num text-4xl text-foreground">{c.value}</span>
+      <Surface className="p-5 md:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-700">
+            Admin View
+          </span>
+          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            System Overview
+          </span>
+        </div>
+        <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Control room</p>
+            <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
+              Welcome back, {firstName}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+              The system is healthy, user counts are stable, and the platform data still reads as live. Keep an eye on service availability and new registrations.
+            </p>
           </div>
+          <div className="rounded-2xl border border-border bg-background/70 px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Current state</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">Operational</p>
+            <p className="mt-1 text-xs text-muted-foreground">No visible disruptions across the demo stack.</p>
+          </div>
+        </div>
+      </Surface>
+
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
+        {[
+          { label: 'Total Users', value: '3', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Athletes', value: '1', icon: 'ki-abstract-26', bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Coaches', value: '1', icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
+          { label: 'WHOOP Records', value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
+        ].map(c => (
+          <StatCard
+            key={c.label}
+            label={c.label}
+            value={c.value}
+            icon={c.icon}
+            iconBg={c.bg}
+          />
         ))}
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-foreground">System Health</h3>
-        </div>
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { label: 'Supabase DB',       status: 'Online',  color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
-            { label: 'WHOOP Data Sync',   status: 'Active',  color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
-            { label: 'Auth Service',      status: 'Healthy', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
-          ].map(s => (
-            <div key={s.label} className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
-              <span className={`w-2 h-2 rounded-full ${s.color} shrink-0`} />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-foreground">{s.label}</div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_0.9fr]">
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Status"
+            title="System health"
+            subtitle="A short, high-clarity status block for the most important platform services."
+          />
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Supabase DB', status: 'Online', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+              { label: 'WHOOP Data Sync', status: 'Active', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+              { label: 'Auth Service', status: 'Healthy', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+            ].map(s => (
+              <div key={s.label} className="flex items-center gap-3 rounded-xl border border-border bg-background/70 p-3">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${s.color}`} />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-foreground">{s.label}</div>
+                </div>
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-2xs font-semibold ${s.badge}`}>
+                  {s.status}
+                </span>
               </div>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold border ${s.badge}`}>
-                {s.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </Surface>
 
-      <div className="flex justify-center">
-        <a href="/admin" className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-setting-2 text-sm" />
-          Go to Admin Panel
-        </a>
+        <Surface className="p-5 md:p-6">
+          <SectionHeader
+            eyebrow="Ops"
+            title="Recent admin actions"
+            subtitle="Keep the operational trail compact and easy to scan."
+          />
+          <div className="mt-4 space-y-3">
+            {[
+              { label: 'New user sync', value: '3 accounts confirmed', meta: 'Latest onboarding window looks clean.', tone: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
+              { label: 'Data feed', value: 'WHOOP import stable', meta: 'No missing sessions in the current demo set.', tone: 'bg-green-50 text-green-600', icon: 'ki-chart-line-up' },
+              { label: 'Audit trail', value: 'Role mapping intact', meta: 'Athlete and coach roles remain unchanged.', tone: 'bg-violet-50 text-violet-600', icon: 'ki-lock' },
+            ].map(item => (
+              <div key={item.label} className="rounded-2xl border border-border bg-background/70 p-3">
+                <div className="flex items-start gap-3">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.tone}`}>
+                    <i className={`ki-filled ${item.icon} text-sm`} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                    <div className="mt-1 text-xs font-medium text-foreground">{item.value}</div>
+                    <div className="mt-1 text-2xs text-muted-foreground">{item.meta}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <a href="/admin" className="kt-btn kt-btn-primary w-full justify-center gap-2">
+              <i className="ki-filled ki-setting-2 text-sm" />
+              Go to Admin Panel
+            </a>
+          </div>
+        </Surface>
       </div>
     </div>
   )
@@ -367,9 +635,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+          <div className="pf-spin h-8 w-8 rounded-full border-2 border-orange-500 border-t-transparent" />
           <span className="text-2sm text-muted-foreground">Loading your data…</span>
         </div>
       </div>
