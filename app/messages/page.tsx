@@ -392,86 +392,166 @@ export default function MessengerPage() {
 
   const filtered = chats.filter(c => (c.other_user.name || c.other_user.email).toLowerCase().includes(search.toLowerCase()))
   const totalUnread = chats.reduce((s, c) => s + c.unread_count, 0)
+  const activeChats = chats.length
+  const visibleChats = filtered.length
+  const hasUnread = totalUnread > 0
   const currentUser: ChatUser = { id: user.id, name: user.name ?? user.email ?? '', email: user.email ?? '', role: user.role ?? '' }
 
   return (
-    <div className="flex flex-col gap-6 pf-enter">
+    <div className="flex flex-col gap-5 pf-enter">
+      <div className="overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-orange-50 via-background to-background shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+        <div className="flex flex-col gap-5 px-5 py-5 md:px-6 md:py-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
+                Коммуникация
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                {activeChats} диалогов
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                {visibleChats} в списке
+              </span>
+            </div>
 
-      {/* Header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard"
-            style={{ width: 38, height: 38, borderRadius: 11, border: '1px solid var(--border)', background: 'var(--card)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', flexShrink: 0, transition: 'all 0.15s' }}
-            className="hover:bg-orange-50 hover:border-orange-200">
-            <i className="ki-filled ki-arrow-left text-muted-foreground text-sm" />
-          </Link>
-          <div>
-            <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-0.5">Общение</p>
-            <div className="flex items-center gap-2.5">
-              <h2 className="pf-num text-[34px] text-foreground leading-none">Сообщения</h2>
-              {totalUnread > 0 && (
-                <span style={{ padding: '3px 10px', borderRadius: 20, background: 'linear-gradient(135deg,#f97316,#ea580c)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 2px 10px rgba(249,115,22,0.4)' }}>
-                  {totalUnread}
-                </span>
-              )}
+            <div className="mt-4 flex items-start gap-3">
+              <Link
+                href="/dashboard"
+                style={{ width: 40, height: 40, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', flexShrink: 0, transition: 'all 0.15s' }}
+                className="hover:bg-orange-50 hover:border-orange-200"
+              >
+                <i className="ki-filled ki-arrow-left text-muted-foreground text-sm" />
+              </Link>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 className="text-[clamp(2.15rem,4.4vw,3.4rem)] font-semibold tracking-tight text-foreground leading-none">
+                    Сообщения
+                  </h2>
+                  {hasUnread && (
+                    <span style={{ padding: '4px 10px', borderRadius: 999, background: 'linear-gradient(135deg,#f97316,#ea580c)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 6px 18px rgba(249,115,22,0.28)' }}>
+                      {totalUnread}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Рабочее пространство для быстрых ответов, новых диалогов и контроля непрочитанных без лишнего шума.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 xl:min-w-[320px]">
+            <div className="rounded-2xl border border-border bg-background/80 px-4 py-3">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Текущее состояние</div>
+              <div className="mt-2 flex items-end justify-between gap-3">
+                <div>
+                  <div className="text-lg font-semibold text-foreground">{hasUnread ? 'Есть новые сообщения' : 'Входящих нет'}</div>
+                  <div className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {hasUnread ? 'Непрочитанные выделены в списке и обновляются в реальном времени.' : 'Можно начать новый диалог или открыть существующий чат.'}
+                  </div>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
+                  <i className={`ki-filled ${hasUnread ? 'ki-notification-on' : 'ki-message-text-2'} text-xl`} />
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2 justify-center">
+              <i className="ki-filled ki-message-add text-sm" />
+              Новый чат
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Всего диалогов</div>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div className="pf-num text-[30px] leading-none text-foreground">{activeChats}</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <i className="ki-filled ki-message-text-2 text-sm" />
             </div>
           </div>
         </div>
-        <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-message-add text-sm" />
-          Новый чат
-        </button>
+        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Непрочитанные</div>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div className="pf-num text-[30px] leading-none text-foreground">{totalUnread}</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+              <i className="ki-filled ki-notification-on text-sm" />
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активные чаты</div>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div className="pf-num text-[30px] leading-none text-foreground">{visibleChats}</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <i className="ki-filled ki-abstract-26 text-sm" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Search */}
-      <div style={{ position: 'relative', maxWidth: 380 }}>
+      <div className="relative max-w-md">
         <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 14 }} />
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
           placeholder="Поиск по имени…"
-          className="w-full rounded-2xl border border-input text-sm outline-none bg-card"
+          className="w-full rounded-2xl border border-input bg-card text-sm outline-none"
           style={{ padding: '11px 14px 11px 38px', transition: 'border-color 0.15s' }}
           onFocus={e => e.currentTarget.style.borderColor = '#f97316'}
           onBlur={e => e.currentTarget.style.borderColor = ''}
         />
       </div>
 
-      {/* Chat cards */}
       {loading ? (
-        <div className="flex items-center justify-center py-24">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-9 h-9 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-2xs text-muted-foreground font-medium">Загрузка чатов…</span>
+        <div className="rounded-[24px] border border-border bg-card px-6 py-20 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
+              <div className="w-9 h-9 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-foreground">Загружаем переписку</div>
+              <div className="mt-1 text-xs leading-5 text-muted-foreground">Подтягиваем чаты, последнее сообщение и непрочитанные обновления.</div>
+            </div>
           </div>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-card border border-border rounded-2xl" style={{ padding: '64px 24px', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: 22, background: 'linear-gradient(135deg,#fff7ed,#ffedd5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px' }}>
-            💬
+        <div className="rounded-[24px] border border-border bg-card px-6 py-16 text-center shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-3xl">
+            {search ? <i className="ki-filled ki-search-list text-orange-500 text-2xl" /> : <i className="ki-filled ki-message-text-2 text-orange-500 text-2xl" />}
           </div>
-          <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--foreground)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '16px 0 6px', letterSpacing: '-0.02em' }}>
             {search ? 'Ничего не найдено' : 'Пока нет сообщений'}
           </h3>
-          <p style={{ fontSize: 13, color: 'var(--muted-foreground)', margin: '0 0 20px', lineHeight: 1.5 }}>
-            {search ? 'Попробуйте изменить запрос' : 'Начни диалог с тренером или атлетом'}
+          <p style={{ fontSize: 13, color: 'var(--muted-foreground)', margin: '0 auto 22px', lineHeight: 1.6, maxWidth: 320 }}>
+            {search ? 'Попробуйте изменить запрос или очистить фильтр.' : 'Создайте первый чат, чтобы начать переписку с тренером или атлетом.'}
           </p>
           {!search && (
             <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2">
-              <i className="ki-filled ki-plus text-sm" />Создать первый чат
+              <i className="ki-filled ki-plus text-sm" />
+              Создать первый чат
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 2xl:grid-cols-3">
           {filtered.map(c => {
             const color = getColor(c.other_user.name || c.other_user.email || '?')
+            const preview = c.last_message ?? 'Нет сообщений — начните диалог'
             return (
-              <button key={c.id} onClick={() => setActiveChat(c)}
-                className="bg-card border border-border rounded-2xl text-left group transition-all hover:shadow-md"
-                style={{ cursor: 'pointer', padding: 0, overflow: 'hidden' }}>
-                {/* Color bar */}
-                <div style={{ height: 4, background: `linear-gradient(90deg, ${color}, ${color}60)`, opacity: c.unread_count > 0 ? 1 : 0.4, transition: 'opacity 0.2s' }} className="group-hover:opacity-100" />
+              <button
+                key={c.id}
+                onClick={() => setActiveChat(c)}
+                className="group overflow-hidden rounded-[24px] border border-border bg-card text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+                style={{ cursor: 'pointer', padding: 0 }}
+              >
+                <div style={{ height: 4, background: `linear-gradient(90deg, ${color}, ${color}60)`, opacity: c.unread_count > 0 ? 1 : 0.38, transition: 'opacity 0.2s' }} className="group-hover:opacity-100" />
                 <div style={{ padding: '16px 18px 18px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+                  <div className="flex items-start gap-3">
                     <div style={{ position: 'relative' }}>
                       <Avatar name={c.other_user.name || c.other_user.email} size={48} ring={c.unread_count > 0} />
                       {c.unread_count > 0 && (
@@ -489,35 +569,70 @@ export default function MessengerPage() {
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginBottom: 3 }}>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>
-                          {c.other_user.name || c.other_user.email}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em', display: 'block' }}>
+                            {c.other_user.name || c.other_user.email}
+                          </span>
+                          <span style={{ marginTop: 3, fontSize: 11, color, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.8 }} />
+                            {c.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 10, color: 'var(--muted-foreground)', flexShrink: 0, marginTop: 1 }}>
+                          {fmtTime(c.updated_at)}
                         </span>
-                        <span style={{ fontSize: 10, color: 'var(--muted-foreground)', flexShrink: 0 }}>{fmtTime(c.updated_at)}</span>
                       </div>
-                      <span style={{ fontSize: 11, color, fontWeight: 600 }}>
-                        {c.other_user.role === 'coach' ? '🏋️ Тренер' : '🏃 Атлет'}
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Last message */}
-                  <div style={{
-                    padding: '9px 12px', borderRadius: 12,
-                    background: c.unread_count > 0 ? `${color}10` : 'var(--accent)',
-                    border: c.unread_count > 0 ? `1px solid ${color}20` : '1px solid transparent',
-                    fontSize: 12.5, color: c.unread_count > 0 ? 'var(--foreground)' : 'var(--muted-foreground)',
-                    fontWeight: c.unread_count > 0 ? 600 : 400,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    marginBottom: 12,
-                  }}>
-                    {c.last_message ?? 'Нет сообщений — начните диалог'}
-                  </div>
+                      <div
+                        style={{
+                          padding: '9px 12px',
+                          borderRadius: 14,
+                          background: c.unread_count > 0 ? `${color}10` : 'var(--accent)',
+                          border: c.unread_count > 0 ? `1px solid ${color}20` : '1px solid transparent',
+                          fontSize: 12.5,
+                          color: c.unread_count > 0 ? 'var(--foreground)' : 'var(--muted-foreground)',
+                          fontWeight: c.unread_count > 0 ? 600 : 400,
+                          lineHeight: 1.55,
+                          overflow: 'hidden',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          minHeight: 46,
+                          marginBottom: 12,
+                        }}
+                      >
+                        {preview}
+                      </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 12, color: '#f97316', fontWeight: 700 }}>Открыть</span>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#f97316,#ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transform: 'translateX(-4px)', transition: 'all 0.2s' }} className="group-hover:opacity-100 group-hover:translate-x-0">
-                      <i className="ki-filled ki-arrow-right text-white text-xs" />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ fontSize: 12, color: 'var(--muted-foreground)', fontWeight: 600 }}>
+                          {c.unread_count > 0 ? 'Новые сообщения ждут' : 'Открыть диалог'}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {c.unread_count > 0 && (
+                            <span style={{
+                              minWidth: 20,
+                              height: 20,
+                              borderRadius: 999,
+                              padding: '0 6px',
+                              background: 'linear-gradient(135deg,#f97316,#ea580c)',
+                              color: 'white',
+                              fontSize: 10,
+                              fontWeight: 800,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 4px 12px rgba(249,115,22,0.28)',
+                            }}>
+                              {c.unread_count > 99 ? '99+' : c.unread_count}
+                            </span>
+                          )}
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#f97316,#ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transform: 'translateX(-4px)', transition: 'all 0.2s' }} className="group-hover:opacity-100 group-hover:translate-x-0">
+                            <i className="ki-filled ki-arrow-right text-white text-xs" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

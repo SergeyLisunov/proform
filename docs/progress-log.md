@@ -43,3 +43,10 @@
 - Re-verified the fourth pass with:
   - `./node_modules/.bin/eslint app/auth/register/page.tsx`
   - `npm run build`
+- Completed the fifth workflow pass:
+  - upgraded the messages workspace shell with a stronger hero, clearer chat-list hierarchy, and better empty/loading presentation
+  - redesigned the athletes screen into a more intentional coach workspace with clearer list/detail separation and stronger athlete detail hierarchy
+  - preserved chat realtime/unread flow and current athlete demo-driven interactions
+- Re-verified the fifth pass with:
+  - `./node_modules/.bin/eslint app/messages/page.tsx app/athletes/page.tsx`
+  - `npm run build`
