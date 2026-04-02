@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useToast } from '@/lib/hooks/useToast'
 import { useUser } from '@/lib/hooks/useUser'
 import { getMyOrg } from '@/services/org.service'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
@@ -17,6 +18,7 @@ const POST_TYPES: PostType[] = ['announcement', 'event', 'news', 'result']
 
 export default function OrgWallPage() {
   const { user, loading: userLoading } = useUser()
+  const { warning } = useToast()
   const [org, setOrg] = useState<Organization | null>(null)
   const [posts, setPosts] = useState<WallPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -70,7 +72,7 @@ export default function OrgWallPage() {
   async function handleTogglePin(post: WallPost) {
     const pinnedCount = posts.filter(p => p.is_pinned).length
     if (!post.is_pinned && pinnedCount >= 5) {
-      alert('Максимум 5 закреплённых публикаций.')
+      warning('Максимум 5 закреплённых публикаций.')
       return
     }
     await togglePin(post.id, !post.is_pinned)

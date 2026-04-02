@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
+import { useToast } from '@/lib/hooks/useToast'
 import Link from 'next/link'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
@@ -36,6 +37,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
 }) {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
+  const { error: toastError } = useToast()
   const [zoom, setZoom] = useState(1)
   const [saving, setSaving] = useState(false)
   const canvasRef  = useRef<HTMLCanvasElement>(null)
@@ -148,7 +150,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
         c.toBlob(b => b ? res(b) : rej(new Error('blob failed')), 'image/jpeg', 0.92))
       onCropped(new File([blob], file.name, { type: 'image/jpeg' }))
       handleClose()
-    } catch (e) { console.error(e); alert('Ошибка кадрирования') }
+    } catch (e) { console.error(e); toastError('Ошибка кадрирования') }
     finally { setSaving(false) }
   }
 
@@ -277,6 +279,7 @@ function UploadBtn({ onFile, children, accept = 'image/*' }: {
 // ── Main Card ──────────────────────────────────────────────────────────────────
 export default function AthleteProfileCard() {
   const { user } = useUser()
+  const { error: toastError } = useToast()
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [profile, setProfile] = useState<AthleteProfile | null>(null)
   const [stats, setStats] = useState<WorkoutStats>({ total:0, totalMinutes:0, avgStrain:0, thisWeek:0 })
@@ -346,7 +349,7 @@ export default function AthleteProfileCard() {
       setProfile(p => p ? { ...p, avatar_url: urlWithCache } : p)
     } catch (err) {
       console.error('avatar upload error:', err)
-      alert('Ошибка загрузки аватарки')
+      toastError('Ошибка загрузки аватарки')
     } finally {
       setUploadingAvatar(false)
     }
@@ -367,7 +370,7 @@ export default function AthleteProfileCard() {
       setProfile(p => p ? { ...p, background_url: urlWithCache } : p)
     } catch (err) {
       console.error('bg upload error:', err)
-      alert('Ошибка загрузки фона')
+      toastError('Ошибка загрузки фона')
     } finally {
       setUploadingBg(false)
     }

@@ -395,6 +395,9 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   // Загрузка данных
   useEffect(() => {
@@ -486,6 +489,21 @@ export default function SettingsPage() {
       setTimeout(() => setSaveError(null), 5000)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirm !== 'УДАЛИТЬ') return
+    setDeleting(true)
+    try {
+      const sb = getSB()
+      await sb.from('users').update({ deleted_at: new Date().toISOString(), status: 'deletion_requested' } as any).eq('id', user!.id)
+      await sb.auth.signOut()
+      window.location.href = '/auth/login'
+    } catch (e: any) {
+      setSaveError(e?.message ?? 'Ошибка удаления аккаунта')
+      setDeleting(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -800,7 +818,7 @@ export default function SettingsPage() {
               }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEE2E2' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEF2F2' }}
-                onClick={() => alert('Функция в разработке')}>
+                onClick={() => setShowDeleteModal(true)}>
                 <i className="ki-filled ki-trash text-sm" />Удалить аккаунт
               </button>
             </div>
@@ -851,5 +869,47 @@ export default function SettingsPage() {
       </div>
 
     </div>
+
+    {/* Delete account modal */}
+    {showDeleteModal && (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '28px 24px', width: '100%', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 12, background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <i className="ki-filled ki-trash text-xl text-red-500" />
+            </div>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Необратимо</p>
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--foreground)', margin: 0 }}>Удалить аккаунт</h3>
+            </div>
+          </div>
+          <p style={{ fontSize: 13, color: 'var(--muted-foreground)', lineHeight: 1.6, marginBottom: 20 }}>
+            Все ваши данные будут помечены на удаление. Это действие нельзя отменить. Для подтверждения введите <strong style={{ color: '#DC2626' }}>УДАЛИТЬ</strong> в поле ниже.
+          </p>
+          <input
+            type="text"
+            value={deleteConfirm}
+            onChange={e => setDeleteConfirm(e.target.value)}
+            placeholder="Введите УДАЛИТЬ"
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'var(--background)', fontSize: 14, outline: 'none', marginBottom: 16, boxSizing: 'border-box' }}
+          />
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirm !== 'УДАЛИТЬ' || deleting}
+              style={{ flex: 1, padding: '12px 16px', borderRadius: 12, border: 'none', background: deleteConfirm === 'УДАЛИТЬ' ? '#DC2626' : '#F1F5F9', color: deleteConfirm === 'УДАЛИТЬ' ? 'white' : 'var(--muted-foreground)', fontSize: 14, fontWeight: 700, cursor: deleteConfirm === 'УДАЛИТЬ' ? 'pointer' : 'not-allowed', transition: 'all 0.15s' }}
+            >
+              {deleting ? 'Удаление…' : 'Удалить аккаунт'}
+            </button>
+            <button
+              onClick={() => { setShowDeleteModal(false); setDeleteConfirm('') }}
+              style={{ padding: '12px 20px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: 'var(--foreground)' }}
+            >
+              Отмена
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   )
 }

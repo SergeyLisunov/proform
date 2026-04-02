@@ -1,5 +1,6 @@
 'use client'
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useToast } from '@/lib/hooks/useToast'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -283,7 +284,7 @@ ${Object.keys(byType).length > 1 ? `
 
   // Открываем новое окно и печатаем
   const win = window.open('', '_blank', 'width=900,height=700')
-  if (!win) { alert('Разрешите всплывающие окна для этого сайта'); return }
+  if (!win) { throw new Error('Разрешите всплывающие окна для этого сайта') }
   win.document.write(html)
   win.document.close()
   win.focus()
@@ -293,6 +294,7 @@ ${Object.keys(byType).length > 1 ? `
 // ── Основной компонент экспорта ───────────────────────────────────────────────
 export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
   const { user } = useUser()
+  const { warning } = useToast()
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
 
@@ -393,8 +395,13 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
     const effectiveFrom = mode === 'range' ? fromDate : (manualDates.length > 0 ? [...manualDates].sort()[0] : todayISO())
     const effectiveTo = mode === 'range' ? toDate : (manualDates.length > 0 ? [...manualDates].sort().pop()! : todayISO())
     setTimeout(() => {
-      generatePDF(workouts, effectiveFrom, effectiveTo, user?.name ?? user?.email ?? 'Атлет')
-      setGenerating(false)
+      try {
+        generatePDF(workouts, effectiveFrom, effectiveTo, user?.name ?? user?.email ?? 'Атлет')
+      } catch (e: any) {
+        warning(e?.message ?? 'Ошибка генерации PDF')
+      } finally {
+        setGenerating(false)
+      }
     }, 100)
   }
 

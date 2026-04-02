@@ -185,7 +185,7 @@ export default function OrgPage() {
 
   async function changeStatus(memberId: string, newStatus: MemberStatus) {
     const { error } = await sb().from('org_members').update({ status: newStatus }).eq('id', memberId)
-    if (error) { alert('Ошибка при изменении статуса'); return }
+    if (error) { showToastMsg('Ошибка при изменении статуса'); return }
     setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: newStatus } : m).filter(m => m.status !== 'removed'))
     showToastMsg(newStatus === 'removed' ? 'Участник удалён' : 'Статус обновлён')
   }

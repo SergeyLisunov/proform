@@ -1,44 +1,160 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { useToast } from '@/lib/hooks/useToast'
 
-type AdminTab = 'users' | 'audit' | 'system' | 'privacy'
-
-const USERS = [
-  { email: 'athlete@proform.test', name: 'Sara Kowalski', role: 'athlete', status: 'active', created: '2025-01-15', lastLogin: '2 hours ago' },
-  { email: 'coach@proform.test',   name: 'Alex Trainer',  role: 'coach',   status: 'active', created: '2025-01-10', lastLogin: '1 day ago' },
-  { email: 'admin@proform.test',   name: 'Admin User',    role: 'admin',   status: 'active', created: '2025-01-01', lastLogin: 'Just now' },
-]
-
-const AUDIT = [
-  { actor: 'Sara Kowalski', action: 'login',          target: 'users',    detail: 'Web login',                            time: '2h ago' },
-  { actor: 'Sara Kowalski', action: 'create',         target: 'workouts', detail: 'Running 62 min',                       time: '2h ago' },
-  { actor: 'Sara Kowalski', action: 'update',         target: 'workouts', detail: 'is_public → true',                     time: '3h ago' },
-  { actor: 'Sara Kowalski', action: 'privacy_change', target: 'athletes', detail: 'workouts → coaches_only',              time: '1d ago' },
-  { actor: 'Alex Trainer',  action: 'create',         target: 'observation_diary', detail: 'Note: Back on Track',         time: '1d ago' },
-  { actor: 'Admin User',    action: 'role_change',    target: 'users',    detail: 'Sara: athlete role confirmed',          time: '5d ago' },
-]
-
-const ROLE_BADGE: Record<string, string> = {
-  athlete: 'bg-orange-50 text-orange-600 border border-orange-200',
-  coach:   'bg-green-50 text-green-600 border border-green-200',
-  admin:   'bg-violet-50 text-violet-600 border border-violet-200',
+function getSB() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 }
 
-const ACTION_BADGE: Record<string, string> = {
-  login:          'bg-blue-50 text-blue-600',
-  create:         'bg-green-50 text-green-600',
-  update:         'bg-orange-50 text-orange-600',
-  privacy_change: 'bg-violet-50 text-violet-600',
-  role_change:    'bg-red-50 text-red-600',
-  delete:         'bg-red-50 text-red-600',
+type AdminTab = 'users' | 'audit' | 'system'
+
+type DBUser = {
+  id: string
+  name: string | null
+  email: string | null
+  role: string
+  created_at: string
+}
+
+type RecentActivity = {
+  id: string
+  actor: string
+  action: string
+  detail: string
+  table_name: string
+  created_at: string
+}
+
+const ROLE_BADGE: Record<string, string> = {
+  athlete:      'bg-orange-50 text-orange-600 border border-orange-200',
+  coach:        'bg-green-50 text-green-600 border border-green-200',
+  admin:        'bg-violet-50 text-violet-600 border border-violet-200',
+  organization: 'bg-blue-50 text-blue-600 border border-blue-200',
+}
+
+const ROLE_LABEL: Record<string, string> = {
+  athlete: 'Атлет', coach: 'Тренер', admin: 'Администратор', organization: 'Организация',
+}
+
+function initials(name: string | null, email: string | null) {
+  const src = name || email || '?'
+  return src.split(/[\s@]/).map(p => p[0]).join('').slice(0, 2).toUpperCase()
+}
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export default function AdminPage() {
   const { user } = useUser()
+  const { success, error: toastError } = useToast()
   const [tab, setTab] = useState<AdminTab>('users')
+
+  // Users tab
+  const [users, setUsers] = useState<DBUser[]>([])
+  const [usersLoading, setUsersLoading] = useState(true)
+  const [changingRole, setChangingRole] = useState<string | null>(null)
+
+  // Stats
+  const [stats, setStats] = useState({ total: 0, athletes: 0, coaches: 0, workouts: 0 })
+
+  // Activity
+  const [activity, setActivity] = useState<RecentActivity[]>([])
+  const [actLoading, setActLoading] = useState(false)
+
+  // Assign modal
   const [showAssign, setShowAssign] = useState(false)
+  const [assignAthlete, setAssignAthlete] = useState('')
+  const [assignCoach, setAssignCoach] = useState('')
+  const [assigning, setAssigning] = useState(false)
+
+  const loadUsers = useCallback(async () => {
+    setUsersLoading(true)
+    const sb = getSB()
+    const { data, error } = await sb
+      .from('users')
+      .select('id, name, email, role, created_at')
+      .order('created_at', { ascending: false })
+    if (error) { console.error(error); setUsersLoading(false); return }
+    const list = (data ?? []) as DBUser[]
+    setUsers(list)
+    setStats({
+      total: list.length,
+      athletes: list.filter(u => u.role === 'athlete').length,
+      coaches: list.filter(u => u.role === 'coach').length,
+      workouts: 0, // loaded separately
+    })
+    setUsersLoading(false)
+  }, [])
+
+  const loadWorkoutCount = useCallback(async () => {
+    const sb = getSB()
+    const { count } = await sb.from('workouts').select('*', { count: 'exact', head: true })
+    setStats(prev => ({ ...prev, workouts: count ?? 0 }))
+  }, [])
+
+  const loadActivity = useCallback(async () => {
+    setActLoading(true)
+    const sb = getSB()
+    // Show recent workouts as activity feed
+    const { data } = await sb
+      .from('workouts')
+      .select('id, activity_type, event_date, created_at, athlete_id, users!workouts_athlete_id_fkey(name, email)')
+      .order('created_at', { ascending: false })
+      .limit(30)
+    const items: RecentActivity[] = (data ?? []).map((w: any) => ({
+      id: w.id,
+      actor: w.users?.name ?? w.users?.email ?? 'Атлет',
+      action: 'create',
+      detail: `${w.activity_type ?? 'Тренировка'} · ${w.event_date}`,
+      table_name: 'workouts',
+      created_at: w.created_at,
+    }))
+    setActivity(items)
+    setActLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return
+    loadUsers()
+    loadWorkoutCount()
+  }, [user, loadUsers, loadWorkoutCount])
+
+  useEffect(() => {
+    if (tab === 'audit' && activity.length === 0) loadActivity()
+  }, [tab, activity.length, loadActivity])
+
+  async function changeRole(userId: string, newRole: string) {
+    setChangingRole(userId)
+    const sb = getSB()
+    const { error } = await sb.from('users').update({ role: newRole }).eq('id', userId)
+    if (error) { toastError('Ошибка смены роли'); setChangingRole(null); return }
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    success('Роль обновлена')
+    setChangingRole(null)
+  }
+
+  async function handleAssign() {
+    if (!assignAthlete || !assignCoach) return
+    setAssigning(true)
+    const sb = getSB()
+    const { error } = await sb
+      .from('athletes')
+      .update({ coach_id: assignCoach })
+      .eq('id', assignAthlete)
+    if (error) { toastError('Ошибка назначения тренера'); setAssigning(false); return }
+    success('Тренер назначен')
+    setAssigning(false)
+    setShowAssign(false)
+    setAssignAthlete('')
+    setAssignCoach('')
+  }
 
   if (user?.role !== 'admin') {
     return (
@@ -55,13 +171,13 @@ export default function AdminPage() {
   }
 
   const TABS: { id: AdminTab; label: string; icon: string }[] = [
-    { id: 'users',   label: 'Пользователи',     icon: 'ki-people' },
-    { id: 'privacy', label: 'Приватность',       icon: 'ki-lock' },
-    { id: 'audit',   label: 'Журнал действий',   icon: 'ki-notepad-edit' },
-    { id: 'system',  label: 'Система',           icon: 'ki-setting-2' },
+    { id: 'users',  label: 'Пользователи',   icon: 'ki-people' },
+    { id: 'audit',  label: 'Активность',      icon: 'ki-notepad-edit' },
+    { id: 'system', label: 'Система',         icon: 'ki-setting-2' },
   ]
 
-  // Quick link to /admin/orgs
+  const athletes = users.filter(u => u.role === 'athlete')
+  const coaches  = users.filter(u => u.role === 'coach')
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
@@ -87,17 +203,17 @@ export default function AdminPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 pf-stagger">
         {[
-          { label: 'Всего пользователей', value: '3',    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Активны сегодня',    value: '3',    icon: 'ki-check-circle',  bg: 'bg-green-50 text-green-600' },
-          { label: 'Таблиц БД',          value: '13',   icon: 'ki-data',          bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Записей WHOOP',      value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
+          { label: 'Всего пользователей', value: stats.total,    icon: 'ki-people',        bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Атлетов',             value: stats.athletes, icon: 'ki-abstract-26',   bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Тренеров',            value: stats.coaches,  icon: 'ki-teacher',       bg: 'bg-green-50 text-green-600' },
+          { label: 'Тренировок в БД',     value: stats.workouts, icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
         ].map(c => (
           <div key={c.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${c.bg}`}>
               <i className={`ki-filled ${c.icon} text-base`} />
             </div>
             <div>
-              <div className="pf-num text-2xl text-foreground">{c.value}</div>
+              <div className="pf-num text-2xl text-foreground">{usersLoading ? '…' : c.value}</div>
               <div className="text-2xs text-muted-foreground">{c.label}</div>
             </div>
           </div>
@@ -127,65 +243,55 @@ export default function AdminPage() {
           {tab === 'users' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground">Управление пользователями</h3>
-                <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
-                  <i className="ki-filled ki-plus text-xs" />
-                  Новый пользователь
-                </button>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Управление пользователями
+                  {!usersLoading && <span className="ml-2 text-muted-foreground font-normal">({users.length})</span>}
+                </h3>
               </div>
-              <div className="divide-y divide-border -mx-5">
-                {USERS.map((u, i) => (
-                  <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/40 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center shrink-0 text-sm font-bold pf-num text-foreground">
-                      {u.name.split(' ').map((n:string) => n[0]).join('').slice(0,2)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-foreground">{u.name}</div>
-                      <div className="text-2xs text-muted-foreground font-mono">{u.email}</div>
-                    </div>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold capitalize ${ROLE_BADGE[u.role]}`}>{u.role}</span>
-                    <div className="text-right hidden md:block shrink-0">
-                      <div className="text-2xs text-foreground font-medium">{u.lastLogin}</div>
-                      <div className="text-[9px] text-muted-foreground">последний вход</div>
-                    </div>
-                    <div className="flex gap-1.5 shrink-0">
-                      <button className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline"><i className="ki-filled ki-pencil text-xs" /></button>
-                      <select className="px-2 py-1 rounded-lg border border-border bg-background text-2xs text-muted-foreground outline-none focus:border-orange-400">
-                        <option>Сменить роль</option>
-                        <option>атлет</option>
-                        <option>тренер</option>
-                        <option>администратор</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* PRIVACY TAB */}
-          {tab === 'privacy' && (
-            <div>
-              <div className="text-2xs text-muted-foreground mb-4">Настройки приватности для атлетов. Администраторы могут просматривать и изменять.</div>
-              <div className="space-y-4">
-                {USERS.filter(u => u.role === 'athlete').map(u => (
-                  <div key={u.email} className="p-4 bg-background border border-border rounded-xl">
-                    <div className="text-sm font-semibold text-foreground mb-3">{u.name}</div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {['profile','workouts','metrics','competitions','diary'].map(resource => (
-                        <div key={resource} className="flex items-center justify-between px-3 py-2 bg-card border border-border rounded-lg">
-                          <span className="text-2xs font-medium text-foreground capitalize">{resource}</span>
-                          <select className="px-2 py-0.5 rounded border border-border bg-background text-2xs text-muted-foreground outline-none focus:border-orange-400">
-                            <option value="private">Приватно</option>
-                            <option value="coaches_only">Только тренеры</option>
-                            <option value="public">Публично</option>
+              {usersLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : users.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">Пользователи не найдены</p>
+              ) : (
+                <div className="divide-y divide-border -mx-5">
+                  {users.map(u => (
+                    <div key={u.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/40 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center shrink-0 text-sm font-bold pf-num text-foreground">
+                        {initials(u.name, u.email)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-foreground">{u.name ?? '—'}</div>
+                        <div className="text-2xs text-muted-foreground font-mono">{u.email ?? '—'}</div>
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold ${ROLE_BADGE[u.role] ?? 'bg-border text-muted-foreground'}`}>
+                        {ROLE_LABEL[u.role] ?? u.role}
+                      </span>
+                      <div className="text-right hidden md:block shrink-0">
+                        <div className="text-2xs text-muted-foreground">{fmtDate(u.created_at)}</div>
+                        <div className="text-[9px] text-muted-foreground">создан</div>
+                      </div>
+                      <div className="shrink-0">
+                        {changingRole === u.id ? (
+                          <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <select
+                            value={u.role}
+                            onChange={e => changeRole(u.id, e.target.value)}
+                            className="px-2 py-1 rounded-lg border border-border bg-background text-2xs text-muted-foreground outline-none focus:border-orange-400"
+                          >
+                            <option value="athlete">Атлет</option>
+                            <option value="coach">Тренер</option>
+                            <option value="organization">Организация</option>
+                            <option value="admin">Администратор</option>
                           </select>
-                        </div>
-                      ))}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -193,30 +299,37 @@ export default function AdminPage() {
           {tab === 'audit' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground">Журнал действий</h3>
-                <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
-                  <i className="ki-filled ki-abstract-26 text-xs" />
-                  Экспорт CSV
+                <h3 className="text-sm font-semibold text-foreground">Последняя активность</h3>
+                <button onClick={loadActivity} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+                  <i className="ki-filled ki-arrows-circle text-xs" />
+                  Обновить
                 </button>
               </div>
-              <div className="divide-y divide-border -mx-5">
-                {AUDIT.map((a, i) => (
-                  <div key={i} className="flex items-center gap-4 px-5 py-3 hover:bg-accent/40">
-                    <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 text-2xs font-bold text-foreground pf-num">
-                      {a.actor.split(' ').map((n:string) => n[0]).join('')}
+              {actLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : activity.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">Активности пока нет</p>
+              ) : (
+                <div className="divide-y divide-border -mx-5">
+                  {activity.map(a => (
+                    <div key={a.id} className="flex items-center gap-4 px-5 py-3 hover:bg-accent/40">
+                      <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 text-2xs font-bold text-foreground pf-num">
+                        {initials(a.actor, null)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-2sm font-medium text-foreground">{a.actor}</div>
+                        <div className="text-2xs text-muted-foreground truncate">{a.detail}</div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase bg-green-50 text-green-600">{a.table_name}</span>
+                        <span className="text-2xs text-muted-foreground hidden sm:block">{fmtDate(a.created_at)}</span>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-2sm font-medium text-foreground">{a.actor}</div>
-                      <div className="text-2xs text-muted-foreground truncate">{a.detail}</div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`px-1.5 py-0.5 rounded text-2xs font-bold uppercase ${ACTION_BADGE[a.action] ?? 'bg-border text-muted-foreground'}`}>{a.action.replace('_',' ')}</span>
-                      <span className="text-2xs text-muted-foreground hidden sm:block">{a.target}</span>
-                      <span className="text-2xs text-muted-foreground">{a.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -229,7 +342,7 @@ export default function AdminPage() {
                 { service: 'WHOOP Data Sync',      region: 'eu-central-1', status: 'Активно',  uptime: '99.7%' },
                 { service: 'Vercel Edge',          region: 'Global',       status: 'Работает', uptime: '100%' },
                 { service: 'Row Level Security',   region: 'DB Layer',     status: 'Включено', uptime: '100%' },
-                { service: 'Журнал действий',      region: 'DB Layer',     status: 'Активно',  uptime: '100%' },
+                { service: 'Realtime Messages',    region: 'eu-central-1', status: 'Активно',  uptime: '99.9%' },
               ].map(s => (
                 <div key={s.service} className="flex items-center gap-3 p-3.5 bg-background border border-border rounded-xl">
                   <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
@@ -261,18 +374,34 @@ export default function AdminPage() {
             <div className="flex flex-col gap-3">
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Атлет</label>
-                <select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">
-                  <option>Sara Kowalski (athlete@proform.test)</option>
+                <select
+                  value={assignAthlete}
+                  onChange={e => setAssignAthlete(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400"
+                >
+                  <option value="">— Выбрать атлета —</option>
+                  {athletes.map(a => <option key={a.id} value={a.id}>{a.name ?? a.email}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Тренер</label>
-                <select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">
-                  <option>Alex Trainer (coach@proform.test)</option>
+                <select
+                  value={assignCoach}
+                  onChange={e => setAssignCoach(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400"
+                >
+                  <option value="">— Выбрать тренера —</option>
+                  {coaches.map(c => <option key={c.id} value={c.id}>{c.name ?? c.email}</option>)}
                 </select>
               </div>
               <div className="flex gap-2 pt-1">
-                <button className="flex-1 kt-btn kt-btn-primary">Назначить</button>
+                <button
+                  onClick={handleAssign}
+                  disabled={!assignAthlete || !assignCoach || assigning}
+                  className="flex-1 kt-btn kt-btn-primary"
+                >
+                  {assigning ? 'Назначение…' : 'Назначить'}
+                </button>
                 <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>
             </div>

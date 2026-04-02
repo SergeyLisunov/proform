@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ToastProvider } from '@/lib/hooks/useToast'
 
 export const metadata: Metadata = {
   title: 'ProForm — Training Diary',
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="/assets/css/styles.css" />
       </head>
       <body className="antialiased flex h-full text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
         <script src="/assets/js/core.bundle.js" defer />
       </body>
     </html>
