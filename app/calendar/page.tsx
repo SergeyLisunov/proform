@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { DEMO_SESSIONS, DEMO_COMPETITIONS, EVENT_COLORS, recoveryColor } from '@/lib/utils/data'
 import { ZoneBar } from '@/components/ui/ZoneBar'
@@ -79,6 +79,67 @@ function strainColor(strain: number): string {
   if (strain < 12) return '#93C5FD'
   if (strain < 15) return '#3B82F6'
   return '#1D4ED8'
+}
+
+function SurfaceFrame({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-sm ${className}`}>
+      {children}
+    </div>
+  )
+}
+
+function MetricCard({ label, value, hint, icon, tone, href }: {
+  label: string
+  value: string | number
+  hint: string
+  icon: string
+  tone: string
+  href?: string
+}) {
+  const inner = (
+    <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-colors hover:bg-accent/40">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+        <i className={`ki-filled ${icon} text-base`} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+        <div className="mt-1 flex items-end gap-1.5">
+          <span className="pf-num text-[clamp(1.8rem,3vw,2.45rem)] leading-none text-foreground">{value}</span>
+        </div>
+        <p className="mt-1.5 text-2xs leading-5 text-muted-foreground">{hint}</p>
+      </div>
+    </div>
+  )
+
+  if (href) {
+    return <Link href={href} className="block no-underline">{inner}</Link>
+  }
+
+  return inner
+}
+
+function SegmentedButton({ active, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { active?: boolean }) {
+  return (
+    <button
+      {...props}
+      className={[
+        'inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-2sm font-medium transition-all',
+        active ? 'bg-orange-50 text-orange-600 shadow-sm' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+        props.className ?? '',
+      ].join(' ')}
+    >
+      {children}
+    </button>
+  )
+}
+
+function Tag({ children, tone = 'border-border bg-background text-muted-foreground' }: { children: ReactNode; tone?: string }) {
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${tone}`}>
+      {children}
+    </span>
+  )
 }
 
 // ── DayCell ────────────────────────────────────────────────────────────────────
@@ -877,134 +938,178 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
   const isEmpty = activeCycles.length === 0 && dayEvents.length === 0 && dayWorkouts.length === 0 && !cdcfg
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4 h-full">
-      <div>
-        <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Выбрано</div>
-        <h3 className="pf-num text-xl text-foreground capitalize">{label}</h3>
+    <SurfaceFrame className="flex h-full flex-col">
+      <div className="border-b border-border bg-gradient-to-br from-orange-50/90 via-card to-card px-5 py-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Выбрано</p>
+            <h3 className="mt-1 text-[clamp(1.2rem,2vw,1.45rem)] font-semibold tracking-tight text-foreground capitalize">{label}</h3>
+          </div>
+          <Tag tone="border-orange-200 bg-orange-50 text-orange-700">{dayWorkouts.length + dayEvents.length || 0} items</Tag>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Tag tone="border-border bg-background text-muted-foreground">Циклов {activeCycles.length}</Tag>
+          <Tag tone="border-border bg-background text-muted-foreground">Тренировок {dayWorkouts.length}</Tag>
+          <Tag tone="border-border bg-background text-muted-foreground">Событий {dayEvents.length}</Tag>
+        </div>
       </div>
-      {cdcfg && (
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border" style={{ background: cdcfg.bg, borderColor: cdcfg.color + '40' }}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: cdcfg.color + '20' }}>
-            <i className={`ki-filled ${cdcfg.icon} text-sm`} style={{ color: cdcfg.color }} />
-          </div>
-          <div>
-            <div className="text-2xs font-bold uppercase tracking-wide" style={{ color: cdcfg.color }}>Тип дня</div>
-            <div className="text-sm font-semibold" style={{ color: cdcfg.color }}>{cdcfg.label}</div>
-          </div>
-        </div>
-      )}
-      {activeCycles.length > 0 && (
-        <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Активные циклы</div>
-          <div className="flex flex-col gap-1.5">
-            {activeCycles.map((c, i) => {
-              const cc = CYCLE_TYPE_CFG[c.type]
-              const total = diffDays(c.start_date, c.end_date) + 1
-              const passed = Math.min(total, diffDays(c.start_date, dateStr) + 1)
-              return (
-                <div key={i} onClick={() => onOpenCycle?.(c)}
-                  className="flex flex-col gap-1.5 px-2.5 py-2 rounded-lg border cursor-pointer hover:opacity-80 transition-opacity"
-                  style={{ background: cc.bg, borderColor: cc.border }}>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full" style={{ background: cc.text }} />
-                    <div className="flex-1">
-                      <div className="text-2xs font-bold" style={{ color: cc.text }}>{c.label}</div>
-                      <div className="text-[10px] text-muted-foreground">{cc.label} · {c.start_date} → {c.end_date}</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-2xs font-bold" style={{ color: cc.text }}>{passed}/{total}</span>
-                      <i className="ki-filled ki-right text-[10px]" style={{ color: cc.text }} />
-                    </div>
-                  </div>
-                  <div className="h-1 rounded-full bg-white/60 overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style={{ width: `${(passed/total)*100}%`, background: cc.text }} />
-                  </div>
-                  {c.goal && <div className="text-[10px] text-muted-foreground">Цель: {c.goal}</div>}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
-      {/* ── Реальные тренировки из workouts ── */}
-      {dayWorkouts.length > 0 && (
-        <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тренировки</div>
-          <div className="flex flex-col gap-2">
-            {dayWorkouts.map(w => {
-              const ac = getActivityCfg(w.activity_type)
-              const MOODS = ['😴','😕','😐','🙂','🔥']
-              return (
-                <div key={w.id} className="flex items-start gap-2.5 p-3 rounded-xl border border-border bg-accent/30 hover:bg-accent/60 transition-colors">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: ac.bg }}>
-                    <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.color }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-foreground truncate">{w.name ?? w.activity_type ?? 'Тренировка'}</span>
-                      {w.mood != null && w.mood >= 0 && <span className="text-sm">{MOODS[w.mood]}</span>}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5 flex flex-wrap gap-2">
-                      {w.activity_duration_min && <span>{fmtDur(w.activity_duration_min)}</span>}
-                      {w.activity_calories && <span>{w.activity_calories} ккал</span>}
-                      {w.avg_heart_rate && <span>{w.avg_heart_rate} уд/мин</span>}
-                    </div>
-                  </div>
-                  {w.activity_strain != null && (
-                    <div className="text-right shrink-0">
-                      <div className="pf-num text-xl leading-none font-bold" style={{ color: strainColor(Number(w.activity_strain)) }}>
-                        {Number(w.activity_strain).toFixed(1)}
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        {cdcfg && (
+          <div className="rounded-2xl border px-4 py-3" style={{ background: cdcfg.bg, borderColor: cdcfg.color + '40' }}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: cdcfg.color + '16' }}>
+                <i className={`ki-filled ${cdcfg.icon} text-base`} style={{ color: cdcfg.color }} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: cdcfg.color }}>Тип дня</p>
+                <p className="mt-1 text-sm font-semibold" style={{ color: cdcfg.color }}>{cdcfg.label}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeCycles.length > 0 && (
+          <div className="rounded-2xl border border-border bg-background/70 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активные циклы</p>
+              <span className="text-[11px] font-semibold text-muted-foreground">{activeCycles.length}</span>
+            </div>
+            <div className="mt-3 flex flex-col gap-2.5">
+              {activeCycles.map((c, i) => {
+                const cc = CYCLE_TYPE_CFG[c.type]
+                const total = diffDays(c.start_date, c.end_date) + 1
+                const passed = Math.min(total, diffDays(c.start_date, dateStr) + 1)
+                return (
+                  <button
+                    key={i}
+                    onClick={() => onOpenCycle?.(c)}
+                    className="group flex flex-col gap-2 rounded-2xl border p-3 text-left transition-all hover:shadow-sm"
+                    style={{ background: cc.bg, borderColor: cc.border }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: cc.text }} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-2xs font-bold uppercase tracking-[0.16em]" style={{ color: cc.text }}>{c.label}</div>
+                        <div className="mt-0.5 text-[10px] text-muted-foreground">{cc.label} · {c.start_date} → {c.end_date}</div>
                       </div>
-                      <div className="text-[10px] text-muted-foreground">нагрузка</div>
+                      <div className="flex items-center gap-1 text-[11px] font-bold" style={{ color: cc.text }}>
+                        {passed}/{total}
+                        <i className="ki-filled ki-right text-[10px]" />
+                      </div>
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {dayEvents.length > 0 && (
-        <div>
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">События</div>
-          <div className="flex flex-col gap-1.5">
-            {dayEvents.map(ev => {
-              const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
-              return (
-                <div key={ev.id} onClick={() => onViewEvent?.(ev, 'view')}
-                  className="flex items-start gap-2 px-2.5 py-2 rounded-lg border border-border hover:bg-accent/30 transition-colors group cursor-pointer">
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
-                    <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-2xs font-semibold text-foreground truncate">{ev.title}</div>
-                    {ev.notes && <div className="text-[10px] text-muted-foreground truncate mt-0.5">{ev.notes}</div>}
-                  </div>
-                  <button onClick={e => { e.stopPropagation(); onDeleteEvent(ev.id) }} className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost">
-                    <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                    <div className="h-1.5 overflow-hidden rounded-full bg-white/60">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${(passed / total) * 100}%`, background: cc.text }} />
+                    </div>
+                    {c.goal && <div className="text-[10px] text-muted-foreground">{c.goal}</div>}
                   </button>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
-      )}
-      {isEmpty ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-          <i className="ki-filled ki-calendar text-3xl text-muted-foreground/20 mb-2" />
-          <p className="text-2sm text-muted-foreground">Нет событий</p>
-          <button onClick={() => onAddEvent(dateStr)} className="mt-3 kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+        )}
+
+        {dayWorkouts.length > 0 && (
+          <div className="rounded-2xl border border-border bg-background/70 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Тренировки</p>
+              <Tag tone="border-blue-200 bg-blue-50 text-blue-700">{dayWorkouts.length}</Tag>
+            </div>
+            <div className="mt-3 flex flex-col gap-2">
+              {dayWorkouts.map(w => {
+                const ac = getActivityCfg(w.activity_type)
+                const MOODS = ['😴', '😕', '😐', '🙂', '🔥']
+                return (
+                  <div key={w.id} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:bg-accent/30">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: ac.bg }}>
+                      <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.color }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="truncate text-sm font-semibold text-foreground">{w.name ?? w.activity_type ?? 'Тренировка'}</span>
+                        {w.mood != null && w.mood >= 0 && <span className="text-sm">{MOODS[w.mood]}</span>}
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-2 text-[10px] text-muted-foreground">
+                        {w.activity_duration_min && <span>{fmtDur(w.activity_duration_min)}</span>}
+                        {w.activity_calories && <span>{w.activity_calories} ккал</span>}
+                        {w.avg_heart_rate && <span>{w.avg_heart_rate} уд/мин</span>}
+                      </div>
+                    </div>
+                    {w.activity_strain != null && (
+                      <div className="shrink-0 text-right">
+                        <div className="pf-num text-xl font-bold leading-none" style={{ color: strainColor(Number(w.activity_strain)) }}>
+                          {Number(w.activity_strain).toFixed(1)}
+                        </div>
+                        <div className="mt-1 text-[10px] text-muted-foreground">нагрузка</div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {dayEvents.length > 0 && (
+          <div className="rounded-2xl border border-border bg-background/70 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">События</p>
+              <Tag tone="border-orange-200 bg-orange-50 text-orange-700">{dayEvents.length}</Tag>
+            </div>
+            <div className="mt-3 flex flex-col gap-2">
+              {dayEvents.map(ev => {
+                const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
+                return (
+                  <div
+                    key={ev.id}
+                    onClick={() => onViewEvent?.(ev, 'view')}
+                    className="group flex items-start gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-orange-200 hover:bg-orange-50/40 cursor-pointer"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
+                      <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="truncate text-sm font-semibold text-foreground">{ev.title}</div>
+                        <span className="inline-flex items-center rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                          {meta?.label ?? 'Событие'}
+                        </span>
+                      </div>
+                      {ev.notes && <div className="mt-1 truncate text-[10px] text-muted-foreground">{ev.notes}</div>}
+                    </div>
+                    <button
+                      onClick={e => { e.stopPropagation(); onDeleteEvent(ev.id) }}
+                      className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0"
+                    >
+                      <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {isEmpty ? (
+          <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/50 px-4 py-10 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
+              <i className="ki-filled ki-calendar text-2xl" />
+            </div>
+            <p className="mt-4 text-sm font-semibold text-foreground">Нет событий на этот день</p>
+            <p className="mt-1 max-w-[18rem] text-2xs leading-5 text-muted-foreground">
+              Добавьте тренировку, встречу или заметку, чтобы день появился в календарной ленте.
+            </p>
+            <button onClick={() => onAddEvent(dateStr)} className="mt-4 kt-btn kt-btn-sm kt-btn-primary gap-1.5">
+              <i className="ki-filled ki-plus text-xs" />Добавить событие
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => onAddEvent(dateStr)} className="mt-auto kt-btn kt-btn-sm kt-btn-outline gap-1.5 w-full justify-center">
             <i className="ki-filled ki-plus text-xs" />Добавить событие
           </button>
-        </div>
-      ) : (
-        <button onClick={() => onAddEvent(dateStr)} className="mt-auto kt-btn kt-btn-sm kt-btn-outline gap-1.5 w-full">
-          <i className="ki-filled ki-plus text-xs" />Добавить событие
-        </button>
-      )}
-    </div>
+        )}
+      </div>
+    </SurfaceFrame>
   )
 }
 
@@ -1262,81 +1367,85 @@ export default function CalendarPage() {
     }
   }
 
-  const avgStrain = monthWorkouts.length
-    ? (monthWorkouts.reduce((a, w) => a + Number(w.activity_strain ?? 0), 0) / monthWorkouts.filter(w => w.activity_strain != null).length || 0).toFixed(1)
+  const strainSamples = monthWorkouts.filter(w => w.activity_strain != null).length
+  const avgStrain = strainSamples
+    ? (monthWorkouts.reduce((a, w) => a + Number(w.activity_strain ?? 0), 0) / strainSamples).toFixed(1)
     : '—'
   const totalCals = monthWorkouts.reduce((a, w) => a + (w.activity_calories ?? 0), 0)
+  const selectedLabel = selected ? parseLocalDate(selected).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Сегодня'
+  const activeCycleCount = cycles.length
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">График тренировок</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Календарь</h2>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <button onClick={() => setShowAddCycle(true)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7,
-            padding: '9px 18px', borderRadius: 12,
-            border: '1.5px solid #C7D2FE',
-            background: 'var(--card)',
-            color: '#4F46E5',
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(79,70,229,0.12)',
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#EEF2FF' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--card)' }}>
-            <i className="ki-filled ki-abstract-26" style={{ fontSize: 14, color: '#6366F1' }} />
-            Создать цикл
-          </button>
-          <button onClick={() => openAddEvent(selected ?? undefined)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7,
-            padding: '9px 18px', borderRadius: 12,
-            border: '1.5px solid #FED7AA',
-            background: 'linear-gradient(135deg, #F97316, #EA580C)',
-            color: 'white',
-            fontSize: 13, fontWeight: 700, cursor: 'pointer',
-            transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
-          }}>
-            <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
-            Добавить событие
-          </button>
-        </div>
-      </div>
+      <SurfaceFrame>
+        <div className="bg-gradient-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <Tag tone="border-orange-200 bg-orange-50 text-orange-700">График тренировок</Tag>
+                <Tag tone="border-border bg-background text-muted-foreground">{periodLabel()}</Tag>
+                <Tag tone="border-border bg-background text-muted-foreground">{activeCycleCount} циклов</Tag>
+                <Tag tone="border-border bg-background text-muted-foreground">{savedEvents.length} событий</Tag>
+              </div>
+              <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-tight text-foreground">Календарь</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                Планируйте циклы, отслеживайте тренировки и держите события в одном shell-слое без потери текущих действий и связей.
+              </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <MetricCard
+                  label="Сессии"
+                  value={periodSessions}
+                  hint={kpiLabel()}
+                  icon="ki-abstract-26"
+                  tone="bg-blue-50 text-blue-600"
+                  href="/diary"
+                />
+                <MetricCard
+                  label="Средняя нагрузка"
+                  value={avgStrain}
+                  hint="По загруженным тренировкам"
+                  icon="ki-chart-line-up"
+                  tone="bg-orange-50 text-orange-600"
+                />
+                <MetricCard
+                  label="Калории"
+                  value={totalCals.toLocaleString()}
+                  hint="Всего за текущий месяц"
+                  icon="ki-abstract-31"
+                  tone="bg-emerald-50 text-emerald-600"
+                />
+              </div>
+            </div>
 
-      {/* KPI */}
-      <div className="grid grid-cols-3 gap-3">
-        <Link href="/diary" className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3 hover:border-blue-300 hover:shadow-sm transition-all no-underline group cursor-pointer">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-blue-600 bg-blue-50 group-hover:bg-blue-100 transition-colors">
-            <i className="ki-filled ki-abstract-26 text-base" />
-          </div>
-          <div>
-            <div className="pf-num text-2xl text-foreground leading-none">{periodSessions}</div>
-            <div className="text-2xs text-muted-foreground">{kpiLabel()}</div>
-          </div>
-          <i className="ki-filled ki-right text-xs text-blue-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-        </Link>
-        <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-orange-600 bg-orange-50">
-            <i className="ki-filled ki-chart-line-up text-base" />
-          </div>
-          <div>
-            <div className="pf-num text-2xl text-foreground leading-none">{avgStrain}</div>
-            <div className="text-2xs text-muted-foreground">Ср. нагрузка</div>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-green-600 bg-green-50">
-            <i className="ki-filled ki-abstract-31 text-base" />
-          </div>
-          <div>
-            <div className="pf-num text-2xl text-foreground leading-none">{totalCals.toLocaleString()}</div>
-            <div className="text-2xs text-muted-foreground">Всего ккал</div>
+            <div className="flex flex-col gap-3 xl:min-w-[280px]">
+              <div className="rounded-2xl border border-border bg-background/80 p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Рабочая область</p>
+                <p className="mt-2 text-lg font-semibold text-foreground capitalize">{selectedLabel}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Активный период: {periodLabel()}.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setShowAddCycle(true)}
+                  className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                >
+                  <i className="ki-filled ki-abstract-26 text-xs" />
+                  Создать цикл
+                </button>
+                <button
+                  onClick={() => openAddEvent(selected ?? undefined)}
+                  className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
+                >
+                  <i className="ki-filled ki-plus text-xs" />
+                  Добавить событие
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </SurfaceFrame>
 
-      {/* Циклы — кликабельные плашки */}
       {cycles.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {cycles.map(c => {
@@ -1344,115 +1453,158 @@ export default function CalendarPage() {
             const total = diffDays(c.start_date, c.end_date) + 1
             const passed = Math.max(0, Math.min(total, diffDays(c.start_date, _today) + 1))
             return (
-              <button key={c.id} onClick={() => setCycleDrawer(c)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border hover:opacity-75 transition-opacity cursor-pointer"
-                style={{ background: cc.bg, borderColor: cc.border }}>
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: cc.text }} />
-                <div className="text-left">
-                  <div className="text-2xs font-bold" style={{ color: cc.text }}>{c.label}</div>
-                  <div className="text-[10px] text-muted-foreground">{c.start_date} → {c.end_date} · {passed}/{total} дн.</div>
+              <button
+                key={c.id}
+                onClick={() => setCycleDrawer(c)}
+                className="flex items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+                style={{ background: cc.bg, borderColor: cc.border }}
+              >
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: cc.text }} />
+                <div>
+                  <div className="text-2xs font-bold uppercase tracking-[0.16em]" style={{ color: cc.text }}>{c.label}</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">{c.start_date} → {c.end_date} · {passed}/{total} дн.</div>
                 </div>
-                <i className="ki-filled ki-right text-[10px] ml-1" style={{ color: cc.text }} />
+                <i className="ki-filled ki-right text-[10px]" style={{ color: cc.text }} />
               </button>
             )
           })}
         </div>
       )}
 
-      {/* View controls */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex items-center gap-0.5 p-1 bg-card border border-border rounded-lg">
-          {VIEWS.map(v => (
-            <button key={v.id} onClick={() => setView(v.id)}
-              className={['px-3 py-1.5 rounded-md text-2sm font-medium transition-all', view===v.id?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground hover:text-foreground'].join(' ')}>
-              {v.label}
+      <SurfaceFrame className="p-4 md:p-5">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-0.5 rounded-2xl border border-border bg-background p-1">
+              {VIEWS.map(v => (
+                <SegmentedButton key={v.id} active={view === v.id} onClick={() => setView(v.id)}>
+                  {v.label}
+                </SegmentedButton>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2">
+              <button onClick={prevPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-left text-xs" /></button>
+              <div className="min-w-[160px] text-center pf-num text-lg text-foreground">{periodLabel()}</div>
+              <button onClick={nextPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-right text-xs" /></button>
+            </div>
+            <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+              <i className="ki-filled ki-calendar text-xs" />
+              Сегодня
             </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={prevPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><i className="ki-filled ki-left text-xs"/></button>
-          <span className="pf-num text-lg text-foreground min-w-[160px] text-center">{periodLabel()}</span>
-          <button onClick={nextPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><i className="ki-filled ki-right text-xs"/></button>
-        </div>
-        <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
-          <i className="ki-filled ki-calendar text-xs"/>Сегодня
-        </button>
-        <div className="ml-auto flex items-center gap-1.5 flex-wrap">
-          {['all','workout','competition','cycle'].map(f => (
-            <button key={f} onClick={() => setFilterType(f)}
-              className={['px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all', filterType===f?'bg-orange-50 border-orange-200 text-orange-600':'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}>
-              {f==='all'?'Все':f==='workout'?'Тренировки':f==='competition'?'Соревнования':'Циклы'}
-            </button>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {loading && <div className="flex items-center gap-2 text-2xs text-muted-foreground"><div className="w-3 h-3 border border-orange-400 border-t-transparent rounded-full animate-spin"/>Загрузка…</div>}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {['all', 'workout', 'competition', 'cycle'].map(f => (
+              <button
+                key={f}
+                onClick={() => setFilterType(f)}
+                className={[
+                  'rounded-full border px-3 py-1.5 text-2xs font-semibold transition-all',
+                  filterType === f ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-sm' : 'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground',
+                ].join(' ')}
+              >
+                {f === 'all' ? 'Все' : f === 'workout' ? 'Тренировки' : f === 'competition' ? 'Соревнования' : 'Циклы'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </SurfaceFrame>
 
-      {/* Calendar grid */}
-      <div className={`grid gap-4 ${view!=='year'&&view!=='quarter'?'xl:grid-cols-[1fr_280px]':''}`}>
+      {loading && (
+        <div className="flex items-center gap-2 text-2xs text-muted-foreground">
+          <div className="h-3 w-3 animate-spin rounded-full border border-orange-400 border-t-transparent" />
+          Загрузка…
+        </div>
+      )}
+
+      <div className={`grid gap-4 ${view !== 'year' && view !== 'quarter' ? 'xl:grid-cols-[1fr_320px]' : ''}`}>
         <div>
-          {view==='year'    && <YearView year={year} onSelect={setSelected} cycles={cycles}/>}
-          {view==='quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles}/>}
-          {view==='month'   && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap}/>}
-          {view==='week'    && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap}/>}
+          {view === 'year' && <YearView year={year} onSelect={setSelected} cycles={cycles} />}
+          {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} />}
+          {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
+          {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
         </div>
-        {(view==='month'||view==='week') && selected && (
-          <DetailPanel dateStr={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap}
-            onAddEvent={openAddEvent} onDeleteEvent={handleDeleteEvent} onViewEvent={openEventDrawer} onOpenCycle={setCycleDrawer}/>
+        {(view === 'month' || view === 'week') && selected && (
+          <DetailPanel
+            dateStr={selected}
+            savedEvents={savedEvents}
+            monthWorkouts={monthWorkouts}
+            cycles={cycles}
+            cycleDaysMap={cycleDaysMap}
+            onAddEvent={openAddEvent}
+            onDeleteEvent={handleDeleteEvent}
+            onViewEvent={openEventDrawer}
+            onOpenCycle={setCycleDrawer}
+          />
         )}
       </div>
 
-      {/* Events list */}
       {savedEvents.length > 0 && (
-        <div className="bg-card border border-border rounded-xl p-4">
-          <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ваши события</div>
-          <div className="flex flex-col gap-1.5">
-            {savedEvents.slice().sort((a,b)=>a.event_date.localeCompare(b.event_date)).map(ev => {
-              const meta = EVENT_TYPES.find(t=>t.value===ev.event_type)
+        <SurfaceFrame className="p-4 md:p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ваши события</p>
+              <h3 className="mt-1 text-base font-semibold text-foreground">Лента событий</h3>
+            </div>
+            <Tag tone="border-border bg-background text-muted-foreground">{savedEvents.length}</Tag>
+          </div>
+          <div className="mt-4 flex flex-col gap-2">
+            {savedEvents.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map(ev => {
+              const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
               return (
-                <div key={ev.id} onClick={()=>openEventDrawer(ev,'view')} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border hover:bg-accent/30 group transition-colors cursor-pointer">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{background:(meta?.color??'#64748B')+'18'}}>
-                    <i className={`ki-filled ${meta?.icon??'ki-calendar'} text-xs`} style={{color:meta?.color??'#64748B'}}/>
+                <div
+                  key={ev.id}
+                  onClick={() => openEventDrawer(ev, 'view')}
+                  className="group flex items-center gap-3 rounded-2xl border border-border bg-background/70 px-3 py-2.5 transition-all hover:border-orange-200 hover:bg-orange-50/40 cursor-pointer"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
+                    <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-2sm font-semibold text-foreground truncate">{ev.title}</span>
-                    {ev.notes&&<span className="text-2xs text-muted-foreground ml-2 truncate">{ev.notes}</span>}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-foreground">{ev.title}</span>
+                      <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        {meta?.label ?? 'Событие'}
+                      </span>
+                    </div>
+                    {ev.notes && <span className="mt-1 block truncate text-2xs text-muted-foreground">{ev.notes}</span>}
                   </div>
-                  <span className="text-2xs text-muted-foreground shrink-0">{parseLocalDate(ev.event_date).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}{ev.start_time&&` · ${ev.start_time}`}</span>
-                  <button onClick={e=>{e.stopPropagation();handleDeleteEvent(ev.id)}} className="opacity-0 group-hover:opacity-100 transition-opacity kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0">
-                    <i className="ki-filled ki-trash text-xs text-muted-foreground"/>
+                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                    {parseLocalDate(ev.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}{ev.start_time && ` · ${ev.start_time}`}
+                  </span>
+                  <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0">
+                    <i className="ki-filled ki-trash text-xs text-muted-foreground" />
                   </button>
                 </div>
               )
             })}
           </div>
-        </div>
+        </SurfaceFrame>
       )}
 
-      {/* Legend */}
-      <div className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-5 flex-wrap">
-        <span className="text-2xs font-bold text-muted-foreground uppercase tracking-wider">Легенда</span>
-        {[
-          { label: 'Тренировка',   color: '#3B82F6', type: 'square' },
-          { label: 'Соревнование', color: '#EA580C', type: 'circle' },
-          ...(['macro','meso','micro'] as CycleType[]).map(t=>({label:CYCLE_TYPE_CFG[t].label,color:CYCLE_TYPE_CFG[t].text,type:'bar'})),
-        ].map(l => (
-          <div key={l.label} className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 rounded-${l.type==='circle'?'full':'sm'} inline-block`} style={{background:l.color}}/>
-            <span className="text-2xs text-muted-foreground">{l.label}</span>
-          </div>
-        ))}
-        <div className="flex items-center gap-1.5 ml-auto">
-          <span className="text-2xs text-muted-foreground">Нагрузка:</span>
-          {[['Низкая','#DBEAFE'],['Средняя','#93C5FD'],['Высокая','#3B82F6'],['Пик','#1D4ED8']].map(([l,c]) => (
-            <span key={l} className="flex items-center gap-0.5">
-              <span className="w-4 h-3 rounded-sm inline-block" style={{background:c}}/>
-              <span className="text-[9px] text-muted-foreground">{l}</span>
-            </span>
+      <SurfaceFrame className="px-4 py-3">
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Легенда</span>
+          {[
+            { label: 'Тренировка', color: '#3B82F6', type: 'square' },
+            { label: 'Соревнование', color: '#EA580C', type: 'circle' },
+            ...(['macro', 'meso', 'micro'] as CycleType[]).map(t => ({ label: CYCLE_TYPE_CFG[t].label, color: CYCLE_TYPE_CFG[t].text, type: 'bar' })),
+          ].map(l => (
+            <div key={l.label} className="flex items-center gap-1.5">
+              <span className={`inline-block w-3 h-3 ${l.type === 'circle' ? 'rounded-full' : 'rounded-sm'}`} style={{ background: l.color }} />
+              <span className="text-2xs text-muted-foreground">{l.label}</span>
+            </div>
           ))}
+          <div className="ml-auto flex items-center gap-1.5">
+            <span className="text-2xs text-muted-foreground">Нагрузка:</span>
+            {[['Низкая', '#DBEAFE'], ['Средняя', '#93C5FD'], ['Высокая', '#3B82F6'], ['Пик', '#1D4ED8']].map(([l, c]) => (
+              <span key={l} className="flex items-center gap-0.5">
+                <span className="inline-block h-3 w-4 rounded-sm" style={{ background: c }} />
+                <span className="text-[9px] text-muted-foreground">{l}</span>
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      </SurfaceFrame>
 
       {/* Drawers */}
       {showAddEvent && user && (

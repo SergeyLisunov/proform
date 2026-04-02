@@ -29,3 +29,10 @@
   - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
   - `./node_modules/.bin/eslint app/dashboard/page.tsx`
   - `npm run build`
+- Completed the third Metronic-inspired product pass:
+  - redesigned the calendar hero and control toolbar to match the new shell direction
+  - upgraded the selected-day detail panel and event list into clearer, card-based Metronic-style blocks
+  - preserved calendar, cycle, drawer, and CRUD behavior while improving visual hierarchy
+- Re-verified the third pass with:
+  - `./node_modules/.bin/eslint app/calendar/page.tsx`
+  - `npm run build`
