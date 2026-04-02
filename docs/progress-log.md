@@ -57,3 +57,10 @@
 - Re-verified the sixth pass with:
   - `./node_modules/.bin/eslint app/analytics/page.tsx app/org/page.tsx app/settings/page.tsx`
   - `npm run build`
+- Applied a sidebar stability fix for narrow shell widths:
+  - stacked the role/status summary block to prevent collisions in compact widths
+  - increased sidebar item spacing and minimum height so navigation rows no longer visually overlap
+  - allowed nav labels to wrap instead of colliding with badges and affordances
+- Re-verified the sidebar fix with:
+  - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
+  - `npm run build`

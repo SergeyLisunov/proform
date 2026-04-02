@@ -158,7 +158,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col items-start gap-2 rounded-2xl border border-border/60 bg-muted/20 px-3 py-2">
           <span
             className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold"
             style={{
@@ -172,11 +172,11 @@ export default function Sidebar() {
           </span>
 
           {user ? (
-            <span className="text-xs text-muted-foreground">
+            <span className="block w-full pl-0.5 text-[11px] leading-4 text-muted-foreground">
               {unreadCount > 0 ? `${unreadCount > 99 ? '99+' : unreadCount} новых` : 'Нет новых сообщений'}
             </span>
           ) : (
-            <span className="text-xs text-muted-foreground">Гостевой режим</span>
+            <span className="block w-full pl-0.5 text-[11px] leading-4 text-muted-foreground">Гостевой режим</span>
           )}
         </div>
       </div>
@@ -190,16 +190,16 @@ export default function Sidebar() {
           data-kt-scrollable-wrappers="#sidebar_content"
           id="sidebar_scrollable"
         >
-          <div className="kt-menu flex flex-col gap-4 grow" data-kt-menu="true">
+          <div className="kt-menu flex flex-col gap-5 grow" data-kt-menu="true">
             {visibleSections.map(section => (
-              <div key={section.title} className="space-y-2">
+              <div key={section.title} className="space-y-2.5">
                 <div className="px-2">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
                     {section.title}
                   </span>
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {section.items.map(item => {
                     const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'))
                     const isMessages = item.href === '/messages'
@@ -211,7 +211,7 @@ export default function Sidebar() {
                           href={item.href}
                           aria-current={active ? 'page' : undefined}
                           className={[
-                            'kt-menu-link group flex items-center gap-3 rounded-2xl border-l-4 px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                            'kt-menu-link group flex min-h-[56px] items-center gap-3 rounded-2xl border-l-4 px-3 py-3 text-sm font-medium transition-all duration-150',
                             active
                               ? 'border-l-orange-500 border-y border-r border-y-orange-100 border-r-orange-100 bg-gradient-to-r from-orange-50 via-orange-50/70 to-white text-orange-700 shadow-sm'
                               : 'border-l-transparent border-y border-r border-y-transparent border-r-transparent text-foreground/75 hover:border-border hover:bg-muted/60 hover:text-foreground',
@@ -228,14 +228,16 @@ export default function Sidebar() {
                             <i className={`ki-filled ${item.icon} text-[15px]`} />
                           </span>
 
-                          <span className="kt-menu-title min-w-0 flex-1 truncate">{item.label}</span>
+                          <span className="kt-menu-title min-w-0 flex-1 text-[15px] leading-5 break-words">
+                            {item.label}
+                          </span>
 
                           {showBadge ? (
-                            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-sm">
+                            <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-sm">
                               {unreadCount > 99 ? '99+' : unreadCount}
                             </span>
                           ) : active ? (
-                            <i className="ki-filled ki-right text-[12px] text-orange-400" />
+                            <i className="ki-filled ki-right shrink-0 text-[12px] text-orange-400" />
                           ) : null}
                         </Link>
                       </div>
