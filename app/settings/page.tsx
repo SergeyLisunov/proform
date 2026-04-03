@@ -514,32 +514,35 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
-      <section className="rounded-[28px] border border-border bg-card p-6 shadow-sm sm:p-7">
+      <section className="relative overflow-hidden rounded-[34px] border border-orange-100/80 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.18),_transparent_28%),radial-gradient(circle_at_85%_18%,_rgba(236,72,153,0.12),_transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_18px_45px_rgba(249,115,22,0.08)] sm:p-7">
+        <div className="pointer-events-none absolute inset-0 opacity-70" style={{ background: 'linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.4) 32%, transparent 62%)' }} />
         <div className="max-w-3xl">
-          <div className="flex items-start gap-3">
+          <div className="relative flex items-start gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-white/80 text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border border-orange-200/80 bg-white/85 text-orange-700 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
             >
               <i className="ki-filled ki-left text-sm" />
             </Link>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center rounded-full border border-orange-300/70 bg-[linear-gradient(135deg,#FFF0E5,#FFE3CF)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700 shadow-[0_8px_18px_rgba(249,115,22,0.08)]">
                   Рабочее пространство атлета
                 </span>
-                <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <span className="inline-flex items-center rounded-full border border-fuchsia-200/70 bg-[linear-gradient(135deg,#FFFFFF,#FAF5FF)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-600 shadow-[0_8px_18px_rgba(148,163,184,0.08)]">
                   Центр настроек
                 </span>
               </div>
-              <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Настройки</p>
-              <h1 className="pf-num mt-1 text-[clamp(2.2rem,4vw,4rem)] leading-[0.95] text-foreground">
+              <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-700/80">Настройки</p>
+              <h1 className="mt-2 text-[clamp(2rem,3.8vw,3.15rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-slate-950">
                 Профиль атлета
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              <p className="mt-3 max-w-2xl text-[15px] leading-7 text-slate-600">
                 Управляйте персональными данными, спортивным контекстом, физиологией и приватностью в одном рабочем пространстве.
               </p>
-              <p className="mt-4 text-xs leading-5 text-muted-foreground">{completionLabel}</p>
+              <p className="mt-5 inline-flex max-w-xl rounded-[20px] border border-white/80 bg-white/70 px-4 py-2.5 text-sm leading-6 text-slate-600 shadow-[0_10px_24px_rgba(255,255,255,0.35)]">
+                {completionLabel}
+              </p>
             </div>
           </div>
         </div>
