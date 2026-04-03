@@ -142,3 +142,9 @@
 - Re-verified the settings expressive header pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the organization members workspace pass:
+  - rebuilt `org/members` into a stronger organization workspace with a denser hero, cleaner KPI strip, and more cohesive filters
+  - upgraded the members list and empty state surfaces without changing invite or member-management logic
+- Re-verified the organization members workspace pass with:
+  - `./node_modules/.bin/eslint app/org/members/page.tsx`
+  - `npm run build`

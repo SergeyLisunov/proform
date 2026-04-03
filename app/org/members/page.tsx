@@ -243,6 +243,20 @@ export default function OrgMembersPage() {
   const athletes = members.filter(m => m.member_role === 'athlete').length
   const coaches  = members.filter(m => m.member_role === 'coach').length
   const pending  = members.filter(m => m.status === 'pending').length
+  const hasFilters = roleFilter !== 'all' || statusFilter !== 'all' || Boolean(search.trim())
+
+  const roleOptions: { id: 'all' | MemberRole; label: string }[] = [
+    { id: 'all', label: 'Все роли' },
+    { id: 'athlete', label: 'Спортсмены' },
+    { id: 'coach', label: 'Тренеры' },
+  ]
+
+  const statusOptions: { id: 'all' | MemberStatus; label: string }[] = [
+    { id: 'all', label: 'Все статусы' },
+    { id: 'active', label: STATUS_CFG.active.label },
+    { id: 'pending', label: STATUS_CFG.pending.label },
+    { id: 'suspended', label: STATUS_CFG.suspended.label },
+  ]
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -252,150 +266,242 @@ export default function OrgMembersPage() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-
-      {/* Header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Панель организации</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Участники</h2>
-        </div>
-        <button onClick={() => setShowInvite(true)} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 7,
-          padding: '9px 18px', borderRadius: 12, border: '1.5px solid #FED7AA',
-          background: 'linear-gradient(135deg,#F97316,#EA580C)', color: 'white',
-          fontSize: 13, fontWeight: 700, cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
-        }}>
-          <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
-          Добавить участника
-        </button>
-      </div>
-
-      {/* KPI */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-        {[
-          { label: 'Всего',       value: total,    color: '#2563EB', bg: '#EFF6FF', icon: 'ki-people'       },
-          { label: 'Атлетов',     value: athletes, color: '#F97316', bg: '#FFF7ED', icon: 'ki-abstract-26'  },
-          { label: 'Тренеров',    value: coaches,  color: '#16A34A', bg: '#F0FDF4', icon: 'ki-notepad-edit' },
-          { label: 'Ожидают',     value: pending,  color: '#CA8A04', bg: '#FEFCE8', icon: 'ki-time'         },
-        ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-            <div style={{ width: 38, height: 38, borderRadius: 11, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className={`ki-filled ${s.icon} text-base`} style={{ color: s.color }} />
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.15),_transparent_28%),radial-gradient(circle_at_88%_12%,_rgba(59,130,246,0.08),_transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_20px_55px_rgba(15,23,42,0.06)] sm:p-7">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
+                Панель организации
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Команда и роли
+              </span>
             </div>
+            <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Участники</p>
+            <h2 className="mt-2 text-[clamp(2rem,4vw,3.35rem)] font-semibold tracking-[-0.04em] text-foreground">
+              Управляйте составом организации без лишнего шума
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Добавляйте атлетов и тренеров, контролируйте статусы и держите состав команды в одном рабочем пространстве.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:min-w-[280px]">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">В выборке</div>
+                <div className="mt-2 pf-num text-2xl text-foreground">{filtered.length}</div>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {hasFilters ? 'Текущий набор участников после поиска и фильтров.' : 'Все участники организации в текущем списке.'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowInvite(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F97316,#EA580C)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all hover:-translate-y-0.5"
+            >
+              <i className="ki-filled ki-plus text-sm" />
+              Добавить участника
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: 'Всего участников', value: total, color: '#2563EB', bg: '#EFF6FF', icon: 'ki-people' },
+            { label: 'Спортсменов', value: athletes, color: '#F97316', bg: '#FFF7ED', icon: 'ki-abstract-26' },
+            { label: 'Тренеров', value: coaches, color: '#16A34A', bg: '#F0FDF4', icon: 'ki-notepad-edit' },
+            { label: 'Ожидают', value: pending, color: '#CA8A04', bg: '#FEFCE8', icon: 'ki-time' },
+          ].map((s) => (
+            <div key={s.label} className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="pf-num text-2xl leading-none text-foreground">{s.value}</div>
+                  <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{s.label}</div>
+                </div>
+                <div
+                  style={{ width: 40, height: 40, borderRadius: 14, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                >
+                  <i className={`ki-filled ${s.icon} text-base`} style={{ color: s.color }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[28px] border border-border bg-card p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <div className="pf-num text-2xl text-foreground">{s.value}</div>
-              <div className="text-2xs text-muted-foreground">{s.label}</div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Навигация состава</p>
+              <p className="mt-1 text-sm text-muted-foreground">Ищите участников, переключайте роли и быстро находите тех, кто требует внимания.</p>
+            </div>
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={() => { setSearch(''); setRoleFilter('all'); setStatusFilter('all') }}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-all hover:border-orange-200 hover:text-orange-600"
+              >
+                <i className="ki-filled ki-cross text-xs" />
+                Сбросить фильтры
+              </button>
+            )}
+          </div>
+
+          <div className="rounded-[24px] border border-border bg-background/70 p-3">
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Поиск по имени или email…"
+                  className="w-full rounded-2xl border border-border bg-card pl-9 pr-4 py-3 text-sm outline-none transition-all focus:border-orange-400"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap">
+                  <div className="flex flex-wrap gap-2">
+                    {roleOptions.map((option) => {
+                      const active = roleFilter === option.id
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setRoleFilter(option.id)}
+                          className={[
+                            'rounded-full border px-3.5 py-2 text-xs font-semibold transition-all',
+                            active
+                              ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-sm'
+                              : 'border-border bg-card text-muted-foreground hover:border-orange-100 hover:text-foreground',
+                          ].join(' ')}
+                        >
+                          {option.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {statusOptions.map((option) => {
+                      const active = statusFilter === option.id
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setStatusFilter(option.id as any)}
+                          className={[
+                            'rounded-full border px-3.5 py-2 text-xs font-semibold transition-all',
+                            active
+                              ? 'border-blue-200 bg-blue-50 text-blue-700 shadow-sm'
+                              : 'border-border bg-card text-muted-foreground hover:border-blue-100 hover:text-foreground',
+                          ].join(' ')}
+                        >
+                          {option.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Показано: {filtered.length}
+                </div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      </section>
 
-      {/* Фильтры */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Поиск по имени или email…"
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-card text-sm outline-none focus:border-orange-400" />
-        </div>
-        {/* Роли */}
-        <div style={{ display: 'flex', gap: 6, padding: 4, background: 'var(--accent)', borderRadius: 12, border: '1px solid var(--border)' }}>
-          {(['all', 'athlete', 'coach'] as const).map(f => (
-            <button key={f} onClick={() => setRoleFilter(f)} style={{
-              padding: '6px 14px', borderRadius: 9, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s',
-              background: roleFilter === f ? 'var(--card)' : 'transparent',
-              color: roleFilter === f ? 'var(--foreground)' : 'var(--muted-foreground)',
-              boxShadow: roleFilter === f ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-            }}>
-              {f === 'all' ? 'Все роли' : ROLE_CFG[f].label + 'ы'}
-            </button>
-          ))}
-        </div>
-        {/* Статусы */}
-        <div style={{ display: 'flex', gap: 6, padding: 4, background: 'var(--accent)', borderRadius: 12, border: '1px solid var(--border)' }}>
-          {(['all', 'active', 'pending', 'suspended'] as const).map(f => (
-            <button key={f} onClick={() => setStatusFilter(f as any)} style={{
-              padding: '6px 14px', borderRadius: 9, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s',
-              background: statusFilter === f ? 'var(--card)' : 'transparent',
-              color: statusFilter === f ? 'var(--foreground)' : 'var(--muted-foreground)',
-              boxShadow: statusFilter === f ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-            }}>
-              {f === 'all' ? 'Все статусы' : STATUS_CFG[f as MemberStatus].label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Таблица */}
       {filtered.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl px-5 py-16 text-center">
-          <i className="ki-filled ki-people text-3xl text-muted-foreground/20 block mb-3" />
-          <p className="text-muted-foreground text-2sm mb-3">
+        <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FFF7ED)] text-orange-400 shadow-sm">
+            <i className="ki-filled ki-people text-3xl" />
+          </div>
+          <p className="mt-5 text-lg font-semibold text-foreground">
             {members.length === 0 ? 'Участников пока нет. Добавьте первого!' : 'Никто не подходит под фильтры'}
           </p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+            {members.length === 0
+              ? 'Когда в организации появятся спортсмены и тренеры, они сразу отобразятся здесь в одном рабочем списке.'
+              : 'Попробуйте ослабить фильтры или очистить поисковый запрос, чтобы снова увидеть участников.'}
+          </p>
           {members.length === 0 && (
-            <button onClick={() => setShowInvite(true)} style={{
-              padding: '8px 18px', borderRadius: 10, border: '1.5px solid #FED7AA',
-              background: 'linear-gradient(135deg,#F97316,#EA580C)', color: 'white',
-              fontSize: 13, fontWeight: 700, cursor: 'pointer',
-            }}>
-              <i className="ki-filled ki-plus text-xs mr-1.5" />Добавить участника
+            <button
+              onClick={() => setShowInvite(true)}
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F97316,#EA580C)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all hover:-translate-y-0.5"
+            >
+              <i className="ki-filled ki-plus text-sm" />
+              Добавить участника
             </button>
           )}
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          {/* Заголовок таблицы */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px 120px 120px', gap: 16, padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--accent)' }}>
-            {['Участник', 'Роль', 'Статус', 'Действия'].map(h => (
-              <span key={h} style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
+        <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
+          <div className="flex flex-col gap-2 border-b border-border bg-background/60 px-5 py-4 sm:px-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Список участников</p>
+            <p className="text-sm text-muted-foreground">Все действия по ролям и статусам доступны прямо из этой ленты.</p>
+          </div>
+
+          <div className="hidden border-b border-border bg-background/50 px-6 py-3 lg:grid lg:grid-cols-[minmax(0,1fr)_150px_140px_128px] lg:gap-4">
+            {['Участник', 'Роль', 'Статус', 'Действия'].map((h) => (
+              <span key={h} className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                {h}
+              </span>
             ))}
           </div>
+
           <div className="divide-y divide-border">
             {filtered.map(m => {
               const rc = ROLE_CFG[m.member_role]
               const sc = STATUS_CFG[m.status]
               const initials = m.user_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
               return (
-                <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 120px 120px', gap: 16, padding: '12px 20px', alignItems: 'center' }}
-                  className="hover:bg-accent/30 transition-colors">
-                  {/* Имя */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 13, fontWeight: 700, background: rc.bg, color: rc.color }}>
+                <div
+                  key={m.id}
+                  className="grid gap-4 px-5 py-4 transition-colors hover:bg-accent/30 sm:px-6 lg:grid-cols-[minmax(0,1fr)_150px_140px_128px] lg:items-center"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                    <div style={{ width: 42, height: 42, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 13, fontWeight: 700, background: rc.bg, color: rc.color }}>
                       {initials}
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user_name}</div>
                       <div style={{ fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user_email}</div>
+                      <div className="mt-1 text-[11px] text-muted-foreground lg:hidden">
+                        {rc.label} · {sc.label}
+                      </div>
                     </div>
                   </div>
-                  {/* Роль */}
-                  <div>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, background: rc.bg, color: rc.color, border: `1px solid ${rc.border}` }}>
+
+                  <div className="hidden lg:block">
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: rc.bg, color: rc.color, border: `1px solid ${rc.border}` }}>
                       <i className={`ki-filled ${rc.icon} text-[10px]`} />{rc.label}
                     </span>
                   </div>
-                  {/* Статус */}
-                  <div>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
+
+                  <div className="hidden lg:block">
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, flexShrink: 0 }} />
                       {sc.label}
                     </span>
                   </div>
-                  {/* Действия */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start' }} className="lg:justify-end">
                     {m.status === 'active' && (
-                      <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #FED7AA', background: '#FFF7ED', color: '#F97316', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                      <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FED7AA', background: '#FFF7ED', color: '#F97316', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-pause text-xs" />
                       </button>
                     )}
                     {(m.status === 'suspended' || m.status === 'pending') && (
-                      <button onClick={() => changeStatus(m.id, 'active')} title="Активировать" style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                      <button onClick={() => changeStatus(m.id, 'active')} title="Активировать" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-check text-xs" />
                       </button>
                     )}
-                    <button onClick={() => { if (confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} title="Удалить" style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                    <button onClick={() => { if (confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} title="Удалить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                       <i className="ki-filled ki-trash text-xs" />
                     </button>
                   </div>
