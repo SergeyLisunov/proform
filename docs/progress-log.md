@@ -169,3 +169,6 @@
 - Completed the organization newsletters workspace pass:
   - rebuilt `org/newsletters` into a communication workspace with a hero, KPI strip, richer section rails, and stronger newsletter cards
   - refreshed the newsletter composer modal without changing create, send, schedule, or stats routing logic
+- Completed the organization newsletter stats workspace pass:
+  - rebuilt `org/newsletters/[id]/stats` into a communication analytics workspace with a stronger hero, KPI strip, and richer rate cards
+  - refreshed the content preview and newsletter meta without changing stats calculations or fetch logic
