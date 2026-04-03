@@ -124,3 +124,9 @@
 - Re-verified the settings hero reset pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the settings hero dedup pass:
+  - removed the duplicated top `Заполнено` strip from the settings hero
+  - simplified the upper settings hero to a compact title block while preserving the lower action row
+- Re-verified the settings hero dedup pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
