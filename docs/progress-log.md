@@ -94,3 +94,9 @@
 - Re-verified the sidebar header fix with:
   - `./node_modules/.bin/eslint components/layout/Sidebar.tsx`
   - `npm run build`
+- Completed the messages centering pass:
+  - wrapped the messages workspace in a centered max-width rail so hero, stats, search, and chat list align to the middle of the available shell
+  - preserved the current message cards, modals, and realtime chat logic while fixing page geometry on wide screens
+- Re-verified the messages centering pass with:
+  - `./node_modules/.bin/eslint app/messages/page.tsx`
+  - `npm run build`

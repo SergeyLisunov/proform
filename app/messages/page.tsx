@@ -398,7 +398,7 @@ export default function MessengerPage() {
   const currentUser: ChatUser = { id: user.id, name: user.name ?? user.email ?? '', email: user.email ?? '', role: user.role ?? '' }
 
   return (
-    <div className="flex flex-col gap-5 pf-enter">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 pf-enter">
       <div className="overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-orange-50 via-background to-background shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
         <div className="flex flex-col gap-5 px-5 py-5 md:px-6 md:py-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
