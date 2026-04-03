@@ -148,3 +148,9 @@
 - Re-verified the organization members workspace pass with:
   - `./node_modules/.bin/eslint app/org/members/page.tsx`
   - `npm run build`
+- Fixed the settings topbar regression:
+  - restored the compact settings header after the later expressive pass reintroduced the large gradient hero
+  - kept the current Russian copy and the simplified single-save layout intact
+- Re-verified the settings topbar regression fix with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
