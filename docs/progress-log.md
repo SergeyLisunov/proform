@@ -166,3 +166,6 @@
 - Completed the organization wall workspace pass:
   - rebuilt `org/wall` into a stronger content workspace with a hero, KPI strip, premium pinned zone, and denser feed cards
   - refreshed the create-post modal styling without changing wall post creation, pinning, or delete logic
+- Completed the organization newsletters workspace pass:
+  - rebuilt `org/newsletters` into a communication workspace with a hero, KPI strip, richer section rails, and stronger newsletter cards
+  - refreshed the newsletter composer modal without changing create, send, schedule, or stats routing logic
