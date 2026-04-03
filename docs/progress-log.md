@@ -100,3 +100,9 @@
 - Re-verified the messages centering pass with:
   - `./node_modules/.bin/eslint app/messages/page.tsx`
   - `npm run build`
+- Completed the settings centering pass:
+  - tightened the overall settings workspace rail so the profile screen reads as a centered form workspace instead of a wide dashboard surface
+  - compacted the desktop `aside + content` proportions while preserving the existing cards, save states, and Supabase profile flows
+- Re-verified the settings centering pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`

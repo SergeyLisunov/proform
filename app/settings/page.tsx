@@ -514,7 +514,7 @@ export default function SettingsPage() {
     'Заполните ключевые данные, чтобы рекомендации и аналитика были точнее.'
 
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 pf-enter">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.16),_transparent_34%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_54%,#FFF4EC_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.06)] sm:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
@@ -568,7 +568,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="flex flex-col gap-4">
           <div className="rounded-[28px] border border-border bg-card p-4 shadow-sm">
             <div className="mb-3 px-1">
