@@ -514,21 +514,21 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
-      <section className="rounded-[28px] border border-border bg-card p-6 shadow-sm sm:p-7">
+      <section className="overflow-hidden rounded-[28px] border border-orange-100/80 bg-gradient-to-br from-orange-50 via-background to-background p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-7">
         <div className="max-w-3xl">
           <div className="flex items-start gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-white/80 text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-white text-orange-700 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
             >
               <i className="ki-filled ki-left text-sm" />
             </Link>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700">
+                <span className="inline-flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-50 to-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700 shadow-[0_6px_18px_rgba(249,115,22,0.12)]">
                   Рабочее пространство атлета
                 </span>
-                <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <span className="inline-flex items-center rounded-full border border-orange-100 bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
                   Центр настроек
                 </span>
               </div>
@@ -539,7 +539,9 @@ export default function SettingsPage() {
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
                 Управляйте персональными данными, спортивным контекстом, физиологией и приватностью в одном рабочем пространстве.
               </p>
-              <p className="mt-4 text-xs leading-5 text-muted-foreground">{completionLabel}</p>
+              <p className="mt-4 inline-flex max-w-xl rounded-2xl border border-orange-100 bg-white/80 px-3.5 py-2 text-xs leading-5 text-slate-600 shadow-[0_10px_24px_rgba(249,115,22,0.08)]">
+                {completionLabel}
+              </p>
             </div>
           </div>
         </div>

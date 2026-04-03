@@ -154,3 +154,9 @@
 - Re-verified the settings topbar regression fix with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the settings messages-style color pass:
+  - kept the restored compact settings topbar but refreshed it with the warm gradient and orange accent language used in `messages`
+  - left the geometry, compact typography, and single-save flow unchanged
+- Re-verified the settings messages-style color pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
