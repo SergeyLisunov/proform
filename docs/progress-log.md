@@ -163,3 +163,6 @@
 - Fixed the collapsed settings header regression:
   - replaced the unstable empty strip composition with a compact header card where the title and completion badge are always visible
   - preserved the warm messages-style palette without relying on the long decorative bar
+- Completed the organization wall workspace pass:
+  - rebuilt `org/wall` into a stronger content workspace with a hero, KPI strip, premium pinned zone, and denser feed cards
+  - refreshed the create-post modal styling without changing wall post creation, pinning, or delete logic
