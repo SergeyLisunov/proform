@@ -172,3 +172,7 @@
 - Completed the organization newsletter stats workspace pass:
   - rebuilt `org/newsletters/[id]/stats` into a communication analytics workspace with a stronger hero, KPI strip, and richer rate cards
   - refreshed the content preview and newsletter meta without changing stats calculations or fetch logic
+- Completed the admin command center pass:
+  - rebuilt `admin` into a stronger operations workspace with a command-center hero, KPI strip, and richer tab shell
+  - refreshed the `users`, `privacy`, `audit`, and `system` tabs while preserving the current demo admin behavior and assignment modal flow
+  - translated the remaining visible English demo strings and system labels on the admin screen into Russian
