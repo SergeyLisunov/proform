@@ -516,14 +516,14 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.16),_transparent_34%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_54%,#FFF4EC_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.06)] sm:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
+        <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(320px,360px)] xl:items-start">
+          <div className="max-w-3xl xl:pr-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700">
-                Athlete Workspace
+                Рабочее пространство атлета
               </span>
               <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Settings Hub
+                Центр настроек
               </span>
             </div>
             <div className="mt-4 flex items-start gap-3">
@@ -545,7 +545,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
+          <div className="grid w-full gap-3 sm:grid-cols-2 xl:self-start">
             <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Заполнено</div>
               <div className="mt-3 flex items-center gap-3">
@@ -636,20 +636,20 @@ export default function SettingsPage() {
 
         <div className="flex flex-col gap-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
               <div className="max-w-2xl">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Active Section</div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активный раздел</div>
                 <h2 className="mt-2 text-2xl font-semibold text-foreground">{activeTab.label}</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{tabDescriptions[activeTab.id]}</p>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex w-full flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:items-end lg:justify-start">
                 <div className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-                  Completion: {completion}%
+                  Заполнено: {completion}%
                 </div>
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className={`inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all ${
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all sm:w-auto ${
                     saving
                       ? 'cursor-not-allowed bg-border text-muted-foreground'
                       : saved

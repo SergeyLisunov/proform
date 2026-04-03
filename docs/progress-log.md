@@ -112,3 +112,9 @@
 - Re-verified the athletes centering pass with:
   - `./node_modules/.bin/eslint app/athletes/page.tsx`
   - `npm run build`
+- Completed the settings header stability pass:
+  - stabilized the upper settings shell so the top chips, summary cards, and action row align more predictably on desktop widths
+  - translated the remaining English labels in the upper settings workspace into Russian
+- Re-verified the settings header stability pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
