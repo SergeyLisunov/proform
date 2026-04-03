@@ -586,7 +586,7 @@ export default function AthletesPage() {
   const selectedTone = recoveryColor(selectedAthlete.recovery)
 
   return (
-    <div className="flex flex-col gap-6 pf-enter">
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       <Surface className="relative">
         <div
           className="absolute inset-0"
@@ -692,7 +692,7 @@ export default function AthletesPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[340px_1fr]">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
         <Surface className="h-fit">
           <div className="border-b border-border px-5 py-4">
             <SectionHeader

@@ -106,3 +106,9 @@
 - Re-verified the settings centering pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the athletes centering pass:
+  - wrapped the athletes workspace in a centered max-width rail for wide layouts
+  - tightened the desktop roster/detail split so the coach workspace reads as a balanced center column
+- Re-verified the athletes centering pass with:
+  - `./node_modules/.bin/eslint app/athletes/page.tsx`
+  - `npm run build`
