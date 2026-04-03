@@ -118,3 +118,9 @@
 - Re-verified the settings header stability pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the settings hero reset pass:
+  - removed the stretched top-strip feeling by rebuilding the upper settings hero as one coherent header
+  - kept the upper settings workspace fully in Russian while preserving the current save flow and form layout
+- Re-verified the settings hero reset pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
