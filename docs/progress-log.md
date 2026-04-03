@@ -160,3 +160,6 @@
 - Re-verified the settings messages-style color pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Fixed the collapsed settings header regression:
+  - replaced the unstable empty strip composition with a compact header card where the title and completion badge are always visible
+  - preserved the warm messages-style palette without relying on the long decorative bar
