@@ -204,7 +204,7 @@ function CoachAnalytics() {
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-                  Coach Workspace
+                  Рабочее пространство тренера
                 </span>
                 <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   Командный обзор
@@ -329,7 +329,7 @@ function CoachAnalytics() {
                             color: recoveryTone,
                           }}
                         >
-                          {athlete.recovery}% recovery
+                          {athlete.recovery}% готовности
                         </div>
                       </div>
                     </div>
@@ -479,13 +479,13 @@ function AthleteAnalytics() {
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-                  Athlete Workspace
+                  Рабочее пространство атлета
                 </span>
                 <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Sara Kowalski · USER_00011
+                  Sara Kowalski · ПРОФИЛЬ_00011
                 </span>
                 <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  WHOOP Live
+                  WHOOP в реальном времени
                 </span>
               </div>
               <h2 className="mt-4 text-[clamp(2.1rem,4vw,3.4rem)] font-semibold tracking-tight text-foreground">

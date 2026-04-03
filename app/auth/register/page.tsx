@@ -285,32 +285,32 @@ export default function RegisterPage() {
             </div>
             <div>
               <div className="pf-num text-[24px] tracking-wide text-white">ProForm</div>
-              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Athlete OS</div>
+              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Платформа атлета</div>
             </div>
           </div>
 
           <div className="relative flex-1 px-10 pb-10 pt-12">
             <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-300">
-              Onboarding flow
+              Поток onboarding
             </div>
 
             <p className="pf-num mb-5 mt-8 text-[64px] leading-[0.92] text-white">
               BUILD
               <br />
-              <span className="text-orange-500">YOUR</span>
+              <span className="text-orange-500">СВОЙ</span>
               <br />
-              WORKFLOW.
+              ПРОЦЕСС.
             </p>
 
             <p className="max-w-[290px] text-sm leading-relaxed text-zinc-400">
-              Create a role-aware account, then unlock the right profile fields only when they are needed.
+              Создайте аккаунт под свою роль, а затем откройте только те поля профиля, которые действительно нужны.
             </p>
 
             <div className="mt-8 grid gap-3">
               {[
-                { label: 'Role-first setup', note: 'Athlete, coach, or organization paths' },
-                { label: 'Focused account step', note: 'Clear password guidance and email capture' },
-                { label: 'Athlete profile only when relevant', note: 'Optional metrics without extra noise' },
+                { label: 'Сначала роль', note: 'Сценарии для атлета, тренера и организации' },
+                { label: 'Понятный шаг аккаунта', note: 'Ясные подсказки по паролю и email' },
+                { label: 'Профиль атлета только по делу', note: 'Опциональные метрики без лишнего шума' },
               ].map((item, index) => (
                 <div
                   key={item.label}
@@ -330,9 +330,9 @@ export default function RegisterPage() {
 
           <div className="relative grid grid-cols-3 gap-3 border-t border-white/10 px-10 py-7">
             {[
-              { value: '3', label: 'roles' },
-              { value: '1', label: 'flow' },
-              { value: '0', label: 'friction' },
+              { value: '3', label: 'роли' },
+              { value: '1', label: 'поток' },
+              { value: '0', label: 'лишних шагов' },
             ].map((item) => (
               <div key={item.label}>
                 <div className="pf-num text-[30px] text-white">{item.value}</div>
@@ -350,12 +350,12 @@ export default function RegisterPage() {
               </div>
               <div>
                 <div className="pf-num text-2xl text-foreground">ProForm</div>
-                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Athlete OS</div>
+                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Платформа атлета</div>
               </div>
             </div>
 
             <div className="hidden rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700 sm:inline-flex">
-              Performance workspace
+              Рабочее пространство
             </div>
           </div>
 

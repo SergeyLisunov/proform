@@ -1,5 +1,5 @@
 const rc = (v: number) => v >= 67 ? '#16A34A' : v >= 34 ? '#F97316' : '#DC2626'
-const rl = (v: number) => v >= 67 ? 'Ready' : v >= 34 ? 'Moderate' : 'Low'
+const rl = (v: number) => v >= 67 ? 'Готов' : v >= 34 ? 'Умеренно' : 'Низко'
 
 export function RecoveryRing({ score, size = 120 }: { score: number; size?: number }) {
   const r = (size / 2) * 0.76

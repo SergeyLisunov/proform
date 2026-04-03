@@ -44,9 +44,9 @@ const TEST_ACCOUNTS = [
 ]
 
 const FEATURE_STRIPS = [
-  { icon: Zap, label: 'WHOOP-ready analytics' },
-  { icon: ShieldCheck, label: 'Coach-grade visibility' },
-  { icon: TimerReset, label: 'Fast demo access' },
+  { icon: Zap, label: 'Аналитика с поддержкой WHOOP' },
+  { icon: ShieldCheck, label: 'Прозрачность для тренера' },
+  { icon: TimerReset, label: 'Быстрый demo-доступ' },
 ]
 
 function getSafeRedirect(target: string | null) {
@@ -171,25 +171,25 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="pf-num text-[24px] tracking-wide text-white">ProForm</div>
-              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Athlete OS</div>
+              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Платформа атлета</div>
             </div>
           </div>
 
           <div className="relative flex-1 px-10 pb-10 pt-12">
             <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-300">
-              Training intelligence
+              Тренировочный интеллект
             </div>
 
             <p className="pf-num mb-5 mt-8 text-[64px] leading-[0.92] text-white">
               BUILD
               <br />
-              <span className="text-orange-500">CONSISTENCY.</span>
+              <span className="text-orange-500">РИТМ.</span>
               <br />
-              WIN THE BLOCK.
+              ВЫИГРЫВАЙ ЦИКЛ.
             </p>
 
             <p className="max-w-[280px] text-sm leading-relaxed text-zinc-400">
-              Workouts, recovery, coach feedback and team coordination in one workflow tailored to serious athletes.
+              Тренировки, восстановление, тренерская обратная связь и командная координация в одном рабочем процессе.
             </p>
 
             <div className="mt-8 grid gap-3">
@@ -209,9 +209,9 @@ export default function LoginPage() {
 
           <div className="relative grid grid-cols-3 gap-3 border-t border-white/10 px-10 py-7">
             {[
-              { value: '100K', label: 'records' },
-              { value: '286', label: 'athletes' },
-              { value: '39', label: 'metrics' },
+              { value: '100K', label: 'записей' },
+              { value: '286', label: 'атлетов' },
+              { value: '39', label: 'метрик' },
             ].map((item) => (
               <div key={item.label}>
                 <div className="pf-num text-[30px] text-white">{item.value}</div>
@@ -229,19 +229,19 @@ export default function LoginPage() {
               </div>
               <div>
                 <div className="pf-num text-2xl text-foreground">ProForm</div>
-                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Athlete OS</div>
+                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Платформа атлета</div>
               </div>
             </div>
 
             <div className="hidden rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700 sm:inline-flex">
-              Performance workspace
+              Рабочее пространство
             </div>
           </div>
 
           <div className="max-w-[520px]">
             <h1 className="pf-num text-[42px] leading-none text-foreground sm:text-[48px]">Войти</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-              Возвращайтесь в тренировочный ритм без лишних действий. Вход запоминает последний email и поддерживает быстрый demo-flow.
+              Возвращайтесь в тренировочный ритм без лишних действий. Вход запоминает последний email и поддерживает быстрый demo-сценарий.
             </p>
 
             {redirectTo !== '/dashboard' && (
@@ -365,7 +365,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700">
-                  One-click demo
+                  Demo в один клик
                 </div>
               </div>
 
@@ -388,7 +388,7 @@ export default function LoginPage() {
                           <div className="text-sm font-semibold text-foreground">{account.label}</div>
                           {selectedDemoEmail === account.email && (
                             <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-700">
-                              active
+                              выбран
                             </span>
                           )}
                         </div>

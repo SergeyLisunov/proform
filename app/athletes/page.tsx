@@ -9,6 +9,13 @@ import ApexChart from '@/components/charts/ApexChart'
 type TabType = 'overview' | 'sessions' | 'diary' | 'marks'
 type Athlete = typeof DEMO_ATHLETES[number]
 
+const RISK_LABELS = {
+  low: 'низкий',
+  moderate: 'умеренный',
+  high: 'высокий',
+  critical: 'критический',
+} as const
+
 function getInitials(name: string) {
   return name
     .split(' ')
@@ -89,7 +96,7 @@ function AthleteCard({
 }) {
   const rc = recoveryColor(athlete.recovery)
   const rr = RISK_COLORS[athlete.risk]
-  const loadLabel = athlete.recovery >= 70 ? 'Ready' : athlete.recovery >= 50 ? 'Balanced' : 'Protect'
+  const loadLabel = athlete.recovery >= 70 ? 'Готов' : athlete.recovery >= 50 ? 'Баланс' : 'Защита'
 
   return (
     <button
@@ -123,7 +130,7 @@ function AthleteCard({
               style={{ background: rr.bg, color: rr.text, borderColor: rr.border }}
             >
               <i className={`ki-filled ${rr.icon} text-[9px]`} />
-              {athlete.risk}
+              {RISK_LABELS[athlete.risk]}
             </span>
           </div>
 
@@ -154,17 +161,17 @@ function AthleteCard({
           <div className="mt-3 grid grid-cols-3 gap-2 text-center">
             <div className="rounded-xl border border-border bg-background/70 py-2">
               <div className="pf-num text-lg text-foreground">{athlete.sessions}</div>
-              <div className="text-[10px] text-muted-foreground">sessions</div>
+              <div className="text-[10px] text-muted-foreground">сессий</div>
             </div>
             <div className="rounded-xl border border-border bg-background/70 py-2">
               <div className="pf-num text-lg text-foreground">{athlete.streak}d</div>
-              <div className="text-[10px] text-muted-foreground">streak</div>
+              <div className="text-[10px] text-muted-foreground">дней подряд</div>
             </div>
             <div className="rounded-xl border border-border bg-background/70 py-2">
               <div className="pf-num text-lg" style={{ color: rc }}>
                 {athlete.recovery}%
               </div>
-              <div className="text-[10px] text-muted-foreground">recovery</div>
+              <div className="text-[10px] text-muted-foreground">готовность</div>
             </div>
           </div>
         </div>
@@ -183,16 +190,16 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
     'text-red-700 bg-red-50 border-red-200'
 
   const readinessTitle =
-    athlete.recovery >= 70 ? 'Ready to build' :
-    athlete.recovery >= 50 ? 'Hold steady' :
-    'Protect the day'
+    athlete.recovery >= 70 ? 'Можно наращивать' :
+    athlete.recovery >= 50 ? 'Держать ритм' :
+    'Поберечь день'
 
   const coachCue =
     athlete.recovery >= 70
-      ? 'Green light for controlled progress. Keep the next block focused and measured.'
+      ? 'Есть зеленый свет на контролируемый прогресс. Следующий блок лучше держать точным и дозированным.'
       : athlete.recovery >= 50
-        ? 'Use the next session to confirm readiness, not to force adaptation.'
-        : 'Keep intensity low, watch recovery signals, and look for a cleaner day tomorrow.'
+        ? 'Следующую сессию лучше использовать для подтверждения готовности, а не для форсирования адаптации.'
+        : 'Держите интенсивность низкой, следите за восстановлением и ждите более чистого дня завтра.'
 
   const lineOpts = {
     chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
@@ -215,10 +222,10 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
   }
 
   const tabs: { id: TabType; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview', icon: 'ki-element-11' },
-    { id: 'sessions', label: 'Sessions', icon: 'ki-abstract-26' },
-    { id: 'diary', label: 'Diary', icon: 'ki-notepad-edit' },
-    { id: 'marks', label: 'Marks', icon: 'ki-tag' },
+    { id: 'overview', label: 'Обзор', icon: 'ki-element-11' },
+    { id: 'sessions', label: 'Сессии', icon: 'ki-abstract-26' },
+    { id: 'diary', label: 'Дневник', icon: 'ki-notepad-edit' },
+    { id: 'marks', label: 'Метки', icon: 'ki-tag' },
   ]
 
   return (
@@ -228,10 +235,10 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-                Selected athlete
+                Выбранный атлет
               </span>
               <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Demo data
+                Demo-данные
               </span>
             </div>
             <div className="mt-3 flex items-center gap-4">
@@ -246,7 +253,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   {athlete.name}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {athlete.sport} · {athlete.age} years · {athlete.gender === 'F' ? 'Woman' : 'Man'} · {athlete.id}
+                  {athlete.sport} · {athlete.age} лет · {athlete.gender === 'F' ? 'Женщина' : 'Мужчина'} · {athlete.id}
                 </p>
               </div>
             </div>
@@ -255,11 +262,11 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
           <div className="flex min-w-[240px] items-center gap-4 rounded-3xl border border-border bg-card px-4 py-3 shadow-sm">
             <RecoveryRing score={athlete.recovery} size={88} />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Coach readout</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Сигнал тренера</p>
               <p className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${readinessTone}`}>
                 {readinessTitle}
               </p>
-              <p className="mt-2 text-sm font-semibold text-foreground">{athlete.recovery}% recovery</p>
+              <p className="mt-2 text-sm font-semibold text-foreground">{athlete.recovery}% готовности</p>
               <p className="mt-1 text-2xs leading-5 text-muted-foreground">{coachCue}</p>
             </div>
           </div>
@@ -269,10 +276,10 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
           <div className="rounded-2xl border border-border bg-card/90 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Next session</p>
             <p className="mt-2 text-sm font-semibold text-foreground">
-              {athlete.recovery >= 70 ? 'Controlled progression' : athlete.recovery >= 50 ? 'Steady aerobic work' : 'Low-stress recovery'}
+              {athlete.recovery >= 70 ? 'Контролируемый прогресс' : athlete.recovery >= 50 ? 'Спокойная аэробная работа' : 'Восстановление без стресса'}
             </p>
             <p className="mt-1.5 text-2xs leading-5 text-muted-foreground">
-              Keep the next block aligned with the recovery signal instead of chasing extra strain.
+              Следующий блок лучше держать в ритме восстановления, а не пытаться добрать лишнюю нагрузку.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card/90 p-4">
@@ -291,16 +298,16 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card/90 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Coach workflow</p>
-            <p className="mt-2 text-sm font-semibold text-foreground">Comment, review, and assign a mark from the same panel.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Работа тренера</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">Комментируйте, просматривайте и ставьте метку из одной панели.</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
                 <i className="ki-filled ki-message-text text-xs" />
-                Comment
+                Комментарий
               </button>
               <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
                 <i className="ki-filled ki-tag text-xs" />
-                Mark session
+                Отметить сессию
               </button>
             </div>
           </div>
@@ -333,10 +340,10 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
           <div className="flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
-                { label: 'Recovery', value: `${athlete.recovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
+                { label: 'Готовность', value: `${athlete.recovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
                 { label: 'HRV', value: `${athlete.hrv} ms`, icon: 'ki-heart', tone: 'bg-blue-50 text-blue-600' },
                 { label: 'RHR', value: `${athlete.rhr} bpm`, icon: 'ki-heart', tone: 'bg-red-50 text-red-500' },
-                { label: 'Streak', value: `${athlete.streak}d`, icon: 'ki-calendar', tone: 'bg-violet-50 text-violet-600' },
+                { label: 'Серия', value: `${athlete.streak}д`, icon: 'ki-calendar', tone: 'bg-violet-50 text-violet-600' },
               ].map((item) => (
                 <StatTile key={item.label} {...item} />
               ))}
@@ -345,18 +352,18 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
                 <SectionHeader
-                  eyebrow="Coach notes"
-                  title="What to do next"
-                  subtitle="A compact readout for the next coaching decision."
+                  eyebrow="Заметки тренера"
+                  title="Что делать дальше"
+                  subtitle="Короткая выжимка для следующего тренерского решения."
                 />
                 <div className="mt-4 rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">Recommended move</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">Рекомендуемый шаг</p>
                   <p className="mt-2 text-sm font-semibold text-foreground">{coachCue}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
                     {[
-                      { label: 'Intensity', value: athlete.recovery >= 70 ? 'Moderate' : 'Low' },
-                      { label: 'Watch', value: athlete.risk === 'low' ? 'Load drift' : 'Recovery drift' },
-                      { label: 'Goal', value: athlete.recovery >= 70 ? 'Build' : 'Stabilize' },
+                      { label: 'Интенсивность', value: athlete.recovery >= 70 ? 'Умеренная' : 'Низкая' },
+                      { label: 'Контроль', value: athlete.risk === 'low' ? 'Дрейф нагрузки' : 'Дрейф восстановления' },
+                      { label: 'Цель', value: athlete.recovery >= 70 ? 'Рост' : 'Стабилизация' },
                     ].map((item) => (
                       <div key={item.label} className="rounded-xl border border-orange-100 bg-white/80 p-3">
                         <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</div>
@@ -369,16 +376,16 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
 
               <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
                 <SectionHeader
-                  eyebrow="Risk map"
-                  title="Signals to monitor"
-                  subtitle="Read the athlete from the most actionable risks to the softer context."
+                  eyebrow="Карта риска"
+                  title="Сигналы для наблюдения"
+                  subtitle="Считывайте атлета от самых прикладных рисков к более мягкому контексту."
                 />
                 <div className="mt-4 grid gap-2">
                   {[
-                    { label: 'Overload risk', status: athlete.recovery < 45 ? 'high' : athlete.recovery < 70 ? 'moderate' : 'low', icon: 'ki-warning-2' },
-                    { label: 'Recovery gap', status: athlete.recovery < 50 ? 'moderate' : 'low', icon: 'ki-abstract-26' },
-                    { label: 'Load stability', status: athlete.streak > 10 ? 'moderate' : 'low', icon: 'ki-chart-line-up' },
-                    { label: 'Trend consistency', status: athlete.risk === 'low' ? 'low' : 'moderate', icon: 'ki-abstract-31' },
+                    { label: 'Риск перегруза', status: athlete.recovery < 45 ? 'high' : athlete.recovery < 70 ? 'moderate' : 'low', icon: 'ki-warning-2' },
+                    { label: 'Разрыв восстановления', status: athlete.recovery < 50 ? 'moderate' : 'low', icon: 'ki-abstract-26' },
+                    { label: 'Стабильность нагрузки', status: athlete.streak > 10 ? 'moderate' : 'low', icon: 'ki-chart-line-up' },
+                    { label: 'Целостность тренда', status: athlete.risk === 'low' ? 'low' : 'moderate', icon: 'ki-abstract-31' },
                   ].map((item) => {
                     const meta = RISK_COLORS[item.status as keyof typeof RISK_COLORS]
 
@@ -393,7 +400,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                           <div className="text-2xs font-semibold" style={{ color: meta.text }}>
                             {item.label}
                           </div>
-                          <div className="text-[10px] text-muted-foreground capitalize">{item.status}</div>
+                          <div className="text-[10px] text-muted-foreground capitalize">{RISK_LABELS[item.status as keyof typeof RISK_LABELS]}</div>
                         </div>
                       </div>
                     )
@@ -404,15 +411,15 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
 
             <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
               <SectionHeader
-                eyebrow="Trend"
-                title="Weekly load and HRV"
-                subtitle="Keep the line chart, but give it a more controlled home in the shell."
+                eyebrow="Тренд"
+                title="Недельная нагрузка и ВСР"
+                subtitle="Линейный график остается, но живет в более собранной рабочей зоне."
               />
               <div className="mt-4">
                 <ApexChart
                   type="line"
                   series={[
-                    { name: 'Load', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
+                    { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
                     { name: 'HRV (ms)', data: [44, 47, 45, 41, 48, 50, 47] },
                   ]}
                   options={lineOpts}
@@ -426,9 +433,9 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
         {tab === 'sessions' && (
           <div className="flex flex-col gap-4">
             <SectionHeader
-              eyebrow="Recent training"
-              title="Session history"
-              subtitle="Latest sessions are shown with load and recovery side by side."
+              eyebrow="Недавние тренировки"
+              title="История сессий"
+              subtitle="Последние тренировки показаны так, чтобы нагрузка и готовность читались рядом."
             />
             <div className="overflow-hidden rounded-[24px] border border-border bg-background/75 shadow-sm">
               {DEMO_SESSIONS.slice(0, 5).map((session, index) => {
@@ -458,7 +465,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                       <div className="pf-num text-xl leading-none" style={{ color: sessionRecovery }}>
                         {session.recovery}%
                       </div>
-                      <div className="mt-1 text-[10px] text-muted-foreground">recovery</div>
+                      <div className="mt-1 text-[10px] text-muted-foreground">готовность</div>
                     </div>
 
                     <div className="hidden items-center justify-end sm:flex">
@@ -477,9 +484,9 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
         {tab === 'diary' && (
           <div className="flex flex-col gap-4">
             <SectionHeader
-              eyebrow="Coach diary"
-              title="Observations and context"
-              subtitle="Capture the softer signals that sit behind the metric readout."
+              eyebrow="Дневник тренера"
+              title="Наблюдения и контекст"
+              subtitle="Фиксируйте мягкие сигналы, которые стоят за цифрами и метриками."
             />
             <div className="grid gap-3">
               {DEMO_DIARY.map((entry, index) => {
@@ -500,7 +507,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                         className="inline-flex shrink-0 items-center rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
                         style={{ background: meta.bg, color: meta.text, borderColor: meta.border }}
                       >
-                        {entry.risk}
+                        {RISK_LABELS[entry.risk]}
                       </span>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -524,9 +531,9 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
         {tab === 'marks' && (
           <div className="flex flex-col gap-4">
             <SectionHeader
-              eyebrow="Coach workflow"
-              title="Marks for sessions"
-              subtitle="Apply coaching labels quickly without leaving the athlete detail panel."
+              eyebrow="Работа тренера"
+              title="Метки для сессий"
+              subtitle="Ставьте тренерские ярлыки быстро, не выходя из карточки атлета."
             />
             <div className="grid gap-3">
               {Object.entries(COACH_MARKS).map(([key, mark]) => (
@@ -548,7 +555,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                     className="rounded-xl border px-3 py-1.5 text-2xs font-semibold transition-all hover:opacity-80"
                     style={{ background: mark.bg, color: mark.text, borderColor: `${mark.text}40` }}
                   >
-                    Apply
+                    Применить
                   </button>
                 </div>
               ))}
@@ -598,46 +605,46 @@ export default function AthletesPage() {
         <div className="relative p-6 md:p-7">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-              Coach shell
+              Контур тренера
             </span>
             <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Metronic-inspired
+              Обновленный shell
             </span>
             <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Demo data
+              Demo-данные
             </span>
           </div>
 
           <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-2xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Athlete roster</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Состав атлетов</p>
               <h2 className="mt-2 text-[clamp(2rem,4vw,3.2rem)] font-semibold tracking-tight text-foreground">
-                My athletes
+                Мои атлеты
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Compare readiness, flag risk, and keep the coaching workflow close to the roster without losing the clean shell used across the app.
+                Сравнивайте готовность, отмечайте риск и держите тренерский workflow рядом с составом, не теряя общий продуктовый язык приложения.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button className="kt-btn kt-btn-outline gap-2">
                 <i className="ki-filled ki-filter text-xs" />
-                Filter
+                Фильтр
               </button>
               <button className="kt-btn kt-btn-primary gap-2">
                 <i className="ki-filled ki-plus text-sm" />
-                Add athlete
+                Добавить атлета
               </button>
             </div>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
             {[
-              { label: 'Athletes', value: DEMO_ATHLETES.length, icon: 'ki-people', tone: 'bg-blue-50 text-blue-600' },
-              { label: 'Avg recovery', value: `${averageRecovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
-              { label: 'In risk', value: riskCount, icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
-              { label: 'Ready now', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
-              { label: 'Sessions', value: totalSessions, icon: 'ki-calendar', tone: 'bg-slate-50 text-slate-600' },
+              { label: 'Атлеты', value: DEMO_ATHLETES.length, icon: 'ki-people', tone: 'bg-blue-50 text-blue-600' },
+              { label: 'Средняя готовность', value: `${averageRecovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
+              { label: 'В зоне риска', value: riskCount, icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
+              { label: 'Готовы сейчас', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
+              { label: 'Сессии', value: totalSessions, icon: 'ki-calendar', tone: 'bg-slate-50 text-slate-600' },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-border bg-background/75 p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
@@ -660,30 +667,30 @@ export default function AthletesPage() {
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            label: 'Selected recovery',
+            label: 'Готовность фокуса',
             value: `${selectedAthlete.recovery}%`,
-            hint: `${selectedAthlete.name} is the current focus athlete`,
+            hint: `${selectedAthlete.name} сейчас в фокусе тренера`,
             icon: 'ki-abstract-26',
             tone: 'bg-emerald-50 text-emerald-600',
           },
           {
-            label: 'Roster risk',
+            label: 'Риск по составу',
             value: `${riskCount}`,
-            hint: 'Athletes need coach attention',
+            hint: 'Атлетам нужен дополнительный контроль',
             icon: 'ki-warning-2',
             tone: 'bg-orange-50 text-orange-600',
           },
           {
-            label: 'Sessions logged',
+            label: 'Сессии в журнале',
             value: `${totalSessions}`,
-            hint: 'Total demo training sessions',
+            hint: 'Общее число demo-тренировок',
             icon: 'ki-calendar',
             tone: 'bg-blue-50 text-blue-600',
           },
           {
-            label: 'Average readiness',
+            label: 'Средняя готовность',
             value: `${averageRecovery}%`,
-            hint: 'Derived from the current demo roster',
+            hint: 'Рассчитано по текущему demo-составу',
             icon: 'ki-heart',
             tone: 'bg-violet-50 text-violet-600',
           },
@@ -696,9 +703,9 @@ export default function AthletesPage() {
         <Surface className="h-fit">
           <div className="border-b border-border px-5 py-4">
             <SectionHeader
-              eyebrow="Roster"
-              title="Athletes"
-              subtitle="Select a card to refresh the detail panel and coach actions."
+              eyebrow="Состав"
+              title="Атлеты"
+              subtitle="Выберите карточку, чтобы обновить detail-панель и тренерские действия."
             />
           </div>
           <div className="space-y-3 p-4">
@@ -717,8 +724,8 @@ export default function AthletesPage() {
       </div>
 
       <div className="rounded-[24px] border border-border bg-card px-5 py-4 text-2sm text-muted-foreground shadow-sm">
-        Coach workflow stays demo-driven here: select an athlete, review readiness, then choose a mark or leave a note from the detail panel.
-        <span className="ml-1 font-semibold text-foreground">Current focus:</span>
+        Здесь тренерский workflow пока остается demo-driven: выберите атлета, оцените готовность, а затем поставьте метку или оставьте заметку из detail-панели.
+        <span className="ml-1 font-semibold text-foreground">Текущий фокус:</span>
         <span className="ml-1" style={{ color: selectedTone }}>
           {selectedAthlete.name}
         </span>

@@ -455,7 +455,7 @@ function ViewEditDrawer({
               </div>
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  {mode === 'view' ? 'Workout Detail' : 'Редактирование'}
+                  {mode === 'view' ? 'Детали тренировки' : 'Редактирование'}
                 </div>
                 <div className="mt-1 truncate text-base font-semibold text-foreground">
                   {mode === 'view' ? displayName : 'Изменить тренировку'}
@@ -482,7 +482,7 @@ function ViewEditDrawer({
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
-                      Athlete Session
+                      Сессия атлета
                     </div>
                     <h3 className="mt-3 text-[28px] font-semibold leading-none text-foreground">{displayName}</h3>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -756,7 +756,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   const quickSummary = [
     form.activity_type,
     form.activity_duration_min ? `${form.activity_duration_min} мин` : 'Длительность не задана',
-    form.activity_strain > 0 ? `${form.activity_strain.toFixed(1)} strain` : 'Нагрузка не задана',
+    form.activity_strain > 0 ? `${form.activity_strain.toFixed(1)} нагрузка` : 'Нагрузка не задана',
   ]
   const inputClass = (hasError = false) => [
     'w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all bg-background',
@@ -778,7 +778,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
-                Quick Capture
+                Быстрое добавление
               </div>
               <h3 className="mt-3 pf-num text-[30px] leading-none text-foreground">Добавить тренировку</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
@@ -1264,10 +1264,10 @@ function AthleteDiary() {
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
-                Athlete Diary
+                Дневник атлета
               </span>
               <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Quick Add Flow
+                Быстрое добавление
               </span>
             </div>
             <p className="mt-4 text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">История тренировок</p>
@@ -1329,7 +1329,7 @@ function AthleteDiary() {
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
-                History Workspace
+                Рабочая история
               </span>
               <span className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                 {filtered.length} записей

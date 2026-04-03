@@ -176,3 +176,7 @@
   - rebuilt `admin` into a stronger operations workspace with a command-center hero, KPI strip, and richer tab shell
   - refreshed the `users`, `privacy`, `audit`, and `system` tabs while preserving the current demo admin behavior and assignment modal flow
   - translated the remaining visible English demo strings and system labels on the admin screen into Russian
+- Completed the final consistency pass:
+  - translated the remaining high-visibility English copy across shared UI, auth, dashboard, analytics, diary, and athletes screens
+  - normalized shell badges, readiness states, workspace chips, and workout/detail wording into a single Russian product language
+  - aligned demo sport names and app metadata so the branch is ready for a production rollout without mixed-language surfaces

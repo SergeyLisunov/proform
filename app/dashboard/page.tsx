@@ -129,9 +129,9 @@ function AthleteDash({ name }: { name: string }) {
   const hrv7d = [41, 44, 50, 48, 47, 45, 47]
   const strain7d = [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1]
   const athleteSignals = [
-    { label: 'Next session', value: 'Easy aerobic', hint: 'Keep the next block in Z2 and cap spikes.', icon: 'ki-abstract-14', tone: 'bg-blue-50 text-blue-600' },
-    { label: 'Sleep', value: '7.8 hrs', hint: 'On target for recovery-supportive volume.', icon: 'ki-moon', tone: 'bg-violet-50 text-violet-600' },
-    { label: 'HRV trend', value: '+2.1 ms', hint: '7-day average is stable and improving.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Следующая сессия', value: 'Легкая аэробика', hint: 'Держите следующий блок в Z2 и не допускайте скачков.', icon: 'ki-abstract-14', tone: 'bg-blue-50 text-blue-600' },
+    { label: 'Сон', value: '7.8 ч', hint: 'Хороший уровень для объема, который поддерживает восстановление.', icon: 'ki-moon', tone: 'bg-violet-50 text-violet-600' },
+    { label: 'Тренд ВСР', value: '+2.1 мс', hint: 'Среднее за 7 дней остается стабильным и постепенно растет.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
   ]
 
   const lineOpts = {
@@ -154,67 +154,67 @@ function AthleteDash({ name }: { name: string }) {
       <Surface className="p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-            Athlete View
+            Представление атлета
           </span>
           <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             WHOOP Live
           </span>
           <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Updated 6m ago
+            Обновлено 6 минут назад
           </span>
         </div>
 
         <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Daily pulse</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Пульс дня</p>
             <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
-              Good morning, {firstName}
+              Доброе утро, {firstName}
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              Recovery is at 42%. Today favors control over intensity, with an easy aerobic ceiling and a clear stop point if strain jumps.
+              Восстановление на уровне 42%. Сегодня лучше держать контроль над интенсивностью, не выходить за легкий аэробный потолок и вовремя остановиться, если нагрузка начнет расти.
             </p>
           </div>
 
           <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
             <RecoveryRing score={42} size={96} />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Readiness</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Готовность</p>
               <p className="mt-1 text-2xl font-semibold text-foreground">42 / 100</p>
-              <p className="mt-1 text-xs text-muted-foreground">Best fit: recovery or low-stress aerobic work.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Лучший режим: восстановление или спокойная аэробная работа.</p>
             </div>
           </div>
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <SmallSignal label="Sleep" value="7.8 hrs" hint="Enough to support a stable training day." icon="ki-moon" tone="bg-violet-50 text-violet-600" />
-          <SmallSignal label="Load ceiling" value="Moderate" hint="Protect the day by keeping volume controlled." icon="ki-abstract-31" tone="bg-orange-50 text-orange-600" />
+          <SmallSignal label="Потолок нагрузки" value="Умеренно" hint="Сохраните день, удерживая объем под контролем." icon="ki-abstract-31" tone="bg-orange-50 text-orange-600" />
           <SmallSignal label="HRV trend" value="47 ms" hint="Still above the week average and holding." icon="ki-abstract-26" tone="bg-blue-50 text-blue-600" />
         </div>
       </Surface>
 
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
         <StatCard
-          label="Avg HRV"
+          label="Средний ВСР"
           value={47.2} unit="ms"
           icon="ki-abstract-26" iconBg="bg-blue-50 text-blue-600"
-          sub="WHOOP metric"
+          sub="Метрика WHOOP"
           sparkData={hrv7d} sparkColor="#2563EB"
         />
         <StatCard
-          label="Resting HR"
+          label="Пульс покоя"
           value={45.8} unit="bpm"
           icon="ki-heart" iconBg="bg-red-50 text-red-500"
           delta={-3}
           sparkData={[48, 47, 46, 47, 45, 46, 46]} sparkColor="#EF4444"
         />
         <StatCard
-          label="Avg Sleep"
+          label="Средний сон"
           value={7.8} unit="hrs"
           icon="ki-moon" iconBg="bg-violet-50 text-violet-600"
           sparkData={[7.2, 8.1, 7.5, 8.3, 7.8, 8.0, 7.8]} sparkColor="#7C3AED"
         />
         <StatCard
-          label="Cal / Day"
+          label="Ккал / день"
           value="3,415" unit="kcal"
           icon="ki-abstract-31" iconBg="bg-orange-50 text-orange-500"
           delta={5}
@@ -225,13 +225,13 @@ function AthleteDash({ name }: { name: string }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Training signal"
-            title="Weekly strain and HRV"
-            subtitle="A single chart, two metrics, and the context coaches usually need first."
+            eyebrow="Тренировочный сигнал"
+            title="Недельная нагрузка и ВСР"
+            subtitle="Один график, две метрики и тот контекст, который обычно нужен первым."
             action={(
               <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-                This week
+                Эта неделя
               </span>
             )}
           />
@@ -251,19 +251,19 @@ function AthleteDash({ name }: { name: string }) {
         <Surface className="p-5 md:p-6">
           <SectionHeader
             eyebrow="Insight"
-            title="Today’s focus"
-            subtitle="Keep load controlled and let recovery lead the day."
+            title="Фокус дня"
+            subtitle="Держите нагрузку под контролем и дайте восстановлению вести день."
           />
           <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50/60 p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">Primary action: stay aerobic</p>
+                <p className="text-sm font-semibold text-foreground">Главное действие: остаться в аэробике</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Recovery is mid-range, HRV is stable, and strain has been swinging enough to justify a calmer session.
+                  Восстановление среднее, ВСР стабилен, а нагрузка колебалась достаточно, чтобы выбрать более спокойную сессию.
                 </p>
               </div>
               <span className="inline-flex shrink-0 items-center rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
-                Moderate
+                Умеренно
               </span>
             </div>
           </div>
@@ -274,9 +274,9 @@ function AthleteDash({ name }: { name: string }) {
           </div>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[
-              { label: 'Sleep debt', value: 'Low', color: 'text-emerald-600' },
-              { label: 'Session cap', value: '45-60m', color: 'text-foreground' },
-              { label: 'Risk', value: 'Manageable', color: 'text-orange-600' },
+              { label: 'Долг по сну', value: 'Низкий', color: 'text-emerald-600' },
+              { label: 'Предел сессии', value: '45-60 мин', color: 'text-foreground' },
+              { label: 'Риск', value: 'Управляемый', color: 'text-orange-600' },
             ].map(item => (
               <div key={item.label} className="rounded-xl border border-border bg-background/70 p-3 text-center">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</div>
@@ -291,9 +291,9 @@ function AthleteDash({ name }: { name: string }) {
         <Surface className="p-0">
           <div className="border-b border-border px-5 py-4 md:px-6">
             <SectionHeader
-              eyebrow="Profile"
-              title="Athlete snapshot"
-              subtitle="Keep the richer profile card visible, but out of the hero rail."
+              eyebrow="Профиль"
+              title="Карточка атлета"
+              subtitle="Расширенный профиль остается на виду, но не перегружает hero-зону."
             />
           </div>
           <div className="p-3 md:p-4">
@@ -308,7 +308,7 @@ function AthleteDash({ name }: { name: string }) {
             subtitle="Clean rhythm, readable details, and the strain number last."
             action={(
               <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
-                View all →
+                Открыть все →
               </a>
             )}
           />
@@ -347,17 +347,17 @@ function CoachDash({ name }: { name: string }) {
   }
 
   const athletes = [
-    { name: 'Sara Kowalski', sport: 'Running', recovery: 42, hrv: 47.2, status: 'warning' },
-    { name: 'Marcus Weiden', sport: 'Cycling', recovery: 82, hrv: 62.2, status: 'good' },
-    { name: 'James Thornton', sport: 'Swimming', recovery: 63, hrv: 32.0, status: 'ok' },
-    { name: 'Linh Nguyen', sport: 'Weight Training', recovery: 80, hrv: 106.5, status: 'good' },
+    { name: 'Sara Kowalski', sport: 'Бег', recovery: 42, hrv: 47.2, status: 'warning' },
+    { name: 'Marcus Weiden', sport: 'Велоспорт', recovery: 82, hrv: 62.2, status: 'good' },
+    { name: 'James Thornton', sport: 'Плавание', recovery: 63, hrv: 32.0, status: 'ok' },
+    { name: 'Linh Nguyen', sport: 'Силовая подготовка', recovery: 80, hrv: 106.5, status: 'good' },
   ]
 
   const watchlist = athletes.filter(a => a.recovery < 70)
   const coachSignals = [
-    { label: 'Today', value: '3 active sessions', hint: 'Enough volume for the roster without crowding recovery.', icon: 'ki-calendar', tone: 'bg-blue-50 text-blue-600' },
-    { label: 'Alert load', value: '1 athlete', hint: 'One athlete needs a stricter cap before the next block.', icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
-    { label: 'Avg recovery', value: '67%', hint: 'The group is usable, but not yet ready for aggressive work.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Сегодня', value: '3 активные сессии', hint: 'Объема достаточно для состава без давления на восстановление.', icon: 'ki-calendar', tone: 'bg-blue-50 text-blue-600' },
+    { label: 'Нагрузка под контролем', value: '1 атлет', hint: 'Одному атлету нужен более жесткий потолок перед следующим блоком.', icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
+    { label: 'Средняя готовность', value: '67%', hint: 'Группа работоспособна, но еще не готова к агрессивной нагрузке.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
   ]
 
   return (
@@ -365,33 +365,33 @@ function CoachDash({ name }: { name: string }) {
       <Surface className="p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-green-700">
-            Coach View
+            Представление тренера
           </span>
           <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Team Pulse
+            Пульс команды
           </span>
           <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            4 athletes in rotation
+            4 атлета в ротации
           </span>
         </div>
 
         <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Coach desk</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Пульт тренера</p>
             <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
-              Welcome back, {firstName}
+              С возвращением, {firstName}
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              The team is trending stable, but one athlete still needs tighter load control. Use the day to steer volume, not chase it.
+              Команда в целом держится стабильно, но одному атлету все еще нужен более жесткий контроль нагрузки. Сегодня лучше управлять объемом, а не догонять его.
             </p>
           </div>
 
           <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
             <RecoveryRing score={67} size={96} />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Team recovery</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Готовность команды</p>
               <p className="mt-1 text-2xl font-semibold text-foreground">67%</p>
-              <p className="mt-1 text-xs text-muted-foreground">Use as a baseline for session selection today.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Используйте это как базовый ориентир для сегодняшних сессий.</p>
             </div>
           </div>
         </div>
@@ -405,10 +405,10 @@ function CoachDash({ name }: { name: string }) {
 
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
         {[
-          { label: 'Active Athletes', value: '4', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Avg Team Recovery', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
-          { label: 'Sessions Today', value: '3', icon: 'ki-calendar', bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Alerts', value: '1', icon: 'ki-notification', bg: 'bg-red-50 text-red-500' },
+          { label: 'Активные атлеты', value: '4', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Средняя готовность команды', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
+          { label: 'Сессии сегодня', value: '3', icon: 'ki-calendar', bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Сигналы', value: '1', icon: 'ki-notification', bg: 'bg-red-50 text-red-500' },
         ].map(c => (
           <StatCard
             key={c.label}
@@ -423,12 +423,12 @@ function CoachDash({ name }: { name: string }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Roster"
-            title="Athlete status"
-            subtitle="This keeps the team list readable at a glance: recovery first, HRV second, status last."
+            eyebrow="Состав"
+            title="Статус атлетов"
+            subtitle="Так список команды читается с первого взгляда: сначала готовность, потом ВСР, затем статус."
             action={(
               <a href="/athletes" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
-                Manage →
+                Управлять →
               </a>
             )}
           />
@@ -450,7 +450,7 @@ function CoachDash({ name }: { name: string }) {
                           {a.sport}
                         </span>
                       </div>
-                      <div className="mt-1 text-2xs text-muted-foreground">HRV {a.hrv} ms · recovery drives the line</div>
+                      <div className="mt-1 text-2xs text-muted-foreground">ВСР {a.hrv} ms · готовность ведет решение</div>
                       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border">
                         <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />
                       </div>
@@ -469,14 +469,14 @@ function CoachDash({ name }: { name: string }) {
         <div className="grid gap-4">
           <Surface className="p-5 md:p-6">
             <SectionHeader
-              eyebrow="Team map"
-              title="Recovery distribution"
-              subtitle="A compact bar view for quick comparison across the roster."
+              eyebrow="Карта команды"
+              title="Распределение готовности"
+              subtitle="Компактный столбчатый вид для быстрого сравнения по составу."
             />
             <div className="mt-4">
               <ApexChart
                 type="bar"
-                series={[{ name: 'Recovery %', data: [42, 82, 63, 80] }]}
+                series={[{ name: 'Готовность %', data: [42, 82, 63, 80] }]}
                 options={barOpts}
                 height={220}
               />
@@ -485,9 +485,9 @@ function CoachDash({ name }: { name: string }) {
 
           <Surface className="p-5 md:p-6">
             <SectionHeader
-              eyebrow="Watchlist"
-              title="Athletes to adjust"
-              subtitle={`${watchlist.length} athlete${watchlist.length === 1 ? '' : 's'} are below the preferred recovery band.`}
+              eyebrow="Лист контроля"
+              title="Атлеты для корректировки"
+              subtitle={`${watchlist.length} атл. находятся ниже предпочтительного коридора готовности.`}
             />
             <div className="mt-4 space-y-3">
               {watchlist.map(a => {
@@ -501,7 +501,7 @@ function CoachDash({ name }: { name: string }) {
                       </div>
                       <div className="shrink-0 text-right">
                         <div className="pf-num text-lg leading-none" style={{ color: rc }}>{a.recovery}%</div>
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">recovery</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">готовность</div>
                       </div>
                     </div>
                   </div>
@@ -524,36 +524,36 @@ function AdminDash({ name }: { name: string }) {
       <Surface className="p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-700">
-            Admin View
+            Представление администратора
           </span>
           <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            System Overview
+            Обзор системы
           </span>
         </div>
         <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Control room</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Пульт контроля</p>
             <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
-              Welcome back, {firstName}
+              С возвращением, {firstName}
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              The system is healthy, user counts are stable, and the platform data still reads as live. Keep an eye on service availability and new registrations.
+              Система здорова, число пользователей стабильно, а данные платформы выглядят актуальными. Держите в фокусе доступность сервисов и новые регистрации.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-background/70 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Current state</p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">Operational</p>
-            <p className="mt-1 text-xs text-muted-foreground">No visible disruptions across the demo stack.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Текущее состояние</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">Работает штатно</p>
+            <p className="mt-1 text-xs text-muted-foreground">Во всем demo-контуре не видно сбоев.</p>
           </div>
         </div>
       </Surface>
 
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
         {[
-          { label: 'Total Users', value: '3', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Athletes', value: '1', icon: 'ki-abstract-26', bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Coaches', value: '1', icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
-          { label: 'WHOOP Records', value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
+          { label: 'Всего пользователей', value: '3', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
+          { label: 'Атлеты', value: '1', icon: 'ki-abstract-26', bg: 'bg-orange-50 text-orange-500' },
+          { label: 'Тренеры', value: '1', icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
+          { label: 'Записи WHOOP', value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
         ].map(c => (
           <StatCard
             key={c.label}
@@ -568,15 +568,15 @@ function AdminDash({ name }: { name: string }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_0.9fr]">
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Status"
-            title="System health"
-            subtitle="A short, high-clarity status block for the most important platform services."
+            eyebrow="Статус"
+            title="Здоровье системы"
+            subtitle="Короткий и понятный статус-блок для самых важных сервисов платформы."
           />
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[
-              { label: 'Supabase DB', status: 'Online', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
-              { label: 'WHOOP Data Sync', status: 'Active', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
-              { label: 'Auth Service', status: 'Healthy', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+              { label: 'Supabase DB', status: 'Онлайн', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+              { label: 'Синхронизация WHOOP', status: 'Активно', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
+              { label: 'Сервис авторизации', status: 'Стабильно', color: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' },
             ].map(s => (
               <div key={s.label} className="flex items-center gap-3 rounded-xl border border-border bg-background/70 p-3">
                 <span className={`h-2 w-2 shrink-0 rounded-full ${s.color}`} />
@@ -593,15 +593,15 @@ function AdminDash({ name }: { name: string }) {
 
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Ops"
-            title="Recent admin actions"
-            subtitle="Keep the operational trail compact and easy to scan."
+            eyebrow="Операции"
+            title="Недавние действия администратора"
+            subtitle="Операционный след должен оставаться компактным и легко читаемым."
           />
           <div className="mt-4 space-y-3">
             {[
-              { label: 'New user sync', value: '3 accounts confirmed', meta: 'Latest onboarding window looks clean.', tone: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
-              { label: 'Data feed', value: 'WHOOP import stable', meta: 'No missing sessions in the current demo set.', tone: 'bg-green-50 text-green-600', icon: 'ki-chart-line-up' },
-              { label: 'Audit trail', value: 'Role mapping intact', meta: 'Athlete and coach roles remain unchanged.', tone: 'bg-violet-50 text-violet-600', icon: 'ki-lock' },
+              { label: 'Синхронизация новых пользователей', value: '3 аккаунта подтверждены', meta: 'Последнее окно onboarding прошло чисто.', tone: 'bg-blue-50 text-blue-600', icon: 'ki-people' },
+              { label: 'Поток данных', value: 'Импорт WHOOP стабилен', meta: 'В текущем demo-наборе нет пропущенных сессий.', tone: 'bg-green-50 text-green-600', icon: 'ki-chart-line-up' },
+              { label: 'Аудит', value: 'Связки ролей целы', meta: 'Роли атлета и тренера остаются неизменными.', tone: 'bg-violet-50 text-violet-600', icon: 'ki-lock' },
             ].map(item => (
               <div key={item.label} className="rounded-2xl border border-border bg-background/70 p-3">
                 <div className="flex items-start gap-3">
@@ -620,7 +620,7 @@ function AdminDash({ name }: { name: string }) {
           <div className="mt-4">
             <a href="/admin" className="kt-btn kt-btn-primary w-full justify-center gap-2">
               <i className="ki-filled ki-setting-2 text-sm" />
-              Go to Admin Panel
+              Открыть панель администратора
             </a>
           </div>
         </Surface>
@@ -638,13 +638,13 @@ export default function DashboardPage() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="pf-spin h-8 w-8 rounded-full border-2 border-orange-500 border-t-transparent" />
-          <span className="text-2sm text-muted-foreground">Loading your data…</span>
+          <span className="text-2sm text-muted-foreground">Загружаем ваши данные…</span>
         </div>
       </div>
     )
   }
 
-  const name = user?.name ?? 'Athlete'
+  const name = user?.name ?? 'Атлет'
 
   if (user?.role === 'coach') return <CoachDash name={name} />
   if (user?.role === 'admin') return <AdminDash name={name} />

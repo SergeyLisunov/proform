@@ -92,10 +92,10 @@ export const COACH_MARKS: Record<string, { label: string; bg: string; text: stri
 
 // ── 4 prototype athletes (WHOOP dataset) ─────────────────────────────────────
 export const DEMO_ATHLETES = [
-  { id: 'USER_00011', name: 'Sara Kowalski',   sport: 'Running',         recovery: 42, hrv: 47.2,  rhr: 58, age: 45, gender: 'F', sessions: 18, streak: 5,  risk: 'moderate' as const },
-  { id: 'USER_00003', name: 'Marcus Weiden',   sport: 'Cycling',         recovery: 82, hrv: 62.2,  rhr: 44, age: 43, gender: 'M', sessions: 24, streak: 12, risk: 'low' as const },
-  { id: 'USER_00006', name: 'James Thornton',  sport: 'Swimming',        recovery: 63, hrv: 32.0,  rhr: 52, age: 55, gender: 'M', sessions: 20, streak: 8,  risk: 'moderate' as const },
-  { id: 'USER_00001', name: 'Linh Nguyen',     sport: 'Weight Training', recovery: 80, hrv: 106.5, rhr: 48, age: 56, gender: 'F', sessions: 22, streak: 10, risk: 'low' as const },
+  { id: 'USER_00011', name: 'Sara Kowalski',   sport: 'Бег',                 recovery: 42, hrv: 47.2,  rhr: 58, age: 45, gender: 'F', sessions: 18, streak: 5,  risk: 'moderate' as const },
+  { id: 'USER_00003', name: 'Marcus Weiden',   sport: 'Велоспорт',           recovery: 82, hrv: 62.2,  rhr: 44, age: 43, gender: 'M', sessions: 24, streak: 12, risk: 'low' as const },
+  { id: 'USER_00006', name: 'James Thornton',  sport: 'Плавание',            recovery: 63, hrv: 32.0,  rhr: 52, age: 55, gender: 'M', sessions: 20, streak: 8,  risk: 'moderate' as const },
+  { id: 'USER_00001', name: 'Linh Nguyen',     sport: 'Силовая подготовка',  recovery: 80, hrv: 106.5, rhr: 48, age: 56, gender: 'F', sessions: 22, streak: 10, risk: 'low' as const },
 ]
 
 // ── Demo competitions ─────────────────────────────────────────────────────────
