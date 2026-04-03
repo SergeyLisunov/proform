@@ -514,45 +514,20 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
-      <section className="overflow-hidden rounded-[28px] border border-orange-100/80 bg-gradient-to-br from-orange-50 via-background to-background p-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/dashboard"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-white text-orange-700 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
-            >
-              <i className="ki-filled ki-left text-sm" />
-            </Link>
-            <span className="inline-flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-50 to-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700 shadow-[0_6px_18px_rgba(249,115,22,0.12)]">
-              Рабочее пространство атлета
-            </span>
-            <span className="inline-flex items-center rounded-full border border-orange-100 bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
-              Центр настроек
-            </span>
-          </div>
-
-          <div className="rounded-[24px] border border-white/80 bg-white/80 px-4 py-4 shadow-[0_12px_30px_rgba(249,115,22,0.08)] sm:px-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Настройки</p>
-                <h1 className="mt-1 text-[clamp(1.9rem,3vw,2.8rem)] font-semibold leading-[0.96] tracking-[-0.04em] text-slate-950">
-                  Профиль атлета
-                </h1>
-              </div>
-              <div className="inline-flex items-center self-start rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">
-                Заполнено: {completion}%
-              </div>
-            </div>
-
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Управляйте персональными данными, спортивным контекстом, физиологией и приватностью в одном рабочем пространстве.
-            </p>
-            <p className="mt-3 inline-flex max-w-xl rounded-2xl border border-orange-100 bg-white px-3.5 py-2 text-xs leading-5 text-slate-600 shadow-[0_10px_24px_rgba(249,115,22,0.08)]">
-              {completionLabel}
-            </p>
-          </div>
-        </div>
-      </section>
+      <div className="flex flex-wrap items-center gap-2.5">
+        <Link
+          href="/dashboard"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-white text-orange-700 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+        >
+          <i className="ki-filled ki-left text-sm" />
+        </Link>
+        <span className="inline-flex items-center rounded-full border border-orange-200 bg-gradient-to-r from-orange-50 to-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-700 shadow-[0_6px_18px_rgba(249,115,22,0.12)]">
+          Рабочее пространство атлета
+        </span>
+        <span className="inline-flex items-center rounded-full border border-orange-100 bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+          Центр настроек
+        </span>
+      </div>
 
       <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="flex flex-col gap-4">
@@ -621,19 +596,26 @@ export default function SettingsPage() {
         </aside>
 
         <div className="flex flex-col gap-6">
-          <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6">
+          <section className="rounded-[28px] border border-orange-100/80 bg-gradient-to-br from-orange-50 via-background to-background p-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-6">
             <div className="flex flex-col gap-4">
-              <div className="max-w-2xl">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активный раздел</div>
-                <h2 className="mt-2 text-2xl font-semibold text-foreground">{activeTab.label}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{tabDescriptions[activeTab.id]}</p>
+              <div className="max-w-3xl">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Настройки</div>
+                <h1 className="mt-2 text-[clamp(1.9rem,3vw,2.8rem)] font-semibold leading-[0.96] tracking-[-0.04em] text-slate-950">
+                  Профиль атлета
+                </h1>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  Управляйте персональными данными, спортивным контекстом, физиологией и приватностью в одном рабочем пространстве.
+                </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                <div className="inline-flex items-center rounded-full border border-orange-100 bg-white px-3 py-1.5 text-xs font-semibold text-muted-foreground">
                   Заполнено: {completion}%
                 </div>
                 <div className="inline-flex items-center rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">
                   Текущий фокус: {activeTab.label}
+                </div>
+                <div className="inline-flex max-w-xl rounded-2xl border border-orange-100 bg-white px-3.5 py-2 text-xs leading-5 text-slate-600 shadow-[0_10px_24px_rgba(249,115,22,0.08)]">
+                  {completionLabel}
                 </div>
               </div>
             </div>
