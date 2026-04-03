@@ -514,7 +514,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
-      <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.16),_transparent_34%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_54%,#FFF4EC_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.06)] sm:p-8">
+      <section className="rounded-[28px] border border-border bg-card p-6 shadow-sm sm:p-7">
         <div className="max-w-3xl">
           <div className="flex items-start gap-3">
             <Link
@@ -613,35 +613,19 @@ export default function SettingsPage() {
 
         <div className="flex flex-col gap-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6">
-            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+            <div className="flex flex-col gap-4">
               <div className="max-w-2xl">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активный раздел</div>
                 <h2 className="mt-2 text-2xl font-semibold text-foreground">{activeTab.label}</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{tabDescriptions[activeTab.id]}</p>
               </div>
-              <div className="flex w-full flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:items-end lg:justify-start">
+              <div className="flex flex-wrap items-center gap-3">
                 <div className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground">
                   Заполнено: {completion}%
                 </div>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all sm:w-auto ${
-                    saving
-                      ? 'cursor-not-allowed bg-border text-muted-foreground'
-                      : saved
-                        ? 'bg-[linear-gradient(135deg,#16A34A,#15803D)] text-white shadow-[0_10px_24px_rgba(22,163,74,0.25)]'
-                        : 'bg-[linear-gradient(135deg,#F97316,#EA580C)] text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]'
-                  }`}
-                >
-                  {saving ? (
-                    <><div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Сохранение…</>
-                  ) : saved ? (
-                    <><i className="ki-filled ki-check text-sm" />Сохранено</>
-                  ) : (
-                    <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
-                  )}
-                </button>
+                <div className="inline-flex items-center rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">
+                  Текущий фокус: {activeTab.label}
+                </div>
               </div>
             </div>
           </section>

@@ -130,3 +130,9 @@
 - Re-verified the settings hero dedup pass with:
   - `./node_modules/.bin/eslint app/settings/page.tsx`
   - `npm run build`
+- Completed the settings single-save pass:
+  - removed the upper save CTA so the settings page now uses only the bottom save button
+  - reset the stretched top hero into a simpler compact header card
+- Re-verified the settings single-save pass with:
+  - `./node_modules/.bin/eslint app/settings/page.tsx`
+  - `npm run build`
