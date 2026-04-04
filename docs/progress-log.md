@@ -186,3 +186,9 @@
 - Re-verified the auth-route collision fix with:
   - `./node_modules/.bin/eslint lib/supabase/middleware.ts`
   - `npm run build`
+- Replaced the unstable legacy root entrypoint:
+  - removed the old client-only organization members screen from `/`
+  - switched the production entrypoint to a server-side auth redirect: authenticated users go to `/dashboard`, guests go to `/auth/login`
+- Re-verified the root entrypoint fix with:
+  - `./node_modules/.bin/eslint app/page.tsx`
+  - `npm run build`
