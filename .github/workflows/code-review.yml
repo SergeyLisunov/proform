@@ -1,0 +1,61 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    name: TypeScript & Security Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-6
+          direct_prompt: |
+            You are a senior TypeScript/Next.js engineer reviewing a PR for the ProForm project.
+
+            Project context:
+            - Next.js 14, TypeScript, Supabase, Metronic Tailwind v4
+            - DB: table `users` (NOT `profiles`), `calendar_events` uses `owner_id`, `workouts` uses `athlete_id`
+            - RLS policies use `get_my_user_id()` function
+            - Roles: athlete | coach | organization | admin
+
+            Review priorities:
+            1. CRITICAL — Security: XSS, SQL injection, hardcoded secrets, exposed env vars
+            2. HIGH — Type safety: `any` without justification, missing types, unsafe casts
+            3. HIGH — Async: unhandled rejections, missing await, floating promises
+            4. HIGH — Supabase: wrong column names (user_id vs owner_id vs athlete_id), missing RLS, no NOTIFY after migration
+            5. MEDIUM — React/Next.js: missing deps in useEffect, state mutation, key={index}
+            6. MEDIUM — Performance: N+1 queries, expensive renders without memo
+
+            Format your review as:
+            - 🔴 CRITICAL / 🟠 HIGH / 🟡 MEDIUM / 🟢 OK
+            - File + line number for each issue
+            - Short explanation + suggested fix
+
+            End with: **Verdict: ✅ Approve / ⚠️ Approve with warnings / 🚫 Block**

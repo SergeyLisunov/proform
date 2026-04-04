@@ -2,9 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { useToast } from '@/lib/hooks/useToast'
 
-type AdminTab = 'users' | 'audit' | 'system' | 'privacy'
+function getSB() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
+type AdminTab = 'users' | 'audit' | 'system'
 
 type AdminUser = {
   email: string
@@ -122,8 +131,108 @@ function getInitials(name: string) {
 
 export default function AdminPage() {
   const { user } = useUser()
+  const { success, error: toastError } = useToast()
   const [tab, setTab] = useState<AdminTab>('users')
+
+  // Users tab
+  const [users, setUsers] = useState<DBUser[]>([])
+  const [usersLoading, setUsersLoading] = useState(true)
+  const [changingRole, setChangingRole] = useState<string | null>(null)
+
+  // Stats
+  const [stats, setStats] = useState({ total: 0, athletes: 0, coaches: 0, workouts: 0 })
+
+  // Activity
+  const [activity, setActivity] = useState<RecentActivity[]>([])
+  const [actLoading, setActLoading] = useState(false)
+
+  // Assign modal
   const [showAssign, setShowAssign] = useState(false)
+  const [assignAthlete, setAssignAthlete] = useState('')
+  const [assignCoach, setAssignCoach] = useState('')
+  const [assigning, setAssigning] = useState(false)
+
+  const loadUsers = useCallback(async () => {
+    setUsersLoading(true)
+    const sb = getSB()
+    const { data, error } = await sb
+      .from('users')
+      .select('id, name, email, role, created_at')
+      .order('created_at', { ascending: false })
+    if (error) { console.error(error); setUsersLoading(false); return }
+    const list = (data ?? []) as DBUser[]
+    setUsers(list)
+    setStats({
+      total: list.length,
+      athletes: list.filter(u => u.role === 'athlete').length,
+      coaches: list.filter(u => u.role === 'coach').length,
+      workouts: 0, // loaded separately
+    })
+    setUsersLoading(false)
+  }, [])
+
+  const loadWorkoutCount = useCallback(async () => {
+    const sb = getSB()
+    const { count } = await sb.from('workouts').select('*', { count: 'exact', head: true })
+    setStats(prev => ({ ...prev, workouts: count ?? 0 }))
+  }, [])
+
+  const loadActivity = useCallback(async () => {
+    setActLoading(true)
+    const sb = getSB()
+    // Show recent workouts as activity feed
+    const { data } = await sb
+      .from('workouts')
+      .select('id, activity_type, event_date, created_at, athlete_id, users!workouts_athlete_id_fkey(name, email)')
+      .order('created_at', { ascending: false })
+      .limit(30)
+    const items: RecentActivity[] = (data ?? []).map((w: any) => ({
+      id: w.id,
+      actor: w.users?.name ?? w.users?.email ?? 'Атлет',
+      action: 'create',
+      detail: `${w.activity_type ?? 'Тренировка'} · ${w.event_date}`,
+      table_name: 'workouts',
+      created_at: w.created_at,
+    }))
+    setActivity(items)
+    setActLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return
+    loadUsers()
+    loadWorkoutCount()
+  }, [user, loadUsers, loadWorkoutCount])
+
+  useEffect(() => {
+    if (tab === 'audit' && activity.length === 0) loadActivity()
+  }, [tab, activity.length, loadActivity])
+
+  async function changeRole(userId: string, newRole: string) {
+    setChangingRole(userId)
+    const sb = getSB()
+    const { error } = await sb.from('users').update({ role: newRole }).eq('id', userId)
+    if (error) { toastError('Ошибка смены роли'); setChangingRole(null); return }
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    success('Роль обновлена')
+    setChangingRole(null)
+  }
+
+  async function handleAssign() {
+    if (!assignAthlete || !assignCoach) return
+    setAssigning(true)
+    const sb = getSB()
+    const { error } = await sb
+      .from('athletes')
+      .update({ coach_id: assignCoach })
+      .eq('id', assignAthlete)
+    if (error) { toastError('Ошибка назначения тренера'); setAssigning(false); return }
+    success('Тренер назначен')
+    setAssigning(false)
+    setShowAssign(false)
+    setAssignAthlete('')
+    setAssignCoach('')
+  }
 
   if (user?.role !== 'admin') {
     return (

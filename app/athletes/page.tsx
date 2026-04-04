@@ -3,8 +3,28 @@
 import { useState, type ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
-import { DEMO_ATHLETES, DEMO_DIARY, DEMO_SESSIONS, RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
-import ApexChart from '@/components/charts/ApexChart'
+import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
+import dynamic from 'next/dynamic'
+import { createBrowserClient } from '@supabase/ssr'
+import type { Workout } from '@/services/workouts.service'
+
+const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
+
+function sb() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
+type AthleteUser = {
+  id: string; name: string; sport_type: string | null; age: number | null; gender: string | null
+}
+
+type AthleteWithStats = AthleteUser & {
+  recovery: number | null; hrv: number | null; rhr: number | null
+  sessions: number; recentWorkouts: Workout[]
+}
 
 type TabType = 'overview' | 'sessions' | 'diary' | 'marks'
 type Athlete = typeof DEMO_ATHLETES[number]
@@ -173,7 +193,7 @@ function AthleteCard({
               </div>
               <div className="text-[10px] text-muted-foreground">готовность</div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </button>
@@ -569,7 +589,49 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
 
 export default function AthletesPage() {
   const { user } = useUser()
+  const [athletes, setAthletes] = useState<AthleteWithStats[]>([])
+  const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(0)
+
+  useEffect(() => {
+    if (!user?.id) return
+    if (user.role !== 'coach' && user.role !== 'admin') return
+
+    async function load() {
+      const { data: users } = await sb()
+        .from('users')
+        .select('id, name, sport_type, age, gender')
+        .eq('role', 'athlete')
+        .limit(30)
+      if (!users) { setLoading(false); return }
+
+      const rows: AthleteWithStats[] = await Promise.all(
+        users.map(async u => {
+          const { data: ws } = await sb()
+            .from('workouts')
+            .select('*')
+            .eq('athlete_id', u.id)
+            .order('event_date', { ascending: false })
+            .limit(20)
+          const workouts = (ws ?? []) as Workout[]
+          const withRecovery = workouts.filter(w => w.recovery_score != null)
+          const withHRV      = workouts.filter(w => w.hrv != null)
+          const withRHR      = workouts.filter(w => w.avg_heart_rate != null)
+          return {
+            ...u,
+            recovery: withRecovery.length ? Math.round(withRecovery[0].recovery_score!) : null,
+            hrv:      withHRV.length      ? parseFloat(withHRV[0].hrv!.toFixed(1)) : null,
+            rhr:      withRHR.length      ? Math.round(withRHR[0].avg_heart_rate!) : null,
+            sessions: workouts.length,
+            recentWorkouts: workouts,
+          }
+        })
+      )
+      setAthletes(rows)
+      setLoading(false)
+    }
+    load()
+  }, [user?.id, user?.role])
 
   if (user?.role !== 'coach' && user?.role !== 'admin') {
     return (

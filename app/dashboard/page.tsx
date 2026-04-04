@@ -138,7 +138,11 @@ function AthleteDash({ name }: { name: string }) {
     chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
     stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 5] },
     colors: ['#F97316', '#60A5FA'],
-    xaxis: { categories: weekLabels, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+    xaxis: {
+      categories: weekLabels.slice(0, strainData.length),
+      labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
+      axisBorder: { show: false }, axisTicks: { show: false },
+    },
     yaxis: [
       { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
       { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
@@ -339,8 +343,12 @@ function CoachDash({ name }: { name: string }) {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
     colors: ['#F97316'],
-    xaxis: { categories: ['Sara K.', 'Marcus W.', 'James T.', 'Linh N.'], labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-    yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
+    xaxis: {
+      categories: athletes.map(a => a.name.split(' ')[0]),
+      labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
+      axisBorder: { show: false }, axisTicks: { show: false },
+    },
+    yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, max: 100 },
     grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
     tooltip: { theme: 'light' },
     dataLabels: { enabled: false },
@@ -459,6 +467,24 @@ function CoachDash({ name }: { name: string }) {
                       <div className="pf-num text-xl leading-none" style={{ color: rc }}>{a.recovery}%</div>
                       <i className={`ki-filled ${statusIcon} text-base ${statusColor}`} />
                     </div>
+                    <div className="text-right">
+                      <div className="pf-num text-lg leading-none" style={{ color: rc }}>
+                        {score != null ? `${score}%` : '—'}
+                      </div>
+                      <div className="text-2xs text-muted-foreground">восстановление</div>
+                    </div>
+                    {a.hrv != null && (
+                      <div className="w-28 hidden sm:block">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-2xs text-muted-foreground">HRV</span>
+                          <span className="text-2xs font-bold text-foreground">{a.hrv.toFixed(1)} ms</span>
+                        </div>
+                        <div className="h-1.5 bg-border rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />
+                        </div>
+                      </div>
+                    )}
+                    <i className={`ki-filled ${statusIcon} text-base ${statusColor} shrink-0`} />
                   </div>
                 </div>
               )
@@ -515,7 +541,7 @@ function CoachDash({ name }: { name: string }) {
   )
 }
 
-// ──────────────────────────────────────────────
+// ── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 function AdminDash({ name }: { name: string }) {
   const firstName = name.split(' ')[0]
 
@@ -629,7 +655,7 @@ function AdminDash({ name }: { name: string }) {
   )
 }
 
-// ──────────────────────────────────────────────
+// ── ROOT ─────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { user, loading } = useUser()
 
@@ -646,7 +672,7 @@ export default function DashboardPage() {
 
   const name = user?.name ?? 'Атлет'
 
-  if (user?.role === 'coach') return <CoachDash name={name} />
-  if (user?.role === 'admin') return <AdminDash name={name} />
-  return <AthleteDash name={name} />
+  if (user.role === 'coach' || user.role === 'organization') return <CoachDash userId={user.id} name={user.name} />
+  if (user.role === 'admin') return <AdminDash name={user.name} />
+  return <AthleteDash userId={user.id} name={user.name} />
 }

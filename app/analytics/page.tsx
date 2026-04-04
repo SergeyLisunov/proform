@@ -149,8 +149,12 @@ function InsightCard({
   )
 }
 
-function CoachAnalytics() {
-  const [period, setPeriod] = useState('30d')
+function sb() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
   const averageRecovery = Math.round(
     DEMO_ATHLETES.reduce((sum, athlete) => sum + athlete.recovery, 0) / DEMO_ATHLETES.length
@@ -398,8 +402,11 @@ function CoachAnalytics() {
   )
 }
 
-function AthleteAnalytics() {
-  const [period, setPeriod] = useState('7d')
+// ── COACH ANALYTICS ──────────────────────────────────────────────────────────
+type AthleteStats = {
+  id: string; name: string; sport_type: string | null
+  recovery: number | null; hrv: number | null; sessions: number; totalStrain: number
+}
 
   const areaOpts = {
     chart: { type: 'area' as const, toolbar: { show: false }, animations: { enabled: false } },
@@ -434,7 +441,6 @@ function AthleteAnalytics() {
     },
     yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
     grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontFamily: 'DM Sans', fontSize: '12px' },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
@@ -662,6 +668,7 @@ function AthleteAnalytics() {
               </div>
             </Surface>
           </div>
+        )}
 
           <Surface className="xl:col-span-6 p-5">
             <SectionTitle
@@ -736,6 +743,7 @@ function AthleteAnalytics() {
   )
 }
 
+// ── ROOT ─────────────────────────────────────────────────────────────────────
 export default function AnalyticsPage() {
   const { user } = useUser()
 

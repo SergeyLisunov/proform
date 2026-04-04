@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
+import { useToast } from '@/lib/hooks/useToast'
 import ReactDOM from 'react-dom'
 import { useUser } from '@/lib/hooks/useUser'
 import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
@@ -342,6 +343,7 @@ function ViewEditDrawer({
   onUpdated: (w: Workout) => void
   onDeleted: (id: string) => void
 }) {
+  const { error: toastError } = useToast()
   const [mounted,    setMounted]    = useState(false)
   const [visible,    setVisible]    = useState(false)
   const [mode,       setMode]       = useState<'view'|'edit'>('view')
@@ -402,7 +404,7 @@ function ViewEditDrawer({
       setMode('view')
     } catch (err) {
       console.error('updateWorkout error:', err)
-      alert('Не удалось сохранить тренировку')
+      toastError('Не удалось сохранить тренировку')
     } finally { setSaving(false) }
   }
 
@@ -415,7 +417,7 @@ function ViewEditDrawer({
       handleClose()
     } catch (err) {
       console.error('deleteWorkout error:', err)
-      alert('Не удалось удалить тренировку')
+      toastError('Не удалось удалить тренировку')
     } finally { setDeleting(false) }
   }
 
