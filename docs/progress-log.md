@@ -180,3 +180,9 @@
   - translated the remaining high-visibility English copy across shared UI, auth, dashboard, analytics, diary, and athletes screens
   - normalized shell badges, readiness states, workspace chips, and workout/detail wording into a single Russian product language
   - aligned demo sport names and app metadata so the branch is ready for a production rollout without mixed-language surfaces
+- Fixed an auth-route collision in middleware after the production QA pass:
+  - found that `messages` and `settings` were missing from the reserved top-level route list and were therefore treated as public organization slugs
+  - switched the org public-page check to an explicit reserved slug set so app routes no longer bypass auth protection by accident
+- Re-verified the auth-route collision fix with:
+  - `./node_modules/.bin/eslint lib/supabase/middleware.ts`
+  - `npm run build`

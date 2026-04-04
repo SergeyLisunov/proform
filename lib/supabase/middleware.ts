@@ -29,10 +29,23 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = pathname.startsWith('/auth')
   const isPublic = pathname === '/'
 
-  // Public org pages: /[orgSlug] — single-segment paths that are not known app routes
-  const knownRoutes = ['/dashboard', '/calendar', '/diary', '/analytics', '/athletes', '/admin', '/org', '/auth', '/api']
+  // Public org pages: /[orgSlug] — single-segment paths that do not collide with app slugs.
+  const reservedTopLevelSlugs = new Set([
+    'dashboard',
+    'calendar',
+    'diary',
+    'analytics',
+    'athletes',
+    'messages',
+    'settings',
+    'pricing',
+    'admin',
+    'org',
+    'auth',
+    'api',
+  ])
   const isOrgPublicPage =
-    !knownRoutes.some(r => pathname === r || pathname.startsWith(r + '/')) &&
+    !reservedTopLevelSlugs.has(pathname.slice(1)) &&
     /^\/[a-z0-9-]+$/.test(pathname)
 
   if (!user && !isAuthRoute && !isPublic && !isOrgPublicPage) {
