@@ -20,7 +20,7 @@ export async function getMyOrg(): Promise<Organization | null> {
     .eq('user_id', userData.id)
     .single()
 
-  return data ?? null
+  return (data ?? null) as Organization | null
 }
 
 export async function getOrgBySlug(slug: string): Promise<Organization | null> {
@@ -31,7 +31,7 @@ export async function getOrgBySlug(slug: string): Promise<Organization | null> {
     .eq('org_slug', slug)
     .single()
 
-  return data ?? null
+  return (data ?? null) as Organization | null
 }
 
 export async function getOrgMembers(orgId: string): Promise<OrgMember[]> {
@@ -42,7 +42,7 @@ export async function getOrgMembers(orgId: string): Promise<OrgMember[]> {
     .eq('org_id', orgId)
     .order('joined_at', { ascending: false })
 
-  return (data ?? []) as OrgMember[]
+  return (data ?? []) as unknown as OrgMember[]
 }
 
 export async function inviteMember(
@@ -96,7 +96,7 @@ export async function getAllOrgs(): Promise<Organization[]> {
     .select('*')
     .order('created_at', { ascending: false })
 
-  return data ?? []
+  return (data ?? []) as Organization[]
 }
 
 export async function verifyOrg(orgId: string): Promise<void> {

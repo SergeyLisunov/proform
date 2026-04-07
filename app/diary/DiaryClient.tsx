@@ -44,6 +44,7 @@ export default function DiaryClient({ role, userId }: Props) {
       hrv: form.hrv ? parseFloat(form.hrv) : null,
       description: form.description || null,
       is_public: form.is_public,
+      cycle_type: 'micro',
     }
     await supabase.from('workouts').insert(payload)
     setSaving(false)

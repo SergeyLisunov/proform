@@ -40,7 +40,7 @@ export async function createWallPost(post: {
   const supabase = createClient()
   const { data } = await supabase
     .from('wall_posts')
-    .insert({ ...post, is_pinned: false, is_deleted: false })
+    .insert({ ...post, event_date: post.event_date ?? null, is_pinned: false, is_deleted: false })
     .select()
     .single()
 

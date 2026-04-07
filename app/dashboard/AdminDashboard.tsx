@@ -13,10 +13,10 @@ export default async function AdminDashboard() {
     supabase.from('users').select('id, name, email, role, created_at').order('created_at', { ascending: false }).limit(10),
   ])
 
-  const ROLE_STYLE: Record<string, { bg: string; text: string }> = {
-    athlete: { bg: '#DBEAFE', text: '#2563EB' },
-    coach:   { bg: '#FFEDD5', text: '#F97316' },
-    admin:   { bg: '#EDE9FE', text: '#7C3AED' },
+  const ROLE_STYLE: Record<string, { background: string; color: string }> = {
+    athlete: { background: '#DBEAFE', color: '#2563EB' },
+    coach:   { background: '#FFEDD5', color: '#F97316' },
+    admin:   { background: '#EDE9FE', color: '#7C3AED' },
   }
 
   return (
@@ -72,7 +72,7 @@ export default async function AdminDashboard() {
                   <td className="py-3 px-3 font-semibold text-slate-800">{u.name}</td>
                   <td className="py-3 px-3 text-slate-500">{u.email}</td>
                   <td className="py-3 px-3">
-                    <span className="text-[11px] font-bold px-2 py-1 rounded-full" style={ROLE_STYLE[u.role] ?? { bg:'#F1F5F9', text:'#64748B' }}>
+                    <span className="text-[11px] font-bold px-2 py-1 rounded-full" style={ROLE_STYLE[u.role] ?? { background:'#F1F5F9', color:'#64748B' }}>
                       {u.role}
                     </span>
                   </td>

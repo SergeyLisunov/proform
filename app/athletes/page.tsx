@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
-import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
+import { RISK_COLORS, COACH_MARKS, recoveryColor, DEMO_ATHLETES, DEMO_SESSIONS, DEMO_DIARY } from '@/lib/utils/data'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
@@ -527,7 +527,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                         className="inline-flex shrink-0 items-center rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
                         style={{ background: meta.bg, color: meta.text, borderColor: meta.border }}
                       >
-                        {RISK_LABELS[entry.risk]}
+                        {RISK_LABELS[entry.risk as keyof typeof RISK_LABELS]}
                       </span>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">

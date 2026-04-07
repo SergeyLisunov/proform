@@ -420,6 +420,14 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting] = useState(false)
 
+  async function handleDeleteAccount() {
+    if (deleteConfirm !== 'УДАЛИТЬ') return
+    setDeleting(true)
+    const sb = getSB()
+    await sb.auth.signOut()
+    window.location.href = '/auth/login'
+  }
+
   // Загрузка данных
   useEffect(() => {
     if (!userId) return

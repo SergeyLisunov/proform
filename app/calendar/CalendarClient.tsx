@@ -47,7 +47,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
     return cycleBlocks.find(b => b.start_date <= ds && b.end_date >= ds && b.cycle_type === layer)
   }
 
-  const cells = Array.from({ length: firstDay }, () => null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1))
+  const cells: (number | null)[] = (Array.from({ length: firstDay }, () => null) as (number | null)[]).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1))
 
   return (
     <div className="flex flex-col gap-5 pf-page-enter">

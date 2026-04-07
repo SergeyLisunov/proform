@@ -30,7 +30,8 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
   ])
 
   const latest = metrics?.[0]
-  const avg = (key: keyof typeof metrics[0]) =>
+  type MetricRow = NonNullable<typeof metrics>[number]
+  const avg = (key: keyof MetricRow) =>
     metrics?.length ? Math.round(metrics.reduce((s, m) => s + ((m[key] as number) ?? 0), 0) / metrics.length * 10) / 10 : null
   const recovery = latest?.recovery_score ?? 0
 
@@ -107,7 +108,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
           <p className="pf-num text-lg text-slate-900 mb-0.5">Зоны пульса</p>
           <p className="text-xs text-slate-400 mb-4">По последним тренировкам</p>
           {workouts?.length ? (() => {
-            const totals = [1,2,3,4,5].map(z => workouts.reduce((s, w) => s + ((w as Record<string,number>)[`hr_zone_${z}_min`] ?? 0), 0))
+            const totals = [1,2,3,4,5].map(z => workouts.reduce((s, w) => s + ((w as unknown as Record<string,number>)[`hr_zone_${z}_min`] ?? 0), 0))
             const grand = totals.reduce((a,b) => a+b, 0) || 1
             const pcts = totals.map(t => Math.round(t/grand*100))
             const COLORS = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']

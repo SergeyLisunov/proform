@@ -37,6 +37,7 @@ export async function createNewsletter(nl: {
     .from('newsletters')
     .insert({
       ...nl,
+      scheduled_at: nl.scheduled_at ?? null,
       sent_at: nl.status === 'sent' ? new Date().toISOString() : null,
     })
     .select()

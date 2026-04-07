@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 
 import ApexChart from '@/components/charts/ApexChart'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
@@ -151,7 +152,6 @@ function InsightCard({
 
 function CoachAnalytics() {
   const [period, setPeriod] = useState('30d')
-
   const averageRecovery = Math.round(
     DEMO_ATHLETES.reduce((sum, athlete) => sum + athlete.recovery, 0) / DEMO_ATHLETES.length
   )
@@ -398,7 +398,7 @@ function CoachAnalytics() {
   )
 }
 
-// ── COACH ANALYTICS ──────────────────────────────────────────────────────────
+// ── ATHLETE ANALYTICS ─────────────────────────────────────────────────────────
 type AthleteStats = {
   id: string; name: string; sport_type: string | null
   recovery: number | null; hrv: number | null; sessions: number; totalStrain: number
@@ -406,7 +406,6 @@ type AthleteStats = {
 
 function AthleteAnalytics() {
   const [period, setPeriod] = useState('30d')
-
   const areaOpts = {
     chart: { type: 'area' as const, toolbar: { show: false }, animations: { enabled: false } },
     stroke: { curve: 'smooth' as const, width: 2.5 },

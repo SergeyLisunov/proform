@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -13,7 +13,10 @@ function getSB() {
   )
 }
 
-type AdminTab = 'users' | 'audit' | 'system'
+type AdminTab = 'users' | 'privacy' | 'audit' | 'system'
+
+type DBUser = { id: string; name: string; email: string; role: string; created_at: string }
+type RecentActivity = { id: string; actor: string; action: string; detail: string; table_name: string; created_at: string }
 
 type AdminUser = {
   email: string

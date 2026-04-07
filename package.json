@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
-    "@supabase/ssr": "^0.5.2",
+    "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.49.1",
     "apexcharts": "^4.7.0",
     "clsx": "^2.1.1",

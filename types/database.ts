@@ -21,6 +21,7 @@ export type Database = {
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['users']['Insert']>
+        Relationships: []
       }
       athletes: {
         Row: {
@@ -40,6 +41,7 @@ export type Database = {
         }
         Insert: Partial<Database['public']['Tables']['athletes']['Row']> & { id: string }
         Update: Partial<Database['public']['Tables']['athletes']['Row']>
+        Relationships: []
       }
       workouts: {
         Row: {
@@ -70,8 +72,35 @@ export type Database = {
           trainer_comment: string | null
           created_at: string
         }
-        Insert: Omit<Database['public']['Tables']['workouts']['Row'], 'id' | 'created_at'> & { id?: string }
+        Insert: {
+          id?: string
+          athlete_id: string
+          event_date: string
+          event_type: string
+          is_public?: boolean
+          cycle_type?: string
+          activity_type?: string | null
+          workout_time_of_day?: string | null
+          start_time?: string | null
+          activity_duration_min?: number | null
+          activity_strain?: number | null
+          avg_heart_rate?: number | null
+          max_heart_rate?: number | null
+          activity_calories?: number | null
+          hr_zone_1_min?: number | null
+          hr_zone_2_min?: number | null
+          hr_zone_3_min?: number | null
+          hr_zone_4_min?: number | null
+          hr_zone_5_min?: number | null
+          recovery_score?: number | null
+          hrv?: number | null
+          name?: string | null
+          description?: string | null
+          mood?: number | null
+          trainer_comment?: string | null
+        }
         Update: Partial<Database['public']['Tables']['workouts']['Row']>
+        Relationships: []
       }
       daily_metrics: {
         Row: {
@@ -91,6 +120,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['daily_metrics']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['daily_metrics']['Row']>
+        Relationships: []
       }
       competitions: {
         Row: {
@@ -106,26 +136,31 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['competitions']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['competitions']['Row']>
+        Relationships: []
       }
       workout_comments: {
         Row: { id: string; workout_id: string; author_id: string; body: string; created_at: string }
         Insert: Omit<Database['public']['Tables']['workout_comments']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['workout_comments']['Row']>
+        Relationships: []
       }
       observation_diary: {
         Row: { id: string; coach_id: string; athlete_id: string | null; date: string; note: string; tags: string[]; created_at: string }
         Insert: Omit<Database['public']['Tables']['observation_diary']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['observation_diary']['Row']>
+        Relationships: []
       }
       cycle_blocks: {
         Row: { id: string; athlete_id: string; start_date: string; end_date: string; cycle_type: 'micro' | 'meso' | 'macro'; label: string | null; color: string; created_at: string }
         Insert: Omit<Database['public']['Tables']['cycle_blocks']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['cycle_blocks']['Row']>
+        Relationships: []
       }
       trainer_athletes: {
         Row: { trainer_id: string; athlete_id: string; created_at: string }
         Insert: { trainer_id: string; athlete_id: string }
         Update: never
+        Relationships: []
       }
       calendar_events: {
         Row: {
@@ -157,6 +192,7 @@ export type Database = {
           start_time?: string | null
           end_time?: string | null
         }
+        Relationships: []
       }
       organizations: {
         Row: {
@@ -171,6 +207,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['organizations']['Row'], 'id' | 'created_at' | 'is_verified'> & { id?: string; is_verified?: boolean }
         Update: Partial<Database['public']['Tables']['organizations']['Row']>
+        Relationships: []
       }
       org_members: {
         Row: {
@@ -183,6 +220,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['org_members']['Row'], 'id' | 'joined_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['org_members']['Row']>
+        Relationships: []
       }
       wall_posts: {
         Row: {
@@ -200,6 +238,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['wall_posts']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['wall_posts']['Row']>
+        Relationships: []
       }
       newsletters: {
         Row: {
@@ -216,6 +255,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['newsletters']['Row'], 'id' | 'created_at'> & { id?: string }
         Update: Partial<Database['public']['Tables']['newsletters']['Row']>
+        Relationships: []
       }
       newsletter_deliveries: {
         Row: {
@@ -228,11 +268,13 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['newsletter_deliveries']['Row'], 'id'> & { id?: string }
         Update: Partial<Database['public']['Tables']['newsletter_deliveries']['Row']>
+        Relationships: []
       }
     }
+    Views: { [_ in never]: never }
     Functions: {
-      get_my_role: { Args: Record<never, never>; Returns: string }
-      get_my_user_id: { Args: Record<never, never>; Returns: string }
+      get_my_role: { Args: Record<string, never>; Returns: string }
+      get_my_user_id: { Args: Record<string, never>; Returns: string }
     }
   }
 }

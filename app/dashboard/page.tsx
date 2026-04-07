@@ -139,7 +139,7 @@ function AthleteDash({ name }: { name: string }) {
     stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 5] },
     colors: ['#F97316', '#60A5FA'],
     xaxis: {
-      categories: weekLabels.slice(0, strainData.length),
+      categories: weekLabels.slice(0, strain7d.length),
       labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
       axisBorder: { show: false }, axisTicks: { show: false },
     },
@@ -339,6 +339,12 @@ function AthleteDash({ name }: { name: string }) {
 // ──────────────────────────────────────────────
 function CoachDash({ name }: { name: string }) {
   const firstName = name.split(' ')[0]
+  const athletes = [
+    { name: 'Sara Kowalski', sport: 'Бег', recovery: 42, hrv: 47.2, status: 'warning' },
+    { name: 'Marcus Weiden', sport: 'Велоспорт', recovery: 82, hrv: 62.2, status: 'good' },
+    { name: 'James Thornton', sport: 'Плавание', recovery: 63, hrv: 32.0, status: 'ok' },
+    { name: 'Linh Nguyen', sport: 'Силовая подготовка', recovery: 80, hrv: 106.5, status: 'good' },
+  ]
   const barOpts = {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
@@ -353,13 +359,6 @@ function CoachDash({ name }: { name: string }) {
     tooltip: { theme: 'light' },
     dataLabels: { enabled: false },
   }
-
-  const athletes = [
-    { name: 'Sara Kowalski', sport: 'Бег', recovery: 42, hrv: 47.2, status: 'warning' },
-    { name: 'Marcus Weiden', sport: 'Велоспорт', recovery: 82, hrv: 62.2, status: 'good' },
-    { name: 'James Thornton', sport: 'Плавание', recovery: 63, hrv: 32.0, status: 'ok' },
-    { name: 'Linh Nguyen', sport: 'Силовая подготовка', recovery: 80, hrv: 106.5, status: 'good' },
-  ]
 
   const watchlist = athletes.filter(a => a.recovery < 70)
   const coachSignals = [
@@ -469,7 +468,7 @@ function CoachDash({ name }: { name: string }) {
                     </div>
                     <div className="text-right">
                       <div className="pf-num text-lg leading-none" style={{ color: rc }}>
-                        {score != null ? `${score}%` : '—'}
+                        {a.recovery != null ? `${a.recovery}%` : '—'}
                       </div>
                       <div className="text-2xs text-muted-foreground">восстановление</div>
                     </div>
@@ -672,7 +671,8 @@ export default function DashboardPage() {
 
   const name = user?.name ?? 'Атлет'
 
-  if (user.role === 'coach' || user.role === 'organization') return <CoachDash userId={user.id} name={user.name} />
+  if (!user) return null
+  if (user.role === 'coach' || user.role === 'organization') return <CoachDash name={user.name} />
   if (user.role === 'admin') return <AdminDash name={user.name} />
-  return <AthleteDash userId={user.id} name={user.name} />
+  return <AthleteDash name={user.name} />
 }
