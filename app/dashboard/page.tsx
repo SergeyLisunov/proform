@@ -669,9 +669,26 @@ export default function DashboardPage() {
     )
   }
 
-  const name = user?.name ?? 'Атлет'
+  if (!user) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Surface className="w-full max-w-md p-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Сессия</p>
+          <h2 className="mt-2 text-2xl font-semibold text-foreground">Не удалось загрузить профиль</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Попробуйте войти снова. Если проблема повторится, мы уже сузили ее до auth-профиля и сможем добить отдельно.
+          </p>
+          <div className="mt-5">
+            <a href="/auth/login" className="kt-btn kt-btn-primary gap-2">
+              <i className="ki-filled ki-enter text-sm" />
+              Перейти ко входу
+            </a>
+          </div>
+        </Surface>
+      </div>
+    )
+  }
 
-  if (!user) return null
   if (user.role === 'coach' || user.role === 'organization') return <CoachDash name={user.name} />
   if (user.role === 'admin') return <AdminDash name={user.name} />
   return <AthleteDash name={user.name} />
