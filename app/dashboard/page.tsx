@@ -105,7 +105,7 @@ function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
           <div className="flex flex-wrap items-center gap-2">
             <h4 className="truncate text-sm font-semibold text-foreground">{title}</h4>
             <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-              Logged
+              Записано
             </span>
           </div>
           <p className="mt-1 text-2xs text-muted-foreground">{meta}</p>
@@ -115,7 +115,7 @@ function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
         </div>
         <div className="shrink-0 text-right">
           <div className="pf-num text-xl leading-none text-foreground">{strain}</div>
-          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">strain</div>
+          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">нагрузка</div>
         </div>
       </div>
     </div>
@@ -190,9 +190,9 @@ function AthleteDash({ name }: { name: string }) {
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <SmallSignal label="Sleep" value="7.8 hrs" hint="Enough to support a stable training day." icon="ki-moon" tone="bg-violet-50 text-violet-600" />
+          <SmallSignal label="Сон" value="7.8 ч" hint="Этого достаточно для стабильного тренировочного дня." icon="ki-moon" tone="bg-violet-50 text-violet-600" />
           <SmallSignal label="Потолок нагрузки" value="Умеренно" hint="Сохраните день, удерживая объем под контролем." icon="ki-abstract-31" tone="bg-orange-50 text-orange-600" />
-          <SmallSignal label="HRV trend" value="47 ms" hint="Still above the week average and holding." icon="ki-abstract-26" tone="bg-blue-50 text-blue-600" />
+          <SmallSignal label="Тренд ВСР" value="47 мс" hint="Пока держится выше среднего уровня за неделю." icon="ki-abstract-26" tone="bg-blue-50 text-blue-600" />
         </div>
       </Surface>
 
@@ -206,14 +206,14 @@ function AthleteDash({ name }: { name: string }) {
         />
         <StatCard
           label="Пульс покоя"
-          value={45.8} unit="bpm"
+          value={45.8} unit="уд/мин"
           icon="ki-heart" iconBg="bg-red-50 text-red-500"
           delta={-3}
           sparkData={[48, 47, 46, 47, 45, 46, 46]} sparkColor="#EF4444"
         />
         <StatCard
           label="Средний сон"
-          value={7.8} unit="hrs"
+          value={7.8} unit="ч"
           icon="ki-moon" iconBg="bg-violet-50 text-violet-600"
           sparkData={[7.2, 8.1, 7.5, 8.3, 7.8, 8.0, 7.8]} sparkColor="#7C3AED"
         />
@@ -243,8 +243,8 @@ function AthleteDash({ name }: { name: string }) {
             <ApexChart
               type="line"
               series={[
-                { name: 'Strain', data: strain7d },
-                { name: 'HRV (ms)', data: hrv7d },
+                { name: 'Нагрузка', data: strain7d },
+                { name: 'ВСР (мс)', data: hrv7d },
               ]}
               options={lineOpts}
               height={220}
@@ -254,7 +254,7 @@ function AthleteDash({ name }: { name: string }) {
 
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Insight"
+            eyebrow="Инсайт"
             title="Фокус дня"
             subtitle="Держите нагрузку под контролем и дайте восстановлению вести день."
           />
@@ -307,9 +307,9 @@ function AthleteDash({ name }: { name: string }) {
 
         <Surface className="p-5 md:p-6">
           <SectionHeader
-            eyebrow="Activity"
-            title="Recent sessions"
-            subtitle="Clean rhythm, readable details, and the strain number last."
+            eyebrow="Активность"
+            title="Последние сессии"
+            subtitle="Плотный ритм, читаемые детали и нагрузка на первом плане."
             action={(
               <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
                 Открыть все →
