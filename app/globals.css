@@ -3,16 +3,23 @@
 @tailwind utilities;
 
 /* ProForm custom utilities on top of Metronic */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('/assets/vendors/keenicons/styles.bundle.css');
+@import url('/assets/css/core.bundle.css');
+@import url('/assets/css/styles.css');
+
+:root {
+  --pf-font-sans: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --pf-font-display: Impact, "Arial Narrow Bold", "Arial Narrow", sans-serif;
+}
 
 .pf-num {
-  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-family: var(--pf-font-display);
   letter-spacing: 0.02em;
   line-height: 1;
 }
 
 body {
-  font-family: 'DM Sans', var(--font-sans, system-ui), sans-serif;
+  font-family: var(--pf-font-sans);
 }
 
 /* Animations */

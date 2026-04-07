@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
 
@@ -10,19 +11,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" className="h-full light" data-kt-theme="true" data-kt-theme-mode="light">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="/assets/vendors/keenicons/styles.bundle.css" />
-        <link rel="stylesheet" href="/assets/css/core.bundle.css" />
-        <link rel="stylesheet" href="/assets/css/styles.css" />
-      </head>
       <body className="antialiased flex h-full text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
         <ToastProvider>
           {children}
         </ToastProvider>
-        <script src="/assets/js/core.bundle.js" defer />
+        <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
       </body>
     </html>
   )

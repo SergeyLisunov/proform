@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useToast } from '@/lib/hooks/useToast'
 import Link from 'next/link'
+import Image from 'next/image'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -47,6 +48,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
   const dragRef    = useRef<{ sx: number; sy: number; cx: number; cy: number } | null>(null)
 
   useEffect(() => {
+    const objectUrl = objUrl.current
     setMounted(true)
     requestAnimationFrame(() => setVisible(true))
     document.body.style.overflow = 'hidden'
@@ -59,11 +61,11 @@ function AvatarCropModal({ file, onClose, onCropped }: {
       cropRef.current = { x: (img.width - side) / 2, y: (img.height - side) / 2, size: side }
       redraw()
     }
-    img.src = objUrl.current
+    img.src = objectUrl
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
-      URL.revokeObjectURL(objUrl.current)
+      URL.revokeObjectURL(objectUrl)
     }
   }, []) // eslint-disable-line
 
@@ -436,10 +438,17 @@ export default function AthleteProfileCard() {
                 className="group">
                 {/* Avatar */}
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.name} style={{
-                    width:80, height:80, borderRadius:'50%',
-                    border:'4px solid var(--card)', objectFit:'cover', display:'block',
-                  }} />
+                  <Image
+                    src={profile.avatar_url}
+                    alt={profile.name}
+                    width={80}
+                    height={80}
+                    unoptimized
+                    style={{
+                      width:80, height:80, borderRadius:'50%',
+                      border:'4px solid var(--card)', objectFit:'cover', display:'block',
+                    }}
+                  />
                 ) : (
                   <div style={{
                     width:80, height:80, borderRadius:'50%',
