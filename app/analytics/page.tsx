@@ -149,12 +149,8 @@ function InsightCard({
   )
 }
 
-function sb() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
+function CoachAnalytics() {
+  const [period, setPeriod] = useState('30d')
 
   const averageRecovery = Math.round(
     DEMO_ATHLETES.reduce((sum, athlete) => sum + athlete.recovery, 0) / DEMO_ATHLETES.length
@@ -407,6 +403,9 @@ type AthleteStats = {
   id: string; name: string; sport_type: string | null
   recovery: number | null; hrv: number | null; sessions: number; totalStrain: number
 }
+
+function AthleteAnalytics() {
+  const [period, setPeriod] = useState('30d')
 
   const areaOpts = {
     chart: { type: 'area' as const, toolbar: { show: false }, animations: { enabled: false } },
@@ -668,7 +667,6 @@ type AthleteStats = {
               </div>
             </Surface>
           </div>
-        )}
 
           <Surface className="xl:col-span-6 p-5">
             <SectionTitle

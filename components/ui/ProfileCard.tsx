@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Instagram, Twitter } from "lucide-react"
 
 interface ProfileCardProps {
@@ -88,9 +89,11 @@ export function ProfileCard({
     <div className="w-full max-w-sm mx-auto">
       <div className="bg-card rounded-[2rem] shadow-lg overflow-hidden">
         <div className="relative h-40 overflow-hidden">
-          <img
+          <Image
             src={backgroundUrl}
             alt="Background"
+            fill
+            unoptimized
             className="w-full h-full object-cover opacity-60"
           />
           <button
@@ -109,7 +112,7 @@ export function ProfileCard({
         <div className="px-6 pb-6 -mt-12">
           <div className="relative w-24 h-24 mb-4">
             <div className="w-full h-full rounded-full border-4 border-card overflow-hidden bg-card shadow-lg">
-              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+              <Image src={avatarUrl} alt={name} fill unoptimized className="w-full h-full object-cover" />
             </div>
           </div>
 

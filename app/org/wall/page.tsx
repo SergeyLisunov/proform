@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useToast } from '@/lib/hooks/useToast'
 import { getMyOrg } from '@/services/org.service'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
 import type { Organization, WallPost, PostType, PostVisibility } from '@/types/org.types'

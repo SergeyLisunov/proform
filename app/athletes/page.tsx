@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
@@ -193,7 +193,7 @@ function AthleteCard({
               </div>
               <div className="text-[10px] text-muted-foreground">готовность</div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </button>

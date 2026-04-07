@@ -518,6 +518,7 @@ export default function SettingsPage() {
     'Заполните ключевые данные, чтобы рекомендации и аналитика были точнее.'
 
   return (
+    <>
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 pf-enter">
       <div className="flex flex-wrap items-center gap-2.5">
         <Link
@@ -936,5 +937,6 @@ export default function SettingsPage() {
         </div>
       </div>
     )}
+    </>
   )
 }
