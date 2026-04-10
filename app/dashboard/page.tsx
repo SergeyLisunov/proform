@@ -1,9 +1,10 @@
 'use client'
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import dynamic from 'next/dynamic'
+import { createClient } from '@/lib/supabase/client'
 import { recoveryColor, DEMO_SESSIONS } from '@/lib/utils/data'
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const AthleteProfileCard = dynamic(() => import('@/components/ui/AthleteProfileCard'), { ssr: false })
@@ -18,6 +19,56 @@ const sparkOpts = (color: string) => ({
 })
 
 const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+type WeeklyGoalProgress = {
+  targetHours: number | null
+  completedHours: number
+  completionPercent: number
+  remainingHours: number | null
+}
+
+type AthleteGoalRow = {
+  weekly_training_hours: number | null
+}
+
+type WorkoutDurationRow = {
+  activity_duration_min: number | null
+  event_date: string
+}
+
+function toISODate(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getCurrentWeekRange() {
+  const now = new Date()
+  const currentDay = now.getDay()
+  const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() + diffToMonday)
+  weekStart.setHours(0, 0, 0, 0)
+
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekStart.getDate() + 6)
+  weekEnd.setHours(23, 59, 59, 999)
+
+  return {
+    from: toISODate(weekStart),
+    to: toISODate(weekEnd),
+  }
+}
+
+function roundHours(value: number) {
+  return Math.round(value * 10) / 10
+}
+
+function formatHours(value: number) {
+  const rounded = roundHours(value)
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)
+}
 
 function Surface({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -123,16 +174,103 @@ function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
 }
 
 // ──────────────────────────────────────────────
-function AthleteDash({ name }: { name: string }) {
+function AthleteDash({ name, userId }: { name: string; userId: string }) {
   const firstName = name.split(' ')[0]
-  const rc = recoveryColor(42)
   const hrv7d = [41, 44, 50, 48, 47, 45, 47]
   const strain7d = [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1]
+  const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoalProgress>({
+    targetHours: null,
+    completedHours: 0,
+    completionPercent: 0,
+    remainingHours: null,
+  })
+  const [weeklyGoalLoading, setWeeklyGoalLoading] = useState(true)
   const athleteSignals = [
     { label: 'Следующая сессия', value: 'Легкая аэробика', hint: 'Держите следующий блок в Z2 и не допускайте скачков.', icon: 'ki-abstract-14', tone: 'bg-blue-50 text-blue-600' },
     { label: 'Сон', value: '7.8 ч', hint: 'Хороший уровень для объема, который поддерживает восстановление.', icon: 'ki-moon', tone: 'bg-violet-50 text-violet-600' },
     { label: 'Тренд ВСР', value: '+2.1 мс', hint: 'Среднее за 7 дней остается стабильным и постепенно растет.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
   ]
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadWeeklyGoal() {
+      setWeeklyGoalLoading(true)
+      const supabase = createClient()
+      const { from, to } = getCurrentWeekRange()
+
+      const [{ data: athleteData }, { data: workoutsData }] = await Promise.all([
+        supabase
+          .from('athletes')
+          .select('weekly_training_hours')
+          .eq('id', userId)
+          .maybeSingle(),
+        supabase
+          .from('workouts')
+          .select('activity_duration_min, event_date')
+          .eq('athlete_id', userId)
+          .gte('event_date', from)
+          .lte('event_date', to),
+      ])
+
+      if (cancelled) return
+
+      const athleteGoal = athleteData as AthleteGoalRow | null
+      const workoutDurations = (workoutsData ?? []) as WorkoutDurationRow[]
+      const targetHoursRaw = athleteGoal?.weekly_training_hours
+      const targetHours = typeof targetHoursRaw === 'number' && Number.isFinite(targetHoursRaw) && targetHoursRaw > 0
+        ? roundHours(targetHoursRaw)
+        : null
+
+      const completedMinutes = workoutDurations.reduce((sum, workout) => {
+        const duration = typeof workout.activity_duration_min === 'number' ? workout.activity_duration_min : 0
+        return sum + duration
+      }, 0)
+      const completedHours = roundHours(completedMinutes / 60)
+      const completionPercent = targetHours
+        ? Math.max(0, Math.min(100, Math.round((completedHours / targetHours) * 100)))
+        : 0
+      const remainingHours = targetHours ? roundHours(Math.max(targetHours - completedHours, 0)) : null
+
+      setWeeklyGoal({
+        targetHours,
+        completedHours,
+        completionPercent,
+        remainingHours,
+      })
+      setWeeklyGoalLoading(false)
+    }
+
+    loadWeeklyGoal()
+
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
+
+  const weeklyRingLabel = !weeklyGoal.targetHours
+    ? 'Цель не задана'
+    : weeklyGoal.completionPercent >= 100
+      ? 'План закрыт'
+      : weeklyGoal.completionPercent >= 65
+        ? 'В процессе'
+        : weeklyGoal.completedHours > 0
+          ? 'Есть прогресс'
+          : 'Старт недели'
+
+  const weeklyGoalTitle = weeklyGoalLoading
+    ? 'Считаем прогресс недели...'
+    : weeklyGoal.targetHours
+      ? `${formatHours(weeklyGoal.completedHours)} / ${formatHours(weeklyGoal.targetHours)} ч`
+      : 'Укажите цель в часах'
+
+  const weeklyGoalHint = weeklyGoalLoading
+    ? 'Собираем выполненные часы по тренировкам текущей недели.'
+    : weeklyGoal.targetHours
+      ? weeklyGoal.remainingHours && weeklyGoal.remainingHours > 0
+        ? `Осталось ${formatHours(weeklyGoal.remainingHours)} ч до недельной цели.`
+        : 'Недельный план уже выполнен или перевыполнен.'
+      : 'Задайте часов тренировок в неделю в разделе настроек спорта.'
 
   const lineOpts = {
     chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
@@ -180,11 +318,11 @@ function AthleteDash({ name }: { name: string }) {
           </div>
 
           <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
-            <RecoveryRing score={42} size={96} />
+            <RecoveryRing score={weeklyGoal.completionPercent} size={96} label={weeklyRingLabel} />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Готовность</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">42 / 100</p>
-              <p className="mt-1 text-xs text-muted-foreground">Лучший режим: восстановление или спокойная аэробная работа.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">План недели</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">{weeklyGoalTitle}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{weeklyGoalHint}</p>
             </div>
           </div>
         </div>
@@ -691,5 +829,5 @@ export default function DashboardPage() {
 
   if (user.role === 'coach' || user.role === 'organization') return <CoachDash name={user.name} />
   if (user.role === 'admin') return <AdminDash name={user.name} />
-  return <AthleteDash name={user.name} />
+  return <AthleteDash name={user.name} userId={user.id} />
 }

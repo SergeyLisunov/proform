@@ -1,7 +1,15 @@
 const rc = (v: number) => v >= 67 ? '#16A34A' : v >= 34 ? '#F97316' : '#DC2626'
 const rl = (v: number) => v >= 67 ? 'Готов' : v >= 34 ? 'Умеренно' : 'Низко'
 
-export function RecoveryRing({ score, size = 120 }: { score: number; size?: number }) {
+export function RecoveryRing({
+  score,
+  size = 120,
+  label,
+}: {
+  score: number
+  size?: number
+  label?: string
+}) {
   const r = (size / 2) * 0.76
   const circ = 2 * Math.PI * r
   const dash = (score / 100) * circ
@@ -25,7 +33,7 @@ export function RecoveryRing({ score, size = 120 }: { score: number; size?: numb
           <span style={{ fontSize: size * 0.08, color: '#ADADB3', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>%</span>
         </div>
       </div>
-      <span style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{rl(score)}</span>
+      <span style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label ?? rl(score)}</span>
     </div>
   )
 }

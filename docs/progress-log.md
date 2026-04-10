@@ -199,3 +199,11 @@
   - `npx tsc --noEmit`
   - `./node_modules/.bin/eslint app components lib middleware.ts services`
   - `npm run build`
+- Connected the athlete weekly goal to the dashboard ring:
+  - reused `weekly_training_hours` from the athlete sport settings as the weekly target
+  - replaced the static athlete hero ring with live weekly progress based on completed workout duration in the current week
+  - added a custom ring label mode so the same ring component can represent plan progress without breaking the old recovery use cases
+- Re-verified the athlete weekly goal progress pass with:
+  - `npx tsc --noEmit`
+  - `./node_modules/.bin/eslint app/dashboard/page.tsx components/ui/RecoveryRing.tsx`
+  - `npm run build`
