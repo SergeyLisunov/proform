@@ -340,6 +340,9 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
                   </div>
                 </div>
               </div>
+              <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
+                В прогресс недели попадают только тренировки текущей недели, у которых указана длительность.
+              </p>
             </div>
           </div>
         </div>
