@@ -25,6 +25,7 @@ type WeeklyGoalProgress = {
   completedHours: number
   completionPercent: number
   remainingHours: number | null
+  workoutCount: number
 }
 
 type AthleteGoalRow = {
@@ -183,6 +184,7 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
     completedHours: 0,
     completionPercent: 0,
     remainingHours: null,
+    workoutCount: 0,
   })
   const [weeklyGoalLoading, setWeeklyGoalLoading] = useState(true)
   const athleteSignals = [
@@ -237,6 +239,7 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
         completedHours,
         completionPercent,
         remainingHours,
+        workoutCount: workoutDurations.length,
       })
       setWeeklyGoalLoading(false)
     }
@@ -323,6 +326,20 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">План недели</p>
               <p className="mt-1 text-2xl font-semibold text-foreground">{weeklyGoalTitle}</p>
               <p className="mt-1 text-xs text-muted-foreground">{weeklyGoalHint}</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="rounded-xl border border-border bg-card px-3 py-2">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Осталось</div>
+                  <div className="mt-1 text-sm font-semibold text-foreground">
+                    {weeklyGoal.targetHours ? `${formatHours(weeklyGoal.remainingHours ?? 0)} ч` : '—'}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border bg-card px-3 py-2">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Учтено тренировок</div>
+                  <div className="mt-1 text-sm font-semibold text-foreground">
+                    {weeklyGoalLoading ? '...' : weeklyGoal.workoutCount}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
