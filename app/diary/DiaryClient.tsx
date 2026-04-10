@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/database'
 
 const ACTIVITY_TYPES = ['Бег','Велоспорт','Плавание','Силовые','HIIT','CrossFit','Йога','Ходьба','Другое']
 const TIME_OF_DAY = ['Утро','День','Вечер','Ночь']
+type WorkoutInsert = Database['public']['Tables']['workouts']['Insert']
 
 interface Props { role: string; userId: string }
 
@@ -30,7 +32,7 @@ export default function DiaryClient({ role, userId }: Props) {
   async function save() {
     setSaving(true)
     const supabase = createClient()
-    const payload = {
+    const payload: WorkoutInsert = {
       athlete_id: userId,
       event_type: form.activity_type === 'Competition' ? 'competition' : 'training',
       activity_type: form.activity_type,
@@ -46,7 +48,7 @@ export default function DiaryClient({ role, userId }: Props) {
       is_public: form.is_public,
       cycle_type: 'micro',
     }
-    await supabase.from('workouts').insert(payload)
+    await (supabase.from('workouts') as any).insert(payload)
     setSaving(false)
     setOpen(false)
     router.refresh()

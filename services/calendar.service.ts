@@ -39,7 +39,6 @@ export async function createCalendarEvent(event: {
   end_time?: string | null
 }): Promise<CalendarEvent | null> {
   const supabase = createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('calendar_events')
     .insert({
@@ -70,7 +69,6 @@ export async function updateCalendarEvent(id: string, data: {
   end_time?: string | null
 }): Promise<CalendarEvent | null> {
   const supabase = createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: result, error } = await (supabase as any)
     .from('calendar_events')
     .update(data)

@@ -1,5 +1,12 @@
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/database'
 import type { Organization, OrgMember, MemberStatus } from '@/types/org.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type OrgMemberInsert = Database['public']['Tables']['org_members']['Insert']
+type OrgMemberUpdate = Database['public']['Tables']['org_members']['Update']
+type OrgMemberRow = Database['public']['Tables']['org_members']['Row']
+type OrganizationUpdate = Database['public']['Tables']['organizations']['Update']
 
 export async function getMyOrg(): Promise<Organization | null> {
   const supabase = createClient()
@@ -11,13 +18,14 @@ export async function getMyOrg(): Promise<Organization | null> {
     .select('id')
     .eq('auth_id', authData.user.id)
     .single()
+  const userRecord = userData as Pick<UserRow, 'id'> | null
 
-  if (!userData) return null
+  if (!userRecord) return null
 
   const { data } = await supabase
     .from('organizations')
     .select('*')
-    .eq('user_id', userData.id)
+    .eq('user_id', userRecord.id)
     .single()
 
   return (data ?? null) as Organization | null
@@ -56,12 +64,12 @@ export async function inviteMember(
     .select('id')
     .eq('email', email)
     .single()
+  const userRecord = userData as Pick<UserRow, 'id'> | null
 
-  if (!userData) return { error: 'Пользователь с таким email не найден' }
+  if (!userRecord) return { error: 'Пользователь с таким email не найден' }
 
-  const { error } = await supabase
-    .from('org_members')
-    .insert({ org_id: orgId, user_id: userData.id, role, status: 'pending' })
+  const payload: OrgMemberInsert = { org_id: orgId, user_id: userRecord.id, role, status: 'pending' }
+  const { error } = await (supabase.from('org_members') as any).insert(payload)
 
   return error ? { error: error.message } : {}
 }
@@ -71,7 +79,8 @@ export async function updateMemberStatus(
   status: MemberStatus
 ): Promise<void> {
   const supabase = createClient()
-  await supabase.from('org_members').update({ status }).eq('id', memberId)
+  const payload: OrgMemberUpdate = { status }
+  await (supabase.from('org_members') as any).update(payload).eq('id', memberId)
 }
 
 export async function getOrgStats(orgId: string) {
@@ -81,10 +90,11 @@ export async function getOrgStats(orgId: string) {
     .select('role, status')
     .eq('org_id', orgId)
     .neq('status', 'suspended')
+  const memberRows = (members ?? []) as Pick<OrgMemberRow, 'role' | 'status'>[]
 
-  const total = members?.length ?? 0
-  const coaches = members?.filter(m => m.role === 'coach').length ?? 0
-  const athletes = members?.filter(m => m.role === 'athlete').length ?? 0
+  const total = memberRows.length
+  const coaches = memberRows.filter((m) => m.role === 'coach').length
+  const athletes = memberRows.filter((m) => m.role === 'athlete').length
 
   return { total, coaches, athletes }
 }
@@ -101,8 +111,8 @@ export async function getAllOrgs(): Promise<Organization[]> {
 
 export async function verifyOrg(orgId: string): Promise<void> {
   const supabase = createClient()
-  await supabase
-    .from('organizations')
-    .update({ is_verified: true })
+  const payload: OrganizationUpdate = { is_verified: true }
+  await (supabase.from('organizations') as any)
+    .update(payload)
     .eq('id', orgId)
 }

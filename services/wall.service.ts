@@ -1,5 +1,9 @@
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/database'
 import type { WallPost, PostType, PostVisibility } from '@/types/org.types'
+
+type WallPostInsert = Database['public']['Tables']['wall_posts']['Insert']
+type WallPostUpdate = Database['public']['Tables']['wall_posts']['Update']
 
 export async function getWallPosts(orgId: string): Promise<WallPost[]> {
   const supabase = createClient()
@@ -38,9 +42,9 @@ export async function createWallPost(post: {
   visible_to: PostVisibility
 }): Promise<WallPost | null> {
   const supabase = createClient()
-  const { data } = await supabase
-    .from('wall_posts')
-    .insert({ ...post, event_date: post.event_date ?? null, is_pinned: false, is_deleted: false })
+  const payload: WallPostInsert = { ...post, event_date: post.event_date ?? null, is_pinned: false, is_deleted: false }
+  const { data } = await (supabase.from('wall_posts') as any)
+    .insert(payload)
     .select()
     .single()
 
@@ -49,10 +53,12 @@ export async function createWallPost(post: {
 
 export async function togglePin(postId: string, isPinned: boolean): Promise<void> {
   const supabase = createClient()
-  await supabase.from('wall_posts').update({ is_pinned: isPinned }).eq('id', postId)
+  const payload: WallPostUpdate = { is_pinned: isPinned }
+  await (supabase.from('wall_posts') as any).update(payload).eq('id', postId)
 }
 
 export async function softDeletePost(postId: string): Promise<void> {
   const supabase = createClient()
-  await supabase.from('wall_posts').update({ is_deleted: true }).eq('id', postId)
+  const payload: WallPostUpdate = { is_deleted: true }
+  await (supabase.from('wall_posts') as any).update(payload).eq('id', postId)
 }

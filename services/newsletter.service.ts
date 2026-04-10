@@ -1,5 +1,10 @@
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/database'
 import type { Newsletter, NewsletterStatus, NewsletterStats, OrgMemberRole } from '@/types/org.types'
+
+type NewsletterInsert = Database['public']['Tables']['newsletters']['Insert']
+type NewsletterUpdate = Database['public']['Tables']['newsletters']['Update']
+type NewsletterDeliveryRow = Database['public']['Tables']['newsletter_deliveries']['Row']
 
 export async function getNewsletters(orgId: string): Promise<Newsletter[]> {
   const supabase = createClient()
@@ -33,13 +38,13 @@ export async function createNewsletter(nl: {
   scheduled_at?: string | null
 }): Promise<Newsletter | null> {
   const supabase = createClient()
-  const { data } = await supabase
-    .from('newsletters')
-    .insert({
-      ...nl,
-      scheduled_at: nl.scheduled_at ?? null,
-      sent_at: nl.status === 'sent' ? new Date().toISOString() : null,
-    })
+  const payload: NewsletterInsert = {
+    ...nl,
+    scheduled_at: nl.scheduled_at ?? null,
+    sent_at: nl.status === 'sent' ? new Date().toISOString() : null,
+  }
+  const { data } = await (supabase.from('newsletters') as any)
+    .insert(payload)
     .select()
     .single()
 
@@ -52,13 +57,13 @@ export async function updateNewsletterStatus(
   scheduled_at?: string | null
 ): Promise<void> {
   const supabase = createClient()
-  await supabase
-    .from('newsletters')
-    .update({
-      status,
-      scheduled_at: scheduled_at ?? null,
-      sent_at: status === 'sent' ? new Date().toISOString() : null,
-    })
+  const payload: NewsletterUpdate = {
+    status,
+    scheduled_at: scheduled_at ?? null,
+    sent_at: status === 'sent' ? new Date().toISOString() : null,
+  }
+  await (supabase.from('newsletters') as any)
+    .update(payload)
     .eq('id', id)
 }
 
@@ -69,7 +74,7 @@ export async function getNewsletterStats(newsletterId: string): Promise<Newslett
     .select('status, opened_at')
     .eq('newsletter_id', newsletterId)
 
-  const rows = data ?? []
+  const rows = (data ?? []) as Pick<NewsletterDeliveryRow, 'status' | 'opened_at'>[]
   return {
     sent: rows.length,
     delivered: rows.filter(r => r.status === 'delivered').length,

@@ -6,10 +6,16 @@ import { recoveryColor, strainColor, strainLabel, fmtDate } from '@/lib/utils/re
 import StrainChart from './StrainChart'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import type { Database } from '@/types/database'
 const AthleteProfileCard = dynamic(
   () => import('@/components/ui/AthleteProfileCard'),
   { ssr: false }
 )
+
+type DailyMetricRow = Database['public']['Tables']['daily_metrics']['Row']
+type WorkoutRow = Database['public']['Tables']['workouts']['Row']
+type WorkoutCommentRow = Database['public']['Tables']['workout_comments']['Row']
+type AverageMetricKey = 'hrv' | 'resting_heart_rate' | 'sleep_hours' | 'calories_burned'
 
 const TYPE_COLOR: Record<string, string> = {
   Running: '#2563EB', Cycling: '#16A34A', Swimming: '#7C3AED', HIIT: '#DC2626',
@@ -23,29 +29,31 @@ const TYPE_ICON: Record<string, string> = {
 export default async function AthleteDashboard({ userId, name }: { userId: string; name: string }) {
   const supabase = await createClient()
 
-  const [{ data: metrics }, { data: workouts }, { data: comments }] = await Promise.all([
+  const [{ data: metricsData }, { data: workoutsData }, { data: commentsData }] = await Promise.all([
     supabase.from('daily_metrics').select('*').eq('athlete_id', userId).order('date', { ascending: false }).limit(56),
     supabase.from('workouts').select('*').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(8),
     supabase.from('workout_comments').select('body, created_at').order('created_at', { ascending: false }).limit(3),
   ])
+  const metrics = (metricsData ?? []) as DailyMetricRow[]
+  const workouts = (workoutsData ?? []) as WorkoutRow[]
+  const comments = (commentsData ?? []) as Pick<WorkoutCommentRow, 'body' | 'created_at'>[]
 
-  const latest = metrics?.[0]
-  type MetricRow = NonNullable<typeof metrics>[number]
-  const avg = (key: keyof MetricRow) =>
-    metrics?.length ? Math.round(metrics.reduce((s, m) => s + ((m[key] as number) ?? 0), 0) / metrics.length * 10) / 10 : null
+  const latest = metrics[0]
+  const avg = (key: AverageMetricKey) =>
+    metrics.length ? Math.round(metrics.reduce((s, m) => s + (m[key] ?? 0), 0) / metrics.length * 10) / 10 : null
   const recovery = latest?.recovery_score ?? 0
 
   // Build weekly strain buckets (last 8 weeks)
   const weeklyData = Array.from({ length: 8 }, (_, wi) => {
-    const now = new Date()
-    const weekStart = new Date(now.getTime() - (7 - wi) * 7 * 86400000)
-    const weekEnd = new Date(weekStart.getTime() + 7 * 86400000)
-    const wMetrics = metrics?.filter(m => {
-      const d = new Date(m.date)
-      return d >= weekStart && d < weekEnd
-    }) ?? []
-    return { w: `W${String(wi + 1).padStart(2, '0')}`, strain: parseFloat((wMetrics.reduce((s, m) => s + (m.day_strain ?? 0), 0)).toFixed(1)) }
-  })
+      const now = new Date()
+      const weekStart = new Date(now.getTime() - (7 - wi) * 7 * 86400000)
+      const weekEnd = new Date(weekStart.getTime() + 7 * 86400000)
+      const wMetrics = metrics.filter(m => {
+        const d = new Date(m.date)
+        return d >= weekStart && d < weekEnd
+      })
+      return { w: `W${String(wi + 1).padStart(2, '0')}`, strain: parseFloat((wMetrics.reduce((s, m) => s + (m.day_strain ?? 0), 0)).toFixed(1)) }
+    })
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
@@ -107,7 +115,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
         <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
           <p className="pf-num text-lg text-slate-900 mb-0.5">Зоны пульса</p>
           <p className="text-xs text-slate-400 mb-4">По последним тренировкам</p>
-          {workouts?.length ? (() => {
+          {workouts.length ? (() => {
             const totals = [1,2,3,4,5].map(z => workouts.reduce((s, w) => s + ((w as unknown as Record<string,number>)[`hr_zone_${z}_min`] ?? 0), 0))
             const grand = totals.reduce((a,b) => a+b, 0) || 1
             const pcts = totals.map(t => Math.round(t/grand*100))
@@ -142,7 +150,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             Показать все <i className="ki-filled ki-arrow-right text-[10px]" />
           </Link>
         </div>
-        {!workouts?.length ? (
+        {!workouts.length ? (
           <div className="text-center py-10 text-slate-400">
             <i className="ki-filled ki-book-open text-3xl mb-2 block" />
             <p className="text-sm">Тренировок пока нет. <Link href="/diary" className="text-[#2563EB] hover:underline">Добавить первую</Link></p>
@@ -185,7 +193,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
         )}
       </div>
 
-      {comments?.length ? (
+      {comments.length ? (
         <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
           <p className="pf-num text-lg text-slate-900 mb-4">Заметки тренера</p>
           <div className="flex flex-col gap-3">

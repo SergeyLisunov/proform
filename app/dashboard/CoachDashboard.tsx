@@ -3,27 +3,39 @@ import { StatCard } from '@/components/ui/StatCard'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { recoveryColor, initials, fmtDate } from '@/lib/utils/recovery'
 import Link from 'next/link'
+import type { Database } from '@/types/database'
+
+type TrainerAthleteRow = Database['public']['Tables']['trainer_athletes']['Row']
+type UserRow = Database['public']['Tables']['users']['Row']
+type DailyMetricRow = Database['public']['Tables']['daily_metrics']['Row']
+type ObservationDiaryRow = Database['public']['Tables']['observation_diary']['Row']
 
 export default async function CoachDashboard({ userId, name }: { userId: string; name: string }) {
   const supabase = await createClient()
 
   // Get coach's athletes
-  const { data: links } = await supabase.from('trainer_athletes').select('athlete_id').eq('trainer_id', userId)
-  const athleteIds = links?.map(l => l.athlete_id) ?? []
+  const { data: linksData } = await supabase.from('trainer_athletes').select('athlete_id').eq('trainer_id', userId)
+  const links = (linksData ?? []) as Pick<TrainerAthleteRow, 'athlete_id'>[]
+  const athleteIds = links.map((link) => link.athlete_id)
 
-  const { data: athletes } = athleteIds.length ? await supabase.from('users').select('id, name').in('id', athleteIds) : { data: [] }
+  const { data: athletesData } = athleteIds.length
+    ? await supabase.from('users').select('id, name').in('id', athleteIds)
+    : { data: [] }
+  const athletes = (athletesData ?? []) as Pick<UserRow, 'id' | 'name'>[]
 
   // Get latest metrics for each athlete
   const metricsMap: Record<string, { recovery: number; hrv: number; rhr: number; strain: number; sleep: number }> = {}
   await Promise.all(
-    (athletes ?? []).map(async a => {
+    athletes.map(async (a) => {
       const { data } = await supabase.from('daily_metrics').select('recovery_score, hrv, resting_heart_rate, day_strain, sleep_hours').eq('athlete_id', a.id).order('date', { ascending: false }).limit(1).single()
-      if (data) metricsMap[a.id] = { recovery: data.recovery_score ?? 0, hrv: data.hrv ?? 0, rhr: data.resting_heart_rate ?? 0, strain: data.day_strain ?? 0, sleep: data.sleep_hours ?? 0 }
+      const metric = data as Pick<DailyMetricRow, 'recovery_score' | 'hrv' | 'resting_heart_rate' | 'day_strain' | 'sleep_hours'> | null
+      if (metric) metricsMap[a.id] = { recovery: metric.recovery_score ?? 0, hrv: metric.hrv ?? 0, rhr: metric.resting_heart_rate ?? 0, strain: metric.day_strain ?? 0, sleep: metric.sleep_hours ?? 0 }
     })
   )
 
   // Recent observation diary
-  const { data: diary } = await supabase.from('observation_diary').select('*').eq('coach_id', userId).order('created_at', { ascending: false }).limit(4)
+  const { data: diaryData } = await supabase.from('observation_diary').select('*').eq('coach_id', userId).order('created_at', { ascending: false }).limit(4)
+  const diary = (diaryData ?? []) as ObservationDiaryRow[]
 
   const avgRecovery = Object.values(metricsMap).length ? Math.round(Object.values(metricsMap).reduce((s, m) => s + m.recovery, 0) / Object.values(metricsMap).length) : 0
 
@@ -49,7 +61,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
           <p className="pf-num text-xl text-slate-900">Мои атлеты</p>
           <Link href="/athletes" className="text-xs text-[#2563EB] hover:underline font-medium">Управление атлетами →</Link>
         </div>
-        {!athletes?.length ? (
+        {!athletes.length ? (
           <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center text-slate-400">
             <i className="ki-filled ki-people text-4xl block mb-3" />
             <p className="text-sm">Атлеты ещё не назначены.</p>
@@ -103,7 +115,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
         ) : (
           <div className="flex flex-col gap-3">
             {diary.map((d) => {
-              const ath = athletes?.find(a => a.id === d.athlete_id)
+              const ath = athletes.find((a) => a.id === d.athlete_id)
               return (
                 <div key={d.id} className="p-4 rounded-xl" style={{ background:'#F8FAFC', borderLeft:'3px solid #F97316' }}>
                   <div className="flex items-start justify-between gap-3 mb-2">

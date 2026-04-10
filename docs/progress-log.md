@@ -192,3 +192,10 @@
 - Re-verified the root entrypoint fix with:
   - `./node_modules/.bin/eslint app/page.tsx`
   - `npm run build`
+- Completed a TypeScript stability pass across dashboards and services:
+  - fixed the remaining `never`-type regressions in `dashboard`, `diary`, `useUser`, and organization communication services by introducing explicit row and payload types
+  - removed a stale lint-rule reference in `services/calendar.service.ts` so project-wide eslint no longer fails on an unknown rule
+- Re-verified the TypeScript stability pass with:
+  - `npx tsc --noEmit`
+  - `./node_modules/.bin/eslint app components lib middleware.ts services`
+  - `npm run build`

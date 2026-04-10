@@ -1,17 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { StatCard } from '@/components/ui/StatCard'
 import { fmtDate } from '@/lib/utils/recovery'
+import type { Database } from '@/types/database'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
 
-  const [{ count: totalUsers }, { count: athletes }, { count: coaches }, { count: workouts }, { data: recentUsers }] = await Promise.all([
+  const [{ count: totalUsers }, { count: athletes }, { count: coaches }, { count: workouts }, { data: recentUsersData }] = await Promise.all([
     supabase.from('users').select('*', { count: 'exact', head: true }),
     supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'athlete'),
     supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'coach'),
     supabase.from('workouts').select('*', { count: 'exact', head: true }),
     supabase.from('users').select('id, name, email, role, created_at').order('created_at', { ascending: false }).limit(10),
   ])
+  const recentUsers = (recentUsersData ?? []) as Pick<UserRow, 'id' | 'name' | 'email' | 'role' | 'created_at'>[]
 
   const ROLE_STYLE: Record<string, { background: string; color: string }> = {
     athlete: { background: '#DBEAFE', color: '#2563EB' },
@@ -67,7 +71,7 @@ export default async function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {recentUsers?.map(u => (
+              {recentUsers.map(u => (
                 <tr key={u.id} className="border-b border-[#F8FAFC] hover:bg-[#F8FAFC] transition-colors">
                   <td className="py-3 px-3 font-semibold text-slate-800">{u.name}</td>
                   <td className="py-3 px-3 text-slate-500">{u.email}</td>

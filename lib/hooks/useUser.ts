@@ -2,7 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserRole } from '@/types/database'
+import type { Database, UserRole } from '@/types/database'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type UserUpdate = Database['public']['Tables']['users']['Update']
 
 export interface AppUser {
   id: string
@@ -26,8 +29,9 @@ export function useUser() {
       .select('id, name, email, role, auth_id')
       .eq('auth_id', authUser.id)
       .single()
-    if (data) {
-      setUser({ id: data.id, authId: authUser.id, name: data.name, email: data.email, role: data.role as UserRole })
+    const userRow = data as Pick<UserRow, 'id' | 'name' | 'email' | 'role' | 'auth_id'> | null
+    if (userRow) {
+      setUser({ id: userRow.id, authId: authUser.id, name: userRow.name, email: userRow.email, role: userRow.role as UserRole })
     }
     setLoading(false)
   }, [])
@@ -38,10 +42,8 @@ export function useUser() {
     if (!user) return
     setSwitching(true)
     const supabase = createClient()
-    const { error } = await supabase
-      .from('users')
-      .update({ role: newRole })
-      .eq('id', user.id)
+    const payload: UserUpdate = { role: newRole }
+    const { error } = await (supabase.from('users') as any).update(payload).eq('id', user.id)
     if (!error) {
       setUser(prev => prev ? { ...prev, role: newRole } : null)
       // Hard reload so all server components & layouts re-render with new role
