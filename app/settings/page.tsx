@@ -518,6 +518,7 @@ export default function SettingsPage() {
   const activeTab = TABS.find(t => t.id === tab)!
 
   return (
+    <>
     <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
 
       {/* ── Header ── */}
@@ -911,5 +912,6 @@ export default function SettingsPage() {
         </div>
       </div>
     )}
+    </>
   )
 }

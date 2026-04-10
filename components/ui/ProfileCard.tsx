@@ -95,10 +95,10 @@ export function ProfileCard({
           />
           <button
             onClick={() => setIsFollowing(!isFollowing)}
-            className={`absolute top-4 right-4 rounded-full px-6 py-2 font-medium transition-all duration-300 ${
+            className={`absolute top-4 right-4 rounded-full px-6 py-2 text-sm font-semibold border-2 transition-all duration-200 pf-focus ${
               isFollowing
-                ? "bg-card text-card-foreground border-2 border-border hover:bg-secondary"
-                : "bg-card text-card-foreground hover:bg-secondary"
+                ? "bg-card text-card-foreground border-border hover:bg-secondary"
+                : "bg-card text-card-foreground border-transparent hover:bg-secondary hover:border-border"
             }`}
           >
             {isFollowing ? "Following" : "Follow"}
@@ -118,8 +118,8 @@ export function ProfileCard({
               <span className="text-sm text-muted-foreground font-light">exp.</span>
               <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 via-pink-500 via-orange-500 via-yellow-500 via-green-500 to-blue-500 transition-all duration-300 ease-out"
-                  style={{ width: `${expProgress}%` }}
+                  className="h-full transition-all duration-300 ease-out"
+                  style={{ width: `${expProgress}%`, background: 'var(--pf-brand)' }}
                 />
               </div>
             </div>

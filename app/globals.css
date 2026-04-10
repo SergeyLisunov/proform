@@ -5,6 +5,15 @@
 /* ProForm custom utilities on top of Metronic */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
 
+/* ── Brand tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --pf-brand:       #F97316;
+  --pf-brand-hover: #EA580C;
+  --pf-brand-muted: #FFF7ED;
+  --pf-brand-border: #FED7AA;
+}
+
+/* ── Typography ───────────────────────────────────────────────────────────── */
 .pf-num {
   font-family: 'Bebas Neue', 'Impact', sans-serif;
   letter-spacing: 0.02em;
@@ -15,18 +24,34 @@ body {
   font-family: 'DM Sans', var(--font-sans, system-ui), sans-serif;
 }
 
-/* Animations */
+/* ── Animations ───────────────────────────────────────────────────────────── */
 @keyframes pf-fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .pf-enter { animation: pf-fade-up 0.25s ease both; }
 .pf-stagger > * { animation: pf-fade-up 0.25s ease both; }
-.pf-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.pf-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.pf-stagger > *:nth-child(1) { animation-delay:   0ms; }
+.pf-stagger > *:nth-child(2) { animation-delay:  55ms; }
 .pf-stagger > *:nth-child(3) { animation-delay: 110ms; }
 .pf-stagger > *:nth-child(4) { animation-delay: 165ms; }
 .pf-stagger > *:nth-child(5) { animation-delay: 220ms; }
+.pf-stagger > *:nth-child(6) { animation-delay: 275ms; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .pf-spin { animation: spin 0.7s linear infinite; }
+
+/* ── Card hover lift ──────────────────────────────────────────────────────── */
+.pf-card-hover {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.pf-card-hover:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ── Focus ring (brand-colored) ───────────────────────────────────────────── */
+.pf-focus:focus-visible {
+  outline: 2px solid var(--pf-brand);
+  outline-offset: 2px;
+}
