@@ -444,9 +444,9 @@ function ViewEditDrawer({
   return ReactDOM.createPortal(
     <>
       <div onClick={handleClose} style={{ position:'fixed',inset:0,zIndex:9998,background:'rgba(15,23,42,0.65)',backdropFilter:'blur(3px)',transition:'opacity 0.26s',opacity:visible?1:0 }} />
-      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:520,maxWidth:'100vw',zIndex:9999,background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
+      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:520,maxWidth:'100vw',zIndex:9999,background:'#ffffff',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
 
-        <div className="sticky top-0 z-[1] border-b border-border bg-card/95 px-6 py-5 backdrop-blur">
+        <div className="sticky top-0 z-[1] border-b border-border px-6 py-5" style={{ background: '#ffffff' }}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <div
@@ -779,7 +779,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   return ReactDOM.createPortal(
     <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', background: 'rgba(15,23,42,0.65)', pointerEvents: open ? 'auto' : 'none' }}>
       <div style={{ position: 'relative', width: '100%', height: '100%', background: '#ffffff', display: 'flex', flexDirection: 'column', overflowY: 'auto', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
-        <div className="border-b border-border bg-card px-6 py-5">
+        <div className="border-b border-border px-6 py-5" style={{ background: '#ffffff' }}>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
@@ -1021,7 +1021,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
             </section>
           </div>
 
-          <div className="border-t border-border bg-card px-6 py-4">
+          <div className="border-t border-border px-6 py-4" style={{ background: '#ffffff' }}>
             <div className="flex items-center justify-between gap-4 rounded-[22px] border border-border bg-background/70 px-4 py-3">
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-foreground">Готово к сохранению</div>
