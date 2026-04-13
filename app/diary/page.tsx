@@ -772,7 +772,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
       <button
         type="button"
         aria-label="Закрыть форму добавления тренировки"
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-slate-950/70"
         onClick={onClose}
       />
       <div className="absolute inset-y-0 right-0 flex w-full max-w-[540px] flex-col border-l border-border bg-card shadow-[0_20px_80px_rgba(15,23,42,0.18)]">
@@ -1123,7 +1123,7 @@ function CoachDiary() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="pf-num text-xl text-foreground">Новая запись в дневник</h3>
