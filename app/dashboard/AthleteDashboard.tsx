@@ -74,8 +74,8 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             <RecoveryRing score={Math.round(recovery)} size={90} />
             <div className="flex flex-col gap-1 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-16">HRV</span>
-                <span className="font-bold text-slate-800">{latest.hrv?.toFixed(1)} ms</span>
+                <span className="text-slate-400 w-16">ВСР</span>
+                <span className="font-bold text-slate-800">{latest.hrv?.toFixed(1)} мс</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-slate-400 w-16">ЧСС покоя</span>

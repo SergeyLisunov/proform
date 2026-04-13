@@ -7,8 +7,8 @@
 @tailwind utilities;
 
 :root {
-  --pf-font-sans: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  --pf-font-display: Impact, "Arial Narrow Bold", "Arial Narrow", sans-serif;
+  --pf-font-sans: "DM Sans", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --pf-font-display: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
 }
 
 /* ── Brand tokens ─────────────────────────────────────────────────────────── */
@@ -24,6 +24,65 @@
   font-family: var(--pf-font-display);
   letter-spacing: 0.02em;
   line-height: 1;
+}
+
+/* Heading scale — Bebas Neue */
+.pf-heading-xl {
+  font-family: var(--pf-font-display);
+  font-size: 64px;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+}
+.pf-heading-lg {
+  font-family: var(--pf-font-display);
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.pf-heading-md {
+  font-family: var(--pf-font-display);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.pf-heading-sm {
+  font-family: var(--pf-font-display);
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+/* Body-scale utilities — DM Sans */
+.pf-label {
+  font-family: var(--pf-font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.pf-metric {
+  font-family: var(--pf-font-sans);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.pf-caption {
+  font-family: var(--pf-font-sans);
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.pf-body {
+  font-family: var(--pf-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pf-body-sm {
+  font-family: var(--pf-font-sans);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 body {

@@ -497,9 +497,9 @@ export default function AthleteProfileCard() {
           {/* Name & meta */}
           <div style={{ marginTop:12 }}>
             <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-              <h2 style={{ fontSize:22, fontWeight:900, color:'var(--foreground)', margin:0, letterSpacing:'-0.02em' }}>{profile.name}</h2>
+              <h2 className="pf-heading-sm" style={{ color:'var(--foreground)', margin:0 }}>{profile.name}</h2>
               {profile.sport_type && (
-                <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, background:'#fff7ed', color:'#ea580c', border:'1px solid #fed7aa' }}>
+                <span className="pf-label" style={{ padding:'3px 10px', borderRadius:20, background:'#fff7ed', color:'#ea580c', border:'1px solid #fed7aa', fontSize:11, letterSpacing:'0.1em' }}>
                   {profile.sport_type}
                 </span>
               )}
@@ -587,8 +587,8 @@ export default function AthleteProfileCard() {
                 <div style={{ width:34,height:34,borderRadius:10,background:s.bg,display:'flex',alignItems:'center',justifyContent:'center' }}>
                   <i className={`ki-filled ${s.icon} text-sm`} style={{ color:s.color }} />
                 </div>
-                <div className="pf-num" style={{ fontSize:22,fontWeight:900,color:'var(--foreground)',lineHeight:1 }}>{s.value}</div>
-                <div style={{ fontSize:10,color:'var(--muted-foreground)',fontWeight:500,textAlign:'center' }}>{s.label}</div>
+                <div className="pf-heading-sm" style={{ color:'var(--foreground)' }}>{s.value}</div>
+                <div className="pf-label" style={{ color:'var(--muted-foreground)',textAlign:'center' }}>{s.label}</div>
               </Link>
             ))}
           </div>

@@ -44,8 +44,8 @@ type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
 const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const MONTHS_RU   = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
-const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-const DAYS_SHORT  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+const MONTHS      = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
+const DAYS_SHORT  = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
 
 function parseLocalDate(s: string): Date { return new Date(s + 'T00:00:00') }
 function todayISO(): string {

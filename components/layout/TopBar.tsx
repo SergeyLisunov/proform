@@ -217,7 +217,7 @@ function NotificationsDrawer({
         {/* Header */}
         <div style={{ padding: '20px 20px 14px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
-            <h2 className="pf-num" style={{ fontSize: 22, color: 'var(--foreground)', margin: 0 }}>Уведомления</h2>
+            <h2 className="pf-heading-sm" style={{ color: 'var(--foreground)', margin: 0 }}>Уведомления</h2>
             {unreadCount > 0 && (
               <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: '2px 0 0' }}>
                 {unreadCount} непрочитанных

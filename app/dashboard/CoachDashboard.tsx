@@ -86,7 +86,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                   </div>
                   {m ? (
                     <div className="grid grid-cols-4 gap-2">
-                      {[{ v: m.hrv.toFixed(1), u:'HRV ms', c:'#2563EB' }, { v: m.rhr.toFixed(1), u:'RHR bpm', c:'#DC2626' }, { v: m.sleep.toFixed(1), u:'Sleep h', c:'#7C3AED' }, { v: m.strain.toFixed(1), u:'Strain', c:'#F97316' }]
+                      {[{ v: m.hrv.toFixed(1), u:'ВСР мс', c:'#2563EB' }, { v: m.rhr.toFixed(1), u:'ЧСС покоя', c:'#DC2626' }, { v: m.sleep.toFixed(1), u:'Сон ч', c:'#7C3AED' }, { v: m.strain.toFixed(1), u:'Нагрузка', c:'#F97316' }]
                         .map(({ v, u, c }) => (
                           <div key={u} className="text-center py-2 px-1 rounded-lg" style={{ background:'#F8FAFC' }}>
                             <div className="pf-num text-lg leading-none" style={{ color: c }}>{v}</div>

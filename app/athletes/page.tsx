@@ -159,7 +159,7 @@ function AthleteCard({
             <div className="min-w-0 flex-1 space-y-2">
               <div>
                 <div className="mb-1 flex justify-between gap-2 text-[10px]">
-                  <span className="text-muted-foreground">HRV {athlete.hrv} ms</span>
+                  <span className="text-muted-foreground">ВСР {athlete.hrv} мс</span>
                   <span className="font-semibold text-foreground">{loadLabel}</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-border">
@@ -168,8 +168,8 @@ function AthleteCard({
               </div>
               <div>
                 <div className="mb-1 flex justify-between gap-2 text-[10px]">
-                  <span className="text-muted-foreground">RHR {athlete.rhr} bpm</span>
-                  <span className="text-foreground">{athlete.sessions} sessions</span>
+                  <span className="text-muted-foreground">ЧСС покоя {athlete.rhr} уд/мин</span>
+                  <span className="text-foreground">{athlete.sessions} сессий</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-border">
                   <div className="h-full rounded-full bg-red-400" style={{ width: `${Math.max(0, 100 - (athlete.rhr - 40) * 3)}%` }} />
@@ -294,7 +294,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card/90 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Next session</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Следующая тренировка</p>
             <p className="mt-2 text-sm font-semibold text-foreground">
               {athlete.recovery >= 70 ? 'Контролируемый прогресс' : athlete.recovery >= 50 ? 'Спокойная аэробная работа' : 'Восстановление без стресса'}
             </p>
@@ -303,7 +303,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card/90 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Risk focus</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Зона риска</p>
             <div className="mt-2 flex items-center gap-2">
               <span
                 className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold"
@@ -314,7 +314,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               </span>
             </div>
             <p className="mt-2 text-2xs leading-5 text-muted-foreground">
-              Watch for overload signals before adding volume or intensity.
+              Следите за сигналами перегрузки перед увеличением объёма или интенсивности.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card/90 p-4">
@@ -361,8 +361,8 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 { label: 'Готовность', value: `${athlete.recovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
-                { label: 'HRV', value: `${athlete.hrv} ms`, icon: 'ki-heart', tone: 'bg-blue-50 text-blue-600' },
-                { label: 'RHR', value: `${athlete.rhr} bpm`, icon: 'ki-heart', tone: 'bg-red-50 text-red-500' },
+                { label: 'ВСР', value: `${athlete.hrv} мс`, icon: 'ki-heart', tone: 'bg-blue-50 text-blue-600' },
+                { label: 'ЧСС покоя', value: `${athlete.rhr} уд/мин`, icon: 'ki-heart', tone: 'bg-red-50 text-red-500' },
                 { label: 'Серия', value: `${athlete.streak}д`, icon: 'ki-calendar', tone: 'bg-violet-50 text-violet-600' },
               ].map((item) => (
                 <StatTile key={item.label} {...item} />
@@ -440,7 +440,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   type="line"
                   series={[
                     { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
-                    { name: 'HRV (ms)', data: [44, 47, 45, 41, 48, 50, 47] },
+                    { name: 'ВСР (мс)', data: [44, 47, 45, 41, 48, 50, 47] },
                   ]}
                   options={lineOpts}
                   height={180}
@@ -490,7 +490,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
 
                     <div className="hidden items-center justify-end sm:flex">
                       <div className="text-right">
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Load block</div>
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Блок нагрузки</div>
                         <div className="mt-1 text-sm font-semibold text-foreground">{session.strain.toFixed(1)}</div>
                       </div>
                     </div>

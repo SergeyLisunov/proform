@@ -633,8 +633,8 @@ function CoachDash({ name }: { name: string }) {
                     {a.hrv != null && (
                       <div className="w-28 hidden sm:block">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-2xs text-muted-foreground">HRV</span>
-                          <span className="text-2xs font-bold text-foreground">{a.hrv.toFixed(1)} ms</span>
+                          <span className="text-2xs text-muted-foreground">ВСР</span>
+                          <span className="text-2xs font-bold text-foreground">{a.hrv.toFixed(1)} мс</span>
                         </div>
                         <div className="h-1.5 bg-border rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, a.hrv)}%`, background: rc }} />

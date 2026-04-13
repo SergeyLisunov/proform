@@ -40,8 +40,8 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
       {/* Weekly strain */}
       <div className="card rounded-2xl border border-[#E2E8F0] bg-white p-6">
         <div className="mb-3">
-          <h3 className="pf-num text-lg text-slate-900">Weekly Day Strain</h3>
-          <p className="text-xs text-slate-400 mt-0.5">WHOOP day_strain score · last 8 weeks</p>
+          <h3 className="pf-num text-lg text-slate-900">Нагрузка по дням недели</h3>
+          <p className="text-xs text-slate-400 mt-0.5">WHOOP day_strain score · последние 8 недель</p>
         </div>
         {weeklyData.length > 0 ? (
           <ReactApexChart
@@ -51,7 +51,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
             height={185}
           />
         ) : (
-          <div className="flex items-center justify-center h-40 text-sm text-slate-400">No data yet</div>
+          <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
         )}
       </div>
 
@@ -59,26 +59,26 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
       <div className="card rounded-2xl border border-[#E2E8F0] bg-white p-6">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="pf-num text-lg text-slate-900">Recovery &amp; HRV</h3>
-            <p className="text-xs text-slate-400 mt-0.5">7-day WHOOP biometrics</p>
+            <h3 className="pf-num text-lg text-slate-900">Восстановление и ВСР</h3>
+            <p className="text-xs text-slate-400 mt-0.5">7-дневные биометрики WHOOP</p>
           </div>
           <div className="flex gap-3 text-xs text-slate-500">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-green-500" />Recovery %</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-blue-500 border-dashed border-t border-blue-500" />HRV ms</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-green-500" />Восстановление %</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-blue-500 border-dashed border-t border-blue-500" />ВСР мс</span>
           </div>
         </div>
         {daily7.length > 0 ? (
           <ReactApexChart
             type="line"
             series={[
-              { name: 'Recovery %', data: daily7.map(d => d.recovery) },
-              { name: 'HRV ms',     data: daily7.map(d => d.hrv) },
+              { name: 'Восстановление %', data: daily7.map(d => d.recovery) },
+              { name: 'ВСР мс',           data: daily7.map(d => d.hrv) },
             ]}
             options={recoveryOptions}
             height={185}
           />
         ) : (
-          <div className="flex items-center justify-center h-40 text-sm text-slate-400">No data yet</div>
+          <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
         )}
       </div>
     </div>

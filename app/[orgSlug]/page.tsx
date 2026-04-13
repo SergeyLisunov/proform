@@ -144,7 +144,7 @@ export default function OrgPublicPage() {
       {/* Footer */}
       <div className="border-t border-border mt-10">
         <div className="max-w-3xl mx-auto px-5 py-6 flex items-center justify-between text-2xs text-muted-foreground">
-          <span>Powered by <Link href="/" className="text-orange-600 font-semibold hover:underline">ProForm</Link></span>
+          <span>На базе <Link href="/" className="text-orange-600 font-semibold hover:underline">ProForm</Link></span>
           <Link href="/auth/login" className="text-orange-600 font-semibold hover:underline">Войти →</Link>
         </div>
       </div>

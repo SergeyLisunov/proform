@@ -234,7 +234,7 @@ export function PricingModal({
                 {TRIGGER_MESSAGES[trigger]}
               </div>
             )}
-            <h2 style={{ fontSize: 26, fontWeight: 900, color: 'var(--foreground)', margin: 0, letterSpacing: '-0.03em' }}>
+            <h2 className="pf-heading-md" style={{ color: 'var(--foreground)', margin: 0 }}>
               Выберите план
             </h2>
             <p style={{ fontSize: 14, color: 'var(--muted-foreground)', margin: '6px 0 0' }}>
@@ -272,9 +272,9 @@ export function PricingModal({
 
                   {/* Plan name */}
                   <div style={{ marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: p.color, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{p.name}</span>
+                    <span className="pf-label" style={{ color: p.color }}>{p.name}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 16 }}>{p.description}</div>
+                  <div className="pf-caption" style={{ marginBottom: 16 }}>{p.description}</div>
 
                   {/* Price */}
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 20 }}>
@@ -374,10 +374,10 @@ export function PaywallBanner({
 
         {/* Text */}
         <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: plan.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+          <div className="pf-label" style={{ color: plan.color, marginBottom: 4 }}>
             {plan.name} план
           </div>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+          <h3 className="pf-heading-sm" style={{ color: 'var(--foreground)', margin: '0 0 6px', fontSize: 18 }}>
             {title}
           </h3>
           <p style={{ fontSize: 13, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.5 }}>{description}</p>
@@ -558,8 +558,8 @@ export function PricingPage() {
                 }}>⭐ Популярный</div>
               )}
 
-              <div style={{ fontSize: 20, fontWeight: 900, color: p.color, marginBottom: 4 }}>{p.name}</div>
-              <div style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 20 }}>{p.description}</div>
+              <div className="pf-heading-sm" style={{ color: p.color, marginBottom: 4 }}>{p.name}</div>
+              <div className="pf-caption" style={{ marginBottom: 20 }}>{p.description}</div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 24 }}>
                 <span className="pf-num" style={{ fontSize: 38, fontWeight: 900, color: 'var(--foreground)', lineHeight: 1, letterSpacing: '-0.03em' }}>
