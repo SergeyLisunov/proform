@@ -777,9 +777,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   ].join(' ')
 
   return ReactDOM.createPortal(
-    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', pointerEvents: open ? 'auto' : 'none' }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0 }} />
-      <div style={{ position: 'relative', width: '100%', maxWidth: 540, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', background: 'var(--card)', pointerEvents: open ? 'auto' : 'none', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', background: 'var(--card)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <div className="border-b border-border bg-card px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
