@@ -689,14 +689,23 @@ function ViewEditDrawer({
 function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   open: boolean; onClose: () => void; userId: string; onCreated: (w: Workout) => void
 }) {
-  const [mounted, setMounted] = useState(false)
-  const [saving,  setSaving]  = useState(false)
-  const [errors,  setErrors]  = useState<Partial<Record<keyof DrawerForm, string>>>({})
-  const [form,    setForm]    = useState<DrawerForm>(EMPTY_FORM)
+  const [mounted,  setMounted]  = useState(false)
+  const [visible,  setVisible]  = useState(false)
+  const [saving,   setSaving]   = useState(false)
+  const [errors,   setErrors]   = useState<Partial<Record<keyof DrawerForm, string>>>({})
+  const [form,     setForm]     = useState<DrawerForm>(EMPTY_FORM)
 
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
-    if (open) { setForm({ ...EMPTY_FORM, event_date: new Date().toISOString().slice(0, 10) }); setErrors({}) }
+    if (open) {
+      setForm({ ...EMPTY_FORM, event_date: new Date().toISOString().slice(0, 10) })
+      setErrors({})
+      document.body.style.overflow = 'hidden'
+      requestAnimationFrame(() => setVisible(true))
+    } else {
+      setVisible(false)
+      document.body.style.overflow = ''
+    }
   }, [open])
 
   function validate(): boolean {
@@ -752,7 +761,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
     if (workout) onCreated(workout)
   }
 
-  if (!mounted || !open) return null
+  if (!mounted) return null
 
   const selectedCfg = ACTIVITY_CONFIG[form.activity_type] ?? DEFAULT_AC
   const quickSummary = [
@@ -768,14 +777,9 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   ].join(' ')
 
   return ReactDOM.createPortal(
-    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
-      <button
-        type="button"
-        aria-label="Закрыть форму добавления тренировки"
-        onClick={onClose}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.72)', backdropFilter: 'blur(3px)', border: 'none', cursor: 'pointer' }}
-      />
-      <div style={{ position: 'relative', width: '100%', maxWidth: 540, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column' }}>
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', pointerEvents: open ? 'auto' : 'none' }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0 }} />
+      <div style={{ position: 'relative', width: '100%', maxWidth: 540, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
         <div className="border-b border-border bg-card px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
