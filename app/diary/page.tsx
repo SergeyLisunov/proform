@@ -777,8 +777,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   ].join(' ')
 
   return ReactDOM.createPortal(
-    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', background: 'var(--card)', pointerEvents: open ? 'auto' : 'none', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
-      <div style={{ position: 'relative', width: '100%', height: '100%', background: 'var(--card)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end', background: 'rgba(15,23,42,0.65)', pointerEvents: open ? 'auto' : 'none' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', background: '#ffffff', display: 'flex', flexDirection: 'column', overflowY: 'auto', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
         <div className="border-b border-border bg-card px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
