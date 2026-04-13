@@ -768,14 +768,14 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   ].join(' ')
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[9999] flex">
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
       <button
         type="button"
         aria-label="Закрыть форму добавления тренировки"
-        className="absolute inset-0 bg-black/90"
         onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.72)', backdropFilter: 'blur(3px)', border: 'none', cursor: 'pointer' }}
       />
-      <div className="absolute inset-y-0 right-0 flex w-full max-w-[540px] flex-col border-l border-border bg-card shadow-[0_20px_80px_rgba(15,23,42,0.18)]">
+      <div style={{ position: 'relative', width: '100%', maxWidth: 540, height: '100%', background: 'var(--card)', boxShadow: '-8px 0 40px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column' }}>
         <div className="border-b border-border bg-card px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
