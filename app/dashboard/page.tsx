@@ -177,8 +177,6 @@ function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
 // ──────────────────────────────────────────────
 function AthleteDash({ name, userId }: { name: string; userId: string }) {
   const firstName = name.split(' ')[0]
-  const hrv7d = [41, 44, 50, 48, 47, 45, 47]
-  const strain7d = [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1]
   const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoalProgress>({
     targetHours: null,
     completedHours: 0,
@@ -187,12 +185,6 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
     workoutCount: 0,
   })
   const [weeklyGoalLoading, setWeeklyGoalLoading] = useState(true)
-  const athleteSignals = [
-    { label: 'Следующая сессия', value: 'Легкая аэробика', hint: 'Держите следующий блок в Z2 и не допускайте скачков.', icon: 'ki-abstract-14', tone: 'bg-blue-50 text-blue-600' },
-    { label: 'Сон', value: '7.8 ч', hint: 'Хороший уровень для объема, который поддерживает восстановление.', icon: 'ki-moon', tone: 'bg-violet-50 text-violet-600' },
-    { label: 'Тренд ВСР', value: '+2.1 мс', hint: 'Среднее за 7 дней остается стабильным и постепенно растет.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
-  ]
-
   useEffect(() => {
     let cancelled = false
 
@@ -275,25 +267,6 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
         : 'Недельный план уже выполнен или перевыполнен.'
       : 'Задайте часов тренировок в неделю в разделе настроек спорта.'
 
-  const lineOpts = {
-    chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
-    stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 5] },
-    colors: ['#F97316', '#60A5FA'],
-    xaxis: {
-      categories: weekLabels.slice(0, strain7d.length),
-      labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
-      axisBorder: { show: false }, axisTicks: { show: false },
-    },
-    yaxis: [
-      { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
-      { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
-    ],
-    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontSize: '12px', fontFamily: 'DM Sans' },
-    tooltip: { theme: 'light' },
-    dataLabels: { enabled: false },
-  }
-
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <Surface className="p-5 md:p-6">
@@ -354,101 +327,6 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
         </div>
       </Surface>
 
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
-        <StatCard
-          label="Средний ВСР"
-          value={47.2} unit="ms"
-          icon="ki-abstract-26" iconBg="bg-blue-50 text-blue-600"
-          sub="Метрика WHOOP"
-          sparkData={hrv7d} sparkColor="#2563EB"
-        />
-        <StatCard
-          label="Пульс покоя"
-          value={45.8} unit="уд/мин"
-          icon="ki-heart" iconBg="bg-red-50 text-red-500"
-          delta={-3}
-          sparkData={[48, 47, 46, 47, 45, 46, 46]} sparkColor="#EF4444"
-        />
-        <StatCard
-          label="Средний сон"
-          value={7.8} unit="ч"
-          icon="ki-moon" iconBg="bg-violet-50 text-violet-600"
-          sparkData={[7.2, 8.1, 7.5, 8.3, 7.8, 8.0, 7.8]} sparkColor="#7C3AED"
-        />
-        <StatCard
-          label="Ккал / день"
-          value="3,415" unit="kcal"
-          icon="ki-abstract-31" iconBg="bg-orange-50 text-orange-500"
-          delta={5}
-          sparkData={[3100, 3400, 3200, 3500, 3350, 3600, 3415]} sparkColor="#F97316"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-        <Surface className="p-5 md:p-6">
-          <SectionHeader
-            eyebrow="Тренировочный сигнал"
-            title="Недельная нагрузка и ВСР"
-            subtitle="Один график, две метрики и тот контекст, который обычно нужен первым."
-            action={(
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-                Эта неделя
-              </span>
-            )}
-          />
-          <div className="mt-4">
-            <ApexChart
-              type="line"
-              series={[
-                { name: 'Нагрузка', data: strain7d },
-                { name: 'ВСР (мс)', data: hrv7d },
-              ]}
-              options={lineOpts}
-              height={220}
-            />
-          </div>
-        </Surface>
-
-        <Surface className="p-5 md:p-6">
-          <SectionHeader
-            eyebrow="Инсайт"
-            title="Фокус дня"
-            subtitle="Держите нагрузку под контролем и дайте восстановлению вести день."
-          />
-          <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50/60 p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">Главное действие: остаться в аэробике</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Восстановление среднее, ВСР стабилен, а нагрузка колебалась достаточно, чтобы выбрать более спокойную сессию.
-                </p>
-              </div>
-              <span className="inline-flex shrink-0 items-center rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
-                Умеренно
-              </span>
-            </div>
-          </div>
-          <div className="mt-4 space-y-3">
-            {athleteSignals.map(signal => (
-              <SmallSignal key={signal.label} {...signal} />
-            ))}
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            {[
-              { label: 'Долг по сну', value: 'Низкий', color: 'text-emerald-600' },
-              { label: 'Предел сессии', value: '45-60 мин', color: 'text-foreground' },
-              { label: 'Риск', value: 'Управляемый', color: 'text-orange-600' },
-            ].map(item => (
-              <div key={item.label} className="rounded-xl border border-border bg-background/70 p-3 text-center">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</div>
-                <div className={`pf-num mt-2 text-lg font-semibold ${item.color}`}>{item.value}</div>
-              </div>
-            ))}
-          </div>
-        </Surface>
-      </div>
-
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.95fr_1.05fr]">
         <Surface className="p-0">
           <div className="border-b border-border px-5 py-4 md:px-6">
@@ -503,21 +381,6 @@ function CoachDash({ name }: { name: string }) {
     { name: 'James Thornton', sport: 'Плавание', recovery: 63, hrv: 32.0, status: 'ok' },
     { name: 'Linh Nguyen', sport: 'Силовая подготовка', recovery: 80, hrv: 106.5, status: 'good' },
   ]
-  const barOpts = {
-    chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
-    plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
-    colors: ['#F97316'],
-    xaxis: {
-      categories: athletes.map(a => a.name.split(' ')[0]),
-      labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
-      axisBorder: { show: false }, axisTicks: { show: false },
-    },
-    yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } }, max: 100 },
-    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    tooltip: { theme: 'light' },
-    dataLabels: { enabled: false },
-  }
-
   const watchlist = athletes.filter(a => a.recovery < 70)
   const coachSignals = [
     { label: 'Сегодня', value: '3 активные сессии', hint: 'Объема достаточно для состава без давления на восстановление.', icon: 'ki-calendar', tone: 'bg-blue-50 text-blue-600' },
@@ -567,23 +430,6 @@ function CoachDash({ name }: { name: string }) {
           ))}
         </div>
       </Surface>
-
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
-        {[
-          { label: 'Активные атлеты', value: '4', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Средняя готовность команды', value: '67%', icon: 'ki-abstract-26', bg: 'bg-green-50 text-green-600' },
-          { label: 'Сессии сегодня', value: '3', icon: 'ki-calendar', bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Сигналы', value: '1', icon: 'ki-notification', bg: 'bg-red-50 text-red-500' },
-        ].map(c => (
-          <StatCard
-            key={c.label}
-            label={c.label}
-            value={c.value}
-            icon={c.icon}
-            iconBg={c.bg}
-          />
-        ))}
-      </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <Surface className="p-5 md:p-6">
@@ -652,22 +498,6 @@ function CoachDash({ name }: { name: string }) {
         <div className="grid gap-4">
           <Surface className="p-5 md:p-6">
             <SectionHeader
-              eyebrow="Карта команды"
-              title="Распределение готовности"
-              subtitle="Компактный столбчатый вид для быстрого сравнения по составу."
-            />
-            <div className="mt-4">
-              <ApexChart
-                type="bar"
-                series={[{ name: 'Готовность %', data: [42, 82, 63, 80] }]}
-                options={barOpts}
-                height={220}
-              />
-            </div>
-          </Surface>
-
-          <Surface className="p-5 md:p-6">
-            <SectionHeader
               eyebrow="Лист контроля"
               title="Атлеты для корректировки"
               subtitle={`${watchlist.length} атл. находятся ниже предпочтительного коридора готовности.`}
@@ -730,23 +560,6 @@ function AdminDash({ name }: { name: string }) {
           </div>
         </div>
       </Surface>
-
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 pf-stagger">
-        {[
-          { label: 'Всего пользователей', value: '3', icon: 'ki-people', bg: 'bg-blue-50 text-blue-600' },
-          { label: 'Атлеты', value: '1', icon: 'ki-abstract-26', bg: 'bg-orange-50 text-orange-500' },
-          { label: 'Тренеры', value: '1', icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
-          { label: 'Записи WHOOP', value: '100K', icon: 'ki-chart-line-up', bg: 'bg-violet-50 text-violet-600' },
-        ].map(c => (
-          <StatCard
-            key={c.label}
-            label={c.label}
-            value={c.value}
-            icon={c.icon}
-            iconBg={c.bg}
-          />
-        ))}
-      </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_0.9fr]">
         <Surface className="p-5 md:p-6">
