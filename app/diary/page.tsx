@@ -372,10 +372,10 @@ function ViewEditDrawer({
   return ReactDOM.createPortal(
     <>
       <div onClick={handleClose} style={{ position:'fixed',inset:0,zIndex:9998,background:'rgba(15,23,42,0.65)',backdropFilter:'blur(3px)',transition:'opacity 0.26s',opacity:visible?1:0 }} />
-      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:480,maxWidth:'100vw',zIndex:9999,background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
+      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:480,maxWidth:'100vw',zIndex:9999,background:'#ffffff',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
 
         {/* Header */}
-        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'var(--card)',zIndex:1 }}>
+        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'#ffffff',zIndex:1 }}>
           <div style={{ display:'flex',alignItems:'center',gap:12,minWidth:0 }}>
             <div style={{ width:40,height:40,borderRadius:12,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:ac.bg,border:`1px solid ${ac.border}` }}>
               <i className={`ki-filled ${ac.icon} text-sm`} style={{ color:ac.text }} />
@@ -608,8 +608,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   return ReactDOM.createPortal(
     <div style={{ position:'fixed',inset:0,zIndex:9999,display:'flex' }}>
       <div style={{ position:'absolute',inset:0,background:'rgba(15,23,42,0.65)' }} onClick={onClose} />
-      <div style={{ position:'absolute',top:0,right:0,height:'100%',width:480,maxWidth:'100vw',background:'var(--card)',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',overflowY:'auto' }}>
-        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'var(--card)',zIndex:1 }}>
+      <div style={{ position:'fixed',top:0,right:0,bottom:0,width:480,maxWidth:'100vw',background:'#ffffff',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',overflowY:'auto',zIndex:10000 }}>
+        <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'#ffffff',zIndex:1 }}>
           <div>
             <p style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:4 }}>Новая тренировка</p>
             <h3 style={{ fontSize:20,fontWeight:700,color:'var(--foreground)',margin:0 }}>Добавить запись</h3>

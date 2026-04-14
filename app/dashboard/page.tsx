@@ -82,34 +82,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
     })
   }, [userId])
 
-  // Метрики за последние 7 тренировок
-  const recent7 = workouts.slice(0, 7)
-  const strainData = recent7.map(w => w.activity_strain ?? 0).reverse()
-  const hrvData    = recent7.map(w => w.hrv ?? 0).reverse()
-  const avgStrain  = recent7.length ? (recent7.reduce((a, w) => a + (w.activity_strain ?? 0), 0) / recent7.length) : 0
-  const avgHRV     = recent7.length ? (recent7.reduce((a, w) => a + (w.hrv ?? 0), 0) / recent7.filter(w => w.hrv).length || 0) : 0
-  const avgHR      = recent7.length ? (recent7.reduce((a, w) => a + (w.avg_heart_rate ?? 0), 0) / recent7.filter(w => w.avg_heart_rate).length || 0) : 0
-  const totalCals  = recent7.reduce((a, w) => a + (w.activity_calories ?? 0), 0)
   const lastRecovery = workouts[0]?.recovery_score ?? null
-
-  const lineOpts = {
-    chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
-    stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 5] },
-    colors: ['#F97316', '#60A5FA'],
-    xaxis: {
-      categories: weekLabels.slice(0, strainData.length),
-      labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
-      axisBorder: { show: false }, axisTicks: { show: false },
-    },
-    yaxis: [
-      { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
-      { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
-    ],
-    grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontSize: '12px', fontFamily: 'DM Sans' },
-    tooltip: { theme: 'light' },
-    dataLabels: { enabled: false },
-  }
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
@@ -125,80 +98,6 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
           </h2>
         </div>
         {lastRecovery !== null && <RecoveryRing score={lastRecovery} size={100} />}
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
-        <StatCard
-          label="Ср. нагрузка"
-          value={avgStrain.toFixed(1)}
-          icon="ki-chart-line-up" iconBg="bg-orange-50 text-orange-500"
-          sub={`За ${recent7.length} тренировок`}
-          sparkData={strainData} sparkColor="#F97316"
-        />
-        <StatCard
-          label="Ср. HRV"
-          value={avgHRV ? avgHRV.toFixed(1) : '—'} unit={avgHRV ? 'ms' : ''}
-          icon="ki-abstract-26" iconBg="bg-blue-50 text-blue-600"
-          sparkData={hrvData.filter(v => v > 0)} sparkColor="#2563EB"
-        />
-        <StatCard
-          label="Ср. ЧСС"
-          value={avgHR ? Math.round(avgHR) : '—'} unit={avgHR ? 'bpm' : ''}
-          icon="ki-heart" iconBg="bg-red-50 text-red-500"
-        />
-        <StatCard
-          label="Всего ккал"
-          value={totalCals > 0 ? totalCals.toLocaleString('ru-RU') : '—'} unit={totalCals > 0 ? 'ккал' : ''}
-          icon="ki-abstract-31" iconBg="bg-green-50 text-green-600"
-          sub="За последние 7 трен."
-        />
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 bg-card border border-border rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">Нагрузка и HRV</h3>
-              <p className="text-2xs text-muted-foreground mt-0.5">Последние тренировки</p>
-            </div>
-          </div>
-          {strainData.length > 0 ? (
-            <ApexChart
-              type="line"
-              series={[
-                { name: 'Нагрузка', data: strainData },
-                { name: 'HRV (ms)', data: hrvData },
-              ]}
-              options={lineOpts}
-              height={200}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-[200px] text-muted-foreground text-2sm">
-              {loading ? 'Загрузка…' : 'Нет данных о тренировках'}
-            </div>
-          )}
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4">
-          <h3 className="text-sm font-semibold text-foreground">Последнее восстановление</h3>
-          <div className="flex items-center justify-center">
-            <RecoveryRing score={lastRecovery ?? 0} size={120} />
-          </div>
-          <div className="space-y-2.5">
-            {[
-              { label: 'HRV',       val: avgHRV ? `${avgHRV.toFixed(1)} ms` : '—' },
-              { label: 'Ср. ЧСС',  val: avgHR  ? `${Math.round(avgHR)} bpm` : '—' },
-              { label: 'Нагрузка', val: avgStrain ? avgStrain.toFixed(1) : '—' },
-            ].map(m => (
-              <div key={m.label} className="flex items-center justify-between">
-                <span className="text-2sm text-muted-foreground">{m.label}</span>
-                <span className="text-2sm font-semibold text-foreground">{m.val}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Recent Sessions */}
