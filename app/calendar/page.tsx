@@ -1372,57 +1372,135 @@ export default function CalendarPage() {
     }
   }
 
-  const strainSamples = monthWorkouts.filter(w => w.activity_strain != null).length
-  const avgStrain = strainSamples
-    ? (monthWorkouts.reduce((a, w) => a + Number(w.activity_strain ?? 0), 0) / strainSamples).toFixed(1)
-    : '—'
-  const totalCals = monthWorkouts.reduce((a, w) => a + (w.activity_calories ?? 0), 0)
   const selectedLabel = selected ? parseLocalDate(selected).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Сегодня'
-  const activeCycleCount = cycles.length
+
+  const periodCompetitions = useMemo(() => {
+    try {
+      if (view === 'week') {
+        const ws = weekStart
+        const we = new Date(ws); we.setDate(we.getDate() + 6)
+        const wsISO = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
+        const weISO = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
+        return savedEvents.filter(e => e.event_type === 'competition' && e.event_date >= wsISO && e.event_date <= weISO).length
+      }
+      if (view === 'month') {
+        return savedEvents.filter(e => {
+          if (e.event_type !== 'competition') return false
+          const d = parseLocalDate(e.event_date)
+          return d.getFullYear() === year && d.getMonth() === month
+        }).length
+      }
+      if (view === 'quarter') {
+        const qStart = (quarter - 1) * 3; const qEnd = qStart + 2
+        return DEMO_COMPETITIONS.filter(c => { const d = parseLocalDate(c.date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
+      }
+      return DEMO_COMPETITIONS.filter(c => parseLocalDate(c.date).getFullYear() === year).length
+    } catch { return 0 }
+  }, [view, year, month, quarter, weekStart, savedEvents])
+
+  const periodCycles = useMemo(() => {
+    try {
+      let from: Date, to: Date
+      if (view === 'week') {
+        from = weekStart; to = new Date(weekStart); to.setDate(to.getDate() + 6)
+      } else if (view === 'month') {
+        from = new Date(year, month, 1); to = new Date(year, month + 1, 0)
+      } else if (view === 'quarter') {
+        from = new Date(year, (quarter - 1) * 3, 1); to = new Date(year, quarter * 3, 0)
+      } else {
+        from = new Date(year, 0, 1); to = new Date(year, 11, 31)
+      }
+      return cycles.filter(c => parseLocalDate(c.start_date) <= to && parseLocalDate(c.end_date) >= from).length
+    } catch { return 0 }
+  }, [view, year, month, quarter, weekStart, cycles])
+
+  const diaryPeriodLink = useCallback(() => {
+    let from: string, to: string
+    if (view === 'week') {
+      const ws = weekStart; const we = new Date(ws); we.setDate(we.getDate() + 6)
+      from = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
+      to   = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
+    } else if (view === 'month') {
+      from = `${year}-${String(month+1).padStart(2,'0')}-01`
+      to   = `${year}-${String(month+1).padStart(2,'0')}-${String(new Date(year, month+1, 0).getDate()).padStart(2,'0')}`
+    } else if (view === 'quarter') {
+      const qsm = (quarter-1)*3+1; const qem = quarter*3
+      from = `${year}-${String(qsm).padStart(2,'0')}-01`
+      to   = `${year}-${String(qem).padStart(2,'0')}-${String(new Date(year, qem, 0).getDate()).padStart(2,'0')}`
+    } else {
+      from = `${year}-01-01`; to = `${year}-12-31`
+    }
+    return `/diary?from=${from}&to=${to}`
+  }, [view, year, month, quarter, weekStart])
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
       <SurfaceFrame>
         <div className="bg-gradient-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-            <div className="max-w-3xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <Tag tone="border-orange-200 bg-orange-50 text-orange-700">График тренировок</Tag>
-                <Tag tone="border-border bg-background text-muted-foreground">{periodLabel()}</Tag>
-                <Tag tone="border-border bg-background text-muted-foreground">{activeCycleCount} циклов</Tag>
-                <Tag tone="border-border bg-background text-muted-foreground">{savedEvents.length} событий</Tag>
-              </div>
-              <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-tight text-foreground">Календарь</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Планируйте циклы, отслеживайте тренировки и держите события в одном shell-слое без потери текущих действий и связей.
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <MetricCard
-                  label="Сессии"
-                  value={periodSessions}
-                  hint={kpiLabel()}
-                  icon="ki-abstract-26"
-                  tone="bg-blue-50 text-blue-600"
-                  href="/diary"
-                />
-                <MetricCard
-                  label="Средняя нагрузка"
-                  value={avgStrain}
-                  hint="По загруженным тренировкам"
-                  icon="ki-chart-line-up"
-                  tone="bg-orange-50 text-orange-600"
-                />
-                <MetricCard
-                  label="Калории"
-                  value={totalCals.toLocaleString()}
-                  hint="Всего за текущий месяц"
-                  icon="ki-abstract-31"
-                  tone="bg-emerald-50 text-emerald-600"
-                />
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="flex-1 min-w-0">
+              <Tag tone="border-orange-200 bg-orange-50 text-orange-700">График тренировок</Tag>
+              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-foreground leading-tight">Календарь</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{periodLabel()}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {/* KPI 1 — Тренировки → дневник с диапазоном дат */}
+                <Link href={diaryPeriodLink()} className="no-underline group">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <i className="ki-filled ki-abstract-26 text-base" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Тренировки</p>
+                      <div className="mt-1 flex items-end gap-1.5">
+                        <span className="pf-num text-[clamp(1.8rem,3vw,2.45rem)] leading-none text-foreground">{periodSessions}</span>
+                      </div>
+                      <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
+                        {kpiLabel()}
+                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+                {/* KPI 2 — Соревнования → календарь с фильтром */}
+                <Link href="/calendar?filter=competition" className="no-underline group">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                      <i className="ki-filled ki-medal-star text-base" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Соревнования</p>
+                      <div className="mt-1 flex items-end gap-1.5">
+                        <span className="pf-num text-[clamp(1.8rem,3vw,2.45rem)] leading-none text-foreground">{periodCompetitions}</span>
+                      </div>
+                      <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
+                        {kpiLabel()}
+                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+                {/* KPI 3 — Циклы → календарь с фильтром */}
+                <Link href="/calendar?filter=cycle" className="no-underline group">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                      <i className="ki-filled ki-abstract-45 text-base" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Циклы</p>
+                      <div className="mt-1 flex items-end gap-1.5">
+                        <span className="pf-num text-[clamp(1.8rem,3vw,2.45rem)] leading-none text-foreground">{periodCycles}</span>
+                      </div>
+                      <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
+                        {kpiLabel()}
+                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </p>
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 xl:min-w-[280px]">
+            <div className="flex flex-col gap-3 xl:w-[260px] xl:shrink-0">
               <div className="rounded-2xl border border-border bg-background/80 p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Рабочая область</p>
                 <p className="mt-2 text-lg font-semibold text-foreground capitalize">{selectedLabel}</p>
