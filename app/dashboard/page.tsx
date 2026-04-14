@@ -320,11 +320,6 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <SmallSignal label="Сон" value="7.8 ч" hint="Этого достаточно для стабильного тренировочного дня." icon="ki-moon" tone="bg-violet-50 text-violet-600" />
-          <SmallSignal label="Потолок нагрузки" value="Умеренно" hint="Сохраните день, удерживая объем под контролем." icon="ki-abstract-31" tone="bg-orange-50 text-orange-600" />
-          <SmallSignal label="Тренд ВСР" value="47 мс" hint="Пока держится выше среднего уровня за неделю." icon="ki-abstract-26" tone="bg-blue-50 text-blue-600" />
-        </div>
       </Surface>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.95fr_1.05fr]">
@@ -382,11 +377,6 @@ function CoachDash({ name }: { name: string }) {
     { name: 'Linh Nguyen', sport: 'Силовая подготовка', recovery: 80, hrv: 106.5, status: 'good' },
   ]
   const watchlist = athletes.filter(a => a.recovery < 70)
-  const coachSignals = [
-    { label: 'Сегодня', value: '3 активные сессии', hint: 'Объема достаточно для состава без давления на восстановление.', icon: 'ki-calendar', tone: 'bg-blue-50 text-blue-600' },
-    { label: 'Нагрузка под контролем', value: '1 атлет', hint: 'Одному атлету нужен более жесткий потолок перед следующим блоком.', icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
-    { label: 'Средняя готовность', value: '67%', hint: 'Группа работоспособна, но еще не готова к агрессивной нагрузке.', icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
-  ]
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
@@ -424,11 +414,6 @@ function CoachDash({ name }: { name: string }) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          {coachSignals.map(signal => (
-            <SmallSignal key={signal.label} {...signal} />
-          ))}
-        </div>
       </Surface>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
