@@ -779,8 +779,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   return ReactDOM.createPortal(
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(3px)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0, display: open ? 'block' : 'none' }} />
-      <div aria-modal="true" role="dialog" className="pf-drawer-panel" style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 560, maxWidth: '100vw', zIndex: 9999, display: open ? 'flex' : 'none', flexDirection: 'column', overflowY: 'auto', borderLeft: '1px solid var(--border)', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
-        <div className="pf-drawer-header border-b border-border px-6 py-5">
+      <div aria-modal="true" role="dialog" className="pf-drawer-panel" style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 560, maxWidth: '100vw', zIndex: 9999, background: '#ffffff', display: open ? 'flex' : 'none', flexDirection: 'column', overflowY: 'auto', borderLeft: '1px solid var(--border)', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
+        <div className="pf-drawer-header border-b border-border px-6 py-5" style={{ background: '#ffffff' }}>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
@@ -1022,7 +1022,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
             </section>
           </div>
 
-          <div className="pf-drawer-footer border-t border-border px-6 py-4">
+          <div className="pf-drawer-footer border-t border-border px-6 py-4" style={{ background: '#ffffff' }}>
             <div className="flex items-center justify-between gap-4 rounded-[22px] border border-border bg-background/70 px-4 py-3">
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-foreground">Готово к сохранению</div>
