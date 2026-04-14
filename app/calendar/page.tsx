@@ -737,7 +737,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
 }
 
 // ── YEAR/QUARTER/MONTH/WEEK VIEWS ─────────────────────────────────────────────
-function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: string) => void; cycles: CycleBlock[] }) {
+function YearView({ year, onSelect, cycles, selected }: { year: number; onSelect: (d: string) => void; cycles: CycleBlock[]; selected?: string | null }) {
   const today = todayISO()
   return (
     <div className="flex flex-col gap-5 pf-enter">
@@ -761,21 +761,23 @@ function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: stri
           while (cells.length%7!==0) cells.push(null)
           return (
             <div key={m} className="bg-card border border-border rounded-xl p-3">
-              <div className="text-2xs font-bold text-foreground uppercase tracking-wider mb-2">{MONTHS_FULL[mi]}</div>
+              <div className="text-2xs font-bold text-foreground uppercase tracking-wider mb-2">{MONTHS_RU[mi]}</div>
               <div className="grid grid-cols-7 gap-[2px] mb-1">
-                {['M','T','W','T','F','S','S'].map((d,i) => <div key={i} className="text-center text-[8px] text-muted-foreground/60 font-medium pb-0.5">{d}</div>)}
+                {DAYS_SHORT.map((d,i) => <div key={i} className="text-center text-[8px] text-muted-foreground/60 font-medium pb-0.5">{d[0]}</div>)}
                 {cells.map((day, di) => {
                   if (!day) return <div key={di} />
                   const ds = `${year}-${String(mi+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
                   const h = HEATMAP[ds]; const inC = cycles.find(c => ds >= c.start_date && ds <= c.end_date)
                   const cc = inC ? CYCLE_TYPE_CFG[inC.type] : null
+                  const isSel = ds === selected
+                  const isToday = ds === today
                   return (
                     <div key={di} onClick={() => onSelect(ds)}
                       className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
                       title={ds}
-                      style={{ background: cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC'), outline: cc ? `1px solid ${cc.border}` : 'none' }}>
+                      style={{ background: isSel ? '#FFF7ED' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F97316' : (cc ? `1px solid ${cc.border}` : 'none') }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
-                      {ds === today && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
+                      {isToday && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
                       <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                         {parseLocalDate(ds).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                       </span>
@@ -791,7 +793,7 @@ function YearView({ year, onSelect, cycles }: { year: number; onSelect: (d: stri
   )
 }
 
-function QuarterView({ year, quarter, onSelect, cycles }: { year: number; quarter: number; onSelect: (d: string) => void; cycles: CycleBlock[] }) {
+function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: number; quarter: number; onSelect: (d: string) => void; cycles: CycleBlock[]; selected?: string | null }) {
   const sm = (quarter-1)*3; const months = [sm, sm+1, sm+2]; const today = todayISO()
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pf-enter">
@@ -803,7 +805,7 @@ function QuarterView({ year, quarter, onSelect, cycles }: { year: number; quarte
         const mc = cycles.filter(c => { const cs=parseLocalDate(c.start_date),ce=parseLocalDate(c.end_date); return cs<=new Date(year,mi+1,0)&&ce>=new Date(year,mi,1) })
         return (
           <div key={mi} className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-border"><h3 className="pf-num text-lg text-foreground">{MONTHS_FULL[mi]} {year}</h3></div>
+            <div className="px-4 py-3 border-b border-border"><h3 className="pf-num text-lg text-foreground">{MONTHS_RU[mi]} {year}</h3></div>
             <div className="p-3">
               <div className="grid grid-cols-7 mb-1">{DAYS_SHORT.map(d => <div key={d} className="text-center text-2xs text-muted-foreground/60 font-medium py-0.5">{d[0]}</div>)}</div>
               {mc.map((c,ci) => { const cc=CYCLE_TYPE_CFG[c.type]; return <div key={ci} className="mb-1 px-2 py-0.5 rounded text-2xs font-medium truncate border" style={{ background:cc.bg, color:cc.text, borderColor:cc.border }}>{c.label}</div> })}
@@ -812,8 +814,11 @@ function QuarterView({ year, quarter, onSelect, cycles }: { year: number; quarte
                   if (!day) return <div key={di} />
                   const ds = `${year}-${String(mi+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
                   const h=HEATMAP[ds]; const inC=cycles.find(c=>ds>=c.start_date&&ds<=c.end_date); const cc=inC?CYCLE_TYPE_CFG[inC.type]:null
-                  return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5" style={{ background:cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA'), borderColor:ds===today?'#F97316':(cc?cc.border:'transparent') }}>
-                    <span className="text-[9px] font-medium text-foreground/60">{day}</span>
+                  const isSel = ds === selected; const isToday = ds === today
+                  return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5"
+                    style={{ background: isSel ? '#FFF7ED' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F97316' : (isToday ? '#FB923C' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
+                    <span className={`text-[9px] font-medium ${isSel ? 'text-orange-600' : isToday ? 'text-orange-500' : 'text-foreground/60'}`}>{day}</span>
+                    {isToday && <span className="w-1 h-1 rounded-full bg-orange-400"/>}
                     {h?.hasComp&&<span className="w-1.5 h-1.5 rounded-full bg-orange-500"/>}
                   </div>
                 })}
@@ -1324,8 +1329,8 @@ export default function CalendarPage() {
   const periodLabel = () => {
     if (view==='year')    return `${year}`
     if (view==='quarter') return `Q${quarter} ${year}`
-    if (view==='month')   return `${MONTHS_FULL[month]} ${year}`
-    return `Неделя · ${MONTHS_FULL[month]} ${year}`
+    if (view==='month')   return `${MONTHS_RU[month]} ${year}`
+    return `Неделя · ${MONTHS_RU[month]} ${year}`
   }
 
   const VIEWS: {id:ViewMode;label:string}[] = [{id:'week',label:'Неделя'},{id:'month',label:'Месяц'},{id:'quarter',label:'Квартал'},{id:'year',label:'Год'}]
@@ -1516,27 +1521,47 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className={`grid gap-4 ${view !== 'year' && view !== 'quarter' ? 'xl:grid-cols-[1fr_320px]' : ''}`}>
-        <div>
-          {view === 'year' && <YearView year={year} onSelect={setSelected} cycles={cycles} />}
-          {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} />}
-          {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
-          {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
+      {view === 'year' ? (
+        <div className="flex flex-col gap-4">
+          <YearView year={year} onSelect={setSelected} cycles={cycles} selected={selected} />
+          {selected && (
+            <div className="pf-enter">
+              <DetailPanel
+                dateStr={selected}
+                savedEvents={savedEvents}
+                monthWorkouts={monthWorkouts}
+                cycles={cycles}
+                cycleDaysMap={cycleDaysMap}
+                onAddEvent={openAddEvent}
+                onDeleteEvent={handleDeleteEvent}
+                onViewEvent={openEventDrawer}
+                onOpenCycle={setCycleDrawer}
+              />
+            </div>
+          )}
         </div>
-        {(view === 'month' || view === 'week') && selected && (
-          <DetailPanel
-            dateStr={selected}
-            savedEvents={savedEvents}
-            monthWorkouts={monthWorkouts}
-            cycles={cycles}
-            cycleDaysMap={cycleDaysMap}
-            onAddEvent={openAddEvent}
-            onDeleteEvent={handleDeleteEvent}
-            onViewEvent={openEventDrawer}
-            onOpenCycle={setCycleDrawer}
-          />
-        )}
-      </div>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
+          <div>
+            {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} selected={selected} />}
+            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
+            {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} cycles={cycles} cycleDaysMap={cycleDaysMap} />}
+          </div>
+          {selected && (
+            <DetailPanel
+              dateStr={selected}
+              savedEvents={savedEvents}
+              monthWorkouts={monthWorkouts}
+              cycles={cycles}
+              cycleDaysMap={cycleDaysMap}
+              onAddEvent={openAddEvent}
+              onDeleteEvent={handleDeleteEvent}
+              onViewEvent={openEventDrawer}
+              onOpenCycle={setCycleDrawer}
+            />
+          )}
+        </div>
+      )}
 
       {savedEvents.length > 0 && (
         <SurfaceFrame className="p-4 md:p-5">
