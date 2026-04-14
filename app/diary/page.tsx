@@ -777,9 +777,9 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   ].join(' ')
 
   return ReactDOM.createPortal(
-    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'block' : 'none' }}>
+    <div aria-modal="true" role="dialog" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: open ? 'flex' : 'none', justifyContent: 'flex-end' }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'rgba(15,23,42,0.65)', transition: 'opacity 0.25s', opacity: visible ? 1 : 0 }} />
-      <div className="pf-drawer-panel" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, zIndex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
+      <div className="pf-drawer-panel" style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 560, height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', boxShadow: '-8px 0 40px rgba(0,0,0,0.18)', transform: visible ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)' }}>
         <div className="pf-drawer-header border-b border-border px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
