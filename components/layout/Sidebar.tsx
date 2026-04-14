@@ -17,7 +17,9 @@ const NAV_SECTIONS = [
   {
     title: 'Тренировки',
     items: [
-      { href: '/calendar', icon: 'ki-calendar', label: 'Календарь', roles: ['athlete', 'coach', 'admin'] as string[] },
+      { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin'] as string[] },
+      { href: '/competitions', icon: 'ki-medal-star',  label: 'Соревнования', roles: ['athlete', 'coach', 'admin'] as string[] },
+      { href: '/cycles',       icon: 'ki-abstract-45', label: 'Циклы',        roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['coach'] as string[] },
       { href: '/messages', icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach'] as string[] },

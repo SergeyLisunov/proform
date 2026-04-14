@@ -1433,6 +1433,25 @@ export default function CalendarPage() {
     return `/diary?from=${from}&to=${to}`
   }, [view, year, month, quarter, weekStart])
 
+  const periodRangeParams = useCallback(() => {
+    let from: string, to: string
+    if (view === 'week') {
+      const ws = weekStart; const we = new Date(ws); we.setDate(we.getDate() + 6)
+      from = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
+      to   = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
+    } else if (view === 'month') {
+      from = `${year}-${String(month+1).padStart(2,'0')}-01`
+      to   = `${year}-${String(month+1).padStart(2,'0')}-${String(new Date(year, month+1, 0).getDate()).padStart(2,'0')}`
+    } else if (view === 'quarter') {
+      const qsm = (quarter-1)*3+1; const qem = quarter*3
+      from = `${year}-${String(qsm).padStart(2,'0')}-01`
+      to   = `${year}-${String(qem).padStart(2,'0')}-${String(new Date(year, qem, 0).getDate()).padStart(2,'0')}`
+    } else {
+      from = `${year}-01-01`; to = `${year}-12-31`
+    }
+    return `from=${from}&to=${to}`
+  }, [view, year, month, quarter, weekStart])
+
   return (
     <div className="flex flex-col gap-5 pf-enter">
       <SurfaceFrame>
@@ -1461,8 +1480,8 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 </Link>
-                {/* KPI 2 — Соревнования → календарь с фильтром */}
-                <Link href="/calendar?filter=competition" className="no-underline group">
+                {/* KPI 2 — Соревнования → страница соревнований с диапазоном дат */}
+                <Link href={`/competitions?${periodRangeParams()}`} className="no-underline group">
                   <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                       <i className="ki-filled ki-medal-star text-base" />
@@ -1479,8 +1498,8 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 </Link>
-                {/* KPI 3 — Циклы → календарь с фильтром */}
-                <Link href="/calendar?filter=cycle" className="no-underline group">
+                {/* KPI 3 — Циклы → страница циклов с диапазоном дат */}
+                <Link href={`/cycles?${periodRangeParams()}`} className="no-underline group">
                   <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                       <i className="ki-filled ki-abstract-45 text-base" />
