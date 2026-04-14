@@ -154,9 +154,6 @@ export default function Sidebar() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="pf-num text-[20px] leading-none text-foreground tracking-wide">ProForm</span>
-              <span className="rounded-full border border-border/70 bg-muted/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Контур
-              </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Панель атлета и тренера</p>
           </div>
