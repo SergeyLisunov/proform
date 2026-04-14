@@ -89,6 +89,20 @@ body {
   font-family: var(--pf-font-sans);
 }
 
+/* Drawer panel — принудительно белый фон */
+.pf-drawer-panel {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+.pf-drawer-header {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+.pf-drawer-footer {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
 .demo1 {
   --sidebar-transition-duration: 0.3s;
   --sidebar-transition-timing: ease;
