@@ -11,6 +11,23 @@ export type Database = {
           name: string
           role: UserRole
           created_at: string
+          nickname: string | null
+          is_searchable: boolean
+          discipline: string | null
+          coach_specialization: string | null
+          experience_years: number | null
+          bio: string | null
+          phone: string | null
+          city: string | null
+          country: string | null
+          first_name: string | null
+          last_name: string | null
+          birth_date: string | null
+          gender: string | null
+          status: string | null
+          deleted_at: string | null
+          avatar_url: string | null
+          sport: string | null
         }
         Insert: {
           id?: string
@@ -19,6 +36,20 @@ export type Database = {
           name: string
           role: UserRole
           created_at?: string
+          nickname?: string | null
+          is_searchable?: boolean
+          discipline?: string | null
+          coach_specialization?: string | null
+          experience_years?: number | null
+          bio?: string | null
+          phone?: string | null
+          city?: string | null
+          country?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          birth_date?: string | null
+          gender?: string | null
+          status?: string | null
         }
         Update: Partial<Database['public']['Tables']['users']['Insert']>
         Relationships: []
@@ -38,9 +69,130 @@ export type Database = {
           profile_public: boolean
           workouts_public: boolean
           updated_at: string | null
+          first_name: string | null
+          last_name: string | null
+          birth_date: string | null
+          phone: string | null
+          city: string | null
+          country: string | null
+          bio: string | null
+          club: string | null
+          vo2max: number | null
+          max_heart_rate: number | null
+          lactate_threshold_hr: number | null
+          weekly_training_hours: number | null
         }
         Insert: Partial<Database['public']['Tables']['athletes']['Row']> & { id: string }
         Update: Partial<Database['public']['Tables']['athletes']['Row']>
+        Relationships: []
+      }
+      connections: {
+        Row: {
+          id: string
+          initiator_id: string
+          recipient_id: string
+          connection_type: 'coach_athlete' | 'org_coach' | 'org_athlete'
+          status: 'pending' | 'active' | 'declined' | 'cancelled' | 'terminated'
+          message: string | null
+          initiated_at: string
+          responded_at: string | null
+          terminated_at: string | null
+          terminated_by: string | null
+        }
+        Insert: {
+          id?: string
+          initiator_id: string
+          recipient_id: string
+          connection_type: 'coach_athlete' | 'org_coach' | 'org_athlete'
+          status?: 'pending' | 'active' | 'declined' | 'cancelled' | 'terminated'
+          message?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['connections']['Row']>
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          body: string | null
+          entity_type: string | null
+          entity_id: string | null
+          is_read: boolean
+          is_archived: boolean
+          action_url: string | null
+          created_at: string
+          read_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: string
+          title: string
+          body?: string | null
+          entity_type?: string | null
+          entity_id?: string | null
+          is_read?: boolean
+          is_archived?: boolean
+          action_url?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['notifications']['Row']>
+        Relationships: []
+      }
+      chats: {
+        Row: {
+          id: string
+          athlete_id: string
+          coach_id: string
+          type: string
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          athlete_id: string
+          coach_id: string
+          type?: string
+          created_by?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['chats']['Row']>
+        Relationships: []
+      }
+      chat_members: {
+        Row: {
+          id: string
+          chat_id: string
+          user_id: string
+          role: string
+          joined_at: string
+        }
+        Insert: {
+          id?: string
+          chat_id: string
+          user_id: string
+          role?: string
+        }
+        Update: Partial<Database['public']['Tables']['chat_members']['Row']>
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          id: string
+          chat_id: string
+          sender_id: string
+          body: string
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          chat_id: string
+          sender_id: string
+          body: string
+          is_read?: boolean
+        }
+        Update: Partial<Database['public']['Tables']['messages']['Row']>
         Relationships: []
       }
       workouts: {

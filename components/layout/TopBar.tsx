@@ -9,14 +9,13 @@ import { useUser } from '@/lib/hooks/useUser'
 
 type Notification = {
   id:           string
-  type:         'comment' | 'announcement' | 'coach_mark' | 'org_post' | 'system'
+  type:         string
   title:        string
   body:         string | null
-  link:         string | null
+  action_url:   string | null
   is_read:      boolean
+  is_archived:  boolean
   created_at:   string
-  from_user_id: string | null
-  from_name?:   string
 }
 
 // ── константы ──────────────────────────────────────────────────────────────────
@@ -44,19 +43,31 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> 
 }
 
 const NOTIF_ICONS: Record<string, string> = {
-  comment:      'ki-message-text',
-  announcement: 'ki-notification-on',
-  coach_mark:   'ki-notepad-edit',
-  org_post:     'ki-office-bag',
-  system:       'ki-information-2',
+  invitation_received:   'ki-user-plus',
+  invitation_accepted:   'ki-check-circle',
+  invitation_declined:   'ki-cross-circle',
+  invitation_cancelled:  'ki-information-5',
+  connection_terminated: 'ki-disconnect',
+  broadcast:             'ki-notification-on',
+  system:                'ki-setting-2',
+  comment:               'ki-message-text',
+  announcement:          'ki-notification-on',
+  coach_mark:            'ki-notepad-edit',
+  org_post:              'ki-office-bag',
 }
 
 const NOTIF_COLORS: Record<string, string> = {
-  comment:      '#2563EB',
-  announcement: '#F97316',
-  coach_mark:   '#16A34A',
-  org_post:     '#7C3AED',
-  system:       '#64748B',
+  invitation_received:   '#F97316',
+  invitation_accepted:   '#16A34A',
+  invitation_declined:   '#DC2626',
+  invitation_cancelled:  '#64748B',
+  connection_terminated: '#DC2626',
+  broadcast:             '#2563EB',
+  system:                '#7C3AED',
+  comment:               '#2563EB',
+  announcement:          '#F97316',
+  coach_mark:            '#16A34A',
+  org_post:              '#7C3AED',
 }
 
 // ── supabase helper ────────────────────────────────────────────────────────────
@@ -150,7 +161,7 @@ function NotificationsDrawer({
 
   async function handleNotifClick(n: Notification) {
     if (!n.is_read) await markRead(n.id)
-    if (n.link) { handleClose(); router.push(n.link) }
+    if (n.action_url) { handleClose(); router.push(n.action_url) }
   }
 
   async function sendAnnouncement(e: React.FormEvent) {
@@ -166,11 +177,10 @@ function NotificationsDrawer({
 
       if (athletes && athletes.length > 0) {
         const rows = athletes.map(a => ({
-          user_id:      a.id,
-          from_user_id: user.id,
-          type:         formType,
-          title:        formTitle.trim(),
-          body:         formBody.trim() || null,
+          user_id: a.id,
+          type:    formType,
+          title:   formTitle.trim(),
+          body:    formBody.trim() || null,
         }))
         await sb().from('notifications').insert(rows)
       }
@@ -312,7 +322,7 @@ function NotificationsDrawer({
               return (
                 <div key={n.id}
                   onClick={() => handleNotifClick(n)}
-                  className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${n.link ? 'cursor-pointer' : ''} ${!n.is_read ? 'bg-orange-50/40' : 'hover:bg-accent/30'}`}
+                  className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${n.action_url ? 'cursor-pointer' : ''} ${!n.is_read ? 'bg-orange-50/40' : 'hover:bg-accent/30'}`}
                   style={{ borderBottom: '1px solid var(--border)' }}
                 >
                   {/* Иконка типа */}
@@ -335,7 +345,7 @@ function NotificationsDrawer({
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[10px] text-muted-foreground/60">{timeAgo(n.created_at)}</span>
-                      {n.link && (
+                      {n.action_url && (
                         <span className="text-[10px] text-orange-500 font-medium">
                           Подробнее →
                         </span>

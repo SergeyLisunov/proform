@@ -174,6 +174,104 @@ function ActivityRow({ title, meta, strain, zones, iconBg, icon, accent }: {
   )
 }
 
+// ── Connections block ──────────────────────────
+type ConnUser = { id: string; nickname: string | null; first_name: string | null; last_name: string | null; role: string }
+type Conn = { id: string; status: string; connection_type: string; initiated_at: string; initiator: ConnUser; recipient: ConnUser }
+
+function ConnectionsBlock({ myUserId: myUserIdProp }: { myUserId?: string }) {
+  const { user } = useUser()
+  const myUserId = myUserIdProp ?? user?.id ?? ''
+  const [conns, setConns] = useState<Conn[]>([])
+  const [loading, setLoading] = useState(true)
+  const [acting, setActing] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!myUserId) return
+    fetch('/api/connections?status=all')
+      .then(r => r.json())
+      .then(d => setConns(d.connections ?? []))
+      .finally(() => setLoading(false))
+  }, [myUserId])
+
+  const active  = conns.filter(c => c.status === 'active')
+  const incoming = conns.filter(c => c.status === 'pending' && c.recipient.id === myUserId)
+  const outgoing = conns.filter(c => c.status === 'pending' && c.initiator.id === myUserId)
+
+  async function respond(id: string, action: 'accept' | 'decline') {
+    setActing(id)
+    try {
+      await fetch(`/api/connections/${id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      setConns(prev => prev.map(c => c.id === id ? { ...c, status: action === 'accept' ? 'active' : 'declined' } : c))
+    } finally { setActing(null) }
+  }
+
+  function connName(c: Conn, side: 'other') {
+    const u = c.initiator.id === myUserId ? c.recipient : c.initiator
+    return [u.first_name, u.last_name].filter(Boolean).join(' ') || (u.nickname ? `@${u.nickname}` : 'Пользователь')
+  }
+
+  if (loading) return null
+  if (!active.length && !incoming.length && !outgoing.length) return null
+
+  return (
+    <Surface className="p-5 md:p-6">
+      <SectionHeader eyebrow="Связи" title="Мои связи" subtitle=""
+        action={<a href="/search" className="text-2xs font-semibold text-orange-500 hover:text-orange-600">Найти людей →</a>}
+      />
+      <div className="mt-4 space-y-3">
+        {incoming.map(c => (
+          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50/60 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+              <i className="ki-filled ki-user-plus text-sm" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{connName(c, 'other')}</p>
+              <p className="text-2xs text-muted-foreground">Входящее приглашение</p>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button disabled={acting === c.id} onClick={() => respond(c.id, 'accept')}
+                className="px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-2xs font-semibold transition-all disabled:opacity-60">
+                {acting === c.id ? '…' : 'Принять'}
+              </button>
+              <button disabled={acting === c.id} onClick={() => respond(c.id, 'decline')}
+                className="px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted text-2xs font-semibold transition-all disabled:opacity-60">
+                Отклонить
+              </button>
+            </div>
+          </div>
+        ))}
+        {outgoing.map(c => (
+          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-background/70 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+              <i className="ki-filled ki-time text-sm" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{connName(c, 'other')}</p>
+              <p className="text-2xs text-muted-foreground">Ожидает ответа</p>
+            </div>
+            <span className="text-2xs font-semibold text-orange-500 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">Отправлено</span>
+          </div>
+        ))}
+        {active.map(c => (
+          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-background/70 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
+              <i className="ki-filled ki-check-circle text-sm" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{connName(c, 'other')}</p>
+              <p className="text-2xs text-muted-foreground capitalize">{c.connection_type.replace('_', ' → ')}</p>
+            </div>
+            <span className="text-2xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full border border-green-200">Активна</span>
+          </div>
+        ))}
+      </div>
+    </Surface>
+  )
+}
+
 // ──────────────────────────────────────────────
 function AthleteDash({ name, userId }: { name: string; userId: string }) {
   const firstName = name.split(' ')[0]
@@ -363,6 +461,8 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
           </div>
         </Surface>
       </div>
+
+      <ConnectionsBlock myUserId={userId} />
     </div>
   )
 }
@@ -509,6 +609,8 @@ function CoachDash({ name }: { name: string }) {
           </Surface>
         </div>
       </div>
+
+      <ConnectionsBlock />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
@@ -19,6 +19,7 @@ type FormData = {
   // Личные
   first_name: string
   last_name: string
+  nickname: string
   birth_date: string
   gender: string
   phone: string
@@ -28,10 +29,14 @@ type FormData = {
   bio: string
   // Спорт
   primary_sport: string
+  discipline: string
   club: string
   fitness_level: string
   goal: string
   weekly_training_hours: string
+  // Для тренеров
+  coach_specialization: string
+  experience_years: string
   // Физиология
   height_cm: string
   weight_kg: string
@@ -43,15 +48,17 @@ type FormData = {
   // Приватность
   profile_public: boolean
   workouts_public: boolean
+  is_searchable: boolean
 }
 
 const EMPTY_FORM: FormData = {
-  first_name: '', last_name: '', birth_date: '', gender: '', phone: '', email: '',
+  first_name: '', last_name: '', nickname: '', birth_date: '', gender: '', phone: '', email: '',
   city: '', country: '', bio: '',
-  primary_sport: '', club: '', fitness_level: '', goal: '', weekly_training_hours: '',
+  primary_sport: '', discipline: '', club: '', fitness_level: '', goal: '', weekly_training_hours: '',
+  coach_specialization: '', experience_years: '',
   height_cm: '', weight_kg: '', max_heart_rate: '', lactate_threshold_hr: '',
   vo2max: '', hrv_baseline: '', rhr_baseline: '',
-  profile_public: true, workouts_public: false,
+  profile_public: true, workouts_public: false, is_searchable: true,
 }
 
 // ── Конфиги ───────────────────────────────────────────────────────────────────
@@ -387,6 +394,15 @@ function PasswordCard() {
 }
 
 // ── Главный компонент ──────────────────────────────────────────────────────────
+type NicknameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+
+function validateNicknameFormat(v: string): boolean {
+  if (v.length < 3 || v.length > 30) return false
+  if (!/^[a-z0-9][a-z0-9_-]*[a-z0-9]$/i.test(v)) return false
+  if (/[_-]{2}/.test(v)) return false
+  return true
+}
+
 export default function SettingsPage() {
   const { user } = useUser()
   const [tab, setTab] = useState<Tab>('personal')
@@ -398,6 +414,9 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [nicknameStatus, setNicknameStatus] = useState<NicknameStatus>('idle')
+  const [originalNickname, setOriginalNickname] = useState('')
+  const nicknameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Загрузка данных
   useEffect(() => {
@@ -408,9 +427,12 @@ export default function SettingsPage() {
         sb.from('athletes').select('*').eq('id', user!.id).maybeSingle(),
         sb.from('users').select('*').eq('id', user!.id).maybeSingle(),
       ])
+      const nick = usr?.nickname ?? ''
+      setOriginalNickname(nick)
       setForm({
         first_name: ath?.first_name ?? usr?.name?.split(' ')[0] ?? '',
         last_name:  ath?.last_name  ?? usr?.name?.split(' ')[1] ?? '',
+        nickname:   nick,
         birth_date: ath?.birth_date ?? '',
         gender:     ath?.gender ?? '',
         phone:      ath?.phone ?? '',
@@ -419,10 +441,13 @@ export default function SettingsPage() {
         country:    ath?.country ?? '',
         bio:        ath?.bio ?? '',
         primary_sport:       ath?.primary_sport ?? '',
+        discipline:          usr?.discipline ?? '',
         club:                ath?.club ?? '',
         fitness_level:       ath?.fitness_level ?? '',
         goal:                ath?.goal ?? '',
         weekly_training_hours: ath?.weekly_training_hours ? String(ath.weekly_training_hours) : '',
+        coach_specialization: usr?.coach_specialization ?? '',
+        experience_years:     usr?.experience_years ? String(usr.experience_years) : '',
         height_cm:           ath?.height_cm ? String(ath.height_cm) : '',
         weight_kg:           ath?.weight_kg ? String(ath.weight_kg) : '',
         max_heart_rate:      ath?.max_heart_rate ? String(ath.max_heart_rate) : '',
@@ -432,6 +457,7 @@ export default function SettingsPage() {
         rhr_baseline:        ath?.rhr_baseline ? String(ath.rhr_baseline) : '',
         profile_public:  ath?.profile_public  ?? true,
         workouts_public: ath?.workouts_public ?? false,
+        is_searchable:   usr?.is_searchable  ?? true,
       })
       setLoading(false)
     }
@@ -442,8 +468,37 @@ export default function SettingsPage() {
     setForm(prev => ({ ...prev, [key]: value }))
   }, [])
 
+  const handleNicknameChange = useCallback((value: string) => {
+    const v = value.toLowerCase()
+    setForm(prev => ({ ...prev, nickname: v }))
+    if (nicknameTimer.current) clearTimeout(nicknameTimer.current)
+    if (!v) { setNicknameStatus('idle'); return }
+    if (!validateNicknameFormat(v)) { setNicknameStatus('invalid'); return }
+    if (v === originalNickname.toLowerCase()) { setNicknameStatus('available'); return }
+    setNicknameStatus('checking')
+    nicknameTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/users/nickname-check?q=${encodeURIComponent(v)}`)
+        const data = await res.json()
+        setNicknameStatus(data.available ? 'available' : 'taken')
+      } catch {
+        setNicknameStatus('idle')
+      }
+    }, 500)
+  }, [originalNickname])
+
   async function handleSave() {
     if (!user?.id) return
+    if (form.nickname && nicknameStatus === 'taken') {
+      setSaveError('Никнейм уже занят')
+      setTimeout(() => setSaveError(null), 4000)
+      return
+    }
+    if (form.nickname && nicknameStatus === 'invalid') {
+      setSaveError('Некорректный формат никнейма')
+      setTimeout(() => setSaveError(null), 4000)
+      return
+    }
     setSaving(true)
     setSaveError(null)
     const sb = getSB()
@@ -476,12 +531,19 @@ export default function SettingsPage() {
     try {
       const { error: athErr } = await sb.from('athletes').upsert(payload, { onConflict: 'id' })
       if (athErr) throw athErr
-      // Обновляем имя пользователя в таблице users
+      // Обновляем поля пользователя в таблице users
       const fullName = [form.first_name, form.last_name].filter(Boolean).join(' ')
-      if (fullName) {
-        const { error: usrErr } = await sb.from('users').update({ name: fullName }).eq('id', user.id)
-        if (usrErr) throw usrErr
+      const usrUpdate: Record<string, unknown> = {
+        is_searchable:        form.is_searchable,
+        discipline:           form.discipline || null,
+        coach_specialization: form.coach_specialization || null,
+        experience_years:     form.experience_years ? Number(form.experience_years) : null,
       }
+      if (fullName) usrUpdate.name = fullName
+      if (form.nickname !== originalNickname) usrUpdate.nickname = form.nickname || null
+      const { error: usrErr } = await sb.from('users').update(usrUpdate).eq('id', user.id)
+      if (usrErr) throw usrErr
+      if (form.nickname !== originalNickname) setOriginalNickname(form.nickname)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (e: any) {
@@ -615,6 +677,35 @@ export default function SettingsPage() {
               <Field label="Телефон">
                 <Input value={form.phone} onChange={set('phone')} placeholder="+7 900 000 00 00" type="tel" />
               </Field>
+              <Field label="Никнейм" hint="3–30 символов: a-z, 0-9, _ и - (начинается и заканчивается на букву/цифру)">
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 14, pointerEvents: 'none', userSelect: 'none' }}>@</span>
+                  <input
+                    value={form.nickname}
+                    onChange={e => handleNicknameChange(e.target.value)}
+                    placeholder="username"
+                    maxLength={30}
+                    style={{
+                      ...iStyle, paddingLeft: 28,
+                      borderColor: nicknameStatus === 'available' ? '#16A34A' : nicknameStatus === 'taken' || nicknameStatus === 'invalid' ? '#DC2626' : undefined,
+                    }}
+                    onFocus={e => { if (nicknameStatus === 'idle') e.target.style.borderColor = '#F97316' }}
+                    onBlur={e => { if (nicknameStatus === 'idle') e.target.style.borderColor = 'var(--border)' }}
+                  />
+                  {nicknameStatus === 'checking' && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+                  )}
+                  {nicknameStatus === 'available' && (
+                    <i className="ki-filled ki-check-circle absolute right-3 top-1/2 -translate-y-1/2 text-sm text-green-600" />
+                  )}
+                  {(nicknameStatus === 'taken' || nicknameStatus === 'invalid') && (
+                    <i className="ki-filled ki-cross-circle absolute right-3 top-1/2 -translate-y-1/2 text-sm text-red-600" />
+                  )}
+                </div>
+                {nicknameStatus === 'taken' && <p style={{ marginTop: 5, fontSize: 11, color: '#DC2626', fontWeight: 600 }}>Этот никнейм уже занят</p>}
+                {nicknameStatus === 'invalid' && <p style={{ marginTop: 5, fontSize: 11, color: '#DC2626', fontWeight: 600 }}>Некорректный формат никнейма</p>}
+                {nicknameStatus === 'available' && <p style={{ marginTop: 5, fontSize: 11, color: '#16A34A', fontWeight: 600 }}>Никнейм доступен</p>}
+              </Field>
               <Field label="Email" hint="Изменение потребует подтверждения">
                 <input value={form.email} readOnly style={{ ...iStyle, opacity: 0.6, cursor: 'not-allowed' }} />
               </Field>
@@ -673,13 +764,30 @@ export default function SettingsPage() {
                 <Select value={form.goal} onChange={set('goal')} options={GOALS} />
               </Field>
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Дисциплина" hint="Конкретная дисциплина внутри вида спорта">
+                <Input value={form.discipline} onChange={set('discipline')} placeholder="Например: марафон, спринт…" />
+              </Field>
               <Field label="Часов тренировок в неделю" hint="Среднее количество часов">
                 <Input value={form.weekly_training_hours} onChange={set('weekly_training_hours')}
                   type="number" placeholder="8" min="0" max="40" />
               </Field>
             </div>
           </Card>
+
+          {user?.role === 'coach' && (
+            <Card>
+              <SectionHeader icon="ki-teacher" color="#7C3AED" title="Параметры тренера" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <Field label="Специализация тренера" hint="Например: силовая подготовка, бег, плавание">
+                  <Input value={form.coach_specialization} onChange={set('coach_specialization')} placeholder="Беговая подготовка…" />
+                </Field>
+                <Field label="Лет опыта тренерской работы">
+                  <Input value={form.experience_years} onChange={set('experience_years')} type="number" placeholder="5" min="0" max="60" />
+                </Field>
+              </div>
+            </Card>
+          )}
 
           <Card>
             <SectionHeader icon="ki-people" color="#0284C7" title="Клуб / Организация" />
@@ -783,6 +891,13 @@ export default function SettingsPage() {
                 onChange={v => set('workouts_public')(v)}
                 label="Публичные тренировки"
                 hint="Тренеры и другие атлеты могут видеть ваш дневник тренировок"
+              />
+              <div style={{ height: 1, background: 'var(--border)' }} />
+              <Toggle
+                value={form.is_searchable}
+                onChange={v => set('is_searchable')(v)}
+                label="Доступен для поиска"
+                hint="Другие пользователи могут найти вас через поиск по имени или @никнейму"
               />
             </div>
           </Card>
