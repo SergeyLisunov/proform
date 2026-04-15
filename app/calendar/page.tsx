@@ -1297,6 +1297,12 @@ export default function CalendarPage() {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
   }, [cycleDays])
 
+  const weekStart = useMemo(() => {
+    const base = selected ? parseLocalDate(selected) : new Date(year, month, now.getDate())
+    const day = base.getDay(); const offset = (day+6)%7
+    const d = new Date(base); d.setDate(d.getDate()-offset); return d
+  }, [selected, year, month]) // eslint-disable-line
+
   const dataRange = useMemo(() => {
     const p = (n: number) => String(n).padStart(2, '0')
     if (view === 'week') {
@@ -1384,12 +1390,6 @@ export default function CalendarPage() {
       return !(cd.day_date >= cycle.start_date && cd.day_date <= cycle.end_date)
     }))
   }, [cycles])
-
-  const weekStart = useMemo(() => {
-    const base = selected ? parseLocalDate(selected) : new Date(year, month, now.getDate())
-    const day = base.getDay(); const offset = (day+6)%7
-    const d = new Date(base); d.setDate(d.getDate()-offset); return d
-  }, [selected, year, month]) // eslint-disable-line
 
   const prevPeriod = () => {
     if (view==='year') setYear(y=>y-1)
