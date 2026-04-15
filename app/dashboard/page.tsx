@@ -638,172 +638,242 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
       : 'Задайте цель в настройках спорта'
 
   return (
-    <div className="flex flex-col gap-6 pf-enter">
+    <div className="flex flex-col gap-4 pf-enter">
 
-      {/* ── HERO BLOCK ── */}
-      <Surface className="p-5 md:p-6">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-
-          {/* Left: profile identity */}
-          <div className="flex items-start gap-4 min-w-0">
+      {/* ── PROFILE HEADER ── */}
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm p-4 md:p-5">
+        <div className="flex items-start gap-4">
+          {heroLoading ? (
+            <div className="shrink-0 w-[72px] h-[72px] rounded-full bg-accent animate-pulse" />
+          ) : (
+            <HeroAvatar
+              avatar_url={hero?.avatar_url ?? null}
+              name={hero?.displayName ?? name}
+              onClick={() => router.push('/settings')}
+            />
+          )}
+          <div className="min-w-0 flex-1">
             {heroLoading ? (
-              <div className="shrink-0 w-[72px] h-[72px] rounded-full bg-accent animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-6 w-40 rounded-lg bg-accent animate-pulse" />
+                <div className="h-4 w-24 rounded-lg bg-accent animate-pulse" />
+                <div className="h-4 w-56 rounded-lg bg-accent animate-pulse" />
+              </div>
             ) : (
-              <HeroAvatar
-                avatar_url={hero?.avatar_url ?? null}
-                name={hero?.displayName ?? name}
-                onClick={() => router.push('/settings')}
-              />
-            )}
-
-            <div className="min-w-0 flex-1">
-              {heroLoading ? (
-                <div className="space-y-2">
-                  <div className="h-7 w-48 rounded-lg bg-accent animate-pulse" />
-                  <div className="h-4 w-28 rounded-lg bg-accent animate-pulse" />
-                  <div className="h-4 w-64 rounded-lg bg-accent animate-pulse" />
-                </div>
-              ) : (
-                <>
-                  <h2 className="text-[clamp(1.55rem,3vw,2.1rem)] font-semibold tracking-tight text-foreground leading-tight">
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-xl font-semibold tracking-tight text-foreground leading-tight">
                     {hero?.displayName ?? name}
                   </h2>
-
                   {hero?.nickname && (
                     <Link href={`/profile/${userId}`}
-                      className="mt-1 inline-block text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+                      className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
                       @{hero.nickname}
                     </Link>
                   )}
-
-                  {hero?.bio && (
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground max-w-md line-clamp-2">
-                      {hero.bio}
-                    </p>
-                  )}
-
-                  {/* Meta pills */}
-                  {(hero?.sport || hero?.club || hero?.city) && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {hero?.sport && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                          🏃 {hero.sport}
-                        </span>
-                      )}
-                      {hero?.club && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                          <i className="ki-filled ki-people text-[10px]" /> {hero.club}
-                        </span>
-                      )}
-                      {hero?.city && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                          <i className="ki-filled ki-geolocation text-[10px]" /> {hero.city}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {hero && <SocialLinks profile={hero} />}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Right: weekly plan + CTA */}
-          <div className="flex flex-col gap-3 xl:min-w-[280px] xl:shrink-0">
-            <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
-              <RecoveryRing score={weeklyGoal.completionPercent} size={80} label={weeklyRingLabel} />
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">План недели</p>
-                <p className="mt-1 text-xl font-semibold text-foreground leading-tight">{weeklyGoalTitle}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">{weeklyGoalHint}</p>
-                <div className="mt-2.5 grid grid-cols-2 gap-2">
-                  <div className="rounded-xl border border-border bg-card px-3 py-2">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Осталось</div>
-                    <div className="mt-0.5 text-sm font-semibold text-foreground">
-                      {weeklyGoal.targetHours ? `${formatHours(weeklyGoal.remainingHours ?? 0)} ч` : '—'}
-                    </div>
+                </div>
+                {hero?.bio && (
+                  <p className="mt-1.5 text-sm leading-5 text-muted-foreground line-clamp-1 max-w-lg">
+                    {hero.bio}
+                  </p>
+                )}
+                {(hero?.sport || hero?.club || hero?.city) && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {hero?.sport && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                        🏃 {hero.sport}
+                      </span>
+                    )}
+                    {hero?.club && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                        <i className="ki-filled ki-people text-[10px]" /> {hero.club}
+                      </span>
+                    )}
+                    {hero?.city && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                        <i className="ki-filled ki-geolocation text-[10px]" /> {hero.city}
+                      </span>
+                    )}
                   </div>
-                  <div className="rounded-xl border border-border bg-card px-3 py-2">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Тренировок</div>
-                    <div className="mt-0.5 text-sm font-semibold text-foreground">
-                      {weeklyGoalLoading ? '…' : weeklyGoal.workoutCount}
-                    </div>
+                )}
+                {hero && <SocialLinks profile={hero} />}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── DASHBOARD GRID ── */}
+      {/*
+        Desktop (xl, 3-col):  [Weekly Plan 2/3] [Add Workout 1/3]
+                               [Recent Workouts 2/3] [Quick Note 1/3]
+                               [Connections full]
+        Tablet  (sm, 2-col):  [Weekly Plan full]
+                               [Add Workout 1/2] [Quick Note 1/2]
+                               [Recent Workouts full]
+                               [Connections full]
+        Mobile  (1-col):      stacked
+      */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+        {/* ── CARD 1: WEEKLY PLAN — xl col1-2 row1 ── */}
+        <div className="rounded-2xl border border-border bg-card shadow-sm p-4 md:p-5
+                        sm:col-span-2 xl:col-span-2 xl:col-start-1 xl:row-start-1">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">План недели</p>
+            <a href="/calendar" className="text-[11px] font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+              Открыть →
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <RecoveryRing score={weeklyGoal.completionPercent} size={80} label={weeklyRingLabel} />
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-semibold text-foreground leading-tight">{weeklyGoalTitle}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{weeklyGoalHint}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-xl border border-border bg-background/70 px-3 py-2">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Осталось</div>
+                  <div className="mt-0.5 text-sm font-semibold text-foreground">
+                    {weeklyGoal.targetHours ? `${formatHours(weeklyGoal.remainingHours ?? 0)} ч` : '—'}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border bg-background/70 px-3 py-2">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Тренировок</div>
+                  <div className="mt-0.5 text-sm font-semibold text-foreground">
+                    {weeklyGoalLoading ? '…' : weeklyGoal.workoutCount}
                   </div>
                 </div>
               </div>
             </div>
-
-            <button onClick={() => setShowAddWorkout(true)}
-              className="kt-btn kt-btn-primary w-full justify-center gap-2">
-              <i className="ki-filled ki-plus text-sm" />
-              Добавить тренировку
-            </button>
           </div>
+          {weeklyGoal.targetHours && (
+            <div className="mt-4">
+              <div className="h-1.5 overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${weeklyGoal.completionPercent}%`,
+                    background: weeklyGoal.completionPercent >= 100
+                      ? '#16a34a'
+                      : weeklyGoal.completionPercent >= 65
+                      ? '#f97316'
+                      : '#3b82f6',
+                  }}
+                />
+              </div>
+              <div className="mt-1.5 flex items-center justify-between">
+                <span className="text-[10px] text-muted-foreground">0 ч</span>
+                <span className="text-[10px] font-semibold text-foreground">{weeklyGoal.completionPercent}%</span>
+                <span className="text-[10px] text-muted-foreground">{formatHours(weeklyGoal.targetHours)} ч</span>
+              </div>
+            </div>
+          )}
         </div>
-      </Surface>
 
-      {/* ── RECENT WORKOUTS ── */}
-      <Surface className="p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Активность"
-          title="Последние тренировки"
-          action={(
-            <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
+        {/* ── CARD 2: ADD WORKOUT CTA — xl col3 row1 ── */}
+        <div
+          className="relative rounded-2xl border border-orange-200 overflow-hidden cursor-pointer
+                     group transition-all hover:shadow-md hover:border-orange-300
+                     xl:col-start-3 xl:row-start-1 min-h-[200px] flex flex-col"
+          style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 60%, #fed7aa 100%)' }}
+          onClick={() => setShowAddWorkout(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => e.key === 'Enter' && setShowAddWorkout(true)}
+          aria-label="Добавить тренировку"
+        >
+          <div className="relative z-10 p-4 md:p-5 flex flex-col justify-between flex-1">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-600/70">Тренировка</p>
+              <h3 className="mt-2 text-xl font-semibold text-orange-900 leading-tight">
+                Добавить<br />тренировку
+              </h3>
+              <p className="mt-1.5 text-xs text-orange-700/70">Запишите активность прямо сейчас</p>
+            </div>
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl
+                              bg-orange-500 shadow-lg shadow-orange-500/30
+                              group-hover:scale-105 transition-transform">
+                <i className="ki-filled ki-plus text-white text-lg" />
+              </div>
+              <span className="text-[11px] font-semibold text-orange-700">Добавить →</span>
+            </div>
+          </div>
+          <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-orange-300/25 pointer-events-none" />
+          <div className="absolute right-4 -top-4 w-16 h-16 rounded-full bg-orange-200/20 pointer-events-none" />
+        </div>
+
+        {/* ── CARD 3: RECENT WORKOUTS — xl col1-2 row2 ── */}
+        <div className="rounded-2xl border border-border bg-card shadow-sm p-4 md:p-5
+                        sm:col-span-2 xl:col-span-2 xl:col-start-1 xl:row-start-2">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Активность</p>
+            <a href="/diary" className="text-[11px] font-semibold text-orange-500 hover:text-orange-600 transition-colors">
               Открыть все →
             </a>
-          )}
-        />
-        <div className="mt-4 space-y-3">
+          </div>
           {workoutsLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 rounded-2xl bg-accent/50 animate-pulse" />
-            ))
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-12 rounded-xl bg-accent/50 animate-pulse" />
+              ))}
+            </div>
           ) : recentWorkouts.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border px-6 py-10 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-                <i className="ki-filled ki-abstract-26 text-xl" />
+            <div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+              <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+                <i className="ki-filled ki-abstract-26 text-base" />
               </div>
               <p className="text-sm font-semibold text-foreground">Тренировок пока нет</p>
-              <p className="mt-1 text-xs text-muted-foreground">Добавьте первую тренировку, чтобы она появилась здесь.</p>
-              <button onClick={() => setShowAddWorkout(true)}
-                className="kt-btn kt-btn-primary mt-4 gap-2">
+              <p className="mt-1 text-xs text-muted-foreground">Добавьте первую тренировку</p>
+              <button onClick={() => setShowAddWorkout(true)} className="kt-btn kt-btn-primary mt-3 gap-1.5">
                 <i className="ki-filled ki-plus text-sm" />
                 Добавить первую
               </button>
             </div>
           ) : (
-            recentWorkouts.map(w => (
-              <div key={w.id} className="rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:bg-accent/40">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
-                    <i className="ki-filled ki-abstract-26 text-sm text-orange-500" />
+            <div className="space-y-2">
+              {recentWorkouts.slice(0, 4).map(w => (
+                <div
+                  key={w.id}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-background/70
+                             px-3 py-2.5 transition-colors hover:bg-accent/40 cursor-pointer"
+                  onClick={() => router.push('/diary')}
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50">
+                    <i className="ki-filled ki-abstract-26 text-xs text-orange-500" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-foreground">
+                    <div className="text-sm font-semibold text-foreground truncate">
                       {w.name || w.activity_type || 'Тренировка'}
                     </div>
-                    <div className="mt-0.5 text-2xs text-muted-foreground">
+                    <div className="text-[11px] text-muted-foreground">
                       {w.activity_type}{w.activity_duration_min ? ` · ${w.activity_duration_min} мин` : ''} · {w.event_date}
                     </div>
                   </div>
                   {w.activity_duration_min && (
-                    <div className="shrink-0 text-right">
-                      <div className="pf-num text-lg leading-none text-foreground">
-                        {w.activity_duration_min < 60 ? `${w.activity_duration_min}м` : `${Math.floor(w.activity_duration_min/60)}ч${w.activity_duration_min%60 ? `${w.activity_duration_min%60}м` : ''}`}
-                      </div>
+                    <div className="shrink-0 pf-num text-sm font-semibold text-foreground">
+                      {w.activity_duration_min < 60
+                        ? `${w.activity_duration_min}м`
+                        : `${Math.floor(w.activity_duration_min / 60)}ч${w.activity_duration_min % 60 ? `${w.activity_duration_min % 60}м` : ''}`}
                     </div>
                   )}
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
-      </Surface>
 
-      <QuickNoteWidget userId={userId} />
+        {/* ── CARD 4: QUICK NOTE — xl col3 row2 ── */}
+        <div className="xl:col-start-3 xl:row-start-2">
+          <QuickNoteWidget userId={userId} />
+        </div>
 
-      <ConnectionsBlock myUserId={userId} />
+        {/* ── CARD 5: CONNECTIONS — full width row3 (conditional) ── */}
+        <div className="sm:col-span-2 xl:col-span-3 xl:row-start-3">
+          <ConnectionsBlock myUserId={userId} />
+        </div>
+
+      </div>
 
       {showAddWorkout && (
         <AddWorkoutModal
