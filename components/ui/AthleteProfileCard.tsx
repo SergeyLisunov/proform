@@ -14,6 +14,9 @@ type AthleteProfile = {
   avatar_url: string | null; background_url: string | null
   instagram_url: string | null; twitter_url: string | null
   threads_url: string | null; bio: string | null
+  club: string | null
+  telegram_url: string | null; youtube_url: string | null
+  tiktok_url: string | null; website_url: string | null
 }
 type WorkoutStats = {
   total: number; totalMinutes: number; avgStrain: number; thisWeek: number
@@ -211,9 +214,11 @@ function SocialEditModal({ profile, onClose, onSaved }: {
   profile: AthleteProfile; onClose: () => void; onSaved: (p: Partial<AthleteProfile>) => void
 }) {
   const { user } = useUser()
-  const [ig, setIg] = useState(profile.instagram_url ?? '')
-  const [tw, setTw] = useState(profile.twitter_url ?? '')
-  const [th, setTh] = useState(profile.threads_url ?? '')
+  const [ig, setIg]  = useState(profile.instagram_url ?? '')
+  const [tg, setTg]  = useState(profile.telegram_url  ?? '')
+  const [yt, setYt]  = useState(profile.youtube_url   ?? '')
+  const [tt, setTt]  = useState(profile.tiktok_url    ?? '')
+  const [ws, setWs]  = useState(profile.website_url   ?? '')
   const [saving, setSaving] = useState(false)
 
   async function save() {
@@ -221,16 +226,26 @@ function SocialEditModal({ profile, onClose, onSaved }: {
     setSaving(true)
     await getSB().from('athletes').upsert({
       id: user.id,
-      instagram_url: ig || null, twitter_url: tw || null, threads_url: th || null,
+      instagram_url: ig || null, telegram_url: tg || null,
+      youtube_url: yt || null, tiktok_url: tt || null, website_url: ws || null,
     }, { onConflict: 'id' })
-    onSaved({ instagram_url: ig || null, twitter_url: tw || null, threads_url: th || null })
+    onSaved({ instagram_url: ig || null, telegram_url: tg || null,
+      youtube_url: yt || null, tiktok_url: tt || null, website_url: ws || null })
     setSaving(false); onClose()
   }
+
+  const fields = [
+    { label: 'Instagram', value: ig, set: setIg, placeholder: 'https://instagram.com/username', emoji: '📸' },
+    { label: 'Telegram',  value: tg, set: setTg, placeholder: 'https://t.me/username',          emoji: '✈️' },
+    { label: 'YouTube',   value: yt, set: setYt, placeholder: 'https://youtube.com/@channel',   emoji: '▶️' },
+    { label: 'TikTok',    value: tt, set: setTt, placeholder: 'https://tiktok.com/@username',   emoji: '🎵' },
+    { label: 'Сайт',      value: ws, set: setWs, placeholder: 'https://yoursite.com',           emoji: '🌐' },
+  ]
 
   return (
     <div style={{ position:'fixed',inset:0,zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',padding:20 }}>
       <div onClick={onClose} style={{ position:'absolute',inset:0,background:'rgba(15,23,42,0.65)',backdropFilter:'blur(6px)' }} />
-      <div style={{ position:'relative',background:'var(--card)',border:'1px solid var(--border)',borderRadius:20,width:400,maxWidth:'95vw',zIndex:1,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.18)' }}>
+      <div style={{ position:'relative',background:'var(--card)',border:'1px solid var(--border)',borderRadius:20,width:420,maxWidth:'95vw',zIndex:1,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.18)' }}>
         <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between' }}>
           <div>
             <p style={{ fontSize:10,fontWeight:700,color:'#f97316',textTransform:'uppercase',letterSpacing:'0.12em',margin:0 }}>Профиль</p>
@@ -238,14 +253,10 @@ function SocialEditModal({ profile, onClose, onSaved }: {
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
         </div>
-        <div style={{ padding:'20px 24px',display:'flex',flexDirection:'column',gap:14 }}>
-          {[
-            { label:'Instagram', value:ig, set:setIg, placeholder:'https://instagram.com/username', emoji:'📸' },
-            { label:'Twitter / X', value:tw, set:setTw, placeholder:'https://x.com/username', emoji:'🐦' },
-            { label:'Threads', value:th, set:setTh, placeholder:'https://threads.net/@username', emoji:'🧵' },
-          ].map(f => (
+        <div style={{ padding:'20px 24px',display:'flex',flexDirection:'column',gap:12 }}>
+          {fields.map(f => (
             <div key={f.label}>
-              <label style={{ fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:6 }}>{f.emoji} {f.label}</label>
+              <label style={{ fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:5 }}>{f.emoji} {f.label}</label>
               <input type="url" value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder}
                 className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
             </div>
@@ -312,6 +323,11 @@ export default function AthleteProfileCard() {
         twitter_url: ath?.twitter_url ?? null,
         threads_url: ath?.threads_url ?? null,
         bio: ath?.bio ?? null,
+        club: ath?.club ?? null,
+        telegram_url: ath?.telegram_url ?? null,
+        youtube_url: ath?.youtube_url ?? null,
+        tiktok_url: ath?.tiktok_url ?? null,
+        website_url: ath?.website_url ?? null,
       }
       setProfile(p)
       if (wks) {
@@ -504,6 +520,11 @@ export default function AthleteProfileCard() {
                 </span>
               )}
             </div>
+            {profile.club && (
+              <p style={{ fontSize:12, color:'var(--muted-foreground)', margin:'4px 0 0', display:'flex', alignItems:'center', gap:4 }}>
+                <i className="ki-filled ki-office-bag" style={{ fontSize:10 }} />{profile.club}
+              </p>
+            )}
             {profile.bio && (
               <p style={{ fontSize:13, color:'var(--muted-foreground)', margin:'5px 0 0', lineHeight:1.55 }}>{profile.bio}</p>
             )}
@@ -514,64 +535,77 @@ export default function AthleteProfileCard() {
               </div>
             )}
 
-            {/* Соцсети — под именем */}
-            <div style={{ display:'flex', gap:8, marginTop:12, alignItems:'center' }}>
-              {/* Instagram */}
-              {profile.instagram_url ? (
-                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" title="Instagram"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888)',border:'none',cursor:'pointer',flexShrink:0,textDecoration:'none',boxShadow:'0 2px 8px rgba(220,39,67,0.3)',transition:'all 0.18s' }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить Instagram"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--accent)',border:'1.5px dashed #CBD5E1',cursor:'pointer',flexShrink:0,transition:'all 0.18s' }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#f09433';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#CBD5E1" stroke="none"/></svg>
-                </button>
-              )}
-              {/* X / Twitter */}
-              {profile.twitter_url ? (
-                <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" title="X / Twitter"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'#000',border:'none',cursor:'pointer',flexShrink:0,textDecoration:'none',boxShadow:'0 2px 8px rgba(0,0,0,0.25)',transition:'all 0.18s' }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить X / Twitter"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--accent)',border:'1.5px dashed #CBD5E1',cursor:'pointer',flexShrink:0,transition:'all 0.18s' }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#CBD5E1"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </button>
-              )}
-              {/* Threads */}
-              {profile.threads_url ? (
-                <a href={profile.threads_url} target="_blank" rel="noopener noreferrer" title="Threads"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'#101010',border:'none',cursor:'pointer',flexShrink:0,textDecoration:'none',boxShadow:'0 2px 8px rgba(0,0,0,0.25)',transition:'all 0.18s' }}
-                  onMouseEnter={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1.1)'}
-                  onMouseLeave={e=>(e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/></svg>
-                </a>
-              ) : (
-                <button onClick={() => setShowSocial(true)} title="Добавить Threads"
-                  style={{ width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--accent)',border:'1.5px dashed #CBD5E1',cursor:'pointer',flexShrink:0,transition:'all 0.18s' }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#94A3B8';(e.currentTarget as HTMLButtonElement).style.background='#F8FAFC'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#CBD5E1';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#CBD5E1"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.029-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.293-1.806-1.817-.436 3.048-2.266 4.878-5.309 5.056-2.329.138-4.518-.988-4.62-3.411-.026-.634.032-1.219.17-1.742.422-1.578 1.674-2.564 3.492-2.773.852-.098 1.713-.09 2.562-.038l.018.002c-.051-.543-.186-.997-.4-1.35-.311-.513-.83-.81-1.647-.81-.607 0-1.127.153-1.543.454l-1.218-1.59C9.94 7.867 10.93 7.5 12.1 7.5c2.9 0 4.578 1.71 4.615 4.76.006.498-.002.998-.025 1.498-.021.465-.046.932-.08 1.395.532.175 1.002.391 1.398.65 1.37.888 2.086 2.146 2.086 3.637 0 3.42-2.875 5.56-7.906 5.56zm1.054-8.14c-1.134-.073-1.96.26-2.24 1.063-.069.2-.096.448-.073.752.097 1.3 1.206 1.63 2.317 1.63.184 0 .37-.01.553-.03 1.633-.178 2.474-1.128 2.613-2.962-.37-.05-.742-.087-1.113-.117a18.43 18.43 0 0 0-2.057-.336z"/></svg>
-                </button>
-              )}
-              {/* Карандаш — редактировать */}
-              <button onClick={() => setShowSocial(true)} title="Редактировать соцсети"
-                style={{ width:32,height:32,borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--accent)',border:'1px solid var(--border)',cursor:'pointer',flexShrink:0,transition:'all 0.18s',marginLeft:2 }}
-                onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#F97316';(e.currentTarget as HTMLButtonElement).style.background='#FFF7ED'}}
-                onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--border)';(e.currentTarget as HTMLButtonElement).style.background='var(--accent)'}}>
-                <i className="ki-filled ki-pencil" style={{ fontSize:11, color:'var(--muted-foreground)' }} />
-              </button>
-            </div>
+            {/* Соцсети — компактный inline-блок */}
+            {(() => {
+              const socials = [
+                {
+                  url: profile.instagram_url, label: 'Instagram',
+                  hoverBg: '#fcedee', hoverColor: '#E1306C',
+                  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>,
+                },
+                {
+                  url: profile.telegram_url, label: 'Telegram',
+                  hoverBg: '#e8f4fd', hoverColor: '#0088cc',
+                  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>,
+                },
+                {
+                  url: profile.youtube_url, label: 'YouTube',
+                  hoverBg: '#fff0f0', hoverColor: '#FF0000',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>,
+                },
+                {
+                  url: profile.tiktok_url, label: 'TikTok',
+                  hoverBg: '#f0f0f0', hoverColor: '#111111',
+                  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.96a8.22 8.22 0 0 0 4.81 1.54V7.04a4.85 4.85 0 0 1-1.04-.35z"/></svg>,
+                },
+                {
+                  url: profile.website_url, label: 'Сайт',
+                  hoverBg: '#f0f7ff', hoverColor: '#0284C7',
+                  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+                },
+              ].filter(s => !!s.url)
+
+              const MAX = 5
+              const visible = socials.slice(0, MAX)
+              const overflow = socials.length - MAX
+
+              return (
+                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:10, flexWrap:'wrap' }}>
+                  {visible.map(s => (
+                    <a key={s.label} href={s.url!} target="_blank" rel="noopener noreferrer" title={s.label}
+                      style={{ width:28, height:28, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center',
+                        background:'var(--accent)', border:'1px solid var(--border)', color:'#9CA3AF',
+                        textDecoration:'none', flexShrink:0, transition:'all 0.15s' }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLAnchorElement
+                        el.style.background = s.hoverBg; el.style.color = s.hoverColor
+                        el.style.borderColor = s.hoverColor + '55'; el.style.transform = 'translateY(-1px)'
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLAnchorElement
+                        el.style.background = 'var(--accent)'; el.style.color = '#9CA3AF'
+                        el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)'
+                      }}>
+                      {s.icon}
+                    </a>
+                  ))}
+                  {overflow > 0 && (
+                    <span style={{ fontSize:11, color:'var(--muted-foreground)', fontWeight:600,
+                      padding:'3px 8px', background:'var(--accent)', borderRadius:8, border:'1px solid var(--border)' }}>
+                      +{overflow}
+                    </span>
+                  )}
+                  <button onClick={() => setShowSocial(true)} title="Редактировать соцсети"
+                    style={{ width:26, height:26, borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center',
+                      background:'transparent', border:'1px dashed #CBD5E1', cursor:'pointer', flexShrink:0,
+                      transition:'all 0.15s', color:'#CBD5E1', marginLeft:2 }}
+                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#F97316'; b.style.color='#F97316'; b.style.background='#FFF7ED' }}
+                    onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#CBD5E1'; b.style.color='#CBD5E1'; b.style.background='transparent' }}>
+                    <i className="ki-filled ki-pencil" style={{ fontSize:9 }} />
+                  </button>
+                </div>
+              )
+            })()}
           </div>
 
           {/* Stats grid */}
