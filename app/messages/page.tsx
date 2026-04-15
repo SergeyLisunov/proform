@@ -5,10 +5,33 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 
 type ChatUser = { id: string; name: string; email: string; role: string }
+type ChatType = 'direct' | 'group' | 'org_channel'
 type Chat = {
-  id: string; athlete_id: string; coach_id: string
-  created_at: string; updated_at: string
-  other_user: ChatUser; last_message?: string; unread_count: number
+  id: string
+  athlete_id: string | null
+  coach_id: string | null
+  type: ChatType
+  name: string | null
+  org_id: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+  other_user: ChatUser | null
+  last_message?: string
+  unread_count: number
+  member_count?: number
+}
+
+function chatDisplayName(c: Chat, fallback = 'Чат'): string {
+  if (c.type !== 'direct' && c.name) return c.name
+  if (c.other_user) return c.other_user.name || c.other_user.email || fallback
+  return fallback
+}
+
+function chatIcon(type: ChatType) {
+  if (type === 'group')      return { icon: 'ki-people', color: '#9333ea', bg: '#FAF5FF' }
+  if (type === 'org_channel') return { icon: 'ki-abstract-26', color: '#2563eb', bg: '#EFF6FF' }
+  return null
 }
 type Message = {
   id: string; chat_id: string; sender_id: string
@@ -211,7 +234,10 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
     else grouped.push({ date: d, msgs: [m] })
   })
 
-  const color = getColor(chat.other_user.name || chat.other_user.email || '?')
+  const ic = chatIcon(chat.type)
+  const color = chat.type === 'direct' && chat.other_user
+    ? getColor(chat.other_user.name || chat.other_user.email || '?')
+    : (ic?.color ?? '#64748b')
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
@@ -232,14 +258,27 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
           background: `linear-gradient(135deg, ${color}08 0%, transparent 60%)`,
           display: 'flex', alignItems: 'center', gap: 14,
         }}>
-          <Avatar name={chat.other_user.name || chat.other_user.email} size={46} ring />
+          {chat.type === 'direct' && chat.other_user
+            ? <Avatar name={chat.other_user.name || chat.other_user.email} size={46} ring />
+            : (() => { const ic = chatIcon(chat.type)!; return (
+                <div style={{ width: 46, height: 46, borderRadius: '50%', flexShrink: 0, background: ic.bg, border: `1.5px solid ${ic.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i className={`ki-filled ${ic.icon}`} style={{ color: ic.color, fontSize: 20 }} />
+                </div>
+              )})()
+          }
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em' }}>
-              {chat.other_user.name || chat.other_user.email}
+              {chatDisplayName(chat)}
             </div>
             <div style={{ fontSize: 11, color, fontWeight: 600, marginTop: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
-              {chat.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}
+              {chat.type === 'direct' && chat.other_user ? (
+                <><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                {chat.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}</>
+              ) : chat.type === 'group' ? (
+                `Группа · ${chat.member_count ?? '?'} участников`
+              ) : (
+                `Канал организации · ${chat.member_count ?? '?'} участников`
+              )}
             </div>
           </div>
           <button onClick={onClose}
@@ -259,7 +298,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
               <div style={{ width: 64, height: 64, borderRadius: 20, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>👋</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)' }}>Начните диалог</div>
               <div style={{ fontSize: 13, color: 'var(--muted-foreground)', textAlign: 'center', maxWidth: 240, lineHeight: 1.5 }}>
-                Напишите первое сообщение {chat.other_user.name?.split(' ')[0] || 'собеседнику'}
+                Напишите первое сообщение {chat.other_user?.name?.split(' ')[0] || 'участникам'}
               </div>
             </div>
           ) : (
@@ -278,7 +317,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
                       <div key={m.id} style={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 8, marginTop: sameAuthor ? 3 : 10 }}>
                         {!isMe && (
                           <div style={{ width: 32, flexShrink: 0, marginBottom: 2 }}>
-                            {!sameAuthor && <Avatar name={chat.other_user.name || chat.other_user.email} size={32} />}
+                            {!sameAuthor && <Avatar name={chat.other_user?.name || chat.other_user?.email || '?'} size={32} />}
                           </div>
                         )}
                         <div style={{ maxWidth: '68%' }}>
@@ -344,6 +383,154 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
   )
 }
 
+// ── New Group Modal ────────────────────────────────────────────────────────────
+function NewGroupModal({ currentUser, onClose, onCreated }: {
+  currentUser: ChatUser; onClose: () => void; onCreated: (chat: Chat) => void
+}) {
+  const [groupName, setGroupName] = useState('')
+  const [users, setUsers] = useState<ChatUser[]>([])
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
+
+  useEffect(() => {
+    getSB().from('users').select('id,name,email,role')
+      .neq('id', currentUser.id).neq('role', 'admin').eq('is_searchable', true)
+      .then(({ data }) => { setUsers(data ?? []); setLoading(false) })
+  }, [currentUser.id])
+
+  async function create() {
+    if (!groupName.trim() || selected.size < 1) return
+    setCreating(true)
+    const sb = getSB()
+    const { data: chat, error } = await sb.from('chats')
+      .insert({ type: 'group', name: groupName.trim(), created_by: currentUser.id })
+      .select().single()
+    if (error || !chat) { setCreating(false); return }
+    // Add creator + selected members
+    const memberIds = [currentUser.id, ...Array.from(selected)]
+    await sb.from('chat_members').insert(
+      memberIds.map((uid, i) => ({ chat_id: chat.id, user_id: uid, role: i === 0 ? 'admin' : 'member' }))
+    )
+    onCreated({ ...chat, other_user: null, unread_count: 0, member_count: memberIds.length })
+  }
+
+  const filtered = users.filter(u => (u.name || u.email).toLowerCase().includes(search.toLowerCase()))
+  const toggle = (id: string) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(8px)' }} />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 440, background: 'var(--card)', borderRadius: 24, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: '0 40px 100px rgba(0,0,0,0.2)' }}>
+        <div style={{ padding: '22px 24px 16px', background: 'linear-gradient(135deg, rgba(147,51,234,0.05), transparent)', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новая группа</p>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать группу</h3>
+            </div>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+          </div>
+          <input value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="Название группы…"
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 14, fontWeight: 600, outline: 'none', boxSizing: 'border-box', marginBottom: 10 }}
+            onFocus={e => e.currentTarget.style.borderColor = '#9333ea'}
+            onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+          />
+          <div style={{ position: 'relative' }}>
+            <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Найти участника…"
+              style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor = '#9333ea'}
+              onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+            />
+          </div>
+          {selected.size > 0 && <p style={{ marginTop: 8, fontSize: 11, color: '#9333ea', fontWeight: 600 }}>Выбрано: {selected.size} участников</p>}
+        </div>
+        <div style={{ maxHeight: 280, overflowY: 'auto' }}>
+          {loading ? (
+            <div style={{ padding: 40, textAlign: 'center' }}><div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" /></div>
+          ) : filtered.map(u => {
+            const sel = selected.has(u.id)
+            return (
+              <button key={u.id} onClick={() => toggle(u.id)}
+                style={{ width: '100%', padding: '11px 24px', display: 'flex', alignItems: 'center', gap: 13, background: sel ? 'rgba(147,51,234,0.05)' : 'transparent', border: 'none', borderBottom: '1px solid var(--border)', cursor: 'pointer', textAlign: 'left' }}
+                className="hover:bg-accent/60 transition-colors">
+                <Avatar name={u.name || u.email} size={40} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)' }}>{u.name || u.email}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{u.role === 'coach' ? '🏋️ Тренер' : u.role === 'organization' ? '🏢 Организация' : '🏃 Атлет'}</div>
+                </div>
+                <div style={{ width: 22, height: 22, borderRadius: 6, border: sel ? 'none' : '1.5px solid var(--border)', background: sel ? '#9333ea' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
+                  {sel && <i className="ki-filled ki-check text-white" style={{ fontSize: 11 }} />}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+        <div style={{ padding: '14px 24px', borderTop: '1px solid var(--border)' }}>
+          <button onClick={create} disabled={!groupName.trim() || selected.size < 1 || creating}
+            style={{ width: '100%', padding: '11px', borderRadius: 14, border: 'none', background: groupName.trim() && selected.size > 0 ? 'linear-gradient(135deg,#9333ea,#7c3aed)' : 'var(--accent)', color: groupName.trim() && selected.size > 0 ? 'white' : 'var(--muted-foreground)', fontWeight: 700, fontSize: 14, cursor: groupName.trim() && selected.size > 0 ? 'pointer' : 'default', transition: 'all 0.15s' }}>
+            {creating ? 'Создаём…' : `Создать группу${selected.size > 0 ? ` (${selected.size + 1})` : ''}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── New Channel Modal (org only) ───────────────────────────────────────────────
+function NewChannelModal({ currentUser, onClose, onCreated }: {
+  currentUser: ChatUser; onClose: () => void; onCreated: (chat: Chat) => void
+}) {
+  const [channelName, setChannelName] = useState('')
+  const [creating, setCreating] = useState(false)
+
+  async function create() {
+    if (!channelName.trim()) return
+    setCreating(true)
+    const sb = getSB()
+    const { data: chat, error } = await sb.from('chats')
+      .insert({ type: 'org_channel', name: channelName.trim(), created_by: currentUser.id, org_id: currentUser.id })
+      .select().single()
+    if (error || !chat) { setCreating(false); return }
+    await sb.from('chat_members').insert({ chat_id: chat.id, user_id: currentUser.id, role: 'admin' })
+    onCreated({ ...chat, other_user: null, unread_count: 0, member_count: 1 })
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(8px)' }} />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 400, background: 'var(--card)', borderRadius: 24, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: '0 40px 100px rgba(0,0,0,0.2)' }}>
+        <div style={{ padding: '22px 24px 18px', background: 'linear-gradient(135deg, rgba(37,99,235,0.05), transparent)', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Канал организации</p>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать канал</h3>
+            </div>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+          </div>
+          <input value={channelName} onChange={e => setChannelName(e.target.value)} placeholder="Название канала…"
+            autoFocus
+            style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 14, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }}
+            onFocus={e => e.currentTarget.style.borderColor = '#2563eb'}
+            onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+            onKeyDown={e => e.key === 'Enter' && create()}
+          />
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--muted-foreground)', lineHeight: 1.5 }}>
+            Канал виден всем участникам организации. После создания можно приглашать пользователей.
+          </p>
+        </div>
+        <div style={{ padding: '14px 24px' }}>
+          <button onClick={create} disabled={!channelName.trim() || creating}
+            style={{ width: '100%', padding: '11px', borderRadius: 14, border: 'none', background: channelName.trim() ? 'linear-gradient(135deg,#2563eb,#1d4ed8)' : 'var(--accent)', color: channelName.trim() ? 'white' : 'var(--muted-foreground)', fontWeight: 700, fontSize: 14, cursor: channelName.trim() ? 'pointer' : 'default', transition: 'all 0.15s' }}>
+            {creating ? 'Создаём…' : 'Создать канал'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function MessengerPage() {
   const { user, loading: ul } = useUser()
@@ -351,21 +538,50 @@ export default function MessengerPage() {
   const [loading, setLoading] = useState(true)
   const [activeChat, setActiveChat] = useState<Chat | null>(null)
   const [showNew, setShowNew] = useState(false)
+  const [showNewGroup, setShowNewGroup] = useState(false)
+  const [showNewChannel, setShowNewChannel] = useState(false)
   const [search, setSearch] = useState('')
 
   const loadChats = useCallback(async () => {
     if (!user) return
     const sb = getSB()
-    const { data } = await sb.from('chats').select('*')
+
+    // direct chats
+    const { data: directData } = await sb.from('chats').select('*')
       .or(`athlete_id.eq.${user.id},coach_id.eq.${user.id}`)
-      .order('updated_at', { ascending: false })
-    if (!data) { setLoading(false); return }
-    const enriched: Chat[] = await Promise.all(data.map(async c => {
-      const otherId = c.athlete_id === user.id ? c.coach_id : c.athlete_id
-      const { data: ou } = await sb.from('users').select('id,name,email,role').eq('id', otherId).single()
-      const { data: lm } = await sb.from('messages').select('body').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1).single()
-      const { count } = await sb.from('messages').select('*', { count: 'exact', head: true }).eq('chat_id', c.id).eq('is_read', false).neq('sender_id', user.id)
-      return { ...c, other_user: ou ?? { id: otherId, name: 'Пользователь', email: '', role: '' }, last_message: lm?.body ?? null, unread_count: count ?? 0 }
+      .eq('type', 'direct')
+
+    // group / org_channel chats via chat_members
+    const { data: memberRows } = await sb.from('chat_members').select('chat_id').eq('user_id', user.id)
+    const memberChatIds = (memberRows ?? []).map(r => r.chat_id)
+    const { data: groupData } = memberChatIds.length > 0
+      ? await sb.from('chats').select('*').in('id', memberChatIds)
+      : { data: [] as typeof directData }
+
+    const allRaw = [...(directData ?? []), ...(groupData ?? [])]
+      .sort((a, b) => (b.updated_at ?? '').localeCompare(a.updated_at ?? ''))
+
+    if (!allRaw.length) { setChats([]); setLoading(false); return }
+
+    const enriched: Chat[] = await Promise.all(allRaw.map(async c => {
+      const lm$ = sb.from('messages').select('body').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1).single()
+      const uc$ = sb.from('messages').select('*', { count: 'exact', head: true }).eq('chat_id', c.id).eq('is_read', false).neq('sender_id', user.id)
+
+      let other_user: ChatUser | null = null
+      if (c.type === 'direct') {
+        const otherId = c.athlete_id === user.id ? c.coach_id : c.athlete_id
+        const { data: ou } = await sb.from('users').select('id,name,email,role').eq('id', otherId).single()
+        other_user = ou ?? { id: otherId ?? '', name: 'Пользователь', email: '', role: '' }
+      }
+
+      let member_count: number | undefined
+      if (c.type !== 'direct') {
+        const { count } = await sb.from('chat_members').select('*', { count: 'exact', head: true }).eq('chat_id', c.id)
+        member_count = count ?? 0
+      }
+
+      const [{ data: lm }, { count }] = await Promise.all([lm$, uc$])
+      return { ...c, other_user, last_message: lm?.body ?? null, unread_count: count ?? 0, member_count }
     }))
     setChats(enriched)
     setLoading(false)
@@ -390,7 +606,7 @@ export default function MessengerPage() {
   )
   if (!user) return null
 
-  const filtered = chats.filter(c => (c.other_user.name || c.other_user.email).toLowerCase().includes(search.toLowerCase()))
+  const filtered = chats.filter(c => chatDisplayName(c).toLowerCase().includes(search.toLowerCase()))
   const totalUnread = chats.reduce((s, c) => s + c.unread_count, 0)
   const activeChats = chats.length
   const visibleChats = filtered.length
@@ -455,10 +671,22 @@ export default function MessengerPage() {
                 </div>
               </div>
             </div>
-            <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2 justify-center">
-              <i className="ki-filled ki-message-add text-sm" />
-              Новый чат
-            </button>
+            <div className="flex gap-2">
+              <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2 flex-1 justify-center">
+                <i className="ki-filled ki-message-add text-sm" />
+                Новый чат
+              </button>
+              <button onClick={() => setShowNewGroup(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать группу">
+                <i className="ki-filled ki-people text-sm text-purple-600" />
+                Группа
+              </button>
+              {user?.role === 'organization' && (
+                <button onClick={() => setShowNewChannel(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать канал">
+                  <i className="ki-filled ki-abstract-26 text-sm text-blue-600" />
+                  Канал
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -540,7 +768,12 @@ export default function MessengerPage() {
       ) : (
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 2xl:grid-cols-3">
           {filtered.map(c => {
-            const color = getColor(c.other_user.name || c.other_user.email || '?')
+            const isDirect = c.type === 'direct'
+            const ic = chatIcon(c.type)
+            const color = isDirect && c.other_user
+              ? getColor(c.other_user.name || c.other_user.email || '?')
+              : (ic?.color ?? '#64748b')
+            const displayName = chatDisplayName(c)
             const preview = c.last_message ?? 'Нет сообщений — начните диалог'
             return (
               <button
@@ -553,7 +786,12 @@ export default function MessengerPage() {
                 <div style={{ padding: '16px 18px 18px' }}>
                   <div className="flex items-start gap-3">
                     <div style={{ position: 'relative' }}>
-                      <Avatar name={c.other_user.name || c.other_user.email} size={48} ring={c.unread_count > 0} />
+                      {isDirect && c.other_user
+                        ? <Avatar name={c.other_user.name || c.other_user.email} size={48} ring={c.unread_count > 0} />
+                        : <div style={{ width: 48, height: 48, borderRadius: '50%', background: ic!.bg, border: `1.5px solid ${ic!.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <i className={`ki-filled ${ic!.icon}`} style={{ color: ic!.color, fontSize: 22 }} />
+                          </div>
+                      }
                       {c.unread_count > 0 && (
                         <span style={{
                           position: 'absolute', top: -4, right: -4,
@@ -572,11 +810,17 @@ export default function MessengerPage() {
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
                         <div style={{ minWidth: 0 }}>
                           <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em', display: 'block' }}>
-                            {c.other_user.name || c.other_user.email}
+                            {displayName}
                           </span>
                           <span style={{ marginTop: 3, fontSize: 11, color, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.8 }} />
-                            {c.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}
+                            {isDirect && c.other_user ? (
+                              <><span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.8 }} />
+                              {c.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}</>
+                            ) : c.type === 'group' ? (
+                              `👥 Группа · ${c.member_count ?? '?'} участников`
+                            ) : (
+                              `📢 Канал · ${c.member_count ?? '?'} участников`
+                            )}
                           </span>
                         </div>
                         <span style={{ fontSize: 10, color: 'var(--muted-foreground)', flexShrink: 0, marginTop: 1 }}>
@@ -659,6 +903,28 @@ export default function MessengerPage() {
             setChats(prev => prev.find(c => c.id === chat.id) ? prev : [chat, ...prev])
             setActiveChat(chat)
             setShowNew(false)
+          }}
+        />
+      )}
+      {showNewGroup && (
+        <NewGroupModal
+          currentUser={currentUser}
+          onClose={() => setShowNewGroup(false)}
+          onCreated={chat => {
+            setChats(prev => [chat, ...prev])
+            setActiveChat(chat)
+            setShowNewGroup(false)
+          }}
+        />
+      )}
+      {showNewChannel && (
+        <NewChannelModal
+          currentUser={currentUser}
+          onClose={() => setShowNewChannel(false)}
+          onCreated={chat => {
+            setChats(prev => [chat, ...prev])
+            setActiveChat(chat)
+            setShowNewChannel(false)
           }}
         />
       )}
