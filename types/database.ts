@@ -108,6 +108,13 @@ export type Database = {
           max_heart_rate: number | null
           lactate_threshold_hr: number | null
           weekly_training_hours: number | null
+          instagram_url: string | null
+          twitter_url: string | null
+          threads_url: string | null
+          telegram_url: string | null
+          youtube_url: string | null
+          tiktok_url: string | null
+          website_url: string | null
         }
         Insert: {
           id: string
@@ -135,6 +142,13 @@ export type Database = {
           max_heart_rate?: number | null
           lactate_threshold_hr?: number | null
           weekly_training_hours?: number | null
+          instagram_url?: string | null
+          twitter_url?: string | null
+          threads_url?: string | null
+          telegram_url?: string | null
+          youtube_url?: string | null
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Update: {
           id?: string
@@ -162,6 +176,13 @@ export type Database = {
           max_heart_rate?: number | null
           lactate_threshold_hr?: number | null
           weekly_training_hours?: number | null
+          instagram_url?: string | null
+          twitter_url?: string | null
+          threads_url?: string | null
+          telegram_url?: string | null
+          youtube_url?: string | null
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

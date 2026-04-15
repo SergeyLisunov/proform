@@ -1,13 +1,15 @@
 'use client'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { ZoneBar } from '@/components/ui/ZoneBar'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
-import { recoveryColor, DEMO_SESSIONS } from '@/lib/utils/data'
+import { recoveryColor } from '@/lib/utils/data'
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
-const AthleteProfileCard = dynamic(() => import('@/components/ui/AthleteProfileCard'), { ssr: false })
 
 const sparkOpts = (color: string) => ({
   chart: { type: 'area' as const, toolbar: { show: false }, sparkline: { enabled: true }, animations: { enabled: false } },
@@ -272,197 +274,541 @@ function ConnectionsBlock({ myUserId: myUserIdProp }: { myUserId?: string }) {
   )
 }
 
+// ── Hero types ─────────────────────────────────────────────────────────────────
+type AthleteHeroProfile = {
+  displayName: string
+  nickname: string | null
+  bio: string | null
+  club: string | null
+  city: string | null
+  sport: string | null
+  avatar_url: string | null
+  instagram_url: string | null
+  telegram_url: string | null
+  youtube_url: string | null
+  tiktok_url: string | null
+  website_url: string | null
+}
+
+type RecentWorkout = {
+  id: string
+  event_date: string
+  activity_type: string | null
+  activity_duration_min: number | null
+  name: string | null
+}
+
+// ── Social Links ────────────────────────────────────────────────────────────────
+const SOCIALS: { key: keyof AthleteHeroProfile; label: string; icon: string }[] = [
+  { key: 'instagram_url', label: 'Instagram', icon: 'ki-instagram' },
+  { key: 'telegram_url',  label: 'Telegram',  icon: 'ki-send' },
+  { key: 'youtube_url',   label: 'YouTube',   icon: 'ki-youtube' },
+  { key: 'tiktok_url',    label: 'TikTok',    icon: 'ki-abstract-14' },
+  { key: 'website_url',   label: 'Сайт',      icon: 'ki-global' },
+]
+
+function SocialLinks({ profile }: { profile: AthleteHeroProfile }) {
+  const visible = SOCIALS.filter(s => !!profile[s.key])
+  if (!visible.length) return null
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-3">
+      {visible.map(s => (
+        <a key={s.key} href={profile[s.key] as string} target="_blank" rel="noopener noreferrer"
+           title={s.label}
+           className="flex h-8 w-8 items-center justify-center rounded-lg border border-border
+                      bg-background/70 text-muted-foreground transition-all
+                      hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500
+                      hover:scale-105 active:scale-95">
+          <i className={`ki-filled ${s.icon} text-sm`} />
+        </a>
+      ))}
+    </div>
+  )
+}
+
+// ── Avatar ──────────────────────────────────────────────────────────────────────
+function HeroAvatar({ avatar_url, name, onClick }: { avatar_url: string | null; name: string; onClick: () => void }) {
+  const initials = name.split(' ').map(p => p[0] ?? '').join('').slice(0, 2).toUpperCase() || '?'
+  const colors = ['#f97316','#2563eb','#16a34a','#9333ea','#0284c7','#dc2626']
+  const color = colors[(name.charCodeAt(0) ?? 0) % colors.length]
+  return (
+    <div onClick={onClick}
+         className="relative group cursor-pointer shrink-0"
+         style={{ width: 72, height: 72 }}>
+      {avatar_url ? (
+        <Image src={avatar_url} alt={name} fill className="rounded-full object-cover"
+               sizes="72px" unoptimized={avatar_url.includes('supabase')} />
+      ) : (
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: `linear-gradient(135deg,${color}30,${color}60)`,
+                      border: `1.5px solid ${color}30`, display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontSize: 24, fontWeight: 800, color }}>
+          {initials}
+        </div>
+      )}
+      <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100
+                      transition-opacity flex items-center justify-center">
+        <i className="ki-filled ki-pencil text-white text-sm" />
+      </div>
+    </div>
+  )
+}
+
+// ── Add Workout Modal ───────────────────────────────────────────────────────────
+const ACTIVITY_TYPES = ['Бег','Велоспорт','Плавание','Силовые','Ходьба','Триатлон','Другое']
+
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+
+function AddWorkoutModal({ athleteId, onClose, onSaved }: {
+  athleteId: string
+  onClose: () => void
+  onSaved: (w: RecentWorkout, durationMin: number, date: string) => void
+}) {
+  const [date, setDate]         = useState(todayStr())
+  const [type, setType]         = useState('Бег')
+  const [duration, setDuration] = useState('')
+  const [wname, setWname]       = useState('')
+  const [notes, setNotes]       = useState('')
+  const [saving, setSaving]     = useState(false)
+  const [err, setErr]           = useState('')
+  const firstRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { setTimeout(() => firstRef.current?.focus(), 120) }, [])
+
+  async function submit() {
+    setErr('')
+    const dur = parseInt(duration)
+    if (!date) return setErr('Укажите дату')
+    if (!type) return setErr('Выберите вид активности')
+    if (!dur || dur < 1 || dur > 1440) return setErr('Длительность: от 1 до 1440 минут')
+    setSaving(true)
+    const sb = createClient()
+    const { data, error } = await sb.from('workouts').insert({
+      athlete_id: athleteId,
+      event_date: date,
+      event_type: 'workout',
+      activity_type: type,
+      activity_duration_min: dur,
+      name: wname.trim() || null,
+      description: notes.trim() || null,
+    }).select('id, event_date, activity_type, activity_duration_min, name').single()
+    setSaving(false)
+    if (error || !data) return setErr('Ошибка сохранения. Попробуйте ещё раз.')
+    onSaved(data as RecentWorkout, dur, date)
+  }
+
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+      <div onClick={onClose} style={{ position:'absolute', inset:0, background:'rgba(15,23,42,0.7)', backdropFilter:'blur(8px)' }} />
+      <div style={{ position:'relative', zIndex:1, width:'100%', maxWidth:440, background:'var(--card)',
+                    borderRadius:24, overflow:'hidden', border:'1px solid var(--border)',
+                    boxShadow:'0 40px 100px rgba(0,0,0,0.2)' }}>
+        {/* Header */}
+        <div style={{ padding:'20px 24px 16px', background:'linear-gradient(135deg,rgba(249,115,22,0.06),transparent)', borderBottom:'1px solid var(--border)' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <div>
+              <p style={{ fontSize:10, fontWeight:700, color:'#f97316', textTransform:'uppercase', letterSpacing:'0.12em', margin:0 }}>Тренировка</p>
+              <h3 style={{ fontSize:18, fontWeight:800, color:'var(--foreground)', margin:'2px 0 0', letterSpacing:'-0.02em' }}>Добавить тренировку</h3>
+            </div>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+              <i className="ki-filled ki-cross text-sm" />
+            </button>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div style={{ padding:'18px 24px', display:'flex', flexDirection:'column', gap:14 }}>
+          {/* Date + Type */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div>
+              <label style={{ fontSize:11, fontWeight:600, color:'var(--muted-foreground)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block', marginBottom:6 }}>Дата</label>
+              <input ref={firstRef} type="date" value={date} onChange={e => setDate(e.target.value)}
+                style={{ width:'100%', padding:'9px 12px', borderRadius:10, border:'1px solid var(--border)',
+                         background:'var(--background)', color:'var(--foreground)', fontSize:13, outline:'none', boxSizing:'border-box' }}
+                onFocus={e => e.currentTarget.style.borderColor='#f97316'}
+                onBlur={e => e.currentTarget.style.borderColor='var(--border)'}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize:11, fontWeight:600, color:'var(--muted-foreground)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block', marginBottom:6 }}>Активность</label>
+              <select value={type} onChange={e => setType(e.target.value)}
+                style={{ width:'100%', padding:'9px 12px', borderRadius:10, border:'1px solid var(--border)',
+                         background:'var(--background)', color:'var(--foreground)', fontSize:13, outline:'none', boxSizing:'border-box', cursor:'pointer' }}
+                onFocus={e => e.currentTarget.style.borderColor='#f97316'}
+                onBlur={e => e.currentTarget.style.borderColor='var(--border)'}
+              >
+                {ACTIVITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Duration */}
+          <div>
+            <label style={{ fontSize:11, fontWeight:600, color:'var(--muted-foreground)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block', marginBottom:6 }}>
+              Длительность (минуты)
+            </label>
+            <input type="number" min={1} max={1440} value={duration}
+              onChange={e => setDuration(e.target.value)}
+              placeholder="60"
+              style={{ width:'100%', padding:'9px 12px', borderRadius:10, border:'1px solid var(--border)',
+                       background:'var(--background)', color:'var(--foreground)', fontSize:13, outline:'none', boxSizing:'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor='#f97316'}
+              onBlur={e => e.currentTarget.style.borderColor='var(--border)'}
+              onKeyDown={e => e.key === 'Enter' && submit()}
+            />
+          </div>
+
+          {/* Name */}
+          <div>
+            <label style={{ fontSize:11, fontWeight:600, color:'var(--muted-foreground)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block', marginBottom:6 }}>
+              Название <span style={{ fontWeight:400, textTransform:'none' }}>(необязательно)</span>
+            </label>
+            <input type="text" value={wname} onChange={e => setWname(e.target.value)}
+              placeholder="Утренняя пробежка"
+              style={{ width:'100%', padding:'9px 12px', borderRadius:10, border:'1px solid var(--border)',
+                       background:'var(--background)', color:'var(--foreground)', fontSize:13, outline:'none', boxSizing:'border-box' }}
+              onFocus={e => e.currentTarget.style.borderColor='#f97316'}
+              onBlur={e => e.currentTarget.style.borderColor='var(--border)'}
+            />
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label style={{ fontSize:11, fontWeight:600, color:'var(--muted-foreground)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block', marginBottom:6 }}>
+              Заметка <span style={{ fontWeight:400, textTransform:'none' }}>(необязательно)</span>
+            </label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)}
+              placeholder="Самочувствие, условия, цели…"
+              rows={2}
+              style={{ width:'100%', padding:'9px 12px', borderRadius:10, border:'1px solid var(--border)',
+                       background:'var(--background)', color:'var(--foreground)', fontSize:13, outline:'none',
+                       boxSizing:'border-box', resize:'none', fontFamily:'inherit', lineHeight:1.5 }}
+              onFocus={e => e.currentTarget.style.borderColor='#f97316'}
+              onBlur={e => e.currentTarget.style.borderColor='var(--border)'}
+            />
+          </div>
+
+          {err && (
+            <div style={{ padding:'9px 12px', borderRadius:10, background:'#FEF2F2', border:'1px solid #FCA5A5', color:'#DC2626', fontSize:12, fontWeight:600 }}>
+              {err}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding:'0 24px 20px', display:'flex', gap:10 }}>
+          <button onClick={submit} disabled={saving}
+            style={{ flex:1, padding:'12px', borderRadius:14, border:'none',
+                     background: saving ? 'var(--accent)' : 'linear-gradient(135deg,#f97316,#ea580c)',
+                     color: saving ? 'var(--muted-foreground)' : 'white',
+                     fontWeight:700, fontSize:14, cursor: saving ? 'not-allowed' : 'pointer',
+                     display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+                     boxShadow: saving ? 'none' : '0 4px 16px rgba(249,115,22,0.35)',
+                     transition:'all 0.15s' }}>
+            {saving
+              ? <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Сохраняем…</>
+              : <><i className="ki-filled ki-plus text-sm" />Добавить</>
+            }
+          </button>
+          <button onClick={onClose}
+            style={{ padding:'12px 18px', borderRadius:14, border:'1.5px solid var(--border)',
+                     background:'transparent', color:'var(--muted-foreground)',
+                     fontSize:14, fontWeight:600, cursor:'pointer' }}>
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ──────────────────────────────────────────────
 function AthleteDash({ name, userId }: { name: string; userId: string }) {
-  const firstName = name.split(' ')[0]
+  const router = useRouter()
+
+  // ── Hero profile ──
+  const [hero, setHero]             = useState<AthleteHeroProfile | null>(null)
+  const [heroLoading, setHeroLoading] = useState(true)
+
+  // ── Weekly goal ──
   const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoalProgress>({
-    targetHours: null,
-    completedHours: 0,
-    completionPercent: 0,
-    remainingHours: null,
-    workoutCount: 0,
+    targetHours: null, completedHours: 0,
+    completionPercent: 0, remainingHours: null, workoutCount: 0,
   })
   const [weeklyGoalLoading, setWeeklyGoalLoading] = useState(true)
+
+  // ── Recent workouts ──
+  const [recentWorkouts, setRecentWorkouts] = useState<RecentWorkout[]>([])
+  const [workoutsLoading, setWorkoutsLoading] = useState(true)
+
+  // ── Modal ──
+  const [showAddWorkout, setShowAddWorkout] = useState(false)
+
+  // ── Load hero profile ──
+  useEffect(() => {
+    const sb = createClient()
+    Promise.all([
+      sb.from('users').select('nickname,first_name,last_name,bio,avatar_url,sport,city').eq('id', userId).single(),
+      sb.from('athletes').select('bio,club,city,primary_sport,instagram_url,telegram_url,youtube_url,tiktok_url,website_url').eq('id', userId).maybeSingle(),
+    ]).then(([{ data: u }, { data: a }]) => {
+      const firstName = u?.first_name ?? null
+      const lastName  = u?.last_name  ?? null
+      const displayName = [firstName, lastName].filter(Boolean).join(' ') || name
+      setHero({
+        displayName,
+        nickname:      u?.nickname ?? null,
+        bio:           a?.bio || u?.bio || null,
+        club:          a?.club ?? null,
+        city:          a?.city || u?.city || null,
+        sport:         a?.primary_sport || u?.sport || null,
+        avatar_url:    u?.avatar_url ?? null,
+        instagram_url: a?.instagram_url ?? null,
+        telegram_url:  a?.telegram_url  ?? null,
+        youtube_url:   a?.youtube_url   ?? null,
+        tiktok_url:    a?.tiktok_url    ?? null,
+        website_url:   a?.website_url   ?? null,
+      })
+      setHeroLoading(false)
+    })
+  }, [userId, name])
+
+  // ── Load weekly goal + recent workouts ──
   useEffect(() => {
     let cancelled = false
+    const sb = createClient()
+    const { from, to } = getCurrentWeekRange()
 
-    async function loadWeeklyGoal() {
-      setWeeklyGoalLoading(true)
-      const supabase = createClient()
-      const { from, to } = getCurrentWeekRange()
-
-      const [{ data: athleteData }, { data: workoutsData }] = await Promise.all([
-        supabase
-          .from('athletes')
-          .select('weekly_training_hours')
-          .eq('id', userId)
-          .maybeSingle(),
-        supabase
-          .from('workouts')
-          .select('activity_duration_min, event_date')
-          .eq('athlete_id', userId)
-          .gte('event_date', from)
-          .lte('event_date', to),
-      ])
-
+    Promise.all([
+      sb.from('athletes').select('weekly_training_hours').eq('id', userId).maybeSingle(),
+      sb.from('workouts').select('activity_duration_min,event_date').eq('athlete_id', userId).gte('event_date', from).lte('event_date', to),
+      sb.from('workouts').select('id,event_date,activity_type,activity_duration_min,name').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(5),
+    ]).then(([{ data: athleteData }, { data: weekWorkouts }, { data: recent }]) => {
       if (cancelled) return
-
-      const athleteGoal = athleteData as AthleteGoalRow | null
-      const workoutDurations = (workoutsData ?? []) as WorkoutDurationRow[]
-      const targetHoursRaw = athleteGoal?.weekly_training_hours
-      const targetHours = typeof targetHoursRaw === 'number' && Number.isFinite(targetHoursRaw) && targetHoursRaw > 0
-        ? roundHours(targetHoursRaw)
-        : null
-
-      const completedMinutes = workoutDurations.reduce((sum, workout) => {
-        const duration = typeof workout.activity_duration_min === 'number' ? workout.activity_duration_min : 0
-        return sum + duration
-      }, 0)
+      const targetHoursRaw = (athleteData as AthleteGoalRow | null)?.weekly_training_hours
+      const targetHours = typeof targetHoursRaw === 'number' && targetHoursRaw > 0 ? roundHours(targetHoursRaw) : null
+      const completedMinutes = (weekWorkouts ?? []).reduce((s, w) => s + (typeof (w as WorkoutDurationRow).activity_duration_min === 'number' ? (w as WorkoutDurationRow).activity_duration_min! : 0), 0)
       const completedHours = roundHours(completedMinutes / 60)
-      const completionPercent = targetHours
-        ? Math.max(0, Math.min(100, Math.round((completedHours / targetHours) * 100)))
-        : 0
-      const remainingHours = targetHours ? roundHours(Math.max(targetHours - completedHours, 0)) : null
-
-      setWeeklyGoal({
-        targetHours,
-        completedHours,
-        completionPercent,
-        remainingHours,
-        workoutCount: workoutDurations.length,
-      })
+      const completionPercent = targetHours ? Math.max(0, Math.min(100, Math.round((completedHours / targetHours) * 100))) : 0
+      setWeeklyGoal({ targetHours, completedHours, completionPercent, remainingHours: targetHours ? roundHours(Math.max(targetHours - completedHours, 0)) : null, workoutCount: (weekWorkouts ?? []).length })
       setWeeklyGoalLoading(false)
-    }
-
-    loadWeeklyGoal()
-
-    return () => {
-      cancelled = true
-    }
+      setRecentWorkouts((recent ?? []) as RecentWorkout[])
+      setWorkoutsLoading(false)
+    })
+    return () => { cancelled = true }
   }, [userId])
 
-  const weeklyRingLabel = !weeklyGoal.targetHours
-    ? 'Цель не задана'
-    : weeklyGoal.completionPercent >= 100
-      ? 'План закрыт'
-      : weeklyGoal.completionPercent >= 65
-        ? 'В процессе'
-        : weeklyGoal.completedHours > 0
-          ? 'Есть прогресс'
-          : 'Старт недели'
+  // ── After adding workout ──
+  const handleWorkoutAdded = useCallback((w: RecentWorkout, durationMin: number, date: string) => {
+    setShowAddWorkout(false)
+    setRecentWorkouts(prev => [w, ...prev.slice(0, 4)])
+    const { from, to } = getCurrentWeekRange()
+    if (date >= from && date <= to) {
+      setWeeklyGoal(prev => {
+        const newCompleted = roundHours(prev.completedHours + durationMin / 60)
+        const newPercent   = prev.targetHours ? Math.min(100, Math.round((newCompleted / prev.targetHours) * 100)) : 0
+        return {
+          ...prev,
+          completedHours:   newCompleted,
+          completionPercent: newPercent,
+          remainingHours:   prev.targetHours ? roundHours(Math.max(0, prev.targetHours - newCompleted)) : null,
+          workoutCount:     prev.workoutCount + 1,
+        }
+      })
+    }
+  }, [])
 
-  const weeklyGoalTitle = weeklyGoalLoading
-    ? 'Считаем прогресс недели...'
-    : weeklyGoal.targetHours
-      ? `${formatHours(weeklyGoal.completedHours)} / ${formatHours(weeklyGoal.targetHours)} ч`
-      : 'Укажите цель в часах'
+  const weeklyRingLabel = !weeklyGoal.targetHours ? 'Цель не задана'
+    : weeklyGoal.completionPercent >= 100 ? 'План закрыт'
+    : weeklyGoal.completionPercent >= 65  ? 'В процессе'
+    : weeklyGoal.completedHours > 0       ? 'Есть прогресс'
+    : 'Старт недели'
 
-  const weeklyGoalHint = weeklyGoalLoading
-    ? 'Собираем выполненные часы по тренировкам текущей недели.'
+  const weeklyGoalTitle = weeklyGoalLoading ? '…'
+    : weeklyGoal.targetHours ? `${formatHours(weeklyGoal.completedHours)} / ${formatHours(weeklyGoal.targetHours)} ч`
+    : 'Цель не задана'
+
+  const weeklyGoalHint = weeklyGoalLoading ? 'Загружаем данные недели…'
     : weeklyGoal.targetHours
       ? weeklyGoal.remainingHours && weeklyGoal.remainingHours > 0
-        ? `Осталось ${formatHours(weeklyGoal.remainingHours)} ч до недельной цели.`
-        : 'Недельный план уже выполнен или перевыполнен.'
-      : 'Задайте часов тренировок в неделю в разделе настроек спорта.'
+        ? `Осталось ${formatHours(weeklyGoal.remainingHours)} ч`
+        : 'Недельный план выполнен!'
+      : 'Задайте цель в настройках спорта'
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
-      <Surface className="p-5 md:p-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-            Представление атлета
-          </span>
-          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            WHOOP Live
-          </span>
-          <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Обновлено 6 минут назад
-          </span>
-        </div>
 
-        <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Пульс дня</p>
-            <h2 className="mt-2 text-[clamp(2rem,4vw,2.75rem)] font-semibold tracking-tight text-foreground">
-              Доброе утро, {firstName}
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              Восстановление на уровне 42%. Сегодня лучше держать контроль над интенсивностью, не выходить за легкий аэробный потолок и вовремя остановиться, если нагрузка начнет расти.
-            </p>
+      {/* ── HERO BLOCK ── */}
+      <Surface className="p-5 md:p-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+
+          {/* Left: profile identity */}
+          <div className="flex items-start gap-4 min-w-0">
+            {heroLoading ? (
+              <div className="shrink-0 w-[72px] h-[72px] rounded-full bg-accent animate-pulse" />
+            ) : (
+              <HeroAvatar
+                avatar_url={hero?.avatar_url ?? null}
+                name={hero?.displayName ?? name}
+                onClick={() => router.push('/settings')}
+              />
+            )}
+
+            <div className="min-w-0 flex-1">
+              {heroLoading ? (
+                <div className="space-y-2">
+                  <div className="h-7 w-48 rounded-lg bg-accent animate-pulse" />
+                  <div className="h-4 w-28 rounded-lg bg-accent animate-pulse" />
+                  <div className="h-4 w-64 rounded-lg bg-accent animate-pulse" />
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-[clamp(1.55rem,3vw,2.1rem)] font-semibold tracking-tight text-foreground leading-tight">
+                    {hero?.displayName ?? name}
+                  </h2>
+
+                  {hero?.nickname && (
+                    <Link href={`/profile/${userId}`}
+                      className="mt-1 inline-block text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+                      @{hero.nickname}
+                    </Link>
+                  )}
+
+                  {hero?.bio && (
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground max-w-md line-clamp-2">
+                      {hero.bio}
+                    </p>
+                  )}
+
+                  {/* Meta pills */}
+                  {(hero?.sport || hero?.club || hero?.city) && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {hero?.sport && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                          🏃 {hero.sport}
+                        </span>
+                      )}
+                      {hero?.club && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                          <i className="ki-filled ki-people text-[10px]" /> {hero.club}
+                        </span>
+                      )}
+                      {hero?.city && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                          <i className="ki-filled ki-geolocation text-[10px]" /> {hero.city}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {hero && <SocialLinks profile={hero} />}
+                </>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
-            <RecoveryRing score={weeklyGoal.completionPercent} size={96} label={weeklyRingLabel} />
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">План недели</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">{weeklyGoalTitle}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{weeklyGoalHint}</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <div className="rounded-xl border border-border bg-card px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Осталось</div>
-                  <div className="mt-1 text-sm font-semibold text-foreground">
-                    {weeklyGoal.targetHours ? `${formatHours(weeklyGoal.remainingHours ?? 0)} ч` : '—'}
+          {/* Right: weekly plan + CTA */}
+          <div className="flex flex-col gap-3 xl:min-w-[280px] xl:shrink-0">
+            <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
+              <RecoveryRing score={weeklyGoal.completionPercent} size={80} label={weeklyRingLabel} />
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">План недели</p>
+                <p className="mt-1 text-xl font-semibold text-foreground leading-tight">{weeklyGoalTitle}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{weeklyGoalHint}</p>
+                <div className="mt-2.5 grid grid-cols-2 gap-2">
+                  <div className="rounded-xl border border-border bg-card px-3 py-2">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Осталось</div>
+                    <div className="mt-0.5 text-sm font-semibold text-foreground">
+                      {weeklyGoal.targetHours ? `${formatHours(weeklyGoal.remainingHours ?? 0)} ч` : '—'}
+                    </div>
                   </div>
-                </div>
-                <div className="rounded-xl border border-border bg-card px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Учтено тренировок</div>
-                  <div className="mt-1 text-sm font-semibold text-foreground">
-                    {weeklyGoalLoading ? '...' : weeklyGoal.workoutCount}
+                  <div className="rounded-xl border border-border bg-card px-3 py-2">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Тренировок</div>
+                    <div className="mt-0.5 text-sm font-semibold text-foreground">
+                      {weeklyGoalLoading ? '…' : weeklyGoal.workoutCount}
+                    </div>
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
-                В прогресс недели попадают только тренировки текущей недели, у которых указана длительность.
-              </p>
             </div>
+
+            <button onClick={() => setShowAddWorkout(true)}
+              className="kt-btn kt-btn-primary w-full justify-center gap-2">
+              <i className="ki-filled ki-plus text-sm" />
+              Добавить тренировку
+            </button>
           </div>
         </div>
-
       </Surface>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-        <Surface className="p-0">
-          <div className="border-b border-border px-5 py-4 md:px-6">
-            <SectionHeader
-              eyebrow="Профиль"
-              title="Карточка атлета"
-              subtitle="Расширенный профиль остается на виду, но не перегружает hero-зону."
-            />
-          </div>
-          <div className="p-3 md:p-4">
-            <AthleteProfileCard />
-          </div>
-        </Surface>
-
-        <Surface className="p-5 md:p-6">
-          <SectionHeader
-            eyebrow="Активность"
-            title="Последние сессии"
-            subtitle="Плотный ритм, читаемые детали и нагрузка на первом плане."
-            action={(
-              <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
-                Открыть все →
-              </a>
-            )}
-          />
-          <div className="mt-4 space-y-3">
-            {DEMO_SESSIONS.slice(0, 5).map((s, i) => (
-              <ActivityRow
-                key={i}
-                title={s.type}
-                meta={`${s.dur} min · ${s.date}`}
-                strain={s.strain}
-                zones={s.z}
-                iconBg="bg-orange-50"
-                icon="ki-abstract-26"
-                accent="text-orange-500"
-              />
-            ))}
-          </div>
-        </Surface>
-      </div>
+      {/* ── RECENT WORKOUTS ── */}
+      <Surface className="p-5 md:p-6">
+        <SectionHeader
+          eyebrow="Активность"
+          title="Последние тренировки"
+          action={(
+            <a href="/diary" className="text-2xs font-semibold text-orange-500 transition-colors hover:text-orange-600">
+              Открыть все →
+            </a>
+          )}
+        />
+        <div className="mt-4 space-y-3">
+          {workoutsLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-16 rounded-2xl bg-accent/50 animate-pulse" />
+            ))
+          ) : recentWorkouts.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border px-6 py-10 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
+                <i className="ki-filled ki-abstract-26 text-xl" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">Тренировок пока нет</p>
+              <p className="mt-1 text-xs text-muted-foreground">Добавьте первую тренировку, чтобы она появилась здесь.</p>
+              <button onClick={() => setShowAddWorkout(true)}
+                className="kt-btn kt-btn-primary mt-4 gap-2">
+                <i className="ki-filled ki-plus text-sm" />
+                Добавить первую
+              </button>
+            </div>
+          ) : (
+            recentWorkouts.map(w => (
+              <div key={w.id} className="rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:bg-accent/40">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
+                    <i className="ki-filled ki-abstract-26 text-sm text-orange-500" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-foreground">
+                      {w.name || w.activity_type || 'Тренировка'}
+                    </div>
+                    <div className="mt-0.5 text-2xs text-muted-foreground">
+                      {w.activity_type}{w.activity_duration_min ? ` · ${w.activity_duration_min} мин` : ''} · {w.event_date}
+                    </div>
+                  </div>
+                  {w.activity_duration_min && (
+                    <div className="shrink-0 text-right">
+                      <div className="pf-num text-lg leading-none text-foreground">
+                        {w.activity_duration_min < 60 ? `${w.activity_duration_min}м` : `${Math.floor(w.activity_duration_min/60)}ч${w.activity_duration_min%60 ? `${w.activity_duration_min%60}м` : ''}`}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </Surface>
 
       <ConnectionsBlock myUserId={userId} />
+
+      {showAddWorkout && (
+        <AddWorkoutModal
+          athleteId={userId}
+          onClose={() => setShowAddWorkout(false)}
+          onSaved={handleWorkoutAdded}
+        />
+      )}
     </div>
   )
 }
