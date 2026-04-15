@@ -3,7 +3,7 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
-import { RISK_COLORS, COACH_MARKS, recoveryColor, DEMO_ATHLETES, DEMO_SESSIONS, DEMO_DIARY } from '@/lib/utils/data'
+import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
@@ -21,13 +21,42 @@ type AthleteUser = {
   id: string; name: string; sport_type: string | null; age: number | null; gender: string | null
 }
 
+type RiskLevel = 'low' | 'moderate' | 'high' | 'critical'
+
 type AthleteWithStats = AthleteUser & {
-  recovery: number | null; hrv: number | null; rhr: number | null
+  recovery: number; hrv: number | null; rhr: number | null
   sessions: number; recentWorkouts: Workout[]
+  risk: RiskLevel; streak: number
 }
 
+type Athlete = AthleteWithStats
+
 type TabType = 'overview' | 'sessions' | 'diary' | 'marks'
-type Athlete = typeof DEMO_ATHLETES[number]
+
+function todayStr(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+
+function computeRisk(recovery: number): RiskLevel {
+  if (recovery < 30) return 'critical'
+  if (recovery < 45) return 'high'
+  if (recovery < 70) return 'moderate'
+  return 'low'
+}
+
+function computeStreak(workouts: Workout[]): number {
+  if (!workouts.length) return 0
+  const dates = new Set(workouts.map(w => w.event_date).filter(Boolean))
+  let streak = 0
+  let cur = new Date(todayStr())
+  while (true) {
+    const iso = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`
+    if (dates.has(iso)) { streak++; cur.setDate(cur.getDate() - 1) }
+    else break
+  }
+  return streak
+}
 
 const RISK_LABELS = {
   low: 'низкий',
@@ -142,7 +171,7 @@ function AthleteCard({
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-foreground">{athlete.name}</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">
-                {athlete.sport} · {athlete.id}
+                {athlete.sport_type ?? 'Спорт'} · {athlete.age ? `${athlete.age} лет` : ''}
               </div>
             </div>
             <span
@@ -163,7 +192,7 @@ function AthleteCard({
                   <span className="font-semibold text-foreground">{loadLabel}</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-border">
-                  <div className="h-full rounded-full" style={{ width: `${Math.min(100, athlete.hrv)}%`, background: rc }} />
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(100, athlete.hrv ?? 0)}%`, background: rc }} />
                 </div>
               </div>
               <div>
@@ -172,7 +201,7 @@ function AthleteCard({
                   <span className="text-foreground">{athlete.sessions} сессий</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-border">
-                  <div className="h-full rounded-full bg-red-400" style={{ width: `${Math.max(0, 100 - (athlete.rhr - 40) * 3)}%` }} />
+                  <div className="h-full rounded-full bg-red-400" style={{ width: `${Math.max(0, 100 - ((athlete.rhr ?? 60) - 40) * 3)}%` }} />
                 </div>
               </div>
             </div>
@@ -258,7 +287,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 Выбранный атлет
               </span>
               <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Demo-данные
+                Реальные данные
               </span>
             </div>
             <div className="mt-3 flex items-center gap-4">
@@ -273,7 +302,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   {athlete.name}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {athlete.sport} · {athlete.age} лет · {athlete.gender === 'F' ? 'Женщина' : 'Мужчина'} · {athlete.id}
+                  {athlete.sport_type ?? 'Спорт'}{athlete.age ? ` · ${athlete.age} лет` : ''}{athlete.gender ? ` · ${athlete.gender === 'F' ? 'Женщина' : 'Мужчина'}` : ''}
                 </p>
               </div>
             </div>
@@ -457,94 +486,104 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               title="История сессий"
               subtitle="Последние тренировки показаны так, чтобы нагрузка и готовность читались рядом."
             />
-            <div className="overflow-hidden rounded-[24px] border border-border bg-background/75 shadow-sm">
-              {DEMO_SESSIONS.slice(0, 5).map((session, index) => {
-                const sessionRecovery = recoveryColor(session.recovery)
-
-                return (
-                  <div
-                    key={`${session.date}-${index}`}
-                    className="grid gap-4 border-b border-border px-4 py-4 transition-colors last:border-b-0 hover:bg-accent/40 sm:grid-cols-[1fr_auto_auto]"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="text-sm font-semibold text-foreground">{session.type}</div>
-                        <span className="rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                          {session.date}
-                        </span>
+            {athlete.recentWorkouts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-[24px] border border-border bg-background/75 py-10 text-center">
+                <i className="ki-filled ki-calendar text-2xl text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">Тренировок пока нет</p>
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-[24px] border border-border bg-background/75 shadow-sm">
+                {athlete.recentWorkouts.slice(0, 8).map((w, index) => {
+                  const strain = w.activity_strain ?? 0
+                  const rc = w.recovery_score != null ? recoveryColor(Math.round(w.recovery_score)) : '#94A3B8'
+                  return (
+                    <div
+                      key={`${w.id}-${index}`}
+                      className="grid gap-4 border-b border-border px-4 py-4 transition-colors last:border-b-0 hover:bg-accent/40 sm:grid-cols-[1fr_auto_auto]"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="text-sm font-semibold text-foreground">{w.name ?? w.activity_type ?? 'Тренировка'}</div>
+                          <span className="rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                            {w.event_date ?? '—'}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-2xs text-muted-foreground">
+                          {w.activity_duration_min ? `${w.activity_duration_min} мин` : ''}{w.avg_heart_rate ? ` · ЧСС ${Math.round(w.avg_heart_rate)} уд/мин` : ''}{strain ? ` · Нагрузка ${Number(strain).toFixed(1)}` : ''}
+                        </p>
+                        {strain > 0 && (
+                          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border sm:max-w-xs">
+                            <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.min(100, (strain / 20) * 100)}%` }} />
+                          </div>
+                        )}
                       </div>
-                      <p className="mt-1 text-2xs text-muted-foreground">
-                        {session.dur} min · Avg HR {session.avg_hr} bpm · Session strain {session.strain}
-                      </p>
-                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border sm:max-w-xs">
-                        <div className="h-full rounded-full bg-blue-500" style={{ width: `${(session.strain / 20) * 100}%` }} />
-                      </div>
+                      {w.recovery_score != null && (
+                        <div className="rounded-2xl border border-border bg-card px-3 py-2 text-center">
+                          <div className="pf-num text-xl leading-none" style={{ color: rc }}>
+                            {Math.round(w.recovery_score)}%
+                          </div>
+                          <div className="mt-1 text-[10px] text-muted-foreground">готовность</div>
+                        </div>
+                      )}
+                      {strain > 0 && (
+                        <div className="hidden items-center justify-end sm:flex">
+                          <div className="text-right">
+                            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Нагрузка</div>
+                            <div className="mt-1 text-sm font-semibold text-foreground">{Number(strain).toFixed(1)}</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-
-                    <div className="rounded-2xl border border-border bg-card px-3 py-2 text-center">
-                      <div className="pf-num text-xl leading-none" style={{ color: sessionRecovery }}>
-                        {session.recovery}%
-                      </div>
-                      <div className="mt-1 text-[10px] text-muted-foreground">готовность</div>
-                    </div>
-
-                    <div className="hidden items-center justify-end sm:flex">
-                      <div className="text-right">
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Блок нагрузки</div>
-                        <div className="mt-1 text-sm font-semibold text-foreground">{session.strain.toFixed(1)}</div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
         {tab === 'diary' && (
           <div className="flex flex-col gap-4">
             <SectionHeader
-              eyebrow="Дневник тренера"
-              title="Наблюдения и контекст"
-              subtitle="Фиксируйте мягкие сигналы, которые стоят за цифрами и метриками."
+              eyebrow="Дневник атлета"
+              title="Записи тренировок"
+              subtitle="Описания и заметки из тренировочного журнала атлета."
             />
-            <div className="grid gap-3">
-              {DEMO_DIARY.map((entry, index) => {
-                const meta = RISK_COLORS[entry.risk as keyof typeof RISK_COLORS]
-
-                return (
-                  <div
-                    key={`${entry.date}-${index}`}
-                    className="rounded-[24px] border p-4 transition-colors hover:border-orange-200"
-                    style={{ background: `${meta.bg}66`, borderColor: meta.border }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-foreground">{entry.title}</div>
-                        <p className="mt-2 text-2xs leading-6 text-foreground/75">{entry.note}</p>
+            {athlete.recentWorkouts.filter(w => w.description).length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-[24px] border border-border bg-background/75 py-10 text-center">
+                <i className="ki-filled ki-notepad-edit text-2xl text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">Заметок пока нет</p>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {athlete.recentWorkouts.filter(w => w.description).slice(0, 6).map((w, index) => {
+                  const risk = computeRisk(w.recovery_score != null ? Math.round(w.recovery_score) : 50)
+                  const meta = RISK_COLORS[risk]
+                  return (
+                    <div
+                      key={`${w.id}-${index}`}
+                      className="rounded-[24px] border p-4 transition-colors hover:border-orange-200"
+                      style={{ background: `${meta.bg}66`, borderColor: meta.border }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-foreground">{w.name ?? w.activity_type ?? 'Тренировка'}</div>
+                          <p className="mt-2 text-2xs leading-6 text-foreground/75">{w.description}</p>
+                        </div>
+                        {w.recovery_score != null && (
+                          <span
+                            className="inline-flex shrink-0 items-center rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
+                            style={{ background: meta.bg, color: meta.text, borderColor: meta.border }}
+                          >
+                            {RISK_LABELS[risk]}
+                          </span>
+                        )}
                       </div>
-                      <span
-                        className="inline-flex shrink-0 items-center rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
-                        style={{ background: meta.bg, color: meta.text, borderColor: meta.border }}
-                      >
-                        {RISK_LABELS[entry.risk as keyof typeof RISK_LABELS]}
-                      </span>
+                      <div className="mt-3 text-[10px] text-muted-foreground">{w.event_date ?? ''}</div>
                     </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {entry.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-3 text-[10px] text-muted-foreground">{entry.date}</div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -598,15 +637,32 @@ export default function AthletesPage() {
     if (user.role !== 'coach' && user.role !== 'admin') return
 
     async function load() {
-      const { data: users } = await sb()
-        .from('users')
-        .select('id, name, sport_type, age, gender')
-        .eq('role', 'athlete')
-        .limit(30)
-      if (!users) { setLoading(false); return }
+      // Find athletes via active coach_athlete connections
+      const { data: conns } = await sb()
+        .from('connections')
+        .select('initiator_id, recipient_id')
+        .eq('connection_type', 'coach_athlete')
+        .eq('status', 'active')
+        .or(`initiator_id.eq.${user!.id},recipient_id.eq.${user!.id}`)
+
+      let athleteIds: string[] = []
+      if (conns?.length) {
+        athleteIds = conns.map(c => c.initiator_id === user!.id ? c.recipient_id : c.initiator_id)
+      }
+
+      // Admin fallback: show all athletes
+      let usersQuery = sb().from('users').select('id, name, sport_type, age, gender').eq('role', 'athlete').limit(30)
+      if (user!.role === 'coach' && athleteIds.length > 0) {
+        usersQuery = sb().from('users').select('id, name, sport_type, age, gender').in('id', athleteIds)
+      } else if (user!.role === 'coach' && athleteIds.length === 0) {
+        setAthletes([]); setLoading(false); return
+      }
+
+      const { data: users_ } = await usersQuery
+      if (!users_) { setLoading(false); return }
 
       const rows: AthleteWithStats[] = await Promise.all(
-        users.map(async u => {
+        users_.map(async u => {
           const { data: ws } = await sb()
             .from('workouts')
             .select('*')
@@ -617,13 +673,16 @@ export default function AthletesPage() {
           const withRecovery = workouts.filter(w => w.recovery_score != null)
           const withHRV      = workouts.filter(w => w.hrv != null)
           const withRHR      = workouts.filter(w => w.avg_heart_rate != null)
+          const recovery = withRecovery.length ? Math.round(withRecovery[0].recovery_score!) : 50
           return {
             ...u,
-            recovery: withRecovery.length ? Math.round(withRecovery[0].recovery_score!) : null,
-            hrv:      withHRV.length      ? parseFloat(withHRV[0].hrv!.toFixed(1)) : null,
-            rhr:      withRHR.length      ? Math.round(withRHR[0].avg_heart_rate!) : null,
+            recovery,
+            hrv:      withHRV.length ? parseFloat(withHRV[0].hrv!.toFixed(1)) : null,
+            rhr:      withRHR.length ? Math.round(withRHR[0].avg_heart_rate!) : null,
             sessions: workouts.length,
             recentWorkouts: workouts,
+            risk:   computeRisk(recovery),
+            streak: computeStreak(workouts),
           }
         })
       )
@@ -647,12 +706,12 @@ export default function AthletesPage() {
     )
   }
 
-  const selectedAthlete = DEMO_ATHLETES[selected]
-  const averageRecovery = Math.round(DEMO_ATHLETES.reduce((total, athlete) => total + athlete.recovery, 0) / DEMO_ATHLETES.length)
-  const riskCount = DEMO_ATHLETES.filter((athlete) => athlete.risk !== 'low').length
-  const readyCount = DEMO_ATHLETES.filter((athlete) => athlete.recovery >= 70).length
-  const totalSessions = DEMO_ATHLETES.reduce((total, athlete) => total + athlete.sessions, 0)
-  const selectedTone = recoveryColor(selectedAthlete.recovery)
+  const selectedAthlete = athletes[selected] ?? null
+  const averageRecovery = athletes.length ? Math.round(athletes.reduce((t, a) => t + a.recovery, 0) / athletes.length) : 0
+  const riskCount = athletes.filter(a => a.risk !== 'low').length
+  const readyCount = athletes.filter(a => a.recovery >= 70).length
+  const totalSessions = athletes.reduce((t, a) => t + a.sessions, 0)
+  const selectedTone = selectedAthlete ? recoveryColor(selectedAthlete.recovery) : '#64748B'
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
@@ -670,10 +729,7 @@ export default function AthletesPage() {
               Контур тренера
             </span>
             <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Обновленный shell
-            </span>
-            <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Demo-данные
+              Реальные данные
             </span>
           </div>
 
@@ -702,7 +758,7 @@ export default function AthletesPage() {
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
             {[
-              { label: 'Атлеты', value: DEMO_ATHLETES.length, icon: 'ki-people', tone: 'bg-blue-50 text-blue-600' },
+              { label: 'Атлеты', value: athletes.length, icon: 'ki-people', tone: 'bg-blue-50 text-blue-600' },
               { label: 'Средняя готовность', value: `${averageRecovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
               { label: 'В зоне риска', value: riskCount, icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
               { label: 'Готовы сейчас', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
@@ -730,8 +786,8 @@ export default function AthletesPage() {
         {[
           {
             label: 'Готовность фокуса',
-            value: `${selectedAthlete.recovery}%`,
-            hint: `${selectedAthlete.name} сейчас в фокусе тренера`,
+            value: selectedAthlete ? `${selectedAthlete.recovery}%` : '—',
+            hint: selectedAthlete ? `${selectedAthlete.name} сейчас в фокусе тренера` : 'Выберите атлета',
             icon: 'ki-abstract-26',
             tone: 'bg-emerald-50 text-emerald-600',
           },
@@ -745,14 +801,14 @@ export default function AthletesPage() {
           {
             label: 'Сессии в журнале',
             value: `${totalSessions}`,
-            hint: 'Общее число demo-тренировок',
+            hint: 'Общее число тренировок в базе',
             icon: 'ki-calendar',
             tone: 'bg-blue-50 text-blue-600',
           },
           {
             label: 'Средняя готовность',
-            value: `${averageRecovery}%`,
-            hint: 'Рассчитано по текущему demo-составу',
+            value: athletes.length ? `${averageRecovery}%` : '—',
+            hint: 'Рассчитано по последним тренировкам',
             icon: 'ki-heart',
             tone: 'bg-violet-50 text-violet-600',
           },
@@ -771,27 +827,42 @@ export default function AthletesPage() {
             />
           </div>
           <div className="space-y-3 p-4">
-            {DEMO_ATHLETES.map((athlete, index) => (
-              <AthleteCard
-                key={athlete.id}
-                athlete={athlete}
-                onSelect={() => setSelected(index)}
-                selected={selected === index}
-              />
-            ))}
+            {loading ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-orange-400 border-t-transparent mr-2" />
+                Загрузка…
+              </div>
+            ) : athletes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+                <i className="ki-filled ki-people text-2xl text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">Атлетов пока нет</p>
+                <p className="text-2xs text-muted-foreground/60">Пригласите атлета через раздел Связи</p>
+              </div>
+            ) : (
+              athletes.map((athlete, index) => (
+                <AthleteCard
+                  key={athlete.id}
+                  athlete={athlete}
+                  onSelect={() => setSelected(index)}
+                  selected={selected === index}
+                />
+              ))
+            )}
           </div>
         </Surface>
 
-        <AthleteDetail athlete={selectedAthlete} />
+        {selectedAthlete && <AthleteDetail athlete={selectedAthlete} />}
       </div>
 
-      <div className="rounded-[24px] border border-border bg-card px-5 py-4 text-2sm text-muted-foreground shadow-sm">
-        Здесь тренерский workflow пока остается demo-driven: выберите атлета, оцените готовность, а затем поставьте метку или оставьте заметку из detail-панели.
-        <span className="ml-1 font-semibold text-foreground">Текущий фокус:</span>
-        <span className="ml-1" style={{ color: selectedTone }}>
-          {selectedAthlete.name}
-        </span>
-      </div>
+      {selectedAthlete && (
+        <div className="rounded-[24px] border border-border bg-card px-5 py-4 text-2sm text-muted-foreground shadow-sm">
+          Выберите атлета из списка, оцените готовность, а затем поставьте метку или оставьте заметку из detail-панели.
+          <span className="ml-1 font-semibold text-foreground">Текущий фокус:</span>
+          <span className="ml-1" style={{ color: selectedTone }}>
+            {selectedAthlete.name}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
