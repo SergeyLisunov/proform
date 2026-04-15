@@ -26,6 +26,12 @@ type FormData = {
   city: string
   country: string
   bio: string
+  // Соцсети
+  instagram_url: string
+  telegram_url: string
+  youtube_url: string
+  tiktok_url: string
+  website_url: string
   // Спорт
   primary_sport: string
   club: string
@@ -48,6 +54,7 @@ type FormData = {
 const EMPTY_FORM: FormData = {
   first_name: '', last_name: '', birth_date: '', gender: '', phone: '', email: '',
   city: '', country: '', bio: '',
+  instagram_url: '', telegram_url: '', youtube_url: '', tiktok_url: '', website_url: '',
   primary_sport: '', club: '', fitness_level: '', goal: '', weekly_training_hours: '',
   height_cm: '', weight_kg: '', max_heart_rate: '', lactate_threshold_hr: '',
   vo2max: '', hrv_baseline: '', rhr_baseline: '',
@@ -418,6 +425,11 @@ export default function SettingsPage() {
         city:       ath?.city ?? '',
         country:    ath?.country ?? '',
         bio:        ath?.bio ?? '',
+        instagram_url: ath?.instagram_url ?? '',
+        telegram_url:  ath?.telegram_url  ?? '',
+        youtube_url:   ath?.youtube_url   ?? '',
+        tiktok_url:    ath?.tiktok_url    ?? '',
+        website_url:   ath?.website_url   ?? '',
         primary_sport:       ath?.primary_sport ?? '',
         club:                ath?.club ?? '',
         fitness_level:       ath?.fitness_level ?? '',
@@ -457,6 +469,11 @@ export default function SettingsPage() {
       city:         form.city       || null,
       country:      form.country    || null,
       bio:          form.bio        || null,
+      instagram_url: form.instagram_url || null,
+      telegram_url:  form.telegram_url  || null,
+      youtube_url:   form.youtube_url   || null,
+      tiktok_url:    form.tiktok_url    || null,
+      website_url:   form.website_url   || null,
       primary_sport:        form.primary_sport        || null,
       club:                 form.club                 || null,
       fitness_level:        form.fitness_level        || null,
@@ -637,6 +654,58 @@ export default function SettingsPage() {
                 onFocus={e => (e.target.style.borderColor = '#F97316')}
                 onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
             </Field>
+          </Card>
+
+          <Card>
+            <SectionHeader icon="ki-global" color="#0284C7" title="Социальные сети" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Field label="Instagram">
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
+                  <input value={form.instagram_url} onChange={e => set('instagram_url')(e.target.value)}
+                    placeholder="username"
+                    style={{ ...iStyle, paddingLeft: 28 }}
+                    onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+              </Field>
+              <Field label="Telegram">
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
+                  <input value={form.telegram_url} onChange={e => set('telegram_url')(e.target.value)}
+                    placeholder="username"
+                    style={{ ...iStyle, paddingLeft: 28 }}
+                    onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+              </Field>
+              <Field label="YouTube">
+                <input value={form.youtube_url} onChange={e => set('youtube_url')(e.target.value)}
+                  placeholder="https://youtube.com/@channel"
+                  style={iStyle}
+                  onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+              </Field>
+              <Field label="TikTok">
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
+                  <input value={form.tiktok_url} onChange={e => set('tiktok_url')(e.target.value)}
+                    placeholder="username"
+                    style={{ ...iStyle, paddingLeft: 28 }}
+                    onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+              </Field>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <Field label="Сайт">
+                  <input value={form.website_url} onChange={e => set('website_url')(e.target.value)}
+                    placeholder="https://yoursite.com"
+                    style={iStyle}
+                    onFocus={e => (e.target.style.borderColor = '#0284C7')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </Field>
+              </div>
+            </div>
           </Card>
         </div>
       )}
