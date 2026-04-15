@@ -42,7 +42,6 @@ function fmtDur(min: number | null | undefined): string {
 
 type ViewMode = 'month' | 'week' | 'year' | 'quarter'
 
-const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const MONTHS_RU   = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTHS      = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
 const DAYS_SHORT  = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
@@ -916,7 +915,7 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, cycles, cycleDay
           {cdcfg&&<div className="mb-1.5 px-1.5 py-1 rounded-lg text-2xs font-semibold flex items-center gap-1" style={{background:cdcfg.bg,color:cdcfg.color}}><i className={`ki-filled ${cdcfg.icon} text-[10px]`}/>{cdcfg.label}</div>}
           {inC&&!cdcfg&&<div className="mb-1 px-1.5 py-0.5 rounded text-[9px] font-bold border truncate" style={{background:ccfg!.bg,color:ccfg!.text,borderColor:ccfg!.border}}>{inC.label.slice(0,12)}</div>}
           {ses&&<div className="mb-1.5"><div className="px-2 py-1 rounded-lg text-2xs font-semibold mb-1" style={{background:strainColor(ses.strain),color:'#1D4ED8'}}>{ses.type}</div><ZoneBar zones={ses.z} height={18}/><div className="flex justify-between mt-1"><span className="text-[9px] text-muted-foreground">{ses.dur}m</span><span className="text-[9px] font-bold text-foreground">{ses.strain}</span></div></div>}
-          {comp&&<div className="px-2 py-1 rounded-lg text-2xs font-semibold" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}>🏆 Race</div>}
+          {comp&&<div className="px-2 py-1 rounded-lg text-2xs font-semibold" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}>🏆 {comp.name||'Старт'}</div>}
           {evs.slice(0,2).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><i className={`ki-filled ${meta?.icon??'ki-calendar'} text-[9px]`}/>{ev.title.slice(0,12)}</div> })}
           {!ses&&!comp&&evs.length===0&&!cdcfg&&!inC&&<div className="flex items-center justify-center h-12 text-muted-foreground/30"><i className="ki-filled ki-minus text-xs"/></div>}
         </div>
@@ -950,7 +949,6 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Выбрано</p>
             <h3 className="mt-1 text-[clamp(1.2rem,2vw,1.45rem)] font-semibold tracking-tight text-foreground capitalize">{label}</h3>
           </div>
-          <Tag tone="border-orange-200 bg-orange-50 text-orange-700">{dayWorkouts.length + dayEvents.length || 0} items</Tag>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Tag tone="border-border bg-background text-muted-foreground">Циклов {activeCycles.length}</Tag>
@@ -1249,6 +1247,8 @@ export default function CalendarPage() {
   const [monthWorkouts, setMonthWorkouts] = useState<Workout[]>([])
   const [cycles,       setCycles]       = useState<CycleBlock[]>([])
   const [cycleDays,    setCycleDays]    = useState<CycleDay[]>([])
+  const [kpiWorkouts,  setKpiWorkouts]  = useState<Workout[]>([])
+  const [kpiEvents,    setKpiEvents]    = useState<CalendarEvent[]>([])
   const [loading,      setLoading]      = useState(false)
   const [eventDrawer,  setEventDrawer]  = useState<CalendarEvent|null>(null)
   const [eventDrawerMode, setEventDrawerMode] = useState<'view'|'edit'>('view')
@@ -1272,6 +1272,28 @@ export default function CalendarPage() {
     ]).then(([evs, cs, cds, wks]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds); setMonthWorkouts(wks) })
       .finally(() => setLoading(false))
   }, [user?.id, year, month])
+
+  // ── KPI-диапазон для квартала/года ─────────────────────────────────────────
+  const { kpiFrom, kpiTo } = useMemo(() => {
+    if (view === 'quarter') {
+      const qsm = (quarter - 1) * 3
+      const from = `${year}-${String(qsm + 1).padStart(2,'0')}-01`
+      const lastMonth = qsm + 3
+      const lastDay = new Date(year, lastMonth, 0).getDate()
+      const to = `${year}-${String(lastMonth).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`
+      return { kpiFrom: from, kpiTo: to }
+    }
+    if (view === 'year') return { kpiFrom: `${year}-01-01`, kpiTo: `${year}-12-31` }
+    return { kpiFrom: '', kpiTo: '' }
+  }, [view, year, quarter])
+
+  useEffect(() => {
+    if (!user?.id || !kpiFrom || !kpiTo) { setKpiWorkouts([]); setKpiEvents([]); return }
+    Promise.all([
+      getWorkoutsForMonth(user.id, kpiFrom, kpiTo),
+      getCalendarEvents(user.id, kpiFrom, kpiTo),
+    ]).then(([wks, evs]) => { setKpiWorkouts(wks); setKpiEvents(evs) })
+  }, [user?.id, kpiFrom, kpiTo])
 
   const openAddEvent = useCallback((date?: string) => { setAddEventDate(date ?? _today); setShowAddEvent(true) }, [_today])
   const openEventDrawer = useCallback((e: CalendarEvent, mode: 'view'|'edit' = 'view') => { setEventDrawer(e); setEventDrawerMode(mode) }, [])
@@ -1328,7 +1350,7 @@ export default function CalendarPage() {
   }
   const periodLabel = () => {
     if (view==='year')    return `${year}`
-    if (view==='quarter') return `Q${quarter} ${year}`
+    if (view==='quarter') return `${quarter} кв. ${year}`
     if (view==='month')   return `${MONTHS_RU[month]} ${year}`
     return `Неделя · ${MONTHS_RU[month]} ${year}`
   }
@@ -1352,14 +1374,14 @@ export default function CalendarPage() {
         const weISO = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
         return monthWorkouts.filter(w => w.event_date && w.event_date >= wsISO && w.event_date <= weISO).length
       }
-      // quarter / year — используем DEMO_SESSIONS т.к. monthWorkouts загружается только за текущий месяц
+      // quarter / year — используем реальные kpiWorkouts
       if (view === 'quarter') {
         const qStart = (quarter - 1) * 3; const qEnd = qStart + 2
-        return DEMO_SESSIONS.filter(s => { const d = parseLocalDate(s.date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
+        return kpiWorkouts.filter(w => { if (!w.event_date) return false; const d = parseLocalDate(w.event_date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
       }
-      return DEMO_SESSIONS.filter(s => parseLocalDate(s.date).getFullYear() === year).length
+      return kpiWorkouts.filter(w => w.event_date && parseLocalDate(w.event_date).getFullYear() === year).length
     } catch { return 0 }
-  }, [view, year, month, quarter, weekStart, monthWorkouts])
+  }, [view, year, month, quarter, weekStart, monthWorkouts, kpiWorkouts])
 
   // Подпись периода для KPI плашки «Тренировки»
   const kpiLabel = () => {
@@ -1392,11 +1414,11 @@ export default function CalendarPage() {
       }
       if (view === 'quarter') {
         const qStart = (quarter - 1) * 3; const qEnd = qStart + 2
-        return DEMO_COMPETITIONS.filter(c => { const d = parseLocalDate(c.date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
+        return kpiEvents.filter(e => { if (e.event_type !== 'competition') return false; const d = parseLocalDate(e.event_date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
       }
-      return DEMO_COMPETITIONS.filter(c => parseLocalDate(c.date).getFullYear() === year).length
+      return kpiEvents.filter(e => e.event_type === 'competition' && parseLocalDate(e.event_date).getFullYear() === year).length
     } catch { return 0 }
-  }, [view, year, month, quarter, weekStart, savedEvents])
+  }, [view, year, month, quarter, weekStart, savedEvents, kpiEvents])
 
   const periodCycles = useMemo(() => {
     try {
