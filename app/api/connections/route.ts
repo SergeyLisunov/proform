@@ -94,21 +94,17 @@ export async function POST(req: NextRequest) {
       .single()
     if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 })
 
-    // Notify recipient
-    await createNotification(supabase, {
-      user_id: recipient_id,
-      type: 'invitation_received',
-      title: 'Новое приглашение',
-      body: message ?? null,
-      entity_type: 'connection',
-      entity_id: updated.id,
-      action_url: '/notifications',
+    // Re-invite: trigger doesn't fire for pending→pending UPDATE, so notify manually
+    await supabase.from('notifications').insert({
+      user_id: recipient_id, type: 'invitation_received',
+      title: 'Новое приглашение', body: message ?? null,
+      entity_type: 'connection', entity_id: updated.id, action_url: '/connections',
     })
 
     return NextResponse.json({ connection: updated }, { status: 200 })
   }
 
-  // Create new
+  // Create new — DB trigger sends invitation_received notification automatically
   const { data: conn, error: connErr } = await supabase
     .from('connections')
     .insert({ initiator_id: me.id, recipient_id, connection_type, message: message ?? null })
@@ -117,31 +113,5 @@ export async function POST(req: NextRequest) {
 
   if (connErr) return NextResponse.json({ error: connErr.message }, { status: 500 })
 
-  // Notify recipient
-  await createNotification(supabase, {
-    user_id: recipient_id,
-    type: 'invitation_received',
-    title: 'Новое приглашение',
-    body: message ?? null,
-    entity_type: 'connection',
-    entity_id: conn.id,
-    action_url: '/notifications',
-  })
-
   return NextResponse.json({ connection: conn }, { status: 201 })
-}
-
-async function createNotification(supabase: any, data: {
-  user_id: string; type: string; title: string; body?: string | null;
-  entity_type?: string; entity_id?: string; action_url?: string
-}) {
-  await supabase.from('notifications').insert({
-    user_id:     data.user_id,
-    type:        data.type,
-    title:       data.title,
-    body:        data.body ?? null,
-    entity_type: data.entity_type ?? null,
-    entity_id:   data.entity_id ?? null,
-    action_url:  data.action_url ?? null,
-  })
 }

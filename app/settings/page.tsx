@@ -417,6 +417,9 @@ export default function SettingsPage() {
   const [nicknameStatus, setNicknameStatus] = useState<NicknameStatus>('idle')
   const [originalNickname, setOriginalNickname] = useState('')
   const nicknameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement | null>(null)
 
   // Загрузка данных
   useEffect(() => {
@@ -429,6 +432,7 @@ export default function SettingsPage() {
       ])
       const nick = usr?.nickname ?? ''
       setOriginalNickname(nick)
+      setAvatarUrl(usr?.avatar_url ?? null)
       setForm({
         first_name: ath?.first_name ?? usr?.name?.split(' ')[0] ?? '',
         last_name:  ath?.last_name  ?? usr?.name?.split(' ')[1] ?? '',
@@ -554,6 +558,30 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user?.id) return
+    if (file.size > 2 * 1024 * 1024) { setSaveError('Файл слишком большой (макс. 2 МБ)'); return }
+    setUploadingAvatar(true)
+    setSaveError(null)
+    try {
+      const sb = getSB()
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `${user.id}.${ext}`
+      const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true })
+      if (upErr) throw upErr
+      const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path)
+      const cacheBusted = `${publicUrl}?t=${Date.now()}`
+      await sb.from('users').update({ avatar_url: cacheBusted }).eq('id', user.id)
+      setAvatarUrl(cacheBusted)
+    } catch (e: any) {
+      setSaveError(e?.message ?? 'Ошибка загрузки фото')
+    } finally {
+      setUploadingAvatar(false)
+      if (avatarInputRef.current) avatarInputRef.current.value = ''
+    }
+  }
+
   async function handleDeleteAccount() {
     if (deleteConfirm !== 'УДАЛИТЬ') return
     setDeleting(true)
@@ -659,6 +687,83 @@ export default function SettingsPage() {
       {/* ═══════════════ ЛИЧНЫЕ ДАННЫЕ ═══════════════ */}
       {tab === 'personal' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Avatar upload */}
+          <Card>
+            <SectionHeader icon="ki-picture" color="#F97316" title="Фото профиля" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 4 }}>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div style={{
+                  width: 80, height: 80, borderRadius: 20,
+                  background: avatarUrl ? 'transparent' : 'linear-gradient(135deg,#F97316,#EA580C)',
+                  border: '2px solid var(--border)', overflow: 'hidden',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {avatarUrl
+                    ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 28, fontWeight: 800, color: 'white' }}>
+                        {(form.first_name || user?.name || '?')[0]?.toUpperCase()}
+                      </span>
+                  }
+                </div>
+                {uploadingAvatar && (
+                  <div style={{
+                    position: 'absolute', inset: 0, borderRadius: 20,
+                    background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)', marginBottom: 6 }}>
+                  Загрузить фото
+                </p>
+                <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 12 }}>
+                  JPG, PNG или WebP · Макс. 2 МБ
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    style={{
+                      padding: '7px 16px', borderRadius: 10,
+                      border: '1.5px solid #FED7AA', background: '#FFF7ED',
+                      color: '#F97316', fontSize: 12, fontWeight: 600,
+                      cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                    }}
+                  >
+                    <i className="ki-filled ki-picture text-xs" />
+                    {uploadingAvatar ? 'Загрузка…' : 'Выбрать файл'}
+                  </button>
+                  {avatarUrl && (
+                    <button
+                      onClick={async () => {
+                        const sb = getSB()
+                        await sb.from('users').update({ avatar_url: null }).eq('id', user!.id)
+                        setAvatarUrl(null)
+                      }}
+                      style={{
+                        padding: '7px 14px', borderRadius: 10,
+                        border: '1.5px solid var(--border)', background: 'transparent',
+                        color: 'var(--muted-foreground)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      Удалить
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarUpload}
+                />
+              </div>
+            </div>
+          </Card>
+
           <Card>
             <SectionHeader icon="ki-profile-circle" color="#F97316" title="Личные данные" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

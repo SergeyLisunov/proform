@@ -37,23 +37,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Notify the other party
-  const notifyUserId = action === 'cancel' ? conn.recipient_id : conn.initiator_id
-  const notifType = action === 'accept' ? 'invitation_accepted' : action === 'decline' ? 'invitation_declined' : 'invitation_cancelled'
-  const titles: Record<string, string> = {
-    'invitation_accepted':  'Приглашение принято',
-    'invitation_declined':  'Приглашение отклонено',
-    'invitation_cancelled': 'Приглашение отозвано',
-  }
-
-  await supabase.from('notifications').insert({
-    user_id:     notifyUserId,
-    type:        notifType,
-    title:       titles[notifType],
-    entity_type: 'connection',
-    entity_id:   id,
-    action_url:  '/notifications',
-  })
+  // Notifications handled by DB trigger (trg_connection_status_notify)
 
   // If accepted coach_athlete → create direct chat if not exists
   if (action === 'accept' && conn.connection_type === 'coach_athlete') {
@@ -107,16 +91,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     .update({ status: 'terminated', terminated_at: new Date().toISOString(), terminated_by: me.id })
     .eq('id', id)
 
-  // Notify the other party
-  const otherId = conn.initiator_id === me.id ? conn.recipient_id : conn.initiator_id
-  await supabase.from('notifications').insert({
-    user_id:     otherId,
-    type:        'connection_terminated',
-    title:       'Связь завершена',
-    entity_type: 'connection',
-    entity_id:   id,
-    action_url:  '/notifications',
-  })
+  // Notification handled by DB trigger (trg_connection_status_notify)
 
   return NextResponse.json({ success: true })
 }
