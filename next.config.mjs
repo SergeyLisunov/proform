@@ -7,6 +7,11 @@ const nextConfig = {
   },
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  async redirects() {
+    return [
+      { source: '/search', destination: '/connections', permanent: false },
+    ]
+  },
 }
 
 export default nextConfig

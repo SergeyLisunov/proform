@@ -16,23 +16,21 @@ export async function GET(req: NextRequest) {
 
   if (q.length < 1) return NextResponse.json({ users: [], total: 0 })
 
-  // Strip @ prefix
+  // Strip @ prefix for nickname search
   const search = q.startsWith('@') ? q.slice(1).toLowerCase() : q.toLowerCase()
 
   let query = supabase
     .from('users')
     .select('id, nickname, first_name, last_name, role, avatar_url, sport, city, is_searchable', { count: 'exact' })
     .eq('is_searchable', true)
-    .neq('role', 'admin')           // admins not searchable
-    .neq('id', me.id)               // exclude self
+    .neq('role', 'admin')
+    .neq('id', me.id)
 
-  if (role) query = query.eq('role', role as import('@/types/database').UserRole)
+  if (role && role !== 'all') query = query.eq('role', role as import('@/types/database').UserRole)
 
   if (q.startsWith('@')) {
-    // Strict nickname search
     query = query.ilike('nickname', `${search}%`)
   } else {
-    // Search nickname OR first_name OR last_name
     query = query.or(
       `nickname.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`
     )
@@ -42,14 +40,14 @@ export async function GET(req: NextRequest) {
     .order('nickname', { ascending: true })
     .range(offset, offset + limit - 1)
 
-  // Fetch connection statuses between me and each result
   const userIds = (users ?? []).map(u => u.id)
-  let connectionMap: Record<string, string> = {}
+  type ConnInfo = { status: string; id: string }
+  const connectionMap: Record<string, ConnInfo> = {}
 
   if (userIds.length > 0) {
     const { data: conns } = await supabase
       .from('connections')
-      .select('initiator_id, recipient_id, status, connection_type')
+      .select('id, initiator_id, recipient_id, status')
       .or(
         `and(initiator_id.eq.${me.id},recipient_id.in.(${userIds.join(',')})),` +
         `and(recipient_id.eq.${me.id},initiator_id.in.(${userIds.join(',')}))`
@@ -58,16 +56,21 @@ export async function GET(req: NextRequest) {
 
     for (const c of conns ?? []) {
       const otherId = c.initiator_id === me.id ? c.recipient_id : c.initiator_id
-      // Prefer active over pending
+      // active takes priority over pending
       if (!connectionMap[otherId] || c.status === 'active') {
-        connectionMap[otherId] = c.status
+        let status: string = c.status
+        if (c.status === 'pending') {
+          status = c.initiator_id === me.id ? 'pending_outgoing' : 'pending_incoming'
+        }
+        connectionMap[otherId] = { status, id: c.id }
       }
     }
   }
 
   const result = (users ?? []).map(u => ({
     ...u,
-    connection_status: connectionMap[u.id] ?? 'none',
+    connection_status: connectionMap[u.id]?.status ?? 'none',
+    connection_id:     connectionMap[u.id]?.id     ?? null,
   }))
 
   return NextResponse.json({ users: result, total: count ?? 0 })

@@ -123,7 +123,7 @@ function NotificationsDrawer({
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
   }, []) // eslint-disable-line
 
-  useEffect(() => { loadNotifications() }, [userId]) // eslint-disable-line
+  useEffect(() => { loadNotifications() }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleClose() {
     setVisible(false)
@@ -137,12 +137,19 @@ function NotificationsDrawer({
         .from('notifications')
         .select('*')
         .eq('user_id', userId)
+        .eq('is_archived', false)
         .order('created_at', { ascending: false })
         .limit(50)
       setNotifications((data ?? []) as Notification[])
     } finally {
       setLoading(false)
     }
+  }
+
+  async function archiveNotif(id: string, e: React.MouseEvent) {
+    e.stopPropagation()
+    await sb().from('notifications').update({ is_archived: true }).eq('id', id)
+    setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
   async function markAllRead() {
@@ -322,13 +329,13 @@ function NotificationsDrawer({
               return (
                 <div key={n.id}
                   onClick={() => handleNotifClick(n)}
-                  className={`flex items-start gap-3 px-5 py-3.5 transition-colors ${n.action_url ? 'cursor-pointer' : ''} ${!n.is_read ? 'bg-orange-50/40' : 'hover:bg-accent/30'}`}
-                  style={{ borderBottom: '1px solid var(--border)' }}
+                  className={`group flex items-start gap-3 px-5 py-3.5 transition-colors ${n.action_url ? 'cursor-pointer' : ''} ${!n.is_read ? 'bg-orange-50/40' : 'hover:bg-accent/30'}`}
+                  style={{ borderBottom: '1px solid var(--border)', borderLeft: `3px solid ${!n.is_read ? color : 'transparent'}` }}
                 >
-                  {/* Иконка типа */}
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                  {/* Тип иконка */}
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
                     style={{ background: color + '15', border: `1px solid ${color}25` }}>
-                    <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
+                    <i className={`ki-filled ${icon} text-xs`} style={{ color }} />
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -336,9 +343,16 @@ function NotificationsDrawer({
                       <p className={`text-2sm leading-tight ${!n.is_read ? 'font-semibold text-foreground' : 'font-medium text-foreground/80'}`}>
                         {n.title}
                       </p>
-                      {!n.is_read && (
-                        <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1" />
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {!n.is_read && <span className="w-2 h-2 rounded-full bg-orange-500" />}
+                        <button
+                          onClick={e => archiveNotif(n.id, e)}
+                          className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                          title="Скрыть"
+                        >
+                          <i className="ki-filled ki-cross text-[10px]" />
+                        </button>
+                      </div>
                     </div>
                     {n.body && (
                       <p className="text-2xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
@@ -346,9 +360,7 @@ function NotificationsDrawer({
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[10px] text-muted-foreground/60">{timeAgo(n.created_at)}</span>
                       {n.action_url && (
-                        <span className="text-[10px] text-orange-500 font-medium">
-                          Подробнее →
-                        </span>
+                        <span className="text-[10px] text-orange-500 font-medium">Подробнее →</span>
                       )}
                     </div>
                   </div>
@@ -382,21 +394,39 @@ export default function TopBar() {
   const rc    = user ? ROLE_COLORS[user.role] : null
   const isAthlete = user?.role === 'athlete'
 
-  // Подгружаем количество непрочитанных
+  // Счётчик непрочитанных: initial load + Realtime
   useEffect(() => {
     if (!user?.id) return
-    const load = async () => {
-      const { count } = await sb()
+    const client = sb()
+
+    const loadCount = async () => {
+      const { count } = await client
         .from('notifications')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('is_read', false)
+        .eq('is_archived', false)
       setUnreadCount(count ?? 0)
     }
-    load()
-    // Обновляем каждые 30 сек
-    const interval = setInterval(load, 30000)
-    return () => clearInterval(interval)
+    loadCount()
+
+    const channel = client
+      .channel(`notif-badge-${user.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => { setUnreadCount(prev => prev + 1) })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => { loadCount() })
+      .subscribe()
+
+    return () => { client.removeChannel(channel) }
   }, [user?.id])
 
   const userPill = user && rc ? (
@@ -464,8 +494,8 @@ export default function TopBar() {
             >
               <i className="ki-filled ki-notification-on text-base" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
-                  {unreadCount > 9 ? '9+' : unreadCount}
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </button>
@@ -484,16 +514,7 @@ export default function TopBar() {
       {showNotif && user?.id && (
         <NotificationsDrawer
           userId={user.id}
-          onClose={() => {
-            setShowNotif(false)
-            // Обновляем счётчик после закрытия
-            sb()
-              .from('notifications')
-              .select('*', { count: 'exact', head: true })
-              .eq('user_id', user.id)
-              .eq('is_read', false)
-              .then(({ count }) => setUnreadCount(count ?? 0))
-          }}
+          onClose={() => setShowNotif(false)}
         />
       )}
     </>
