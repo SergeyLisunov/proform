@@ -11,6 +11,7 @@ import {
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
 import type { Workout } from '@/services/workouts.service'
+import { getNotes, type Note } from '@/services/notes.service'
 import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
@@ -830,10 +831,10 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
   )
 }
 
-function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts, cycles, cycleDaysMap, filterType = 'all' }: {
+function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts, cycles, cycleDaysMap, filterType = 'all', notesByDate = {} }: {
   year: number; month: number; onSelect: (d: string) => void; selected: string | null
   savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]; cycleDaysMap: Record<string, DayType>
-  filterType?: string
+  filterType?: string; notesByDate?: Record<string, boolean>
 }) {
   const fd=(new Date(year,month,1).getDay()+6)%7; const days=new Date(year,month+1,0).getDate()
   const cells: (number|null)[] = [...Array(fd).fill(null), ...Array.from({length:days},(_,i)=>i+1)]
@@ -890,6 +891,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
                 })}
                 {dayWksDisplay.length>2&&<div className="text-[10px] text-muted-foreground px-1.5">+{dayWksDisplay.length-2} трен.</div>}
                 {evsDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
+                {notesByDate[ds] && <div className="flex items-center gap-0.5 px-1 mt-0.5"><i className="ki-filled ki-notepad-edit text-[8px] text-amber-400"/><span className="text-[9px] text-amber-500 font-medium">заметка</span></div>}
               </>}
             </div>
           })}
@@ -957,13 +959,13 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle, filterType = 'all' }: {
+function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle, filterType = 'all', dayNotes = [] }: {
   dateStr: string; savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]
   cycleDaysMap: Record<string, DayType>
   onAddEvent: (date: string) => void; onDeleteEvent: (id: string) => void
   onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
   onOpenCycle?: (cycle: CycleBlock) => void
-  filterType?: string
+  filterType?: string; dayNotes?: Note[]
 }) {
   const allCycles = cycles.filter(c => dateStr >= c.start_date && dateStr <= c.end_date)
   const activeCycles = filterType === 'all' || filterType === 'cycle' ? allCycles : []
@@ -1132,7 +1134,30 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
           </div>
         )}
 
-        {isEmpty ? (
+        {/* Notes for this day */}
+        {dayNotes.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Заметки</div>
+              <Link href="/notes" className="text-2xs text-amber-500 hover:text-amber-600 transition-colors">Все →</Link>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {dayNotes.map(note => (
+                <div key={note.id} className="px-2.5 py-2 rounded-lg border border-amber-100 bg-amber-50/50">
+                  {note.title && <div className="text-2xs font-semibold text-amber-700 mb-0.5">{note.title}</div>}
+                  <div className="text-[11px] text-muted-foreground line-clamp-2">{note.content}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {dayNotes.length === 0 && (
+          <Link href="/notes" className="flex items-center gap-1.5 text-2xs text-amber-500 hover:text-amber-600 transition-colors mt-1">
+            <i className="ki-filled ki-notepad-edit text-xs" />Добавить заметку
+          </Link>
+        )}
+
+        {isEmpty && dayNotes.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/50 px-4 py-10 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
               <i className="ki-filled ki-calendar text-2xl" />
@@ -1292,6 +1317,7 @@ export default function CalendarPage() {
   const [eventDrawer,  setEventDrawer]  = useState<CalendarEvent|null>(null)
   const [eventDrawerMode, setEventDrawerMode] = useState<'view'|'edit'>('view')
   const [cycleDrawer,  setCycleDrawer]  = useState<CycleBlock|null>(null)
+  const [savedNotes,   setSavedNotes]   = useState<Note[]>([])
 
   const cycleDaysMap = useMemo(() => {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
@@ -1328,7 +1354,8 @@ export default function CalendarPage() {
       getCycles(user.id, dataRange.from, dataRange.to),
       getCycleDays(user.id, dataRange.from, dataRange.to),
       getWorkoutsForMonth(user.id, dataRange.from, dataRange.to),
-    ]).then(([evs, cs, cds, wks]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds); setMonthWorkouts(wks) })
+      getNotes(user.id, dataRange.from, dataRange.to),
+    ]).then(([evs, cs, cds, wks, nts]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds); setMonthWorkouts(wks); setSavedNotes(nts) })
       .finally(() => setLoading(false))
   }, [user?.id, dataRange.from, dataRange.to])
 
@@ -1353,6 +1380,17 @@ export default function CalendarPage() {
       getCalendarEvents(user.id, kpiFrom, kpiTo),
     ]).then(([wks, evs]) => { setKpiWorkouts(wks); setKpiEvents(evs) })
   }, [user?.id, kpiFrom, kpiTo])
+
+  const notesByDate = useMemo(() => {
+    const m: Record<string, boolean> = {}
+    savedNotes.forEach(n => { m[n.note_date] = true })
+    return m
+  }, [savedNotes])
+
+  const dayNotes = useMemo(() => {
+    if (!selected) return []
+    return savedNotes.filter(n => n.note_date === selected)
+  }, [savedNotes, selected])
 
   const openAddEvent = useCallback((date?: string) => { setAddEventDate(date ?? _today); setShowAddEvent(true) }, [_today])
   const openEventDrawer = useCallback((e: CalendarEvent, mode: 'view'|'edit' = 'view') => { setEventDrawer(e); setEventDrawerMode(mode) }, [])
@@ -1708,6 +1746,7 @@ export default function CalendarPage() {
                 onViewEvent={openEventDrawer}
                 onOpenCycle={setCycleDrawer}
                 filterType={filterType}
+                dayNotes={dayNotes}
               />
             </div>
           )}
@@ -1716,7 +1755,7 @@ export default function CalendarPage() {
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <div>
             {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} selected={selected} />}
-            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} />}
+            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} notesByDate={notesByDate} />}
             {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} />}
           </div>
           {selected && (
@@ -1731,6 +1770,7 @@ export default function CalendarPage() {
               onViewEvent={openEventDrawer}
               onOpenCycle={setCycleDrawer}
               filterType={filterType}
+              dayNotes={dayNotes}
             />
           )}
         </div>

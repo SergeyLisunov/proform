@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import { recoveryColor } from '@/lib/utils/data'
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
+const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
 
 const sparkOpts = (color: string) => ({
   chart: { type: 'area' as const, toolbar: { show: false }, sparkline: { enabled: true }, animations: { enabled: false } },
@@ -799,6 +800,8 @@ function AthleteDash({ name, userId }: { name: string; userId: string }) {
           )}
         </div>
       </Surface>
+
+      <QuickNoteWidget userId={userId} />
 
       <ConnectionsBlock myUserId={userId} />
 
