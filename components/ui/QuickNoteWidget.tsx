@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import NoteEditor from './NoteEditor'
+import VoiceButton from './VoiceButton'
 
 interface QuickNoteWidgetProps {
   userId: string
@@ -51,6 +52,14 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
     [handleSave]
   )
 
+  // Append transcript to the end of current content
+  const handleTranscript = useCallback((text: string) => {
+    setContent(prev => {
+      const trimmed = prev.trimEnd()
+      return trimmed ? `${trimmed}\n${text}` : text
+    })
+  }, [])
+
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
@@ -79,24 +88,27 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
 
       {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
 
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-gray-400">
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <span className="text-xs text-gray-400 min-w-0 truncate">
           {content.length > 0 ? `${content.length} chars` : 'Math expressions auto-calculate'}
         </span>
-        <button
-          onClick={handleSave}
-          disabled={saving || !content.trim()}
-          className={[
-            'rounded-lg px-4 py-1.5 text-xs font-medium transition-all',
-            saved
-              ? 'bg-green-500 text-white'
-              : saving || !content.trim()
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 text-white hover:bg-blue-600',
-          ].join(' ')}
-        >
-          {saved ? 'Saved!' : saving ? 'Saving…' : 'Save note'}
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <VoiceButton onTranscript={handleTranscript} size="sm" />
+          <button
+            onClick={handleSave}
+            disabled={saving || !content.trim()}
+            className={[
+              'rounded-lg px-4 py-1.5 text-xs font-medium transition-all',
+              saved
+                ? 'bg-green-500 text-white'
+                : saving || !content.trim()
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600',
+            ].join(' ')}
+          >
+            {saved ? 'Saved!' : saving ? 'Saving…' : 'Save note'}
+          </button>
+        </div>
       </div>
     </div>
   )
