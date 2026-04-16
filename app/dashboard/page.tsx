@@ -56,7 +56,7 @@ function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
 
   if (targetH === 0) {
     return (
-      <div className="bg-card border border-border rounded-xl p-5 h-full flex flex-col items-center justify-center gap-3 text-center">
+      <div className="bg-card border border-border rounded-[20px] p-5 h-full flex flex-col items-center justify-center gap-3 text-center">
         <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
           <i className="ki-filled ki-calendar text-orange-400 text-xl" />
         </div>
@@ -72,7 +72,7 @@ function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 h-full">
+    <div className="bg-card border border-border rounded-[20px] p-5 h-full">
       <div className="flex items-start gap-5">
 
         {/* ── Ring ── */}
@@ -431,7 +431,7 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
   loading: boolean
 }) {
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden h-full flex flex-col">
+    <div className="bg-card border border-border rounded-[20px] overflow-hidden h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
         <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
@@ -635,23 +635,96 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   return (
     <div className="flex flex-col gap-6 pf-enter">
 
-      {/* ── Compact profile header ── */}
-      <div className="bg-card border border-border rounded-xl px-5 py-4 flex items-center gap-4">
-        <HeroAvatar
-          avatarUrl={profile?.avatar_url ?? null}
-          name={name}
-          userId={userId}
-          onAvatarUpdate={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
-        />
-        <div>
-          <h2 className="text-xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
-          {profile?.nickname
-            ? <p className="text-sm text-muted-foreground mt-0.5">@{profile.nickname}</p>
-            : <p className="text-xs text-muted-foreground/40 mt-0.5 italic">никнейм не задан</p>
-          }
-          {profile && (
-            <SocialIcons data={profile} onEdit={() => setShowSocialEdit(true)} />
-          )}
+      {/* ── Hero ── */}
+      <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
+        {/* Gradient banner */}
+        <div style={{
+          background: 'linear-gradient(135deg,#FFF7ED 0%,#FFFBF5 60%,#F0F9FF 100%)',
+          padding: '28px 32px',
+          borderBottom: '1px solid var(--border)',
+        }}>
+          <div className="flex flex-wrap items-start justify-between gap-6">
+
+            {/* Left: profile */}
+            <div className="flex items-center gap-4">
+              <HeroAvatar
+                avatarUrl={profile?.avatar_url ?? null}
+                name={name}
+                userId={userId}
+                onAvatarUpdate={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
+              />
+              <div>
+                <p style={{ fontSize:10, fontWeight:800, color:'#F97316', textTransform:'uppercase', letterSpacing:'0.22em', marginBottom:4 }}>
+                  Профиль атлета
+                </p>
+                <h2 className="text-2xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
+                {profile?.nickname
+                  ? <p className="text-sm text-muted-foreground mt-0.5">@{profile.nickname}</p>
+                  : <p className="text-xs text-muted-foreground/40 mt-0.5 italic">никнейм не задан</p>
+                }
+                {profile && <SocialIcons data={profile} onEdit={() => setShowSocialEdit(true)} />}
+              </div>
+            </div>
+
+            {/* Right: stat chips */}
+            <div className="flex flex-wrap items-center gap-3">
+              {[
+                {
+                  label: 'Тренировок\nза неделю',
+                  value: String(weeklyCount),
+                  icon: 'ki-abstract-26',
+                  color: '#F97316',
+                  bg: '#FFF7ED',
+                },
+                {
+                  label: 'Часов\nза неделю',
+                  value: actualHours > 0
+                    ? (actualHours % 1 === 0 ? actualHours.toFixed(0) : actualHours.toFixed(1)) + ' ч'
+                    : '0 ч',
+                  icon: 'ki-time',
+                  color: '#2563EB',
+                  bg: '#EFF6FF',
+                },
+                {
+                  label: 'Цель\nна неделю',
+                  value: targetHours > 0 ? targetHours + ' ч' : 'Не задана',
+                  icon: 'ki-medal-star',
+                  color: '#16A34A',
+                  bg: '#F0FDF4',
+                },
+              ].map(s => (
+                <div
+                  key={s.label}
+                  className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-border min-w-[90px] text-center"
+                  style={{ background: s.bg + 'cc' }}
+                >
+                  <div
+                    className="w-8 h-8 rounded-xl flex items-center justify-center"
+                    style={{ background: s.bg }}
+                  >
+                    <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
+                  </div>
+                  <span className="pf-num text-xl font-black text-foreground leading-none">{s.value}</span>
+                  <span style={{ fontSize:9, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.3, whiteSpace:'pre-line', textAlign:'center' }}>
+                    {s.label}
+                  </span>
+                </div>
+              ))}
+              <a
+                href="/settings"
+                className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-dashed border-border hover:border-orange-300 hover:bg-orange-50/60 transition-all min-w-[90px] text-center"
+              >
+                <div className="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center">
+                  <i className="ki-filled ki-setting-2 text-sm text-muted-foreground" />
+                </div>
+                <span className="pf-num text-sm font-bold text-muted-foreground">Настройки</span>
+                <span style={{ fontSize:9, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.3 }}>
+                  профиль
+                </span>
+              </a>
+            </div>
+
+          </div>
         </div>
       </div>
 
