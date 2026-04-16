@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import dynamic from 'next/dynamic'
@@ -17,14 +17,16 @@ function sb() {
   )
 }
 
-function getActivityIcon(type: string | null): string {
-  const t = (type ?? '').toLowerCase()
-  if (t.includes('run')  || t.includes('бег'))                       return 'ki-geolocation'
-  if (t.includes('swim') || t.includes('плав'))                      return 'ki-abstract-26'
-  if (t.includes('cycl') || t.includes('велос') || t.includes('bike')) return 'ki-abstract-31'
-  if (t.includes('strength') || t.includes('силов') || t.includes('gym')) return 'ki-abstract-14'
-  return 'ki-abstract-26'
+const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
+  'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
+  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C' },
+  'Плавание':  { icon: 'ki-abstract-14',  bg: '#E0F2FE', border: '#7DD3FC', text: '#0284C7' },
+  'Силовые':   { icon: 'ki-abstract-45',  bg: '#FAF5FF', border: '#E9D5FF', text: '#9333EA' },
+  'Ходьба':    { icon: 'ki-map',          bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
+  'Другое':    { icon: 'ki-calendar',     bg: '#F8FAFC', border: '#E2E8F0', text: '#64748B' },
 }
+const DEFAULT_AC = ACTIVITY_CONFIG['Другое']
+function getAC(type: string | null) { return ACTIVITY_CONFIG[type ?? ''] ?? DEFAULT_AC }
 
 // ── WEEKLY PLAN CARD ──────────────────────────────────────────────────────────
 function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
@@ -52,8 +54,25 @@ function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
   const circ = 2 * Math.PI * r
   const dash = (pct / 100) * circ
 
+  if (targetH === 0) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-5 h-full flex flex-col items-center justify-center gap-3 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
+          <i className="ki-filled ki-calendar text-orange-400 text-xl" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">Цель на неделю не задана</p>
+          <p className="text-xs text-muted-foreground mt-1">Укажите недельный объём тренировок в настройках</p>
+        </div>
+        <a href="/settings" className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+          Настроить цель →
+        </a>
+      </div>
+    )
+  }
+
   return (
-    <div className="bg-card border border-border rounded-xl p-5 h-full">
+    <div className="bg-card border border-border rounded-2xl p-5 h-full">
       <div className="flex items-start gap-5">
 
         {/* ── Ring ── */}
@@ -96,13 +115,13 @@ function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg border border-border px-3 py-2">
+            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
               <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Осталось</p>
               <p className="pf-num text-base font-bold text-foreground">
                 {remaining % 1 === 0 ? remaining.toFixed(0) : remaining.toFixed(1)} ч
               </p>
             </div>
-            <div className="rounded-lg border border-border px-3 py-2">
+            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
               <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Учтено тренировок</p>
               <p className="pf-num text-base font-bold text-foreground">{workoutsCount}</p>
             </div>
@@ -415,7 +434,7 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
     <div className="bg-card border border-border rounded-xl overflow-hidden h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-        <h3 className="text-sm font-semibold text-foreground">Тренировки</h3>
+        <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
         <div className="flex items-center gap-3">
           <Link href="/diary"    className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Дневник</Link>
           <Link href="/calendar" className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Календарь</Link>
@@ -453,8 +472,8 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
                   href="/diary"
                   className="flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
-                    <i className={`ki-filled ${getActivityIcon(w.activity_type)} text-orange-500 text-xs`} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(w.activity_type).bg }}>
+                    <i className={`ki-filled ${getAC(w.activity_type).icon} text-xs`} style={{ color: getAC(w.activity_type).text }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-foreground truncate">
@@ -495,8 +514,8 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
                   href="/calendar"
                   className="flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer last:pb-4"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                    <i className={`ki-filled ${getActivityIcon(ev.activity_type)} text-blue-500 text-xs`} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(ev.activity_type).bg }}>
+                    <i className={`ki-filled ${getAC(ev.activity_type).icon} text-xs`} style={{ color: getAC(ev.activity_type).text }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-foreground truncate">{ev.title}</div>
@@ -538,23 +557,40 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const [loading, setLoading]               = useState(true)
   const [showSocialEdit, setShowSocialEdit] = useState(false)
 
+  const loadWeekly = useCallback(async () => {
+    const today = new Date()
+    const dow = (today.getDay() + 6) % 7
+    const monday = new Date(today)
+    monday.setDate(today.getDate() - dow)
+    monday.setHours(0, 0, 0, 0)
+    const mondayStr = monday.toISOString().split('T')[0]
+    const todayStr = today.toISOString().split('T')[0]
+    const { data: weekData } = await sb()
+      .from('workouts')
+      .select('activity_duration_min')
+      .eq('athlete_id', userId)
+      .gte('event_date', mondayStr)
+      .lte('event_date', todayStr)
+    const week = weekData ?? []
+    setWeeklyMinutes(week.reduce((s, w) => s + (w.activity_duration_min ?? 0), 0))
+    setWeeklyCount(week.filter(w => (w.activity_duration_min ?? 0) > 0).length)
+  }, [userId])
+
+  useEffect(() => {
+    const handler = () => loadWeekly()
+    window.addEventListener('proform:workout-added', handler)
+    return () => window.removeEventListener('proform:workout-added', handler)
+  }, [loadWeekly])
+
   useEffect(() => {
     async function load() {
       const today    = new Date()
       const todayStr = today.toISOString().split('T')[0]
 
-      // Monday of the current week (Mon-based)
-      const dow    = (today.getDay() + 6) % 7
-      const monday = new Date(today)
-      monday.setDate(today.getDate() - dow)
-      monday.setHours(0, 0, 0, 0)
-      const mondayStr = monday.toISOString().split('T')[0]
-
       const [
         { data: userData },
         { data: athData },
         { data: pastData },
-        { data: weekData },
         { data: upcomingData },
       ] = await Promise.all([
         sb().from('users').select('nickname').eq('id', userId).single(),
@@ -567,11 +603,6 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
           .lt('event_date', todayStr)
           .order('event_date', { ascending: false })
           .limit(2),
-        sb().from('workouts')
-          .select('activity_duration_min')
-          .eq('athlete_id', userId)
-          .gte('event_date', mondayStr)
-          .lte('event_date', todayStr),
         sb().from('calendar_events')
           .select('id, title, event_date, start_time, activity_type')
           .eq('owner_id', userId)
@@ -591,25 +622,21 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         weekly_training_hours: athData?.weekly_training_hours ?? null,
       })
       setPastWorkouts((pastData ?? []) as Workout[])
-
-      const week = weekData ?? []
-      setWeeklyMinutes(week.reduce((s, w) => s + (w.activity_duration_min ?? 0), 0))
-      setWeeklyCount(week.filter(w => (w.activity_duration_min ?? 0) > 0).length)
-
+      await loadWeekly()
       setUpcomingEvents((upcomingData ?? []) as UpcomingEvent[])
       setLoading(false)
     }
     load()
-  }, [userId])
+  }, [userId, loadWeekly])
 
-  const targetHours = profile?.weekly_training_hours ?? 10
+  const targetHours = profile?.weekly_training_hours ?? 0
   const actualHours = weeklyMinutes / 60
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
 
       {/* ── Compact profile header ── */}
-      <div className="flex items-center gap-4">
+      <div className="bg-card border border-border rounded-xl px-5 py-4 flex items-center gap-4">
         <HeroAvatar
           avatarUrl={profile?.avatar_url ?? null}
           name={name}

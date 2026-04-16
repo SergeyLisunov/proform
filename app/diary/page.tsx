@@ -1234,11 +1234,13 @@ function AthleteDiary() {
 
   function handleCreated(w: Workout) {
     setWorkouts(prev => [w, ...prev])
+    window.dispatchEvent(new CustomEvent('proform:workout-added'))
     setShowDrawer(false)
     setToast(true); setTimeout(() => setToast(false), 3000)
   }
   function handleUpdated(updated: Workout) {
     setWorkouts(prev => prev.map(w => w.id === updated.id ? updated : w))
+    window.dispatchEvent(new CustomEvent('proform:workout-added'))
     setSelectedWorkout(updated)
     setToast(true); setTimeout(() => setToast(false), 3000)
   }
