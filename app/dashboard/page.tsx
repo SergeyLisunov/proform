@@ -632,6 +632,10 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const targetHours = profile?.weekly_training_hours ?? 0
   const actualHours = weeklyMinutes / 60
 
+  const weekPct = targetHours > 0 ? Math.min(100, Math.round((actualHours / targetHours) * 100)) : 0
+  const weekRingColor = weekPct === 0 ? '#9CA3AF' : weekPct < 50 ? '#DC2626' : weekPct < 80 ? '#F97316' : weekPct < 100 ? '#2563EB' : '#16A34A'
+  const weekRingBg = weekPct === 0 ? '#F9FAFB' : weekPct < 50 ? '#FFF1F2' : weekPct < 80 ? '#FFF7ED' : weekPct < 100 ? '#EFF6FF' : '#F0FDF4'
+
   return (
     <div className="flex flex-col gap-6 pf-enter">
 
@@ -710,18 +714,38 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                   </span>
                 </div>
               ))}
-              <a
-                href="/settings"
-                className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-dashed border-border hover:border-orange-300 hover:bg-orange-50/60 transition-all min-w-[90px] text-center"
-              >
-                <div className="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center">
-                  <i className="ki-filled ki-setting-2 text-sm text-muted-foreground" />
-                </div>
-                <span className="pf-num text-sm font-bold text-muted-foreground">Настройки</span>
-                <span style={{ fontSize:9, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.3 }}>
-                  профиль
-                </span>
-              </a>
+              {/* Mini progress ring chip */}
+              {(() => {
+                const size = 52
+                const r = 20
+                const circ = 2 * Math.PI * r
+                const dash = (weekPct / 100) * circ
+                return (
+                  <div
+                    className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-border min-w-[90px] text-center"
+                    style={{ background: weekRingBg }}
+                  >
+                    <div style={{ position: 'relative', width: size, height: size }}>
+                      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#F2F2F3" strokeWidth={5} />
+                        <circle
+                          cx={size/2} cy={size/2} r={r} fill="none"
+                          stroke={weekRingColor} strokeWidth={5}
+                          strokeDasharray={`${dash} ${circ - dash}`}
+                          strokeLinecap="round"
+                          style={{ transition: 'stroke-dasharray .6s ease, stroke .4s' }}
+                        />
+                      </svg>
+                      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <span className="pf-num" style={{ fontSize:11, fontWeight:900, color:weekRingColor, lineHeight:1 }}>{weekPct}%</span>
+                      </div>
+                    </div>
+                    <span style={{ fontSize:9, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.3, whiteSpace:'pre-line', textAlign:'center' }}>
+                      {'ПРОГРЕСС\nНЕДЕЛИ'}
+                    </span>
+                  </div>
+                )
+              })()}
             </div>
 
           </div>
