@@ -26,39 +26,93 @@ function getActivityIcon(type: string | null): string {
   return 'ki-abstract-26'
 }
 
-// ── WEEKLY RING ───────────────────────────────────────────────────────────────
-function WeeklyRing({ actualH, targetH, size = 96 }: { actualH: number; targetH: number; size?: number }) {
-  const r     = (size / 2) * 0.76
-  const circ  = 2 * Math.PI * r
-  const pct   = targetH > 0 ? Math.min(1, actualH / targetH) : 0
-  const dash  = pct * circ
-  const color = pct >= 1 ? '#16A34A' : pct >= 0.5 ? '#F97316' : '#3B82F6'
+// ── WEEKLY PLAN CARD ──────────────────────────────────────────────────────────
+function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
+  actualH: number
+  targetH: number
+  workoutsCount: number
+}) {
+  const pct       = targetH > 0 ? Math.min(100, Math.round((actualH / targetH) * 100)) : 0
+  const remaining = Math.max(0, targetH - actualH)
+
+  const color = pct === 0   ? '#9CA3AF'
+    : pct < 50  ? '#DC2626'
+    : pct < 80  ? '#F97316'
+    : pct < 100 ? '#2563EB'
+    : '#16A34A'
+
+  const statusLabel = pct === 0   ? 'НЕТ ДАННЫХ'
+    : pct < 50  ? 'ЕСТЬ ПРОГРЕСС'
+    : pct < 80  ? 'ХОРОШИЙ ТЕМП'
+    : pct < 100 ? 'ПОЧТИ ГОТОВО'
+    : 'ЦЕЛЬ ДОСТИГНУТА!'
+
+  const size = 104
+  const r    = (size / 2) * 0.76
+  const circ = 2 * Math.PI * r
+  const dash = (pct / 100) * circ
 
   return (
-    <div className="flex flex-col items-center gap-1.5 shrink-0">
-      <div style={{ position: 'relative', width: size, height: size }}>
-        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F2F2F3" strokeWidth={size * 0.08} />
-          <circle
-            cx={size / 2} cy={size / 2} r={r} fill="none"
-            stroke={color} strokeWidth={size * 0.08}
-            strokeDasharray={`${dash} ${circ - dash}`}
-            strokeLinecap="round"
-            style={{ transition: 'stroke-dasharray .6s ease, stroke .4s' }}
-          />
-        </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <span className="pf-num" style={{ fontSize: size * 0.23, color, lineHeight: 1 }}>
-            {actualH < 10 ? actualH.toFixed(1) : Math.round(actualH)}
-          </span>
-          <span style={{ fontSize: size * 0.115, color: '#ADADB3', letterSpacing: '0.03em', marginTop: 1 }}>
-            /{targetH}ч
+    <div className="bg-card border border-border rounded-xl p-5 h-full">
+      <div className="flex items-start gap-5">
+
+        {/* ── Ring ── */}
+        <div className="flex flex-col items-center gap-2 shrink-0">
+          <div style={{ position: 'relative', width: size, height: size }}>
+            <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#F2F2F3" strokeWidth={size * 0.085} />
+              <circle
+                cx={size/2} cy={size/2} r={r} fill="none"
+                stroke={color} strokeWidth={size * 0.085}
+                strokeDasharray={`${dash} ${circ - dash}`}
+                strokeLinecap="round"
+                style={{ transition: 'stroke-dasharray .6s ease, stroke .4s' }}
+              />
+            </svg>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <span className="pf-num" style={{ fontSize: size * 0.28, color, lineHeight: 1 }}>{pct}</span>
+              <span style={{ fontSize: size * 0.13, color: '#ADADB3', letterSpacing: '0.04em', marginTop: 1 }}>%</span>
+            </div>
+          </div>
+          <span style={{ fontSize: 9, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', maxWidth: size }}>
+            {statusLabel}
           </span>
         </div>
+
+        {/* ── Details ── */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+            План недели
+          </p>
+          <p className="pf-num text-[28px] font-black text-foreground leading-none mb-1">
+            {actualH % 1 === 0 ? actualH.toFixed(0) : actualH.toFixed(1)} / {targetH} ч
+          </p>
+          <p className="text-sm text-muted-foreground mb-3">
+            {pct >= 100
+              ? 'Недельная цель выполнена! 🎉'
+              : `Осталось ${remaining % 1 === 0 ? remaining.toFixed(0) : remaining.toFixed(1)} ч до недельной цели.`
+            }
+          </p>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-border px-3 py-2">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Осталось</p>
+              <p className="pf-num text-base font-bold text-foreground">
+                {remaining % 1 === 0 ? remaining.toFixed(0) : remaining.toFixed(1)} ч
+              </p>
+            </div>
+            <div className="rounded-lg border border-border px-3 py-2">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Учтено тренировок</p>
+              <p className="pf-num text-base font-bold text-foreground">{workoutsCount}</p>
+            </div>
+          </div>
+
+          <p className="text-[10px] text-muted-foreground/50 mt-3 leading-relaxed">
+            В прогресс недели попадают только тренировки текущей недели, у которых указана длительность.
+          </p>
+        </div>
       </div>
-      <span style={{ fontSize: 9, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-        {pct >= 1 ? 'Цель!' : 'ч / нед'}
-      </span>
     </div>
   )
 }
@@ -469,20 +523,21 @@ type AthleteProfile = SocialData & {
 
 // ── ATHLETE DASHBOARD ─────────────────────────────────────────────────────────
 function AthleteDash({ userId, name }: { userId: string; name: string }) {
-  const [profile, setProfile]         = useState<AthleteProfile | null>(null)
-  const [pastWorkouts, setPastWorkouts]   = useState<Workout[]>([])
+  const [profile, setProfile]               = useState<AthleteProfile | null>(null)
+  const [pastWorkouts, setPastWorkouts]     = useState<Workout[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
   const [weeklyMinutes, setWeeklyMinutes]   = useState(0)
-  const [loading, setLoading]         = useState(true)
+  const [weeklyCount, setWeeklyCount]       = useState(0)
+  const [loading, setLoading]               = useState(true)
   const [showSocialEdit, setShowSocialEdit] = useState(false)
 
   useEffect(() => {
     async function load() {
-      const today  = new Date()
+      const today    = new Date()
       const todayStr = today.toISOString().split('T')[0]
 
       // Monday of the current week (Mon-based)
-      const dow    = (today.getDay() + 6) % 7   // 0 = Mon
+      const dow    = (today.getDay() + 6) % 7
       const monday = new Date(today)
       monday.setDate(today.getDate() - dow)
       monday.setHours(0, 0, 0, 0)
@@ -495,26 +550,21 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         { data: weekData },
         { data: upcomingData },
       ] = await Promise.all([
-        // nickname
         sb().from('users').select('nickname').eq('id', userId).single(),
-        // avatar + social + goal hours
         sb().from('athletes')
           .select('avatar_url, instagram_url, telegram_url, youtube_url, tiktok_url, weekly_training_hours')
           .eq('id', userId).maybeSingle(),
-        // last 2 completed workouts (strictly before today)
         sb().from('workouts')
           .select('id, name, activity_type, event_date, activity_duration_min, activity_strain')
           .eq('athlete_id', userId)
           .lt('event_date', todayStr)
           .order('event_date', { ascending: false })
           .limit(2),
-        // this-week workouts for hours ring
         sb().from('workouts')
           .select('activity_duration_min')
           .eq('athlete_id', userId)
           .gte('event_date', mondayStr)
           .lte('event_date', todayStr),
-        // next 3 calendar events (today included = upcoming / today → предстоящие per spec)
         sb().from('calendar_events')
           .select('id, title, event_date, start_time, activity_type')
           .eq('owner_id', userId)
@@ -533,8 +583,12 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         tiktok_url:            athData?.tiktok_url            ?? null,
         weekly_training_hours: athData?.weekly_training_hours ?? null,
       })
-      setPastWorkouts((pastData     ?? []) as Workout[])
-      setWeeklyMinutes((weekData ?? []).reduce((s, w) => s + (w.activity_duration_min ?? 0), 0))
+      setPastWorkouts((pastData ?? []) as Workout[])
+
+      const week = weekData ?? []
+      setWeeklyMinutes(week.reduce((s, w) => s + (w.activity_duration_min ?? 0), 0))
+      setWeeklyCount(week.filter(w => (w.activity_duration_min ?? 0) > 0).length)
+
       setUpcomingEvents((upcomingData ?? []) as UpcomingEvent[])
       setLoading(false)
     }
@@ -548,48 +602,45 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
     <div className="flex flex-col gap-6 pf-enter">
 
       {/* ── Compact profile header ── */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-
-        {/* Left: avatar + name + nickname + socials */}
-        <div className="flex items-center gap-4">
-          <HeroAvatar
-            avatarUrl={profile?.avatar_url ?? null}
-            name={name}
-            userId={userId}
-            onAvatarUpdate={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
-          />
-          <div>
-            <h2 className="text-xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
-            {profile?.nickname
-              ? <p className="text-sm text-muted-foreground mt-0.5">@{profile.nickname}</p>
-              : <p className="text-sm text-muted-foreground/40 mt-0.5 italic text-xs">никнейм не задан</p>
-            }
-            {profile && (
-              <SocialIcons
-                data={profile}
-                onEdit={() => setShowSocialEdit(true)}
-              />
-            )}
-          </div>
+      <div className="flex items-center gap-4">
+        <HeroAvatar
+          avatarUrl={profile?.avatar_url ?? null}
+          name={name}
+          userId={userId}
+          onAvatarUpdate={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
+        />
+        <div>
+          <h2 className="text-xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
+          {profile?.nickname
+            ? <p className="text-sm text-muted-foreground mt-0.5">@{profile.nickname}</p>
+            : <p className="text-xs text-muted-foreground/40 mt-0.5 italic">никнейм не задан</p>
+          }
+          {profile && (
+            <SocialIcons data={profile} onEdit={() => setShowSocialEdit(true)} />
+          )}
         </div>
-
-        {/* Right: weekly hours ring */}
-        <WeeklyRing actualH={actualHours} targetH={targetHours} size={96} />
       </div>
 
-      {/* ── Grid: Training widget (2/3) + Quick Note (1/3) ── */}
+      {/* ── Row 1: Weekly Plan (2/3) + Quick Note (1/3) ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2">
-          <TrainingWidget
-            pastWorkouts={pastWorkouts}
-            upcomingEvents={upcomingEvents}
-            loading={loading}
+          <WeeklyPlanCard
+            actualH={actualHours}
+            targetH={targetHours}
+            workoutsCount={weeklyCount}
           />
         </div>
         <div>
           <QuickNoteWidget userId={userId} />
         </div>
       </div>
+
+      {/* ── Row 2: Training widget (full width) ── */}
+      <TrainingWidget
+        pastWorkouts={pastWorkouts}
+        upcomingEvents={upcomingEvents}
+        loading={loading}
+      />
 
       {/* Social edit modal */}
       {showSocialEdit && profile && (
