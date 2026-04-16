@@ -125,6 +125,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
     setError(null)
     const picked = Array.from(fileList).slice(0, remaining)
     const newFiles: PendingFile[] = []
+    const paired: { file: File; tempId: string }[] = []
 
     for (const file of picked) {
       const attachType = ALLOWED_TYPES[file.type]
@@ -134,20 +135,19 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
         setError(`Файл слишком большой: ${file.name} (макс. ${attachType === 'image' ? '10' : '20'} МБ)`)
         continue
       }
+      const tempId = `${Date.now()}-${Math.random()}`
       newFiles.push({
-        tempId: `${Date.now()}-${Math.random()}`,
+        tempId,
         name: file.name, size: file.size,
         mimeType: file.type, attachType,
         localUrl: URL.createObjectURL(file),
         uploading: true,
       })
+      paired.push({ file, tempId })
     }
 
     setFiles(prev => [...prev, ...newFiles])
-    // upload each
-    for (let i = 0; i < newFiles.length; i++) {
-      await uploadFile(picked[i], newFiles[i].tempId)
-    }
+    await Promise.all(paired.map(p => uploadFile(p.file, p.tempId)))
   }, [files.length, uploadFile])
 
   const removeFile = useCallback((tempId: string) => {

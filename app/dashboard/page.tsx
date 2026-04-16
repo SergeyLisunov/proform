@@ -418,7 +418,14 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
         <h3 className="text-sm font-semibold text-foreground">Тренировки</h3>
         <div className="flex items-center gap-3">
           <Link href="/diary"    className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Дневник</Link>
-          <Link href="/calendar" className="text-2xs font-semibold text-orange-500 hover:text-orange-600 transition-colors">Календарь →</Link>
+          <Link href="/calendar" className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Календарь</Link>
+          <Link
+            href="/diary"
+            className="flex items-center gap-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 text-2xs font-semibold transition-colors"
+          >
+            <i className="ki-filled ki-plus text-[11px]" />
+            Тренировка
+          </Link>
         </div>
       </div>
 

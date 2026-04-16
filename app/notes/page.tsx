@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import NoteEditor from '@/components/ui/NoteEditor'
-import type { Note } from '@/services/notes.service'
+import type { Note, NoteAttachment } from '@/services/notes.service'
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -27,6 +27,7 @@ export default function NotesPage() {
   const [editContent, setEditContent] = useState('')
   const [editTitle, setEditTitle] = useState('')
   const [editDate, setEditDate] = useState(todayISO())
+  const [editAttachments, setEditAttachments] = useState<NoteAttachment[]>([])
   const [saving, setSaving] = useState(false)
   const [isNew, setIsNew] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -68,6 +69,7 @@ export default function NotesPage() {
     setEditContent(note.content)
     setEditTitle(note.title ?? '')
     setEditDate(note.note_date)
+    setEditAttachments(note.attachments ?? [])
     setIsNew(false)
     setDeleteConfirm(false)
   }
@@ -77,6 +79,7 @@ export default function NotesPage() {
     setEditContent('')
     setEditTitle('')
     setEditDate(todayISO())
+    setEditAttachments([])
     setIsNew(true)
     setDeleteConfirm(false)
   }
@@ -109,6 +112,7 @@ export default function NotesPage() {
             content: editContent.trim(),
             title: editTitle.trim() || null,
             note_date: editDate,
+            attachments: editAttachments.length ? editAttachments : [],
           }),
         })
         const json = await res.json()
@@ -213,7 +217,15 @@ export default function NotesPage() {
                       <p className={`text-sm font-medium truncate flex-1 ${active ? 'text-orange-600' : 'text-foreground'}`}>
                         {note.title || note.content.slice(0, 40) || 'Без названия'}
                       </p>
-                      {active && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0 mt-1.5" />}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {(note.attachments?.length ?? 0) > 0 && (
+                          <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground/60">
+                            <i className="ki-filled ki-paper-clip text-[10px]" />
+                            {note.attachments!.length}
+                          </span>
+                        )}
+                        {active && <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />}
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5 truncate">
                       {note.content.slice(0, 60)}
@@ -255,6 +267,51 @@ export default function NotesPage() {
                   placeholder="Напишите заметку… (математические выражения вычисляются автоматически)"
                   minRows={12}
                 />
+
+                {/* Attachments */}
+                {editAttachments.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground mb-2">
+                      Вложения · {editAttachments.length}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {editAttachments.map((att, i) =>
+                        att.type === 'image' ? (
+                          <a
+                            key={i}
+                            href={att.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/30 hover:opacity-90 transition-opacity"
+                            title={att.name}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={att.url} alt={att.name} className="w-full h-full object-cover" />
+                          </a>
+                        ) : (
+                          <a
+                            key={i}
+                            href={att.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px] hover:border-orange-300 hover:bg-orange-50 transition-colors no-underline"
+                            title={att.name}
+                          >
+                            <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                            <div className="min-w-0">
+                              <div className="text-[11px] text-foreground truncate">{att.name}</div>
+                              <div className="text-[10px] text-muted-foreground">
+                                {att.size < 1024 * 1024
+                                  ? `${(att.size / 1024).toFixed(0)} КБ`
+                                  : `${(att.size / 1024 / 1024).toFixed(1)} МБ`}
+                              </div>
+                            </div>
+                          </a>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Footer actions */}

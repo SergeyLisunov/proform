@@ -48,6 +48,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     payload.content = body.content.trim()
   }
   if (body.note_date !== undefined) payload.note_date = body.note_date
+  if (body.attachments !== undefined) payload.attachments = body.attachments
 
   if (Object.keys(payload).length === 0)
     return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
