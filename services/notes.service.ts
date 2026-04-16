@@ -1,11 +1,20 @@
 import { createClient } from '@/lib/supabase/client'
 
+export interface NoteAttachment {
+  name: string
+  url: string
+  type: 'image' | 'document'
+  size: number
+  mimeType: string
+}
+
 export interface Note {
   id: string
   user_id: string
   note_date: string
   title: string | null
   content: string
+  attachments: NoteAttachment[]
   is_deleted: boolean
   created_at: string
   updated_at: string
@@ -15,12 +24,14 @@ export interface CreateNoteInput {
   note_date?: string
   title?: string | null
   content: string
+  attachments?: NoteAttachment[]
 }
 
 export interface UpdateNoteInput {
   title?: string | null
   content?: string
   note_date?: string
+  attachments?: NoteAttachment[]
 }
 
 function todayISO(): string {
@@ -78,10 +89,11 @@ export async function createNote(userId: string, input: CreateNoteInput): Promis
   const { data, error } = await createClient()
     .from('notes')
     .insert({
-      user_id:   userId,
-      note_date: input.note_date ?? todayISO(),
-      title:     input.title ?? null,
-      content:   input.content,
+      user_id:     userId,
+      note_date:   input.note_date ?? todayISO(),
+      title:       input.title ?? null,
+      content:     input.content,
+      attachments: input.attachments ?? [],
     })
     .select()
     .single()
@@ -91,9 +103,10 @@ export async function createNote(userId: string, input: CreateNoteInput): Promis
 
 export async function updateNote(id: string, input: UpdateNoteInput): Promise<Note | null> {
   const payload: Record<string, unknown> = {}
-  if (input.title !== undefined) payload.title = input.title
-  if (input.content !== undefined) payload.content = input.content
-  if (input.note_date !== undefined) payload.note_date = input.note_date
+  if (input.title !== undefined)       payload.title = input.title
+  if (input.content !== undefined)     payload.content = input.content
+  if (input.note_date !== undefined)   payload.note_date = input.note_date
+  if (input.attachments !== undefined) payload.attachments = input.attachments
 
   const { data, error } = await createClient()
     .from('notes')

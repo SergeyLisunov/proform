@@ -51,25 +51,32 @@ export async function POST(req: NextRequest) {
   if (!me) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
   const body = await req.json()
-  const { content, title, note_date } = body
+  const { content, title, note_date, attachments } = body
 
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
-    return NextResponse.json({ error: 'content is required' }, { status: 400 })
+  // Allow saving note with only attachments (empty content ok if attachments present)
+  const hasContent = content && typeof content === 'string' && content.trim().length > 0
+  const hasAttachments = Array.isArray(attachments) && attachments.length > 0
+  if (!hasContent && !hasAttachments) {
+    return NextResponse.json({ error: 'Заметка должна содержать текст или вложения' }, { status: 400 })
   }
-  if (content.length > 50000) {
-    return NextResponse.json({ error: 'content too long (max 50000 chars)' }, { status: 400 })
+  if (content && content.length > 50000) {
+    return NextResponse.json({ error: 'Текст слишком длинный (макс. 50000 символов)' }, { status: 400 })
   }
   if (title && title.length > 255) {
-    return NextResponse.json({ error: 'title too long (max 255 chars)' }, { status: 400 })
+    return NextResponse.json({ error: 'Название слишком длинное (макс. 255 символов)' }, { status: 400 })
+  }
+  if (hasAttachments && attachments.length > 5) {
+    return NextResponse.json({ error: 'Максимум 5 вложений' }, { status: 400 })
   }
 
   const { data, error } = await supabase
     .from('notes')
     .insert({
-      user_id:   me.id,
-      note_date: note_date ?? todayISO(),
-      title:     title ?? null,
-      content:   content.trim(),
+      user_id:     me.id,
+      note_date:   note_date ?? todayISO(),
+      title:       title ?? null,
+      content:     hasContent ? content.trim() : '',
+      attachments: hasAttachments ? attachments : [],
     })
     .select()
     .single()
