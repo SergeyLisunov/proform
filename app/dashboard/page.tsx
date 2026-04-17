@@ -6,6 +6,11 @@ import dynamic from 'next/dynamic'
 import type { Workout } from '@/services/workouts.service'
 import { recoveryColor } from '@/lib/utils/data'
 import { createBrowserClient } from '@supabase/ssr'
+import {
+  WorkoutAddDrawer,
+  WorkoutEditDrawer,
+  CalendarEventEditDrawer,
+} from '@/components/workout/WorkoutDrawers'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -318,27 +323,21 @@ function fmtFutureDate(dateStr: string): string {
 }
 
 // ── TRAINING WIDGET ───────────────────────────────────────────────────────────
-function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
+function TrainingWidget({
+  pastWorkouts, upcomingEvents, loading, onOpenWorkout, onOpenEvent, onPlan,
+}: {
   pastWorkouts: Workout[]
   upcomingEvents: UpcomingEvent[]
   loading: boolean
+  onOpenWorkout: (w: Workout) => void
+  onOpenEvent:   (ev: UpcomingEvent) => void
+  onPlan:        () => void
 }) {
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden h-full flex flex-col">
-      {/* Header */}
+      {/* Header — без ссылок и кнопки */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
         <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
-        <div className="flex items-center gap-3">
-          <Link href="/diary"    className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Дневник</Link>
-          <Link href="/calendar" className="text-2xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors">Календарь</Link>
-          <Link
-            href="/diary"
-            className="flex items-center gap-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 text-2xs font-semibold transition-colors"
-          >
-            <i className="ki-filled ki-plus text-[11px]" />
-            Тренировка
-          </Link>
-        </div>
       </div>
 
       {loading ? (
@@ -360,10 +359,11 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
           ) : (
             <div className="divide-y divide-border/50">
               {pastWorkouts.map(w => (
-                <Link
+                <button
                   key={w.id}
-                  href="/diary"
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
+                  type="button"
+                  onClick={() => onOpenWorkout(w)}
+                  className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(w.activity_type).bg }}>
                     <i className={`ki-filled ${getAC(w.activity_type).icon} text-xs`} style={{ color: getAC(w.activity_type).text }} />
@@ -382,7 +382,7 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
                       <div className="text-2xs text-muted-foreground">strain {w.activity_strain.toFixed(1)}</div>
                     )}
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           )}
@@ -397,15 +397,18 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
           {upcomingEvents.length === 0 ? (
             <p className="px-5 pb-4 text-2xs text-muted-foreground">
               Нет запланированных тренировок ·{' '}
-              <Link href="/calendar" className="text-orange-500 hover:underline">Запланировать</Link>
+              <button onClick={onPlan} className="text-orange-500 hover:underline bg-transparent border-0 p-0 font-semibold cursor-pointer">
+                Запланировать
+              </button>
             </p>
           ) : (
             <div className="divide-y divide-border/50">
               {upcomingEvents.map(ev => (
-                <Link
+                <button
                   key={ev.id}
-                  href="/calendar"
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer last:pb-4"
+                  type="button"
+                  onClick={() => onOpenEvent(ev)}
+                  className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer last:pb-4"
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(ev.activity_type).bg }}>
                     <i className={`ki-filled ${getAC(ev.activity_type).icon} text-xs`} style={{ color: getAC(ev.activity_type).text }} />
@@ -422,7 +425,7 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
                       <div className="text-2xs text-muted-foreground">{ev.start_time.slice(0, 5)}</div>
                     )}
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           )}
@@ -430,6 +433,53 @@ function TrainingWidget({ pastWorkouts, upcomingEvents, loading }: {
         </div>
       )}
     </div>
+  )
+}
+
+// ── QUICK ADD WORKOUT CARD ────────────────────────────────────────────────────
+function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative w-full overflow-hidden rounded-[20px] border text-left transition-all hover:shadow-lg"
+      style={{
+        background: 'linear-gradient(135deg,#FFEDD5 0%,#FFF7ED 55%,#FFFBEB 100%)',
+        borderColor: '#FED7AA',
+      }}
+    >
+      {/* Decorative blobs */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 -right-6 h-32 w-32 rounded-full blur-2xl opacity-70 transition-opacity group-hover:opacity-100"
+        style={{ background: 'radial-gradient(circle, #FDBA74 0%, rgba(253,186,116,0) 70%)' }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
+        style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
+      />
+      <div className="relative flex items-center gap-4 px-5 py-5">
+        <div
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
+          style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
+        >
+          <i className="ki-filled ki-plus text-white text-xl" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Быстрое добавление</div>
+          <div className="mt-1 text-lg font-extrabold leading-tight text-foreground">Записать тренировку</div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Новая запись появится и в дневнике, и в календаре.
+          </div>
+        </div>
+        <div
+          className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl bg-white/70 border border-white/80 shadow-sm transition-transform group-hover:translate-x-1"
+        >
+          <i className="ki-filled ki-arrow-right text-orange-500 text-sm" />
+        </div>
+      </div>
+    </button>
   )
 }
 
@@ -449,6 +499,9 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const [weeklyCount, setWeeklyCount]       = useState(0)
   const [loading, setLoading]               = useState(true)
   const [showSocialEdit, setShowSocialEdit] = useState(false)
+  const [showAddWorkout, setShowAddWorkout] = useState(false)
+  const [editWorkout, setEditWorkout]       = useState<Workout | null>(null)
+  const [editEvent, setEditEvent]           = useState<UpcomingEvent | null>(null)
 
   const loadWeekly = useCallback(async () => {
     // Неделя: понедельник 00:00 (локальная TZ) … сегодня включительно
@@ -517,40 +570,49 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
     setWeeklyCount(slots.size)
   }, [userId])
 
+  const loadLists = useCallback(async () => {
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    const y = today.getFullYear()
+    const m = String(today.getMonth() + 1).padStart(2, '0')
+    const d = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${y}-${m}-${d}`
+
+    const [{ data: pastData }, { data: upcomingData }] = await Promise.all([
+      sb().from('workouts')
+        .select('*')
+        .eq('athlete_id', userId)
+        .lt('event_date', todayStr)
+        .order('event_date', { ascending: false })
+        .limit(2),
+      sb().from('calendar_events')
+        .select('id, title, event_date, start_time, activity_type')
+        .eq('owner_id', userId)
+        .gte('event_date', todayStr)
+        .order('event_date', { ascending: true })
+        .order('start_time', { ascending: true })
+        .limit(3),
+    ])
+
+    setPastWorkouts((pastData ?? []) as Workout[])
+    setUpcomingEvents((upcomingData ?? []) as UpcomingEvent[])
+  }, [userId])
+
   useEffect(() => {
-    const handler = () => loadWeekly()
+    const handler = () => {
+      loadWeekly()
+      loadLists()
+    }
     window.addEventListener('proform:workout-added', handler)
     return () => window.removeEventListener('proform:workout-added', handler)
-  }, [loadWeekly])
+  }, [loadWeekly, loadLists])
 
   useEffect(() => {
     async function load() {
-      const today    = new Date()
-      const todayStr = today.toISOString().split('T')[0]
-
-      const [
-        { data: userData },
-        { data: athData },
-        { data: pastData },
-        { data: upcomingData },
-      ] = await Promise.all([
+      const [{ data: userData }, { data: athData }] = await Promise.all([
         sb().from('users').select('nickname').eq('id', userId).single(),
         sb().from('athletes')
           .select('avatar_url, instagram_url, telegram_url, youtube_url, tiktok_url, weekly_training_hours')
           .eq('id', userId).maybeSingle(),
-        sb().from('workouts')
-          .select('id, name, activity_type, event_date, activity_duration_min, activity_strain')
-          .eq('athlete_id', userId)
-          .lt('event_date', todayStr)
-          .order('event_date', { ascending: false })
-          .limit(2),
-        sb().from('calendar_events')
-          .select('id, title, event_date, start_time, activity_type')
-          .eq('owner_id', userId)
-          .gte('event_date', todayStr)
-          .order('event_date', { ascending: true })
-          .order('start_time', { ascending: true })
-          .limit(3),
       ])
 
       setProfile({
@@ -562,13 +624,11 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         tiktok_url:            athData?.tiktok_url            ?? null,
         weekly_training_hours: athData?.weekly_training_hours ?? null,
       })
-      setPastWorkouts((pastData ?? []) as Workout[])
-      await loadWeekly()
-      setUpcomingEvents((upcomingData ?? []) as UpcomingEvent[])
+      await Promise.all([loadLists(), loadWeekly()])
       setLoading(false)
     }
     load()
-  }, [userId, loadWeekly])
+  }, [userId, loadWeekly, loadLists])
 
   const targetHours = profile?.weekly_training_hours ?? 0
   const actualHours = weeklyMinutes / 60
@@ -693,16 +753,20 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         </div>
       </div>
 
-      {/* ── Row 1: Training widget (2/3) + Quick Note (1/3) ── */}
+      {/* ── Row 1: Training widget (2/3) + [QuickAdd + QuickNote] (1/3) ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2">
           <TrainingWidget
             pastWorkouts={pastWorkouts}
             upcomingEvents={upcomingEvents}
             loading={loading}
+            onOpenWorkout={w => setEditWorkout(w)}
+            onOpenEvent={ev => setEditEvent(ev)}
+            onPlan={() => setShowAddWorkout(true)}
           />
         </div>
-        <div>
+        <div className="flex flex-col gap-4">
+          <QuickAddWorkoutCard onClick={() => setShowAddWorkout(true)} />
           <QuickNoteWidget userId={userId} />
         </div>
       </div>
@@ -716,6 +780,22 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
           onSaved={d => setProfile(p => p ? { ...p, ...d } : p)}
         />
       )}
+
+      {/* Workout drawers */}
+      <WorkoutAddDrawer
+        open={showAddWorkout}
+        userId={userId}
+        onClose={() => setShowAddWorkout(false)}
+      />
+      <WorkoutEditDrawer
+        workout={editWorkout}
+        onClose={() => setEditWorkout(null)}
+      />
+      <CalendarEventEditDrawer
+        event={editEvent}
+        ownerId={userId}
+        onClose={() => setEditEvent(null)}
+      />
 
     </div>
   )
