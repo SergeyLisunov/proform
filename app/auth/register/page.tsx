@@ -4,8 +4,9 @@ import { type FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-type Role = 'athlete' | 'coach' | 'organization'
-type Step = 'role' | 'account' | 'athlete_profile' | 'done'
+type Role = 'athlete' | 'coach' | 'organization' | 'doctor'
+type Plan = 'free' | 'pro' | 'team'
+type Step = 'role' | 'account' | 'athlete_profile' | 'plan' | 'done'
 
 const ROLES: { value: Role; label: string; desc: string; icon: string; bg: string; text: string; border: string }[] = [
   {
@@ -33,6 +34,48 @@ const ROLES: { value: Role; label: string; desc: string; icon: string; bg: strin
     icon: 'ki-office-bag',
     bg: '#EFF6FF',
     text: '#2563EB',
+    border: '#BFDBFE',
+  },
+  {
+    value: 'doctor',
+    label: 'Доктор',
+    desc: 'Наблюдаю здоровье и восстановление, оставляю медицинские заметки',
+    icon: 'ki-heart-circle',
+    bg: '#FEF2F2',
+    text: '#DC2626',
+    border: '#FECACA',
+  },
+]
+
+const PLANS: { value: Plan; label: string; price: string; desc: string; features: string[]; accent: string; bg: string; border: string }[] = [
+  {
+    value: 'free',
+    label: 'Free',
+    price: '0 ₽',
+    desc: 'Для знакомства с платформой',
+    features: ['До 10 тренировок в месяц', 'Основной дневник', 'Профиль и связи'],
+    accent: '#64748B',
+    bg: '#F8FAFC',
+    border: '#E2E8F0',
+  },
+  {
+    value: 'pro',
+    label: 'Pro',
+    price: '599 ₽/мес',
+    desc: 'Для активных атлетов и тренеров',
+    features: ['Безлимит тренировок', 'Аналитика и экспорт', 'Циклы и соревнования', 'Мессенджер'],
+    accent: '#F97316',
+    bg: '#FFF7ED',
+    border: '#FED7AA',
+  },
+  {
+    value: 'team',
+    label: 'Team',
+    price: '1999 ₽/мес',
+    desc: 'Для команды и организации',
+    features: ['Всё из Pro', 'До 20 атлетов', 'CRM и рассылки', 'Приоритетная поддержка'],
+    accent: '#2563EB',
+    bg: '#EFF6FF',
     border: '#BFDBFE',
   },
 ]
@@ -79,6 +122,7 @@ function StepIndicator({ current, role }: { current: Step; role: Role | null }) 
     { id: 'role', label: 'Роль', hint: 'Выберите сценарий' },
     { id: 'account', label: 'Аккаунт', hint: 'Контакт и пароль' },
     ...(role === 'athlete' ? [{ id: 'athlete_profile' as Step, label: 'Профиль', hint: 'Опциональные данные' }] : []),
+    { id: 'plan' as Step, label: 'Тариф', hint: 'Free / Pro / Team' },
   ]
 
   const currentIdx = steps.findIndex((step) => step.id === current)
@@ -170,6 +214,10 @@ export default function RegisterPage() {
   const [athleteSaving, setAthleteSaving] = useState(false)
   const [athleteError, setAthleteError] = useState('')
 
+  const [selectedPlan, setSelectedPlan] = useState<Plan>('free')
+  const [planSaving, setPlanSaving] = useState(false)
+  const [planError, setPlanError] = useState('')
+
   function handleRoleNext() {
     if (!selectedRole) return
     setStep('account')
@@ -208,7 +256,7 @@ export default function RegisterPage() {
     if (selectedRole === 'athlete') {
       setStep('athlete_profile')
     } else {
-      setStep('done')
+      setStep('plan')
     }
   }
 
@@ -249,7 +297,7 @@ export default function RegisterPage() {
 
       if (upsertErr) throw upsertErr
 
-      setStep('done')
+      setStep('plan')
     } catch (err: any) {
       setAthleteError(err?.message ?? 'Не удалось сохранить профиль')
     } finally {
@@ -258,7 +306,41 @@ export default function RegisterPage() {
   }
 
   function skipAthleteProfile() {
-    setStep('done')
+    setStep('plan')
+  }
+
+  async function handlePlanSubmit() {
+    setPlanSaving(true)
+    setPlanError('')
+    try {
+      const supabase = createClient() as any
+      const { data: userRow } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single()
+
+      if (userRow?.id) {
+        // Сохраняем выбор тарифа в subscriptions (если таблица есть — upsert)
+        await supabase
+          .from('subscriptions')
+          .upsert(
+            {
+              user_id: userRow.id,
+              plan: selectedPlan,
+              status: selectedPlan === 'free' ? 'active' : 'trial',
+              expires_at: null,
+            },
+            { onConflict: 'user_id' }
+          )
+      }
+    } catch (err: any) {
+      // Не блокируем регистрацию, если таблицы нет — просто логируем
+      console.warn('subscription save skipped:', err?.message)
+    } finally {
+      setPlanSaving(false)
+      setStep('done')
+    }
   }
 
   const selectedRoleMeta = ROLES.find((role) => role.value === selectedRole)
@@ -833,6 +915,95 @@ export default function RegisterPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            )}
+
+            {step === 'plan' && (
+              <div className="pf-enter">
+                <div className="mb-5">
+                  <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Последний шаг</div>
+                  <h2 className="pf-num mt-1 text-[28px] leading-none text-foreground sm:text-[32px]">Выберите тариф</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    Можно начать с Free и обновиться позже в настройках аккаунта.
+                  </p>
+                </div>
+
+                {planError && (
+                  <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <span>{planError}</span>
+                  </div>
+                )}
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {PLANS.map((plan) => {
+                    const isActive = selectedPlan === plan.value
+                    return (
+                      <button
+                        key={plan.value}
+                        type="button"
+                        onClick={() => setSelectedPlan(plan.value)}
+                        className={[
+                          'group flex flex-col gap-3 rounded-[24px] border p-4 text-left transition-all',
+                          isActive
+                            ? 'shadow-[0_10px_30px_rgba(15,23,42,0.08)]'
+                            : 'hover:shadow-sm',
+                        ].join(' ')}
+                        style={{
+                          background: isActive ? plan.bg : '#FFFFFF',
+                          borderColor: isActive ? plan.accent : '#E5E7EB',
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-xs uppercase tracking-[0.24em]" style={{ color: plan.accent }}>
+                              {plan.label}
+                            </div>
+                            <div className="pf-num mt-1 text-[22px] leading-none text-foreground">{plan.price}</div>
+                          </div>
+                          {isActive && (
+                            <div
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-white"
+                              style={{ background: plan.accent }}
+                            >
+                              <i className="ki-filled ki-check text-[11px]" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-2xs text-muted-foreground">{plan.desc}</p>
+                        <ul className="flex flex-col gap-1.5 text-2xs text-foreground">
+                          {plan.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2">
+                              <i className="ki-filled ki-check-circle mt-0.5 text-[11px]" style={{ color: plan.accent }} />
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={handlePlanSubmit}
+                    disabled={planSaving}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {planSaving ? (
+                      <>
+                        <span className="pf-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent" />
+                        Сохранение...
+                      </>
+                    ) : (
+                      <>
+                        Завершить регистрацию
+                        <i className="ki-filled ki-right text-xs" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 

@@ -9,6 +9,7 @@ import { createBrowserClient } from '@supabase/ssr'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
+const DoctorDash = dynamic(() => import('./DoctorDashboard'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -1058,6 +1059,7 @@ export default function DashboardPage() {
 
   if (!user) return null
 
+  if (user.role === 'doctor') return <DoctorDash userId={user.id} name={user.name} />
   if (user.role === 'coach' || user.role === 'organization') return <CoachDash userId={user.id} name={user.name} />
   if (user.role === 'admin') return <AdminDash name={user.name} />
   return <AthleteDash userId={user.id} name={user.name} />

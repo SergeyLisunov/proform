@@ -9,6 +9,7 @@ const ROLE_META: Record<string, { label: string; color: string; bg: string }> = 
   coach:        { label: 'Тренер',     color: '#16A34A', bg: '#F0FDF4' },
   organization: { label: 'Организация', color: '#2563EB', bg: '#EFF6FF' },
   admin:        { label: 'Админ',      color: '#7C3AED', bg: '#F5F3FF' },
+  doctor:       { label: 'Доктор',     color: '#DC2626', bg: '#FEF2F2' },
 }
 
 type Profile = {
@@ -36,13 +37,18 @@ type Profile = {
 }
 
 function getConnectionType(myRole: string, theirRole: string): string | null {
-  if (myRole === 'athlete'  && theirRole === 'coach')        return 'coach_athlete'
-  if (myRole === 'coach'    && theirRole === 'athlete')      return 'coach_athlete'
-  if (myRole === 'organization' && theirRole === 'coach')    return 'org_coach'
-  if (myRole === 'organization' && theirRole === 'athlete')  return 'org_athlete'
-  if (myRole === 'coach'    && theirRole === 'organization') return 'org_coach'
-  if (myRole === 'athlete'  && theirRole === 'organization') return 'org_athlete'
-  return null
+  // Сортируем пару ролей, чтобы логика была симметричной
+  const pair = [myRole, theirRole].sort().join('|')
+  const map: Record<string, string> = {
+    'athlete|coach':        'coach_athlete',
+    'athlete|organization': 'org_athlete',
+    'coach|organization':   'org_coach',
+    'athlete|doctor':       'doctor_athlete',
+    'coach|doctor':         'coach_doctor',
+    'doctor|organization':  'org_doctor',
+    'admin|doctor':         'admin_doctor',
+  }
+  return map[pair] ?? null
 }
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {

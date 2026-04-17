@@ -1,4 +1,13 @@
-export type UserRole = 'athlete' | 'coach' | 'admin' | 'organization'
+export type UserRole = 'athlete' | 'coach' | 'admin' | 'organization' | 'doctor'
+
+export type ConnectionType =
+  | 'coach_athlete'
+  | 'org_coach'
+  | 'org_athlete'
+  | 'doctor_athlete'
+  | 'coach_doctor'
+  | 'org_doctor'
+  | 'admin_doctor'
 
 export type Database = {
   public: {
@@ -191,7 +200,7 @@ export type Database = {
           id: string
           initiator_id: string
           recipient_id: string
-          connection_type: 'coach_athlete' | 'org_coach' | 'org_athlete'
+          connection_type: ConnectionType
           status: 'pending' | 'active' | 'declined' | 'cancelled' | 'terminated'
           message: string | null
           initiated_at: string
@@ -203,7 +212,7 @@ export type Database = {
           id?: string
           initiator_id: string
           recipient_id: string
-          connection_type: 'coach_athlete' | 'org_coach' | 'org_athlete'
+          connection_type: ConnectionType
           status?: 'pending' | 'active' | 'declined' | 'cancelled' | 'terminated'
           message?: string | null
           initiated_at?: string
@@ -215,7 +224,7 @@ export type Database = {
           id?: string
           initiator_id?: string
           recipient_id?: string
-          connection_type?: 'coach_athlete' | 'org_coach' | 'org_athlete'
+          connection_type?: ConnectionType
           status?: 'pending' | 'active' | 'declined' | 'cancelled' | 'terminated'
           message?: string | null
           initiated_at?: string

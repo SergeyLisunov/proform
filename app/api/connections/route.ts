@@ -51,9 +51,13 @@ export async function POST(req: NextRequest) {
   if (!recipient) return NextResponse.json({ error: 'Recipient not found' }, { status: 404 })
 
   const validCombos: Record<string, [string, string]> = {
-    'coach_athlete': ['coach', 'athlete'],
-    'org_coach':     ['organization', 'coach'],
-    'org_athlete':   ['organization', 'athlete'],
+    'coach_athlete':  ['coach', 'athlete'],
+    'org_coach':      ['organization', 'coach'],
+    'org_athlete':    ['organization', 'athlete'],
+    'doctor_athlete': ['doctor', 'athlete'],
+    'coach_doctor':   ['coach', 'doctor'],
+    'org_doctor':     ['organization', 'doctor'],
+    'admin_doctor':   ['admin', 'doctor'],
   }
   const [roleA, roleB] = validCombos[connection_type] ?? []
   const rolesMatch = (me.role === roleA && recipient.role === roleB) || (me.role === roleB && recipient.role === roleA)

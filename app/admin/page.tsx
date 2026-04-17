@@ -66,16 +66,20 @@ const TABS: { id: AdminTab; label: string; icon: string; hint: string }[] = [
   { id: 'system', label: 'Система', icon: 'ki-setting-2', hint: 'Ключевые сервисы и контуры' },
 ]
 
-const ROLE_BADGE: Record<AdminUser['role'], string> = {
+const ROLE_BADGE: Record<string, string> = {
   athlete: 'bg-orange-50 text-orange-700 border border-orange-200',
   coach: 'bg-green-50 text-green-700 border border-green-200',
   admin: 'bg-violet-50 text-violet-700 border border-violet-200',
+  organization: 'bg-blue-50 text-blue-700 border border-blue-200',
+  doctor: 'bg-red-50 text-red-700 border border-red-200',
 }
 
-const ROLE_LABEL: Record<AdminUser['role'], string> = {
+const ROLE_LABEL: Record<string, string> = {
   athlete: 'Атлет',
   coach: 'Тренер',
   admin: 'Администратор',
+  organization: 'Организация',
+  doctor: 'Доктор',
 }
 
 const STATUS_LABEL: Record<AdminUser['status'], string> = {

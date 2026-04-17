@@ -90,19 +90,24 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
 
   useEffect(() => {
     const sb = getSB()
-    const role = currentUser.role === 'athlete' ? 'coach' : 'athlete'
-    sb.from('users').select('id,name,email,role').eq('role', role)
+    // Показываем всех пользователей (кроме себя и админов) — любой с любым может начать диалог
+    sb.from('users')
+      .select('id,name,email,role')
+      .neq('id', currentUser.id)
+      .neq('role', 'admin')
+      .eq('is_searchable', true)
       .then(({ data }) => { setUsers(data ?? []); setLoading(false) })
-  }, [currentUser.role])
+  }, [currentUser.id])
 
   async function start(other: ChatUser) {
     setCreating(other.id)
     const sb = getSB()
-    const athleteId = currentUser.role === 'athlete' ? currentUser.id : other.id
-    const coachId   = currentUser.role === 'coach'   ? currentUser.id : other.id
+    // Для direct chat пары (id1, id2) кладём меньший id в athlete_id-слот, больший в coach_id-слот
+    // (схема сохраняет уникальность пары, семантика слотов не важна для direct)
+    const [slotA, slotB] = [currentUser.id, other.id].sort()
     const { data, error } = await sb
       .from('chats')
-      .upsert({ athlete_id: athleteId, coach_id: coachId }, { onConflict: 'athlete_id,coach_id' })
+      .upsert({ athlete_id: slotA, coach_id: slotB, type: 'direct' }, { onConflict: 'athlete_id,coach_id' })
       .select().single()
     if (!error && data) onCreated({ ...data, other_user: other, unread_count: 0 })
     setCreating(null)
@@ -124,7 +129,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новый диалог</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>
-                {currentUser.role === 'athlete' ? 'Выбери тренера' : 'Выбери атлета'}
+                Выбери собеседника
               </h3>
             </div>
             <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">

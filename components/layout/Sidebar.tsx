@@ -17,21 +17,21 @@ const NAV_SECTIONS = [
   {
     title: 'Тренировки',
     items: [
-      { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin'] as string[] },
+      { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
       { href: '/competitions', icon: 'ki-medal-star',  label: 'Соревнования', roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/cycles',       icon: 'ki-abstract-45', label: 'Циклы',        roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
-      { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['coach'] as string[] },
+      { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['coach', 'doctor'] as string[] },
       { href: '/notes',       icon: 'ki-notepad-edit',   label: 'Заметки',      roles: null },
-      { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach'] as string[] },
-      { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin'] as string[] },
+      { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
+      { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
   },
   {
     title: 'Команда',
     items: [
-      { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика', roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/athletes', icon: 'ki-people', label: 'Мои атлеты', roles: ['coach', 'admin'] as string[] },
+      { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика', roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
+      { href: '/athletes', icon: 'ki-people', label: 'Мои атлеты', roles: ['coach', 'admin', 'doctor'] as string[] },
     ],
   },
   {
@@ -42,12 +42,6 @@ const NAV_SECTIONS = [
       { href: '/admin/crm', icon: 'ki-graph-3', label: 'CRM', roles: ['admin'] as string[] },
     ],
   },
-  {
-    title: 'Доступ',
-    items: [
-      { href: '/pricing', icon: 'ki-dollar', label: 'Тарифы', roles: null },
-    ],
-  },
 ] as const
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
@@ -55,6 +49,7 @@ const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> =
   coach:        { label: 'Тренер',        bg: '#F0FDF4', text: '#16A34A' },
   admin:        { label: 'Администратор', bg: '#F5F3FF', text: '#7C3AED' },
   organization: { label: 'Организация',   bg: '#EFF6FF', text: '#2563EB' },
+  doctor:       { label: 'Доктор',        bg: '#FEF2F2', text: '#DC2626' },
 }
 
 const GUEST_ROLE = { label: 'Гость', bg: '#F8FAFC', text: '#64748B' }

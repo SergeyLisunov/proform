@@ -40,6 +40,7 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> 
   coach:        { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   admin:        { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
   organization: { bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
+  doctor:       { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
 }
 
 const NOTIF_ICONS: Record<string, string> = {
@@ -112,7 +113,7 @@ function NotificationsDrawer({
   const [formType, setFormType]   = useState<'comment' | 'announcement'>('comment')
   const [sending, setSending]     = useState(false)
 
-  const canSend = user?.role && ['coach', 'organization', 'admin'].includes(user.role)
+  const canSend = user?.role && ['coach', 'organization', 'admin', 'doctor'].includes(user.role)
 
   useEffect(() => {
     setMounted(true)

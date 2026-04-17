@@ -22,16 +22,30 @@ const ROLE_FILTER_OPTIONS = [
   { value: 'athlete',      label: 'Атлеты' },
   { value: 'coach',        label: 'Тренеры' },
   { value: 'organization', label: 'Организации' },
+  { value: 'doctor',       label: 'Доктора' },
 ]
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F97316', bg: '#FFF7ED' },
   coach:        { label: 'Тренер',     color: '#16A34A', bg: '#F0FDF4' },
   organization: { label: 'Орг.',       color: '#2563EB', bg: '#EFF6FF' },
+  doctor:       { label: 'Доктор',     color: '#DC2626', bg: '#FEF2F2' },
 }
 
 // Connection type logic based on my role → their role
 function getConnectionType(myRole: string, theirRole: string): string | null {
+  const pair = [myRole, theirRole].sort().join('|')
+  const map: Record<string, string> = {
+    'athlete|coach':        'coach_athlete',
+    'athlete|organization': 'org_athlete',
+    'coach|organization':   'org_coach',
+    'athlete|doctor':       'doctor_athlete',
+    'coach|doctor':         'coach_doctor',
+    'doctor|organization':  'org_doctor',
+    'admin|doctor':         'admin_doctor',
+  }
+  const mapped = map[pair]
+  if (mapped) return mapped
   if (myRole === 'athlete'  && theirRole === 'coach')        return 'coach_athlete'
   if (myRole === 'coach'    && theirRole === 'athlete')      return 'coach_athlete'
   if (myRole === 'organization' && theirRole === 'coach')    return 'org_coach'
