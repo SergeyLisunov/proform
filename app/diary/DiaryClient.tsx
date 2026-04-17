@@ -11,6 +11,37 @@ type WorkoutInsert = Database['public']['Tables']['workouts']['Insert']
 
 interface Props { role: string; userId: string }
 
+function DurationHMInput({ valueMin, onChange }: { valueMin: string; onChange: (v: string) => void }) {
+  const totalN = Number(valueMin) || 0
+  const h = Math.floor(totalN / 60)
+  const m = totalN % 60
+  const base = 'w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white'
+  function update(hNew: number, mNew: number) {
+    const hv = Math.max(0, Number.isFinite(hNew) ? Math.floor(hNew) : 0)
+    const mv = Math.max(0, Math.min(59, Number.isFinite(mNew) ? Math.floor(mNew) : 0))
+    const total = hv * 60 + mv
+    onChange(total > 0 ? String(total) : '')
+  }
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <div className="relative">
+        <input type="number" min={0} inputMode="numeric" aria-label="Часы"
+          value={valueMin === '' ? '' : String(h)} placeholder="0"
+          onChange={e => update(Number(e.target.value), m)}
+          className={`${base} pr-9`} />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">ч</span>
+      </div>
+      <div className="relative">
+        <input type="number" min={0} max={59} inputMode="numeric" aria-label="Минуты"
+          value={valueMin === '' ? '' : String(m)} placeholder="0"
+          onChange={e => update(h, Number(e.target.value))}
+          className={`${base} pr-11`} />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">мин</span>
+      </div>
+    </div>
+  )
+}
+
 export default function DiaryClient({ role, userId }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -110,7 +141,13 @@ export default function DiaryClient({ role, userId }: Props) {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>{lbl('Длительность (мин)')}{inp('activity_duration_min', 'number', '60')}</div>
+                <div>
+                  {lbl('Длительность')}
+                  <DurationHMInput
+                    valueMin={form.activity_duration_min}
+                    onChange={v => setForm(f => ({ ...f, activity_duration_min: v }))}
+                  />
+                </div>
                 <div>{lbl('Ср. ЧСС (bpm)')}{inp('avg_heart_rate', 'number', '145')}</div>
                 <div>{lbl('Калории')}{inp('activity_calories', 'number', '500')}</div>
                 <div>{lbl('Нагрузка (0–21)')}{inp('activity_strain', 'number', '10.5')}</div>

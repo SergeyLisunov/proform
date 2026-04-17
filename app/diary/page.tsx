@@ -119,6 +119,59 @@ function fmtFullDate(s: string | null | undefined): string {
   return parseDate(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+// ── Duration input (hours + minutes) ─────────────────────────────────────────
+// Пара полей Ч/МИН сохраняет данные в канонический minutes-string.
+function DurationHMInput({
+  valueMin, onChange, inputClassName,
+}: {
+  valueMin: string
+  onChange: (totalMin: string) => void
+  inputClassName: string
+}) {
+  const totalN = Number(valueMin) || 0
+  const h = Math.floor(totalN / 60)
+  const m = totalN % 60
+
+  function update(hNew: number, mNew: number) {
+    const hv = Math.max(0, Number.isFinite(hNew) ? Math.floor(hNew) : 0)
+    const mv = Math.max(0, Math.min(59, Number.isFinite(mNew) ? Math.floor(mNew) : 0))
+    const total = hv * 60 + mv
+    onChange(total > 0 ? String(total) : '')
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <div className="relative">
+        <input
+          type="number"
+          min={0}
+          inputMode="numeric"
+          value={valueMin === '' ? '' : String(h)}
+          onChange={e => update(Number(e.target.value), m)}
+          placeholder="0"
+          aria-label="Часы"
+          className={`${inputClassName} pr-9`}
+        />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">ч</span>
+      </div>
+      <div className="relative">
+        <input
+          type="number"
+          min={0}
+          max={59}
+          inputMode="numeric"
+          value={valueMin === '' ? '' : String(m)}
+          onChange={e => update(h, Number(e.target.value))}
+          placeholder="0"
+          aria-label="Минуты"
+          className={`${inputClassName} pr-11`}
+        />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">мин</span>
+      </div>
+    </div>
+  )
+}
+
 type DiaryGroup = 'Сегодня' | 'Эта неделя' | 'Ранее'
 const DIARY_GROUPS: DiaryGroup[] = ['Сегодня', 'Эта неделя', 'Ранее']
 
@@ -595,8 +648,12 @@ function ViewEditDrawer({
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность (мин)</label>
-                      <input type="number" name="activity_duration_min" value={form.activity_duration_min} onChange={handleChange} placeholder="60" className={inputClass} />
+                      <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность</label>
+                      <DurationHMInput
+                        valueMin={form.activity_duration_min}
+                        onChange={v => setForm(f => ({ ...f, activity_duration_min: v }))}
+                        inputClassName={inputClass}
+                      />
                     </div>
                     <div>
                       <div className="mb-1.5 flex items-center justify-between">
@@ -766,7 +823,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
   const selectedCfg = ACTIVITY_CONFIG[form.activity_type] ?? DEFAULT_AC
   const quickSummary = [
     form.activity_type,
-    form.activity_duration_min ? `${form.activity_duration_min} мин` : 'Длительность не задана',
+    form.activity_duration_min ? fmtDuration(Number(form.activity_duration_min)) : 'Длительность не задана',
     form.activity_strain > 0 ? `${form.activity_strain.toFixed(1)} нагрузка` : 'Нагрузка не задана',
   ]
   const inputClass = (hasError = false) => [
@@ -894,14 +951,11 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность (мин)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={form.activity_duration_min}
-                    onChange={e => setForm(f => ({ ...f, activity_duration_min: e.target.value }))}
-                    placeholder="60"
-                    className={inputClass()}
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Длительность</label>
+                  <DurationHMInput
+                    valueMin={form.activity_duration_min}
+                    onChange={v => setForm(f => ({ ...f, activity_duration_min: v }))}
+                    inputClassName={inputClass()}
                   />
                 </div>
               </div>
@@ -921,7 +975,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 </div>
                 <div className="rounded-2xl border border-border bg-card px-4 py-3">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Длительность</div>
-                  <div className="mt-2 text-lg font-semibold text-foreground">{form.activity_duration_min ? `${form.activity_duration_min} мин` : '—'}</div>
+                  <div className="mt-2 text-lg font-semibold text-foreground">{form.activity_duration_min ? fmtDuration(Number(form.activity_duration_min)) : '—'}</div>
                 </div>
                 <div className="rounded-2xl border border-border bg-card px-4 py-3">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Пульс</div>
