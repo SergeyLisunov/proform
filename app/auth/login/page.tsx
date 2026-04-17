@@ -41,6 +41,14 @@ const TEST_ACCOUNTS = [
     iconColor: 'text-violet-600',
     ring: 'hover:border-violet-200 hover:bg-violet-50/60',
   },
+  {
+    label: 'Доктор',
+    email: 'doctor@proform.test',
+    hint: 'Медицинские заметки, восстановление, травмы',
+    iconBg: 'bg-red-100',
+    iconColor: 'text-red-600',
+    ring: 'hover:border-red-200 hover:bg-red-50/60',
+  },
 ]
 
 const FEATURE_STRIPS = [
