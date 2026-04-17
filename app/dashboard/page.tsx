@@ -29,114 +29,6 @@ const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string
 const DEFAULT_AC = ACTIVITY_CONFIG['Другое']
 function getAC(type: string | null) { return ACTIVITY_CONFIG[type ?? ''] ?? DEFAULT_AC }
 
-// ── WEEKLY PLAN CARD ──────────────────────────────────────────────────────────
-function WeeklyPlanCard({ actualH, targetH, workoutsCount }: {
-  actualH: number
-  targetH: number
-  workoutsCount: number
-}) {
-  const pct       = targetH > 0 ? Math.min(100, Math.round((actualH / targetH) * 100)) : 0
-  const remaining = Math.max(0, targetH - actualH)
-
-  const color = pct === 0   ? '#9CA3AF'
-    : pct < 50  ? '#DC2626'
-    : pct < 80  ? '#F97316'
-    : pct < 100 ? '#2563EB'
-    : '#16A34A'
-
-  const statusLabel = pct === 0   ? 'НЕТ ДАННЫХ'
-    : pct < 50  ? 'ЕСТЬ ПРОГРЕСС'
-    : pct < 80  ? 'ХОРОШИЙ ТЕМП'
-    : pct < 100 ? 'ПОЧТИ ГОТОВО'
-    : 'ЦЕЛЬ ДОСТИГНУТА!'
-
-  const size = 104
-  const r    = (size / 2) * 0.76
-  const circ = 2 * Math.PI * r
-  const dash = (pct / 100) * circ
-
-  if (targetH === 0) {
-    return (
-      <div className="bg-card border border-border rounded-[20px] p-5 h-full flex flex-col items-center justify-center gap-3 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
-          <i className="ki-filled ki-calendar text-orange-400 text-xl" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-foreground">Цель на неделю не задана</p>
-          <p className="text-xs text-muted-foreground mt-1">Укажите недельный объём тренировок в настройках</p>
-        </div>
-        <a href="/settings" className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition-colors">
-          Настроить цель →
-        </a>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-card border border-border rounded-[20px] p-5 h-full">
-      <div className="flex items-start gap-5">
-
-        {/* ── Ring ── */}
-        <div className="flex flex-col items-center gap-2 shrink-0">
-          <div style={{ position: 'relative', width: size, height: size }}>
-            <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-              <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#F2F2F3" strokeWidth={size * 0.085} />
-              <circle
-                cx={size/2} cy={size/2} r={r} fill="none"
-                stroke={color} strokeWidth={size * 0.085}
-                strokeDasharray={`${dash} ${circ - dash}`}
-                strokeLinecap="round"
-                style={{ transition: 'stroke-dasharray .6s ease, stroke .4s' }}
-              />
-            </svg>
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="pf-num" style={{ fontSize: size * 0.28, color, lineHeight: 1 }}>{pct}</span>
-              <span style={{ fontSize: size * 0.13, color: '#ADADB3', letterSpacing: '0.04em', marginTop: 1 }}>%</span>
-            </div>
-          </div>
-          <span style={{ fontSize: 9, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', maxWidth: size }}>
-            {statusLabel}
-          </span>
-        </div>
-
-        {/* ── Details ── */}
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
-            План недели
-          </p>
-          <p className="pf-num text-[28px] font-black text-foreground leading-none mb-1">
-            {actualH % 1 === 0 ? actualH.toFixed(0) : actualH.toFixed(1)} / {targetH} ч
-          </p>
-          <p className="text-sm text-muted-foreground mb-3">
-            {pct >= 100
-              ? 'Недельная цель выполнена! 🎉'
-              : `Осталось ${remaining % 1 === 0 ? remaining.toFixed(0) : remaining.toFixed(1)} ч до недельной цели.`
-            }
-          </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
-              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Осталось</p>
-              <p className="pf-num text-base font-bold text-foreground">
-                {remaining % 1 === 0 ? remaining.toFixed(0) : remaining.toFixed(1)} ч
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
-              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Учтено тренировок</p>
-              <p className="pf-num text-base font-bold text-foreground">{workoutsCount}</p>
-            </div>
-          </div>
-
-          <p className="text-[10px] text-muted-foreground/50 mt-3 leading-relaxed">
-            В прогресс недели попадают только тренировки текущей недели, у которых указана длительность.
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── HERO AVATAR ───────────────────────────────────────────────────────────────
 function HeroAvatar({ avatarUrl, name, userId, onAvatarUpdate }: {
   avatarUrl: string | null
@@ -559,22 +451,70 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const [showSocialEdit, setShowSocialEdit] = useState(false)
 
   const loadWeekly = useCallback(async () => {
+    // Неделя: понедельник 00:00 (локальная TZ) … сегодня включительно
     const today = new Date()
-    const dow = (today.getDay() + 6) % 7
+    today.setHours(0, 0, 0, 0)
+    const dow = (today.getDay() + 6) % 7 // 0 = понедельник
     const monday = new Date(today)
     monday.setDate(today.getDate() - dow)
-    monday.setHours(0, 0, 0, 0)
-    const mondayStr = monday.toISOString().split('T')[0]
-    const todayStr = today.toISOString().split('T')[0]
-    const { data: weekData } = await sb()
+
+    const toLocalISO = (d: Date) => {
+      const y = d.getFullYear()
+      const m = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${y}-${m}-${day}`
+    }
+    const mondayStr = toLocalISO(monday)
+    const todayStr  = toLocalISO(today)
+
+    // Источник #1 — записи из дневника (workouts)
+    const { data: wkData } = await sb()
       .from('workouts')
-      .select('activity_duration_min')
+      .select('id, event_date, start_time, activity_duration_min, name')
       .eq('athlete_id', userId)
       .gte('event_date', mondayStr)
       .lte('event_date', todayStr)
-    const week = weekData ?? []
-    setWeeklyMinutes(week.reduce((s, w) => s + (w.activity_duration_min ?? 0), 0))
-    setWeeklyCount(week.filter(w => (w.activity_duration_min ?? 0) > 0).length)
+
+    // Источник #2 — события в календаре, у которых указаны start+end (для старых/"внешних" записей, не продублированных в workouts)
+    const { data: evData } = await sb()
+      .from('calendar_events')
+      .select('id, event_date, start_time, end_time, title, event_type')
+      .eq('owner_id', userId)
+      .eq('event_type', 'workout')
+      .gte('event_date', mondayStr)
+      .lte('event_date', todayStr)
+
+    // Нормализуем: для каждого события считаем minutes. Если ни у workout, ни у связанного calendar_event нет
+    // явной длительности, но есть start/end в календаре — берём её оттуда.
+    type Slot = { key: string; minutes: number }
+    const slots = new Map<string, Slot>()
+
+    const keyOf = (date: string | null, title: string | null, start: string | null) =>
+      `${date ?? ''}|${(title ?? '').trim().toLowerCase()}|${(start ?? '').slice(0, 5)}`
+
+    for (const w of wkData ?? []) {
+      const minutes = Math.max(0, Number(w.activity_duration_min ?? 0) || 0)
+      if (minutes <= 0) continue
+      const k = keyOf(w.event_date, w.name, w.start_time)
+      slots.set(k, { key: k, minutes })
+    }
+
+    for (const ev of evData ?? []) {
+      if (!ev.start_time || !ev.end_time) continue
+      const [sh, sm] = String(ev.start_time).split(':').map(Number)
+      const [eh, em] = String(ev.end_time).split(':').map(Number)
+      if ([sh, sm, eh, em].some(n => Number.isNaN(n))) continue
+      const diff = (eh * 60 + em) - (sh * 60 + sm)
+      if (diff <= 0) continue
+      const k = keyOf(ev.event_date, ev.title, ev.start_time)
+      // Не перетираем — если уже есть по ключу из workouts, оставляем дневник как источник истины
+      if (!slots.has(k)) slots.set(k, { key: k, minutes: diff })
+    }
+
+    let totalMin = 0
+    for (const s of slots.values()) totalMin += s.minutes
+    setWeeklyMinutes(totalMin)
+    setWeeklyCount(slots.size)
   }, [userId])
 
   useEffect(() => {
@@ -753,26 +693,19 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         </div>
       </div>
 
-      {/* ── Row 1: Weekly Plan (2/3) + Quick Note (1/3) ── */}
+      {/* ── Row 1: Training widget (2/3) + Quick Note (1/3) ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2">
-          <WeeklyPlanCard
-            actualH={actualHours}
-            targetH={targetHours}
-            workoutsCount={weeklyCount}
+          <TrainingWidget
+            pastWorkouts={pastWorkouts}
+            upcomingEvents={upcomingEvents}
+            loading={loading}
           />
         </div>
         <div>
           <QuickNoteWidget userId={userId} />
         </div>
       </div>
-
-      {/* ── Row 2: Training widget (full width) ── */}
-      <TrainingWidget
-        pastWorkouts={pastWorkouts}
-        upcomingEvents={upcomingEvents}
-        loading={loading}
-      />
 
       {/* Social edit modal */}
       {showSocialEdit && profile && (

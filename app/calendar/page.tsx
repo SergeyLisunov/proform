@@ -1231,8 +1231,91 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
     window.dispatchEvent(new CustomEvent('proform:workout-added'))
     handleClose()
   }
-  async function handleUpdate(e:React.FormEvent){e.preventDefault();if(!form.title.trim()||!initialEvent){setError('Название обязательно');return};setSaving(true);setError('');const r=await updateCalendarEvent(initialEvent.id,{event_date:form.event_date,event_type:form.event_type,title:form.title.trim(),notes:form.notes.trim()||null,start_time:form.start_time||null,end_time:form.end_time||null});if(!r){setError('Не удалось обновить.');setSaving(false);return};onUpdated?.(r);window.dispatchEvent(new CustomEvent('proform:workout-added'));handleClose()}
-  async function handleDelete(){if(!initialEvent)return;await deleteCalendarEvent(initialEvent.id);onDeleted?.(initialEvent.id);handleClose()}
+  async function handleUpdate(e:React.FormEvent){
+    e.preventDefault()
+    if(!form.title.trim()||!initialEvent){setError('Название обязательно');return}
+    setSaving(true);setError('')
+    const r=await updateCalendarEvent(initialEvent.id,{event_date:form.event_date,event_type:form.event_type,title:form.title.trim(),notes:form.notes.trim()||null,start_time:form.start_time||null,end_time:form.end_time||null})
+    if(!r){setError('Не удалось обновить.');setSaving(false);return}
+
+    // Синхронизируем парный workout (если событие — тренировка).
+    // Ищем существующую запись по owner/date/title (исходные значения события).
+    try {
+      const {createBrowserClient} = await import('@supabase/ssr')
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      let durationMin: number | null = null
+      if (form.start_time && form.end_time) {
+        const [sh, sm] = form.start_time.split(':').map(Number)
+        const [eh, em] = form.end_time.split(':').map(Number)
+        const d = (eh*60+em) - (sh*60+sm)
+        if (d > 0) durationMin = d
+      }
+
+      const origDate = initialEvent.event_date
+      const origTitle = (initialEvent.title ?? '').trim()
+
+      const {data: linked} = await sb.from('workouts')
+        .select('id')
+        .eq('athlete_id', ownerId)
+        .eq('event_date', origDate)
+        .eq('name', origTitle)
+        .limit(1)
+
+      const patch = {
+        event_date: form.event_date,
+        name: form.title.trim(),
+        description: form.notes.trim() || null,
+        start_time: form.start_time || null,
+        activity_duration_min: durationMin,
+      }
+
+      if (form.event_type === 'workout') {
+        if (linked && linked.length > 0) {
+          await sb.from('workouts').update(patch).eq('id', linked[0].id)
+        } else {
+          // Парной записи нет — создаём, чтобы дневник учитывал тренировку.
+          await sb.from('workouts').insert({
+            athlete_id: ownerId,
+            event_date: form.event_date,
+            event_type: 'workout',
+            activity_type: 'Другое',
+            name: form.title.trim(),
+            description: form.notes.trim() || null,
+            start_time: form.start_time || null,
+            activity_duration_min: durationMin,
+            is_public: false,
+          })
+        }
+      } else if (linked && linked.length > 0) {
+        // Тип изменился с тренировки на другой — удаляем парный workout, чтобы не искажать статистику.
+        await sb.from('workouts').delete().eq('id', linked[0].id)
+      }
+    } catch {
+      // Некритично: событие в календаре уже обновлено.
+    }
+
+    onUpdated?.(r)
+    window.dispatchEvent(new CustomEvent('proform:workout-added'))
+    handleClose()
+  }
+  async function handleDelete(){
+    if(!initialEvent)return
+    await deleteCalendarEvent(initialEvent.id)
+    // Удаляем парный workout, если это была тренировка.
+    if (initialEvent.event_type === 'workout') {
+      try {
+        const {createBrowserClient} = await import('@supabase/ssr')
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+        await sb.from('workouts').delete()
+          .eq('athlete_id', ownerId)
+          .eq('event_date', initialEvent.event_date)
+          .eq('name', (initialEvent.title ?? '').trim())
+      } catch { /* некритично */ }
+    }
+    window.dispatchEvent(new CustomEvent('proform:workout-added'))
+    onDeleted?.(initialEvent.id)
+    handleClose()
+  }
   const selType=EVENT_TYPES.find(t=>t.value===form.event_type)
   if(!mounted)return null
   return createPortal(
