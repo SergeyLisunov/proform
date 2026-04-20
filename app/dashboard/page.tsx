@@ -22,6 +22,7 @@ const CoachBriefingCard    = dynamic(() => import('@/components/widgets/CoachBri
 const WeeklyPlannerCard    = dynamic(() => import('@/components/widgets/WeeklyPlannerCard'),    { ssr: false })
 const AnomalyAlertCard     = dynamic(() => import('@/components/widgets/AnomalyAlertCard'),     { ssr: false })
 const TrainingLoadWidget   = dynamic(() => import('@/components/widgets/TrainingLoadWidget'),   { ssr: false })
+const WorkoutCommentsDrawer = dynamic(() => import('@/components/workout/WorkoutCommentsDrawer'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -331,7 +332,7 @@ function fmtFutureDate(dateStr: string): string {
 
 // ── TRAINING WIDGET ───────────────────────────────────────────────────────────
 function TrainingWidget({
-  pastWorkouts, upcomingEvents, loading, onOpenWorkout, onOpenEvent, onPlan,
+  pastWorkouts, upcomingEvents, loading, onOpenWorkout, onOpenEvent, onPlan, onOpenComments,
 }: {
   pastWorkouts: Workout[]
   upcomingEvents: UpcomingEvent[]
@@ -339,6 +340,7 @@ function TrainingWidget({
   onOpenWorkout: (w: Workout) => void
   onOpenEvent:   (ev: UpcomingEvent) => void
   onPlan:        () => void
+  onOpenComments: (w: Workout) => void
 }) {
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden h-full flex flex-col">
@@ -366,30 +368,42 @@ function TrainingWidget({
           ) : (
             <div className="divide-y divide-border/50">
               {pastWorkouts.map(w => (
-                <button
+                <div
                   key={w.id}
-                  type="button"
-                  onClick={() => onOpenWorkout(w)}
-                  className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="group flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(w.activity_type).bg }}>
-                    <i className={`ki-filled ${getAC(w.activity_type).icon} text-xs`} style={{ color: getAC(w.activity_type).text }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-foreground truncate">
-                      {w.name ?? w.activity_type ?? 'Тренировка'}
+                  <button
+                    type="button"
+                    onClick={() => onOpenWorkout(w)}
+                    className="flex flex-1 min-w-0 items-center gap-3 bg-transparent text-left cursor-pointer"
+                  >
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(w.activity_type).bg }}>
+                      <i className={`ki-filled ${getAC(w.activity_type).icon} text-xs`} style={{ color: getAC(w.activity_type).text }} />
                     </div>
-                    {w.activity_duration_min != null && (
-                      <div className="text-2xs text-muted-foreground">{w.activity_duration_min} мин</div>
-                    )}
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-2xs font-semibold text-foreground">{fmtPastDate(w.event_date)}</div>
-                    {w.activity_strain != null && (
-                      <div className="text-2xs text-muted-foreground">strain {w.activity_strain.toFixed(1)}</div>
-                    )}
-                  </div>
-                </button>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-foreground truncate">
+                        {w.name ?? w.activity_type ?? 'Тренировка'}
+                      </div>
+                      {w.activity_duration_min != null && (
+                        <div className="text-2xs text-muted-foreground">{w.activity_duration_min} мин</div>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-2xs font-semibold text-foreground">{fmtPastDate(w.event_date)}</div>
+                      {w.activity_strain != null && (
+                        <div className="text-2xs text-muted-foreground">strain {w.activity_strain.toFixed(1)}</div>
+                      )}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); onOpenComments(w) }}
+                    title="Комментарии"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+                  >
+                    <i className="ki-filled ki-messages text-[13px]" />
+                  </button>
+                </div>
               ))}
             </div>
           )}
@@ -507,6 +521,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const [showAddWorkout, setShowAddWorkout] = useState(false)
   const [editWorkout, setEditWorkout]       = useState<Workout | null>(null)
   const [editEvent, setEditEvent]           = useState<UpcomingEvent | null>(null)
+  const [commentsFor, setCommentsFor]       = useState<Workout | null>(null)
 
   const loadWeekly = useCallback(async () => {
     // Неделя: понедельник 00:00 (локальная TZ) … сегодня включительно
@@ -775,6 +790,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
             onOpenWorkout={w => setEditWorkout(w)}
             onOpenEvent={ev => setEditEvent(ev)}
             onPlan={() => setShowAddWorkout(true)}
+            onOpenComments={w => setCommentsFor(w)}
           />
         </div>
         <div className="flex flex-col gap-4">
@@ -823,6 +839,12 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         event={editEvent}
         ownerId={userId}
         onClose={() => setEditEvent(null)}
+      />
+      <WorkoutCommentsDrawer
+        workoutId={commentsFor?.id ?? null}
+        workoutTitle={commentsFor?.name ?? commentsFor?.activity_type ?? null}
+        currentUserId={userId}
+        onClose={() => setCommentsFor(null)}
       />
 
     </div>
