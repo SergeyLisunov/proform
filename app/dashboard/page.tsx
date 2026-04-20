@@ -18,6 +18,7 @@ const DoctorDash = dynamic(() => import('./DoctorDashboard'), { ssr: false })
 const AiCoachCard          = dynamic(() => import('@/components/widgets/AiCoachCard'),          { ssr: false })
 const WeeklyInsightsCard   = dynamic(() => import('@/components/widgets/WeeklyInsightsCard'),   { ssr: false })
 const RecoveryTrendWidget  = dynamic(() => import('@/components/widgets/RecoveryTrendWidget'),  { ssr: false })
+const CoachBriefingCard    = dynamic(() => import('@/components/widgets/CoachBriefingCard'),    { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -902,6 +903,9 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
           </div>
         ))}
       </div>
+
+      {/* AI coach morning briefing */}
+      <CoachBriefingCard />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2 bg-card border border-border rounded-xl overflow-hidden">

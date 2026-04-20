@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
+import VoiceDebriefButton from '@/components/workout/VoiceDebriefButton'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -673,6 +674,7 @@ export function WorkoutEditDrawer({
                 <p className="text-sm text-foreground whitespace-pre-wrap m-0">{workout.description}</p>
               </div>
             )}
+            <VoiceDebriefButton workoutId={workout.id} onApplied={() => fireWorkoutsChanged()} />
           </div>
         ) : (
           <>
