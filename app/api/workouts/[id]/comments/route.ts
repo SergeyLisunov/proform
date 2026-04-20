@@ -58,5 +58,37 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .single()
 
   if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+
+  // Notify the workout owner (if different from author)
+  try {
+    const { data: workout } = await sb
+      .from('workouts')
+      .select('athlete_id, activity_type, date')
+      .eq('id', workoutId)
+      .maybeSingle()
+    const ownerId = (workout as { athlete_id?: string } | null)?.athlete_id
+    if (ownerId && ownerId !== meRow.id) {
+      const { data: author } = await sb
+        .from('users').select('name, first_name, last_name').eq('id', meRow.id).maybeSingle()
+      const a = author as { name?: string; first_name?: string; last_name?: string } | null
+      const authorName =
+        a?.name ||
+        [a?.first_name, a?.last_name].filter(Boolean).join(' ') ||
+        'Пользователь'
+      const preview = body.body.length > 140 ? body.body.slice(0, 140) + '…' : body.body
+      await sb.from('notifications').insert({
+        user_id: ownerId,
+        type: 'workout_comment',
+        title: `${authorName} оставил комментарий к тренировке`,
+        body: preview,
+        entity_type: 'workout',
+        entity_id: workoutId,
+        action_url: `/diary?workout=${workoutId}`,
+      })
+    }
+  } catch (e) {
+    console.error('workout-comment notification failed:', e)
+  }
+
   return NextResponse.json({ ok: true, comment: data })
 }
