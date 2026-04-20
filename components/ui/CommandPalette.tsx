@@ -47,6 +47,7 @@ export default function CommandPalette() {
     { id: 'nav-insights',      title: 'AI разбор недели',  subtitle: 'Недельный/месячный дайджест', icon: 'ki-sparkle',    iconColor: '#0EA5E9', run: go('/insights') },
     { id: 'nav-records',       title: 'Рекорды',           subtitle: 'Личные максимумы и прогресс', icon: 'ki-medal',      iconColor: '#F59E0B', run: go('/records') },
     { id: 'nav-load',          title: 'Нагрузка · ACWR',    subtitle: 'Светофор острой и хрон. нагрузки', icon: 'ki-pulse', iconColor: '#10B981', run: go('/load') },
+    { id: 'nav-quick',         title: 'Голос → тренировка', subtitle: 'Надиктуй — AI соберёт запись', icon: 'ki-microphone-2', iconColor: '#8B5CF6', run: go('/quick') },
     { id: 'nav-notifications', title: 'Уведомления',                                         icon: 'ki-notification',    iconColor: '#DC2626', run: go('/notifications') },
     { id: 'nav-search',        title: 'Поиск людей',      subtitle: 'Атлеты и тренеры',       icon: 'ki-magnifier',       iconColor: '#64748B', run: go('/search') },
     { id: 'nav-settings',      title: 'Настройки',                                           icon: 'ki-setting-2',       iconColor: '#475569', run: go('/settings') },
