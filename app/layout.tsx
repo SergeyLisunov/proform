@@ -5,6 +5,7 @@ import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
 
 const CommandPalette = dynamic(() => import('@/components/ui/CommandPalette'), { ssr: false })
+const AiChatBubble   = dynamic(() => import('@/components/ui/AiChatBubble'),   { ssr: false })
 
 export const metadata: Metadata = {
   title: 'ProForm — Дневник тренировок',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           {children}
           <CommandPalette />
+          <AiChatBubble />
         </ToastProvider>
         <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
       </body>
