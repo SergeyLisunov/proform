@@ -25,6 +25,7 @@ const NAV_SECTIONS = [
       { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['coach', 'doctor'] as string[] },
       { href: '/notes',       icon: 'ki-notepad-edit',   label: 'Заметки',      roles: null },
+      { href: '/form-analysis', icon: 'ki-video',        label: 'AI разбор техники', roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
       { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],

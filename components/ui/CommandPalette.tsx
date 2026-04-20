@@ -43,6 +43,7 @@ export default function CommandPalette() {
     { id: 'nav-connections',   title: 'Связи',            subtitle: 'Тренеры и клубы',        icon: 'ki-address-book',    iconColor: '#0284C7', run: go('/connections') },
     { id: 'nav-messages',      title: 'Сообщения',        subtitle: 'Чаты',                   icon: 'ki-messages',        iconColor: '#7C3AED', run: go('/messages') },
     { id: 'nav-notes',         title: 'Заметки',          subtitle: 'Быстрые записи',         icon: 'ki-notepad-edit',    iconColor: '#D97706', run: go('/notes') },
+    { id: 'nav-form-analysis', title: 'AI разбор техники', subtitle: 'Видео → разбор ошибок',  icon: 'ki-video',           iconColor: '#F43F5E', run: go('/form-analysis') },
     { id: 'nav-notifications', title: 'Уведомления',                                         icon: 'ki-notification',    iconColor: '#DC2626', run: go('/notifications') },
     { id: 'nav-search',        title: 'Поиск людей',      subtitle: 'Атлеты и тренеры',       icon: 'ki-magnifier',       iconColor: '#64748B', run: go('/search') },
     { id: 'nav-settings',      title: 'Настройки',                                           icon: 'ki-setting-2',       iconColor: '#475569', run: go('/settings') },
