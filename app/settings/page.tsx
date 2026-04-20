@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import RoleProfile from '@/components/settings/RoleProfile'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -621,6 +622,11 @@ export default function SettingsPage() {
       <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
     </div>
   )
+
+  // Non-athlete roles have dedicated profile UIs.
+  if (user && user.role !== 'athlete') {
+    return <RoleProfile user={user} />
+  }
 
   const activeTab = TABS.find(t => t.id === tab)!
 
