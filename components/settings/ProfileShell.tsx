@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useRef } from 'react'
 
 type Tab = { id: string; label: string; icon: string; color: string }
@@ -25,6 +26,14 @@ export function ProfileShell(props: {
   return (
     <div className="mx-auto flex w-full max-w-[980px] flex-col gap-6">
       <div>
+        <Link
+          href="/dashboard"
+          aria-label="Вернуться на главную"
+          title="Вернуться на главную"
+          className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-card text-muted-foreground no-underline transition-colors hover:border-orange-400 hover:bg-orange-50 hover:text-orange-500"
+        >
+          <i className="ki-filled ki-left text-[13px]" />
+        </Link>
         <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
           Настройки
         </div>
