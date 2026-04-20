@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import dynamic from 'next/dynamic'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
+
+const CommandPalette = dynamic(() => import('@/components/ui/CommandPalette'), { ssr: false })
 
 export const metadata: Metadata = {
   title: 'ProForm — Дневник тренировок',
@@ -14,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased flex h-full text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
         <ToastProvider>
           {children}
+          <CommandPalette />
         </ToastProvider>
         <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
       </body>

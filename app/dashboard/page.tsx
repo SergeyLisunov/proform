@@ -608,6 +608,13 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
     return () => window.removeEventListener('proform:workout-added', handler)
   }, [loadWeekly, loadLists])
 
+  // Cmd+K palette → open add-workout drawer
+  useEffect(() => {
+    const openHandler = () => setShowAddWorkout(true)
+    window.addEventListener('proform:open-add-workout', openHandler)
+    return () => window.removeEventListener('proform:open-add-workout', openHandler)
+  }, [])
+
   useEffect(() => {
     async function load() {
       const [{ data: userData }, { data: athData }] = await Promise.all([
