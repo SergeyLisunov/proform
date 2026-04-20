@@ -393,7 +393,6 @@ export default function TopBar() {
   const sub   = meta?.sub   ?? ''
   const date  = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   const rc    = user ? ROLE_COLORS[user.role] : null
-  const isAthlete = user?.role === 'athlete'
 
   // Счётчик непрочитанных: initial load + Realtime
   useEffect(() => {
@@ -441,9 +440,13 @@ export default function TopBar() {
         {user.name.split(' ')[0]}
       </span>
       <span className="text-2xs uppercase font-bold opacity-60" style={{ color: rc.text }}>
-        {user.role === 'athlete' ? 'Атлет' : user.role === 'coach' ? 'Тренер' : user.role === 'admin' ? 'Админ' : 'Орг'}
+        {user.role === 'athlete' ? 'Атлет'
+          : user.role === 'coach' ? 'Тренер'
+          : user.role === 'doctor' ? 'Врач'
+          : user.role === 'admin' ? 'Админ'
+          : 'Орг'}
       </span>
-      {isAthlete && <i className="ki-filled ki-pencil text-[10px] opacity-40" style={{ color: rc.text }} />}
+      <i className="ki-filled ki-pencil text-[10px] opacity-40" style={{ color: rc.text }} />
     </div>
   ) : null
 
@@ -501,12 +504,12 @@ export default function TopBar() {
               )}
             </button>
 
-            {/* Плашка пользователя */}
-            {isAthlete ? (
-              <Link href="/settings" className="no-underline hover:opacity-80 transition-opacity">
+            {/* Плашка пользователя — клик ведёт в /settings (свой профиль) */}
+            {userPill && (
+              <Link href="/settings" className="no-underline hover:opacity-80 transition-opacity" title="Открыть профиль">
                 {userPill}
               </Link>
-            ) : userPill}
+            )}
           </div>
         </div>
       </header>
