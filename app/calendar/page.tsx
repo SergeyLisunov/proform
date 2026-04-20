@@ -831,11 +831,14 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
   )
 }
 
-function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts, cycles, cycleDaysMap, filterType = 'all', notesByDate = {} }: {
+function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts, cycles, cycleDaysMap, filterType = 'all', notesByDate = {}, onMoveEvent, onMoveWorkout }: {
   year: number; month: number; onSelect: (d: string) => void; selected: string | null
   savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]; cycleDaysMap: Record<string, DayType>
   filterType?: string; notesByDate?: Record<string, boolean>
+  onMoveEvent?: (id: string, newDate: string) => void
+  onMoveWorkout?: (id: string, newDate: string) => void
 }) {
+  const [dragOverDate, setDragOverDate] = useState<string | null>(null)
   const fd=(new Date(year,month,1).getDay()+6)%7; const days=new Date(year,month+1,0).getDate()
   const cells: (number|null)[] = [...Array(fd).fill(null), ...Array.from({length:days},(_,i)=>i+1)]
   while (cells.length%7!==0) cells.push(null)
@@ -877,20 +880,47 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
             const ccfgDisplay  = showCyc ? ccfg  : null
             const maxStrain = dayWksDisplay.length > 0 ? Math.max(...dayWksDisplay.map(w => Number(w.activity_strain ?? 0))) : 0
             const cellBg = ccfgDisplay ? ccfgDisplay.bg : (maxStrain > 0 ? strainColor(maxStrain) + '40' : undefined)
+            const isDragOver = day && dragOverDate === ds
             return <div key={di} onClick={()=>day&&onSelect(ds)}
-              className={['min-h-[90px] p-1.5 border-e border-e-border last:border-e-0 transition-colors', day?'cursor-pointer':'bg-background/40', isSel?'bg-orange-50/80':day?'hover:bg-accent/50':''].join(' ')}
+              onDragOver={day ? (e) => { if (e.dataTransfer.types.includes('application/x-proform-event') || e.dataTransfer.types.includes('application/x-proform-workout')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (dragOverDate !== ds) setDragOverDate(ds) } } : undefined}
+              onDragLeave={day ? () => { if (dragOverDate === ds) setDragOverDate(null) } : undefined}
+              onDrop={day ? (e) => {
+                e.preventDefault()
+                setDragOverDate(null)
+                const evId = e.dataTransfer.getData('application/x-proform-event')
+                if (evId) { const src = savedEvents.find(x => x.id === evId); if (src && src.event_date !== ds) onMoveEvent?.(evId, ds); return }
+                const wkId = e.dataTransfer.getData('application/x-proform-workout')
+                if (wkId) { const src = monthWorkouts.find(x => x.id === wkId); if (src && src.event_date !== ds) onMoveWorkout?.(wkId, ds) }
+              } : undefined}
+              className={['min-h-[90px] p-1.5 border-e border-e-border last:border-e-0 transition-colors', day?'cursor-pointer':'bg-background/40', isSel?'bg-orange-50/80':day?'hover:bg-accent/50':'', isDragOver?'ring-2 ring-orange-400 bg-orange-50/40':''].join(' ')}
               style={{ borderLeft: ccfgDisplay?`3px solid ${ccfgDisplay.text}`:undefined, background: isSel ? undefined : cellBg }}>
               {day&&<>
                 <div className={['w-7 h-7 rounded-lg flex items-center justify-center text-2sm font-semibold mb-1 mx-auto', isT?'bg-orange-500 text-white':isSel?'bg-orange-100 text-orange-600':'text-foreground'].join(' ')}>{day}</div>
                 {cdcfgDisplay&&<div className="mb-0.5 px-1 py-0.5 rounded text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfgDisplay.bg,color:cdcfgDisplay.color}}><i className={`ki-filled ${cdcfgDisplay.icon} text-[8px]`}/>{cdcfgDisplay.label.slice(0,8)}</div>}
                 {dayWksDisplay.slice(0,2).map(w => {
                   const ac = getActivityCfg(w.activity_type)
-                  return <div key={w.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold truncate flex items-center gap-1" style={{background:ac.bg,color:ac.color}}>
+                  return <div
+                    key={w.id}
+                    draggable
+                    onClick={(e) => e.stopPropagation()}
+                    onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.setData('application/x-proform-workout', w.id); e.dataTransfer.effectAllowed = 'move' }}
+                    className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
+                    style={{background:ac.bg,color:ac.color}}
+                    title="Перетащите для переноса"
+                  >
                     <i className={`ki-filled ${ac.icon} text-[9px] shrink-0`}/>{(w.name??w.activity_type??'').slice(0,10)}{w.activity_strain!=null&&<span className="ml-auto font-bold">{Number(w.activity_strain).toFixed(0)}</span>}
                   </div>
                 })}
                 {dayWksDisplay.length>2&&<div className="text-[10px] text-muted-foreground px-1.5">+{dayWksDisplay.length-2} трен.</div>}
-                {evsDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
+                {evsDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div
+                  key={ev.id}
+                  draggable
+                  onClick={(e) => e.stopPropagation()}
+                  onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.setData('application/x-proform-event', ev.id); e.dataTransfer.effectAllowed = 'move' }}
+                  className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
+                  style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}
+                  title="Перетащите для переноса"
+                ><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
                 {notesByDate[ds] && <div className="flex items-center gap-0.5 px-1 mt-0.5"><i className="ki-filled ki-notepad-edit text-[8px] text-amber-400"/><span className="text-[9px] text-amber-500 font-medium">заметка</span></div>}
               </>}
             </div>
@@ -1498,6 +1528,28 @@ export default function CalendarPage() {
   const handleEventUpdated = useCallback((u: CalendarEvent) => { setSavedEvents(prev=>prev.map(e=>e.id===u.id?u:e)) }, [])
   const handleDeleteEvent  = useCallback(async (id: string) => { await deleteCalendarEvent(id); setSavedEvents(prev=>prev.filter(e=>e.id!==id)); if(eventDrawer?.id===id)setEventDrawer(null) }, [eventDrawer])
 
+  const handleMoveEvent = useCallback(async (id: string, newDate: string) => {
+    const prev = savedEvents.find(e => e.id === id)
+    if (!prev || prev.event_date === newDate) return
+    setSavedEvents(list => list.map(e => e.id === id ? { ...e, event_date: newDate } : e))
+    const r = await updateCalendarEvent(id, { event_date: newDate })
+    if (!r) setSavedEvents(list => list.map(e => e.id === id ? prev : e))
+  }, [savedEvents])
+
+  const handleMoveWorkout = useCallback(async (id: string, newDate: string) => {
+    const prev = monthWorkouts.find(w => w.id === id)
+    if (!prev || prev.event_date === newDate) return
+    setMonthWorkouts(list => list.map(w => w.id === id ? { ...w, event_date: newDate } : w))
+    try {
+      const { createBrowserClient } = await import('@supabase/ssr')
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      const { error } = await (sb.from('workouts') as any).update({ event_date: newDate }).eq('id', id)
+      if (error) setMonthWorkouts(list => list.map(w => w.id === id ? prev : w))
+    } catch {
+      setMonthWorkouts(list => list.map(w => w.id === id ? prev : w))
+    }
+  }, [monthWorkouts])
+
   const handleCycleCreated = useCallback((c: CycleBlock) => {
     setCycles(prev => [...prev, c]); setSelected(c.start_date)
     const d = parseLocalDate(c.start_date); setYear(d.getFullYear()); setMonth(d.getMonth())
@@ -1848,7 +1900,7 @@ export default function CalendarPage() {
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <div>
             {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} selected={selected} />}
-            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} notesByDate={notesByDate} />}
+            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} notesByDate={notesByDate} onMoveEvent={handleMoveEvent} onMoveWorkout={handleMoveWorkout} />}
             {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} />}
           </div>
           {selected && (
