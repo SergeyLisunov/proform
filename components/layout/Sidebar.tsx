@@ -30,6 +30,7 @@ const NAV_SECTIONS = [
       { href: '/records',       icon: 'ki-medal',         label: 'Рекорды',           roles: ['athlete', 'admin'] as string[] },
       { href: '/load',          icon: 'ki-pulse',         label: 'Нагрузка · ACWR',   roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/quick',         icon: 'ki-microphone-2',  label: 'Голос → тренировка', roles: ['athlete', 'admin'] as string[] },
+      { href: '/streaks',       icon: 'ki-flash',         label: 'Серия и бейджи',    roles: ['athlete', 'admin'] as string[] },
       { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
       { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
