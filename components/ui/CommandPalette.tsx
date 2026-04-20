@@ -34,6 +34,7 @@ export default function CommandPalette() {
     { id: 'nav-dashboard',     title: 'Главная',          subtitle: 'Дашборд',                icon: 'ki-home-2',          iconColor: '#F97316', run: go('/dashboard') },
     { id: 'nav-diary',         title: 'Дневник',          subtitle: 'Все тренировки',         icon: 'ki-book',            iconColor: '#2563EB', run: go('/diary') },
     { id: 'nav-calendar',      title: 'Календарь',        subtitle: 'Планирование',           icon: 'ki-calendar',        iconColor: '#16A34A', run: go('/calendar') },
+    { id: 'nav-templates',     title: 'Шаблоны',          subtitle: 'Библиотека тренировок',  icon: 'ki-notepad-edit',    iconColor: '#F97316', run: go('/templates') },
     { id: 'nav-cycles',        title: 'Циклы',            subtitle: 'Макроциклы и периодизация', icon: 'ki-chart-simple', iconColor: '#0D9488', run: go('/cycles') },
     { id: 'nav-athletes',      title: 'Атлеты',           subtitle: 'Моя команда',            icon: 'ki-people',          iconColor: '#9333EA', run: go('/athletes') },
     { id: 'nav-competitions',  title: 'Соревнования',     subtitle: 'Старты сезона',          icon: 'ki-crown',           iconColor: '#EA580C', run: go('/competitions') },
