@@ -15,6 +15,9 @@ import {
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
 const DoctorDash = dynamic(() => import('./DoctorDashboard'), { ssr: false })
+const AiCoachCard          = dynamic(() => import('@/components/widgets/AiCoachCard'),          { ssr: false })
+const WeeklyInsightsCard   = dynamic(() => import('@/components/widgets/WeeklyInsightsCard'),   { ssr: false })
+const RecoveryTrendWidget  = dynamic(() => import('@/components/widgets/RecoveryTrendWidget'),  { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -767,6 +770,13 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
           <QuickAddWorkoutCard onClick={() => setShowAddWorkout(true)} />
           <QuickNoteWidget userId={userId} />
         </div>
+      </div>
+
+      {/* ── Row 2: AI insights — AI coach + Weekly insights + Recovery trend ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <AiCoachCard />
+        <WeeklyInsightsCard />
+        <RecoveryTrendWidget userId={userId} />
       </div>
 
       {/* Social edit modal */}
