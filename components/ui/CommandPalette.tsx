@@ -33,6 +33,7 @@ export default function CommandPalette() {
     // Navigation
     { id: 'nav-dashboard',     title: 'Главная',          subtitle: 'Дашборд',                icon: 'ki-home-2',          iconColor: '#F97316', run: go('/dashboard') },
     { id: 'nav-diary',         title: 'Дневник',          subtitle: 'Все тренировки',         icon: 'ki-book',            iconColor: '#2563EB', run: go('/diary') },
+    { id: 'nav-diary-search',  title: 'Семантический поиск', subtitle: 'Поиск по смыслу в заметках и тренировках', icon: 'ki-magnifier', iconColor: '#6366F1', run: go('/diary/search') },
     { id: 'nav-calendar',      title: 'Календарь',        subtitle: 'Планирование',           icon: 'ki-calendar',        iconColor: '#16A34A', run: go('/calendar') },
     { id: 'nav-templates',     title: 'Шаблоны',          subtitle: 'Библиотека тренировок',  icon: 'ki-notepad-edit',    iconColor: '#F97316', run: go('/templates') },
     { id: 'nav-challenges',    title: 'Челленджи',        subtitle: 'Лидерборды и вызовы',    icon: 'ki-crown',           iconColor: '#10B981', run: go('/challenges') },
