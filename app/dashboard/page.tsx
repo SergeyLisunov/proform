@@ -461,15 +461,14 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
       />
       <div className="relative flex items-center gap-3 px-4 py-4">
         <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
         >
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-base font-extrabold leading-tight text-foreground truncate">Добавить тренировку</div>
-          <div className="mt-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
-            Новая запись появится и в дневнике, и в календаре.
+          <div className="text-base font-extrabold leading-none text-foreground truncate">
+            Добавить тренировку
           </div>
         </div>
         <div
