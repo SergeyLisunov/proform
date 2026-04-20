@@ -33,6 +33,7 @@ const NAV_SECTIONS = [
       { href: '/streaks',       icon: 'ki-flash',         label: 'Серия и бейджи',    roles: ['athlete', 'admin'] as string[] },
       { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
       { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
+      { href: '/directory',   icon: 'ki-magnifier',       label: 'Найти специалиста', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
   },
   {
