@@ -16,6 +16,7 @@ import {
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
 const DoctorDash = dynamic(() => import('./DoctorDashboard'), { ssr: false })
+const OrgDash = dynamic(() => import('./OrganizationDashboard'), { ssr: false })
 const AiCoachCard          = dynamic(() => import('@/components/widgets/AiCoachCard'),          { ssr: false })
 const WeeklyInsightsCard   = dynamic(() => import('@/components/widgets/WeeklyInsightsCard'),   { ssr: false })
 const RecoveryTrendWidget  = dynamic(() => import('@/components/widgets/RecoveryTrendWidget'),  { ssr: false })
@@ -1164,7 +1165,8 @@ export default function DashboardPage() {
   if (!user) return null
 
   if (user.role === 'doctor') return <DoctorDash userId={user.id} name={user.name} />
-  if (user.role === 'coach' || user.role === 'organization') return <CoachDash userId={user.id} name={user.name} />
+  if (user.role === 'organization') return <OrgDash userId={user.id} name={user.name} />
+  if (user.role === 'coach') return <CoachDash userId={user.id} name={user.name} />
   if (user.role === 'admin') return <AdminDash name={user.name} />
   return <AthleteDash userId={user.id} name={user.name} />
 }

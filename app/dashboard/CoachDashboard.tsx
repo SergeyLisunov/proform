@@ -37,6 +37,22 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
   const { data: diaryData } = await supabase.from('observation_diary').select('*').eq('coach_id', userId).order('created_at', { ascending: false }).limit(4)
   const diary = (diaryData ?? []) as ObservationDiaryRow[]
 
+  // Pending connection requests (athletes asking to join)
+  const { data: pendingRaw } = await supabase
+    .from('connections')
+    .select('id, initiator_id, created_at')
+    .eq('recipient_id', userId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(5)
+  const pendingConnections = (pendingRaw ?? []) as Array<{ id: string; initiator_id: string; created_at: string }>
+  const initiatorIds = pendingConnections.map(p => p.initiator_id)
+  const { data: initiatorsData } = initiatorIds.length
+    ? await supabase.from('users').select('id, name, avatar_url').in('id', initiatorIds)
+    : { data: [] as Array<{ id: string; name: string | null; avatar_url: string | null }> }
+  const initiatorsById = new Map((initiatorsData ?? []).map(u => [u.id, u]))
+  const pending = pendingConnections.map(p => ({ ...p, user: initiatorsById.get(p.initiator_id) ?? null }))
+
   const avgRecovery = Object.values(metricsMap).length ? Math.round(Object.values(metricsMap).reduce((s, m) => s + m.recovery, 0) / Object.values(metricsMap).length) : 0
 
   const AT_COLORS = ['#2563EB','#F97316','#16A34A','#7C3AED','#D97706','#DC2626']
@@ -52,8 +68,44 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
         <StatCard label="Мои атлеты" value={athletes?.length ?? 0} icon="ki-people" iconColor="#2563EB" />
         <StatCard label="Ср. восстановление" value={avgRecovery + '%'} icon="ki-graph-up" iconColor={recoveryColor(avgRecovery)} />
         <StatCard label="Записей в дневнике" value={diary?.length ?? 0} icon="ki-notepad-edit" iconColor="#7C3AED" sub="эта неделя" />
-        <StatCard label="Атлетов подключено" value={athleteIds.length} icon="ki-abstract-26" iconColor="#F97316" />
+        <StatCard label="Заявки в связи" value={pending.length} icon="ki-message-question" iconColor="#F97316" sub={pending.length > 0 ? 'ждут ответа' : 'новых нет'} />
       </div>
+
+      {pending.length > 0 && (
+        <div className="rounded-2xl border border-[#FED7AA] bg-gradient-to-r from-[#FFF7ED] to-white p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FED7AA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i className="ki-filled ki-message-question text-sm" style={{ color: '#EA580C' }} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Новые заявки от атлетов</p>
+                <p className="text-[11px] text-slate-500">Примите или отклоните в разделе &laquo;Мои связи&raquo;</p>
+              </div>
+            </div>
+            <Link href="/connections" className="text-xs font-semibold text-[#EA580C] hover:underline">Открыть →</Link>
+          </div>
+          <div className="flex flex-col gap-2">
+            {pending.slice(0, 3).map(p => (
+              <Link key={p.id} href="/connections" className="flex items-center gap-3 rounded-xl bg-white/70 px-3 py-2 hover:bg-white">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 overflow-hidden" style={{ background: '#F97316' }}>
+                  {p.user?.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.user.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    initials(p.user?.name ?? '?')
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-slate-800 truncate">{p.user?.name ?? 'Атлет'}</div>
+                  <div className="text-[11px] text-slate-400">{fmtDate(p.created_at)}</div>
+                </div>
+                <i className="ki-filled ki-right text-xs text-slate-400" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Athlete cards */}
       <div>
