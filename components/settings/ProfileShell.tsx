@@ -253,6 +253,39 @@ export function Select(props: {
   )
 }
 
+export function Chips(props: {
+  value: string[]
+  options: { value: string; label: string }[]
+  onChange: (v: string[]) => void
+}) {
+  const set = new Set(props.value)
+  return (
+    <div className="flex flex-wrap gap-2">
+      {props.options.map(o => {
+        const active = set.has(o.value)
+        return (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => {
+              const next = new Set(set)
+              if (active) next.delete(o.value); else next.add(o.value)
+              props.onChange(Array.from(next))
+            }}
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              active
+                ? 'border-orange-400 bg-orange-50 text-orange-700'
+                : 'border-border bg-background text-muted-foreground hover:border-orange-300 hover:text-foreground'
+            }`}
+          >
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export function Toggle(props: {
   label: string
   hint?: string

@@ -11,6 +11,7 @@ import {
   TextArea,
   Select,
   Toggle,
+  Chips,
 } from './ProfileShell'
 
 function getSB() {
@@ -93,6 +94,67 @@ const SPORT_TYPES = [
   { value: 'Другое', label: '✏️ Другое' },
 ]
 
+const SESSION_FORMATS = [
+  { value: 'offline',    label: 'Очно в зале' },
+  { value: 'online',     label: 'Онлайн' },
+  { value: 'home',       label: 'Выезд к клиенту' },
+  { value: 'group',      label: 'Групповые' },
+  { value: 'camp',       label: 'Сборы / кэмпы' },
+  { value: 'async',      label: 'План на неделю (async)' },
+]
+
+const CONSULTATION_FORMATS = [
+  { value: 'offline',  label: 'Очно в клинике' },
+  { value: 'online',   label: 'Телемедицина' },
+  { value: 'home',     label: 'Вызов на дом' },
+  { value: 'emergency',label: 'Экстренные случаи' },
+]
+
+const DOCTOR_SERVICES = [
+  { value: 'checkup',        label: 'Диспансеризация' },
+  { value: 'cardio_test',    label: 'Нагрузочный тест' },
+  { value: 'ecg',            label: 'ЭКГ / Холтер' },
+  { value: 'body_composition', label: 'Биоимпедансометрия' },
+  { value: 'vo2max',         label: 'VO₂max / газоанализ' },
+  { value: 'blood_panel',    label: 'Биохимия крови' },
+  { value: 'nutrition_plan', label: 'План питания' },
+  { value: 'injury_rehab',   label: 'Реабилитация травм' },
+  { value: 'sleep_analysis', label: 'Анализ сна / HRV' },
+  { value: 'psych_support',  label: 'Психологическая поддержка' },
+]
+
+const ORG_TYPES = [
+  { value: '',            label: '— Выбрать —' },
+  { value: 'club',        label: '🏅 Спортивный клуб' },
+  { value: 'federation',  label: '🏛 Федерация' },
+  { value: 'team',        label: '🚴 Команда' },
+  { value: 'school',      label: '🎓 Спортшкола' },
+  { value: 'gym',         label: '💪 Фитнес-центр' },
+  { value: 'academy',     label: '📘 Академия' },
+  { value: 'other',       label: '✏️ Другое' },
+]
+
+const ORG_SERVICES = [
+  { value: 'training',     label: 'Тренировки' },
+  { value: 'competitions', label: 'Соревнования' },
+  { value: 'camps',        label: 'Сборы / кэмпы' },
+  { value: 'individual',   label: 'Персональный тренер' },
+  { value: 'nutrition',    label: 'Питание' },
+  { value: 'medical',      label: 'Медицинское сопровождение' },
+  { value: 'recovery',     label: 'Восстановление / SPA' },
+  { value: 'rental',       label: 'Аренда площадки' },
+]
+
+const ADMIN_RESPONSIBILITIES = [
+  { value: 'moderation',   label: 'Модерация' },
+  { value: 'support',      label: 'Поддержка' },
+  { value: 'billing',      label: 'Биллинг' },
+  { value: 'content',      label: 'Контент' },
+  { value: 'partnerships', label: 'Партнёрства' },
+  { value: 'tech',         label: 'Техподдержка' },
+  { value: 'analytics',    label: 'Аналитика' },
+]
+
 type CoachForm = {
   first_name: string; last_name: string; birth_date: string; gender: string
   phone: string; city: string; country: string; bio: string
@@ -100,33 +162,43 @@ type CoachForm = {
   certifications_text: string; sports_text: string; languages_text: string
   workplace: string; hourly_rate: string; currency: string
   telegram_url: string; instagram_url: string; youtube_url: string; website_url: string
+  whatsapp_url: string; email_public: string
   athletes_count: string; accepts_new_athletes: boolean; profile_public: boolean
+  coaching_philosophy: string; session_formats: string[]
+  achievements_text: string; past_workplaces_text: string
 }
 
 type DoctorForm = {
   first_name: string; last_name: string; birth_date: string; gender: string
   phone: string; city: string; country: string; bio: string
   medical_specialization: string; license_number: string; license_authority: string
+  license_expires_at: string; main_focus: string
   education: string; degree: string; experience_years: string; workplace: string
   certifications_text: string; languages_text: string
+  services: string[]; consultation_formats: string[]
+  hospital_affiliations_text: string
+  scientific_publications_text: string
   consultation_fee: string; currency: string
-  telegram_url: string; website_url: string
-  accepts_new_patients: boolean; profile_public: boolean
+  telegram_url: string; website_url: string; whatsapp_url: string
+  accepts_new_patients: boolean; profile_public: boolean; emergency_contact: boolean
 }
 
 type OrgForm = {
-  org_name: string; org_slug: string; sport_type: string; description: string
+  org_name: string; org_slug: string; org_type: string; sport_type: string; description: string
   website_url: string; email: string; phone: string; address: string
   city: string; country: string; founded_year: string; members_count: string
   contact_person: string; languages_text: string
   instagram_url: string; telegram_url: string; youtube_url: string
   profile_public: boolean
+  training_base: string; license_info: string; coaches_count: string
+  services: string[]; membership_types_text: string
 }
 
 type AdminForm = {
   first_name: string; last_name: string; phone: string
   city: string; country: string; bio: string
   department: string; access_level: string; notes: string
+  responsibilities: string[]; work_email: string; on_call: boolean; schedule: string
 }
 
 const EMPTY_COACH: CoachForm = {
@@ -136,30 +208,40 @@ const EMPTY_COACH: CoachForm = {
   certifications_text: '', sports_text: '', languages_text: '',
   workplace: '', hourly_rate: '', currency: 'RUB',
   telegram_url: '', instagram_url: '', youtube_url: '', website_url: '',
+  whatsapp_url: '', email_public: '',
   athletes_count: '', accepts_new_athletes: true, profile_public: true,
+  coaching_philosophy: '', session_formats: [],
+  achievements_text: '', past_workplaces_text: '',
 }
 const EMPTY_DOCTOR: DoctorForm = {
   first_name: '', last_name: '', birth_date: '', gender: '',
   phone: '', city: '', country: '', bio: '',
   medical_specialization: '', license_number: '', license_authority: '',
+  license_expires_at: '', main_focus: '',
   education: '', degree: '', experience_years: '', workplace: '',
   certifications_text: '', languages_text: '',
+  services: [], consultation_formats: [],
+  hospital_affiliations_text: '',
+  scientific_publications_text: '',
   consultation_fee: '', currency: 'RUB',
-  telegram_url: '', website_url: '',
-  accepts_new_patients: true, profile_public: true,
+  telegram_url: '', website_url: '', whatsapp_url: '',
+  accepts_new_patients: true, profile_public: true, emergency_contact: false,
 }
 const EMPTY_ORG: OrgForm = {
-  org_name: '', org_slug: '', sport_type: '', description: '',
+  org_name: '', org_slug: '', org_type: '', sport_type: '', description: '',
   website_url: '', email: '', phone: '', address: '',
   city: '', country: '', founded_year: '', members_count: '',
   contact_person: '', languages_text: '',
   instagram_url: '', telegram_url: '', youtube_url: '',
   profile_public: true,
+  training_base: '', license_info: '', coaches_count: '',
+  services: [], membership_types_text: '',
 }
 const EMPTY_ADMIN: AdminForm = {
   first_name: '', last_name: '', phone: '',
   city: '', country: '', bio: '',
   department: '', access_level: '', notes: '',
+  responsibilities: [], work_email: '', on_call: false, schedule: '',
 }
 
 function listFromText(v: string): string[] {
@@ -175,36 +257,48 @@ function textFromCerts(v: unknown): string {
   if (!Array.isArray(v)) return ''
   return v.map(c => (typeof c === 'string' ? c : (c as { name?: string })?.name ?? '')).filter(Boolean).join('\n')
 }
+function jsonbLinesFromText(v: string): { text: string }[] {
+  return v.split(/\n/).map(s => s.trim()).filter(Boolean).map(text => ({ text }))
+}
+function textFromJsonbLines(v: unknown): string {
+  if (!Array.isArray(v)) return ''
+  return v.map(x => (typeof x === 'string' ? x : (x as { text?: string; name?: string })?.text ?? (x as { name?: string })?.name ?? '')).filter(Boolean).join('\n')
+}
 
 type TabDef = { id: string; label: string; icon: string; color: string }
 
 const COACH_TABS: TabDef[] = [
-  { id: 'personal',  label: 'Личные данные',     icon: 'ki-profile-circle', color: '#F97316' },
-  { id: 'professional', label: 'Профессия',      icon: 'ki-abstract-26',    color: '#2563EB' },
-  { id: 'experience', label: 'Опыт и ставка',    icon: 'ki-medal-star',     color: '#0D9488' },
-  { id: 'contacts',  label: 'Контакты',          icon: 'ki-people',         color: '#7C3AED' },
-  { id: 'privacy',   label: 'Приватность',       icon: 'ki-shield-tick',    color: '#16A34A' },
+  { id: 'personal',     label: 'Личные данные', icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'professional', label: 'Профессия',     icon: 'ki-abstract-26',    color: '#2563EB' },
+  { id: 'methodology',  label: 'Методика',      icon: 'ki-flash',          color: '#8B5CF6' },
+  { id: 'experience',   label: 'Опыт и ставка', icon: 'ki-medal-star',     color: '#0D9488' },
+  { id: 'contacts',     label: 'Контакты',      icon: 'ki-people',         color: '#7C3AED' },
+  { id: 'privacy',      label: 'Приватность',   icon: 'ki-shield-tick',    color: '#16A34A' },
 ]
 
 const DOCTOR_TABS: TabDef[] = [
   { id: 'personal',    label: 'Личные данные',   icon: 'ki-profile-circle', color: '#F97316' },
   { id: 'medical',     label: 'Специализация',   icon: 'ki-heart',          color: '#E11D48' },
   { id: 'education',   label: 'Образование',     icon: 'ki-book',           color: '#2563EB' },
+  { id: 'services',    label: 'Услуги и формат', icon: 'ki-abstract-26',    color: '#0EA5E9' },
   { id: 'practice',    label: 'Практика',        icon: 'ki-briefcase',      color: '#0D9488' },
   { id: 'privacy',     label: 'Приватность',     icon: 'ki-shield-tick',    color: '#16A34A' },
 ]
 
 const ORG_TABS: TabDef[] = [
-  { id: 'main',      label: 'Основное',          icon: 'ki-home-2',         color: '#F97316' },
-  { id: 'contacts',  label: 'Контакты',          icon: 'ki-sms',            color: '#2563EB' },
-  { id: 'social',    label: 'Соцсети',           icon: 'ki-share',          color: '#7C3AED' },
-  { id: 'privacy',   label: 'Приватность',       icon: 'ki-shield-tick',    color: '#16A34A' },
+  { id: 'main',         label: 'Основное',         icon: 'ki-home-2',         color: '#F97316' },
+  { id: 'structure',    label: 'Структура',        icon: 'ki-abstract-26',    color: '#0D9488' },
+  { id: 'membership',   label: 'Услуги и членство', icon: 'ki-crown',         color: '#8B5CF6' },
+  { id: 'contacts',     label: 'Контакты',         icon: 'ki-sms',            color: '#2563EB' },
+  { id: 'social',       label: 'Соцсети',          icon: 'ki-share',          color: '#7C3AED' },
+  { id: 'privacy',      label: 'Приватность',      icon: 'ki-shield-tick',    color: '#16A34A' },
 ]
 
 const ADMIN_TABS: TabDef[] = [
-  { id: 'personal', label: 'Личные данные',      icon: 'ki-profile-circle', color: '#F97316' },
-  { id: 'role',     label: 'Права доступа',      icon: 'ki-shield-tick',    color: '#16A34A' },
-  { id: 'contacts', label: 'Контакты',           icon: 'ki-sms',            color: '#2563EB' },
+  { id: 'personal',        label: 'Личные данные',  icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'role',            label: 'Права доступа',  icon: 'ki-shield-tick',    color: '#16A34A' },
+  { id: 'responsibilities',label: 'Зоны ответственности', icon: 'ki-abstract-26', color: '#8B5CF6' },
+  { id: 'contacts',        label: 'Контакты',       icon: 'ki-sms',            color: '#2563EB' },
 ]
 
 export default function RoleProfile({ user }: { user: AppUser }) {
@@ -292,6 +386,12 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           athletes_count: c.athletes_count != null ? String(c.athletes_count) : '',
           accepts_new_athletes: Boolean(c.accepts_new_athletes ?? true),
           profile_public:       Boolean(c.profile_public ?? true),
+          whatsapp_url: String(c.whatsapp_url ?? ''),
+          email_public: String(c.email_public ?? ''),
+          coaching_philosophy: String(c.coaching_philosophy ?? ''),
+          session_formats: Array.isArray(c.session_formats) ? (c.session_formats as string[]) : [],
+          achievements_text: textFromJsonbLines(c.achievements),
+          past_workplaces_text: textFromJsonbLines(c.past_workplaces),
         })
       } else if (role === 'doctor') {
         const { data } = await sb.from('doctors').select('*').eq('id', user.id).maybeSingle()
@@ -318,8 +418,16 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           currency: String(d.currency ?? 'RUB'),
           telegram_url: String(d.telegram_url ?? ''),
           website_url:  String(d.website_url ?? ''),
+          whatsapp_url: String(d.whatsapp_url ?? ''),
           accepts_new_patients: Boolean(d.accepts_new_patients ?? true),
           profile_public:       Boolean(d.profile_public ?? true),
+          license_expires_at: String(d.license_expires_at ?? ''),
+          main_focus: String(d.main_focus ?? ''),
+          services: Array.isArray(d.services) ? (d.services as string[]) : [],
+          consultation_formats: Array.isArray(d.consultation_formats) ? (d.consultation_formats as string[]) : [],
+          hospital_affiliations_text: textFromList(d.hospital_affiliations as string[] | null),
+          scientific_publications_text: textFromJsonbLines(d.scientific_publications),
+          emergency_contact: Boolean(d.emergency_contact ?? false),
         })
       } else if (role === 'organization') {
         const { data } = await sb.from('organizations').select('*').eq('id', user.id).maybeSingle()
@@ -343,6 +451,12 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           telegram_url:  String(o.telegram_url ?? ''),
           youtube_url:   String(o.youtube_url ?? ''),
           profile_public: Boolean(o.profile_public ?? true),
+          org_type: String(o.org_type ?? ''),
+          training_base: String(o.training_base ?? ''),
+          license_info: String(o.license_info ?? ''),
+          coaches_count: o.coaches_count != null ? String(o.coaches_count) : '',
+          services: Array.isArray(o.services) ? (o.services as string[]) : [],
+          membership_types_text: textFromJsonbLines(o.membership_types),
         })
       } else if (role === 'admin') {
         const { data } = await sb.from('admins').select('*').eq('id', user.id).maybeSingle()
@@ -357,6 +471,10 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           department: String(a.department ?? ''),
           access_level: String(a.access_level ?? ''),
           notes:      String(a.notes ?? ''),
+          responsibilities: Array.isArray(a.responsibilities) ? (a.responsibilities as string[]) : [],
+          work_email: String(a.work_email ?? ''),
+          on_call: Boolean(a.on_call ?? false),
+          schedule: String(a.schedule ?? ''),
         })
       }
       setLoading(false)
@@ -432,6 +550,12 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           athletes_count: coach.athletes_count ? Number(coach.athletes_count) : null,
           accepts_new_athletes: coach.accepts_new_athletes,
           profile_public:       coach.profile_public,
+          whatsapp_url: coach.whatsapp_url || null,
+          email_public: coach.email_public || null,
+          coaching_philosophy: coach.coaching_philosophy || null,
+          session_formats: coach.session_formats,
+          achievements: jsonbLinesFromText(coach.achievements_text),
+          past_workplaces: jsonbLinesFromText(coach.past_workplaces_text),
           updated_at: new Date().toISOString(),
         }
         const { error } = await (sb.from('coaches') as any).upsert(payload, { onConflict: 'id' })
@@ -462,8 +586,16 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           currency: doctor.currency || 'RUB',
           telegram_url: doctor.telegram_url || null,
           website_url:  doctor.website_url  || null,
+          whatsapp_url: doctor.whatsapp_url || null,
           accepts_new_patients: doctor.accepts_new_patients,
           profile_public:       doctor.profile_public,
+          license_expires_at: doctor.license_expires_at || null,
+          main_focus: doctor.main_focus || null,
+          services: doctor.services,
+          consultation_formats: doctor.consultation_formats,
+          hospital_affiliations: listFromText(doctor.hospital_affiliations_text),
+          scientific_publications: jsonbLinesFromText(doctor.scientific_publications_text),
+          emergency_contact: doctor.emergency_contact,
           updated_at: new Date().toISOString(),
         }
         const { error } = await (sb.from('doctors') as any).upsert(payload, { onConflict: 'id' })
@@ -491,6 +623,12 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           telegram_url:  org.telegram_url  || null,
           youtube_url:   org.youtube_url   || null,
           profile_public: org.profile_public,
+          org_type: org.org_type || null,
+          training_base: org.training_base || null,
+          license_info: org.license_info || null,
+          coaches_count: org.coaches_count ? Number(org.coaches_count) : null,
+          services: org.services,
+          membership_types: jsonbLinesFromText(org.membership_types_text),
           updated_at: new Date().toISOString(),
         }
         const { error } = await (sb.from('organizations') as any).upsert(payload, { onConflict: 'id' })
@@ -508,6 +646,10 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           department: admin.department || null,
           access_level: admin.access_level || null,
           notes:      admin.notes      || null,
+          responsibilities: admin.responsibilities,
+          work_email: admin.work_email || null,
+          on_call: admin.on_call,
+          schedule: admin.schedule || null,
           updated_at: new Date().toISOString(),
         }
         const { error } = await (sb.from('admins') as any).upsert(payload, { onConflict: 'id' })
@@ -563,7 +705,7 @@ export default function RoleProfile({ user }: { user: AppUser }) {
 // ────────────────────────────────────────────────────────────────────────────
 
 function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: React.Dispatch<React.SetStateAction<CoachForm>> }) {
-  const u = (k: keyof CoachForm) => (v: string | boolean) => set(s => ({ ...s, [k]: v }))
+  const u = (k: keyof CoachForm) => (v: string | boolean | string[]) => set(s => ({ ...s, [k]: v }))
 
   if (tab === 'personal') {
     return (
@@ -595,6 +737,25 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
     )
   }
 
+  if (tab === 'methodology') {
+    return (
+      <FormSection title="Методика и достижения" icon="ki-flash" iconBg="#F5F3FF" iconColor="#8B5CF6">
+        <Field label="Философия тренировок" full hint="Ваш подход, принципы работы с атлетами">
+          <TextArea value={form.coaching_philosophy} onChange={u('coaching_philosophy') as (v: string) => void} rows={4} placeholder="Индивидуальный план, акцент на восстановлении и биомеханике…" />
+        </Field>
+        <Field label="Форматы тренировок" full>
+          <Chips value={form.session_formats} options={SESSION_FORMATS} onChange={u('session_formats') as (v: string[]) => void} />
+        </Field>
+        <Field label="Достижения" full hint="Каждое с новой строки: награды, титулы, результаты учеников">
+          <TextArea value={form.achievements_text} onChange={u('achievements_text') as (v: string) => void} rows={4} placeholder="Подготовил 3-х призёров чемпионата России 2023\nПобедитель Bosco Cup 2022" />
+        </Field>
+        <Field label="Предыдущие места работы" full hint="Каждое с новой строки">
+          <TextArea value={form.past_workplaces_text} onChange={u('past_workplaces_text') as (v: string) => void} rows={3} placeholder="SkyRun Academy (2019-2023) — старший тренер" />
+        </Field>
+      </FormSection>
+    )
+  }
+
   if (tab === 'experience') {
     return (
       <FormSection title="Опыт и ставка" icon="ki-medal-star" iconBg="#ECFDF5" iconColor="#0D9488">
@@ -616,6 +777,8 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
   if (tab === 'contacts') {
     return (
       <FormSection title="Контакты и соцсети" icon="ki-people" iconBg="#F5F3FF" iconColor="#7C3AED">
+        <Field label="Публичный e-mail"><TextInput type="email" value={form.email_public} onChange={u('email_public') as (v: string) => void} placeholder="coach@example.com" /></Field>
+        <Field label="WhatsApp"><TextInput value={form.whatsapp_url} onChange={u('whatsapp_url') as (v: string) => void} placeholder="https://wa.me/79001234567" /></Field>
         <Field label="Telegram"><TextInput value={form.telegram_url} onChange={u('telegram_url') as (v: string) => void} placeholder="https://t.me/coach" /></Field>
         <Field label="Instagram"><TextInput value={form.instagram_url} onChange={u('instagram_url') as (v: string) => void} placeholder="https://instagram.com/…" /></Field>
         <Field label="YouTube"><TextInput value={form.youtube_url} onChange={u('youtube_url') as (v: string) => void} placeholder="https://youtube.com/@…" /></Field>
@@ -645,7 +808,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
 }
 
 function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: React.Dispatch<React.SetStateAction<DoctorForm>> }) {
-  const u = (k: keyof DoctorForm) => (v: string | boolean) => set(s => ({ ...s, [k]: v }))
+  const u = (k: keyof DoctorForm) => (v: string | boolean | string[]) => set(s => ({ ...s, [k]: v }))
 
   if (tab === 'personal') {
     return (
@@ -669,7 +832,36 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
         <Field label="Стаж (лет)"><TextInput type="number" value={form.experience_years} onChange={u('experience_years') as (v: string) => void} /></Field>
         <Field label="Номер лицензии"><TextInput value={form.license_number} onChange={u('license_number') as (v: string) => void} /></Field>
         <Field label="Выдана (орган)"><TextInput value={form.license_authority} onChange={u('license_authority') as (v: string) => void} placeholder="Росздравнадзор, Минздрав…" /></Field>
+        <Field label="Лицензия действует до"><TextInput type="date" value={form.license_expires_at} onChange={u('license_expires_at') as (v: string) => void} /></Field>
+        <Field label="Основной фокус работы"><TextInput value={form.main_focus} onChange={u('main_focus') as (v: string) => void} placeholder="Выносливость, циклические виды" /></Field>
         <Field label="Языки приёма" hint="Через запятую" full><TextInput value={form.languages_text} onChange={u('languages_text') as (v: string) => void} placeholder="Русский, Английский" /></Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'services') {
+    return (
+      <FormSection title="Услуги и форматы приёма" icon="ki-abstract-26" iconBg="#E0F2FE" iconColor="#0EA5E9">
+        <Field label="Услуги" full>
+          <Chips value={form.services} options={DOCTOR_SERVICES} onChange={u('services') as (v: string[]) => void} />
+        </Field>
+        <Field label="Формат приёма" full>
+          <Chips value={form.consultation_formats} options={CONSULTATION_FORMATS} onChange={u('consultation_formats') as (v: string[]) => void} />
+        </Field>
+        <Field label="Аффилиации / больницы" full hint="Через запятую">
+          <TextInput value={form.hospital_affiliations_text} onChange={u('hospital_affiliations_text') as (v: string) => void} placeholder="Клиника Спортивной Медицины, Медси" />
+        </Field>
+        <Field label="Научные публикации" full hint="Каждая с новой строки">
+          <TextArea value={form.scientific_publications_text} onChange={u('scientific_publications_text') as (v: string) => void} rows={3} placeholder="«HRV у триатлетов», Журнал СпортМедицины, 2023" />
+        </Field>
+        <Field label="Приём экстренных случаев" full>
+          <Toggle
+            label="Могу принимать экстренные обращения"
+            hint="Спортивные травмы, неотложная помощь"
+            value={form.emergency_contact}
+            onChange={u('emergency_contact') as (v: boolean) => void}
+          />
+        </Field>
       </FormSection>
     )
   }
@@ -700,6 +892,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
           ]} />
         </Field>
         <Field label="Telegram"><TextInput value={form.telegram_url} onChange={u('telegram_url') as (v: string) => void} /></Field>
+        <Field label="WhatsApp"><TextInput value={form.whatsapp_url} onChange={u('whatsapp_url') as (v: string) => void} placeholder="https://wa.me/…" /></Field>
         <Field label="Сайт"><TextInput value={form.website_url} onChange={u('website_url') as (v: string) => void} /></Field>
       </FormSection>
     )
@@ -726,18 +919,46 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
 }
 
 function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Dispatch<React.SetStateAction<OrgForm>> }) {
-  const u = (k: keyof OrgForm) => (v: string | boolean) => set(s => ({ ...s, [k]: v }))
+  const u = (k: keyof OrgForm) => (v: string | boolean | string[]) => set(s => ({ ...s, [k]: v }))
 
   if (tab === 'main') {
     return (
       <FormSection title="Основная информация" icon="ki-home-2" iconBg="#FFF7ED" iconColor="#F97316">
         <Field label="Название организации"><TextInput value={form.org_name} onChange={u('org_name') as (v: string) => void} /></Field>
         <Field label="Короткий URL (slug)" hint="например: skyrun"><TextInput value={form.org_slug} onChange={u('org_slug') as (v: string) => void} /></Field>
+        <Field label="Тип организации"><Select value={form.org_type} onChange={u('org_type') as (v: string) => void} options={ORG_TYPES} /></Field>
         <Field label="Вид спорта"><Select value={form.sport_type} onChange={u('sport_type') as (v: string) => void} options={SPORT_TYPES} /></Field>
         <Field label="Год основания"><TextInput type="number" value={form.founded_year} onChange={u('founded_year') as (v: string) => void} placeholder="2018" /></Field>
-        <Field label="Количество участников"><TextInput type="number" value={form.members_count} onChange={u('members_count') as (v: string) => void} /></Field>
         <Field label="Контактное лицо"><TextInput value={form.contact_person} onChange={u('contact_person') as (v: string) => void} /></Field>
         <Field label="Описание" full><TextArea value={form.description} onChange={u('description') as (v: string) => void} placeholder="О клубе, федерации, команде…" rows={4} /></Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'structure') {
+    return (
+      <FormSection title="Структура и инфраструктура" icon="ki-abstract-26" iconBg="#ECFDF5" iconColor="#0D9488">
+        <Field label="Участников всего"><TextInput type="number" value={form.members_count} onChange={u('members_count') as (v: string) => void} placeholder="120" /></Field>
+        <Field label="Тренеров в штате"><TextInput type="number" value={form.coaches_count} onChange={u('coaches_count') as (v: string) => void} placeholder="8" /></Field>
+        <Field label="Тренировочная база" full hint="Адрес / локация / описание">
+          <TextArea value={form.training_base} onChange={u('training_base') as (v: string) => void} rows={3} placeholder="Стадион Лужники, 50-м бассейн, 400-м тартан" />
+        </Field>
+        <Field label="Лицензия / разрешения" full hint="Номер и орган, выдавший разрешение">
+          <TextInput value={form.license_info} onChange={u('license_info') as (v: string) => void} placeholder="Лицензия Минспорта РФ №…" />
+        </Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'membership') {
+    return (
+      <FormSection title="Услуги и членство" icon="ki-crown" iconBg="#F5F3FF" iconColor="#8B5CF6">
+        <Field label="Предоставляемые услуги" full>
+          <Chips value={form.services} options={ORG_SERVICES} onChange={u('services') as (v: string[]) => void} />
+        </Field>
+        <Field label="Тарифы / членство" full hint="Каждый тариф с новой строки: название — цена — период">
+          <TextArea value={form.membership_types_text} onChange={u('membership_types_text') as (v: string) => void} rows={4} placeholder="Базовый — 5 000 ₽/месяц — безлимит\nПро — 12 000 ₽/месяц — + персональные" />
+        </Field>
       </FormSection>
     )
   }
@@ -781,7 +1002,7 @@ function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Di
 }
 
 function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: React.Dispatch<React.SetStateAction<AdminForm>> }) {
-  const u = (k: keyof AdminForm) => (v: string | boolean) => set(s => ({ ...s, [k]: v }))
+  const u = (k: keyof AdminForm) => (v: string | boolean | string[]) => set(s => ({ ...s, [k]: v }))
 
   if (tab === 'personal') {
     return (
@@ -800,7 +1021,19 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
       <FormSection title="Служебные данные" icon="ki-shield-tick" iconBg="#ECFDF5" iconColor="#16A34A">
         <Field label="Департамент"><TextInput value={form.department} onChange={u('department') as (v: string) => void} placeholder="Поддержка / Модерация" /></Field>
         <Field label="Уровень доступа"><Select value={form.access_level} onChange={u('access_level') as (v: string) => void} options={ACCESS_LEVELS} /></Field>
+        <Field label="График работы"><TextInput value={form.schedule} onChange={u('schedule') as (v: string) => void} placeholder="Пн-Пт, 10-19 МСК" /></Field>
+        <Field label="Доступность"><div className="flex items-center h-full"><Toggle label="Дежурство on-call" hint="Экстренные инциденты" value={form.on_call} onChange={u('on_call') as (v: boolean) => void} /></div></Field>
         <Field label="Внутренние заметки" full><TextArea value={form.notes} onChange={u('notes') as (v: string) => void} rows={4} /></Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'responsibilities') {
+    return (
+      <FormSection title="Зоны ответственности" icon="ki-abstract-26" iconBg="#F5F3FF" iconColor="#8B5CF6">
+        <Field label="Направления работы" full>
+          <Chips value={form.responsibilities} options={ADMIN_RESPONSIBILITIES} onChange={u('responsibilities') as (v: string[]) => void} />
+        </Field>
       </FormSection>
     )
   }
@@ -808,6 +1041,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
   return (
     <FormSection title="Контакты" icon="ki-sms" iconBg="#EFF6FF" iconColor="#2563EB">
       <Field label="Телефон"><TextInput value={form.phone} onChange={u('phone') as (v: string) => void} /></Field>
+      <Field label="Рабочий e-mail"><TextInput type="email" value={form.work_email} onChange={u('work_email') as (v: string) => void} placeholder="admin@proform.test" /></Field>
     </FormSection>
   )
 }
