@@ -192,32 +192,47 @@ export default function DoctorDash({ userId, name }: { userId: string; name: str
           ) : (
             <div className="grid gap-2.5">
               {recentPatients.map((p) => (
-                <Link
+                <div
                   key={p.id}
-                  href={p.user ? `/profile/${p.user.id}` : '/connections'}
                   className="group flex items-center gap-3 rounded-2xl border border-border bg-background px-3 py-3 transition-all hover:border-red-200 hover:bg-red-50/60"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
-                    {p.user?.avatar_url ? (
-                      <img src={p.user.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover" />
-                    ) : (
-                      <i className="ki-filled ki-user text-[15px]" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-foreground">{displayName(p.user)}</div>
-                    <div className="mt-0.5 flex items-center gap-2 text-2xs text-muted-foreground">
-                      {p.user?.sport && <span className="truncate">{p.user.sport}</span>}
-                      {p.user?.city && (
-                        <>
-                          <span className="h-1 w-1 rounded-full bg-border" />
-                          <span className="truncate">{p.user.city}</span>
-                        </>
+                  <Link
+                    href={p.user ? `/profile/${p.user.id}` : '/connections'}
+                    className="flex flex-1 min-w-0 items-center gap-3"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                      {p.user?.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.user.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover" />
+                      ) : (
+                        <i className="ki-filled ki-user text-[15px]" />
                       )}
                     </div>
-                  </div>
-                  <i className="ki-filled ki-right text-[11px] text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-red-500" />
-                </Link>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-foreground">{displayName(p.user)}</div>
+                      <div className="mt-0.5 flex items-center gap-2 text-2xs text-muted-foreground">
+                        {p.user?.sport && <span className="truncate">{p.user.sport}</span>}
+                        {p.user?.city && (
+                          <>
+                            <span className="h-1 w-1 rounded-full bg-border" />
+                            <span className="truncate">{p.user.city}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  {p.user && (
+                    <Link
+                      href={`/doctor/report/${p.user.id}`}
+                      title="Медицинский отчёт · PDF"
+                      className="flex h-8 items-center gap-1 rounded-lg border border-red-200 bg-white px-2 text-[11px] font-bold text-red-700 hover:bg-red-50"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <i className="ki-filled ki-document text-[12px]" />
+                      Отчёт
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           )}
