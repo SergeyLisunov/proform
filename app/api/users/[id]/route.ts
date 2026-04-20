@@ -20,11 +20,27 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const { data: athlete } = await supabase
-    .from('athletes')
-    .select('primary_sport, fitness_level, goal, height_cm, weight_kg, club, weekly_training_hours, profile_public, workouts_public')
-    .eq('id', id)
-    .maybeSingle()
+  // Role-specific profile record
+  let roleProfile: Record<string, unknown> | null = null
+  if (profile.role === 'athlete') {
+    const { data } = await supabase
+      .from('athletes')
+      .select('primary_sport, fitness_level, goal, height_cm, weight_kg, club, weekly_training_hours, profile_public, workouts_public')
+      .eq('id', id).maybeSingle()
+    roleProfile = (data as Record<string, unknown>) ?? null
+  } else if (profile.role === 'coach') {
+    const { data } = await supabase
+      .from('coaches').select('*').eq('id', id).maybeSingle()
+    roleProfile = (data as Record<string, unknown>) ?? null
+  } else if (profile.role === 'doctor') {
+    const { data } = await supabase
+      .from('doctors').select('*').eq('id', id).maybeSingle()
+    roleProfile = (data as Record<string, unknown>) ?? null
+  } else if (profile.role === 'organization') {
+    const { data } = await supabase
+      .from('organizations').select('*').eq('id', id).maybeSingle()
+    roleProfile = (data as Record<string, unknown>) ?? null
+  }
 
   // Connection status between me and this user
   let connectionStatus = 'none'
@@ -40,7 +56,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   return NextResponse.json({
-    profile: { ...profile, ...(athlete ?? {}) },
+    profile: { ...profile, ...(roleProfile ?? {}) },
     connectionStatus,
     connectionId,
     isOwn: me.id === id,

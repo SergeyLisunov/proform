@@ -24,16 +24,104 @@ type Profile = {
   city: string | null
   country: string | null
   bio: string | null
-  coach_specialization: string | null
-  experience_years: number | null
-  primary_sport: string | null
-  fitness_level: string | null
-  goal: string | null
-  height_cm: number | null
-  weight_kg: number | null
-  club: string | null
-  weekly_training_hours: number | null
-  profile_public: boolean
+  // athlete
+  primary_sport?: string | null
+  fitness_level?: string | null
+  goal?: string | null
+  height_cm?: number | null
+  weight_kg?: number | null
+  club?: string | null
+  weekly_training_hours?: number | null
+  profile_public?: boolean
+  // coach/doctor common
+  specialization?: string | null
+  experience_years?: number | null
+  coach_specialization?: string | null
+  medical_specialization?: string | null
+  workplace?: string | null
+  education?: string | null
+  sports?: string[] | null
+  languages?: string[] | null
+  certifications?: unknown
+  telegram_url?: string | null
+  instagram_url?: string | null
+  youtube_url?: string | null
+  website_url?: string | null
+  whatsapp_url?: string | null
+  email_public?: string | null
+  // coach
+  coaching_philosophy?: string | null
+  session_formats?: string[] | null
+  achievements?: unknown
+  past_workplaces?: unknown
+  hourly_rate?: number | null
+  athletes_count?: number | null
+  accepts_new_athletes?: boolean
+  currency?: string | null
+  // doctor
+  license_number?: string | null
+  license_authority?: string | null
+  license_expires_at?: string | null
+  main_focus?: string | null
+  services?: string[] | null
+  consultation_formats?: string[] | null
+  hospital_affiliations?: string[] | null
+  scientific_publications?: unknown
+  consultation_fee?: number | null
+  accepts_new_patients?: boolean
+  emergency_contact?: boolean
+  degree?: string | null
+  // organization
+  org_name?: string | null
+  org_slug?: string | null
+  org_type?: string | null
+  sport_type?: string | null
+  description?: string | null
+  founded_year?: number | null
+  members_count?: number | null
+  coaches_count?: number | null
+  training_base?: string | null
+  license_info?: string | null
+  contact_person?: string | null
+  address?: string | null
+  membership_types?: unknown
+}
+
+const SESSION_FORMAT_LABELS: Record<string, string> = {
+  offline: 'Очно', online: 'Онлайн', home: 'Выезд',
+  group: 'Группа', camp: 'Сборы', async: 'Async-план',
+}
+const CONSULT_FORMAT_LABELS: Record<string, string> = {
+  offline: 'Очно', online: 'Телемедицина',
+  home: 'На дому', emergency: 'Экстренно',
+}
+const SERVICE_LABELS: Record<string, string> = {
+  checkup: 'Диспансеризация', cardio_test: 'Нагрузочный тест',
+  ecg: 'ЭКГ / Холтер', body_composition: 'Биоимпеданс',
+  vo2max: 'VO₂max', blood_panel: 'Биохимия',
+  nutrition_plan: 'Питание', injury_rehab: 'Реабилитация',
+  sleep_analysis: 'Сон / HRV', psych_support: 'Психология',
+}
+const ORG_SERVICE_LABELS: Record<string, string> = {
+  training: 'Тренировки', competitions: 'Соревнования', camps: 'Сборы',
+  individual: 'Персональный', nutrition: 'Питание', medical: 'Медсопровождение',
+  recovery: 'Восстановление', rental: 'Аренда площадки',
+}
+const ORG_TYPE_LABELS: Record<string, string> = {
+  club: '🏅 Клуб', federation: '🏛 Федерация', team: '🚴 Команда',
+  school: '🎓 Школа', gym: '💪 Фитнес-центр', academy: '📘 Академия', other: 'Другое',
+}
+
+function asStringList(v: unknown): string[] {
+  if (!Array.isArray(v)) return []
+  return v.map(x => {
+    if (typeof x === 'string') return x
+    if (typeof x === 'object' && x) {
+      const o = x as { text?: string; name?: string }
+      return o.text ?? o.name ?? ''
+    }
+    return ''
+  }).filter(Boolean)
 }
 
 function getConnectionType(myRole: string, theirRole: string): string | null {
@@ -281,34 +369,38 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         </div>
       )}
 
-      {/* Coach specialization */}
-      {profile.role === 'coach' && (profile.coach_specialization || profile.experience_years) && (
+      {/* Coach — rich profile */}
+      {profile.role === 'coach' && <CoachProfile profile={profile} />}
+      {profile.role === 'doctor' && <DoctorProfile profile={profile} />}
+      {profile.role === 'organization' && <OrgProfile profile={profile} />}
+
+      {/* Socials */}
+      {(profile.telegram_url || profile.instagram_url || profile.youtube_url || profile.website_url || profile.whatsapp_url) && (
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Тренерская деятельность</p>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            {profile.coach_specialization && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <i className="ki-filled ki-teacher text-sm text-green-600" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 11, color: 'var(--muted-foreground)', margin: 0 }}>Специализация</p>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)', margin: 0 }}>{profile.coach_specialization}</p>
-                </div>
-              </div>
-            )}
-            {profile.experience_years && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <i className="ki-filled ki-medal-star text-sm text-green-600" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 11, color: 'var(--muted-foreground)', margin: 0 }}>Опыт</p>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)', margin: 0 }}>{profile.experience_years} лет</p>
-                </div>
-              </div>
-            )}
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Контакты</p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {profile.telegram_url && <SocialLink href={profile.telegram_url} icon="ki-send" label="Telegram" color="#0284C7" />}
+            {profile.whatsapp_url && <SocialLink href={profile.whatsapp_url} icon="ki-whatsapp" label="WhatsApp" color="#16A34A" />}
+            {profile.instagram_url && <SocialLink href={profile.instagram_url} icon="ki-instagram" label="Instagram" color="#E11D48" />}
+            {profile.youtube_url && <SocialLink href={profile.youtube_url} icon="ki-youtube" label="YouTube" color="#DC2626" />}
+            {profile.website_url && <SocialLink href={profile.website_url} icon="ki-earth" label="Сайт" color="#0D9488" />}
           </div>
+        </div>
+      )}
+
+      {profile.role === 'coach' && (profile.accepts_new_athletes === true || profile.hourly_rate != null) && (
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          {profile.accepts_new_athletes === true && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: '#F0FDF4', color: '#16A34A', fontSize: 12, fontWeight: 700, border: '1px solid #BBF7D0' }}>
+              <i className="ki-filled ki-check-circle text-xs" /> Принимает новых атлетов
+            </span>
+          )}
+          {profile.hourly_rate != null && (
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Ставка за час</p>
+              <p className="pf-num" style={{ fontSize: 22, fontWeight: 800, color: 'var(--foreground)' }}>{profile.hourly_rate}<span style={{ fontSize: 12, color: 'var(--muted-foreground)', marginLeft: 6 }}>{profile.currency ?? 'RUB'}</span></p>
+            </div>
+          )}
         </div>
       )}
 
@@ -328,5 +420,215 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         </div>
       )}
     </div>
+  )
+}
+
+function SectionCard({ title, color, bg, children }: { title: string; color: string; bg: string; children: React.ReactNode }) {
+  return (
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
+      <p style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 12, display: 'inline-block', background: bg, padding: '3px 10px', borderRadius: 99 }}>{title}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>{children}</div>
+    </div>
+  )
+}
+
+function ChipRow({ items }: { items: string[] }) {
+  if (!items.length) return null
+  return (
+    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      {items.map(t => (
+        <span key={t} style={{
+          fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 99,
+          background: 'var(--accent)', color: 'var(--foreground)', border: '1px solid var(--border)',
+        }}>{t}</span>
+      ))}
+    </div>
+  )
+}
+
+function FactRow({ label, value }: { label: string; value: string | number | null | undefined }) {
+  if (value === null || value === undefined || value === '') return null
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '6px 0', borderBottom: '1px dashed var(--border)' }}>
+      <span style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)', textAlign: 'right' }}>{value}</span>
+    </div>
+  )
+}
+
+function BulletList({ items }: { items: string[] }) {
+  if (!items.length) return null
+  return (
+    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {items.map((t, i) => (
+        <li key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5 }}>
+          <span style={{ color: '#F97316', fontWeight: 700 }}>•</span><span>{t}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function SocialLink({ href, icon, label, color }: { href: string; icon: string; label: string; color: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px',
+      borderRadius: 12, border: `1px solid ${color}33`, background: `${color}0D`,
+      color, fontSize: 12, fontWeight: 600, textDecoration: 'none',
+    }}>
+      <i className={`ki-filled ${icon} text-[12px]`} />{label}
+    </a>
+  )
+}
+
+function CoachProfile({ profile }: { profile: Profile }) {
+  const formats = (profile.session_formats ?? []).map(k => SESSION_FORMAT_LABELS[k] ?? k)
+  const achievements = asStringList(profile.achievements)
+  const pastWork = asStringList(profile.past_workplaces)
+  const certs = asStringList(profile.certifications)
+  const sports = profile.sports ?? []
+  const langs  = profile.languages ?? []
+  const hasAny =
+    profile.specialization || profile.coach_specialization || profile.experience_years != null ||
+    profile.workplace || profile.coaching_philosophy || formats.length ||
+    achievements.length || pastWork.length || certs.length || sports.length || langs.length
+
+  if (!hasAny) return null
+
+  return (
+    <>
+      <SectionCard title="Тренерская деятельность" color="#16A34A" bg="#F0FDF4">
+        <FactRow label="Специализация" value={profile.specialization || profile.coach_specialization} />
+        <FactRow label="Опыт" value={profile.experience_years ? `${profile.experience_years} лет` : null} />
+        <FactRow label="Атлетов под руководством" value={profile.athletes_count} />
+        <FactRow label="Место работы" value={profile.workplace} />
+        {sports.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Виды спорта</p><ChipRow items={sports} /></div>}
+        {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки</p><ChipRow items={langs} /></div>}
+      </SectionCard>
+
+      {(profile.coaching_philosophy || formats.length > 0) && (
+        <SectionCard title="Методика и форматы" color="#8B5CF6" bg="#F5F3FF">
+          {profile.coaching_philosophy && <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.6, margin: 0 }}>{profile.coaching_philosophy}</p>}
+          {formats.length > 0 && <ChipRow items={formats} />}
+        </SectionCard>
+      )}
+
+      {achievements.length > 0 && (
+        <SectionCard title="Достижения" color="#0D9488" bg="#ECFDF5"><BulletList items={achievements} /></SectionCard>
+      )}
+
+      {(certs.length > 0 || profile.education) && (
+        <SectionCard title="Образование и сертификаты" color="#2563EB" bg="#EFF6FF">
+          {profile.education && <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, margin: 0 }}>{profile.education}</p>}
+          {certs.length > 0 && <BulletList items={certs} />}
+        </SectionCard>
+      )}
+
+      {pastWork.length > 0 && (
+        <SectionCard title="Опыт работы" color="#D97706" bg="#FFFBEB"><BulletList items={pastWork} /></SectionCard>
+      )}
+    </>
+  )
+}
+
+function DoctorProfile({ profile }: { profile: Profile }) {
+  const services = (profile.services ?? []).map(k => SERVICE_LABELS[k] ?? k)
+  const formats  = (profile.consultation_formats ?? []).map(k => CONSULT_FORMAT_LABELS[k] ?? k)
+  const affils   = profile.hospital_affiliations ?? []
+  const pubs     = asStringList(profile.scientific_publications)
+  const certs    = asStringList(profile.certifications)
+  const langs    = profile.languages ?? []
+  const hasAny =
+    profile.medical_specialization || profile.degree || profile.experience_years != null ||
+    profile.workplace || profile.main_focus || services.length || formats.length ||
+    affils.length || pubs.length || certs.length || langs.length ||
+    profile.license_number || profile.license_expires_at || profile.consultation_fee != null
+
+  if (!hasAny) return null
+
+  return (
+    <>
+      <SectionCard title="Медицинская практика" color="#DC2626" bg="#FEF2F2">
+        <FactRow label="Специализация" value={profile.medical_specialization} />
+        <FactRow label="Учёная степень" value={profile.degree} />
+        <FactRow label="Основной фокус" value={profile.main_focus} />
+        <FactRow label="Стаж" value={profile.experience_years ? `${profile.experience_years} лет` : null} />
+        <FactRow label="Место работы" value={profile.workplace} />
+        <FactRow label="Лицензия" value={profile.license_number ? `№${profile.license_number}${profile.license_authority ? ' · ' + profile.license_authority : ''}` : null} />
+        <FactRow label="Действует до" value={profile.license_expires_at} />
+        <FactRow label="Стоимость консультации" value={profile.consultation_fee != null ? `${profile.consultation_fee} ${profile.currency ?? 'RUB'}` : null} />
+        {profile.emergency_contact && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 99, background: '#FEE2E2', color: '#B91C1C', fontSize: 11, fontWeight: 700, border: '1px solid #FCA5A5', width: 'fit-content' }}>
+            <i className="ki-filled ki-bandage text-[11px]" /> Принимает экстренные случаи
+          </span>
+        )}
+        {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки приёма</p><ChipRow items={langs} /></div>}
+      </SectionCard>
+
+      {(services.length > 0 || formats.length > 0) && (
+        <SectionCard title="Услуги и форматы" color="#0EA5E9" bg="#E0F2FE">
+          {services.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 6 }}>Услуги</p><ChipRow items={services} /></div>}
+          {formats.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 6 }}>Формат приёма</p><ChipRow items={formats} /></div>}
+        </SectionCard>
+      )}
+
+      {(certs.length > 0 || profile.education) && (
+        <SectionCard title="Образование и сертификаты" color="#2563EB" bg="#EFF6FF">
+          {profile.education && <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, margin: 0 }}>{profile.education}</p>}
+          {certs.length > 0 && <BulletList items={certs} />}
+        </SectionCard>
+      )}
+
+      {affils.length > 0 && (
+        <SectionCard title="Клинические аффилиации" color="#0D9488" bg="#ECFDF5"><ChipRow items={affils} /></SectionCard>
+      )}
+
+      {pubs.length > 0 && (
+        <SectionCard title="Научные публикации" color="#8B5CF6" bg="#F5F3FF"><BulletList items={pubs} /></SectionCard>
+      )}
+    </>
+  )
+}
+
+function OrgProfile({ profile }: { profile: Profile }) {
+  const services = (profile.services ?? []).map(k => ORG_SERVICE_LABELS[k] ?? k)
+  const memberships = asStringList(profile.membership_types)
+  const langs = profile.languages ?? []
+  const typeLabel = profile.org_type ? (ORG_TYPE_LABELS[profile.org_type] ?? profile.org_type) : null
+  const hasAny =
+    typeLabel || profile.sport_type || profile.founded_year || profile.members_count != null ||
+    profile.coaches_count != null || profile.training_base || profile.license_info ||
+    profile.contact_person || services.length || memberships.length
+
+  if (!hasAny) return null
+
+  return (
+    <>
+      <SectionCard title="Об организации" color="#2563EB" bg="#EFF6FF">
+        <FactRow label="Тип" value={typeLabel} />
+        <FactRow label="Вид спорта" value={profile.sport_type} />
+        <FactRow label="Год основания" value={profile.founded_year} />
+        <FactRow label="Участников" value={profile.members_count} />
+        <FactRow label="Тренеров в штате" value={profile.coaches_count} />
+        <FactRow label="Контактное лицо" value={profile.contact_person} />
+        {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки</p><ChipRow items={langs} /></div>}
+      </SectionCard>
+
+      {(profile.training_base || profile.license_info || profile.address) && (
+        <SectionCard title="Инфраструктура и лицензии" color="#0D9488" bg="#ECFDF5">
+          <FactRow label="Адрес" value={profile.address} />
+          {profile.training_base && <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, margin: 0 }}>{profile.training_base}</p>}
+          <FactRow label="Лицензия" value={profile.license_info} />
+        </SectionCard>
+      )}
+
+      {services.length > 0 && (
+        <SectionCard title="Услуги" color="#F97316" bg="#FFF7ED"><ChipRow items={services} /></SectionCard>
+      )}
+
+      {memberships.length > 0 && (
+        <SectionCard title="Тарифы и членство" color="#8B5CF6" bg="#F5F3FF"><BulletList items={memberships} /></SectionCard>
+      )}
+    </>
   )
 }
