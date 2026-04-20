@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useToast } from '@/lib/hooks/useToast'
 import dynamic from 'next/dynamic'
 import type { Workout } from '@/services/workouts.service'
 import { recoveryColor } from '@/lib/utils/data'
@@ -342,6 +343,30 @@ function TrainingWidget({
   onPlan:        () => void
   onOpenComments: (w: Workout) => void
 }) {
+  const { success, error } = useToast()
+  const [sharing, setSharing] = useState<string | null>(null)
+
+  async function handleShare(w: Workout) {
+    if (sharing) return
+    setSharing(w.id)
+    try {
+      const res = await fetch(`/api/workouts/${w.id}/share`, { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok || !json.ok) throw new Error(json.error ?? 'SHARE_ERROR')
+      const url = `${window.location.origin}/share/workout/${json.share.token}`
+      try {
+        await navigator.clipboard.writeText(url)
+        success('Ссылка скопирована')
+      } catch {
+        window.prompt('Скопируйте ссылку:', url)
+      }
+    } catch (e) {
+      error(e instanceof Error ? e.message : 'Ошибка')
+    } finally {
+      setSharing(null)
+    }
+  }
+
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden h-full flex flex-col">
       {/* Header — без ссылок и кнопки */}
@@ -402,6 +427,19 @@ function TrainingWidget({
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
                   >
                     <i className="ki-filled ki-messages text-[13px]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); handleShare(w) }}
+                    disabled={sharing === w.id}
+                    title="Поделиться ссылкой"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
+                  >
+                    {sharing === w.id ? (
+                      <div className="h-3.5 w-3.5 rounded-full border-2 border-blue-500 border-t-transparent pf-spin" />
+                    ) : (
+                      <i className="ki-filled ki-share text-[13px]" />
+                    )}
                   </button>
                 </div>
               ))}
