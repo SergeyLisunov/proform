@@ -459,22 +459,21 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
         style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
       />
-      <div className="relative flex items-center gap-4 px-5 py-5">
+      <div className="relative flex items-center gap-3 px-4 py-4">
         <div
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
         >
-          <i className="ki-filled ki-plus text-white text-xl" />
+          <i className="ki-filled ki-plus text-white text-lg" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Быстрое добавление</div>
-          <div className="mt-1 text-lg font-extrabold leading-tight text-foreground">Записать тренировку</div>
-          <div className="mt-1 text-xs text-muted-foreground">
+          <div className="text-base font-extrabold leading-tight text-foreground truncate">Добавить тренировку</div>
+          <div className="mt-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
             Новая запись появится и в дневнике, и в календаре.
           </div>
         </div>
         <div
-          className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl bg-white/70 border border-white/80 shadow-sm transition-transform group-hover:translate-x-1"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/70 border border-white/80 shadow-sm transition-transform group-hover:translate-x-1"
         >
           <i className="ki-filled ki-arrow-right text-orange-500 text-sm" />
         </div>
