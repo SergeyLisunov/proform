@@ -20,6 +20,8 @@ const WeeklyInsightsCard   = dynamic(() => import('@/components/widgets/WeeklyIn
 const RecoveryTrendWidget  = dynamic(() => import('@/components/widgets/RecoveryTrendWidget'),  { ssr: false })
 const CoachBriefingCard    = dynamic(() => import('@/components/widgets/CoachBriefingCard'),    { ssr: false })
 const WeeklyPlannerCard    = dynamic(() => import('@/components/widgets/WeeklyPlannerCard'),    { ssr: false })
+const AnomalyAlertCard     = dynamic(() => import('@/components/widgets/AnomalyAlertCard'),     { ssr: false })
+const TrainingLoadWidget   = dynamic(() => import('@/components/widgets/TrainingLoadWidget'),   { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -790,6 +792,12 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
 
       {/* ── Row 3: AI weekly planner ── */}
       <WeeklyPlannerCard />
+
+      {/* ── Row 4: Anomaly alerts + Training load ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <AnomalyAlertCard />
+        <TrainingLoadWidget userId={userId} />
+      </div>
 
       {/* Social edit modal */}
       {showSocialEdit && profile && (
