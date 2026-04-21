@@ -25,22 +25,24 @@ const NAV_SECTIONS = [
       { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['coach', 'doctor'] as string[] },
       { href: '/notes',       icon: 'ki-notepad-edit',   label: 'Заметки',      roles: null },
-      { href: '/form-analysis', icon: 'ki-video',        label: 'AI разбор техники', roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/insights',      icon: 'ki-sparkle',       label: 'AI разбор недели',  roles: ['athlete', 'admin'] as string[] },
       { href: '/records',       icon: 'ki-medal',         label: 'Рекорды',           roles: ['athlete', 'admin'] as string[] },
       { href: '/load',          icon: 'ki-pulse',         label: 'Нагрузка · ACWR',   roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/quick',         icon: 'ki-microphone-2',  label: 'Голос → тренировка', roles: ['athlete', 'admin'] as string[] },
       { href: '/streaks',       icon: 'ki-flash',         label: 'Серия и бейджи',    roles: ['athlete', 'admin'] as string[] },
       { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
-      { href: '/connections', icon: 'ki-people',          label: 'Мои связи',  roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
-      { href: '/directory',   icon: 'ki-magnifier',       label: 'Найти специалиста', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
   },
   {
-    title: 'Команда',
+    title: 'Сеть',
     items: [
+      { href: '/network', icon: 'ki-people', label: 'Сеть и контакты', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
+      { href: '/athletes', icon: 'ki-abstract-26', label: 'Мои атлеты', roles: ['coach', 'admin', 'doctor'] as string[] },
       { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика', roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
-      { href: '/athletes', icon: 'ki-people', label: 'Мои атлеты', roles: ['coach', 'admin', 'doctor'] as string[] },
+    ],
+  },
+  {
+    title: 'Умные инструменты',
+    items: [
+      { href: '/ai', icon: 'ki-sparkle', label: 'ProForm AI', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
   },
   {

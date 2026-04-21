@@ -29,14 +29,30 @@ const TYPE_ICON: Record<string, string> = {
 export default async function AthleteDashboard({ userId, name }: { userId: string; name: string }) {
   const supabase = await createClient()
 
-  const [{ data: metricsData }, { data: workoutsData }, { data: commentsData }] = await Promise.all([
+  const [{ data: metricsData }, { data: workoutsData }, { data: commentsData }, { data: coachConnData }] = await Promise.all([
     supabase.from('daily_metrics').select('*').eq('athlete_id', userId).order('date', { ascending: false }).limit(56),
     supabase.from('workouts').select('*').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(8),
     supabase.from('workout_comments').select('body, created_at').order('created_at', { ascending: false }).limit(3),
+    supabase
+      .from('connections')
+      .select('id, initiator_id, recipient_id, initiator:users!connections_initiator_id_fkey(id, first_name, last_name, nickname, avatar_url, role, city, sport), recipient:users!connections_recipient_id_fkey(id, first_name, last_name, nickname, avatar_url, role, city, sport)')
+      .eq('connection_type', 'coach_athlete')
+      .eq('status', 'active')
+      .or(`initiator_id.eq.${userId},recipient_id.eq.${userId}`)
+      .limit(1)
+      .maybeSingle(),
   ])
   const metrics = (metricsData ?? []) as DailyMetricRow[]
   const workouts = (workoutsData ?? []) as WorkoutRow[]
   const comments = (commentsData ?? []) as Pick<WorkoutCommentRow, 'body' | 'created_at'>[]
+
+  // Extract coach (the other participant in the coach_athlete connection)
+  type ConnUser = { id: string; first_name: string | null; last_name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null; sport: string | null }
+  type ConnRow = { id: string; initiator_id: string; recipient_id: string; initiator: ConnUser | null; recipient: ConnUser | null }
+  const conn = (coachConnData ?? null) as ConnRow | null
+  const coach: ConnUser | null = conn
+    ? (conn.initiator_id === userId ? conn.recipient : conn.initiator)
+    : null
 
   const latest = metrics[0]
   const avg = (key: AverageMetricKey) =>
@@ -94,6 +110,68 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             </div>
           </div>
         )}
+      </div>
+
+      {/* Coach + AI unified row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 card bg-white border border-[#E2E8F0] rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Мой тренер</p>
+            {!coach && (
+              <Link href="/network?tab=find&type=coach" className="text-[11px] font-semibold text-[#F97316] hover:underline">
+                Найти тренера →
+              </Link>
+            )}
+          </div>
+          {coach ? (
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-2xl border border-[#E2E8F0] overflow-hidden shrink-0 bg-[#F0FDF4] flex items-center justify-center">
+                {coach.avatar_url
+                  ? <img src={coach.avatar_url} alt="" className="h-full w-full object-cover" />
+                  : <span className="text-lg font-bold text-[#16A34A]">{((coach.first_name?.[0] ?? '') + (coach.last_name?.[0] ?? '')).toUpperCase() || '?'}</span>
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-bold text-slate-800 truncate">
+                    {[coach.first_name, coach.last_name].filter(Boolean).join(' ') || coach.nickname || 'Тренер'}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">Тренер</span>
+                </div>
+                <div className="text-xs text-slate-400 mt-1 flex gap-2 flex-wrap">
+                  {coach.sport && <span>{coach.sport}</span>}
+                  {coach.city && <span>· {coach.city}</span>}
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <Link href={`/profile/${coach.id}`} className="text-[11px] font-semibold px-3 py-2 rounded-xl border border-[#E2E8F0] hover:border-[#16A34A] hover:text-[#16A34A]">
+                  Профиль
+                </Link>
+                <Link href="/messages" className="text-[11px] font-semibold px-3 py-2 rounded-xl bg-[#16A34A] text-white hover:bg-[#15803D]">
+                  Написать
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-400">Связи с тренером пока нет. Найдите подходящего специалиста в каталоге.</p>
+          )}
+        </div>
+
+        <Link href="/ai" className="card border border-[#7C3AED]/20 rounded-2xl p-5 bg-gradient-to-br from-[#F5F3FF] to-white hover:shadow-md transition no-underline">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#7C3AED]/10 flex items-center justify-center shrink-0">
+              <i className="ki-filled ki-sparkle text-[18px] text-[#7C3AED]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7C3AED]">ProForm AI</p>
+              <p className="text-sm font-bold text-slate-800 mt-1">Рекомендации и разборы</p>
+              <p className="text-xs text-slate-500 mt-1">Ассистент, видео-разбор техники, голосовой ввод, insights.</p>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#7C3AED] mt-2">
+                Открыть <i className="ki-filled ki-arrow-right text-[10px]" />
+              </span>
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Stats */}
