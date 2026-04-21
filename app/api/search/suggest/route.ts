@@ -41,9 +41,10 @@ export async function GET(req: NextRequest) {
     .join(' & ')
 
   // ── People (users) ───────────────────────────────────────────────────────
+  // The `users` table stores a single `name` column (no first_name/last_name).
   let peopleQuery = supabase
     .from('users')
-    .select('id, nickname, first_name, last_name, name, role, avatar_url, city, sport')
+    .select('id, nickname, name, role, avatar_url, city, sport')
     .eq('is_searchable', true)
     .neq('role', 'admin')
     .neq('id', me.id)
@@ -53,9 +54,7 @@ export async function GET(req: NextRequest) {
     peopleQuery = peopleQuery.textSearch('search_doc', tsquery, { type: 'plain' })
   } else {
     const term = q.toLowerCase()
-    peopleQuery = peopleQuery.or(
-      `nickname.ilike.${term}%,first_name.ilike.${term}%,last_name.ilike.${term}%`
-    )
+    peopleQuery = peopleQuery.or(`nickname.ilike.${term}%,name.ilike.${term}%`)
   }
 
   const [{ data: peopleRaw }, coachesRes, doctorsRes, orgsRes] = await Promise.all([
@@ -104,7 +103,7 @@ export async function GET(req: NextRequest) {
     id:         u.id,
     kind:       'user' as const,
     role:       u.role,
-    name:       [u.first_name, u.last_name].filter(Boolean).join(' ') || u.name || u.nickname || 'Пользователь',
+    name:       u.name || u.nickname || 'Пользователь',
     nickname:   u.nickname,
     avatar_url: u.avatar_url,
     subtitle:   [u.sport, u.city].filter(Boolean).join(' · ') || null,
