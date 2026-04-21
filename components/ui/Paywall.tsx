@@ -306,10 +306,23 @@ export function PricingModal({
 
                   {/* CTA */}
                   <button
-                    onClick={() => {
-                      // Здесь будет интеграция с платёжной системой
-                      // Например: window.open('https://pay.proform.app/?plan=' + p.id)
-                      alert(`Оплата плана ${p.name} — здесь будет подключена платёжная система (ЮКassa / Stripe)`)
+                    onClick={async () => {
+                      if (p.id === 'free') return
+                      try {
+                        const res  = await fetch('/api/billing/checkout', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ plan: p.id }),
+                        })
+                        const data = await res.json().catch(() => ({}))
+                        if (!res.ok || !data.url) {
+                          alert(data.error || 'Не удалось открыть оплату. Попробуйте позже.')
+                          return
+                        }
+                        window.location.href = data.url as string
+                      } catch {
+                        alert('Сеть недоступна. Проверьте соединение и попробуйте снова.')
+                      }
                     }}
                     style={{
                       marginTop: 20, width: '100%', padding: '11px 16px',
