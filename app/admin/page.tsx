@@ -302,6 +302,13 @@ export default function AdminPage() {
                   <i className="ki-filled ki-office-bag text-sm" />
                   Управление организациями
                 </Link>
+                <Link
+                  href="/admin/commerce"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-green-200 bg-green-50/80 px-4 py-2.5 text-sm font-semibold text-green-700 no-underline shadow-sm transition-all hover:bg-green-100"
+                >
+                  <i className="ki-filled ki-chart-line-up text-sm" />
+                  Коммерция · MRR
+                </Link>
               </div>
             </div>
 

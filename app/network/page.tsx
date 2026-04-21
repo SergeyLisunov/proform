@@ -1,6 +1,7 @@
 'use client'
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { Suspense, useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 
 type Mode = 'contacts' | 'find'
@@ -443,19 +444,52 @@ function ContactsPanel() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function NetworkPage() {
+function NetworkPageInner() {
   const { user, loading } = useUser()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [mode, setMode] = useState<Mode>('contacts')
   const [findType, setFindType] = useState<FindType>('people')
 
+  // Hydrate state from URL on mount and whenever the query string changes.
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const sp = new URLSearchParams(window.location.search)
-    const tab = sp.get('tab')
-    if (tab === 'find') setMode('find')
-    const t = sp.get('type') as FindType | null
-    if (t && ['people', 'coach', 'doctor', 'organization'].includes(t)) setFindType(t)
-  }, [])
+    const tab = searchParams.get('tab')
+    setMode(tab === 'find' ? 'find' : 'contacts')
+    const t = searchParams.get('type') as FindType | null
+    if (t && ['people', 'coach', 'doctor', 'organization'].includes(t)) {
+      setFindType(t)
+    }
+  }, [searchParams])
+
+  // Push URL back whenever tab / findType changes so the view is shareable.
+  const syncUrl = useCallback(
+    (nextMode: Mode, nextType: FindType) => {
+      const params = new URLSearchParams()
+      if (nextMode === 'find') {
+        params.set('tab', 'find')
+        params.set('type', nextType)
+      }
+      const qs = params.toString()
+      router.replace(qs ? `/network?${qs}` : '/network', { scroll: false })
+    },
+    [router],
+  )
+
+  const selectMode = useCallback(
+    (m: Mode) => {
+      setMode(m)
+      syncUrl(m, findType)
+    },
+    [findType, syncUrl],
+  )
+
+  const selectFindType = useCallback(
+    (t: FindType) => {
+      setFindType(t)
+      syncUrl('find', t)
+    },
+    [syncUrl],
+  )
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[300px]">
@@ -481,10 +515,10 @@ export default function NetworkPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <PillButton active={mode === 'contacts'} onClick={() => setMode('contacts')} icon="ki-people" accent="#F97316">
+        <PillButton active={mode === 'contacts'} onClick={() => selectMode('contacts')} icon="ki-people" accent="#F97316">
           Мои контакты
         </PillButton>
-        <PillButton active={mode === 'find'} onClick={() => setMode('find')} icon="ki-magnifier" accent="#2563EB">
+        <PillButton active={mode === 'find'} onClick={() => selectMode('find')} icon="ki-magnifier" accent="#2563EB">
           Найти
         </PillButton>
       </div>
@@ -494,10 +528,10 @@ export default function NetworkPage() {
       {mode === 'find' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-wrap gap-2 rounded-2xl border border-[#E2E8F0] bg-white p-2">
-            <PillButton active={findType === 'people'} onClick={() => setFindType('people')} icon="ki-user" accent="#64748B">По имени</PillButton>
-            <PillButton active={findType === 'coach'} onClick={() => setFindType('coach')} icon="ki-award" accent="#16A34A">Тренеры</PillButton>
-            <PillButton active={findType === 'doctor'} onClick={() => setFindType('doctor')} icon="ki-heart-circle" accent="#DC2626">Врачи</PillButton>
-            <PillButton active={findType === 'organization'} onClick={() => setFindType('organization')} icon="ki-office-bag" accent="#2563EB">Организации</PillButton>
+            <PillButton active={findType === 'people'} onClick={() => selectFindType('people')} icon="ki-user" accent="#64748B">По имени</PillButton>
+            <PillButton active={findType === 'coach'} onClick={() => selectFindType('coach')} icon="ki-award" accent="#16A34A">Тренеры</PillButton>
+            <PillButton active={findType === 'doctor'} onClick={() => selectFindType('doctor')} icon="ki-heart-circle" accent="#DC2626">Врачи</PillButton>
+            <PillButton active={findType === 'organization'} onClick={() => selectFindType('organization')} icon="ki-office-bag" accent="#2563EB">Организации</PillButton>
           </div>
 
           {findType === 'people' && <PeopleSearch myRole={user.role} />}
@@ -505,5 +539,19 @@ export default function NetworkPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function NetworkPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[300px]">
+          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+        </div>
+      }
+    >
+      <NetworkPageInner />
+    </Suspense>
   )
 }
