@@ -12,6 +12,7 @@ import {
 } from '@/services/calendar.service'
 import type { Workout } from '@/services/workouts.service'
 import { getNotes, type Note } from '@/services/notes.service'
+import QuickNoteModal from '@/components/ui/QuickNoteModal'
 import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
@@ -989,12 +990,13 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────────
-function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle, filterType = 'all', dayNotes = [] }: {
+function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap, onAddEvent, onDeleteEvent, onViewEvent, onOpenCycle, onAddNote, filterType = 'all', dayNotes = [] }: {
   dateStr: string; savedEvents: CalendarEvent[]; monthWorkouts: Workout[]; cycles: CycleBlock[]
   cycleDaysMap: Record<string, DayType>
   onAddEvent: (date: string) => void; onDeleteEvent: (id: string) => void
   onViewEvent?: (event: CalendarEvent, mode: 'view' | 'edit') => void
   onOpenCycle?: (cycle: CycleBlock) => void
+  onAddNote?: (date: string) => void
   filterType?: string; dayNotes?: Note[]
 }) {
   const allCycles = cycles.filter(c => dateStr >= c.start_date && dateStr <= c.end_date)
@@ -1181,10 +1183,14 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
             </div>
           </div>
         )}
-        {dayNotes.length === 0 && (
-          <Link href="/notes" className="flex items-center gap-1.5 text-2xs text-amber-500 hover:text-amber-600 transition-colors mt-1">
+        {dayNotes.length === 0 && onAddNote && (
+          <button
+            type="button"
+            onClick={() => onAddNote(dateStr)}
+            className="flex items-center gap-1.5 text-2xs text-amber-500 hover:text-amber-600 transition-colors mt-1"
+          >
             <i className="ki-filled ki-notepad-edit text-xs" />Добавить заметку
-          </Link>
+          </button>
         )}
 
         {isEmpty && dayNotes.length === 0 ? (
@@ -1441,6 +1447,7 @@ export default function CalendarPage() {
   const [eventDrawerMode, setEventDrawerMode] = useState<'view'|'edit'>('view')
   const [cycleDrawer,  setCycleDrawer]  = useState<CycleBlock|null>(null)
   const [savedNotes,   setSavedNotes]   = useState<Note[]>([])
+  const [noteModalDate, setNoteModalDate] = useState<string | null>(null)
 
   const cycleDaysMap = useMemo(() => {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
@@ -1890,6 +1897,7 @@ export default function CalendarPage() {
                 onDeleteEvent={handleDeleteEvent}
                 onViewEvent={openEventDrawer}
                 onOpenCycle={setCycleDrawer}
+                onAddNote={setNoteModalDate}
                 filterType={filterType}
                 dayNotes={dayNotes}
               />
@@ -1914,6 +1922,7 @@ export default function CalendarPage() {
               onDeleteEvent={handleDeleteEvent}
               onViewEvent={openEventDrawer}
               onOpenCycle={setCycleDrawer}
+              onAddNote={setNoteModalDate}
               filterType={filterType}
               dayNotes={dayNotes}
             />
@@ -2006,6 +2015,13 @@ export default function CalendarPage() {
         <CycleDetailDrawer cycle={cycleDrawer} userId={user.id} onClose={()=>setCycleDrawer(null)}
           onUpdated={c=>{handleCycleUpdated(c);setCycleDrawer(null)}}
           onDeleted={id=>{handleCycleDeleted(id);setCycleDrawer(null)}}/>
+      )}
+      {noteModalDate && (
+        <QuickNoteModal
+          noteDate={noteModalDate}
+          onClose={() => setNoteModalDate(null)}
+          onSaved={(note) => setSavedNotes(prev => [note, ...prev])}
+        />
       )}
     </div>
   )
