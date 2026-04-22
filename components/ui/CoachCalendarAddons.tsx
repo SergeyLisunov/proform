@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   listCoachPlans, createCoachPlan, updateCoachPlan, deleteCoachPlan,
-  listAthletePasses, issuePass, updatePass, deletePass,
+  listAthletePasses, issuePass, updatePass, deletePass, createCoachSession,
   listCoachSessions, createCoachSession, updateCoachSession, deleteCoachSession,
   getAthletePassSummaries,
   type CoachPassPlan, type AthletePass, type CoachSession, type AthletePassSummary, type SessionStatus,
@@ -490,6 +490,9 @@ export function IssuePassDrawer({
   const [saving, setSaving] = useState(false)
   const [visible, setVisible] = useState(false)
   const [existing, setExisting] = useState<AthletePass[]>([])
+  const [autoSchedule, setAutoSchedule] = useState(false)
+  const [scheduleDays, setScheduleDays] = useState<number[]>([1, 3, 5])
+  const [scheduleTime, setScheduleTime] = useState<string>('19:00')
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 10); return () => clearTimeout(t) }, [])
 
@@ -527,9 +530,30 @@ export function IssuePassDrawer({
       starts_at: startsAt, expires_at: expiresAt,
       price_cents: priceCents, currency: 'RUB',
     })
+    if (res && autoSchedule && scheduleDays.length > 0) {
+      const [hh, mm] = scheduleTime.split(':')
+      const endH = String(Math.min(23, Number(hh) + 1)).padStart(2, '0')
+      const start = new Date(startsAt + 'T00:00:00')
+      const end   = new Date(expiresAt + 'T00:00:00')
+      let generated = 0
+      const cur = new Date(start)
+      while (generated < totalSessions && cur <= end) {
+        if (scheduleDays.includes(cur.getDay())) {
+          const y = cur.getFullYear(), m = String(cur.getMonth()+1).padStart(2,'0'), d = String(cur.getDate()).padStart(2,'0')
+          await createCoachSession({
+            coach_id: coachId, athlete_id: athleteId, pass_id: res.id,
+            session_date: `${y}-${m}-${d}`,
+            start_time: `${hh}:${mm}:00`, end_time: `${endH}:${mm}:00`,
+            title: title.trim(), status: 'planned',
+          })
+          generated++
+        }
+        cur.setDate(cur.getDate() + 1)
+      }
+    }
     setSaving(false)
     if (res) { onIssued(res); handleClose() }
-  }, [athleteId, coachId, planId, title, totalSessions, startsAt, expiresAt, priceCents, onIssued, handleClose])
+  }, [athleteId, coachId, planId, title, totalSessions, startsAt, expiresAt, priceCents, autoSchedule, scheduleDays, scheduleTime, onIssued, handleClose])
 
   const handleStatusChange = useCallback(async (id: string, status: AthletePass['status']) => {
     await updatePass(id, { status })
@@ -619,6 +643,44 @@ export function IssuePassDrawer({
               <input type="date" value={expiresAt} readOnly
                 className="w-full rounded-lg border border-border bg-muted/40 px-2 py-2 text-sm text-muted-foreground"/>
             </div>
+          </div>
+
+          <div className="rounded-xl border border-border bg-muted/20 p-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={autoSchedule} onChange={e => setAutoSchedule(e.target.checked)}
+                className="w-4 h-4 rounded border-border"/>
+              <span className="text-xs font-semibold text-foreground">Сразу создать занятия в календаре</span>
+            </label>
+            {autoSchedule && (
+              <div className="mt-3 space-y-2">
+                <div>
+                  <label className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Дни недели</label>
+                  <div className="mt-1 grid grid-cols-7 gap-1">
+                    {['Вс','Пн','Вт','Ср','Чт','Пт','Сб'].map((lbl, i) => {
+                      const on = scheduleDays.includes(i)
+                      return (
+                        <button key={i} type="button"
+                          onClick={() => setScheduleDays(prev => prev.includes(i) ? prev.filter(x=>x!==i) : [...prev, i].sort())}
+                          className={`py-1.5 text-[11px] font-semibold rounded-md border transition-all ${
+                            on ? 'border-orange-400 bg-orange-50 text-orange-700'
+                               : 'border-border bg-background text-muted-foreground hover:border-orange-200'
+                          }`}>
+                          {lbl}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground">Время начала</label>
+                  <input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-2 py-2 text-sm"/>
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Будет создано до {totalSessions} занятий на выбранных днях недели до истечения абонемента.
+                </p>
+              </div>
+            )}
           </div>
 
           {existing.length > 0 && (

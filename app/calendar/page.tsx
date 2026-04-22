@@ -18,6 +18,14 @@ import {
 } from '@/components/ui/CoachCalendarAddons'
 import { listCoachSessions, type CoachSession } from '@/services/coach.service'
 import {
+  DoctorPatientsPanel, MedicalCheckupDrawer, useDoctorPatients,
+} from '@/components/ui/DoctorCalendarAddons'
+import { listCheckups, type MedicalCheckup } from '@/services/doctor.service'
+import {
+  OrgSessionsPanel, OrgSessionDrawer, useOrgMembers,
+} from '@/components/ui/OrgCalendarAddons'
+import { listGroupSessions, type GroupSession } from '@/services/org-sessions.service'
+import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
@@ -1470,9 +1478,74 @@ export default function CalendarPage() {
   const [issuePassForAthlete, setIssuePassForAthlete] = useState<string | null>(null)
   const [coachRefreshToken, setCoachRefreshToken] = useState(0)
 
+  // Doctor-specific state
+  const { patients: doctorPatients } = useDoctorPatients(isDoctor ? (user?.id ?? null) : null)
+  const [checkups, setCheckups] = useState<MedicalCheckup[]>([])
+  const [showCheckupDrawer, setShowCheckupDrawer] = useState(false)
+  const [checkupDrawerInit, setCheckupDrawerInit] = useState<{ date?: string; athleteId?: string; checkup?: MedicalCheckup | null } | null>(null)
+  const [doctorRefreshToken, setDoctorRefreshToken] = useState(0)
+
+  // Organization-specific state
+  const { members: orgMembers } = useOrgMembers(isOrg ? (user?.id ?? null) : null)
+  const [groupSessions, setGroupSessions] = useState<GroupSession[]>([])
+  const [showOrgSessionDrawer, setShowOrgSessionDrawer] = useState(false)
+  const [orgDrawerInit, setOrgDrawerInit] = useState<{ date?: string; session?: GroupSession | null } | null>(null)
+  const [orgRefreshToken, setOrgRefreshToken] = useState(0)
+
   const cycleDaysMap = useMemo(() => {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
   }, [cycleDays])
+
+  const eventsForViews = useMemo((): CalendarEvent[] => {
+    const synthetic: CalendarEvent[] = []
+    if (isCoach) {
+      for (const s of coachSessions) {
+        if (s.status === 'cancelled') continue
+        const a = coachAthletes.find(x => x.id === s.athlete_id)
+        synthetic.push({
+          id: `cs_${s.id}`, owner_id: s.coach_id, event_date: s.session_date,
+          event_type: 'workout',
+          title: s.title ?? (a ? `Тренировка · ${a.name}` : 'Тренировка'),
+          notes: s.notes, start_time: s.start_time, end_time: s.end_time,
+          created_at: s.created_at,
+        })
+      }
+    }
+    if (isOrg) {
+      const sessionTypeToEvent: Record<string, CalendarEvent['event_type']> = {
+        team_practice: 'workout', competition: 'competition', travel: 'travel',
+        meeting: 'note', camp: 'camp', other: 'other',
+      }
+      for (const g of groupSessions) {
+        if (g.status === 'cancelled') continue
+        synthetic.push({
+          id: `gs_${g.id}`, owner_id: g.organization_id, event_date: g.session_date,
+          event_type: sessionTypeToEvent[g.session_type] ?? 'other',
+          title: g.title, notes: g.description,
+          start_time: g.start_time, end_time: g.end_time,
+          created_at: g.created_at,
+        })
+      }
+    }
+    if (isDoctor) {
+      const checkupLabels: Record<string, string> = {
+        general: 'Осмотр', cardiology: 'Кардио', blood: 'Анализы',
+        injury: 'Травма', mobility: 'Мобильность', return_to_sport: 'Return-to-sport',
+        nutrition: 'Питание', other: 'Мед.',
+      }
+      for (const c of checkups) {
+        if (c.status === 'cancelled') continue
+        synthetic.push({
+          id: `mc_${c.id}`, owner_id: c.doctor_id, event_date: c.checkup_date,
+          event_type: 'medical',
+          title: checkupLabels[c.checkup_type] ?? 'Медосмотр',
+          notes: c.findings, start_time: c.start_time, end_time: c.end_time,
+          created_at: c.created_at,
+        })
+      }
+    }
+    return [...savedEvents, ...synthetic]
+  }, [savedEvents, coachSessions, groupSessions, checkups, coachAthletes, isCoach, isOrg, isDoctor])
 
   const weekStart = useMemo(() => {
     const base = selected ? parseLocalDate(selected) : new Date(year, month, now.getDate())
@@ -1507,16 +1580,20 @@ export default function CalendarPage() {
       showWorkouts ? getWorkoutsForMonth(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as Workout[]),
       getNotes(user.id, dataRange.from, dataRange.to),
       isCoach ? listCoachSessions(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CoachSession[]),
+      isDoctor ? listCheckups(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as MedicalCheckup[]),
+      isOrg ? listGroupSessions(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as GroupSession[]),
     ]
-    Promise.all(tasks).then(([evs, cs, cds, wks, nts, csess]) => {
+    Promise.all(tasks).then(([evs, cs, cds, wks, nts, csess, chks, gss]) => {
       setSavedEvents(evs as CalendarEvent[])
       setCycles(cs as CycleBlock[])
       setCycleDays(cds as CycleDay[])
       setMonthWorkouts(wks as Workout[])
       setSavedNotes(nts as Note[])
       setCoachSessions(csess as CoachSession[])
+      setCheckups(chks as MedicalCheckup[])
+      setGroupSessions(gss as GroupSession[])
     }).finally(() => setLoading(false))
-  }, [user?.id, dataRange.from, dataRange.to, isCoach, showCycles, showWorkouts])
+  }, [user?.id, dataRange.from, dataRange.to, isCoach, isDoctor, isOrg, showCycles, showWorkouts])
 
   // ── KPI-диапазон для квартала/года ─────────────────────────────────────────
   const { kpiFrom, kpiTo } = useMemo(() => {
@@ -1552,7 +1629,10 @@ export default function CalendarPage() {
   }, [savedNotes, selected])
 
   const openAddEvent = useCallback((date?: string) => { setAddEventDate(date ?? _today); setShowAddEvent(true) }, [_today])
-  const openEventDrawer = useCallback((e: CalendarEvent, mode: 'view'|'edit' = 'view') => { setEventDrawer(e); setEventDrawerMode(mode) }, [])
+  const isSyntheticId = (id: string) => id.startsWith('cs_') || id.startsWith('gs_') || id.startsWith('mc_')
+  const openEventDrawer = useCallback((e: CalendarEvent, mode: 'view'|'edit' = 'view') => {
+    setEventDrawer(e); setEventDrawerMode(isSyntheticId(e.id) ? 'view' : mode)
+  }, [])
 
   const handleEventCreated = useCallback((e: CalendarEvent) => {
     setSavedEvents(prev => [...prev, e])
@@ -1562,7 +1642,10 @@ export default function CalendarPage() {
   }, [year, month])
 
   const handleEventUpdated = useCallback((u: CalendarEvent) => { setSavedEvents(prev=>prev.map(e=>e.id===u.id?u:e)) }, [])
-  const handleDeleteEvent  = useCallback(async (id: string) => { await deleteCalendarEvent(id); setSavedEvents(prev=>prev.filter(e=>e.id!==id)); if(eventDrawer?.id===id)setEventDrawer(null) }, [eventDrawer])
+  const handleDeleteEvent  = useCallback(async (id: string) => {
+    if (id.startsWith('cs_') || id.startsWith('gs_') || id.startsWith('mc_')) return
+    await deleteCalendarEvent(id); setSavedEvents(prev=>prev.filter(e=>e.id!==id)); if(eventDrawer?.id===id)setEventDrawer(null)
+  }, [eventDrawer])
 
   const handleMoveEvent = useCallback(async (id: string, newDate: string) => {
     const prev = savedEvents.find(e => e.id === id)
@@ -1855,6 +1938,24 @@ export default function CalendarPage() {
                     </button>
                   </>
                 )}
+                {isDoctor && (
+                  <button
+                    onClick={() => { setCheckupDrawerInit({ date: selected ?? _today, checkup: null }); setShowCheckupDrawer(true) }}
+                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                  >
+                    <i className="ki-filled ki-heart text-xs" />
+                    Медосмотр
+                  </button>
+                )}
+                {isOrg && (
+                  <button
+                    onClick={() => { setOrgDrawerInit({ date: selected ?? _today, session: null }); setShowOrgSessionDrawer(true) }}
+                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                  >
+                    <i className="ki-filled ki-people text-xs" />
+                    Событие команды
+                  </button>
+                )}
                 <button
                   onClick={() => openAddEvent(selected ?? undefined)}
                   className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
@@ -1873,6 +1974,25 @@ export default function CalendarPage() {
           coachId={user.id}
           refreshToken={coachRefreshToken}
           onPickAthlete={(athleteId) => { setIssuePassForAthlete(athleteId); setShowIssuePass(true) }}
+        />
+      )}
+
+      {isDoctor && user && (
+        <DoctorPatientsPanel
+          doctorId={user.id}
+          refreshToken={doctorRefreshToken}
+          onPickPatient={(athleteId) => {
+            setCheckupDrawerInit({ date: selected ?? _today, athleteId, checkup: null })
+            setShowCheckupDrawer(true)
+          }}
+        />
+      )}
+
+      {isOrg && user && (
+        <OrgSessionsPanel
+          orgId={user.id}
+          refreshToken={orgRefreshToken}
+          onCreateClick={() => { setOrgDrawerInit({ date: selected ?? _today, session: null }); setShowOrgSessionDrawer(true) }}
         />
       )}
 
@@ -1958,7 +2078,7 @@ export default function CalendarPage() {
             <div className="pf-enter">
               <DetailPanel
                 dateStr={selected}
-                savedEvents={savedEvents}
+                savedEvents={eventsForViews}
                 monthWorkouts={monthWorkouts}
                 cycles={cycles}
                 cycleDaysMap={cycleDaysMap}
@@ -1977,13 +2097,13 @@ export default function CalendarPage() {
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <div>
             {view === 'quarter' && <QuarterView year={year} quarter={quarter} onSelect={setSelected} cycles={cycles} selected={selected} />}
-            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} notesByDate={notesByDate} onMoveEvent={handleMoveEvent} onMoveWorkout={handleMoveWorkout} />}
-            {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={savedEvents} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} />}
+            {view === 'month' && <MonthView year={year} month={month} onSelect={setSelected} selected={selected} savedEvents={eventsForViews} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} notesByDate={notesByDate} onMoveEvent={handleMoveEvent} onMoveWorkout={handleMoveWorkout} />}
+            {view === 'week' && <WeekView year={year} month={month} weekStart={weekStart} onSelect={setSelected} selected={selected} savedEvents={eventsForViews} monthWorkouts={monthWorkouts} cycles={cycles} cycleDaysMap={cycleDaysMap} filterType={filterType} />}
           </div>
           {selected && (
             <DetailPanel
               dateStr={selected}
-              savedEvents={savedEvents}
+              savedEvents={eventsForViews}
               monthWorkouts={monthWorkouts}
               cycles={cycles}
               cycleDaysMap={cycleDaysMap}
@@ -2120,6 +2240,41 @@ export default function CalendarPage() {
           initialAthleteId={issuePassForAthlete}
           onClose={() => { setShowIssuePass(false); setIssuePassForAthlete(null) }}
           onIssued={() => { setCoachRefreshToken(t => t + 1); refreshCoachAthletes() }}
+        />
+      )}
+
+      {isDoctor && user && showCheckupDrawer && (
+        <MedicalCheckupDrawer
+          doctorId={user.id}
+          initialDate={checkupDrawerInit?.date ?? selected ?? _today}
+          initialPatientId={checkupDrawerInit?.athleteId}
+          initial={checkupDrawerInit?.checkup ?? null}
+          patients={doctorPatients}
+          onClose={() => { setShowCheckupDrawer(false); setCheckupDrawerInit(null) }}
+          onSaved={(c) => {
+            setCheckups(prev => {
+              const idx = prev.findIndex(x => x.id === c.id)
+              return idx >= 0 ? prev.map(x => x.id === c.id ? c : x) : [...prev, c]
+            })
+            setDoctorRefreshToken(t => t + 1)
+          }}
+        />
+      )}
+
+      {isOrg && user && showOrgSessionDrawer && (
+        <OrgSessionDrawer
+          orgId={user.id}
+          initialDate={orgDrawerInit?.date ?? selected ?? _today}
+          initial={orgDrawerInit?.session ?? null}
+          members={orgMembers}
+          onClose={() => { setShowOrgSessionDrawer(false); setOrgDrawerInit(null) }}
+          onSaved={(s) => {
+            setGroupSessions(prev => {
+              const idx = prev.findIndex(x => x.id === s.id)
+              return idx >= 0 ? prev.map(x => x.id === s.id ? s : x) : [...prev, s]
+            })
+            setOrgRefreshToken(t => t + 1)
+          }}
         />
       )}
     </div>
