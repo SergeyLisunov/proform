@@ -14,6 +14,10 @@ import type { Workout } from '@/services/workouts.service'
 import { getNotes, type Note } from '@/services/notes.service'
 import QuickNoteModal from '@/components/ui/QuickNoteModal'
 import {
+  CoachAthletesPanel, CoachSessionDrawer, PassPlansManager, IssuePassDrawer, useCoachAthletes,
+} from '@/components/ui/CoachCalendarAddons'
+import { listCoachSessions, type CoachSession } from '@/services/coach.service'
+import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
@@ -1449,6 +1453,23 @@ export default function CalendarPage() {
   const [savedNotes,   setSavedNotes]   = useState<Note[]>([])
   const [noteModalDate, setNoteModalDate] = useState<string | null>(null)
 
+  const role = user?.role ?? 'athlete'
+  const isCoach   = role === 'coach'
+  const isDoctor  = role === 'doctor'
+  const isOrg     = role === 'organization'
+  const showWorkouts = role === 'athlete' || role === 'coach'
+  const showCycles   = role === 'athlete' || role === 'coach'
+
+  // Coach-specific state
+  const { athletes: coachAthletes, refresh: refreshCoachAthletes } = useCoachAthletes(isCoach ? (user?.id ?? null) : null)
+  const [coachSessions, setCoachSessions] = useState<CoachSession[]>([])
+  const [showSessionDrawer, setShowSessionDrawer] = useState(false)
+  const [sessionDrawerInit, setSessionDrawerInit] = useState<{ date?: string; athleteId?: string; session?: CoachSession | null } | null>(null)
+  const [showPlansManager, setShowPlansManager] = useState(false)
+  const [showIssuePass, setShowIssuePass]       = useState(false)
+  const [issuePassForAthlete, setIssuePassForAthlete] = useState<string | null>(null)
+  const [coachRefreshToken, setCoachRefreshToken] = useState(0)
+
   const cycleDaysMap = useMemo(() => {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
   }, [cycleDays])
@@ -1479,15 +1500,23 @@ export default function CalendarPage() {
   useEffect(() => {
     if (!user?.id) return
     setLoading(true)
-    Promise.all([
+    const tasks: Promise<unknown>[] = [
       getCalendarEvents(user.id, dataRange.from, dataRange.to),
-      getCycles(user.id, dataRange.from, dataRange.to),
-      getCycleDays(user.id, dataRange.from, dataRange.to),
-      getWorkoutsForMonth(user.id, dataRange.from, dataRange.to),
+      showCycles ? getCycles(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CycleBlock[]),
+      showCycles ? getCycleDays(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CycleDay[]),
+      showWorkouts ? getWorkoutsForMonth(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as Workout[]),
       getNotes(user.id, dataRange.from, dataRange.to),
-    ]).then(([evs, cs, cds, wks, nts]) => { setSavedEvents(evs); setCycles(cs); setCycleDays(cds); setMonthWorkouts(wks); setSavedNotes(nts) })
-      .finally(() => setLoading(false))
-  }, [user?.id, dataRange.from, dataRange.to])
+      isCoach ? listCoachSessions(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CoachSession[]),
+    ]
+    Promise.all(tasks).then(([evs, cs, cds, wks, nts, csess]) => {
+      setSavedEvents(evs as CalendarEvent[])
+      setCycles(cs as CycleBlock[])
+      setCycleDays(cds as CycleDay[])
+      setMonthWorkouts(wks as Workout[])
+      setSavedNotes(nts as Note[])
+      setCoachSessions(csess as CoachSession[])
+    }).finally(() => setLoading(false))
+  }, [user?.id, dataRange.from, dataRange.to, isCoach, showCycles, showWorkouts])
 
   // ── KPI-диапазон для квартала/года ─────────────────────────────────────────
   const { kpiFrom, kpiTo } = useMemo(() => {
@@ -1792,13 +1821,40 @@ export default function CalendarPage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setShowAddCycle(true)}
-                  className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
-                >
-                  <i className="ki-filled ki-abstract-26 text-xs" />
-                  Создать цикл
-                </button>
+                {showCycles && (
+                  <button
+                    onClick={() => setShowAddCycle(true)}
+                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                  >
+                    <i className="ki-filled ki-abstract-26 text-xs" />
+                    Создать цикл
+                  </button>
+                )}
+                {isCoach && (
+                  <>
+                    <button
+                      onClick={() => { setSessionDrawerInit({ date: selected ?? _today, session: null }); setShowSessionDrawer(true) }}
+                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    >
+                      <i className="ki-filled ki-calendar-tick text-xs" />
+                      Занятие
+                    </button>
+                    <button
+                      onClick={() => setShowPlansManager(true)}
+                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    >
+                      <i className="ki-filled ki-discount text-xs" />
+                      Тарифы
+                    </button>
+                    <button
+                      onClick={() => { setIssuePassForAthlete(null); setShowIssuePass(true) }}
+                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    >
+                      <i className="ki-filled ki-ticket text-xs" />
+                      Абонемент
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => openAddEvent(selected ?? undefined)}
                   className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
@@ -1812,7 +1868,15 @@ export default function CalendarPage() {
         </div>
       </SurfaceFrame>
 
-      {cycles.length > 0 && (
+      {isCoach && user && (
+        <CoachAthletesPanel
+          coachId={user.id}
+          refreshToken={coachRefreshToken}
+          onPickAthlete={(athleteId) => { setIssuePassForAthlete(athleteId); setShowIssuePass(true) }}
+        />
+      )}
+
+      {showCycles && cycles.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {cycles.map(c => {
             const cc = CYCLE_TYPE_CFG[c.type]
@@ -1859,7 +1923,12 @@ export default function CalendarPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
-            {['all', 'workout', 'competition', 'cycle'].map(f => (
+            {(() => {
+              const base = ['all', 'competition']
+              if (showWorkouts) base.splice(1, 0, 'workout')
+              if (showCycles)   base.push('cycle')
+              return base
+            })().map(f => (
               <button
                 key={f}
                 onClick={() => setFilterType(f)}
@@ -2021,6 +2090,36 @@ export default function CalendarPage() {
           noteDate={noteModalDate}
           onClose={() => setNoteModalDate(null)}
           onSaved={(note) => setSavedNotes(prev => [note, ...prev])}
+        />
+      )}
+
+      {isCoach && user && showSessionDrawer && (
+        <CoachSessionDrawer
+          coachId={user.id}
+          initialDate={sessionDrawerInit?.date ?? selected ?? _today}
+          initialAthleteId={sessionDrawerInit?.athleteId}
+          initial={sessionDrawerInit?.session ?? null}
+          athletes={coachAthletes}
+          onClose={() => { setShowSessionDrawer(false); setSessionDrawerInit(null) }}
+          onSaved={(s) => {
+            setCoachSessions(prev => {
+              const idx = prev.findIndex(x => x.id === s.id)
+              return idx >= 0 ? prev.map(x => x.id === s.id ? s : x) : [...prev, s]
+            })
+            setCoachRefreshToken(t => t + 1)
+          }}
+        />
+      )}
+      {isCoach && user && showPlansManager && (
+        <PassPlansManager coachId={user.id} onClose={() => setShowPlansManager(false)} />
+      )}
+      {isCoach && user && showIssuePass && (
+        <IssuePassDrawer
+          coachId={user.id}
+          athletes={coachAthletes}
+          initialAthleteId={issuePassForAthlete}
+          onClose={() => { setShowIssuePass(false); setIssuePassForAthlete(null) }}
+          onIssued={() => { setCoachRefreshToken(t => t + 1); refreshCoachAthletes() }}
         />
       )}
     </div>
