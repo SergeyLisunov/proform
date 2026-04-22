@@ -3,7 +3,39 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import NoteEditor from '@/components/ui/NoteEditor'
+import { createClient } from '@/lib/supabase/client'
 import type { Note, NoteAttachment } from '@/services/notes.service'
+
+type AttachType = 'image' | 'document'
+
+interface PendingFile {
+  tempId: string
+  name: string
+  size: number
+  mimeType: string
+  attachType: AttachType
+  localUrl: string
+  storageUrl?: string
+  uploading: boolean
+  error?: string
+}
+
+const ALLOWED_TYPES: Record<string, AttachType> = {
+  'image/jpeg': 'image',
+  'image/png': 'image',
+  'image/webp': 'image',
+  'application/pdf': 'document',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'document',
+  'text/plain': 'document',
+}
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+const MAX_DOC_SIZE   = 20 * 1024 * 1024
+const MAX_FILES = 5
+
+function fmtSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} КБ`
+  return `${(bytes / 1024 / 1024).toFixed(1)} МБ`
+}
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -28,11 +60,14 @@ export default function NotesPage() {
   const [editTitle, setEditTitle] = useState('')
   const [editDate, setEditDate] = useState(todayISO())
   const [editAttachments, setEditAttachments] = useState<NoteAttachment[]>([])
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([])
+  const [attachError, setAttachError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [isNew, setIsNew] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
 
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadNotes = useCallback(async (q?: string) => {
     setLoading(true)
@@ -62,9 +97,14 @@ export default function NotesPage() {
     }, 400)
   }
 
-  const selectedNote = notes.find(n => n.id === selectedId) ?? null
+  const resetPending = useCallback(() => {
+    pendingFiles.forEach(f => URL.revokeObjectURL(f.localUrl))
+    setPendingFiles([])
+    setAttachError(null)
+  }, [pendingFiles])
 
   const openNote = (note: Note) => {
+    resetPending()
     setSelectedId(note.id)
     setEditContent(note.content)
     setEditTitle(note.title ?? '')
@@ -75,6 +115,7 @@ export default function NotesPage() {
   }
 
   const startNew = () => {
+    resetPending()
     setSelectedId(null)
     setEditContent('')
     setEditTitle('')
@@ -84,10 +125,83 @@ export default function NotesPage() {
     setDeleteConfirm(false)
   }
 
+  const uploadFile = useCallback(async (file: File, tempId: string) => {
+    try {
+      const sb = createClient()
+      const { data: { user: authUser } } = await sb.auth.getUser()
+      if (!authUser) throw new Error('Не авторизован')
+      const ext  = file.name.split('.').pop() ?? 'bin'
+      const path = `${authUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const { error: upErr } = await sb.storage.from('note-attachments').upload(path, file, { upsert: false })
+      if (upErr) throw new Error(upErr.message)
+      const { data: { publicUrl } } = sb.storage.from('note-attachments').getPublicUrl(path)
+      setPendingFiles(prev => prev.map(f => f.tempId === tempId ? { ...f, storageUrl: publicUrl, uploading: false } : f))
+    } catch (err) {
+      setPendingFiles(prev => prev.map(f => f.tempId === tempId
+        ? { ...f, uploading: false, error: err instanceof Error ? err.message : 'Ошибка загрузки' }
+        : f
+      ))
+    }
+  }, [])
+
+  const totalAttachments = editAttachments.length + pendingFiles.length
+
+  const handleFilePick = useCallback(async (fileList: FileList) => {
+    const remaining = MAX_FILES - totalAttachments
+    if (remaining <= 0) { setAttachError(`Максимум ${MAX_FILES} файлов`); return }
+    setAttachError(null)
+    const picked = Array.from(fileList).slice(0, remaining)
+    const newFiles: PendingFile[] = []
+    const paired: { file: File; tempId: string }[] = []
+
+    for (const file of picked) {
+      const attachType = ALLOWED_TYPES[file.type]
+      if (!attachType) { setAttachError(`Формат не поддерживается: ${file.name}`); continue }
+      const maxSize = attachType === 'image' ? MAX_IMAGE_SIZE : MAX_DOC_SIZE
+      if (file.size > maxSize) {
+        setAttachError(`Файл слишком большой: ${file.name} (макс. ${attachType === 'image' ? '10' : '20'} МБ)`)
+        continue
+      }
+      const tempId = `${Date.now()}-${Math.random()}`
+      newFiles.push({
+        tempId,
+        name: file.name, size: file.size,
+        mimeType: file.type, attachType,
+        localUrl: URL.createObjectURL(file),
+        uploading: true,
+      })
+      paired.push({ file, tempId })
+    }
+
+    setPendingFiles(prev => [...prev, ...newFiles])
+    await Promise.all(paired.map(p => uploadFile(p.file, p.tempId)))
+  }, [totalAttachments, uploadFile])
+
+  const removePending = (tempId: string) => {
+    setPendingFiles(prev => {
+      const f = prev.find(x => x.tempId === tempId)
+      if (f) URL.revokeObjectURL(f.localUrl)
+      return prev.filter(x => x.tempId !== tempId)
+    })
+  }
+
+  const removeExisting = (idx: number) => {
+    setEditAttachments(prev => prev.filter((_, i) => i !== idx))
+  }
+
   const handleSave = async () => {
     if (!editContent.trim()) return
+    if (pendingFiles.some(f => f.uploading)) { setAttachError('Дождитесь загрузки всех файлов'); return }
     setSaving(true)
     try {
+      const newAttachments: NoteAttachment[] = pendingFiles
+        .filter(f => !f.error && f.storageUrl)
+        .map(f => ({
+          name: f.name, url: f.storageUrl!,
+          type: f.attachType, size: f.size, mimeType: f.mimeType,
+        }))
+      const allAttachments = [...editAttachments, ...newAttachments]
+
       if (isNew) {
         const res = await fetch('/api/notes', {
           method: 'POST',
@@ -96,12 +210,16 @@ export default function NotesPage() {
             content: editContent.trim(),
             title: editTitle.trim() || null,
             note_date: editDate,
+            attachments: allAttachments.length ? allAttachments : undefined,
           }),
         })
         const json = await res.json()
         if (json.note) {
           setNotes(prev => [json.note, ...prev])
           setSelectedId(json.note.id)
+          setEditAttachments(json.note.attachments ?? [])
+          pendingFiles.forEach(f => URL.revokeObjectURL(f.localUrl))
+          setPendingFiles([])
           setIsNew(false)
         }
       } else if (selectedId) {
@@ -112,12 +230,15 @@ export default function NotesPage() {
             content: editContent.trim(),
             title: editTitle.trim() || null,
             note_date: editDate,
-            attachments: editAttachments.length ? editAttachments : [],
+            attachments: allAttachments,
           }),
         })
         const json = await res.json()
         if (json.note) {
           setNotes(prev => prev.map(n => n.id === selectedId ? json.note : n))
+          setEditAttachments(json.note.attachments ?? [])
+          pendingFiles.forEach(f => URL.revokeObjectURL(f.localUrl))
+          setPendingFiles([])
         }
       }
     } finally {
@@ -129,6 +250,7 @@ export default function NotesPage() {
     if (!selectedId) return
     await fetch(`/api/notes/${selectedId}`, { method: 'DELETE' })
     setNotes(prev => prev.filter(n => n.id !== selectedId))
+    resetPending()
     setSelectedId(null)
     setIsNew(false)
     setDeleteConfirm(false)
@@ -268,55 +390,117 @@ export default function NotesPage() {
                   minRows={12}
                 />
 
-                {/* Attachments */}
-                {editAttachments.length > 0 && (
+                {/* Attachments (existing + pending) */}
+                {(editAttachments.length > 0 || pendingFiles.length > 0) && (
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground mb-2">
-                      Вложения · {editAttachments.length}
+                      Вложения · {editAttachments.length + pendingFiles.length}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {editAttachments.map((att, i) =>
-                        att.type === 'image' ? (
-                          <a
-                            key={i}
-                            href={att.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="relative w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/30 hover:opacity-90 transition-opacity"
-                            title={att.name}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={att.url} alt={att.name} className="w-full h-full object-cover" />
-                          </a>
-                        ) : (
-                          <a
-                            key={i}
-                            href={att.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px] hover:border-orange-300 hover:bg-orange-50 transition-colors no-underline"
-                            title={att.name}
-                          >
-                            <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
-                            <div className="min-w-0">
-                              <div className="text-[11px] text-foreground truncate">{att.name}</div>
-                              <div className="text-[10px] text-muted-foreground">
-                                {att.size < 1024 * 1024
-                                  ? `${(att.size / 1024).toFixed(0)} КБ`
-                                  : `${(att.size / 1024 / 1024).toFixed(1)} МБ`}
+                      {/* Existing attachments */}
+                      {editAttachments.map((att, i) => (
+                        <div key={`existing-${i}`} className="relative group">
+                          {att.type === 'image' ? (
+                            <a
+                              href={att.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative block w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/30 hover:opacity-90 transition-opacity"
+                              title={att.name}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={att.url} alt={att.name} className="w-full h-full object-cover" />
+                            </a>
+                          ) : (
+                            <a
+                              href={att.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px] hover:border-orange-300 hover:bg-orange-50 transition-colors no-underline"
+                              title={att.name}
+                            >
+                              <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                              <div className="min-w-0">
+                                <div className="text-[11px] text-foreground truncate">{att.name}</div>
+                                <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
                               </div>
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeExisting(i)}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground/85 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            aria-label="Удалить вложение"
+                          >
+                            <i className="ki-filled ki-cross text-[9px]" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Pending uploads */}
+                      {pendingFiles.map(f => (
+                        <div key={f.tempId} className="relative group">
+                          {f.attachType === 'image' ? (
+                            <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/30">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={f.localUrl} alt={f.name} className="w-full h-full object-cover" />
+                              {f.uploading && (
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                </div>
+                              )}
+                              {f.error && (
+                                <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center">
+                                  <i className="ki-filled ki-warning text-white text-xs" />
+                                </div>
+                              )}
                             </div>
-                          </a>
-                        )
-                      )}
+                          ) : (
+                            <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px]">
+                              <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                              <div className="min-w-0">
+                                <div className="text-[11px] text-foreground truncate">{f.name}</div>
+                                <div className="text-[10px] text-muted-foreground">{fmtSize(f.size)}</div>
+                              </div>
+                              {f.uploading && (
+                                <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin shrink-0" />
+                              )}
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removePending(f.tempId)}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground/85 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            aria-label="Удалить файл"
+                          >
+                            <i className="ki-filled ki-cross text-[9px]" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
+                    {attachError && <p className="mt-2 text-[11px] text-red-500">{attachError}</p>}
                   </div>
+                )}
+                {attachError && editAttachments.length === 0 && pendingFiles.length === 0 && (
+                  <p className="mt-2 text-[11px] text-red-500">{attachError}</p>
                 )}
               </div>
 
               {/* Footer actions */}
               <div className="flex items-center justify-between px-6 py-3 border-t border-border shrink-0">
                 <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setAttachError(null); fileInputRef.current?.click() }}
+                    disabled={totalAttachments >= MAX_FILES}
+                    title="Прикрепить файл"
+                    aria-label="Прикрепить файл"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-background
+                               text-muted-foreground hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500
+                               transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <i className="ki-filled ki-paper-clip text-[14px]" />
+                  </button>
                   {!isNew && (
                     deleteConfirm ? (
                       <div className="flex items-center gap-2">
@@ -336,13 +520,13 @@ export default function NotesPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">⌘S для сохранения</span>
+                  <span className="text-xs text-muted-foreground hidden sm:block">⌘S сохранить</span>
                   <button
                     onClick={handleSave}
-                    disabled={saving || !editContent.trim()}
+                    disabled={saving || !editContent.trim() || pendingFiles.some(f => f.uploading)}
                     className={[
                       'flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
-                      saving || !editContent.trim()
+                      saving || !editContent.trim() || pendingFiles.some(f => f.uploading)
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         : 'bg-orange-500 hover:bg-orange-600 text-white',
                     ].join(' ')}
@@ -361,6 +545,15 @@ export default function NotesPage() {
                   </button>
                 </div>
               </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png,.webp,.pdf,.docx,.txt"
+                className="hidden"
+                onChange={e => { if (e.target.files?.length) handleFilePick(e.target.files); e.target.value = '' }}
+              />
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-8">

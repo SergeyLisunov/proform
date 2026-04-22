@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from 'react'
 import NoteEditor from './NoteEditor'
-import VoiceButton from './VoiceButton'
 import { createClient } from '@/lib/supabase/client'
 import type { NoteAttachment } from '@/services/notes.service'
 
@@ -96,10 +95,6 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); handleSave() }
   }, [handleSave])
 
-  const handleTranscript = useCallback((text: string) => {
-    setContent(prev => { const t = prev.trimEnd(); return t ? `${t}\n${text}` : text })
-  }, [])
-
   const uploadFile = useCallback(async (file: File, tempId: string) => {
     try {
       const sb = createClient()
@@ -190,7 +185,6 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
           onChange={setContent}
           placeholder="Напишите заметку… (⌘↵ для сохранения)"
           minRows={3}
-          showVoice={false}
         />
       </div>
 
@@ -266,7 +260,6 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
           >
             <i className="ki-filled ki-paper-clip text-[14px]" />
           </button>
-          <VoiceButton onTranscript={handleTranscript} size="sm" />
           {files.length === 0 && content.length === 0 && (
             <span className="text-[11px] text-muted-foreground/60 truncate hidden sm:block">
               Выражения вычисляются

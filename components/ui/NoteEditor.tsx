@@ -1,8 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, lazy, Suspense } from 'react'
-
-const VoiceButton = lazy(() => import('./VoiceButton'))
+import { useCallback, useMemo, useRef } from 'react'
 
 // Detects if a line is a math expression
 function isMathExpression(line: string): boolean {
@@ -54,6 +52,7 @@ interface NoteEditorProps {
   placeholder?: string
   className?: string
   minRows?: number
+  /** @deprecated Voice input removed from notes */
   showVoice?: boolean
 }
 
@@ -64,7 +63,6 @@ export default function NoteEditor({
   placeholder = 'Write a note... (math expressions are evaluated inline)',
   className = '',
   minRows = 6,
-  showVoice = true,
 }: NoteEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -81,35 +79,6 @@ export default function NoteEditor({
     },
     [onChange]
   )
-
-  // Insert transcript at cursor position
-  const handleTranscript = useCallback((text: string) => {
-    const ta = textareaRef.current
-    if (!ta || !onChange) {
-      // Fallback: append to end
-      onChange?.(value ? `${value.trimEnd()}\n${text}` : text)
-      return
-    }
-
-    const start = ta.selectionStart ?? value.length
-    const end = ta.selectionEnd ?? value.length
-
-    // Add space/newline separator if needed
-    const before = value.slice(0, start)
-    const after = value.slice(end)
-    const needsSpace = before.length > 0 && !/[\s\n]$/.test(before)
-    const separator = needsSpace ? ' ' : ''
-
-    const newValue = `${before}${separator}${text}${after}`
-    onChange(newValue)
-
-    // Restore cursor after the inserted text
-    requestAnimationFrame(() => {
-      const newPos = start + separator.length + text.length
-      ta.setSelectionRange(newPos, newPos)
-      ta.focus()
-    })
-  }, [value, onChange])
 
   const lines = value.split('\n')
 
@@ -162,15 +131,6 @@ export default function NoteEditor({
                 </div>
               )
             })}
-          </div>
-        )}
-
-        {/* Voice button — top-right corner of textarea */}
-        {!readOnly && showVoice && (
-          <div className="absolute top-2 right-2 z-10">
-            <Suspense fallback={null}>
-              <VoiceButton onTranscript={handleTranscript} size="sm" />
-            </Suspense>
           </div>
         )}
       </div>
