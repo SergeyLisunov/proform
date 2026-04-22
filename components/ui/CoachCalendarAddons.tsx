@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   listCoachPlans, createCoachPlan, updateCoachPlan, deleteCoachPlan,
-  listAthletePasses, issuePass, updatePass, deletePass, createCoachSession,
+  listAthletePasses, issuePass, updatePass, deletePass,
   listCoachSessions, createCoachSession, updateCoachSession, deleteCoachSession,
   getAthletePassSummaries,
   type CoachPassPlan, type AthletePass, type CoachSession, type AthletePassSummary, type SessionStatus,
