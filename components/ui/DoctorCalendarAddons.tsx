@@ -8,6 +8,8 @@ import {
   CHECKUP_TYPE_LABELS,
   type MedicalCheckup, type CheckupStatus, type CheckupType, type DoctorPatient, type DoctorPatientSummary,
 } from '@/services/doctor.service'
+import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
+import { ConflictWarning } from '@/components/ui/ConflictWarning'
 
 export function useDoctorPatients(doctorId: string | null) {
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -117,8 +119,27 @@ export function MedicalCheckupDrawer({
   const [status, setStatus]           = useState<CheckupStatus>(initial?.status ?? 'scheduled')
   const [saving, setSaving]           = useState(false)
   const [visible, setVisible]         = useState(false)
+  const [conflicts, setConflicts]     = useState<Conflict[]>([])
+  const [checkingConflicts, setCheckingConflicts] = useState(false)
+  const [ackConflicts, setAckConflicts] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 10); return () => clearTimeout(t) }, [])
+
+  useEffect(() => {
+    if (!athleteId || !checkupDate || status === 'cancelled') { setConflicts([]); return }
+    let aborted = false
+    setCheckingConflicts(true)
+    findAthleteConflicts({
+      athlete_id: athleteId,
+      date: checkupDate,
+      start_time: startTime || null,
+      end_time: endTime || null,
+      exclude: initial ? [{ kind: 'medical_checkup', id: initial.id }] : [],
+    })
+      .then(list => { if (!aborted) { setConflicts(list); setAckConflicts(false) } })
+      .finally(() => { if (!aborted) setCheckingConflicts(false) })
+    return () => { aborted = true }
+  }, [athleteId, checkupDate, startTime, endTime, status, initial])
 
   const handleClose = useCallback(() => { setVisible(false); setTimeout(onClose, 200) }, [onClose])
 
@@ -239,6 +260,17 @@ export function MedicalCheckupDrawer({
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"/>
           </div>
 
+          {conflicts.length > 0 && status !== 'cancelled' && (
+            <div className="space-y-2">
+              <ConflictWarning conflicts={conflicts} color="red" />
+              <label className="flex items-center gap-2 cursor-pointer text-[11px] text-red-700">
+                <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-red-300"/>
+                <span>Всё равно назначить осмотр</span>
+              </label>
+            </div>
+          )}
+
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Статус</label>
             <div className="mt-1 grid grid-cols-2 gap-1.5">
@@ -260,7 +292,9 @@ export function MedicalCheckupDrawer({
         </div>
 
         <div className="border-t border-border px-5 py-3 flex items-center gap-2">
-          <button onClick={handleSave} disabled={saving || !athleteId}
+          <button
+            onClick={handleSave}
+            disabled={saving || !athleteId || checkingConflicts || (conflicts.length > 0 && status !== 'cancelled' && !ackConflicts)}
             className="flex-1 rounded-xl bg-red-500 text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:bg-red-600 transition-colors">
             {saving?'Сохранение…':initial?'Сохранить':'Создать осмотр'}
           </button>

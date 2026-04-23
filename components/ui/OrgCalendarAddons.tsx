@@ -10,6 +10,8 @@ import {
   type GroupSession, type SessionType, type GroupStatus,
   type SessionParticipant, type AttendanceStatus, type OrgMember,
 } from '@/services/org-sessions.service'
+import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
+import { GroupConflictWarning } from '@/components/ui/ConflictWarning'
 
 export function useOrgMembers(orgId: string | null) {
   const [members, setMembers] = useState<OrgMember[]>([])
@@ -120,8 +122,38 @@ export function OrgSessionDrawer({
   const [attendance, setAttendanceMap] = useState<Record<string, AttendanceStatus>>({})
   const [saving, setSaving]           = useState(false)
   const [visible, setVisible]         = useState(false)
+  const [conflictsByUser, setConflictsByUser] = useState<Array<{ athleteId: string; athleteName: string; conflicts: Conflict[] }>>([])
+  const [checkingConflicts, setCheckingConflicts] = useState(false)
+  const [ackConflicts, setAckConflicts] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 10); return () => clearTimeout(t) }, [])
+
+  // Пересечения у каждого выбранного участника (только для атлетов)
+  useEffect(() => {
+    if (status === 'cancelled' || participantIds.length === 0) {
+      setConflictsByUser([]); return
+    }
+    let aborted = false
+    setCheckingConflicts(true)
+    const athleteMembers = members.filter(m => m.role === 'athlete' && participantIds.includes(m.id))
+    Promise.all(
+      athleteMembers.map(async m => {
+        const list = await findAthleteConflicts({
+          athlete_id: m.id,
+          date: sessionDate,
+          start_time: startTime || null,
+          end_time: endTime || null,
+          exclude: initial ? [{ kind: 'group_session', id: initial.id }] : [],
+        })
+        return { athleteId: m.id, athleteName: m.name, conflicts: list }
+      }),
+    )
+      .then(rows => { if (!aborted) { setConflictsByUser(rows); setAckConflicts(false) } })
+      .finally(() => { if (!aborted) setCheckingConflicts(false) })
+    return () => { aborted = true }
+  }, [members, participantIds, sessionDate, startTime, endTime, status, initial])
+
+  const hasAnyConflict = conflictsByUser.some(r => r.conflicts.length > 0)
 
   useEffect(() => {
     if (initial) {
@@ -297,6 +329,17 @@ export function OrgSessionDrawer({
             </div>
           </div>
 
+          {hasAnyConflict && status !== 'cancelled' && (
+            <div className="space-y-2">
+              <GroupConflictWarning items={conflictsByUser} color="purple" />
+              <label className="flex items-center gap-2 cursor-pointer text-[11px] text-purple-700">
+                <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-purple-300"/>
+                <span>Всё равно назначить (я согласовал с участниками)</span>
+              </label>
+            </div>
+          )}
+
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Статус</label>
             <div className="mt-1 grid grid-cols-3 gap-1.5">
@@ -317,7 +360,9 @@ export function OrgSessionDrawer({
         </div>
 
         <div className="border-t border-border px-5 py-3 flex items-center gap-2">
-          <button onClick={handleSave} disabled={saving || !title.trim()}
+          <button
+            onClick={handleSave}
+            disabled={saving || !title.trim() || checkingConflicts || (hasAnyConflict && status !== 'cancelled' && !ackConflicts)}
             className="flex-1 rounded-xl bg-purple-500 text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:bg-purple-600 transition-colors">
             {saving?'Сохранение…':initial?'Сохранить':'Создать событие'}
           </button>

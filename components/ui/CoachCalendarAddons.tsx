@@ -10,6 +10,8 @@ import {
   type CoachPassPlan, type AthletePass, type CoachSession, type AthletePassSummary, type SessionStatus,
 } from '@/services/coach.service'
 import { createClient } from '@/lib/supabase/client'
+import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
+import { ConflictWarning } from '@/components/ui/ConflictWarning'
 
 type Athlete = { id: string; name: string }
 
@@ -162,6 +164,9 @@ export function CoachSessionDrawer({
   const [activePasses, setActivePasses] = useState<AthletePass[]>([])
   const [saving, setSaving]         = useState(false)
   const [visible, setVisible]       = useState(false)
+  const [conflicts, setConflicts]   = useState<Conflict[]>([])
+  const [checkingConflicts, setCheckingConflicts] = useState(false)
+  const [ackConflicts, setAckConflicts] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 10); return () => clearTimeout(t) }, [])
 
@@ -174,6 +179,25 @@ export function CoachSessionDrawer({
       if (!initial && list.length > 0) setPassId(list[0].id)
     })
   }, [coachId, athleteId, initial])
+
+  // Проверка пересечений в календаре атлета
+  useEffect(() => {
+    if (!athleteId || !sessionDate || status === 'cancelled') {
+      setConflicts([]); return
+    }
+    let aborted = false
+    setCheckingConflicts(true)
+    findAthleteConflicts({
+      athlete_id: athleteId,
+      date: sessionDate,
+      start_time: startTime || null,
+      end_time: endTime || null,
+      exclude: initial ? [{ kind: 'coach_session', id: initial.id }] : [],
+    })
+      .then(list => { if (!aborted) { setConflicts(list); setAckConflicts(false) } })
+      .finally(() => { if (!aborted) setCheckingConflicts(false) })
+    return () => { aborted = true }
+  }, [athleteId, sessionDate, startTime, endTime, status, initial])
 
   const handleClose = useCallback(() => { setVisible(false); setTimeout(onClose, 200) }, [onClose])
 
@@ -283,6 +307,17 @@ export function CoachSessionDrawer({
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none"/>
           </div>
 
+          {conflicts.length > 0 && status !== 'cancelled' && (
+            <div className="space-y-2">
+              <ConflictWarning conflicts={conflicts} color="orange" />
+              <label className="flex items-center gap-2 cursor-pointer text-[11px] text-orange-700">
+                <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-orange-300"/>
+                <span>Всё равно назначить (я согласовал с атлетом)</span>
+              </label>
+            </div>
+          )}
+
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Статус</label>
             <div className="mt-1 grid grid-cols-2 gap-1.5">
@@ -304,7 +339,9 @@ export function CoachSessionDrawer({
         </div>
 
         <div className="border-t border-border px-5 py-3 flex items-center gap-2">
-          <button onClick={handleSave} disabled={saving || !athleteId}
+          <button
+            onClick={handleSave}
+            disabled={saving || !athleteId || checkingConflicts || (conflicts.length > 0 && status !== 'cancelled' && !ackConflicts)}
             className="flex-1 rounded-xl bg-orange-500 text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:bg-orange-600 transition-colors">
             {saving?'Сохранение…':initial?'Сохранить':'Создать занятие'}
           </button>
