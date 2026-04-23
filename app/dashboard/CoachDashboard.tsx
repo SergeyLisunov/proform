@@ -73,6 +73,14 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
         <StatCard label="Заявки в связи" value={pending.length} icon="ki-message-question" iconColor="#F97316" sub={pending.length > 0 ? 'ждут ответа' : 'новых нет'} />
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Link href="/athletes/load"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#FECACA] bg-gradient-to-r from-[#FEF2F2] to-white px-4 py-2 text-xs font-semibold text-[#B91C1C] hover:bg-[#FEF2F2]">
+          <i className="ki-filled ki-shield-cross text-xs"/>
+          ACWR атлетов — риск травмы →
+        </Link>
+      </div>
+
       {pending.length > 0 && (
         <div className="rounded-2xl border border-[#FED7AA] bg-gradient-to-r from-[#FFF7ED] to-white p-5">
           <div className="flex items-center justify-between mb-3">
