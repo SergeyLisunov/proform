@@ -176,6 +176,55 @@ export async function createGroupSession(input: {
   return session
 }
 
+/**
+ * Create a series of group sessions on a set of weekdays between start_date
+ * and end_date (inclusive). Participant list is copied to every occurrence.
+ * days_of_week: 0=Sunday, 1=Monday, ..., 6=Saturday.
+ */
+export async function createRecurringGroupSessions(input: {
+  organization_id: string
+  start_date: string            // YYYY-MM-DD
+  end_date: string              // YYYY-MM-DD
+  days_of_week: number[]        // 0..6
+  title: string
+  session_type?: SessionType
+  start_time?: string | null
+  end_time?: string | null
+  location?: string | null
+  description?: string | null
+  participant_ids?: string[]
+  max_occurrences?: number      // safety cap, default 52
+}): Promise<{ created: GroupSession[]; skipped: number }> {
+  const cap = input.max_occurrences ?? 52
+  const start = new Date(input.start_date + 'T00:00:00')
+  const end   = new Date(input.end_date   + 'T00:00:00')
+  const days  = new Set(input.days_of_week)
+  const occurrences: string[] = []
+  for (let d = new Date(start); d <= end && occurrences.length < cap; d.setDate(d.getDate() + 1)) {
+    if (days.has(d.getDay())) {
+      const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0')
+      occurrences.push(`${y}-${m}-${dd}`)
+    }
+  }
+  const created: GroupSession[] = []
+  let skipped = 0
+  for (const date of occurrences) {
+    const row = await createGroupSession({
+      organization_id: input.organization_id,
+      session_date:    date,
+      title:           input.title,
+      session_type:    input.session_type,
+      start_time:      input.start_time,
+      end_time:        input.end_time,
+      location:        input.location,
+      description:     input.description,
+      participant_ids: input.participant_ids,
+    })
+    if (row) created.push(row); else skipped++
+  }
+  return { created, skipped }
+}
+
 async function listParticipantUserIds(sessionId: string): Promise<string[]> {
   const sb = createClient()
   const { data } = await sb

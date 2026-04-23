@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import {
   listOrgMembers, listGroupSessions, listParticipants,
   createGroupSession, updateGroupSession, deleteGroupSession,
+  createRecurringGroupSessions,
   setParticipants, setAttendance,
   SESSION_TYPE_LABELS,
   type GroupSession, type SessionType, type GroupStatus,
@@ -122,6 +123,12 @@ export function OrgSessionDrawer({
   const [attendance, setAttendanceMap] = useState<Record<string, AttendanceStatus>>({})
   const [saving, setSaving]           = useState(false)
   const [visible, setVisible]         = useState(false)
+  const [recurring, setRecurring] = useState(false)
+  const [recurDays, setRecurDays] = useState<number[]>([1, 3, 5]) // Mon/Wed/Fri default
+  const [recurEndDate, setRecurEndDate] = useState<string>(() => {
+    const d = new Date(initial?.session_date ?? initialDate); d.setDate(d.getDate() + 28)
+    return d.toISOString().slice(0, 10)
+  })
   const [conflictsByUser, setConflictsByUser] = useState<Array<{ athleteId: string; athleteName: string; conflicts: Conflict[] }>>([])
   const [checkingConflicts, setCheckingConflicts] = useState(false)
   const [ackConflicts, setAckConflicts] = useState(false)
@@ -175,6 +182,30 @@ export function OrgSessionDrawer({
   const handleSave = useCallback(async () => {
     if (!title.trim()) return
     setSaving(true)
+
+    if (!initial && recurring && recurDays.length > 0 && recurEndDate >= sessionDate) {
+      // Bulk-create a series. Each occurrence is independent (no parent link).
+      const { created } = await createRecurringGroupSessions({
+        organization_id: orgId,
+        start_date: sessionDate,
+        end_date:   recurEndDate,
+        days_of_week: recurDays,
+        title: title.trim(),
+        session_type: sessionType,
+        start_time: startTime || null,
+        end_time:   endTime   || null,
+        location:   location  || null,
+        description: description || null,
+        participant_ids: participantIds,
+      })
+      setSaving(false)
+      if (created.length > 0) {
+        onSaved(created[0])
+        handleClose()
+      }
+      return
+    }
+
     const payload = {
       session_date: sessionDate,
       title: title.trim(),
@@ -193,7 +224,7 @@ export function OrgSessionDrawer({
     }
     setSaving(false)
     if (res) { onSaved(res); handleClose() }
-  }, [orgId, sessionDate, title, sessionType, startTime, endTime, location, description, status, participantIds, initial, onSaved, handleClose])
+  }, [orgId, sessionDate, title, sessionType, startTime, endTime, location, description, status, participantIds, initial, onSaved, handleClose, recurring, recurDays, recurEndDate])
 
   const handleDelete = useCallback(async () => {
     if (!initial) return
@@ -337,6 +368,47 @@ export function OrgSessionDrawer({
                   className="w-3.5 h-3.5 rounded border-purple-300"/>
                 <span>Всё равно назначить (я согласовал с участниками)</span>
               </label>
+            </div>
+          )}
+
+          {!initial && (
+            <div className="rounded-xl border border-border bg-muted/20 p-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={recurring} onChange={e => setRecurring(e.target.checked)}
+                  className="w-4 h-4 rounded border-border"/>
+                <span className="text-xs font-semibold text-foreground">Повторяющееся событие</span>
+              </label>
+              {recurring && (
+                <div className="mt-3 space-y-2">
+                  <div>
+                    <label className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Дни недели</label>
+                    <div className="mt-1 grid grid-cols-7 gap-1">
+                      {['Вс','Пн','Вт','Ср','Чт','Пт','Сб'].map((lbl, i) => {
+                        const on = recurDays.includes(i)
+                        return (
+                          <button key={i} type="button"
+                            onClick={() => setRecurDays(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i].sort())}
+                            className={`py-1.5 text-[11px] font-semibold rounded-md border transition-all ${
+                              on ? 'border-purple-400 bg-purple-50 text-purple-700'
+                                 : 'border-border bg-background text-muted-foreground hover:border-purple-200'
+                            }`}>
+                            {lbl}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-muted-foreground">Повторять до</label>
+                    <input type="date" value={recurEndDate} onChange={e => setRecurEndDate(e.target.value)}
+                      min={sessionDate}
+                      className="w-full rounded-lg border border-border bg-background px-2 py-2 text-sm"/>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    Будут созданы отдельные события на выбранных днях с {sessionDate} по {recurEndDate}. Каждое можно редактировать индивидуально.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
