@@ -51,9 +51,11 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        const userId  = session.metadata?.user_id
-        const orderId = session.metadata?.order_id
-        const plan    = session.metadata?.plan
+        const userId      = session.metadata?.user_id
+        const orderId     = session.metadata?.order_id
+        const plan        = session.metadata?.plan
+        const passPlanId  = session.metadata?.pass_plan_id
+        const coachId     = session.metadata?.coach_id
         if (session.mode === 'subscription' && userId && plan) {
           await sb.from('subscriptions').upsert({
             user_id: userId,
@@ -62,6 +64,65 @@ export async function POST(req: NextRequest) {
             stripe_customer_id:     typeof session.customer     === 'string' ? session.customer     : null,
             stripe_subscription_id: typeof session.subscription === 'string' ? session.subscription : null,
           }, { onConflict: 'user_id' })
+        }
+        // ── Coach pass-plan purchase → issue athlete_pass ────────────────
+        if (session.mode === 'payment' && passPlanId && userId && coachId) {
+          const total = parseInt(session.metadata?.total_sessions ?? '0', 10)
+          const days  = parseInt(session.metadata?.period_days ?? '30', 10)
+          const startISO = new Date().toISOString().slice(0, 10)
+          const expiresISO = new Date(Date.now() + Math.max(0, days - 1) * 86400000).toISOString().slice(0, 10)
+          // De-dupe: only issue once per stripe session id.
+          const { data: existingPass } = await sb
+            .from('athlete_passes').select('id')
+            .eq('stripe_session_id', session.id)
+            .maybeSingle()
+          if (!existingPass) {
+            await sb.from('athlete_passes').insert({
+              coach_id:   coachId,
+              athlete_id: userId,
+              plan_id:    passPlanId,
+              title:      session.metadata?.plan_title ?? 'Абонемент',
+              total_sessions: Math.max(1, total),
+              used_sessions:  0,
+              starts_at:  startISO,
+              expires_at: expiresISO,
+              price_cents: parseInt(session.metadata?.plan_price_cents ?? '0', 10),
+              currency:    session.metadata?.plan_currency ?? 'RUB',
+              status:      'active',
+              stripe_session_id: session.id,
+            })
+            await sb.from('notifications').insert([
+              {
+                user_id: userId,
+                type: 'pass_issued',
+                title: 'Абонемент оплачен',
+                body:  `${session.metadata?.plan_title ?? 'Абонемент'} · ${total} занятий`,
+                entity_type: 'athlete_pass',
+                entity_id:   null,
+                action_url:  '/calendar',
+              },
+              {
+                user_id: coachId,
+                type: 'broadcast',
+                title: 'Оплачен абонемент',
+                body:  session.metadata?.plan_title ?? 'Абонемент',
+                entity_type: 'athlete_pass',
+                entity_id:   null,
+                action_url:  '/athletes',
+              },
+            ])
+            await sb.from('payments').insert({
+              user_id: userId,
+              order_id: null,
+              stripe_session_id: session.id,
+              stripe_payment_intent_id:
+                typeof session.payment_intent === 'string' ? session.payment_intent : null,
+              amount: session.amount_total ? Math.floor(session.amount_total / 100) : 0,
+              currency: (session.currency ?? 'rub').toUpperCase(),
+              status: 'succeeded',
+              raw: session as unknown as Record<string, unknown>,
+            })
+          }
         }
         if (session.mode === 'payment' && orderId) {
           await sb.from('coach_orders').update({

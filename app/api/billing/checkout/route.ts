@@ -7,8 +7,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({} as Record<string, unknown>))
     const plan = body.plan as PlanKey | undefined
     const serviceId = typeof body.serviceId === 'string' ? body.serviceId : null
-    if (!plan && !serviceId) {
-      return NextResponse.json({ error: 'plan or serviceId required' }, { status: 400 })
+    const passPlanId = typeof body.passPlanId === 'string' ? body.passPlanId : null
+    if (!plan && !serviceId && !passPlanId) {
+      return NextResponse.json({ error: 'plan, serviceId, or passPlanId required' }, { status: 400 })
     }
 
     const supabase = await createClient()
@@ -46,6 +47,54 @@ export async function POST(req: NextRequest) {
         success_url: `${origin}/settings?billing=success`,
         cancel_url:  `${origin}/pricing?billing=cancelled`,
         allow_promotion_codes: true,
+      })
+      return NextResponse.json({ url: session.url })
+    }
+
+    // ── Coach pass-plan one-off purchase (issues athlete_pass on success) ──
+    if (passPlanId) {
+      const { data: planRow } = await supabase
+        .from('coach_pass_plans')
+        .select('id, coach_id, title, description, total_sessions, period_days, price_cents, currency, is_active')
+        .eq('id', passPlanId)
+        .single()
+      if (!planRow || !planRow.is_active) {
+        return NextResponse.json({ error: 'Plan unavailable' }, { status: 404 })
+      }
+      if (planRow.coach_id === me.id) {
+        return NextResponse.json({ error: 'Cannot purchase your own plan' }, { status: 422 })
+      }
+      if (planRow.price_cents <= 0) {
+        return NextResponse.json({ error: 'Free plan — no checkout needed' }, { status: 400 })
+      }
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: (planRow.currency ?? 'RUB').toLowerCase(),
+            product_data: {
+              name: planRow.title,
+              description: planRow.description
+                ?? `${planRow.total_sessions} занятий · ${planRow.period_days} дн`,
+            },
+            unit_amount: planRow.price_cents,
+          },
+          quantity: 1,
+        }],
+        client_reference_id: me.id,
+        customer_email: me.email ?? undefined,
+        metadata: {
+          user_id: me.id,
+          pass_plan_id: planRow.id,
+          coach_id: planRow.coach_id,
+          total_sessions: String(planRow.total_sessions),
+          period_days:    String(planRow.period_days),
+          plan_title:     planRow.title,
+          plan_currency:  planRow.currency ?? 'RUB',
+          plan_price_cents: String(planRow.price_cents),
+        },
+        success_url: `${origin}/calendar?pass=success`,
+        cancel_url:  `${origin}/profile/${planRow.coach_id}?pass=cancelled`,
       })
       return NextResponse.json({ url: session.url })
     }
