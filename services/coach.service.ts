@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { notify } from './notifications.service'
 
 export interface CoachPassPlan {
   id: string
@@ -166,7 +167,17 @@ export async function issuePass(input: {
     .select()
     .single()
   if (error) { console.error('issuePass:', error.message); return null }
-  return data as AthletePass
+  const pass = data as AthletePass
+  await notify({
+    user_id: input.athlete_id,
+    type: 'pass_issued',
+    title: 'Выдан абонемент',
+    body: `${input.title} · ${input.total_sessions} занятий (до ${input.expires_at})`,
+    entity_type: 'athlete_pass',
+    entity_id: pass.id,
+    action_url: '/calendar',
+  })
+  return pass
 }
 
 export async function updatePass(id: string, patch: Partial<Omit<AthletePass,'id'|'coach_id'|'created_at'|'updated_at'>>): Promise<AthletePass | null> {
@@ -208,6 +219,30 @@ export async function listSessionsForAthlete(coachId: string, athleteId: string,
   return (data ?? []) as CoachSession[]
 }
 
+// Athlete-side: все сессии, где я участвую (от всех тренеров).
+export async function listMySessionsAsAthlete(athleteId: string, from: string, to: string): Promise<CoachSession[]> {
+  const sb = createClient()
+  const { data } = await sb
+    .from('coach_sessions')
+    .select('*')
+    .eq('athlete_id', athleteId)
+    .gte('session_date', from)
+    .lte('session_date', to)
+    .order('session_date', { ascending: true })
+  return (data ?? []) as CoachSession[]
+}
+
+// Athlete-side: мои активные абонементы (от всех тренеров).
+export async function listMyPassesAsAthlete(athleteId: string): Promise<AthletePass[]> {
+  const sb = createClient()
+  const { data } = await sb
+    .from('athlete_passes')
+    .select('*')
+    .eq('athlete_id', athleteId)
+    .order('starts_at', { ascending: false })
+  return (data ?? []) as AthletePass[]
+}
+
 export async function createCoachSession(input: {
   coach_id: string
   athlete_id: string
@@ -238,7 +273,17 @@ export async function createCoachSession(input: {
     .select()
     .single()
   if (error) { console.error('createCoachSession:', error.message); return null }
-  return data as CoachSession
+  const session = data as CoachSession
+  await notify({
+    user_id: input.athlete_id,
+    type: 'session_scheduled',
+    title: 'Назначена тренировка',
+    body: `${input.title ?? 'Занятие с тренером'} · ${input.session_date}${input.start_time ? ' в ' + input.start_time.slice(0,5) : ''}`,
+    entity_type: 'coach_session',
+    entity_id: session.id,
+    action_url: '/calendar',
+  })
+  return session
 }
 
 export async function updateCoachSession(id: string, patch: Partial<Omit<CoachSession,'id'|'coach_id'|'created_at'|'updated_at'>>): Promise<CoachSession | null> {

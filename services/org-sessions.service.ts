@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { notifyMany } from './notifications.service'
 
 export type SessionType = 'team_practice' | 'competition' | 'travel' | 'meeting' | 'camp' | 'other'
 export type GroupStatus = 'planned' | 'completed' | 'cancelled'
@@ -70,6 +71,52 @@ export async function listGroupSessions(orgId: string, from: string, to: string)
   return (data ?? []) as GroupSession[]
 }
 
+// Athlete/coach-side: события команды, где я участник.
+export async function listMyGroupSessionsAsMember(
+  userId: string, from: string, to: string
+): Promise<Array<GroupSession & { my_attendance: AttendanceStatus }>> {
+  const sb = createClient()
+  const { data: partsRaw } = await sb
+    .from('org_session_participants')
+    .select('session_id, attendance_status')
+    .eq('user_id', userId)
+  const parts = (partsRaw ?? []) as Array<{ session_id: string; attendance_status: AttendanceStatus }>
+  if (parts.length === 0) return []
+  const attMap: Record<string, AttendanceStatus> = {}
+  for (const p of parts) attMap[p.session_id] = p.attendance_status
+  const ids = parts.map(p => p.session_id)
+  const { data: sRaw } = await sb
+    .from('org_group_sessions')
+    .select('*')
+    .in('id', ids)
+    .gte('session_date', from)
+    .lte('session_date', to)
+    .order('session_date', { ascending: true })
+  const sessions = (sRaw ?? []) as GroupSession[]
+  return sessions.map(s => ({ ...s, my_attendance: attMap[s.id] ?? 'pending' }))
+}
+
+// Athlete-side: моя текущая организация (первая активная связь).
+export async function getMyOrganization(userId: string): Promise<{ id: string; name: string } | null> {
+  const sb = createClient()
+  const { data: mRaw } = await sb
+    .from('org_members')
+    .select('org_id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .limit(1)
+  const members = (mRaw ?? []) as Array<{ org_id: string }>
+  if (members.length === 0) return null
+  const { data: orgRaw } = await sb
+    .from('users')
+    .select('id, name')
+    .eq('id', members[0].org_id)
+    .single()
+  const org = orgRaw as { id: string; name: string | null } | null
+  if (!org) return null
+  return { id: org.id, name: org.name ?? '—' }
+}
+
 export async function listParticipants(sessionIds: string[]): Promise<SessionParticipant[]> {
   if (sessionIds.length === 0) return []
   const sb = createClient()
@@ -115,6 +162,16 @@ export async function createGroupSession(input: {
       session_id: session.id, user_id: uid, attendance_status: 'pending' as const,
     }))
     await (sb as any).from('org_session_participants').insert(rows)
+    const typeLabel = SESSION_TYPE_LABELS[session.session_type]
+    await notifyMany(input.participant_ids.map(uid => ({
+      user_id: uid,
+      type: 'invited_to_event' as const,
+      title: `Приглашение на ${typeLabel.toLowerCase()}`,
+      body: `${session.title} · ${session.session_date}${session.start_time ? ' в ' + session.start_time.slice(0,5) : ''}`,
+      entity_type: 'group_session',
+      entity_id: session.id,
+      action_url: '/calendar',
+    })))
   }
   return session
 }
@@ -143,7 +200,25 @@ export async function setParticipants(sessionId: string, userIds: string[]): Pro
   }))
   const toRemove = existing.filter(p => !newSet.has(p.user_id)).map(p => p.user_id)
 
-  if (toAdd.length > 0) await (sb as any).from('org_session_participants').insert(toAdd)
+  if (toAdd.length > 0) {
+    await (sb as any).from('org_session_participants').insert(toAdd)
+    // Pull session title for notification body.
+    const { data: sRaw } = await sb.from('org_group_sessions')
+      .select('title, session_date, session_type, start_time').eq('id', sessionId).single()
+    const s = sRaw as { title: string; session_date: string; session_type: SessionType; start_time: string | null } | null
+    if (s) {
+      const typeLabel = SESSION_TYPE_LABELS[s.session_type]
+      await notifyMany(toAdd.map(r => ({
+        user_id: r.user_id,
+        type: 'invited_to_event' as const,
+        title: `Приглашение на ${typeLabel.toLowerCase()}`,
+        body: `${s.title} · ${s.session_date}${s.start_time ? ' в ' + s.start_time.slice(0,5) : ''}`,
+        entity_type: 'group_session',
+        entity_id: sessionId,
+        action_url: '/calendar',
+      })))
+    }
+  }
   if (toRemove.length > 0) {
     await sb.from('org_session_participants').delete()
       .eq('session_id', sessionId).in('user_id', toRemove)

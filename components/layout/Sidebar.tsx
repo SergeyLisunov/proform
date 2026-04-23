@@ -17,6 +17,7 @@ const NAV_SECTIONS = [
   {
     title: 'Тренировки',
     items: [
+      { href: '/notifications', icon: 'ki-notification', label: 'Уведомления',  roles: null },
       { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
       { href: '/templates',    icon: 'ki-notepad-edit', label: 'Шаблоны',      roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/competitions', icon: 'ki-medal-star',  label: 'Соревнования', roles: ['athlete', 'coach', 'admin'] as string[] },
@@ -81,6 +82,7 @@ export default function Sidebar() {
   const { user } = useUser()
   const [signingOut, setSigningOut] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [notifyCount, setNotifyCount] = useState(0)
   const roleMeta = getRoleMeta(user?.role)
 
   useEffect(() => {
@@ -120,6 +122,35 @@ export default function Sidebar() {
     return () => {
       mounted = false
       sb.removeChannel(channel)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    const sb = getSB()
+    let mounted = true
+
+    async function loadNotify() {
+      const { count } = await sb
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user!.id)
+        .eq('is_read', false)
+        .eq('is_archived', false)
+      if (!mounted) return
+      setNotifyCount(count ?? 0)
+    }
+
+    loadNotify()
+
+    const ch = sb
+      .channel('sidebar-notifications')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => loadNotify())
+      .subscribe()
+
+    return () => {
+      mounted = false
+      sb.removeChannel(ch)
     }
   }, [user])
 
@@ -214,7 +245,9 @@ export default function Sidebar() {
                   {section.items.map(item => {
                     const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'))
                     const isMessages = item.href === '/messages'
-                    const showBadge = isMessages && unreadCount > 0
+                    const isNotifications = item.href === '/notifications'
+                    const badgeVal = isMessages ? unreadCount : isNotifications ? notifyCount : 0
+                    const showBadge = badgeVal > 0
 
                     return (
                       <div key={`${item.href}-${item.label}`} className="kt-menu-item">
@@ -245,7 +278,7 @@ export default function Sidebar() {
 
                           {showBadge ? (
                             <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-sm">
-                              {unreadCount > 99 ? '99+' : unreadCount}
+                              {badgeVal > 99 ? '99+' : badgeVal}
                             </span>
                           ) : active ? (
                             <i className="ki-filled ki-right shrink-0 text-[12px] text-orange-400" />

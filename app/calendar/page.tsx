@@ -16,15 +16,18 @@ import QuickNoteModal from '@/components/ui/QuickNoteModal'
 import {
   CoachAthletesPanel, CoachSessionDrawer, PassPlansManager, IssuePassDrawer, useCoachAthletes,
 } from '@/components/ui/CoachCalendarAddons'
-import { listCoachSessions, type CoachSession } from '@/services/coach.service'
+import { listCoachSessions, listMySessionsAsAthlete, type CoachSession } from '@/services/coach.service'
 import {
   DoctorPatientsPanel, MedicalCheckupDrawer, useDoctorPatients,
 } from '@/components/ui/DoctorCalendarAddons'
-import { listCheckups, type MedicalCheckup } from '@/services/doctor.service'
+import { listCheckups, listMyCheckupsAsAthlete, type MedicalCheckup } from '@/services/doctor.service'
 import {
   OrgSessionsPanel, OrgSessionDrawer, useOrgMembers,
 } from '@/components/ui/OrgCalendarAddons'
-import { listGroupSessions, type GroupSession } from '@/services/org-sessions.service'
+import {
+  listGroupSessions, listMyGroupSessionsAsMember, setAttendance,
+  type GroupSession, type AttendanceStatus,
+} from '@/services/org-sessions.service'
 import {
   getCycles, getCycleDays, getCycleDaysByCycle, createCycle, updateCycle, deleteCycle,
   upsertCycleDay, deleteCycleDay,
@@ -1229,10 +1232,53 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
 }
 
 // ── ADD EVENT DRAWER ───────────────────────────────────────────────────────────
-function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'create', initialEvent, onUpdated, onDeleted }: {
+function RsvpBlock({ status, onSet }: { status: AttendanceStatus; onSet: (next: AttendanceStatus) => Promise<void> }) {
+  const [busy, setBusy] = useState<AttendanceStatus | null>(null)
+  async function click(next: AttendanceStatus) {
+    if (busy) return
+    setBusy(next)
+    try { await onSet(next) } finally { setBusy(null) }
+  }
+  const STATUS_LABEL: Record<AttendanceStatus, string> = {
+    pending: 'Ожидает ответа',
+    confirmed: 'Вы подтвердили',
+    declined: 'Вы отказались',
+    attended: 'Присутствовали',
+    absent: 'Отсутствовали',
+  }
+  const STATUS_COLOR: Record<AttendanceStatus, string> = {
+    pending: '#64748B', confirmed: '#16A34A', declined: '#DC2626', attended: '#0284C7', absent: '#94A3B8',
+  }
+  return (
+    <div style={{padding:'14px 16px',borderRadius:12,background:'#F8FAFC',border:'1px solid var(--border)'}}>
+      <p style={{fontSize:11,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:8}}>Ваше участие</p>
+      <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 10px',borderRadius:20,background:STATUS_COLOR[status]+'18',border:`1.5px solid ${STATUS_COLOR[status]}40`,marginBottom:10}}>
+        <span style={{width:6,height:6,borderRadius:'50%',background:STATUS_COLOR[status]}}/>
+        <span style={{fontSize:12,fontWeight:700,color:STATUS_COLOR[status]}}>{STATUS_LABEL[status]}</span>
+      </div>
+      <div style={{display:'flex',gap:8}}>
+        <button
+          onClick={()=>click('confirmed')}
+          disabled={!!busy || status === 'confirmed'}
+          style={{flex:1,padding:'10px 0',borderRadius:10,background:status==='confirmed'?'#16A34A':'#F0FDF4',color:status==='confirmed'?'#fff':'#16A34A',fontSize:13,fontWeight:600,border:status==='confirmed'?'none':'1.5px solid #BBF7D0',cursor:busy?'not-allowed':'pointer',opacity:busy?0.6:1}}>
+          <i className="ki-filled ki-check" style={{marginRight:6,fontSize:12}}/>Буду
+        </button>
+        <button
+          onClick={()=>click('declined')}
+          disabled={!!busy || status === 'declined'}
+          style={{flex:1,padding:'10px 0',borderRadius:10,background:status==='declined'?'#DC2626':'#FEF2F2',color:status==='declined'?'#fff':'#DC2626',fontSize:13,fontWeight:600,border:status==='declined'?'none':'1.5px solid #FECACA',cursor:busy?'not-allowed':'pointer',opacity:busy?0.6:1}}>
+          <i className="ki-filled ki-cross" style={{marginRight:6,fontSize:12}}/>Не смогу
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'create', initialEvent, onUpdated, onDeleted, rsvp }: {
   initialDate: string; ownerId: string; onClose: () => void; onCreated: (e: CalendarEvent) => void
   mode?: 'create'|'view'|'edit'; initialEvent?: CalendarEvent
   onUpdated?: (e: CalendarEvent) => void; onDeleted?: (id: string) => void
+  rsvp?: { status: AttendanceStatus; onSet: (next: AttendanceStatus) => Promise<void> } | null
 }) {
   const [mounted,setMounted]=useState(false); const [visible,setVisible]=useState(false)
   const [drawerMode,setDrawerMode]=useState<'create'|'view'|'edit'>(mode)
@@ -1388,7 +1434,13 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 {(initialEvent.start_time||initialEvent.end_time)&&<InfoBlock label="Время" value={[initialEvent.start_time,initialEvent.end_time].filter(Boolean).join(' – ')}/>}
                 {initialEvent.notes&&<InfoBlock label="Заметки" value={initialEvent.notes} multiline/>}
               </div>
-              {confirmDelete?(
+              {rsvp && <RsvpBlock status={rsvp.status} onSet={rsvp.onSet}/>}
+              {initialEvent && (initialEvent.id.startsWith('cs_') || initialEvent.id.startsWith('gs_') || initialEvent.id.startsWith('mc_')) ? (
+                <div style={{paddingTop:4}}>
+                  <button onClick={handleClose} style={{width:'100%',padding:'11px 0',borderRadius:12,background:'#F1F5F9',color:'#334155',fontSize:14,fontWeight:600,border:'none',cursor:'pointer'}}>Закрыть</button>
+                  <p style={{fontSize:11,color:'var(--muted-foreground)',marginTop:8,textAlign:'center'}}>Это событие создано другим пользователем — редактирование недоступно</p>
+                </div>
+              ) : confirmDelete?(
                 <div style={{padding:'14px 16px',borderRadius:12,background:'#FEF2F2',border:'1px solid #FECACA'}}>
                   <p style={{fontSize:13,fontWeight:600,color:'#DC2626',marginBottom:10}}>Удалить это событие?</p>
                   <div style={{display:'flex',gap:8}}>
@@ -1492,6 +1544,12 @@ export default function CalendarPage() {
   const [orgDrawerInit, setOrgDrawerInit] = useState<{ date?: string; session?: GroupSession | null } | null>(null)
   const [orgRefreshToken, setOrgRefreshToken] = useState(0)
 
+  // Athlete-side visibility: events assigned to me by coach/doctor/org.
+  const isAthlete = role === 'athlete'
+  const [athleteCoachSessions, setAthleteCoachSessions] = useState<CoachSession[]>([])
+  const [athleteCheckups, setAthleteCheckups] = useState<MedicalCheckup[]>([])
+  const [athleteGroupSessions, setAthleteGroupSessions] = useState<Array<GroupSession & { my_attendance: AttendanceStatus }>>([])
+
   const cycleDaysMap = useMemo(() => {
     const m: Record<string,DayType>={}; cycleDays.forEach(cd=>{m[cd.day_date]=cd.day_type}); return m
   }, [cycleDays])
@@ -1544,8 +1602,52 @@ export default function CalendarPage() {
         })
       }
     }
+    if (isAthlete) {
+      for (const s of athleteCoachSessions) {
+        if (s.status === 'cancelled') continue
+        synthetic.push({
+          id: `cs_${s.id}`, owner_id: s.athlete_id, event_date: s.session_date,
+          event_type: 'workout',
+          title: s.title ?? 'Тренировка с тренером',
+          notes: s.notes, start_time: s.start_time, end_time: s.end_time,
+          created_at: s.created_at,
+        })
+      }
+      const aCheckupLabels: Record<string, string> = {
+        general: 'Осмотр', cardiology: 'Кардио', blood: 'Анализы',
+        injury: 'Травма', mobility: 'Мобильность', return_to_sport: 'Return-to-sport',
+        nutrition: 'Питание', other: 'Мед.',
+      }
+      for (const c of athleteCheckups) {
+        if (c.status === 'cancelled') continue
+        synthetic.push({
+          id: `mc_${c.id}`, owner_id: c.athlete_id, event_date: c.checkup_date,
+          event_type: 'medical',
+          title: `${aCheckupLabels[c.checkup_type] ?? 'Медосмотр'} · врач`,
+          notes: c.findings, start_time: c.start_time, end_time: c.end_time,
+          created_at: c.created_at,
+        })
+      }
+      const aSessionTypeToEvent: Record<string, CalendarEvent['event_type']> = {
+        team_practice: 'workout', competition: 'competition', travel: 'travel',
+        meeting: 'note', camp: 'camp', other: 'other',
+      }
+      for (const g of athleteGroupSessions) {
+        if (g.status === 'cancelled') continue
+        synthetic.push({
+          id: `gs_${g.id}`, owner_id: user?.id ?? '', event_date: g.session_date,
+          event_type: aSessionTypeToEvent[g.session_type] ?? 'other',
+          title: `${g.title} · команда`,
+          notes: g.description,
+          start_time: g.start_time, end_time: g.end_time,
+          created_at: g.created_at,
+        })
+      }
+    }
     return [...savedEvents, ...synthetic]
-  }, [savedEvents, coachSessions, groupSessions, checkups, coachAthletes, isCoach, isOrg, isDoctor])
+  }, [savedEvents, coachSessions, groupSessions, checkups, coachAthletes,
+      athleteCoachSessions, athleteCheckups, athleteGroupSessions,
+      isCoach, isOrg, isDoctor, isAthlete, user?.id])
 
   const weekStart = useMemo(() => {
     const base = selected ? parseLocalDate(selected) : new Date(year, month, now.getDate())
@@ -1582,8 +1684,11 @@ export default function CalendarPage() {
       isCoach ? listCoachSessions(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CoachSession[]),
       isDoctor ? listCheckups(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as MedicalCheckup[]),
       isOrg ? listGroupSessions(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as GroupSession[]),
+      isAthlete ? listMySessionsAsAthlete(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as CoachSession[]),
+      isAthlete ? listMyCheckupsAsAthlete(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as MedicalCheckup[]),
+      isAthlete ? listMyGroupSessionsAsMember(user.id, dataRange.from, dataRange.to) : Promise.resolve([] as Array<GroupSession & { my_attendance: AttendanceStatus }>),
     ]
-    Promise.all(tasks).then(([evs, cs, cds, wks, nts, csess, chks, gss]) => {
+    Promise.all(tasks).then(([evs, cs, cds, wks, nts, csess, chks, gss, acs, ach, ags]) => {
       setSavedEvents(evs as CalendarEvent[])
       setCycles(cs as CycleBlock[])
       setCycleDays(cds as CycleDay[])
@@ -1592,8 +1697,11 @@ export default function CalendarPage() {
       setCoachSessions(csess as CoachSession[])
       setCheckups(chks as MedicalCheckup[])
       setGroupSessions(gss as GroupSession[])
+      setAthleteCoachSessions(acs as CoachSession[])
+      setAthleteCheckups(ach as MedicalCheckup[])
+      setAthleteGroupSessions(ags as Array<GroupSession & { my_attendance: AttendanceStatus }>)
     }).finally(() => setLoading(false))
-  }, [user?.id, dataRange.from, dataRange.to, isCoach, isDoctor, isOrg, showCycles, showWorkouts])
+  }, [user?.id, dataRange.from, dataRange.to, isCoach, isDoctor, isOrg, isAthlete, showCycles, showWorkouts])
 
   // ── KPI-диапазон для квартала/года ─────────────────────────────────────────
   const { kpiFrom, kpiTo } = useMemo(() => {
@@ -2191,12 +2299,26 @@ export default function CalendarPage() {
       {showAddEvent && user && (
         <AddEventDrawer initialDate={addEventDate} ownerId={user.id} onClose={()=>setShowAddEvent(false)} onCreated={handleEventCreated}/>
       )}
-      {eventDrawer && user && (
-        <AddEventDrawer initialDate={eventDrawer.event_date} ownerId={user.id} mode={eventDrawerMode} initialEvent={eventDrawer}
-          onClose={()=>setEventDrawer(null)} onCreated={handleEventCreated}
-          onUpdated={e=>{handleEventUpdated(e);setEventDrawer(null)}}
-          onDeleted={id=>{handleDeleteEvent(id);setEventDrawer(null)}}/>
-      )}
+      {eventDrawer && user && (() => {
+        const id = eventDrawer.id
+        const isGroup = isAthlete && id.startsWith('gs_')
+        const sessionId = isGroup ? id.slice(3) : null
+        const groupSession = sessionId ? athleteGroupSessions.find(g => g.id === sessionId) : null
+        const rsvpProp = (isGroup && groupSession) ? {
+          status: groupSession.my_attendance,
+          onSet: async (next: AttendanceStatus) => {
+            await setAttendance(sessionId!, user.id, next)
+            setAthleteGroupSessions(prev => prev.map(g => g.id === sessionId ? { ...g, my_attendance: next } : g))
+          },
+        } : null
+        return (
+          <AddEventDrawer initialDate={eventDrawer.event_date} ownerId={user.id} mode={eventDrawerMode} initialEvent={eventDrawer}
+            onClose={()=>setEventDrawer(null)} onCreated={handleEventCreated}
+            onUpdated={e=>{handleEventUpdated(e);setEventDrawer(null)}}
+            onDeleted={id=>{handleDeleteEvent(id);setEventDrawer(null)}}
+            rsvp={rsvpProp}/>
+        )
+      })()}
       {showAddCycle && user && (
         <CycleCreateDrawer initialDate={selected??_today} userId={user.id} onClose={()=>setShowAddCycle(false)} onCreated={handleCycleCreated}/>
       )}

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { notify } from './notifications.service'
 
 export type CheckupType = 'general' | 'cardiology' | 'blood' | 'injury' | 'mobility' | 'return_to_sport' | 'nutrition' | 'other'
 export type CheckupStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
@@ -68,6 +69,19 @@ export async function listCheckups(doctorId: string, from: string, to: string): 
   return (data ?? []) as MedicalCheckup[]
 }
 
+// Athlete-side: мои осмотры от всех врачей.
+export async function listMyCheckupsAsAthlete(athleteId: string, from: string, to: string): Promise<MedicalCheckup[]> {
+  const sb = createClient()
+  const { data } = await sb
+    .from('medical_checkups')
+    .select('*')
+    .eq('athlete_id', athleteId)
+    .gte('checkup_date', from)
+    .lte('checkup_date', to)
+    .order('checkup_date', { ascending: true })
+  return (data ?? []) as MedicalCheckup[]
+}
+
 export async function createCheckup(input: {
   doctor_id: string
   athlete_id: string
@@ -100,7 +114,17 @@ export async function createCheckup(input: {
     .select()
     .single()
   if (error) { console.error('createCheckup:', error.message); return null }
-  return data as MedicalCheckup
+  const checkup = data as MedicalCheckup
+  await notify({
+    user_id: input.athlete_id,
+    type: 'checkup_scheduled',
+    title: 'Назначен медосмотр',
+    body: `${CHECKUP_TYPE_LABELS[checkup.checkup_type]} · ${checkup.checkup_date}${checkup.start_time ? ' в ' + checkup.start_time.slice(0,5) : ''}`,
+    entity_type: 'medical_checkup',
+    entity_id: checkup.id,
+    action_url: '/calendar',
+  })
+  return checkup
 }
 
 export async function updateCheckup(id: string, patch: Partial<Omit<MedicalCheckup, 'id' | 'doctor_id' | 'created_at' | 'updated_at'>>): Promise<MedicalCheckup | null> {
