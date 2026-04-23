@@ -4,6 +4,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import ReactDOM from 'react-dom'
 import { useUser } from '@/lib/hooks/useUser'
 import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
+import CoachDiaryClient from '@/components/coach/CoachDiaryClient'
 import { getWorkouts, createWorkout } from '@/services/workouts.service'
 import type { Workout } from '@/services/workouts.service'
 import { createBrowserClient } from '@supabase/ssr'
@@ -1681,6 +1682,15 @@ function AthleteDiary() {
 }
 
 export default function DiaryPage() {
-  const { user } = useUser()
-  return user?.role === 'coach' ? <CoachDiary /> : <AthleteDiary />
+  const { user, loading } = useUser()
+  if (loading || !user) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+      </div>
+    )
+  }
+  return user.role === 'coach'
+    ? <CoachDiaryClient coachId={user.id} />
+    : <AthleteDiary />
 }
