@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": [
+    ".claude/**",
+    ".agents/**",
+    ".omc/**",
+    "public/assets/**",
+    "supabase/migrations/**",
+    "sentry.*.config.ts",
+    "instrumentation.ts",
+    "scripts/**"
+  ],
+  "ignoreDependencies": [
+    "@sentry/nextjs"
+  ],
+  "next": {
+    "entry": [
+      "app/**/{page,layout,loading,error,not-found,default,template,route}.{ts,tsx}",
+      "app/**/route.{ts,tsx}",
+      "middleware.ts",
+      "instrumentation.ts",
+      "sentry.{client,server,edge}.config.ts"
+    ]
+  }
+}
