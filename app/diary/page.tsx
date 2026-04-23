@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 import { useUser } from '@/lib/hooks/useUser'
 import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
 import CoachDiaryClient from '@/components/coach/CoachDiaryClient'
+import MedicalDiaryClient from '@/components/doctor/MedicalDiaryClient'
 import { getWorkouts, createWorkout } from '@/services/workouts.service'
 import type { Workout } from '@/services/workouts.service'
 import { createBrowserClient } from '@supabase/ssr'
@@ -1690,7 +1691,7 @@ export default function DiaryPage() {
       </div>
     )
   }
-  return user.role === 'coach'
-    ? <CoachDiaryClient coachId={user.id} />
-    : <AthleteDiary />
+  if (user.role === 'coach')  return <CoachDiaryClient coachId={user.id} />
+  if (user.role === 'doctor') return <MedicalDiaryClient doctorId={user.id} />
+  return <AthleteDiary />
 }

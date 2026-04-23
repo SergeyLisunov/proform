@@ -24,7 +24,7 @@ const NAV_SECTIONS = [
       { href: '/cycles',       icon: 'ki-abstract-45', label: 'Циклы',        roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
       { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник тренера',    roles: ['coach'] as string[] },
-      { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник наблюдений', roles: ['doctor'] as string[] },
+      { href: '/diary', icon: 'ki-heart-circle',  label: 'Дневник врача',      roles: ['doctor'] as string[] },
       { href: '/notes',       icon: 'ki-notepad-edit',   label: 'Заметки',      roles: null },
       { href: '/records',       icon: 'ki-medal',         label: 'Рекорды',           roles: ['athlete', 'admin'] as string[] },
       { href: '/load',          icon: 'ki-pulse',         label: 'Нагрузка · ACWR',   roles: ['athlete', 'coach', 'admin'] as string[] },
