@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
+import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
 
 type Mode = 'contacts' | 'find'
 type FindType = 'people' | 'coach' | 'doctor' | 'organization'
@@ -450,6 +451,7 @@ function NetworkPageInner() {
   const searchParams = useSearchParams()
   const [mode, setMode] = useState<Mode>('contacts')
   const [findType, setFindType] = useState<FindType>('people')
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   // Hydrate state from URL on mount and whenever the query string changes.
   useEffect(() => {
@@ -514,14 +516,26 @@ function NetworkPageInner() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <PillButton active={mode === 'contacts'} onClick={() => selectMode('contacts')} icon="ki-people" accent="#F97316">
           Мои контакты
         </PillButton>
         <PillButton active={mode === 'find'} onClick={() => selectMode('find')} icon="ki-magnifier" accent="#2563EB">
           Найти
         </PillButton>
+        {user.role !== 'athlete' && (
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F97316] hover:bg-[#FFF7ED]"
+          >
+            <i className="ki-filled ki-sms text-xs"/>
+            Пригласить по email
+          </button>
+        )}
       </div>
+      {inviteOpen && user.role !== 'athlete' && (
+        <EmailInviteDialog myRole={user.role as 'coach' | 'doctor' | 'organization' | 'admin'} onClose={() => setInviteOpen(false)} />
+      )}
 
       {mode === 'contacts' && <ContactsPanel />}
 

@@ -143,3 +143,48 @@ export function renderCoachWeeklyDigest(params: {
   `
   return { subject, html: wrap(subject, `${attention.length} атлетов требуют внимания`, inner) }
 }
+
+// ─── Email invitation ──────────────────────────────────────────────────────
+
+const INVITE_ROLE_LABELS: Record<string, string> = {
+  coach_athlete:  'тренера',
+  org_coach:      'организации',
+  org_athlete:    'организации',
+  doctor_athlete: 'врача',
+  coach_doctor:   'тренера',
+  org_doctor:     'организации',
+  admin_doctor:   'администратора',
+}
+
+export function renderInviteEmail(input: {
+  inviter_name: string
+  connection_type: string
+  message: string | null
+  claim_url: string
+  expires_at: string
+}): { subject: string; html: string } {
+  const roleLabel = INVITE_ROLE_LABELS[input.connection_type] ?? 'пользователя'
+  const subject = `${input.inviter_name} приглашает вас в ProForm`
+  const expiresHuman = new Date(input.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+  const inner = `
+    <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A">Вас приглашают в ProForm</h1>
+    <p style="margin:0 0 16px 0;color:#334155;font-size:14px;line-height:1.55">
+      <strong>${escape(input.inviter_name)}</strong> приглашает вас подключиться в качестве ${escape(roleLabel)} на платформе ProForm —
+      тренировки, медицинские осмотры и командные события в одном месте.
+    </p>
+    ${input.message ? `
+      <div style="padding:14px 16px;background:#FFF7ED;border-left:3px solid #F97316;border-radius:8px;margin-bottom:20px;color:#9A3412;font-size:13px;line-height:1.5;white-space:pre-wrap">${escape(input.message)}</div>
+    ` : ''}
+    <div style="margin:20px 0">
+      <a href="${input.claim_url}" style="display:inline-block;padding:14px 28px;background:#F97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Принять приглашение →</a>
+    </div>
+    <p style="margin:12px 0 0 0;color:#64748B;font-size:12px;line-height:1.5">
+      Ссылка действует до <strong>${escape(expiresHuman)}</strong>. Если у вас ещё нет аккаунта — вы сможете зарегистрироваться по той же ссылке, и связь установится автоматически.
+    </p>
+    <p style="margin:12px 0 0 0;color:#94A3B8;font-size:11px;word-break:break-all">
+      Или скопируйте ссылку: ${escape(input.claim_url)}
+    </p>
+  `
+  return { subject, html: wrap(subject, `${input.inviter_name} зовёт вас в ProForm`, inner) }
+}
+
