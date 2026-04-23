@@ -17,7 +17,6 @@ const NAV_SECTIONS = [
   {
     title: 'Тренировки',
     items: [
-      { href: '/notifications', icon: 'ki-notification', label: 'Уведомления',  roles: null },
       { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
       { href: '/templates',    icon: 'ki-notepad-edit', label: 'Шаблоны',      roles: ['athlete', 'coach', 'admin'] as string[] },
       { href: '/competitions', icon: 'ki-medal-star',  label: 'Соревнования', roles: ['athlete', 'coach', 'admin'] as string[] },
