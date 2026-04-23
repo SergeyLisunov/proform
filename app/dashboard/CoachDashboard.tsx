@@ -4,6 +4,7 @@ import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { recoveryColor, initials, fmtDate } from '@/lib/utils/recovery'
 import Link from 'next/link'
 import CoachFeedbackFeed from '@/components/ui/CoachFeedbackFeed'
+import PrescribeWorkoutButton from '@/components/ui/PrescribeWorkoutButton'
 import type { Database } from '@/types/database'
 
 type TrainerAthleteRow = Database['public']['Tables']['trainer_athletes']['Row']
@@ -112,9 +113,15 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
 
       {/* Athlete cards */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <p className="pf-num text-xl text-slate-900">Мои атлеты</p>
-          <Link href="/athletes" className="text-xs text-[#2563EB] hover:underline font-medium">Управление атлетами →</Link>
+          <div className="flex items-center gap-3">
+            <PrescribeWorkoutButton
+              coachId={userId}
+              athletes={athletes.map(a => ({ id: a.id, name: a.name ?? '—' }))}
+            />
+            <Link href="/athletes" className="text-xs text-[#2563EB] hover:underline font-medium">Управление атлетами →</Link>
+          </div>
         </div>
         {!athletes.length ? (
           <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center text-slate-400">
