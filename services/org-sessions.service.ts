@@ -176,17 +176,87 @@ export async function createGroupSession(input: {
   return session
 }
 
+async function listParticipantUserIds(sessionId: string): Promise<string[]> {
+  const sb = createClient()
+  const { data } = await sb
+    .from('org_session_participants')
+    .select('user_id')
+    .eq('session_id', sessionId)
+  return ((data ?? []) as Array<{ user_id: string }>).map(r => r.user_id)
+}
+
 export async function updateGroupSession(id: string, patch: Partial<Omit<GroupSession, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>): Promise<GroupSession | null> {
   const sb = createClient()
+  const { data: prevRaw } = await (sb as any)
+    .from('org_group_sessions').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as GroupSession | null
+
   const { data, error } = await (sb as any)
     .from('org_group_sessions').update(patch).eq('id', id).select().single()
   if (error) { console.error('updateGroupSession:', error.message); return null }
-  return data as GroupSession
+  const next = data as GroupSession
+
+  if (prev) {
+    const cancelledNow = prev.status !== 'cancelled' && next.status === 'cancelled'
+    const dateChanged  = prev.session_date !== next.session_date
+    const timeChanged  = (prev.start_time ?? '') !== (next.start_time ?? '')
+                       || (prev.end_time   ?? '') !== (next.end_time   ?? '')
+
+    if (cancelledNow || dateChanged || timeChanged) {
+      const participants = await listParticipantUserIds(id)
+      if (participants.length > 0) {
+        const typeLabel = SESSION_TYPE_LABELS[next.session_type]
+        const base = `${next.title} · ${next.session_date}${next.start_time ? ' в ' + next.start_time.slice(0,5) : ''}`
+        await notifyMany(participants.map(uid => (
+          cancelledNow
+            ? {
+                user_id: uid,
+                type: 'event_cancelled' as const,
+                title: `${typeLabel} отменено`,
+                body: base,
+                entity_type: 'group_session',
+                entity_id: next.id,
+                action_url: '/calendar',
+              }
+            : {
+                user_id: uid,
+                type: 'invited_to_event' as const,
+                title: `${typeLabel} перенесено`,
+                body: base,
+                entity_type: 'group_session',
+                entity_id: next.id,
+                action_url: '/calendar',
+              }
+        )))
+      }
+    }
+  }
+
+  return next
 }
 
 export async function deleteGroupSession(id: string): Promise<void> {
   const sb = createClient()
+  const { data: prevRaw } = await (sb as any)
+    .from('org_group_sessions').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as GroupSession | null
+  const participants = prev ? await listParticipantUserIds(id) : []
+
   await sb.from('org_group_sessions').delete().eq('id', id)
+
+  if (prev && participants.length > 0) {
+    const typeLabel = SESSION_TYPE_LABELS[prev.session_type]
+    const base = `${prev.title} · ${prev.session_date}${prev.start_time ? ' в ' + prev.start_time.slice(0,5) : ''}`
+    await notifyMany(participants.map(uid => ({
+      user_id: uid,
+      type: 'event_cancelled' as const,
+      title: `${typeLabel} отменено`,
+      body: base,
+      entity_type: 'group_session',
+      entity_id: prev.id,
+      action_url: '/calendar',
+    })))
+  }
 }
 
 export async function setParticipants(sessionId: string, userIds: string[]): Promise<void> {

@@ -288,10 +288,46 @@ export async function createCoachSession(input: {
 
 export async function updateCoachSession(id: string, patch: Partial<Omit<CoachSession,'id'|'coach_id'|'created_at'|'updated_at'>>): Promise<CoachSession | null> {
   const sb = createClient()
+  // Снимок до апдейта — чтобы отправить уведомление при смене статуса/переносе.
+  const { data: prevRaw } = await (sb as any)
+    .from('coach_sessions').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as CoachSession | null
+
   const { data, error } = await (sb as any)
     .from('coach_sessions').update(patch).eq('id', id).select().single()
   if (error) { console.error('updateCoachSession:', error.message); return null }
-  return data as CoachSession
+  const next = data as CoachSession
+
+  if (prev) {
+    const cancelledNow = prev.status !== 'cancelled' && next.status === 'cancelled'
+    const dateChanged  = prev.session_date !== next.session_date
+    const timeChanged  = (prev.start_time ?? '') !== (next.start_time ?? '')
+                       || (prev.end_time   ?? '') !== (next.end_time   ?? '')
+
+    if (cancelledNow) {
+      await notify({
+        user_id: next.athlete_id,
+        type: 'session_cancelled',
+        title: 'Тренировка отменена',
+        body: `${next.title ?? 'Занятие с тренером'} · ${next.session_date}${next.start_time ? ' в ' + next.start_time.slice(0,5) : ''}`,
+        entity_type: 'coach_session',
+        entity_id: next.id,
+        action_url: '/calendar',
+      })
+    } else if ((dateChanged || timeChanged) && next.status !== 'cancelled') {
+      await notify({
+        user_id: next.athlete_id,
+        type: 'session_scheduled',
+        title: 'Тренировка перенесена',
+        body: `${next.title ?? 'Занятие с тренером'} · ${next.session_date}${next.start_time ? ' в ' + next.start_time.slice(0,5) : ''}`,
+        entity_type: 'coach_session',
+        entity_id: next.id,
+        action_url: '/calendar',
+      })
+    }
+  }
+
+  return next
 }
 
 export async function setSessionStatus(id: string, status: SessionStatus): Promise<CoachSession | null> {
@@ -300,7 +336,24 @@ export async function setSessionStatus(id: string, status: SessionStatus): Promi
 
 export async function deleteCoachSession(id: string): Promise<void> {
   const sb = createClient()
+  // Снимок до удаления — чтобы уведомить атлета об отмене.
+  const { data: prevRaw } = await (sb as any)
+    .from('coach_sessions').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as CoachSession | null
+
   await sb.from('coach_sessions').delete().eq('id', id)
+
+  if (prev) {
+    await notify({
+      user_id: prev.athlete_id,
+      type: 'session_cancelled',
+      title: 'Тренировка отменена',
+      body: `${prev.title ?? 'Занятие с тренером'} · ${prev.session_date}${prev.start_time ? ' в ' + prev.start_time.slice(0,5) : ''}`,
+      entity_type: 'coach_session',
+      entity_id: prev.id,
+      action_url: '/calendar',
+    })
+  }
 }
 
 // ─── Агрегаты: свёрнутая сводка по каждому атлету ────────────────────────

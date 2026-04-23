@@ -129,15 +129,68 @@ export async function createCheckup(input: {
 
 export async function updateCheckup(id: string, patch: Partial<Omit<MedicalCheckup, 'id' | 'doctor_id' | 'created_at' | 'updated_at'>>): Promise<MedicalCheckup | null> {
   const sb = createClient()
+  const { data: prevRaw } = await (sb as any)
+    .from('medical_checkups').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as MedicalCheckup | null
+
   const { data, error } = await (sb as any)
     .from('medical_checkups').update(patch).eq('id', id).select().single()
   if (error) { console.error('updateCheckup:', error.message); return null }
-  return data as MedicalCheckup
+  const next = data as MedicalCheckup
+
+  if (prev) {
+    const cancelledNow = prev.status !== 'cancelled' && next.status === 'cancelled'
+    const dateChanged  = prev.checkup_date !== next.checkup_date
+    const timeChanged  = (prev.start_time ?? '') !== (next.start_time ?? '')
+                       || (prev.end_time   ?? '') !== (next.end_time   ?? '')
+    const typeLabel    = CHECKUP_TYPE_LABELS[next.checkup_type]
+
+    if (cancelledNow) {
+      await notify({
+        user_id: next.athlete_id,
+        type: 'checkup_cancelled',
+        title: 'Медосмотр отменён',
+        body: `${typeLabel} · ${next.checkup_date}${next.start_time ? ' в ' + next.start_time.slice(0,5) : ''}`,
+        entity_type: 'medical_checkup',
+        entity_id: next.id,
+        action_url: '/calendar',
+      })
+    } else if ((dateChanged || timeChanged) && next.status !== 'cancelled') {
+      await notify({
+        user_id: next.athlete_id,
+        type: 'checkup_scheduled',
+        title: 'Медосмотр перенесён',
+        body: `${typeLabel} · ${next.checkup_date}${next.start_time ? ' в ' + next.start_time.slice(0,5) : ''}`,
+        entity_type: 'medical_checkup',
+        entity_id: next.id,
+        action_url: '/calendar',
+      })
+    }
+  }
+
+  return next
 }
 
 export async function deleteCheckup(id: string): Promise<void> {
   const sb = createClient()
+  const { data: prevRaw } = await (sb as any)
+    .from('medical_checkups').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as MedicalCheckup | null
+
   await sb.from('medical_checkups').delete().eq('id', id)
+
+  if (prev) {
+    const typeLabel = CHECKUP_TYPE_LABELS[prev.checkup_type]
+    await notify({
+      user_id: prev.athlete_id,
+      type: 'checkup_cancelled',
+      title: 'Медосмотр отменён',
+      body: `${typeLabel} · ${prev.checkup_date}${prev.start_time ? ' в ' + prev.start_time.slice(0,5) : ''}`,
+      entity_type: 'medical_checkup',
+      entity_id: prev.id,
+      action_url: '/calendar',
+    })
+  }
 }
 
 export interface DoctorPatientSummary {
