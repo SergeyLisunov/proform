@@ -35,6 +35,14 @@ export interface ScheduleData {
   activity_type?: string
 }
 
+export interface DiaryAttachment {
+  name: string
+  url: string
+  type: 'image' | 'document' | 'audio'
+  size: number
+  mimeType?: string
+}
+
 export interface DiaryEntry {
   id: string
   coach_id: string
@@ -52,6 +60,8 @@ export interface DiaryEntry {
   competition_data: CompetitionData | null
   schedule_data: ScheduleData | null
   calendar_event_id: string | null
+  is_shared_with_athlete: boolean
+  attachments: DiaryAttachment[] | null
   created_at: string | null
   updated_at: string | null
 }
@@ -143,6 +153,8 @@ export interface DiaryInput {
   session_data?: SessionData | null
   competition_data?: CompetitionData | null
   schedule_data?: ScheduleData | null
+  is_shared_with_athlete?: boolean
+  attachments?: DiaryAttachment[] | null
 }
 
 /**
@@ -194,13 +206,21 @@ export async function createDiaryEntry(input: DiaryInput): Promise<DiaryEntry | 
       competition_data: input.competition_data ?? null,
       schedule_data:    input.schedule_data ?? null,
       calendar_event_id: calendarEventId,
+      is_shared_with_athlete: !!input.is_shared_with_athlete,
+      attachments:      input.attachments && input.attachments.length > 0 ? input.attachments : null,
     })
     .select().single()
   if (error) { console.error('createDiaryEntry:', error.message); return null }
   const row = data as DiaryEntry
 
-  // 3. Уведомление атлету (если указан) и если запись не приватна.
-  if (row.athlete_id && (row.entry_type === 'schedule' || row.entry_type === 'competition_report')) {
+  // 3. Уведомление атлету.
+  const shouldNotify =
+    row.athlete_id && (
+      row.is_shared_with_athlete ||
+      row.entry_type === 'schedule' ||
+      row.entry_type === 'competition_report'
+    )
+  if (shouldNotify) {
     const typeLabel = ENTRY_TYPE_META[row.entry_type].label
     await notify({
       user_id: row.athlete_id,
@@ -252,6 +272,51 @@ export async function updateDiaryEntry(
   }
 
   return next
+}
+
+/** Одним кликом включить/выключить видимость для атлета. */
+export async function toggleShareWithAthlete(id: string, next: boolean): Promise<DiaryEntry | null> {
+  const sb = createClient()
+  // При включении шэринга — отдельное уведомление атлету.
+  const { data: prevRaw } = await (sb as any)
+    .from('observation_diary').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as DiaryEntry | null
+  const { data, error } = await (sb as any)
+    .from('observation_diary')
+    .update({ is_shared_with_athlete: next })
+    .eq('id', id)
+    .select().single()
+  if (error) { console.warn('[toggleShareWithAthlete]', error.message); return null }
+  const row = data as DiaryEntry
+  if (next && !prev?.is_shared_with_athlete && row.athlete_id) {
+    const meta = ENTRY_TYPE_META[row.entry_type]
+    await notify({
+      user_id: row.athlete_id,
+      type: 'broadcast',
+      title: `Тренер поделился: ${meta.label.toLowerCase()}`,
+      body: (row.title ?? row.note).slice(0, 120),
+      entity_type: 'diary_entry',
+      entity_id: row.id,
+      action_url: '/dashboard',
+    })
+  }
+  return row
+}
+
+/** Агрегат количества записей по датам за `weeks` последних недель (для хитмапы). */
+export async function getHeatmapData(coachId: string, weeks = 12): Promise<Record<string, number>> {
+  const sb = createClient()
+  const from = new Date(Date.now() - weeks * 7 * 86400000).toISOString().slice(0, 10)
+  const { data } = await sb
+    .from('observation_diary')
+    .select('date')
+    .eq('coach_id', coachId)
+    .gte('date', from)
+  const counts: Record<string, number> = {}
+  for (const r of ((data ?? []) as Array<{ date: string }>)) {
+    counts[r.date] = (counts[r.date] ?? 0) + 1
+  }
+  return counts
 }
 
 export async function deleteDiaryEntry(id: string): Promise<boolean> {
