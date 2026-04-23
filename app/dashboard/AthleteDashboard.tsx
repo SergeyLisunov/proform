@@ -15,6 +15,10 @@ const AthleteConnectionsPanel = dynamic(
   () => import('@/components/ui/AthleteConnectionsPanel').then(m => m.AthleteConnectionsPanel),
   { ssr: false }
 )
+const AthleteFeedbackCard = dynamic(
+  () => import('@/components/ui/AthleteFeedbackCard'),
+  { ssr: false }
+)
 
 type DailyMetricRow = Database['public']['Tables']['daily_metrics']['Row']
 type WorkoutRow = Database['public']['Tables']['workouts']['Row']
@@ -180,6 +184,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {/* My circle: doctor / team / passes */}
       <AthleteConnectionsPanel userId={userId} />
+      <AthleteFeedbackCard userId={userId} />
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pf-stagger">

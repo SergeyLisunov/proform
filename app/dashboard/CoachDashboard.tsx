@@ -3,6 +3,7 @@ import { StatCard } from '@/components/ui/StatCard'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { recoveryColor, initials, fmtDate } from '@/lib/utils/recovery'
 import Link from 'next/link'
+import CoachFeedbackFeed from '@/components/ui/CoachFeedbackFeed'
 import type { Database } from '@/types/database'
 
 type TrainerAthleteRow = Database['public']['Tables']['trainer_athletes']['Row']
@@ -106,6 +107,8 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
           </div>
         </div>
       )}
+
+      <CoachFeedbackFeed coachId={userId} />
 
       {/* Athlete cards */}
       <div>
