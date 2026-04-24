@@ -9,6 +9,7 @@ import {
   type AthleteAcwr,
   type AcwrZone,
 } from '@/services/acwr.service'
+import AdaptivePlanModal from '@/components/coach/AdaptivePlanModal'
 
 const ZONE_ORDER: AcwrZone[] = ['danger', 'monitor', 'optimal', 'detraining', 'no_data']
 
@@ -16,6 +17,7 @@ export default function AthleteLoadPage() {
   const { user, loading: userLoading } = useUser()
   const [rows, setRows] = useState<AthleteAcwr[]>([])
   const [loading, setLoading] = useState(true)
+  const [adaptive, setAdaptive] = useState<{ id: string; name: string } | null>(null)
 
   const load = useCallback(async () => {
     if (!user?.id) return
@@ -96,19 +98,22 @@ export default function AthleteLoadPage() {
           <div className="divide-y divide-border">
             {rows.map(r => {
               const meta = ACWR_ZONE_META[r.zone]
+              const highlight = r.zone === 'danger' || r.zone === 'monitor'
               return (
-                <Link key={r.athlete_id} href={`/profile/${r.athlete_id}`}
+                <div key={r.athlete_id}
                   className="flex items-center gap-3 px-5 py-3 hover:bg-muted/40 transition-colors">
-                  <div className="w-9 h-9 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs shrink-0">
-                    {r.athlete_name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-foreground truncate">{r.athlete_name}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      острая {r.acute_avg.toFixed(1)} · хроническая {r.chronic_avg.toFixed(1)} · {r.workouts_28d} тренировок за 28 дн
+                  <Link href={`/profile/${r.athlete_id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs shrink-0">
+                      {r.athlete_name.charAt(0).toUpperCase()}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-foreground truncate">{r.athlete_name}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        острая {r.acute_avg.toFixed(1)} · хроническая {r.chronic_avg.toFixed(1)} · {r.workouts_28d} тренировок за 28 дн
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="flex items-center gap-2 shrink-0">
                     <div className="pf-num text-lg font-bold" style={{ color: meta.color }}>
                       {r.acwr === null ? '—' : r.acwr.toFixed(2)}
                     </div>
@@ -116,8 +121,15 @@ export default function AthleteLoadPage() {
                       style={{ color: meta.color, background: meta.bg, border: `1px solid ${meta.border}` }}>
                       {meta.label}
                     </span>
+                    <button onClick={() => setAdaptive({ id: r.athlete_id, name: r.athlete_name })}
+                      title="AI-адаптация плана"
+                      className={`rounded-lg px-2 py-1 text-[10px] font-semibold border transition-all ${highlight
+                        ? 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700'
+                        : 'bg-background text-purple-700 border-purple-200 hover:bg-purple-50'}`}>
+                      🤖 AI-план
+                    </button>
                   </div>
-                </Link>
+                </div>
               )
             })}
           </div>
@@ -134,6 +146,15 @@ export default function AthleteLoadPage() {
           Нагрузка = Whoop strain (если есть), иначе длительность × 0.1. Минимум 3 тренировки за 28 дн для расчёта.
         </p>
       </div>
+
+      {adaptive && (
+        <AdaptivePlanModal
+          athleteId={adaptive.id}
+          athleteName={adaptive.name}
+          onClose={() => setAdaptive(null)}
+          onApplied={load}
+        />
+      )}
     </div>
   )
 }
