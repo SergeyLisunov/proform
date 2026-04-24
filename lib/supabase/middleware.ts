@@ -29,12 +29,16 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = pathname.startsWith('/auth')
   const isPublic = pathname === '/'
 
+  // API routes manage their own auth and должны возвращать 401/404 в JSON.
+  // Middleware не должен редиректить их на login, иначе тесты/клиенты
+  // получают 200 (рендер login-страницы) вместо правильного статуса.
+  const isApiRoute = pathname.startsWith('/api/')
+
   // Public multi-segment prefixes — lead-magnet tools, invite tokens, network pages.
   const isPublicPrefix =
     pathname.startsWith('/tools/') ||
     pathname.startsWith('/invite/') ||
-    pathname.startsWith('/network') ||
-    pathname.startsWith('/api/tools/')
+    pathname.startsWith('/network')
 
   // Public org pages: /[orgSlug] — single-segment paths that do not collide with app slugs.
   const reservedTopLevelSlugs = new Set([
@@ -55,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     !reservedTopLevelSlugs.has(pathname.slice(1)) &&
     /^\/[a-z0-9-]+$/.test(pathname)
 
-  if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage) {
+  if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage && !isApiRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     url.searchParams.set('redirectTo', `${pathname}${request.nextUrl.search}`)

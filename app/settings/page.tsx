@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import RoleProfile from '@/components/settings/RoleProfile'
+import DevicesSection from '@/components/settings/DevicesSection'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -14,7 +15,7 @@ function getSB() {
 }
 
 // ── Типы ──────────────────────────────────────────────────────────────────────
-type Tab = 'personal' | 'sport' | 'physio' | 'privacy'
+type Tab = 'personal' | 'sport' | 'physio' | 'devices' | 'privacy'
 
 type FormData = {
   // Личные
@@ -74,6 +75,7 @@ const TABS: { id: Tab; label: string; icon: string; color: string }[] = [
   { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle', color: '#F97316' },
   { id: 'sport',    label: 'Спорт',         icon: 'ki-abstract-26',    color: '#2563EB' },
   { id: 'physio',   label: 'Физиология',    icon: 'ki-heart',          color: '#E11D48' },
+  { id: 'devices',  label: 'Устройства',    icon: 'ki-watch',          color: '#7C3AED' },
   { id: 'privacy',  label: 'Приватность',   icon: 'ki-shield-tick',    color: '#16A34A' },
 ]
 
@@ -1052,6 +1054,9 @@ export default function SettingsPage() {
           </Card>
         </div>
       )}
+
+      {/* ═══════════════ УСТРОЙСТВА ═══════════════ */}
+      {tab === 'devices' && <DevicesSection />}
 
       {/* ═══════════════ ПРИВАТНОСТЬ ═══════════════ */}
       {tab === 'privacy' && (
