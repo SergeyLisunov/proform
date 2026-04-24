@@ -38,6 +38,7 @@ export async function updateSession(request: NextRequest) {
   const isPublicPrefix =
     pathname.startsWith('/tools/') ||
     pathname.startsWith('/invite/') ||
+    pathname.startsWith('/p/') ||
     pathname.startsWith('/network')
 
   // Public org pages: /[orgSlug] — single-segment paths that do not collide with app slugs.
