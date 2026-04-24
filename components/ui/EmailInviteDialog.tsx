@@ -103,6 +103,10 @@ export function EmailInviteDialog({
               </div>
             ) : (
               <>
+                <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-[11px] text-orange-800">
+                  🎁 <strong>Бонус:</strong> за каждого принявшего — <strong>+1 месяц Pro</strong> вам
+                  автоматически.
+                </div>
                 <div>
                   <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Email</label>
                   <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com"

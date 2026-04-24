@@ -5,6 +5,7 @@ import { recoveryColor, initials, fmtDate } from '@/lib/utils/recovery'
 import Link from 'next/link'
 import CoachFeedbackFeed from '@/components/ui/CoachFeedbackFeed'
 import PrescribeWorkoutButton from '@/components/ui/PrescribeWorkoutButton'
+import ReferralPanel from '@/components/coach/ReferralPanel'
 import type { Database } from '@/types/database'
 
 type TrainerAthleteRow = Database['public']['Tables']['trainer_athletes']['Row']
@@ -116,6 +117,8 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
           </div>
         </div>
       )}
+
+      <ReferralPanel myRole="coach" />
 
       <CoachFeedbackFeed coachId={userId} />
 

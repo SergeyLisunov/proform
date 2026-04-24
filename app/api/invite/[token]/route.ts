@@ -146,11 +146,26 @@ export async function POST(_req: Request, { params }: { params: { token: string 
     })
     .eq('id', inv.id)
 
+  // Referral credit: +1 месяц Pro инвайтеру. Идемпотентно через
+  // unique source_invite_id → повторный claim того же invite ничего не даст.
+  let referralCreditId: string | null = null
+  try {
+    const { data: rpcData } = await (admin as any).rpc('grant_referral_credit', {
+      p_inviter_id:       inv.inviter_id,
+      p_invited_user_id:  (me as any).id,
+      p_source_invite_id: inv.id,
+      p_months:           1,
+    })
+    referralCreditId = rpcData ?? null
+  } catch (e) {
+    console.warn('[invite] referral credit skipped:', e)
+  }
+
   // Notify inviter.
   await admin.from('notifications').insert({
     user_id: inv.inviter_id,
     type: 'invitation_accepted',
-    title: 'Приглашение принято',
+    title: referralCreditId ? 'Приглашение принято — +1 месяц Pro' : 'Приглашение принято',
     body: (me as any).email ?? null,
     entity_type: 'connection',
     entity_id: connectionId,
