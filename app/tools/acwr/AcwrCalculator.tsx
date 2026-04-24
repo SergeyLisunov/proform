@@ -190,11 +190,12 @@ export default function AcwrCalculator() {
               {(['3 недели назад', '2 недели назад', 'Прошлая неделя', 'Эта неделя'] as const).map((label, i) => (
                 <div key={i}>
                   <label className="text-xs font-semibold text-slate-600">{label}</label>
-                  <input type="number" min={0} step={i === 2 ? 1 : 1}
+                  <input type="number" min={0} step={1} inputMode="numeric"
                     value={w[i] || ''}
                     onChange={e => {
                       const next = [...w] as [number, number, number, number]
-                      next[i] = Number(e.target.value) || 0
+                      const parsed = Number(e.target.value)
+                      next[i] = Number.isFinite(parsed) ? Math.max(0, parsed) : 0
                       setW(next)
                     }}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100" />

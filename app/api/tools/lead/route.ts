@@ -44,15 +44,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'consent_required' }, { status: 400 })
   }
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-             ?? req.headers.get('x-real-ip')
-             ?? ''
-  const ipHash    = ip ? sha(ip) : null
+  const rawIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+                ?? req.headers.get('x-real-ip')
+                ?? ''
+  const ipHash    = rawIp.length > 0 ? sha(rawIp) : null
   const userAgent = req.headers.get('user-agent')?.slice(0, 400) ?? null
+
+  // Жёстко режем payload — защита от гигантских JSON'ов (DB constraint
+  // ловит то же на уровне Postgres, но лучше отсечь до запроса к БД).
+  const payloadSize = payload ? JSON.stringify(payload).length : 0
+  if (payloadSize > 16_000) {
+    return NextResponse.json({ ok: false, error: 'payload_too_large' }, { status: 413 })
+  }
 
   const admin = createAdminClient()
 
-  // Soft rate limit: не даём больше 20 вставок за час с одного IP.
+  // Soft rate limit: не больше 20 вставок/час с одного IP и 5/день
+  // по одному email (второй ограничитель критичнее — атакующий может
+  // ротировать IP, но генерирующий много email'ов — уже спам).
   if (ipHash) {
     const { count } = await admin
       .from('tool_leads')
@@ -63,16 +72,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 })
     }
   }
+  const { count: emailCount } = await admin
+    .from('tool_leads')
+    .select('id', { count: 'exact', head: true })
+    .eq('email', email)
+    .gte('created_at', new Date(Date.now() - 24 * 3600_000).toISOString())
+  if ((emailCount ?? 0) >= 5) {
+    return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 })
+  }
 
   const { error } = await admin.from('tool_leads').insert({
     email,
     source,
-    payload: payload as any,
+    payload,
     ip_hash: ipHash,
     user_agent: userAgent,
   })
   if (error) {
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+    // pg_column_size check или прочая валидация — отдадим общий код.
+    return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
   }
   return NextResponse.json({ ok: true }, { status: 201 })
 }

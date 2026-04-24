@@ -18,13 +18,18 @@ export interface ReferralStats {
   claimed_count: number
 }
 
-/** Суммарная статистика рефералов текущего пользователя. */
-export async function getMyReferralStats(): Promise<ReferralStats> {
+/** Суммарная статистика рефералов текущего пользователя.
+ * Возвращает поле `error`, чтобы UI мог показать явное состояние
+ * вместо молчаливых нулей при RLS-сбое или потере сессии. */
+export async function getMyReferralStats(): Promise<ReferralStats & { error: string | null }> {
   const sb = createClient()
   const [creditsRes, invitesRes] = await Promise.all([
     sb.from('referral_credits').select('*').order('applied_at', { ascending: false }),
     sb.from('email_invites').select('id, status'),
   ])
+  const errMsg =
+    creditsRes.error?.message ?? invitesRes.error?.message ?? null
+  if (errMsg) console.warn('[getMyReferralStats]', errMsg)
   const credits = (creditsRes.data ?? []) as ReferralCredit[]
   const invites = ((invitesRes.data ?? []) as Array<{ id: string; status: string }>)
   return {
@@ -32,6 +37,7 @@ export async function getMyReferralStats(): Promise<ReferralStats> {
     total_months:  credits.reduce((s, c) => s + c.months_granted, 0),
     pending_count: invites.filter(i => i.status === 'pending').length,
     claimed_count: invites.filter(i => i.status === 'claimed').length,
+    error: errMsg,
   }
 }
 

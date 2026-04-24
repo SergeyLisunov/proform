@@ -70,13 +70,20 @@ export interface AcwrResult {
 }
 
 export function computeAcwr(input: AcwrInput): AcwrResult {
-  const [w3, w2, w1, w0] = input.weeks
-  const filled = input.weeks.filter(v => v > 0).length
+  // Clamp negatives — input component enforces min=0 but a typed-in "-5"
+  // would otherwise sail through and break the zone classifier.
+  const sanitized = input.weeks.map(v => Math.max(0, Number.isFinite(v) ? v : 0)) as [number, number, number, number]
+  const [w3, w2, w1, w0] = sanitized
+  const filled = sanitized.filter(v => v > 0).length
   if (filled < 2) {
     return { acute: 0, chronic: 0, acwr: null, zone: 'no_data', advice: [] }
   }
   const acute   = w0
-  const chronic = (w3 + w2 + w1 + w0) / 4
+  // Divide by the count of non-zero weeks, not a hard 4, otherwise
+  // a partially-filled form deflates chronic and inflates ACWR into
+  // a false "danger" reading.
+  const chronicSum   = sanitized.reduce((s, v) => s + v, 0)
+  const chronic = chronicSum / filled
   const acwr    = chronic > 0 ? Number((acute / chronic).toFixed(2)) : null
   const zone    = zoneOf(acwr)
   return {
