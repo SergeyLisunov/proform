@@ -1,13 +1,18 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
-import { StatCard } from '@/components/ui/StatCard'
+
+const OrgHeroBar       = dynamic(() => import('@/components/organization/OrgHeroBar'),       { ssr: false })
+const OrgQuickActions  = dynamic(() => import('@/components/organization/OrgQuickActions'),  { ssr: false })
+const OrgTodayEvents   = dynamic(() => import('@/components/organization/OrgTodayEvents'),   { ssr: false })
 
 function getSB() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   )
 }
 
@@ -53,7 +58,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
 
       const [mRes, pRes, nRes, cRes] = await Promise.all([
         sb.from('org_members').select('member_role, status').eq('org_id', orgData.id).neq('status', 'removed'),
-        sb.from('wall_posts').select('id, title, post_type, is_pinned, created_at').eq('org_id', orgData.id).is('deleted_at', null).order('created_at', { ascending: false }).limit(4),
+        sb.from('wall_posts').select('id, title, post_type, is_pinned, created_at').eq('org_id', orgData.id).is('deleted_at', null).order('created_at', { ascending: false }).limit(5),
         sb.from('newsletters').select('id, subject, status, sent_at, created_at, recipients_count').eq('org_id', orgData.id).order('created_at', { ascending: false }).limit(3),
         sb.from('connections').select('id', { count: 'exact', head: true }).eq('recipient_id', userId).eq('status', 'pending'),
       ])
@@ -68,14 +73,14 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full pf-spin" />
       </div>
     )
   }
 
   if (!org) {
     return (
-      <div className="flex flex-col gap-6 pf-page-enter">
+      <div className="flex flex-col gap-5 pf-page-enter">
         <div>
           <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Панель организации</p>
           <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{name}</h2>
@@ -98,132 +103,116 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
   const totalMembers = members.length
   const coaches = members.filter(m => m.member_role === 'coach').length
   const athletes = members.filter(m => m.member_role === 'athlete').length
-  const sentCount = newsletters.filter(nl => nl.status === 'sent').length
-  const draftCount = newsletters.filter(nl => nl.status === 'draft').length
 
   return (
-    <div className="flex flex-col gap-6 pf-page-enter">
-      <div>
-        <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Панель организации</p>
-        <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{org.org_name ?? name}</h2>
-        <p className="text-xs text-slate-400 mt-1">
-          {[org.org_type, org.sport_type, org.city].filter(Boolean).join(' · ') || 'Команда на базе ProForm'}
-        </p>
-      </div>
+    <div className="flex flex-col gap-5 pf-page-enter">
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pf-stagger">
-        <StatCard label="Активный состав" value={totalMembers} icon="ki-people" iconColor="#2563EB" />
-        <StatCard label="Тренеров" value={coaches} icon="ki-award" iconColor="#16A34A" />
-        <StatCard label="Атлетов" value={athletes} icon="ki-abstract-26" iconColor="#F97316" />
-        <StatCard label="Запросы в связи" value={pendingRequests} icon="ki-message-question" iconColor="#9333EA" sub={pendingRequests > 0 ? 'ждут ответа' : 'новых нет'} />
-      </div>
+      {/* 1. HERO */}
+      <OrgHeroBar
+        orgName={org.org_name ?? name}
+        meta={{ type: org.org_type, sport: org.sport_type, city: org.city }}
+        stats={{
+          membersCount: totalMembers,
+          coachesCount: coaches,
+          athletesCount: athletes,
+          pendingRequests,
+        }}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Link href="/org/members" className="group flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4 transition hover:border-[#2563EB]/60 hover:shadow-sm">
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <i className="ki-filled ki-people text-[15px]" style={{ color: '#2563EB' }} />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-foreground">Участники</div>
-            <div className="text-[11px] text-muted-foreground">Состав и приглашения</div>
-          </div>
-          <i className="ki-filled ki-right text-xs text-muted-foreground ml-auto" />
-        </Link>
-        <Link href="/org/wall" className="group flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4 transition hover:border-[#F97316]/60 hover:shadow-sm">
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <i className="ki-filled ki-abstract-45 text-[15px]" style={{ color: '#F97316' }} />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-foreground">Стена</div>
-            <div className="text-[11px] text-muted-foreground">Новости и анонсы</div>
-          </div>
-          <i className="ki-filled ki-right text-xs text-muted-foreground ml-auto" />
-        </Link>
-        <Link href="/org/newsletters" className="group flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4 transition hover:border-[#9333EA]/60 hover:shadow-sm">
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <i className="ki-filled ki-sms text-[15px]" style={{ color: '#9333EA' }} />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-foreground">Рассылки</div>
-            <div className="text-[11px] text-muted-foreground">{sentCount} отпр. · {draftCount} черн.</div>
-          </div>
-          <i className="ki-filled ki-right text-xs text-muted-foreground ml-auto" />
-        </Link>
-      </div>
+      {/* 2. QUICK ACTIONS */}
+      <OrgQuickActions />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* 3. TODAY'S EVENTS */}
+      <OrgTodayEvents orgId={org.id} />
+
+      {/* 4. RECENT POSTS + NEWSLETTERS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-            <p className="pf-num text-lg text-slate-900">Последние публикации</p>
-            <Link href="/org/wall" className="text-xs font-semibold text-[#F97316] hover:underline">Все →</Link>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Стена</p>
+              <h3 className="text-base font-bold text-foreground">Последние публикации</h3>
+            </div>
+            <Link href="/org/wall" className="text-[11px] font-semibold text-orange-600 hover:underline">Все →</Link>
           </div>
           {posts.length === 0 ? (
-            <div className="px-5 py-10 text-center text-sm text-slate-400">
-              Публикаций пока нет.
+            <div className="px-5 py-10 text-center">
+              <p className="text-sm text-slate-400">Публикаций пока нет.</p>
+              <Link href="/org/wall" className="mt-2 inline-block text-xs text-orange-600 hover:underline">Создать первую →</Link>
             </div>
           ) : (
             <div className="divide-y divide-[#E2E8F0]">
               {posts.map(p => (
-                <div key={p.id} className="px-5 py-3 flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      {p.is_pinned && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]">📌 закреп</span>
-                      )}
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
-                        {p.post_type}
-                      </span>
+                <Link key={p.id} href="/org/wall" className="block px-5 py-3 hover:bg-muted/40 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        {p.is_pinned && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]">📌 закреп</span>
+                        )}
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                          {p.post_type}
+                        </span>
+                      </div>
+                      <div className="text-sm font-semibold text-foreground truncate">{p.title}</div>
                     </div>
-                    <div className="text-sm font-semibold text-foreground truncate">{p.title}</div>
+                    <div className="shrink-0 text-[11px] text-muted-foreground">{formatRuDate(p.created_at)}</div>
                   </div>
-                  <div className="shrink-0 text-[11px] text-muted-foreground">{formatRuDate(p.created_at)}</div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
         </div>
 
         <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-            <p className="pf-num text-lg text-slate-900">Рассылки</p>
-            <Link href="/org/newsletters" className="text-xs font-semibold text-[#9333EA] hover:underline">Все →</Link>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Email</p>
+              <h3 className="text-base font-bold text-foreground">Рассылки</h3>
+            </div>
+            <Link href="/org/newsletters" className="text-[11px] font-semibold text-purple-600 hover:underline">Все →</Link>
           </div>
           {newsletters.length === 0 ? (
-            <div className="px-5 py-10 text-center text-sm text-slate-400">
-              Рассылок пока нет.
+            <div className="px-5 py-10 text-center">
+              <p className="text-sm text-slate-400">Рассылок пока нет.</p>
+              <Link href="/org/newsletters" className="mt-2 inline-block text-xs text-purple-600 hover:underline">Создать первую →</Link>
             </div>
           ) : (
             <div className="divide-y divide-[#E2E8F0]">
               {newsletters.map(nl => (
-                <div key={nl.id} className="px-5 py-3 flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-foreground truncate">{nl.subject}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      {nl.status} · {nl.recipients_count ?? 0} получателей
+                <Link key={nl.id} href="/org/newsletters" className="block px-5 py-3 hover:bg-muted/40 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-foreground truncate">{nl.subject}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        <span className="font-semibold uppercase tracking-wider">{nl.status}</span>
+                        <span> · {nl.recipients_count ?? 0} получателей</span>
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-[11px] text-muted-foreground">
+                      {formatRuDate(nl.sent_at ?? nl.created_at)}
                     </div>
                   </div>
-                  <div className="shrink-0 text-[11px] text-muted-foreground">
-                    {formatRuDate(nl.sent_at ?? nl.created_at)}
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-        <div className="flex items-start gap-3">
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <i className="ki-filled ki-office-bag text-[15px]" style={{ color: '#2563EB' }} />
+      {/* 5. ORG ADMIN BANNER */}
+      <div className="rounded-2xl border border-[#BFDBFE] bg-gradient-to-r from-[#EFF6FF] to-white p-5">
+        <div className="flex items-start gap-3 flex-wrap">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+            <i className="ki-filled ki-office-bag text-lg" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold text-foreground">Полное управление организацией</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Настройки профиля, структура команды, тренировочная база и публичная страница доступны в разделе /org.
+            <div className="text-sm font-bold text-foreground">Полное управление организацией</div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Структура команды, тренировочная база, профиль организации, публичная страница и история всех событий — в разделе /org.
             </p>
           </div>
-          <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] px-4 py-2 text-sm font-semibold text-white shadow-sm">
+          <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm">
             Открыть /org
             <i className="ki-filled ki-right text-xs" />
           </Link>
