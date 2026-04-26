@@ -88,6 +88,47 @@ test.describe('api contracts', () => {
   })
 })
 
+// Athlete Passport — commit 0d9be25: /p/ prefix must be in middleware allowlist
+test.describe('athlete passport — public /p/ routes', () => {
+  test('GET /p/does-not-exist → 404 (not a redirect to /auth/login)', async ({ request }) => {
+    const res = await request.get('/p/does-not-exist', { maxRedirects: 0 })
+    // Must NOT be 302 to /auth/login — that indicates the middleware allowlist patch is missing
+    expect(res.status()).not.toBe(302)
+    // Acceptable outcomes: 404 (notFound()) or 200 (rendered error page)
+    expect([200, 404]).toContain(res.status())
+  })
+
+  test('GET /p/does-not-exist via browser → URL stays on /p/ (no redirect to login)', async ({ page }) => {
+    await page.goto('/p/does-not-exist')
+    expect(page.url()).not.toContain('/auth/login')
+  })
+})
+
+// Wearable integrations — commit 6f91196
+test.describe('wearable integrations — auth guard', () => {
+  test('GET /api/integrations/whoop/start without auth → 401 JSON', async ({ request }) => {
+    const res = await request.get('/api/integrations/whoop/start')
+    expect(res.status()).toBe(401)
+    const ct = res.headers()['content-type'] ?? ''
+    expect(ct).toContain('json')
+  })
+
+  test('GET /api/integrations/garmin/start without auth → 401 JSON', async ({ request }) => {
+    const res = await request.get('/api/integrations/garmin/start')
+    expect(res.status()).toBe(401)
+    const ct = res.headers()['content-type'] ?? ''
+    expect(ct).toContain('json')
+  })
+})
+
+// Adaptive plans — commit 9ffafdc
+test.describe('adaptive plans — auth guard', () => {
+  test('GET /api/ai/adaptive-plan/:id without auth → 401', async ({ request }) => {
+    const res = await request.get('/api/ai/adaptive-plan/00000000-0000-0000-0000-000000000000')
+    expect(res.status()).toBe(401)
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {

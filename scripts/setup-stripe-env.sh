@@ -57,25 +57,25 @@ open_url() {
 }
 
 prompt_secret() {
-  # prompt_secret <var_name> <prompt>
-  local -n _out=$1
-  local prompt="$2"
-  read -r -s -p "$prompt: " _out
-  printf "\n"
+  # prompt_secret <prompt>  →  echoes value to stdout (bash 3.2 compatible)
+  local prompt="$1" val=""
+  read -r -s -p "$prompt: " val </dev/tty
+  printf "\n" >&2
+  printf '%s' "$val"
 }
 
 prompt_value() {
-  # prompt_value <var_name> <prompt>
-  local -n _out=$1
-  local prompt="$2"
-  read -r -p "$prompt: " _out
+  # prompt_value <prompt>  →  echoes value to stdout
+  local prompt="$1" val=""
+  read -r -p "$prompt: " val </dev/tty
+  printf '%s' "$val"
 }
 
 remove_if_exists() {
   local name="$1" env="$2"
   if vercel env ls "$env" 2>/dev/null | awk '{print $1}' | grep -qx "$name"; then
     note "  · удаляю существующий $name ($env)"
-    yes | vercel env rm "$name" "$env" >/dev/null 2>&1 || true
+    vercel env rm "$name" "$env" --yes >/dev/null 2>&1 || true
   fi
 }
 
@@ -87,9 +87,14 @@ write_env() {
     return 0
   fi
   for env in production preview development; do
+    note "  … $env: проверяю существующее значение"
     remove_if_exists "$name" "$env"
-    printf '%s' "$value" | vercel env add "$name" "$env" >/dev/null 2>&1 \
-      && note "  · записано $name → $env"
+    note "  … $env: записываю"
+    if printf '%s\n' "$value" | vercel env add "$name" "$env" >/dev/null 2>&1; then
+      note "  · записано $name → $env"
+    else
+      warn "  ✗ не удалось записать $name в $env (см. vercel env ls $env)"
+    fi
   done
   ok "$name установлен во всех окружениях"
 }
@@ -116,7 +121,7 @@ say "1/4  STRIPE_SECRET_KEY"
 note "Сейчас откроется страница с API-ключами. Скопируй Secret key (sk_live_... для прод)."
 open_url "https://dashboard.stripe.com/apikeys"
 echo
-prompt_secret STRIPE_SECRET_KEY "Вставь Stripe Secret Key"
+STRIPE_SECRET_KEY="$(prompt_secret "Вставь Stripe Secret Key")"
 if [ -z "$STRIPE_SECRET_KEY" ]; then fail "Secret key не может быть пустым"; exit 1; fi
 case "$STRIPE_SECRET_KEY" in
   sk_*) ;;
@@ -140,7 +145,7 @@ echo
 note "После создания endpoint-а нажми «Reveal» рядом с Signing secret (whsec_...) и скопируй."
 open_url "https://dashboard.stripe.com/webhooks"
 echo
-prompt_secret STRIPE_WEBHOOK_SECRET "Вставь Webhook Signing Secret (whsec_...)"
+STRIPE_WEBHOOK_SECRET="$(prompt_secret "Вставь Webhook Signing Secret (whsec_...)")"
 if [ -z "$STRIPE_WEBHOOK_SECRET" ]; then fail "Webhook secret не может быть пустым"; exit 1; fi
 case "$STRIPE_WEBHOOK_SECRET" in
   whsec_*) ;;
@@ -155,8 +160,8 @@ note "Открою Products. Для каждого тарифа («Pro» и «Te
 note "с recurring-ценой (ежемесячно) и скопируй id цены (price_...)."
 open_url "https://dashboard.stripe.com/products"
 echo
-prompt_value STRIPE_PRICE_PRO  "STRIPE_PRICE_PRO  (price_...)"
-prompt_value STRIPE_PRICE_TEAM "STRIPE_PRICE_TEAM (price_...)"
+STRIPE_PRICE_PRO="$(prompt_value  "STRIPE_PRICE_PRO  (price_...)")"
+STRIPE_PRICE_TEAM="$(prompt_value "STRIPE_PRICE_TEAM (price_...)")"
 case "$STRIPE_PRICE_PRO"  in price_*) ;; *) warn "PRO id не начинается с price_ — проверь"; ;; esac
 case "$STRIPE_PRICE_TEAM" in price_*) ;; *) warn "TEAM id не начинается с price_ — проверь"; ;; esac
 write_env STRIPE_PRICE_PRO  "$STRIPE_PRICE_PRO"
