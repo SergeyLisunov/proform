@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -45,6 +46,9 @@ export async function POST(req: Request) {
   if ((workout as { athlete_id: string }).athlete_id !== (me as { id: string }).id) {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
+
+  const limited = await enforceAiRateLimit(sb, 'workout-debrief', 20, 3600)
+  if (limited) return limited
 
   try {
     const debrief = await aiObject({

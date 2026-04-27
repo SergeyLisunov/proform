@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -31,6 +32,28 @@ export async function GET(req: Request) {
   if (meRow.role !== 'doctor' && meRow.role !== 'admin') {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
+
+  // Doctor must have an active doctor_athlete connection with this athlete.
+  // Admin bypasses (full-access role). Without this check any doctor could pull
+  // any athlete's full workout/HRV/medical history.
+  if (meRow.role === 'doctor') {
+    const { data: link } = await sb
+      .from('connections')
+      .select('id')
+      .eq('connection_type', 'doctor_athlete')
+      .eq('status', 'active')
+      .or(
+        `and(initiator_id.eq.${meRow.id},recipient_id.eq.${athleteId}),` +
+        `and(initiator_id.eq.${athleteId},recipient_id.eq.${meRow.id})`
+      )
+      .maybeSingle()
+    if (!link) {
+      return NextResponse.json({ ok: false, error: 'NO_PATIENT_RELATIONSHIP' }, { status: 403 })
+    }
+  }
+
+  const limited = await enforceAiRateLimit(sb, 'medical-summary', 10, 3600)
+  if (limited) return limited
 
   // Default period: last 30 days
   const sinceParam = url.searchParams.get('from')

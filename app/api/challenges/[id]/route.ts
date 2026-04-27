@@ -51,6 +51,33 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   })
 }
 
+// Verifies the caller owns the challenge (or is admin). Returns the user's
+// id when authorised, or a NextResponse with the appropriate error.
+async function authoriseChallengeWrite(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sb: any,
+  challengeId: string,
+): Promise<{ ok: true; meId: string } | { ok: false; res: NextResponse }> {
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) {
+    return { ok: false, res: NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 }) }
+  }
+  const { data: me } = await sb.from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
+  if (!me) {
+    return { ok: false, res: NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 }) }
+  }
+  const meRow = me as { id: string; role: string | null }
+  const { data: ch } = await sb.from('challenges').select('owner_id').eq('id', challengeId).maybeSingle()
+  if (!ch) {
+    return { ok: false, res: NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 }) }
+  }
+  const ownerId = (ch as { owner_id: string }).owner_id
+  if (ownerId !== meRow.id && meRow.role !== 'admin') {
+    return { ok: false, res: NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 }) }
+  }
+  return { ok: true, meId: meRow.id }
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   let body: z.infer<typeof PatchSchema>
@@ -58,8 +85,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   catch { return NextResponse.json({ ok: false, error: 'BAD_REQUEST' }, { status: 400 }) }
 
   const sb = await createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
+  const guard = await authoriseChallengeWrite(sb, id)
+  if (!guard.ok) return guard.res
 
   const { data, error } = await sb
     .from('challenges')
@@ -75,8 +102,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const sb = await createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
+  const guard = await authoriseChallengeWrite(sb, id)
+  if (!guard.ok) return guard.res
 
   const { error } = await sb.from('challenges').delete().eq('id', id)
   if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })

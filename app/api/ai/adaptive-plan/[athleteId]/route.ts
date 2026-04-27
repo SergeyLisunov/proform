@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 import { computeCoachAthletesAcwr } from '@/services/acwr.service'
 
 export const runtime = 'nodejs'
@@ -55,6 +56,9 @@ export async function GET(_req: Request, { params }: { params: { athleteId: stri
     .select('athlete_id').eq('trainer_id', meRow.id).eq('athlete_id', params.athleteId)
     .eq('status', 'accepted').maybeSingle()
   if (!linkRaw) return NextResponse.json({ ok: false, error: 'NOT_LINKED' }, { status: 403 })
+
+  const limited = await enforceAiRateLimit(sb, 'adaptive-plan', 10, 3600)
+  if (limited) return limited
 
   // ACWR конкретного атлета
   const allAcwr = await computeCoachAthletesAcwr(meRow.id)

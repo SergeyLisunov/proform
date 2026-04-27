@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -34,6 +35,9 @@ export async function GET() {
   if (meRow.role !== 'coach') {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
+
+  const limited = await enforceAiRateLimit(sb, 'coach-briefing', 10, 3600)
+  if (limited) return limited
 
   // Coach's athletes — prefer trainer_athletes mapping; fallback to athletes with role=athlete
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

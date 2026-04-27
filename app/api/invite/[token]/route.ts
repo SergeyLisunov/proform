@@ -64,6 +64,11 @@ export async function POST(_req: Request, { params }: { params: { token: string 
 
   if (!invite) return NextResponse.json({ ok: false, error: 'not_found' }, { status: 404 })
   const inv = invite as any
+  // Block self-claim — even if creation slipped through, claim must not credit
+  // the inviter for inviting themselves (closes +1mo Pro abuse vector).
+  if (inv.inviter_id === (me as { id: string }).id) {
+    return NextResponse.json({ ok: false, error: 'self_referral_not_allowed' }, { status: 422 })
+  }
   if (inv.status !== 'pending') {
     return NextResponse.json({ ok: false, error: inv.status }, { status: 410 })
   }

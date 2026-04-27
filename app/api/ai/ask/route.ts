@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiText, isAiConfigured, AI_MODEL_FAST } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -33,6 +34,9 @@ export async function POST(req: Request) {
   const { data: me } = await sb.from('users').select('id, name, role, sport_type').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
   const meRow = me as { id: string; name: string | null; role: string | null; sport_type: string | null }
+
+  const limited = await enforceAiRateLimit(sb, 'ask', 30, 3600)
+  if (limited) return limited
 
   const since = new Date(); since.setDate(since.getDate() - 30)
   const sinceStr = since.toISOString().slice(0, 10)
