@@ -63,8 +63,13 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION check_and_increment_ai_rate_limit(text, int, int) FROM PUBLIC;
-GRANT  EXECUTE ON FUNCTION check_and_increment_ai_rate_limit(text, int, int) TO authenticated;
+-- Supabase sets implicit grants on public-schema functions for anon and
+-- authenticated; REVOKE FROM PUBLIC alone isn't enough — anon retains
+-- EXECUTE. Lock both roles down explicitly, then grant only authenticated.
+REVOKE ALL ON FUNCTION check_and_increment_ai_rate_limit(text, int, int)
+  FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION check_and_increment_ai_rate_limit(text, int, int)
+  TO authenticated;
 
 -- Periodic cleanup helper — call from a cron to keep the table small.
 -- Removes anything older than 24 hours; safe because the largest window
@@ -77,7 +82,11 @@ AS $$
   DELETE FROM ai_rate_limits WHERE created_at < now() - interval '24 hours';
 $$;
 
-REVOKE ALL ON FUNCTION cleanup_ai_rate_limits() FROM PUBLIC;
-GRANT  EXECUTE ON FUNCTION cleanup_ai_rate_limits() TO service_role;
+-- Cleanup is operator-only — neither end-users nor signed-in clients
+-- should be able to wipe the counter table.
+REVOKE ALL ON FUNCTION cleanup_ai_rate_limits()
+  FROM PUBLIC, anon, authenticated;
+GRANT  EXECUTE ON FUNCTION cleanup_ai_rate_limits()
+  TO service_role;
 
 NOTIFY pgrst, 'reload schema';
