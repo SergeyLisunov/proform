@@ -33,6 +33,10 @@ jobs:
         continue-on-error: true
 
       - name: Claude Code Review
+        # Optional review step. Requires the Claude Code GitHub App to be
+        # installed on the repository (https://github.com/apps/claude).
+        # Marked continue-on-error so a missing install doesn't block PRs.
+        continue-on-error: true
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
