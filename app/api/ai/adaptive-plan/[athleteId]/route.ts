@@ -39,7 +39,7 @@ const AdaptivePlanSchema = z.object({
   team_focus_next_week: z.string().max(200),
 })
 
-export async function GET(_req: Request, { params }: { params: { athleteId: string } }) {
+export async function GET(req: Request, { params }: { params: { athleteId: string } }) {
   if (!isAiConfigured()) {
     return NextResponse.json({ ok: false, error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }
@@ -57,7 +57,7 @@ export async function GET(_req: Request, { params }: { params: { athleteId: stri
     .eq('status', 'accepted').maybeSingle()
   if (!linkRaw) return NextResponse.json({ ok: false, error: 'NOT_LINKED' }, { status: 403 })
 
-  const limited = await enforceAiRateLimit(sb, 'adaptive-plan', 10, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'adaptive-plan', 10, 3600)
   if (limited) return limited
 
   // ACWR конкретного атлета

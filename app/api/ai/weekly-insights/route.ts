@@ -15,7 +15,7 @@ const InsightsSchema = z.object({
   total_strain:  z.number().min(0),
 })
 
-export async function GET() {
+export async function GET(req: Request) {
   if (!isAiConfigured()) {
     return NextResponse.json({ ok: false, error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }
@@ -27,7 +27,7 @@ export async function GET() {
   const { data: me } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
 
-  const limited = await enforceAiRateLimit(sb, 'weekly-insights', 10, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'weekly-insights', 10, 3600)
   if (limited) return limited
 
   const since = new Date(); since.setDate(since.getDate() - 7)

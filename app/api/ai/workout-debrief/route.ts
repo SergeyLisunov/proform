@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
 
-  const limited = await enforceAiRateLimit(sb, 'workout-debrief', 20, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'workout-debrief', 20, 3600)
   if (limited) return limited
 
   try {

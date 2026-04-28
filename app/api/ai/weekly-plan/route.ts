@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
   const meRow = me as { id: string; sport_type: string | null }
 
-  const limited = await enforceAiRateLimit(sb, 'weekly-plan', 10, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'weekly-plan', 10, 3600)
   if (limited) return limited
 
   const since = new Date(); since.setDate(since.getDate() - 14)

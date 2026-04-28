@@ -20,7 +20,7 @@ const BriefingSchema = z.object({
   priorities: z.array(z.string().max(120)).max(3).describe('До 3 главных приоритетов на день'),
 })
 
-export async function GET() {
+export async function GET(req: Request) {
   if (!isAiConfigured()) {
     return NextResponse.json({ ok: false, error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }
@@ -36,7 +36,7 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
 
-  const limited = await enforceAiRateLimit(sb, 'coach-briefing', 10, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'coach-briefing', 10, 3600)
   if (limited) return limited
 
   // Coach's athletes — prefer trainer_athletes mapping; fallback to athletes with role=athlete

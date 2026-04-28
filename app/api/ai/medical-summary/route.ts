@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     }
   }
 
-  const limited = await enforceAiRateLimit(sb, 'medical-summary', 10, 3600)
+  const limited = await enforceAiRateLimit(req, sb, 'medical-summary', 10, 3600)
   if (limited) return limited
 
   // Default period: last 30 days

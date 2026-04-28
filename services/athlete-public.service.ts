@@ -5,11 +5,15 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Server-only aggregator публичного «Athlete Passport».
  * Использует service-role client, НО сам фильтрует по
  * athletes.profile_public = true и отдаёт клиенту только
- * безопасную проекцию (никаких email/phone/birth_date).
+ * безопасную проекцию (никаких email/phone/birth_date,
+ * никакого внутреннего users.id).
  */
 
 export interface AthletePassport {
-  id: string
+  // NOTE: internal users.id is intentionally NOT exposed here.
+  // The public identifier is `nickname`. The DB id is a stable
+  // enumeration handle into other authenticated APIs and must
+  // never leak to anonymous callers.
   nickname: string
   display_name: string
   role: string
@@ -181,7 +185,6 @@ export async function getAthletePassport(nickname: string): Promise<AthletePassp
   }))
 
   return {
-    id: u.id,
     nickname: u.nickname ?? nickname,
     display_name: deriveDisplayName({
       name: u.name,
