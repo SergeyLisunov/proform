@@ -16,8 +16,10 @@ export type SportType =
   | 'other'
 
 export interface Organization {
+  // NOTE: organizations table has no user_id / owner_id column. The
+  // owner relationship is via org_members (status='active' + the role
+  // that signifies admin/owner). See services/org.service.ts:getMyOrg.
   id: string
-  user_id: string
   org_name: string
   org_slug: string
   sport_type: SportType | null
@@ -27,12 +29,14 @@ export interface Organization {
 }
 
 export interface OrgMember {
+  // DB column is `member_role`, NOT `role` — the previous interface was
+  // a fiction the regenerated types caught.
   id: string
   org_id: string
   user_id: string
-  role: OrgMemberRole
+  member_role: OrgMemberRole
   status: MemberStatus
-  joined_at: string
+  joined_at: string | null
   user?: {
     name: string
     email: string
@@ -40,6 +44,10 @@ export interface OrgMember {
 }
 
 export interface WallPost {
+  // visible_to is text[] in the DB (default ['athlete','coach','public']);
+  // the service translates the API-level PostVisibility union to/from
+  // that array. Soft delete is via deleted_at IS NULL — the previous
+  // is_deleted boolean was never on the table.
   id: string
   org_id: string
   author_id: string
@@ -49,7 +57,7 @@ export interface WallPost {
   event_date: string | null
   visible_to: PostVisibility
   is_pinned: boolean
-  is_deleted: boolean
+  deleted_at: string | null
   created_at: string
 }
 

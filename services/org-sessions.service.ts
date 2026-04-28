@@ -43,19 +43,21 @@ export interface OrgMember {
 
 export async function listOrgMembers(orgId: string): Promise<OrgMember[]> {
   const sb = createClient()
+  // DB column is `member_role`, not `role`. The earlier alias-less select
+  // returned a SelectQueryError silently because of `(as ...)` casting.
   const { data: mRaw } = await sb
     .from('org_members')
-    .select('user_id, role, status')
+    .select('user_id, member_role, status')
     .eq('org_id', orgId)
     .eq('status', 'active')
-  const members = (mRaw ?? []) as Array<{ user_id: string; role: 'athlete' | 'coach' }>
+  const members = (mRaw ?? []) as Array<{ user_id: string; member_role: 'athlete' | 'coach' }>
   if (members.length === 0) return []
   const ids = members.map(m => m.user_id)
   const { data: usersRaw } = await sb.from('users').select('id, name').in('id', ids)
   const users = (usersRaw ?? []) as Array<{ id: string; name: string | null }>
   const nameById = new Map(users.map(u => [u.id, u.name ?? '—']))
   return members
-    .map(m => ({ id: m.user_id, name: nameById.get(m.user_id) ?? '—', role: m.role }))
+    .map(m => ({ id: m.user_id, name: nameById.get(m.user_id) ?? '—', role: m.member_role }))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 

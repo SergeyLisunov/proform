@@ -2,9 +2,33 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
 import type { Newsletter, NewsletterStatus, NewsletterStats, OrgMemberRole } from '@/types/org.types'
 
-type NewsletterInsert = Database['public']['Tables']['newsletters']['Insert']
-type NewsletterUpdate = Database['public']['Tables']['newsletters']['Update']
+type NewsletterRow         = Database['public']['Tables']['newsletters']['Row']
+type NewsletterInsert      = Database['public']['Tables']['newsletters']['Insert']
+type NewsletterUpdate      = Database['public']['Tables']['newsletters']['Update']
 type NewsletterDeliveryRow = Database['public']['Tables']['newsletter_deliveries']['Row']
+
+// ─── DB ↔ domain mapping ──────────────────────────────────────────────────
+// The newsletters table stores `body_html` (NOT NULL) and optional
+// `body_text`; the public Newsletter type only exposes a single `body`
+// field. The previous service silently relied on stale types and
+// inserted/read a non-existent `body` column.
+
+function rowToNewsletter(row: NewsletterRow): Newsletter {
+  return {
+    id:           row.id,
+    org_id:       row.org_id,
+    author_id:    row.author_id,
+    subject:      row.subject,
+    body:         row.body_html ?? row.body_text ?? '',
+    target_roles: (row.target_roles as OrgMemberRole[]) ?? [],
+    status:       row.status as NewsletterStatus,
+    scheduled_at: row.scheduled_at,
+    sent_at:      row.sent_at,
+    created_at:   row.created_at,
+  }
+}
+
+// ─── reads ────────────────────────────────────────────────────────────────
 
 export async function getNewsletters(orgId: string): Promise<Newsletter[]> {
   const supabase = createClient()
@@ -14,7 +38,7 @@ export async function getNewsletters(orgId: string): Promise<Newsletter[]> {
     .eq('org_id', orgId)
     .order('created_at', { ascending: false })
 
-  return (data ?? []) as Newsletter[]
+  return ((data ?? []) as NewsletterRow[]).map(rowToNewsletter)
 }
 
 export async function getNewsletter(id: string): Promise<Newsletter | null> {
@@ -25,8 +49,10 @@ export async function getNewsletter(id: string): Promise<Newsletter | null> {
     .eq('id', id)
     .single()
 
-  return data ?? null
+  return data ? rowToNewsletter(data as NewsletterRow) : null
 }
+
+// ─── writes ───────────────────────────────────────────────────────────────
 
 export async function createNewsletter(nl: {
   org_id: string
@@ -39,16 +65,22 @@ export async function createNewsletter(nl: {
 }): Promise<Newsletter | null> {
   const supabase = createClient()
   const payload: NewsletterInsert = {
-    ...nl,
+    org_id:       nl.org_id,
+    author_id:    nl.author_id,
+    subject:      nl.subject,
+    body_html:    nl.body,
+    target_roles: nl.target_roles,
+    status:       nl.status,
     scheduled_at: nl.scheduled_at ?? null,
-    sent_at: nl.status === 'sent' ? new Date().toISOString() : null,
+    sent_at:      nl.status === 'sent' ? new Date().toISOString() : null,
   }
-  const { data } = await (supabase.from('newsletters') as any)
+  const { data } = await supabase
+    .from('newsletters')
     .insert(payload)
     .select()
     .single()
 
-  return data ?? null
+  return data ? rowToNewsletter(data as NewsletterRow) : null
 }
 
 export async function updateNewsletterStatus(
@@ -62,7 +94,8 @@ export async function updateNewsletterStatus(
     scheduled_at: scheduled_at ?? null,
     sent_at: status === 'sent' ? new Date().toISOString() : null,
   }
-  await (supabase.from('newsletters') as any)
+  await supabase
+    .from('newsletters')
     .update(payload)
     .eq('id', id)
 }
