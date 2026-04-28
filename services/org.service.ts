@@ -1,13 +1,52 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
-import type { Organization, OrgMember, MemberStatus } from '@/types/org.types'
+import type { Organization, OrgMember, MemberStatus, OrgMemberRole } from '@/types/org.types'
 
-type UserRow = Database['public']['Tables']['users']['Row']
-type OrgMemberInsert = Database['public']['Tables']['org_members']['Insert']
-type OrgMemberUpdate = Database['public']['Tables']['org_members']['Update']
-type OrgMemberRow = Database['public']['Tables']['org_members']['Row']
-type OrganizationUpdate = Database['public']['Tables']['organizations']['Update']
+type UserRow             = Database['public']['Tables']['users']['Row']
+type OrgRow              = Database['public']['Tables']['organizations']['Row']
+type OrgMemberInsert     = Database['public']['Tables']['org_members']['Insert']
+type OrgMemberUpdate     = Database['public']['Tables']['org_members']['Update']
+type OrgMemberRow        = Database['public']['Tables']['org_members']['Row']
+type OrganizationUpdate  = Database['public']['Tables']['organizations']['Update']
 
+// ─── shape narrowing ──────────────────────────────────────────────────────
+// The Organization domain type is a public-facing subset of the DB row —
+// no user_id (column doesn't exist in DB), and a couple of fields stay
+// nullable to match runtime reality.
+
+function rowToOrganization(row: OrgRow): Organization {
+  return {
+    id:          row.id,
+    org_name:    row.org_name,
+    org_slug:    row.org_slug,
+    sport_type:  (row.sport_type as Organization['sport_type']) ?? null,
+    city:        row.city,
+    is_verified: row.is_verified ?? false,
+    created_at:  row.created_at,
+  }
+}
+
+function rowToOrgMember(row: OrgMemberRow & { user?: { name: string; email: string } }): OrgMember {
+  return {
+    id:          row.id,
+    org_id:      row.org_id,
+    user_id:     row.user_id,
+    member_role: row.member_role as OrgMemberRole,
+    status:      row.status as MemberStatus,
+    joined_at:   row.joined_at,
+    user:        row.user,
+  }
+}
+
+// ─── reads ────────────────────────────────────────────────────────────────
+
+/**
+ * "My organisation" = the org where I'm an active member with the
+ * `coach` role (de-facto admin in the current product). The previous
+ * implementation queried `organizations.user_id` which doesn't exist
+ * — every call returned null and the org dashboard appeared empty for
+ * legitimately-onboarded users.
+ */
 export async function getMyOrg(): Promise<Organization | null> {
   const supabase = createClient()
   const { data: authData } = await supabase.auth.getUser()
@@ -19,16 +58,28 @@ export async function getMyOrg(): Promise<Organization | null> {
     .eq('auth_id', authData.user.id)
     .single()
   const userRecord = userData as Pick<UserRow, 'id'> | null
-
   if (!userRecord) return null
 
-  const { data } = await supabase
+  // Find an active org_members row for this user. Coach takes precedence
+  // over athlete if the user is somehow in both.
+  const { data: memberRows } = await supabase
+    .from('org_members')
+    .select('org_id, member_role')
+    .eq('user_id', userRecord.id)
+    .eq('status', 'active')
+  const members = (memberRows ?? []) as Pick<OrgMemberRow, 'org_id' | 'member_role'>[]
+  if (members.length === 0) return null
+
+  const preferred = members.find(m => m.member_role === 'coach') ?? members[0]
+
+  const { data: orgData } = await supabase
     .from('organizations')
     .select('*')
-    .eq('user_id', userRecord.id)
+    .eq('id', preferred.org_id)
     .single()
+  if (!orgData) return null
 
-  return (data ?? null) as Organization | null
+  return rowToOrganization(orgData as OrgRow)
 }
 
 export async function getOrgBySlug(slug: string): Promise<Organization | null> {
@@ -39,24 +90,56 @@ export async function getOrgBySlug(slug: string): Promise<Organization | null> {
     .eq('org_slug', slug)
     .single()
 
-  return (data ?? null) as Organization | null
+  return data ? rowToOrganization(data as OrgRow) : null
 }
 
 export async function getOrgMembers(orgId: string): Promise<OrgMember[]> {
   const supabase = createClient()
+  // FK hint required: org_members has TWO FKs to users (user_id and
+  // invited_by). Without `!org_members_user_id_fkey` PostgREST raises
+  // "more than one relationship was found".
   const { data } = await supabase
     .from('org_members')
-    .select('*, user:users(name, email)')
+    .select('*, user:users!org_members_user_id_fkey(name, email)')
     .eq('org_id', orgId)
     .order('joined_at', { ascending: false })
 
-  return (data ?? []) as unknown as OrgMember[]
+  return ((data ?? []) as unknown as Array<OrgMemberRow & { user?: { name: string; email: string } }>)
+    .map(rowToOrgMember)
 }
+
+export async function getAllOrgs(): Promise<Organization[]> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('organizations')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  return ((data ?? []) as OrgRow[]).map(rowToOrganization)
+}
+
+export async function getOrgStats(orgId: string) {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('org_members')
+    .select('member_role, status')
+    .eq('org_id', orgId)
+    .neq('status', 'suspended')
+  const memberRows = (data ?? []) as Pick<OrgMemberRow, 'member_role' | 'status'>[]
+
+  const total    = memberRows.length
+  const coaches  = memberRows.filter((m) => m.member_role === 'coach').length
+  const athletes = memberRows.filter((m) => m.member_role === 'athlete').length
+
+  return { total, coaches, athletes }
+}
+
+// ─── writes ───────────────────────────────────────────────────────────────
 
 export async function inviteMember(
   orgId: string,
   email: string,
-  role: 'athlete' | 'coach'
+  role: OrgMemberRole,
 ): Promise<{ error?: string }> {
   const supabase = createClient()
   const { data: userData } = await supabase
@@ -68,51 +151,33 @@ export async function inviteMember(
 
   if (!userRecord) return { error: 'Пользователь с таким email не найден' }
 
-  const payload: OrgMemberInsert = { org_id: orgId, user_id: userRecord.id, role, status: 'pending' }
-  const { error } = await (supabase.from('org_members') as any).insert(payload)
+  // DB column is `member_role`, NOT `role`. Previous code passed `role`
+  // and the insert silently dropped it because of `(sb as any)`.
+  const payload: OrgMemberInsert = {
+    org_id:      orgId,
+    user_id:     userRecord.id,
+    member_role: role,
+    status:      'pending',
+  }
+  const { error } = await supabase.from('org_members').insert(payload)
 
   return error ? { error: error.message } : {}
 }
 
 export async function updateMemberStatus(
   memberId: string,
-  status: MemberStatus
+  status: MemberStatus,
 ): Promise<void> {
   const supabase = createClient()
   const payload: OrgMemberUpdate = { status }
-  await (supabase.from('org_members') as any).update(payload).eq('id', memberId)
-}
-
-export async function getOrgStats(orgId: string) {
-  const supabase = createClient()
-  const { data: members } = await supabase
-    .from('org_members')
-    .select('role, status')
-    .eq('org_id', orgId)
-    .neq('status', 'suspended')
-  const memberRows = (members ?? []) as Pick<OrgMemberRow, 'role' | 'status'>[]
-
-  const total = memberRows.length
-  const coaches = memberRows.filter((m) => m.role === 'coach').length
-  const athletes = memberRows.filter((m) => m.role === 'athlete').length
-
-  return { total, coaches, athletes }
-}
-
-export async function getAllOrgs(): Promise<Organization[]> {
-  const supabase = createClient()
-  const { data } = await supabase
-    .from('organizations')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  return (data ?? []) as Organization[]
+  await supabase.from('org_members').update(payload).eq('id', memberId)
 }
 
 export async function verifyOrg(orgId: string): Promise<void> {
   const supabase = createClient()
   const payload: OrganizationUpdate = { is_verified: true }
-  await (supabase.from('organizations') as any)
+  await supabase
+    .from('organizations')
     .update(payload)
     .eq('id', orgId)
 }

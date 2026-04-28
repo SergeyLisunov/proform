@@ -128,18 +128,21 @@ export type Database = {
           created_at: string
           endpoint: string
           id: string
+          ip_hash: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           endpoint: string
           id?: string
+          ip_hash?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           endpoint?: string
           id?: string
+          ip_hash?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1972,36 +1975,51 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_url: string | null
           body: string | null
           created_at: string
+          entity_id: string | null
+          entity_type: string | null
           from_user_id: string | null
           id: string
+          is_archived: boolean
           is_read: boolean
           link: string | null
           title: string
           type: string
+          updated_at: string
           user_id: string
         }
         Insert: {
+          action_url?: string | null
           body?: string | null
           created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
           from_user_id?: string | null
           id?: string
+          is_archived?: boolean
           is_read?: boolean
           link?: string | null
           title: string
           type: string
+          updated_at?: string
           user_id: string
         }
         Update: {
+          action_url?: string | null
           body?: string | null
           created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
           from_user_id?: string | null
           id?: string
+          is_archived?: boolean
           is_read?: boolean
           link?: string | null
           title?: string
           type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -3217,14 +3235,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      check_and_increment_ai_rate_limit: {
+      check_and_increment_ai_ip_rate_limit: {
         Args: {
-          p_endpoint: string
+          p_ip_hash: string
           p_max_per_window: number
           p_window_seconds: number
         }
         Returns: boolean
       }
+      check_and_increment_ai_rate_limit:
+        | {
+            Args: {
+              p_endpoint: string
+              p_max_per_window: number
+              p_window_seconds: number
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_endpoint: string
+              p_ip_hash?: string
+              p_ip_max?: number
+              p_ip_window_secs?: number
+              p_max_per_window: number
+              p_window_seconds: number
+            }
+            Returns: boolean
+          }
       cleanup_ai_rate_limits: { Args: never; Returns: undefined }
       get_challenge_leaderboard: {
         Args: { p_challenge_id: string }
