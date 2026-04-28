@@ -68,9 +68,14 @@ export async function GET(req: Request) {
 
     return redirectTo('/settings?device_connected=whoop')
   } catch (e) {
+    // Log the full error server-side; redirect with an opaque code only.
+    // The previous implementation echoed e.message into the URL, which
+    // ended up in browser history, server access logs, and any analytics
+    // capturing query strings — a Whoop API error body or token snippet
+    // could leak via that channel.
     const msg = e instanceof Error ? e.message : String(e)
     console.error('[whoop/callback]', msg)
-    return redirectTo(`/settings?device_error=${encodeURIComponent(msg).slice(0, 200)}`)
+    return redirectTo('/settings?device_error=whoop_exchange_failed')
   }
 }
 

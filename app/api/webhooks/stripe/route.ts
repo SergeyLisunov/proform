@@ -173,8 +173,18 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (err) {
+    // CRITICAL: must return non-2xx so Stripe retries. The previous
+    // implementation returned 200 on internal errors, meaning a
+    // crashed handler silently dropped events — paid subscriptions
+    // never activated, athlete passes never issued. Now Stripe will
+    // retry with exponential backoff, and the handler is idempotent
+    // (subscriptions upsert by user_id, athlete_passes dedupe by
+    // stripe_session_id).
     console.error('[stripe-webhook] handler error', err)
-    return NextResponse.json({ received: true, handled: false }, { status: 200 })
+    return NextResponse.json(
+      { received: true, handled: false, error: 'handler_error' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ received: true })

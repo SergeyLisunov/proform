@@ -48,6 +48,11 @@ export async function POST(req: Request) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 400 })
   }
+  // Block self-invite — closes the +1mo Pro referral abuse vector at creation.
+  const myEmail = ((me as { email?: string | null }).email ?? '').trim().toLowerCase()
+  if (myEmail && myEmail === email) {
+    return NextResponse.json({ error: 'self_invite_not_allowed' }, { status: 400 })
+  }
   const combo = VALID_COMBOS[connection_type]
   if (!combo) return NextResponse.json({ error: 'invalid_connection_type' }, { status: 400 })
   if (me.role !== combo[0] && me.role !== combo[1]) {

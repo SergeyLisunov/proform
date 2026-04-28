@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured } from '@/lib/ai/claude'
+import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -15,7 +16,7 @@ const SuggestionSchema = z.object({
   tips:        z.array(z.string().max(120)).max(3).describe('До 3 коротких советов'),
 })
 
-export async function GET() {
+export async function GET(req: Request) {
   if (!isAiConfigured()) {
     return NextResponse.json({ ok: false, error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }
@@ -26,6 +27,9 @@ export async function GET() {
 
   const { data: me } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
+
+  const limited = await enforceAiRateLimit(req, sb, 'coach-suggest', 20, 3600)
+  if (limited) return limited
 
   const since = new Date(); since.setDate(since.getDate() - 14)
   const sinceStr = since.toISOString().slice(0, 10)

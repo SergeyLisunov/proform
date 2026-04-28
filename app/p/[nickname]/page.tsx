@@ -224,7 +224,7 @@ export default async function AthletePassportPage(
         <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Создай свой «Паспорт атлета»</h3>
           <p className="mt-1 text-sm md:text-base opacity-90 max-w-2xl">
-            Шарабельная ссылка, публичные PR'ы, статистика за 90 дней, подключение
+            Шарабельная ссылка, публичные PR&apos;ы, статистика за 90 дней, подключение
             тренера и врача. Бесплатно, без wearables тоже работает.
           </p>
           <Link href="/auth/register?utm_source=passport&utm_medium=public&utm_campaign=cta"

@@ -70,12 +70,28 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-See `.env.example` for the full list. Required:
+Полный список с комментариями — в [`.env.example`](./.env.example).
+Сгруппировано по назначению:
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| Группа | Переменные | Когда нужны |
+|---|---|---|
+| **Core (обязательно)** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SITE_URL` | Авторизация, чтение БД, серверные роуты |
+| **AI** | `ANTHROPIC_API_KEY` | `/api/ai/adaptive-plan`, `/api/diary/weekly-summary`, разборы тренировок. Без — все AI-эндпоинты возвращают `503 AI_NOT_CONFIGURED` |
+| **Email** | `RESEND_API_KEY`, `RESEND_FROM`, `CRON_SECRET` | Digest-рассылки, инвайты, newsletters, Vercel Cron |
+| **Stripe** | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_TEAM` | Биллинг и подписки |
+| **Wearables** | `WHOOP_CLIENT_ID`/`SECRET`, `GARMIN_CONSUMER_KEY`/`SECRET` | OAuth для Whoop / Garmin. Apple Health работает без env (file-upload) |
+| **AI search (опц.)** | `HF_API_TOKEN`, `HF_EMBED_MODEL` | Семантический поиск по дневнику |
+| **Sentry (опц.)** | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_DSN` | Error tracking. SDK вшит, но `init()` пропускается без DSN |
+
+### Setting envs in Vercel
+
+```
+Vercel → Project Settings → Environment Variables
+  ↳ Production / Preview / Development (set all three)
+```
+
+После добавления `ANTHROPIC_API_KEY` нужно передеплоить — Vercel
+переподключит env только при новом билде.
 
 ## Deployment
 

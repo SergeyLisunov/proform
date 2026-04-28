@@ -123,6 +123,35 @@ export type Database = {
           },
         ]
       }
+      ai_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_rate_limits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       athlete_passes: {
         Row: {
           athlete_id: string
@@ -1644,6 +1673,103 @@ export type Database = {
           },
         ]
       }
+      medical_diary: {
+        Row: {
+          athlete_id: string | null
+          attachments: Json | null
+          body_part: string | null
+          calendar_event_id: string | null
+          created_at: string
+          date: string
+          doctor_id: string
+          entry_type: string
+          id: string
+          is_shared_with_athlete: boolean
+          lab_data: Json | null
+          mood: number | null
+          note: string
+          pain_level: number | null
+          prescription_data: Json | null
+          rehab_data: Json | null
+          schedule_data: Json | null
+          severity: string | null
+          tags: string[] | null
+          title: string | null
+          updated_at: string
+          vitals: Json | null
+        }
+        Insert: {
+          athlete_id?: string | null
+          attachments?: Json | null
+          body_part?: string | null
+          calendar_event_id?: string | null
+          created_at?: string
+          date: string
+          doctor_id: string
+          entry_type?: string
+          id?: string
+          is_shared_with_athlete?: boolean
+          lab_data?: Json | null
+          mood?: number | null
+          note: string
+          pain_level?: number | null
+          prescription_data?: Json | null
+          rehab_data?: Json | null
+          schedule_data?: Json | null
+          severity?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string
+          vitals?: Json | null
+        }
+        Update: {
+          athlete_id?: string | null
+          attachments?: Json | null
+          body_part?: string | null
+          calendar_event_id?: string | null
+          created_at?: string
+          date?: string
+          doctor_id?: string
+          entry_type?: string
+          id?: string
+          is_shared_with_athlete?: boolean
+          lab_data?: Json | null
+          mood?: number | null
+          note?: string
+          pain_level?: number | null
+          prescription_data?: Json | null
+          rehab_data?: Json | null
+          schedule_data?: Json | null
+          severity?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string
+          vitals?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_diary_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_diary_calendar_event_id_fkey"
+            columns: ["calendar_event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_diary_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -1898,39 +2024,66 @@ export type Database = {
       observation_diary: {
         Row: {
           athlete_id: string | null
+          attachments: Json | null
+          calendar_event_id: string | null
           category: string | null
           coach_id: string
+          competition_data: Json | null
           created_at: string | null
           date: string
+          energy_level: number | null
+          entry_type: string
           id: string
+          is_shared_with_athlete: boolean
+          mood: number | null
           note: string
           risk_level: Database["public"]["Enums"]["risk_level"] | null
+          schedule_data: Json | null
+          session_data: Json | null
           tags: string[] | null
           title: string | null
           updated_at: string | null
         }
         Insert: {
           athlete_id?: string | null
+          attachments?: Json | null
+          calendar_event_id?: string | null
           category?: string | null
           coach_id: string
+          competition_data?: Json | null
           created_at?: string | null
           date?: string
+          energy_level?: number | null
+          entry_type?: string
           id?: string
+          is_shared_with_athlete?: boolean
+          mood?: number | null
           note: string
           risk_level?: Database["public"]["Enums"]["risk_level"] | null
+          schedule_data?: Json | null
+          session_data?: Json | null
           tags?: string[] | null
           title?: string | null
           updated_at?: string | null
         }
         Update: {
           athlete_id?: string | null
+          attachments?: Json | null
+          calendar_event_id?: string | null
           category?: string | null
           coach_id?: string
+          competition_data?: Json | null
           created_at?: string | null
           date?: string
+          energy_level?: number | null
+          entry_type?: string
           id?: string
+          is_shared_with_athlete?: boolean
+          mood?: number | null
           note?: string
           risk_level?: Database["public"]["Enums"]["risk_level"] | null
+          schedule_data?: Json | null
+          session_data?: Json | null
           tags?: string[] | null
           title?: string | null
           updated_at?: string | null
@@ -1941,6 +2094,13 @@ export type Database = {
             columns: ["athlete_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observation_diary_calendar_event_id_fkey"
+            columns: ["calendar_event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
             referencedColumns: ["id"]
           },
           {
@@ -2295,6 +2455,55 @@ export type Database = {
           },
         ]
       }
+      referral_credits: {
+        Row: {
+          applied_at: string
+          id: string
+          invited_user_id: string | null
+          inviter_id: string
+          months_granted: number
+          source_invite_id: string | null
+        }
+        Insert: {
+          applied_at?: string
+          id?: string
+          invited_user_id?: string | null
+          inviter_id: string
+          months_granted?: number
+          source_invite_id?: string | null
+        }
+        Update: {
+          applied_at?: string
+          id?: string
+          invited_user_id?: string | null
+          inviter_id?: string
+          months_granted?: number
+          source_invite_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_credits_invited_user_id_fkey"
+            columns: ["invited_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_credits_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_credits_source_invite_id_fkey"
+            columns: ["source_invite_id"]
+            isOneToOne: true
+            referencedRelation: "email_invites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_views: {
         Row: {
           created_at: string | null
@@ -2373,6 +2582,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tool_leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_hash: string | null
+          payload: Json | null
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_hash?: string | null
+          payload?: Json | null
+          source: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          payload?: Json | null
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       trainer_athletes: {
         Row: {
@@ -2467,6 +2706,68 @@ export type Database = {
             columns: ["workout_id"]
             isOneToOne: false
             referencedRelation: "workouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_device_connections: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          last_sync_at: string | null
+          last_sync_error: string | null
+          metadata: Json | null
+          provider: string
+          provider_user_id: string | null
+          refresh_token: string | null
+          scope: string | null
+          status: string
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          metadata?: Json | null
+          provider: string
+          provider_user_id?: string | null
+          refresh_token?: string | null
+          scope?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          metadata?: Json | null
+          provider?: string
+          provider_user_id?: string | null
+          refresh_token?: string | null
+          scope?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_device_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -2916,6 +3217,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_and_increment_ai_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_max_per_window: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
+      cleanup_ai_rate_limits: { Args: never; Returns: undefined }
       get_challenge_leaderboard: {
         Args: { p_challenge_id: string }
         Returns: {
@@ -2952,6 +3262,15 @@ export type Database = {
           recovery_score: number
           workout_id: string
         }[]
+      }
+      grant_referral_credit: {
+        Args: {
+          p_invited_user_id: string
+          p_inviter_id: string
+          p_months?: number
+          p_source_invite_id: string
+        }
+        Returns: string
       }
       match_diary: {
         Args: { p_embedding: string; p_limit?: number }

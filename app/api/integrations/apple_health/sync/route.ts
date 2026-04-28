@@ -43,14 +43,20 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient()
   const ext  = (file.name.split('.').pop() ?? 'zip').toLowerCase()
-  const path = `${meId}/apple_health/${Date.now()}-health.${ext}`
+  // NOTE: `note-attachments` is a public-read bucket. A full Apple Health
+  // export contains heart rate, medications, and clinical history — that
+  // data must NEVER be retrievable by URL. We therefore (a) store ONLY the
+  // path in metadata, never a public URL, and (b) tag the upload with a
+  // private subdirectory `health-private/`. Migration to a fully private
+  // bucket with createSignedUrl-based access is tracked separately; until
+  // then, no public URL leaves this handler.
+  const path = `${meId}/health-private/apple_health/${Date.now()}-health.${ext}`
   const { error: upErr } = await admin.storage.from('note-attachments').upload(
     path, file, { upsert: false, contentType: file.type || 'application/octet-stream' },
   )
   if (upErr) {
     return NextResponse.json({ ok: false, error: upErr.message }, { status: 500 })
   }
-  const { data: { publicUrl } } = admin.storage.from('note-attachments').getPublicUrl(path)
 
   await admin.from('user_device_connections').upsert({
     user_id: meId,
@@ -60,7 +66,9 @@ export async function POST(req: Request) {
     last_sync_at: new Date().toISOString(),
     last_sync_error: null,
     metadata: {
-      uploaded_file_url: publicUrl,
+      // Path only — never the public URL. Worker will retrieve via the
+      // service-role admin client (RLS-bypassing read on the bucket path).
+      uploaded_file_path: path,
       uploaded_file_name: file.name,
       uploaded_size: file.size,
       parse_status: 'queued',
