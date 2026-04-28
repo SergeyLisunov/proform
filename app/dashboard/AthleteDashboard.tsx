@@ -212,7 +212,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             {comments.map((c, i) => (
               <div key={i} className="p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed" style={{ background: '#F8FAFC', borderLeft: '3px solid #F97316' }}>
                 {c.body}
-                <div className="text-[10px] text-slate-400 mt-1">{fmtDate(c.created_at)}</div>
+                <div className="text-[10px] text-slate-400 mt-1">{fmtDate(c.created_at ?? '')}</div>
               </div>
             ))}
           </div>

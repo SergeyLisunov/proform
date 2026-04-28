@@ -21,18 +21,19 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('users')
-    .select('id, nickname, first_name, last_name, role, avatar_url, sport, city, is_searchable', { count: 'exact' })
+    .select('id, nickname, name, role, avatar_url, sport, city, is_searchable', { count: 'exact' })
     .eq('is_searchable', true)
     .neq('role', 'admin')
     .neq('id', me.id)
 
-  if (role && role !== 'all') query = query.eq('role', role as import('@/types/database').UserRole)
+  if (role && role !== 'all') query = query.eq('role', role as import('@/types/users').UserRole)
 
   if (q.startsWith('@')) {
     query = query.ilike('nickname', `${search}%`)
   } else {
+    // users has no first_name/last_name — search across nickname + name only.
     query = query.or(
-      `nickname.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`
+      `nickname.ilike.%${search}%,name.ilike.%${search}%`
     )
   }
 

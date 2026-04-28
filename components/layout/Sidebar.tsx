@@ -245,7 +245,11 @@ export default function Sidebar() {
                   {section.items.map(item => {
                     const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'))
                     const isMessages = item.href === '/messages'
-                    const isNotifications = item.href === '/notifications'
+                    // item.href type union doesn't include '/notifications' (it's
+                    // gated by role/feature flag and only injected dynamically);
+                    // string-cast keeps the runtime comparison while satisfying
+                    // the literal-union check.
+                    const isNotifications = (item.href as string) === '/notifications'
                     const badgeVal = isMessages ? unreadCount : isNotifications ? notifyCount : 0
                     const showBadge = badgeVal > 0
 

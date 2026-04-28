@@ -700,6 +700,73 @@ export type Database = {
           },
         ]
       }
+      coach_orders: {
+        Row: {
+          athlete_id: string
+          coach_id: string
+          created_at: string
+          currency: string
+          fulfilled_at: string | null
+          id: string
+          paid_at: string | null
+          price_amount: number
+          service_id: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          athlete_id: string
+          coach_id: string
+          created_at?: string
+          currency?: string
+          fulfilled_at?: string | null
+          id?: string
+          paid_at?: string | null
+          price_amount: number
+          service_id: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          athlete_id?: string
+          coach_id?: string
+          created_at?: string
+          currency?: string
+          fulfilled_at?: string | null
+          id?: string
+          paid_at?: string | null
+          price_amount?: number
+          service_id?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_orders_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_orders_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_orders_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "coach_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_pass_plans: {
         Row: {
           coach_id: string
@@ -740,6 +807,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "coach_pass_plans_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_services: {
+        Row: {
+          coach_id: string
+          created_at: string
+          currency: string
+          description: string | null
+          duration_days: number | null
+          format: string | null
+          id: string
+          is_active: boolean
+          price_amount: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_days?: number | null
+          format?: string | null
+          id?: string
+          is_active?: boolean
+          price_amount: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_days?: number | null
+          format?: string | null
+          id?: string
+          is_active?: boolean
+          price_amount?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_services_coach_id_fkey"
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1610,6 +1727,66 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          hosted_invoice_url: string | null
+          id: string
+          issued_at: string
+          number: string | null
+          payment_id: string | null
+          pdf_url: string | null
+          status: string
+          stripe_invoice_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          hosted_invoice_url?: string | null
+          id?: string
+          issued_at?: string
+          number?: string | null
+          payment_id?: string | null
+          pdf_url?: string | null
+          status?: string
+          stripe_invoice_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          hosted_invoice_url?: string | null
+          id?: string
+          issued_at?: string
+          number?: string | null
+          payment_id?: string | null
+          pdf_url?: string | null
+          status?: string
+          stripe_invoice_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_checkups: {
         Row: {
           athlete_id: string
@@ -2378,6 +2555,73 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          order_id: string | null
+          raw: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          raw?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          raw?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "coach_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       personal_records: {
         Row: {
           achieved_at: string
@@ -2559,36 +2803,51 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          cancel_at_period_end: boolean
           cancelled_at: string | null
           created_at: string
+          current_period_end: string | null
           expires_at: string | null
           id: string
           plan: string
           price_usd: number | null
           started_at: string
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
+          cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
+          current_period_end?: string | null
           expires_at?: string | null
           id?: string
           plan?: string
           price_usd?: number | null
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
+          cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
+          current_period_end?: string | null
           expires_at?: string | null
           id?: string
           plan?: string
           price_usd?: number | null
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [

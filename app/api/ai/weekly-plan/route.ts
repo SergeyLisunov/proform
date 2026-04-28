@@ -44,9 +44,9 @@ export async function POST(req: Request) {
   const { data: auth } = await sb.auth.getUser()
   if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
 
-  const { data: me } = await sb.from('users').select('id, sport_type').eq('auth_id', auth.user.id).maybeSingle()
+  const { data: me } = await sb.from('users').select('id, sport').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
-  const meRow = me as { id: string; sport_type: string | null }
+  const meRow = me as { id: string; sport: string | null }
 
   const limited = await enforceAiRateLimit(req, sb, 'weekly-plan', 10, 3600)
   if (limited) return limited
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       system: 'Ты опытный тренер по выносливости. Составляешь недельные планы. Отвечай на русском, в JSON.',
       prompt: [
         'Составь план тренировок на 7 дней, начиная с завтра (day_offset=0 — завтра).',
-        `Вид спорта: ${meRow.sport_type ?? 'не указан'}.`,
+        `Вид спорта: ${meRow.sport ?? 'не указан'}.`,
         `Цель атлета: ${goal ?? 'поддерживающая нагрузка'}.`,
         `Текущая готовность: ${lastRecovery ?? 'нет данных'}, HRV: ${lastHrv ?? 'нет данных'}.`,
         `Strain за 2 недели: ${weekStrain.toFixed(1)}.`,

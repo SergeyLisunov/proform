@@ -31,9 +31,9 @@ export async function POST(req: Request) {
   const sb = await createClient()
   const { data: auth } = await sb.auth.getUser()
   if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
-  const { data: me } = await sb.from('users').select('id, name, role, sport_type').eq('auth_id', auth.user.id).maybeSingle()
+  const { data: me } = await sb.from('users').select('id, name, role, sport').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
-  const meRow = me as { id: string; name: string | null; role: string | null; sport_type: string | null }
+  const meRow = me as { id: string; name: string | null; role: string | null; sport: string | null }
 
   const limited = await enforceAiRateLimit(req, sb, 'ask', 30, 3600)
   if (limited) return limited
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     'Отвечай кратко, по делу, на русском. Используй данные атлета чтобы отвечать конкретно, а не обобщённо.',
     'Если у атлета не хватает данных для ответа — прямо скажи об этом.',
     'Ты НЕ врач. При симптомах травм/болезни — советуй обратиться к специалисту.',
-    `Профиль: имя ${meRow.name ?? 'атлет'}, роль ${meRow.role ?? 'athlete'}, вид спорта ${meRow.sport_type ?? 'не указан'}.`,
+    `Профиль: имя ${meRow.name ?? 'атлет'}, роль ${meRow.role ?? 'athlete'}, вид спорта ${meRow.sport ?? 'не указан'}.`,
   ].join('\n')
 
   const prompt = [

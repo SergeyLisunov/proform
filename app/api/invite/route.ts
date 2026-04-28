@@ -19,12 +19,11 @@ const VALID_COMBOS: Record<string, [string, string]> = {
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
 const FROM    = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
 
-function displayName(u: { name?: string | null; first_name?: string | null; last_name?: string | null; nickname?: string | null; email?: string | null }): string {
-  return (u.name
-    ?? [u.first_name, u.last_name].filter(Boolean).join(' ')
-    ?? u.nickname
-    ?? u.email
-    ?? 'Коллега').trim() || 'Коллега'
+function displayName(u: { name?: string | null; nickname?: string | null; email?: string | null }): string {
+  // Schema only has `name` (no first_name/last_name) — the previous
+  // signature accepted those fields as defensive fallback, but the
+  // SELECT below never asked for them. Drop both.
+  return (u.name ?? u.nickname ?? u.email ?? 'Коллега').trim() || 'Коллега'
 }
 
 // POST /api/invite — create + email a tokenised invitation
@@ -35,7 +34,7 @@ export async function POST(req: Request) {
 
   const { data: me } = await supabase
     .from('users')
-    .select('id, role, name, first_name, last_name, nickname, email')
+    .select('id, role, name, nickname, email')
     .eq('auth_id', authUser.id)
     .single()
   if (!me) return NextResponse.json({ error: 'User not found' }, { status: 404 })
