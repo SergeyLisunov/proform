@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 
 // ── типы ──────────────────────────────────────────────────────────────────────
 
@@ -69,6 +70,28 @@ const NOTIF_COLORS: Record<string, string> = {
   announcement:          '#F97316',
   coach_mark:            '#16A34A',
   org_post:              '#7C3AED',
+}
+
+// ── mobile menu toggle ────────────────────────────────────────────────────────
+// Uses MobileMenuProvider context (lib/hooks/useMobileMenu) instead of
+// Metronic's data-kt-drawer-toggle, which never wired up reliably under
+// Next.js hydration. The previous implementation rendered a button with
+// `data-kt-drawer-toggle="#sidebar"` and trusted core.bundle.js to install
+// click handlers — it didn't, leaving the burger inert on every mobile load.
+function MobileMenuToggle() {
+  const { open, toggle } = useMobileMenu()
+  return (
+    <button
+      type="button"
+      aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
+      aria-expanded={open}
+      aria-controls="sidebar"
+      onClick={toggle}
+      className="kt-btn kt-btn-icon kt-btn-ghost lg:hidden"
+    >
+      <i className={`ki-filled ${open ? 'ki-cross' : 'ki-burger-menu-2'} text-base`} />
+    </button>
+  )
 }
 
 // ── supabase helper ────────────────────────────────────────────────────────────
@@ -461,9 +484,7 @@ export default function TopBar() {
 
           {/* Left */}
           <div className="flex items-center gap-3">
-            <button className="kt-btn kt-btn-icon kt-btn-ghost lg:hidden" data-kt-drawer-toggle="#sidebar">
-              <i className="ki-filled ki-burger-menu-2 text-base" />
-            </button>
+            <MobileMenuToggle />
             <div>
               <h1 className="pf-num text-xl text-foreground leading-none">{title}</h1>
               {sub && <p className="text-2xs text-muted-foreground mt-0.5 hidden sm:block">{sub}</p>}
