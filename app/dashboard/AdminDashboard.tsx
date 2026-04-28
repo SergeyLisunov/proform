@@ -206,7 +206,7 @@ export default async function AdminDashboard() {
                       {u.role}
                     </span>
                   </td>
-                  <td className="py-2.5 px-4 text-muted-foreground text-xs">{fmtDate(u.created_at)}</td>
+                  <td className="py-2.5 px-4 text-muted-foreground text-xs">{fmtDate(u.created_at ?? '')}</td>
                 </tr>
               ))}
             </tbody>

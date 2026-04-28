@@ -220,7 +220,9 @@ export async function createDiaryEntry(input: DiaryInput): Promise<DiaryEntry | 
       row.entry_type === 'schedule' ||
       row.entry_type === 'competition_report'
     )
-  if (shouldNotify) {
+  // Narrow null off athlete_id — `shouldNotify` already requires it
+  // truthy but the compiler doesn't carry that across the boolean.
+  if (shouldNotify && row.athlete_id) {
     const typeLabel = ENTRY_TYPE_META[row.entry_type].label
     await notify({
       user_id: row.athlete_id,

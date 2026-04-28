@@ -2,7 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Database, UserRole } from '@/types/database'
+import type { Database } from '@/types/database'
+// Shared with server code via @/types/users — useUser.ts is 'use client'
+// and can't be imported from server routes.
+import type { UserRole } from '@/types/users'
+export type { UserRole }
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type UserUpdate = Database['public']['Tables']['users']['Update']

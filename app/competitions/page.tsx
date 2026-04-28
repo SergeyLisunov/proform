@@ -9,7 +9,13 @@ import {
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
 
-function parseLocalDate(s: string): Date { return new Date(s + 'T00:00:00') }
+function parseLocalDate(s: string | null | undefined): Date {
+  // Calendar events from the DB allow nullable event_date; treat null as
+  // a sentinel "very old" date so sorting/filters keep producing
+  // sensible UI without bespoke null branches at every call site.
+  if (!s) return new Date('1970-01-01T00:00:00')
+  return new Date(s + 'T00:00:00')
+}
 function todayISO(): string {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
@@ -18,7 +24,8 @@ function todayISO(): string {
 const WEEKDAYS_RU = ['вс','пн','вт','ср','чт','пт','сб']
 const MONTHS_RU_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
 
-function fmtDate(s: string): string {
+function fmtDate(s: string | null | undefined): string {
+  if (!s) return '—'
   const d = parseLocalDate(s)
   return `${d.getDate()} ${MONTHS_RU_GEN[d.getMonth()]} ${d.getFullYear()}, ${WEEKDAYS_RU[d.getDay()]}`
 }
@@ -275,14 +282,16 @@ function CompetitionsContent() {
 
   // Apply period filter from URL params (or show all)
   const filtered = useMemo(() => {
-    let list = competitions
-    if (urlFrom) list = list.filter(e => e.event_date >= urlFrom)
-    if (urlTo)   list = list.filter(e => e.event_date <= urlTo)
-    return list.sort((a, b) => a.event_date.localeCompare(b.event_date))
+    // Drop competitions without an event_date upfront — every downstream
+    // comparison expects a real ISO date string.
+    let list = competitions.filter(c => c.event_date != null)
+    if (urlFrom) list = list.filter(e => (e.event_date ?? '') >= urlFrom)
+    if (urlTo)   list = list.filter(e => (e.event_date ?? '') <= urlTo)
+    return list.sort((a, b) => (a.event_date ?? '').localeCompare(b.event_date ?? ''))
   }, [competitions, urlFrom, urlTo])
 
-  const upcoming = filtered.filter(e => e.event_date >= today)
-  const past     = filtered.filter(e => e.event_date < today)
+  const upcoming = filtered.filter(e => (e.event_date ?? '') >= today)
+  const past     = filtered.filter(e => (e.event_date ?? '') < today)
 
   const handleCreated = useCallback((e: CalendarEvent) => {
     setCompetitions(prev => [...prev, e])

@@ -63,10 +63,13 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
   const diary = (diaryData ?? []) as ObservationDiaryRow[]
 
   const { data: pendingRaw } = await supabase
-    .from('connections').select('id, initiator_id, created_at')
+    .from('connections').select('id, initiator_id, initiated_at')
     .eq('recipient_id', userId).eq('status', 'pending')
-    .order('created_at', { ascending: false }).limit(5)
-  const pendingConnections = (pendingRaw ?? []) as Array<{ id: string; initiator_id: string; created_at: string }>
+    .order('initiated_at', { ascending: false }).limit(5)
+  // connections has `initiated_at`, not `created_at` — old code relied on
+  // a column that never existed; the cast was hiding the error until the
+  // generated types were refreshed.
+  const pendingConnections = (pendingRaw ?? []) as Array<{ id: string; initiator_id: string; initiated_at: string }>
   const initiatorIds = pendingConnections.map(p => p.initiator_id)
   const { data: initiatorsData } = initiatorIds.length
     ? await supabase.from('users').select('id, name, avatar_url').in('id', initiatorIds)
@@ -136,7 +139,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-slate-800 truncate">{p.user?.name ?? 'Атлет'}</div>
-                    <div className="text-[10px] text-slate-400">{fmtDate(p.created_at)}</div>
+                    <div className="text-[10px] text-slate-400">{fmtDate(p.initiated_at)}</div>
                   </div>
                   <i className="ki-filled ki-right text-[10px] text-slate-400" />
                 </Link>
@@ -230,7 +233,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                   <div className="flex items-start justify-between gap-3 mb-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
                       {ath && <span className="text-xs font-bold text-[#F97316]">{ath.name}</span>}
-                      {d.tags?.length > 0 && d.tags.map((t: string) => (
+                      {d.tags && d.tags.length > 0 && d.tags.map((t: string) => (
                         <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: '#FFEDD5', color: '#F97316' }}>{t}</span>
                       ))}
                     </div>

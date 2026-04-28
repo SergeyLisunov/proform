@@ -146,9 +146,14 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription
+        // current_period_end is on the Stripe API payload but the typed
+        // SDK Subscription shape moved/renamed it across major versions.
+        // Read defensively via an `any` cast — wire-format is stable.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const periodEndUnix = (sub as any).current_period_end as number | undefined
         await sb.from('subscriptions').update({
           status: mapSubscriptionStatus(sub.status),
-          current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+          current_period_end: periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null,
           cancel_at_period_end: sub.cancel_at_period_end ?? false,
         }).eq('stripe_subscription_id', sub.id)
         break

@@ -12,9 +12,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .from('users').select('id').eq('auth_id', authUser.id).single()
   if (!me) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
+  // users table has no first_name/last_name (just `name` + nickname).
+  // Coaches/doctors hold the split fields in their role tables.
   const { data: profile } = await supabase
     .from('users')
-    .select('id, nickname, first_name, last_name, role, avatar_url, sport, discipline, city, country, bio, coach_specialization, experience_years, is_searchable')
+    .select('id, nickname, name, role, avatar_url, sport, discipline, city, country, bio, coach_specialization, experience_years, is_searchable')
     .eq('id', id)
     .single()
 

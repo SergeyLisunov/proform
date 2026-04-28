@@ -43,7 +43,7 @@ export async function POST() {
         preview: clipPreview(body),
       }
     })
-    .filter((r): r is Row => !!r)
+    .filter((r): r is NonNullable<typeof r> => r !== null)
 
   // 2. Gather workout sources (anything with a description or meaningful metrics).
   const { data: workouts } = await supabase
@@ -72,7 +72,7 @@ export async function POST() {
         preview: clipPreview(body),
       }
     })
-    .filter((r): r is Row => !!r)
+    .filter((r): r is NonNullable<typeof r> => r !== null)
 
   const allRows = [...noteRows, ...workoutRows]
   if (allRows.length === 0) {

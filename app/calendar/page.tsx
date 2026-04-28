@@ -38,6 +38,36 @@ import {
 function getWS() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 }
+
+// Build a complete CalendarEvent row from synthetic data (coach sessions,
+// org group sessions, medical checkups). The DB row has nullable display
+// fields (all_day, color, description, end_date, is_public, updated_at)
+// + a non-null `start_date` we mirror from event_date.
+function makeSynthEvent(p: {
+  id: string; owner_id: string; event_date: string;
+  event_type: CalendarEvent['event_type']; title: string;
+  notes: string | null; start_time: string | null; end_time: string | null;
+  created_at: string;
+}): CalendarEvent {
+  return {
+    id:          p.id,
+    owner_id:    p.owner_id,
+    event_date:  p.event_date,
+    start_date:  p.event_date,
+    event_type:  p.event_type,
+    title:       p.title,
+    notes:       p.notes,
+    start_time:  p.start_time,
+    end_time:    p.end_time,
+    created_at:  p.created_at,
+    all_day:     null,
+    color:       null,
+    description: null,
+    end_date:    null,
+    is_public:   null,
+    updated_at:  null,
+  }
+}
 async function getWorkoutsForMonth(athleteId: string, from: string, to: string): Promise<Workout[]> {
   const { data } = await getWS().from('workouts').select('*').eq('athlete_id', athleteId).gte('event_date', from).lte('event_date', to).order('event_date', { ascending: false })
   return (data ?? []) as Workout[]
@@ -861,7 +891,15 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
   const weeks: (number|null)[][] = []; for (let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7))
   const today = todayISO()
   const activeCycles = cycles.filter(c => parseLocalDate(c.start_date)<=new Date(year,month+1,0)&&parseLocalDate(c.end_date)>=new Date(year,month,1))
-  const eventsByDate = useMemo(() => { const m: Record<string,CalendarEvent[]>={}; savedEvents.forEach(ev=>{if(!m[ev.event_date])m[ev.event_date]=[]; m[ev.event_date].push(ev)}); return m }, [savedEvents])
+  const eventsByDate = useMemo(() => {
+    const m: Record<string, CalendarEvent[]> = {}
+    savedEvents.forEach(ev => {
+      if (!ev.event_date) return
+      if (!m[ev.event_date]) m[ev.event_date] = []
+      m[ev.event_date].push(ev)
+    })
+    return m
+  }, [savedEvents])
   // Группируем реальные тренировки по дате
   const workoutsByDate = useMemo(() => {
     const m: Record<string, Workout[]> = {}
@@ -1430,7 +1468,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
               {selType&&<div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'6px 12px',borderRadius:20,background:selType.color+'12',border:`1.5px solid ${selType.color}30`,alignSelf:'flex-start'}}><i className={`ki-filled ${selType.icon}`} style={{color:selType.color,fontSize:12}}/><span style={{fontSize:12,fontWeight:700,color:selType.color}}>{selType.label}</span></div>}
               <div style={{display:'flex',flexDirection:'column',gap:12}}>
                 <InfoBlock label="Название" value={initialEvent.title}/>
-                <InfoBlock label="Дата" value={parseLocalDate(initialEvent.event_date).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}/>
+                <InfoBlock label="Дата" value={parseLocalDate(initialEvent.event_date ?? initialEvent.start_date).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}/>
                 {(initialEvent.start_time||initialEvent.end_time)&&<InfoBlock label="Время" value={[initialEvent.start_time,initialEvent.end_time].filter(Boolean).join(' – ')}/>}
                 {initialEvent.notes&&<InfoBlock label="Заметки" value={initialEvent.notes} multiline/>}
               </div>
@@ -1560,13 +1598,13 @@ export default function CalendarPage() {
       for (const s of coachSessions) {
         if (s.status === 'cancelled') continue
         const a = coachAthletes.find(x => x.id === s.athlete_id)
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `cs_${s.id}`, owner_id: s.coach_id, event_date: s.session_date,
           event_type: 'workout',
           title: s.title ?? (a ? `Тренировка · ${a.name}` : 'Тренировка'),
           notes: s.notes, start_time: s.start_time, end_time: s.end_time,
           created_at: s.created_at,
-        })
+        }))
       }
     }
     if (isOrg) {
@@ -1576,13 +1614,13 @@ export default function CalendarPage() {
       }
       for (const g of groupSessions) {
         if (g.status === 'cancelled') continue
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `gs_${g.id}`, owner_id: g.organization_id, event_date: g.session_date,
           event_type: sessionTypeToEvent[g.session_type] ?? 'other',
           title: g.title, notes: g.description,
           start_time: g.start_time, end_time: g.end_time,
           created_at: g.created_at,
-        })
+        }))
       }
     }
     if (isDoctor) {
@@ -1593,25 +1631,25 @@ export default function CalendarPage() {
       }
       for (const c of checkups) {
         if (c.status === 'cancelled') continue
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `mc_${c.id}`, owner_id: c.doctor_id, event_date: c.checkup_date,
           event_type: 'medical',
           title: checkupLabels[c.checkup_type] ?? 'Медосмотр',
           notes: c.findings, start_time: c.start_time, end_time: c.end_time,
           created_at: c.created_at,
-        })
+        }))
       }
     }
     if (isAthlete) {
       for (const s of athleteCoachSessions) {
         if (s.status === 'cancelled') continue
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `cs_${s.id}`, owner_id: s.athlete_id, event_date: s.session_date,
           event_type: 'workout',
           title: s.title ?? 'Тренировка с тренером',
           notes: s.notes, start_time: s.start_time, end_time: s.end_time,
           created_at: s.created_at,
-        })
+        }))
       }
       const aCheckupLabels: Record<string, string> = {
         general: 'Осмотр', cardiology: 'Кардио', blood: 'Анализы',
@@ -1620,13 +1658,13 @@ export default function CalendarPage() {
       }
       for (const c of athleteCheckups) {
         if (c.status === 'cancelled') continue
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `mc_${c.id}`, owner_id: c.athlete_id, event_date: c.checkup_date,
           event_type: 'medical',
           title: `${aCheckupLabels[c.checkup_type] ?? 'Медосмотр'} · врач`,
           notes: c.findings, start_time: c.start_time, end_time: c.end_time,
           created_at: c.created_at,
-        })
+        }))
       }
       const aSessionTypeToEvent: Record<string, CalendarEvent['event_type']> = {
         team_practice: 'workout', competition: 'competition', travel: 'travel',
@@ -1634,14 +1672,14 @@ export default function CalendarPage() {
       }
       for (const g of athleteGroupSessions) {
         if (g.status === 'cancelled') continue
-        synthetic.push({
+        synthetic.push(makeSynthEvent({
           id: `gs_${g.id}`, owner_id: user?.id ?? '', event_date: g.session_date,
           event_type: aSessionTypeToEvent[g.session_type] ?? 'other',
           title: `${g.title} · команда`,
           notes: g.description,
           start_time: g.start_time, end_time: g.end_time,
           created_at: g.created_at,
-        })
+        }))
       }
     }
     return [...savedEvents, ...synthetic]
@@ -1744,9 +1782,10 @@ export default function CalendarPage() {
 
   const handleEventCreated = useCallback((e: CalendarEvent) => {
     setSavedEvents(prev => [...prev, e])
-    const d = parseLocalDate(e.event_date)
+    const dateStr = e.event_date ?? e.start_date
+    const d = parseLocalDate(dateStr)
     if (d.getFullYear()!==year||d.getMonth()!==month) { setYear(d.getFullYear()); setMonth(d.getMonth()) }
-    setSelected(e.event_date)
+    setSelected(dateStr)
   }, [year, month])
 
   const handleEventUpdated = useCallback((u: CalendarEvent) => { setSavedEvents(prev=>prev.map(e=>e.id===u.id?u:e)) }, [])
@@ -1865,20 +1904,20 @@ export default function CalendarPage() {
         const we = new Date(ws); we.setDate(we.getDate() + 6)
         const wsISO = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`
         const weISO = `${we.getFullYear()}-${String(we.getMonth()+1).padStart(2,'0')}-${String(we.getDate()).padStart(2,'0')}`
-        return savedEvents.filter(e => e.event_type === 'competition' && e.event_date >= wsISO && e.event_date <= weISO).length
+        return savedEvents.filter(e => e.event_type === 'competition' && e.event_date != null && e.event_date >= wsISO && e.event_date <= weISO).length
       }
       if (view === 'month') {
         return savedEvents.filter(e => {
-          if (e.event_type !== 'competition') return false
+          if (e.event_type !== 'competition' || !e.event_date) return false
           const d = parseLocalDate(e.event_date)
           return d.getFullYear() === year && d.getMonth() === month
         }).length
       }
       if (view === 'quarter') {
         const qStart = (quarter - 1) * 3; const qEnd = qStart + 2
-        return kpiEvents.filter(e => { if (e.event_type !== 'competition') return false; const d = parseLocalDate(e.event_date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
+        return kpiEvents.filter(e => { if (e.event_type !== 'competition' || !e.event_date) return false; const d = parseLocalDate(e.event_date); return d.getFullYear() === year && d.getMonth() >= qStart && d.getMonth() <= qEnd }).length
       }
-      return kpiEvents.filter(e => e.event_type === 'competition' && parseLocalDate(e.event_date).getFullYear() === year).length
+      return kpiEvents.filter(e => e.event_type === 'competition' && e.event_date != null && parseLocalDate(e.event_date).getFullYear() === year).length
     } catch { return 0 }
   }, [view, year, month, quarter, weekStart, savedEvents, kpiEvents])
 
@@ -2237,7 +2276,7 @@ export default function CalendarPage() {
             <Tag tone="border-border bg-background text-muted-foreground">{savedEvents.length}</Tag>
           </div>
           <div className="mt-4 flex flex-col gap-2">
-            {savedEvents.slice().sort((a, b) => a.event_date.localeCompare(b.event_date)).map(ev => {
+            {savedEvents.slice().sort((a, b) => (a.event_date ?? '').localeCompare(b.event_date ?? '')).map(ev => {
               const meta = EVENT_TYPES.find(t => t.value === ev.event_type)
               return (
                 <div
@@ -2258,7 +2297,7 @@ export default function CalendarPage() {
                     {ev.notes && <span className="mt-1 block truncate text-2xs text-muted-foreground">{ev.notes}</span>}
                   </div>
                   <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {parseLocalDate(ev.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}{ev.start_time && ` · ${ev.start_time}`}
+                    {parseLocalDate(ev.event_date ?? ev.start_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}{ev.start_time && ` · ${ev.start_time}`}
                   </span>
                   <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0">
                     <i className="ki-filled ki-trash text-xs text-muted-foreground" />
@@ -2312,7 +2351,7 @@ export default function CalendarPage() {
           },
         } : null
         return (
-          <AddEventDrawer initialDate={eventDrawer.event_date} ownerId={user.id} mode={eventDrawerMode} initialEvent={eventDrawer}
+          <AddEventDrawer initialDate={eventDrawer.event_date ?? eventDrawer.start_date} ownerId={user.id} mode={eventDrawerMode} initialEvent={eventDrawer}
             onClose={()=>setEventDrawer(null)} onCreated={handleEventCreated}
             onUpdated={e=>{handleEventUpdated(e);setEventDrawer(null)}}
             onDeleted={id=>{handleDeleteEvent(id);setEventDrawer(null)}}

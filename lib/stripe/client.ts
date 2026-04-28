@@ -13,7 +13,11 @@ export function getStripe(): Stripe {
       'STRIPE_SECRET_KEY is not set. Configure it in .env.local or Vercel env vars.'
     )
   }
-  _stripe = new Stripe(key, { apiVersion: '2024-06-20' as Stripe.LatestApiVersion })
+  // Pin a known-working Stripe API version. Both `Stripe.LatestApiVersion`
+  // and `Stripe.StripeConfig` were removed/renamed across SDK majors; the
+  // simplest portable option is to bypass the literal-union check.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _stripe = new Stripe(key, { apiVersion: '2024-06-20' as any })
   return _stripe
 }
 
