@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
+import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 import { createBrowserClient } from '@supabase/ssr'
 
 const NAV_SECTIONS = [
@@ -80,6 +81,10 @@ function getRoleMeta(role?: string) {
 export default function Sidebar() {
   const pathname = usePathname()
   const { user } = useUser()
+  // Mobile drawer wiring — sees the same context as TopBar's burger.
+  // The previous implementation relied on Metronic kt-drawer JS that
+  // never bound under Next hydration, leaving the burger inert.
+  const { open: mobileOpen, close: closeMobile } = useMobileMenu()
   const [signingOut, setSigningOut] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [notifyCount, setNotifyCount] = useState(0)
@@ -177,14 +182,38 @@ export default function Sidebar() {
   }
 
   return (
-    <div
-      id="sidebar"
-      className="kt-sidebar bg-card border-e border-e-border fixed top-0 bottom-0 z-20 hidden lg:flex flex-col items-stretch shrink-0 shadow-[0_12px_40px_rgba(15,23,42,0.04)]"
-      data-kt-drawer="true"
-      data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
-    >
+    <>
+      {/*
+        Mobile backdrop. Only rendered when drawer is open and viewport is
+        narrow (lg:hidden). Click anywhere outside the drawer dismisses it.
+      */}
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Закрыть меню"
+          onClick={closeMobile}
+          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-[1px] lg:hidden"
+        />
+      )}
       <div
-        className="kt-sidebar-header hidden lg:flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
+        id="sidebar"
+        className={[
+          'kt-sidebar bg-card border-e border-e-border',
+          'fixed top-0 bottom-0 z-30',
+          'flex flex-col items-stretch shrink-0',
+          'shadow-[0_12px_40px_rgba(15,23,42,0.04)]',
+          // Slide on mobile, always-visible on lg+. Initial off-screen
+          // position keeps the drawer hidden without `display:none` so
+          // transitions work both directions.
+          'transform transition-transform duration-200 ease-out',
+          'lg:translate-x-0',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
+        data-kt-drawer="true"
+        data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
+      >
+      <div
+        className="kt-sidebar-header flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
         id="sidebar_header"
         style={{ height: 'auto' }}
       >
@@ -345,5 +374,6 @@ export default function Sidebar() {
         </div>
       </div>
     </div>
+    </>
   )
 }
