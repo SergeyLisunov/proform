@@ -192,16 +192,20 @@ export default function Sidebar() {
           type="button"
           aria-label="Закрыть меню"
           onClick={closeMobile}
-          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-[1px] lg:hidden"
+          className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-sm lg:hidden"
         />
       )}
       <div
         id="sidebar"
         className={[
-          'kt-sidebar bg-card border-e border-e-border',
+          // Explicit `bg-white` (vs `bg-card`) — Metronic's kt-sidebar.css
+          // ships a translucent default that bled the backdrop through
+          // the mobile drawer. Solid white + heavier mobile shadow makes
+          // the surface read as a real sheet on top of dimmed content.
+          'kt-sidebar bg-white border-e border-e-border',
           'fixed top-0 bottom-0 z-30',
           'flex flex-col items-stretch shrink-0',
-          'shadow-[0_12px_40px_rgba(15,23,42,0.04)]',
+          'shadow-[0_24px_60px_rgba(15,23,42,0.18)] lg:shadow-[0_12px_40px_rgba(15,23,42,0.04)]',
           // Slide on mobile, always-visible on lg+. Initial off-screen
           // position keeps the drawer hidden without `display:none` so
           // transitions work both directions.
@@ -212,6 +216,16 @@ export default function Sidebar() {
         data-kt-drawer="true"
         data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
       >
+      {/* Mobile-only close (×) button. Pinned top-right of the drawer so
+          users can dismiss without hunting for the backdrop or burger. */}
+      <button
+        type="button"
+        aria-label="Закрыть меню"
+        onClick={closeMobile}
+        className="lg:hidden absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:border-orange-200 hover:text-orange-600"
+      >
+        <i className="ki-filled ki-cross text-base" />
+      </button>
       <div
         className="kt-sidebar-header flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
         id="sidebar_header"
