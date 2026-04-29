@@ -84,30 +84,30 @@ export function ProfileShell(props: {
         </div>
       </div>
 
-      {/* Tabs — horizontal scroll on mobile to keep all items visible
-          without wrapping into multiple rows. snap-x for smooth landing. */}
-      <div className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex w-max min-w-full gap-1 rounded-2xl border border-border bg-muted/30 p-1 snap-x snap-mandatory">
-          {props.tabs.map(t => {
-            const active = t.id === props.activeTab
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => props.onTabChange(t.id)}
-                className={`flex shrink-0 snap-start items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-1 sm:min-w-[140px] ${
-                  active
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                style={active ? { color: t.color } : undefined}
-              >
-                <i className={`ki-filled ${t.icon} text-[14px]`} />
-                <span className="whitespace-nowrap">{t.label}</span>
-              </button>
-            )
-          })}
-        </div>
+      {/* Tabs — wrap on narrow viewport (was flex flex-wrap; horizontal-scroll
+          variant in PR #7 caused the bar to render empty for some users).
+          Two-row wrap reads cleaner than off-screen tabs and matches the
+          original athlete settings page. */}
+      <div className="flex flex-wrap gap-1 rounded-2xl border border-border bg-muted/30 p-1">
+        {props.tabs.map(t => {
+          const active = t.id === props.activeTab
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => props.onTabChange(t.id)}
+              className={`flex flex-1 min-w-[120px] items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition sm:min-w-[140px] sm:px-4 ${
+                active
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              style={active ? { color: t.color } : undefined}
+            >
+              <i className={`ki-filled ${t.icon} text-[14px]`} />
+              <span className="whitespace-nowrap">{t.label}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Avatar block */}
