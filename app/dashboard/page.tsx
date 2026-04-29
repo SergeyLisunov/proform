@@ -526,29 +526,23 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -top-10 -right-6 h-32 w-32 rounded-full blur-2xl opacity-70 transition-opacity group-hover:opacity-100"
         style={{ background: 'radial-gradient(circle, #FDBA74 0%, rgba(253,186,116,0) 70%)' }}
       />
-      <div className="relative px-4 py-3.5">
-        {/* Row 1: icons + single-line title with items-center → guaranteed
-            mathematical AND visual vertical center (single-line text
-            beside 44×44 icons). */}
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
-            style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
-          >
-            <i className="ki-filled ki-plus text-white text-lg" />
-          </div>
-          <span className="min-w-0 flex-1 text-base font-extrabold text-foreground truncate">
-            Добавить тренировку
-          </span>
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
-            <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
-          </div>
+      {/* Single-row button — subtitle dropped after 6 iterations failed to
+          make 11px secondary text legible inside an orange-tinted button.
+          The title "Добавить тренировку" already conveys the action; an
+          extra description was decorative and persistently caused
+          alignment/contrast issues. */}
+      <div className="relative flex items-center gap-3 px-4 py-4">
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
+          style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
+        >
+          <i className="ki-filled ki-plus text-white text-lg" />
         </div>
-        {/* Row 2: subtitle aligned with title (offset = icon 44 + gap 12 = 56px).
-            Tightened mt-1 (4px) and bumped color to orange-900/85 with
-            font-medium so the subtitle reads clearly inside the button. */}
-        <div className="mt-1 pl-[56px] text-[11px] font-medium text-orange-900/85 truncate">
-          Запиши пробежку, силовую или сессию
+        <span className="min-w-0 flex-1 text-base font-extrabold text-foreground truncate">
+          Добавить тренировку
+        </span>
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
+          <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
         </div>
       </div>
     </button>
