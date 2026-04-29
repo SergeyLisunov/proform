@@ -527,29 +527,26 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
         style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
       />
-      <div className="relative flex items-center gap-3 px-4 py-3.5">
+      <div className="relative flex items-center gap-3 px-4 py-4">
+        {/* Same 44×44 size for both icons keeps the row visually symmetric.
+            Previously plus was 44px and arrow was 36px — asymmetric.
+            items-center on parent centers all 3 against the row's middle. */}
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
         >
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
-        <div className="min-w-0 flex-1">
-          {/* leading-tight (vs leading-none) gives the glyphs proper line-box
-              height so they sit centered with the 11×11 icon tiles. The
-              subtitle adds a second line that balances the row visually
-              and explains the action. */}
-          <div className="text-base font-extrabold leading-tight text-foreground truncate">
+        <div className="min-w-0 flex-1 leading-tight">
+          <div className="text-base font-extrabold text-foreground truncate">
             Добавить тренировку
           </div>
-          <div className="mt-0.5 text-[11px] leading-tight text-orange-700/70 truncate">
+          <div className="mt-0.5 text-[11px] text-orange-700/70 truncate">
             Запиши пробежку, силовую или сессию
           </div>
         </div>
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/70 border border-white/80 shadow-sm transition-transform group-hover:translate-x-1"
-        >
-          <i className="ki-filled ki-arrow-right text-orange-500 text-sm" />
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
+          <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
         </div>
       </div>
     </button>

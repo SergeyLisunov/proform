@@ -83,10 +83,13 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
   const barMax = Math.max(1, ...metrics.weekTotals)
 
   return (
-    <div className="rounded-[20px] border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div
+      className="rounded-[20px] border border-sky-100 overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#F0F9FF 0%,#F8FBFF 60%,#FFFFFF 100%)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-sky-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#F0F9FF' }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-sky-100">
             <i className="ki-filled ki-chart-line-up text-[14px] text-sky-600" />
           </div>
           <div>

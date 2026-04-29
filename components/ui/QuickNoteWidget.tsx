@@ -156,7 +156,10 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
   const canSave = (content.trim().length > 0 || files.length > 0) && !files.some(f => f.uploading) && !saving
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm h-full flex flex-col">
+    <div
+      className="rounded-xl border border-amber-100 p-4 shadow-sm h-full flex flex-col"
+      style={{ background: 'linear-gradient(160deg,#FFFBEB 0%,#FFFDF5 60%,#FFFFFF 100%)' }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
