@@ -516,27 +516,20 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         borderColor: '#FED7AA',
       }}
     >
-      {/* Decorative blobs */}
+      {/* Top-right decorative blob only — bottom-left blob was removed
+          because its 144×144 blur extended over the subtitle area and
+          visually faded the subtitle into the orange glow, making the
+          user perceive the subtitle as having "moved far below the
+          button borders". */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-10 -right-6 h-32 w-32 rounded-full blur-2xl opacity-70 transition-opacity group-hover:opacity-100"
         style={{ background: 'radial-gradient(circle, #FDBA74 0%, rgba(253,186,116,0) 70%)' }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
-        style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
-      />
-      <div className="relative px-4 py-4">
-        {/* Row 1: icons + single-line title with items-center.
-            Past 3 attempts kept title+subtitle in a single text wrapper
-            and tried to vertically center. Problem: title's visual cap
-            sits in upper half of any centered two-line block, while
-            icons (44×44) are purely centered. They never align by eye.
-            Solution: split text into two rows — title shares the icon
-            row (single line, items-center → mathematical AND visual
-            center), subtitle becomes a caption below, aligned with
-            title's left edge (icon 44 + gap 12 = 56px). */}
+      <div className="relative px-4 py-3.5">
+        {/* Row 1: icons + single-line title with items-center → guaranteed
+            mathematical AND visual vertical center (single-line text
+            beside 44×44 icons). */}
         <div className="flex items-center gap-3">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
@@ -551,8 +544,10 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
             <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
           </div>
         </div>
-        {/* Row 2: subtitle aligned with title (offset = icon 44 + gap 12 = 56px) */}
-        <div className="mt-1.5 pl-[56px] text-[11px] text-orange-700/70 truncate">
+        {/* Row 2: subtitle aligned with title (offset = icon 44 + gap 12 = 56px).
+            Tightened mt-1 (4px) and bumped color to orange-900/85 with
+            font-medium so the subtitle reads clearly inside the button. */}
+        <div className="mt-1 pl-[56px] text-[11px] font-medium text-orange-900/85 truncate">
           Запиши пробежку, силовую или сессию
         </div>
       </div>
