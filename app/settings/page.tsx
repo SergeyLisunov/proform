@@ -791,7 +791,7 @@ export default function SettingsPage() {
 
           <Card>
             <SectionHeader icon="ki-profile-circle" color="#F97316" title="Личные данные" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Имя">
                 <Input value={form.first_name} onChange={set('first_name')} placeholder="Иван" />
               </Field>
@@ -862,7 +862,7 @@ export default function SettingsPage() {
 
           <Card>
             <SectionHeader icon="ki-global" color="#0284C7" title="Социальные сети" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Instagram">
                 <div style={{ position: 'relative' }}>
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
@@ -919,7 +919,7 @@ export default function SettingsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card>
             <SectionHeader icon="ki-abstract-26" color="#2563EB" title="Спортивный профиль" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Вид спорта">
                 <Select value={SPORTS.some(s => s.value === form.primary_sport) ? form.primary_sport : (form.primary_sport ? 'Другое' : '')}
                   onChange={v => { if (v !== 'Другое') set('primary_sport')(v); else set('primary_sport')('') }}
@@ -946,7 +946,7 @@ export default function SettingsPage() {
                 <Select value={form.goal} onChange={set('goal')} options={GOALS} />
               </Field>
             </div>
-            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Дисциплина" hint="Конкретная дисциплина внутри вида спорта">
                 <Input value={form.discipline} onChange={set('discipline')} placeholder="Например: марафон, спринт…" />
               </Field>
@@ -960,7 +960,7 @@ export default function SettingsPage() {
           {user?.role === 'coach' && (
             <Card>
               <SectionHeader icon="ki-teacher" color="#7C3AED" title="Параметры тренера" />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Специализация тренера" hint="Например: силовая подготовка, бег, плавание">
                   <Input value={form.coach_specialization} onChange={set('coach_specialization')} placeholder="Беговая подготовка…" />
                 </Field>
@@ -1007,7 +1007,7 @@ export default function SettingsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card>
             <SectionHeader icon="ki-abstract-31" color="#E11D48" title="Антропометрия" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Рост (см)" hint="100 – 250 см">
                 <Input value={form.height_cm} onChange={set('height_cm')} type="number" placeholder="175" min="100" max="250" />
               </Field>
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
 
           <Card>
             <SectionHeader icon="ki-heart" color="#E11D48" title="Кардио-параметры" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Макс. ЧСС (уд/мин)" hint="Максимальная частота сердечных сокращений">
                 <Input value={form.max_heart_rate} onChange={set('max_heart_rate')} type="number" placeholder="185" min="100" max="230" />
               </Field>
@@ -1037,7 +1037,7 @@ export default function SettingsPage() {
               </Field>
             </div>
             {/* Подсказки */}
-            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div className="mt-5 grid grid-cols-1 gap-2.5 md:grid-cols-2">
               {[
                 { label: 'VO2max', icon: 'ki-chart-line-up', color: '#16A34A', hint: 'Отличный: >55, Хороший: 45–55, Средний: 35–45' },
                 { label: 'HRV', icon: 'ki-heart', color: '#E11D48', hint: 'Норма: 20–100 мс. Выше — лучше восстановление' },
