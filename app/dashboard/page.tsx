@@ -516,29 +516,23 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         borderColor: '#FED7AA',
       }}
     >
-      {/* Top-right decorative blob only — bottom-left blob was removed
-          because its 144×144 blur extended over the subtitle area and
-          visually faded the subtitle into the orange glow, making the
-          user perceive the subtitle as having "moved far below the
-          button borders". */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-10 -right-6 h-32 w-32 rounded-full blur-2xl opacity-70 transition-opacity group-hover:opacity-100"
-        style={{ background: 'radial-gradient(circle, #FDBA74 0%, rgba(253,186,116,0) 70%)' }}
-      />
-      {/* Single-row button — subtitle dropped after 6 iterations failed to
-          make 11px secondary text legible inside an orange-tinted button.
-          The title "Добавить тренировку" already conveys the action; an
-          extra description was decorative and persistently caused
-          alignment/contrast issues. */}
-      <div className="relative flex items-center gap-3 px-4 py-4">
+      {/* Both decorative blobs removed: top-right blob's blur-2xl bled
+          orange tint above the actual button border (it had -top-10),
+          which made the user perceive the button as "starting higher"
+          than it actually rendered → title looked low-of-center.
+          With blobs gone, the eye anchors on the actual button rect.
+          Plus: leading-none on title compresses the line-box from 24px
+          (text-base default 1.5) to 16px (font-size only), so the cap
+          height is the dominant vertical metric and centers exactly on
+          the icon centers. */}
+      <div className="relative flex items-center gap-3 px-4 py-3.5">
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
         >
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
-        <span className="min-w-0 flex-1 text-base font-extrabold text-foreground truncate">
+        <span className="min-w-0 flex-1 text-base font-extrabold leading-none text-foreground truncate">
           Добавить тренировку
         </span>
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
