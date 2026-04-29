@@ -527,17 +527,21 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
         style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
       />
-      <div className="relative flex items-center gap-3 px-4 py-4">
-        {/* Same 44×44 size for both icons keeps the row visually symmetric.
-            Previously plus was 44px and arrow was 36px — asymmetric.
-            items-center on parent centers all 3 against the row's middle. */}
+      <div className="relative flex items-stretch gap-3 px-4 py-4">
+        {/* All three children share the same vertical box (h-11 = 44px) and
+            internally center their content. Previous attempt used items-center
+            on parent — that vertically centered each child's BBOX against the
+            row, but the text-block (≈36px) and icons (44px) had different
+            heights so the eye perceived the title as floating above center.
+            Forcing every child to h-11 + internal justify-center makes the
+            title baseline land exactly at the icon centers. */}
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
         >
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
-        <div className="min-w-0 flex-1 leading-tight">
+        <div className="flex h-11 min-w-0 flex-1 flex-col justify-center leading-tight">
           <div className="text-base font-extrabold text-foreground truncate">
             Добавить тренировку
           </div>
