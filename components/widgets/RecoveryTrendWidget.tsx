@@ -71,10 +71,13 @@ export default function RecoveryTrendWidget({ userId }: { userId: string }) {
   const delta = last != null && prev != null ? last - prev : null
 
   return (
-    <div className="rounded-[20px] border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div
+      className="rounded-[20px] border border-emerald-100 overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#ECFDF5 0%,#F6FEFA 60%,#FFFFFF 100%)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#F0FDF4' }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-emerald-100">
             <i className="ki-filled ki-heart text-[14px] text-emerald-600" />
           </div>
           <h3 className="text-sm font-bold text-foreground">Готовность · 14 дней</h3>

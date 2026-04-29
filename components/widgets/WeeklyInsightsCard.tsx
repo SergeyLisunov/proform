@@ -34,10 +34,13 @@ export default function WeeklyInsightsCard() {
   useEffect(() => { load() }, [load])
 
   return (
-    <div className="rounded-[20px] border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div
+      className="rounded-[20px] border border-indigo-100 overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#EEF2FF 0%,#F8FAFF 60%,#FFFFFF 100%)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-indigo-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#EEF2FF' }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-indigo-100">
             <i className="ki-filled ki-chart-line-up text-[14px] text-indigo-600" />
           </div>
           <h3 className="text-sm font-bold text-foreground">Неделя в цифрах</h3>
