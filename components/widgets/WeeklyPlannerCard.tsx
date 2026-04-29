@@ -95,10 +95,13 @@ export default function WeeklyPlannerCard() {
   }
 
   return (
-    <div className="rounded-[20px] border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div
+      className="rounded-[20px] border border-purple-100 overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#FAF5FF 0%,#FCFAFF 60%,#FFFFFF 100%)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-purple-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#F3E8FF' }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-purple-100">
             <i className="ki-filled ki-calendar-tick text-[14px] text-purple-600" />
           </div>
           <div>

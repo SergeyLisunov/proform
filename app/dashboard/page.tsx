@@ -369,10 +369,18 @@ function TrainingWidget({
   }
 
   return (
-    <div className="bg-card border border-border rounded-[20px] overflow-hidden h-full flex flex-col">
+    <div
+      className="border border-orange-100 rounded-[20px] overflow-hidden h-full flex flex-col"
+      style={{ background: 'linear-gradient(160deg,#FFF7ED 0%,#FFFBF5 50%,#FFFFFF 100%)' }}
+    >
       {/* Header — без ссылок и кнопки */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-        <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
+      <div className="flex items-center justify-between px-5 py-4 border-b border-orange-100/80 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-orange-100">
+            <i className="ki-filled ki-abstract-26 text-[14px] text-orange-500" />
+          </div>
+          <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
+        </div>
       </div>
 
       {loading ? (
@@ -519,7 +527,7 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
         style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
       />
-      <div className="relative flex items-center gap-3 px-4 py-4">
+      <div className="relative flex items-center gap-3 px-4 py-3.5">
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
@@ -527,8 +535,15 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-base font-extrabold leading-none text-foreground truncate">
+          {/* leading-tight (vs leading-none) gives the glyphs proper line-box
+              height so they sit centered with the 11×11 icon tiles. The
+              subtitle adds a second line that balances the row visually
+              and explains the action. */}
+          <div className="text-base font-extrabold leading-tight text-foreground truncate">
             Добавить тренировку
+          </div>
+          <div className="mt-0.5 text-[11px] leading-tight text-orange-700/70 truncate">
+            Запиши пробежку, силовую или сессию
           </div>
         </div>
         <div
