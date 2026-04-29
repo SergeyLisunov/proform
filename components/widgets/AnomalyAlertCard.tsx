@@ -63,11 +63,14 @@ export default function AnomalyAlertCard() {
   const st = data ? STATUS_STYLE[data.overall_status] : null
 
   return (
-    <div className="rounded-[20px] border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div
+      className="rounded-[20px] border border-rose-100 overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#FFF1F2 0%,#FFF8F8 60%,#FFFFFF 100%)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-rose-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#FEF2F2' }}>
-            <i className="ki-filled ki-shield-tick text-[14px] text-red-600" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-rose-100">
+            <i className="ki-filled ki-shield-tick text-[14px] text-rose-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-foreground leading-none">Аномалии</h3>
