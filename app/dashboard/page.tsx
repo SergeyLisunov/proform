@@ -527,30 +527,33 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full blur-2xl opacity-60"
         style={{ background: 'radial-gradient(circle, #FB923C 0%, rgba(251,146,60,0) 70%)' }}
       />
-      <div className="relative flex items-stretch gap-3 px-4 py-4">
-        {/* All three children share the same vertical box (h-11 = 44px) and
-            internally center their content. Previous attempt used items-center
-            on parent — that vertically centered each child's BBOX against the
-            row, but the text-block (≈36px) and icons (44px) had different
-            heights so the eye perceived the title as floating above center.
-            Forcing every child to h-11 + internal justify-center makes the
-            title baseline land exactly at the icon centers. */}
-        <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
-          style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
-        >
-          <i className="ki-filled ki-plus text-white text-lg" />
-        </div>
-        <div className="flex h-11 min-w-0 flex-1 flex-col justify-center leading-tight">
-          <div className="text-base font-extrabold text-foreground truncate">
+      <div className="relative px-4 py-4">
+        {/* Row 1: icons + single-line title with items-center.
+            Past 3 attempts kept title+subtitle in a single text wrapper
+            and tried to vertically center. Problem: title's visual cap
+            sits in upper half of any centered two-line block, while
+            icons (44×44) are purely centered. They never align by eye.
+            Solution: split text into two rows — title shares the icon
+            row (single line, items-center → mathematical AND visual
+            center), subtitle becomes a caption below, aligned with
+            title's left edge (icon 44 + gap 12 = 56px). */}
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
+            style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
+          >
+            <i className="ki-filled ki-plus text-white text-lg" />
+          </div>
+          <span className="min-w-0 flex-1 text-base font-extrabold text-foreground truncate">
             Добавить тренировку
-          </div>
-          <div className="mt-0.5 text-[11px] text-orange-700/70 truncate">
-            Запиши пробежку, силовую или сессию
+          </span>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
+            <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
           </div>
         </div>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
-          <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
+        {/* Row 2: subtitle aligned with title (offset = icon 44 + gap 12 = 56px) */}
+        <div className="mt-1.5 pl-[56px] text-[11px] text-orange-700/70 truncate">
+          Запиши пробежку, силовую или сессию
         </div>
       </div>
     </button>
