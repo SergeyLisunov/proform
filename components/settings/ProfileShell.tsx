@@ -8,6 +8,10 @@ export function ProfileShell(props: {
   title: string
   subtitle: string
   roleBadge?: string
+  /** 0–100. When defined, the header shows a "Заполнено N%" progress bar
+   * matching the athlete settings page. Color shifts red < 40, orange < 80,
+   * emerald otherwise. */
+  completionPct?: number
   tabs: Tab[]
   activeTab: string
   onTabChange: (id: string) => void
@@ -23,6 +27,15 @@ export function ProfileShell(props: {
 }) {
   const fileRef = useRef<HTMLInputElement | null>(null)
 
+  // Same scale the athlete page uses, kept here so coach/doctor/org get
+  // a visually identical progress bar without re-implementing it.
+  const pct = props.completionPct
+  const pctColor =
+    pct == null ? null
+      : pct < 40 ? '#DC2626'
+      : pct < 80 ? '#F97316'
+      : '#16A34A'
+
   return (
     <div className="mx-auto flex w-full max-w-[980px] flex-col gap-6">
       <div>
@@ -34,41 +47,67 @@ export function ProfileShell(props: {
         >
           <i className="ki-filled ki-left text-[13px]" />
         </Link>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Настройки
-        </div>
-        <h1 className="pf-num mt-2 flex items-center gap-3 text-[32px] leading-tight text-foreground">
-          {props.title}
-          {props.roleBadge && (
-            <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              {props.roleBadge}
-            </span>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              Настройки
+            </div>
+            <h1 className="pf-num mt-2 flex flex-wrap items-center gap-3 text-[clamp(1.7rem,5vw,2rem)] leading-tight text-foreground">
+              {props.title}
+              {props.roleBadge && (
+                <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {props.roleBadge}
+                </span>
+              )}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">{props.subtitle}</p>
+          </div>
+
+          {pct != null && pctColor != null && (
+            <div className="w-full sm:w-[200px] shrink-0">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Заполнено
+                </span>
+                <span className="pf-num text-sm font-bold" style={{ color: pctColor }}>
+                  {pct}%
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full transition-[width] duration-300"
+                  style={{ width: `${Math.max(0, Math.min(100, pct))}%`, background: pctColor }}
+                />
+              </div>
+            </div>
           )}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">{props.subtitle}</p>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-1 rounded-2xl border border-border bg-muted/30 p-1">
-        {props.tabs.map(t => {
-          const active = t.id === props.activeTab
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => props.onTabChange(t.id)}
-              className={`flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
-                active
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-              style={active ? { color: t.color } : undefined}
-            >
-              <i className={`ki-filled ${t.icon} text-[14px]`} />
-              {t.label}
-            </button>
-          )
-        })}
+      {/* Tabs — horizontal scroll on mobile to keep all items visible
+          without wrapping into multiple rows. snap-x for smooth landing. */}
+      <div className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex w-max min-w-full gap-1 rounded-2xl border border-border bg-muted/30 p-1 snap-x snap-mandatory">
+          {props.tabs.map(t => {
+            const active = t.id === props.activeTab
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => props.onTabChange(t.id)}
+                className={`flex shrink-0 snap-start items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-1 sm:min-w-[140px] ${
+                  active
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                style={active ? { color: t.color } : undefined}
+              >
+                <i className={`ki-filled ${t.icon} text-[14px]`} />
+                <span className="whitespace-nowrap">{t.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Avatar block */}

@@ -247,6 +247,61 @@ const EMPTY_ADMIN: AdminForm = {
 function listFromText(v: string): string[] {
   return v.split(/[,\n]/).map(s => s.trim()).filter(Boolean)
 }
+
+/**
+ * Profile completion calculator. Returns 0–100 based on how many of
+ * the given keys carry a non-empty value. Mirrors the athlete settings
+ * page approach so the progress bar reads consistently across roles.
+ *
+ * For each key:
+ *   - string  → counts as filled if `.trim()` non-empty
+ *   - string[]→ counts as filled if non-empty array
+ *   - other   → counts as filled if truthy
+ *
+ * Avatar adds a small fixed weight (5%) so users see immediate progress
+ * after uploading a photo.
+ */
+function calcCompletion<T extends Record<string, unknown>>(
+  form: T, keys: (keyof T)[], hasAvatar: boolean,
+): number {
+  if (keys.length === 0) return 0
+  const total = keys.length
+  let filled = 0
+  for (const k of keys) {
+    const v = form[k]
+    if (typeof v === 'string') { if (v.trim() !== '') filled++ }
+    else if (Array.isArray(v)) { if (v.length > 0) filled++ }
+    else if (v) { filled++ }
+  }
+  const fieldsPct = (filled / total) * 95  // 95% from form fields
+  const avatarPct = hasAvatar ? 5 : 0       // 5% from avatar
+  return Math.round(fieldsPct + avatarPct)
+}
+
+const COACH_COMPLETION_KEYS: (keyof CoachForm)[] = [
+  'first_name', 'last_name', 'birth_date', 'gender',
+  'phone', 'city', 'country', 'bio',
+  'specialization', 'experience_years', 'education',
+  'certifications_text', 'sports_text', 'workplace',
+  'hourly_rate', 'coaching_philosophy', 'session_formats',
+]
+const DOCTOR_COMPLETION_KEYS: (keyof DoctorForm)[] = [
+  'first_name', 'last_name', 'birth_date', 'gender',
+  'phone', 'city', 'country', 'bio',
+  'medical_specialization', 'license_number', 'license_authority',
+  'main_focus', 'education', 'degree', 'experience_years',
+  'workplace', 'services', 'consultation_formats', 'consultation_fee',
+]
+const ORG_COMPLETION_KEYS: (keyof OrgForm)[] = [
+  'org_name', 'org_slug', 'org_type', 'sport_type', 'description',
+  'website_url', 'email', 'phone', 'city', 'country',
+  'founded_year', 'contact_person',
+  'training_base', 'license_info', 'services',
+]
+const ADMIN_COMPLETION_KEYS: (keyof AdminForm)[] = [
+  'first_name', 'last_name', 'phone', 'city', 'country',
+  'department', 'access_level', 'work_email', 'responsibilities',
+]
 function textFromList(v: string[] | null | undefined): string {
   return (v ?? []).join(', ')
 }
@@ -675,11 +730,20 @@ export default function RoleProfile({ user }: { user: AppUser }) {
     )
   }
 
+  // Per-role completion %. Keeps the progress bar in sync with the form
+  // state so users see immediate feedback as they type.
+  const completionPct =
+    role === 'coach' ? calcCompletion(coach, COACH_COMPLETION_KEYS, !!avatarUrl) :
+    role === 'doctor' ? calcCompletion(doctor, DOCTOR_COMPLETION_KEYS, !!avatarUrl) :
+    role === 'organization' ? calcCompletion(org, ORG_COMPLETION_KEYS, !!avatarUrl) :
+    calcCompletion(admin, ADMIN_COMPLETION_KEYS, !!avatarUrl)
+
   return (
     <ProfileShell
       title={title}
       subtitle={subtitle}
       roleBadge={roleBadge}
+      completionPct={completionPct}
       tabs={tabs}
       activeTab={tab}
       onTabChange={setTab}
