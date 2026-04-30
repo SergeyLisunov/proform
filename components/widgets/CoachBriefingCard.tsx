@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { PaywallBanner, type Plan } from '@/components/ui/Paywall'
 
 type AthleteItem = {
   athlete_id: string
@@ -16,6 +17,12 @@ type Briefing = {
   priorities: string[]
 }
 
+type Paywall = {
+  feature: string
+  required_plan: Plan
+  message: string
+}
+
 const STATUS_STYLE: Record<AthleteItem['status'], { dot: string; bg: string; label: string }> = {
   ok:    { dot: '#10B981', bg: '#ECFDF5', label: 'OK' },
   watch: { dot: '#F59E0B', bg: '#FFFBEB', label: 'Внимание' },
@@ -27,12 +34,22 @@ export default function CoachBriefingCard() {
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState<string | null>(null)
   const [disabled, setDisabled] = useState(false)
+  const [paywall, setPaywall]   = useState<Paywall | null>(null)
 
   const load = useCallback(async () => {
-    setLoading(true); setError(null)
+    setLoading(true); setError(null); setPaywall(null)
     try {
       const res = await fetch('/api/ai/coach-briefing', { cache: 'no-store' })
       if (res.status === 503) { setDisabled(true); return }
+      if (res.status === 402) {
+        const j = await res.json().catch(() => ({}))
+        setPaywall({
+          feature: j.feature ?? 'coach_briefing',
+          required_plan: (j.required_plan as Plan) ?? 'pro',
+          message: j.message ?? 'Эта функция доступна на тарифах Pro и выше.',
+        })
+        return
+      }
       const json = await res.json()
       if (!res.ok || !json.ok) throw new Error(json.error ?? 'AI_ERROR')
       setData(json.data as Briefing)
@@ -68,7 +85,14 @@ export default function CoachBriefingCard() {
       </div>
 
       <div className="p-5">
-        {disabled ? (
+        {paywall ? (
+          <PaywallBanner
+            feature={paywall.feature}
+            requiredPlan={paywall.required_plan}
+            title="Утренний брифинг по команде"
+            description={paywall.message}
+          />
+        ) : disabled ? (
           <p className="text-xs text-muted-foreground">AI-брифинг отключён. Добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.</p>
         ) : error ? (
           <p className="text-xs text-red-600">Не удалось получить брифинг. <button onClick={load} className="underline">Повторить</button></p>
