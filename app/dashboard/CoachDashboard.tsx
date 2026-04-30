@@ -7,6 +7,8 @@ import CoachFeedbackFeed from '@/components/ui/CoachFeedbackFeed'
 import ReferralPanel from '@/components/coach/ReferralPanel'
 import type { Database } from '@/types/database'
 
+import CoachRestrictionsWidget from '@/components/coach/CoachRestrictionsWidget'
+
 const CoachHeroBar          = dynamic(() => import('@/components/coach/CoachHeroBar'),         { ssr: false })
 const CoachQuickActions     = dynamic(() => import('@/components/coach/CoachQuickActions'),    { ssr: false })
 const CoachTodaySchedule    = dynamic(() => import('@/components/coach/CoachTodaySchedule'),   { ssr: false })
@@ -103,6 +105,9 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
 
       {/* 2. AT-RISK ATHLETES */}
       <CoachAtRiskAthletes coachId={userId} />
+
+      {/* 2.5. MEDICAL RESTRICTIONS (Doctor → Coach feedback loop, Sprint W1 D1) */}
+      <CoachRestrictionsWidget athleteIds={athleteIds} />
 
       {/* 3. QUICK ACTIONS */}
       <CoachQuickActions coachId={userId} athletes={athletesForActions} />

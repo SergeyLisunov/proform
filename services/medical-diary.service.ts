@@ -98,6 +98,7 @@ export interface MedicalEntry {
   schedule_data: ScheduleData | null
   attachments: MedicalAttachment[] | null
   is_shared_with_athlete: boolean
+  is_shared_with_coach: boolean
   calendar_event_id: string | null
   created_at: string | null
   updated_at: string | null
@@ -213,6 +214,7 @@ export interface MedicalInput {
   schedule_data?: ScheduleData | null
   attachments?: MedicalAttachment[] | null
   is_shared_with_athlete?: boolean
+  is_shared_with_coach?: boolean
 }
 
 /**
@@ -264,6 +266,7 @@ export async function createMedicalEntry(input: MedicalInput): Promise<MedicalEn
       schedule_data:     input.schedule_data ?? null,
       attachments:       input.attachments && input.attachments.length > 0 ? input.attachments : null,
       is_shared_with_athlete: !!input.is_shared_with_athlete,
+      is_shared_with_coach:   !!input.is_shared_with_coach,
       calendar_event_id: calendarEventId,
     })
     .select().single()
@@ -355,6 +358,72 @@ export async function toggleShareWithAthlete(id: string, next: boolean): Promise
     })
   }
   return row
+}
+
+/**
+ * Toggle is_shared_with_coach. When set to true, ALL active coaches of the
+ * athlete (linked via trainer_athletes status='accepted') receive a
+ * notification about the new restriction/note. RLS controls visibility on
+ * the coach side via the medical_diary_coach_shared policy added in
+ * migration 048.
+ */
+export async function toggleShareWithCoach(id: string, next: boolean): Promise<MedicalEntry | null> {
+  const sb = createClient()
+  const { data: prevRaw } = await (sb as any)
+    .from('medical_diary').select('*').eq('id', id).maybeSingle()
+  const prev = prevRaw as MedicalEntry | null
+  const { data, error } = await (sb as any)
+    .from('medical_diary').update({ is_shared_with_coach: next }).eq('id', id)
+    .select().single()
+  if (error) { console.warn('[toggleShareWithCoach]', error.message); return null }
+  const row = data as MedicalEntry
+  if (next && !prev?.is_shared_with_coach && row.athlete_id) {
+    // Notify every active coach of this athlete.
+    const { data: linksRaw } = await sb
+      .from('trainer_athletes')
+      .select('trainer_id')
+      .eq('athlete_id', row.athlete_id)
+      .eq('status', 'accepted')
+    const coachIds = ((linksRaw ?? []) as Array<{ trainer_id: string }>).map(r => r.trainer_id)
+    const meta = MED_TYPE_META[row.entry_type]
+    await Promise.all(coachIds.map(coachId => notify({
+      user_id: coachId,
+      type: 'broadcast',
+      title: `Медотметка для тренера: ${meta.label.toLowerCase()}`,
+      body: (row.title ?? row.note).slice(0, 140),
+      entity_type: 'medical_diary',
+      entity_id: row.id,
+      action_url: '/dashboard',
+    })))
+  }
+  return row
+}
+
+/**
+ * Coach-side query: returns medical_diary entries that have been
+ * explicitly shared with the coach by a doctor/specialist. RLS
+ * ensures only entries for connected athletes leak through (see
+ * policy `medical_diary_coach_shared` in migration 048).
+ *
+ * The coach uses this to surface medical restrictions (e.g.
+ * "no jumping 2 weeks", "восстановление после массажа 3 дня") on
+ * the dashboard so they can adjust workload accordingly.
+ */
+export async function listCoachVisibleMedicalEntries(
+  athleteIds: string[],
+  limit = 20,
+): Promise<MedicalEntry[]> {
+  if (athleteIds.length === 0) return []
+  const sb = createClient()
+  const { data, error } = await sb
+    .from('medical_diary')
+    .select('*')
+    .eq('is_shared_with_coach', true)
+    .in('athlete_id', athleteIds)
+    .order('date', { ascending: false })
+    .limit(limit)
+  if (error) { console.warn('[listCoachVisibleMedicalEntries]', error.message); return [] }
+  return (data ?? []) as MedicalEntry[]
 }
 
 // ── Patient linkage ────────────────────────────────────────────────────────

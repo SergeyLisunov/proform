@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useDictation } from '@/hooks/useDictation'
 import {
   listMedicalEntries, createMedicalEntry, updateMedicalEntry, deleteMedicalEntry,
-  toggleShareWithAthlete, getMedicalHeatmap, listMyPatients, getPatientSnapshot,
+  toggleShareWithAthlete, toggleShareWithCoach,
+  getMedicalHeatmap, listMyPatients, getPatientSnapshot,
   MED_TYPE_META, SEVERITY_LABELS, MOOD_EMOJI, BODY_PARTS_RU,
   type MedicalEntry, type MedicalEntryType, type MedicalSeverity,
   type DoctorPatient, type PatientSnapshot,
@@ -230,6 +231,10 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
                 await toggleShareWithAthlete(e.id, !e.is_shared_with_athlete)
                 load()
               }}
+              onToggleShareCoach={async () => {
+                await toggleShareWithCoach(e.id, !e.is_shared_with_coach)
+                load()
+              }}
               onDelete={async () => {
                 if (!confirm('Удалить запись? Связанное событие в календаре тоже удалится.')) return
                 await deleteMedicalEntry(e.id)
@@ -427,13 +432,14 @@ function Metric({ label, value, highlight }: { label: string; value: string; hig
 // ── Entry card ─────────────────────────────────────────────────────────────
 
 function EntryCard({
-  entry, patientName, onEdit, onDelete, onToggleShare,
+  entry, patientName, onEdit, onDelete, onToggleShare, onToggleShareCoach,
 }: {
   entry: MedicalEntry
   patientName: string | null
   onEdit: () => void
   onDelete: () => void
   onToggleShare: () => void
+  onToggleShareCoach: () => void
 }) {
   const meta = MED_TYPE_META[entry.entry_type]
   const sev = entry.severity ? SEVERITY_LABELS[entry.severity] : null
@@ -483,6 +489,12 @@ function EntryCard({
                 Видит пациент
               </span>
             )}
+            {entry.is_shared_with_coach && (
+              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-orange-50 text-orange-700 border border-orange-200 inline-flex items-center gap-1">
+                <i className="ki-filled ki-people text-[10px]" />
+                Видит тренер
+              </span>
+            )}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5">
             {fmtDate(entry.date)}
@@ -492,11 +504,18 @@ function EntryCard({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {entry.athlete_id && (
-            <button onClick={onToggleShare}
-              className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
-              title={entry.is_shared_with_athlete ? 'Скрыть от пациента' : 'Поделиться с пациентом'}>
-              <i className={`ki-filled ${entry.is_shared_with_athlete ? 'ki-eye' : 'ki-eye-slash'} text-xs ${entry.is_shared_with_athlete ? 'text-blue-500' : 'text-muted-foreground'}`} />
-            </button>
+            <>
+              <button onClick={onToggleShare}
+                className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+                title={entry.is_shared_with_athlete ? 'Скрыть от пациента' : 'Поделиться с пациентом'}>
+                <i className={`ki-filled ${entry.is_shared_with_athlete ? 'ki-eye' : 'ki-eye-slash'} text-xs ${entry.is_shared_with_athlete ? 'text-blue-500' : 'text-muted-foreground'}`} />
+              </button>
+              <button onClick={onToggleShareCoach}
+                className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+                title={entry.is_shared_with_coach ? 'Скрыть от тренера' : 'Передать тренеру (ограничение)'}>
+                <i className={`ki-filled ki-people text-xs ${entry.is_shared_with_coach ? 'text-orange-500' : 'text-muted-foreground'}`} />
+              </button>
+            </>
           )}
           <button onClick={onEdit} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost" title="Редактировать">
             <i className="ki-filled ki-pencil text-xs text-muted-foreground" />
@@ -686,7 +705,8 @@ function EntryDrawer({
   const [bodyPart, setBodyPart] = useState<string>(initial?.body_part ?? '')
   const [mood,     setMood]     = useState<number | ''>(initial?.mood ?? '')
   const [pain,     setPain]     = useState<number | ''>(initial?.pain_level ?? '')
-  const [shared,   setShared]   = useState<boolean>(initial?.is_shared_with_athlete ?? false)
+  const [shared,      setShared]      = useState<boolean>(initial?.is_shared_with_athlete ?? false)
+  const [sharedCoach, setSharedCoach] = useState<boolean>(initial?.is_shared_with_coach   ?? false)
 
   // Vitals
   const v0: Vitals = initial?.vitals ?? {}
@@ -825,6 +845,7 @@ function EntryDrawer({
       } : null,
       attachments: attachments.length > 0 ? attachments : null,
       is_shared_with_athlete: shared,
+      is_shared_with_coach:   sharedCoach,
     }
 
     if (initial) {
@@ -1237,19 +1258,33 @@ function EntryDrawer({
             {uploadErr && <p className="mt-1 text-[11px] text-red-500">{uploadErr}</p>}
           </div>
 
-          {/* Share toggle */}
+          {/* Share toggles — две раздельные ручки */}
           {athleteId && (
-            <label className="flex items-center gap-2 cursor-pointer rounded-xl border border-border bg-muted/20 px-3 py-2.5">
-              <input type="checkbox" checked={shared} onChange={e => setShared(e.target.checked)}
-                className="w-4 h-4 rounded border-border accent-blue-500" />
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-foreground">Показать пациенту</div>
-                <div className="text-[11px] text-muted-foreground">
-                  Пациент получит уведомление и сможет прочитать запись в своём кабинете.
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer rounded-xl border border-border bg-muted/20 px-3 py-2.5">
+                <input type="checkbox" checked={shared} onChange={e => setShared(e.target.checked)}
+                  className="w-4 h-4 rounded border-border accent-blue-500" />
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-foreground">Показать пациенту</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Пациент получит уведомление и сможет прочитать запись в своём кабинете.
+                  </div>
                 </div>
-              </div>
-              <i className="ki-filled ki-eye text-blue-500" />
-            </label>
+                <i className="ki-filled ki-eye text-blue-500" />
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer rounded-xl border border-border bg-muted/20 px-3 py-2.5">
+                <input type="checkbox" checked={sharedCoach} onChange={e => setSharedCoach(e.target.checked)}
+                  className="w-4 h-4 rounded border-border accent-orange-500" />
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-foreground">Передать тренеру</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Тренеры пациента увидят это ограничение/заметку на дашборде. Используйте для restrictions
+                    («не прыгать 2 недели», «массаж — восстановление 3 дня»).
+                  </div>
+                </div>
+                <i className="ki-filled ki-people text-orange-500" />
+              </label>
+            </div>
           )}
 
           <div>
