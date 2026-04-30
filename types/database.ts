@@ -1865,6 +1865,7 @@ export type Database = {
           entry_type: string
           id: string
           is_shared_with_athlete: boolean
+          is_shared_with_coach: boolean
           lab_data: Json | null
           mood: number | null
           note: string
@@ -1889,6 +1890,7 @@ export type Database = {
           entry_type?: string
           id?: string
           is_shared_with_athlete?: boolean
+          is_shared_with_coach?: boolean
           lab_data?: Json | null
           mood?: number | null
           note: string
@@ -1913,6 +1915,7 @@ export type Database = {
           entry_type?: string
           id?: string
           is_shared_with_athlete?: boolean
+          is_shared_with_coach?: boolean
           lab_data?: Json | null
           mood?: number | null
           note?: string
