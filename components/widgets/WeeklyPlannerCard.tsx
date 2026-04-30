@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { PaywallBanner, type Plan as PlanTier } from '@/components/ui/Paywall'
 
 type Day = {
   day_offset: number
@@ -46,9 +47,10 @@ export default function WeeklyPlannerCard() {
   const [disabled, setDisabled] = useState(false)
   const [applied, setApplied]   = useState(false)
   const [applying, setApplying] = useState(false)
+  const [paywall, setPaywall]   = useState<{ feature: string; required_plan: PlanTier; message: string } | null>(null)
 
   async function generate() {
-    setLoading(true); setError(null); setApplied(false)
+    setLoading(true); setError(null); setApplied(false); setPaywall(null)
     try {
       const res = await fetch('/api/ai/weekly-plan', {
         method: 'POST',
@@ -56,6 +58,15 @@ export default function WeeklyPlannerCard() {
         body: JSON.stringify({ goal: goal.trim() || undefined }),
       })
       if (res.status === 503) { setDisabled(true); return }
+      if (res.status === 402) {
+        const j = await res.json().catch(() => ({}))
+        setPaywall({
+          feature: j.feature ?? 'weekly_plan',
+          required_plan: (j.required_plan as PlanTier) ?? 'pro',
+          message: j.message ?? 'Эта функция доступна на тарифах Pro и выше.',
+        })
+        return
+      }
       const json = await res.json()
       if (!res.ok || !json.ok) throw new Error(json.error ?? 'AI_ERROR')
       setPlan(json.data as Plan)
@@ -126,7 +137,14 @@ export default function WeeklyPlannerCard() {
       </div>
 
       <div className="p-5 space-y-4">
-        {disabled ? (
+        {paywall ? (
+          <PaywallBanner
+            feature={paywall.feature}
+            requiredPlan={paywall.required_plan}
+            title="AI-планировщик недели"
+            description={paywall.message}
+          />
+        ) : disabled ? (
           <p className="text-xs text-muted-foreground">Планировщик отключён. Добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.</p>
         ) : (
           <>

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
 import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
+import { enforcePlanForAi } from '@/lib/ai/plan-gate'
 
 export const runtime = 'nodejs'
 
@@ -35,6 +36,12 @@ export async function GET(req: Request) {
   if (meRow.role !== 'coach') {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
+
+  const gated = await enforcePlanForAi(sb, meRow.id, meRow.role, {
+    feature: 'coach_briefing',
+    requiredPlan: 'pro',
+  })
+  if (gated) return gated
 
   const limited = await enforceAiRateLimit(req, sb, 'coach-briefing', 10, 3600)
   if (limited) return limited

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured } from '@/lib/ai/claude'
 import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
+import { enforcePlanForAi } from '@/lib/ai/plan-gate'
 import { computeCoachAthletesAcwr } from '@/services/acwr.service'
 
 export const runtime = 'nodejs'
@@ -56,6 +57,12 @@ export async function GET(req: Request, { params }: { params: { athleteId: strin
     .select('athlete_id').eq('trainer_id', meRow.id).eq('athlete_id', params.athleteId)
     .eq('status', 'accepted').maybeSingle()
   if (!linkRaw) return NextResponse.json({ ok: false, error: 'NOT_LINKED' }, { status: 403 })
+
+  const gated = await enforcePlanForAi(sb, meRow.id, meRow.role, {
+    feature: 'adaptive_plan',
+    requiredPlan: 'pro',
+  })
+  if (gated) return gated
 
   const limited = await enforceAiRateLimit(req, sb, 'adaptive-plan', 10, 3600)
   if (limited) return limited

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { PaywallBanner, type Plan as PlanTier } from '@/components/ui/Paywall'
 
 interface Suggestion {
   workout_id: string
@@ -55,11 +56,21 @@ export default function AdaptivePlanModal({
   const [picked, setPicked]   = useState<Record<string, boolean>>({})
   const [applying, setApplying] = useState(false)
   const [result, setResult]     = useState<{ applied: number; skipped: number } | null>(null)
+  const [paywall, setPaywall]   = useState<{ feature: string; required_plan: PlanTier; message: string } | null>(null)
 
   const load = useCallback(async () => {
-    setLoading(true); setErr(null)
+    setLoading(true); setErr(null); setPaywall(null)
     try {
       const res = await fetch(`/api/ai/adaptive-plan/${athleteId}`)
+      if (res.status === 402) {
+        const j = await res.json().catch(() => ({}))
+        setPaywall({
+          feature: j.feature ?? 'adaptive_plan',
+          required_plan: (j.required_plan as PlanTier) ?? 'pro',
+          message: j.message ?? 'Эта функция доступна на тарифах Pro и выше.',
+        })
+        return
+      }
       const json = await res.json()
       if (!json.ok) { setErr(json.error ?? 'AI_ERROR'); return }
       setData(json.data as PlanData)
@@ -116,6 +127,13 @@ export default function AdaptivePlanModal({
               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full pf-spin mx-auto mb-3" />
               Claude анализирует ACWR и последние 14 дней…
             </div>
+          ) : paywall ? (
+            <PaywallBanner
+              feature={paywall.feature}
+              requiredPlan={paywall.required_plan}
+              title="AI-адаптация плана команды"
+              description={paywall.message}
+            />
           ) : err ? (
             <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
               Ошибка: {err === 'AI_NOT_CONFIGURED'

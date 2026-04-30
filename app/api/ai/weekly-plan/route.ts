@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
 import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
+import { enforcePlanForAi } from '@/lib/ai/plan-gate'
 
 export const runtime = 'nodejs'
 
@@ -44,9 +45,15 @@ export async function POST(req: Request) {
   const { data: auth } = await sb.auth.getUser()
   if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
 
-  const { data: me } = await sb.from('users').select('id, sport').eq('auth_id', auth.user.id).maybeSingle()
+  const { data: me } = await sb.from('users').select('id, sport, role').eq('auth_id', auth.user.id).maybeSingle()
   if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
-  const meRow = me as { id: string; sport: string | null }
+  const meRow = me as { id: string; sport: string | null; role: string | null }
+
+  const gated = await enforcePlanForAi(sb, meRow.id, meRow.role, {
+    feature: 'weekly_plan',
+    requiredPlan: 'pro',
+  })
+  if (gated) return gated
 
   const limited = await enforceAiRateLimit(req, sb, 'weekly-plan', 10, 3600)
   if (limited) return limited
