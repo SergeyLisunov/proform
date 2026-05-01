@@ -19,6 +19,13 @@ export interface ProviderMeta {
   syncs: string[]
   /** Env vars required on the server. When undefined we show "скоро". */
   requiredEnv?: string[]
+  /**
+   * When true, the provider card shows a "Скоро" badge instead of the
+   * Connect button. Used to honestly signal that integration is not
+   * production-ready (e.g. waiting for Health API Partner Program
+   * approval) without removing the card from the catalog. Sprint W1 Day 5.
+   */
+  comingSoon?: boolean
   /** Кратко — в 2 строки — что получают. */
   description: string
 }
@@ -35,6 +42,11 @@ export const PROVIDERS: Record<DeviceProvider, ProviderMeta> = {
     connectMode: 'oauth',
     syncs: ['Тренировки', 'HRV', 'ЧСС', 'Сон', 'Steps'],
     requiredEnv: ['GARMIN_CONSUMER_KEY', 'GARMIN_CONSUMER_SECRET'],
+    // Garmin Health API requires Partner Program approval (OAuth 1.0a
+    // handshake + signed request flow). Until partnership is in place
+    // the /api/integrations/garmin/start route returns a TODO stub —
+    // honest "Скоро" badge avoids false promise to athletes.
+    comingSoon: true,
     description:
       'Автоматический импорт тренировок, HRV, сна и суточного пульса с Garmin Forerunner / Fenix / Edge.',
   },
