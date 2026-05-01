@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { getMyOrg } from '@/services/org.service'
-import { getNewsletters, createNewsletter, updateNewsletterStatus } from '@/services/newsletter.service'
+import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewsletter } from '@/services/newsletter.service'
 import type { Organization, Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
 
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
@@ -99,9 +99,32 @@ export default function OrgNewslettersPage() {
     setSaving(false)
   }
 
+  // Real send via Resend — replaces the previous status-flip stub.
+  // Confirms with the user, calls the server route, then either
+  // marks the newsletter as sent locally + shows result, or surfaces
+  // the failure. The server route is idempotent (409 on already-sent).
+  const [sending, setSending] = useState<string | null>(null)
+  const [sendResult, setSendResult] = useState<{ id: string; ok: boolean; message: string } | null>(null)
+
   async function handleSend(id: string) {
-    await updateNewsletterStatus(id, 'sent')
-    setNewsletters(prev => prev.map(n => n.id === id ? { ...n, status: 'sent' as NewsletterStatus, sent_at: new Date().toISOString() } : n))
+    if (sending) return
+    if (!confirm('Отправить рассылку всем активным членам с выбранными ролями?')) return
+    setSending(id)
+    setSendResult(null)
+    try {
+      const result = await sendNewsletter(id)
+      if (!result) {
+        setSendResult({ id, ok: false, message: 'Не удалось отправить. Проверьте настройки email или повторите позже.' })
+        return
+      }
+      setNewsletters(prev => prev.map(n => n.id === id
+        ? { ...n, status: 'sent' as NewsletterStatus, sent_at: new Date().toISOString() }
+        : n,
+      ))
+      setSendResult({ id, ok: true, message: result.message })
+    } finally {
+      setSending(null)
+    }
   }
 
   const drafts = newsletters.filter(n => n.status === 'draft')
@@ -281,10 +304,11 @@ export default function OrgNewslettersPage() {
                       {nl.status === 'draft' && (
                         <button
                           onClick={() => handleSend(nl.id)}
-                          className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
+                          disabled={sending === nl.id}
+                          className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 disabled:opacity-50"
                         >
-                          <i className="ki-filled ki-send text-xs" />
-                          Отправить
+                          <i className={`ki-filled ${sending === nl.id ? 'ki-arrows-circle' : 'ki-send'} text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
+                          {sending === nl.id ? 'Отправка…' : 'Отправить'}
                         </button>
                       )}
                       {nl.status === 'sent' && (
@@ -298,6 +322,16 @@ export default function OrgNewslettersPage() {
                       )}
                     </div>
                   </div>
+                  {sendResult?.id === nl.id && (
+                    <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${
+                      sendResult.ok
+                        ? 'border-green-200 bg-green-50 text-green-700'
+                        : 'border-red-200 bg-red-50 text-red-700'
+                    }`}>
+                      <i className={`ki-filled ${sendResult.ok ? 'ki-check-circle' : 'ki-shield-cross'} text-sm mr-1.5`} />
+                      {sendResult.message}
+                    </div>
+                  )}
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
                     <span className="text-2xs text-muted-foreground">
                       {nl.sent_at
