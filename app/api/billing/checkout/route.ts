@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe, STRIPE_PRICE_IDS, type PlanKey } from '@/lib/stripe/client'
+import { createPaymentIntent } from '@/services/billing.service'
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,8 +9,15 @@ export async function POST(req: NextRequest) {
     const plan = body.plan as PlanKey | undefined
     const serviceId = typeof body.serviceId === 'string' ? body.serviceId : null
     const passPlanId = typeof body.passPlanId === 'string' ? body.passPlanId : null
-    if (!plan && !serviceId && !passPlanId) {
-      return NextResponse.json({ error: 'plan, serviceId, or passPlanId required' }, { status: 400 })
+    // Sprint W2 Day 7: ЮKassa branch. When `provider === 'yookassa'` AND a
+    // `tariffCode` is supplied, dispatch via billing.service.createPaymentIntent
+    // which uses the new tariffs table + ЮKassa HTTP client. Stripe path
+    // stays untouched (legacy `plan` param + STRIPE_PRICE_IDS).
+    const provider = typeof body.provider === 'string' ? body.provider : null
+    const tariffCode = typeof body.tariffCode === 'string' ? body.tariffCode : null
+
+    if (!plan && !serviceId && !passPlanId && !tariffCode) {
+      return NextResponse.json({ error: 'plan, tariffCode, serviceId, or passPlanId required' }, { status: 400 })
     }
 
     const supabase = await createClient()
@@ -22,6 +30,34 @@ export async function POST(req: NextRequest) {
       .eq('auth_id', authUser.id)
       .single()
     if (!me) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    // ── ЮKassa subscription checkout (NEW) ────────────────────────────
+    // Pass-through to provider-agnostic billing.service.
+    if (provider === 'yookassa' && tariffCode) {
+      const origin = req.headers.get('origin')
+        ?? process.env.NEXT_PUBLIC_SITE_URL
+        ?? 'https://proform-delta.vercel.app'
+      try {
+        const result = await createPaymentIntent({
+          userId:     me.id,
+          tariffCode,
+          provider:   'yookassa',
+          returnUrl:  `${origin}/settings?billing=success&payment_id={payment_id}`,
+        })
+        return NextResponse.json({
+          url:        result.confirmationUrl,
+          payment_id: result.paymentId,
+          provider:   'yookassa',
+        })
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'CHECKOUT_FAILED'
+        const status = msg.startsWith('YOOKASSA_NOT_CONFIGURED') ? 503
+                     : msg.startsWith('TARIFF_NOT_FOUND')        ? 404
+                     : msg.startsWith('TARIFF_FREE_NO_CHECKOUT') ? 400
+                     : 500
+        return NextResponse.json({ error: msg }, { status })
+      }
+    }
 
     const stripe = getStripe()
     const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://proform-delta.vercel.app'
