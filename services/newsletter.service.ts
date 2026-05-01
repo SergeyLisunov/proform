@@ -100,6 +100,34 @@ export async function updateNewsletterStatus(
     .eq('id', id)
 }
 
+/**
+ * Send-now: triggers actual email blast via the server route.
+ * Returns server payload `{ sent, failed, total_recipients, message }` on
+ * success, or null on transport/server error (caller shows generic
+ * "не удалось отправить" toast).
+ *
+ * Why a separate route + admin client: org admin needs to see emails of
+ * all `org_members` with `target_roles`, and RLS would correctly hide
+ * those from the user-side client. The server uses createAdminClient()
+ * AFTER verifying caller authorization.
+ */
+export interface NewsletterSendResult {
+  sent: number
+  failed: number
+  total_recipients: number
+  message: string
+}
+
+export async function sendNewsletter(id: string): Promise<NewsletterSendResult | null> {
+  const res = await fetch(`/api/org/newsletters/${id}/send`, { method: 'POST' })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok || !json.ok) {
+    console.warn('[sendNewsletter]', res.status, json?.error)
+    return null
+  }
+  return json.data as NewsletterSendResult
+}
+
 export async function getNewsletterStats(newsletterId: string): Promise<NewsletterStats> {
   const supabase = createClient()
   const { data } = await supabase
