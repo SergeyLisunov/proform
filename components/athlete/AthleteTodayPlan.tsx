@@ -29,6 +29,11 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
   const [rows, setRows] = useState<PrescribedWorkout[]>([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
+  // Celebratory micro-toast — Sprint W1 Day 5. Until this PR, marking
+  // a workout "✓ Сделано" silently flipped the badge with no closure
+  // ritual; now we briefly celebrate the action so the athlete gets a
+  // small positive feedback loop (also nudges to debrief).
+  const [celebrateId, setCelebrateId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -43,7 +48,13 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
   const setStatus = async (id: string, status: 'completed' | 'skipped') => {
     setBusyId(id)
     const ok = await setPrescribedCompletion(id, status)
-    if (ok) setRows(prev => prev.map(r => r.id === id ? { ...r, completion_status: status } : r))
+    if (ok) {
+      setRows(prev => prev.map(r => r.id === id ? { ...r, completion_status: status } : r))
+      if (status === 'completed') {
+        setCelebrateId(id)
+        setTimeout(() => setCelebrateId(prev => (prev === id ? null : prev)), 4000)
+      }
+    }
     setBusyId(null)
   }
 
@@ -126,11 +137,20 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
                     </button>
                   </div>
                 ) : (
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                    status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'
-                  }`}>
-                    {status === 'completed' ? 'Сделано' : 'Пропуск'}
-                  </span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {status === 'completed' ? '✓ Сделано' : 'Пропуск'}
+                    </span>
+                    {celebrateId === w.id && (
+                      <Link href="/diary"
+                        className="inline-flex items-center gap-1 rounded-md bg-green-500/10 text-green-700 px-2 py-0.5 text-[10px] font-semibold border border-green-200 hover:bg-green-500/20 animate-pulse"
+                        title="Поделиться впечатлениями (опционально)">
+                        🎉 Отлично! Поделиться?
+                      </Link>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

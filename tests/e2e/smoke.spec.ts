@@ -129,6 +129,41 @@ test.describe('adaptive plans — auth guard', () => {
   })
 })
 
+// Sprint W1 Day 2 — subscription gate on tier-paid AI endpoints (commit f00304d).
+// Auth must be enforced BEFORE the plan check, so unauthenticated requests
+// must return 401 (not 402). Regression-protect this ordering — if someone
+// accidentally moves enforcePlanForAi() before auth, a free unauth user
+// would receive a paywall instead of a login redirect.
+test.describe('AI subscription gate — auth-first ordering', () => {
+  test('GET /api/ai/coach-briefing without auth → 401', async ({ request }) => {
+    const res = await request.get('/api/ai/coach-briefing')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET /api/ai/medical-summary?athlete_id=… without auth → 401', async ({ request }) => {
+    const res = await request.get('/api/ai/medical-summary?athlete_id=00000000-0000-0000-0000-000000000000')
+    expect(res.status()).toBe(401)
+  })
+
+  test('POST /api/ai/weekly-plan without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/ai/weekly-plan', { data: {} })
+    expect(res.status()).toBe(401)
+  })
+})
+
+// Sprint W1 Day 4 — newsletter real send (commit a58769d). Auth + role
+// gate must reject unauthenticated POSTs with 401 (and never partial-send).
+test.describe('newsletter send — auth guard', () => {
+  test('POST /api/org/newsletters/:id/send without auth → 401 JSON', async ({ request }) => {
+    const res = await request.post('/api/org/newsletters/00000000-0000-0000-0000-000000000000/send')
+    expect(res.status()).toBe(401)
+    const ct = res.headers()['content-type'] ?? ''
+    expect(ct).toContain('json')
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {

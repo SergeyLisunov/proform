@@ -193,6 +193,12 @@ export default function DevicesSection() {
                       Отключить
                     </button>
                   </>
+                ) : meta.comingSoon ? (
+                  <div className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-amber-800"
+                    title="Интеграция ждёт одобрения Garmin Health API Partner Program. Подключить пока нельзя — мы не показываем фейковые данные.">
+                    <i className="ki-filled ki-information-2 text-[14px]" />
+                    <span className="text-[12px] font-bold uppercase tracking-wider">Скоро</span>
+                  </div>
                 ) : meta.connectMode === 'oauth' ? (
                   <a href={`/api/integrations/${meta.id}/start`}
                     className="w-full rounded-lg text-white px-3 py-2 text-sm font-semibold text-center"
