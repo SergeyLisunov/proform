@@ -2600,6 +2600,39 @@ export type Database = {
           },
         ]
       }
+      payment_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          provider_event_id: string
+          provider_payment_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          provider: string
+          provider_event_id: string
+          provider_payment_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          provider_event_id?: string
+          provider_payment_id?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -2852,48 +2885,63 @@ export type Database = {
           cancelled_at: string | null
           created_at: string
           current_period_end: string | null
+          current_period_start: string | null
           expires_at: string | null
           id: string
           plan: string
           price_usd: number | null
+          provider: string
           started_at: string
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
+          tariff_code: string | null
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
+          yookassa_payment_method_id: string | null
         }
         Insert: {
           cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           expires_at?: string | null
           id?: string
           plan?: string
           price_usd?: number | null
+          provider?: string
           started_at?: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          tariff_code?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
+          yookassa_payment_method_id?: string | null
         }
         Update: {
           cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           expires_at?: string | null
           id?: string
           plan?: string
           price_usd?: number | null
+          provider?: string
           started_at?: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          tariff_code?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
+          yookassa_payment_method_id?: string | null
         }
         Relationships: [
           {
@@ -2904,6 +2952,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tariffs: {
+        Row: {
+          billing_period: string
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          display_order: number
+          features: Json
+          id: string
+          is_active: boolean
+          max_athletes: number | null
+          max_coaches: number | null
+          max_teams: number | null
+          name: string
+          price_cents: number
+          target_role: string
+          trial_days: number
+          updated_at: string
+        }
+        Insert: {
+          billing_period: string
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_athletes?: number | null
+          max_coaches?: number | null
+          max_teams?: number | null
+          name: string
+          price_cents: number
+          target_role: string
+          trial_days?: number
+          updated_at?: string
+        }
+        Update: {
+          billing_period?: string
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_athletes?: number | null
+          max_coaches?: number | null
+          max_teams?: number | null
+          name?: string
+          price_cents?: number
+          target_role?: string
+          trial_days?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       tool_leads: {
         Row: {

@@ -164,6 +164,30 @@ test.describe('newsletter send — auth guard', () => {
   })
 })
 
+// Sprint W2 Day 7 — ЮKassa webhook IP-allowlist guard. The endpoint
+// must reject random callers (no auth header — only IP matters), so a
+// public scanner can't spam payment_events with garbage. GET serves a
+// healthcheck for Юkassa "test webhook" button in их ЛК.
+test.describe('ЮKassa webhook — IP allowlist guard', () => {
+  test('POST /api/webhooks/yookassa from non-allowlisted IP → 401 IP_NOT_ALLOWED', async ({ request }) => {
+    const res = await request.post('/api/webhooks/yookassa', {
+      data: { type: 'notification', event: 'payment.succeeded', object: { id: 'fake' } },
+      headers: { 'x-forwarded-for': '1.2.3.4' },
+    })
+    expect(res.status()).toBe(401)
+    const body = await res.json()
+    expect(body.error).toBe('IP_NOT_ALLOWED')
+  })
+
+  test('GET /api/webhooks/yookassa returns healthcheck JSON', async ({ request }) => {
+    const res = await request.get('/api/webhooks/yookassa')
+    expect(res.status()).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.endpoint).toContain('/api/webhooks/yookassa')
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {
