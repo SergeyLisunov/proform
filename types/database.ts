@@ -165,7 +165,11 @@ export type Database = {
           id: string
           notes: string | null
           plan_id: string | null
+          platform_fee_cents: number | null
           price_cents: number
+          seller_role: string
+          seller_specialty: string | null
+          service_type: string
           starts_at: string
           status: string
           stripe_session_id: string | null
@@ -183,7 +187,11 @@ export type Database = {
           id?: string
           notes?: string | null
           plan_id?: string | null
+          platform_fee_cents?: number | null
           price_cents?: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           starts_at: string
           status?: string
           stripe_session_id?: string | null
@@ -201,7 +209,11 @@ export type Database = {
           id?: string
           notes?: string | null
           plan_id?: string | null
+          platform_fee_cents?: number | null
           price_cents?: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           starts_at?: string
           status?: string
           stripe_session_id?: string | null
@@ -709,8 +721,12 @@ export type Database = {
           fulfilled_at: string | null
           id: string
           paid_at: string | null
+          platform_fee_amount: number | null
           price_amount: number
+          seller_role: string
+          seller_specialty: string | null
           service_id: string
+          service_type: string
           status: string
           stripe_session_id: string | null
           updated_at: string
@@ -723,8 +739,12 @@ export type Database = {
           fulfilled_at?: string | null
           id?: string
           paid_at?: string | null
+          platform_fee_amount?: number | null
           price_amount: number
+          seller_role?: string
+          seller_specialty?: string | null
           service_id: string
+          service_type?: string
           status?: string
           stripe_session_id?: string | null
           updated_at?: string
@@ -737,8 +757,12 @@ export type Database = {
           fulfilled_at?: string | null
           id?: string
           paid_at?: string | null
+          platform_fee_amount?: number | null
           price_amount?: number
+          seller_role?: string
+          seller_specialty?: string | null
           service_id?: string
+          service_type?: string
           status?: string
           stripe_session_id?: string | null
           updated_at?: string
@@ -777,6 +801,9 @@ export type Database = {
           is_active: boolean
           period_days: number
           price_cents: number
+          seller_role: string
+          seller_specialty: string | null
+          service_type: string
           title: string
           total_sessions: number
         }
@@ -789,6 +816,9 @@ export type Database = {
           is_active?: boolean
           period_days: number
           price_cents?: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           title: string
           total_sessions: number
         }
@@ -801,6 +831,9 @@ export type Database = {
           is_active?: boolean
           period_days?: number
           price_cents?: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           title?: string
           total_sessions?: number
         }
@@ -825,6 +858,9 @@ export type Database = {
           id: string
           is_active: boolean
           price_amount: number
+          seller_role: string
+          seller_specialty: string | null
+          service_type: string
           title: string
           updated_at: string
         }
@@ -838,6 +874,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           price_amount: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           title: string
           updated_at?: string
         }
@@ -851,6 +890,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           price_amount?: number
+          seller_role?: string
+          seller_specialty?: string | null
+          service_type?: string
           title?: string
           updated_at?: string
         }
