@@ -9,6 +9,7 @@ import type { Database } from '@/types/database'
 
 const AthleteHeroBar          = dynamic(() => import('@/components/athlete/AthleteHeroBar'),       { ssr: false })
 const DailyWellnessCard       = dynamic(() => import('@/components/athlete/DailyWellnessCard'),    { ssr: false })
+const MyRecommendationsCard   = dynamic(() => import('@/components/athlete/MyRecommendationsCard'), { ssr: false })
 const AthleteQuickActions     = dynamic(() => import('@/components/athlete/AthleteQuickActions'),  { ssr: false })
 const AthleteActiveAlerts     = dynamic(() => import('@/components/athlete/AthleteActiveAlerts'),  { ssr: false })
 const AthleteTodayPlan        = dynamic(() => import('@/components/athlete/AthleteTodayPlan'),     { ssr: false })
@@ -87,6 +88,9 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {/* 1.5. DAILY WELLNESS CHECK-IN — Sprint W1 Day 3, ритуал утра */}
       <DailyWellnessCard athleteId={userId} />
+
+      {/* 1.6. MY RECOMMENDATIONS — Sprint W2 Day 9, structured recs from doctor */}
+      <MyRecommendationsCard athleteId={userId} />
 
       {/* 2. ACTIVE ALERTS — рендерится только при наличии травм/истекающих абонементов */}
       <AthleteActiveAlerts athleteId={userId} />
