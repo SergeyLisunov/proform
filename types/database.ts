@@ -2352,6 +2352,49 @@ export type Database = {
           },
         ]
       }
+      org_group_members: {
+        Row: {
+          added_by: string | null
+          athlete_id: string
+          group_id: string
+          joined_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          athlete_id: string
+          group_id: string
+          joined_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          athlete_id?: string
+          group_id?: string
+          joined_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_group_members_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_group_members_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "org_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_group_sessions: {
         Row: {
           created_at: string
@@ -2401,6 +2444,66 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_groups: {
+        Row: {
+          age_max: number | null
+          age_min: number | null
+          color: string | null
+          created_at: string
+          description: string | null
+          head_coach_id: string | null
+          id: string
+          is_active: boolean
+          level: string | null
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          age_max?: number | null
+          age_min?: number | null
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          head_coach_id?: string | null
+          id?: string
+          is_active?: boolean
+          level?: string | null
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          age_max?: number | null
+          age_min?: number | null
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          head_coach_id?: string | null
+          id?: string
+          is_active?: boolean
+          level?: string | null
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_groups_head_coach_id_fkey"
+            columns: ["head_coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
