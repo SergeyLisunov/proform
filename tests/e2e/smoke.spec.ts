@@ -188,6 +188,36 @@ test.describe('ЮKassa webhook — IP allowlist guard', () => {
   })
 })
 
+// Sprint W2 Day 9 — Recommendations API auth guard. POST creates a
+// structured doctor recommendation, GET lists for athlete. Both must
+// reject unauth callers; POST also enforces role check (doctor only).
+test.describe('Recommendations API — auth guard', () => {
+  test('POST /api/recommendations without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/recommendations', {
+      data: {
+        athlete_id: '00000000-0000-0000-0000-000000000000',
+        title: 'Test',
+        category: 'observation',
+      },
+    })
+    expect(res.status()).toBe(401)
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+  })
+
+  test('GET /api/recommendations without auth → 401', async ({ request }) => {
+    const res = await request.get('/api/recommendations?athlete_id=00000000-0000-0000-0000-000000000000')
+    expect(res.status()).toBe(401)
+  })
+
+  test('POST /api/recommendations/:id/ack without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/recommendations/00000000-0000-0000-0000-000000000000/ack', {
+      data: { as: 'coach' },
+    })
+    expect(res.status()).toBe(401)
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {
