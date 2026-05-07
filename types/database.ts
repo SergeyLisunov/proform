@@ -2795,6 +2795,114 @@ export type Database = {
           },
         ]
       }
+      recommendations: {
+        Row: {
+          acknowledged_by_athlete_at: string | null
+          acknowledged_by_coach_at: string | null
+          athlete_id: string
+          attachments: Json | null
+          body: string | null
+          category: string
+          coach_id: string | null
+          created_at: string
+          doctor_id: string
+          id: string
+          organization_id: string | null
+          organization_seen_at: string | null
+          referred_to_specialty: string | null
+          referred_to_user_id: string | null
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+          visibility_level: string
+        }
+        Insert: {
+          acknowledged_by_athlete_at?: string | null
+          acknowledged_by_coach_at?: string | null
+          athlete_id: string
+          attachments?: Json | null
+          body?: string | null
+          category: string
+          coach_id?: string | null
+          created_at?: string
+          doctor_id: string
+          id?: string
+          organization_id?: string | null
+          organization_seen_at?: string | null
+          referred_to_specialty?: string | null
+          referred_to_user_id?: string | null
+          severity?: string
+          status?: string
+          title: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          visibility_level?: string
+        }
+        Update: {
+          acknowledged_by_athlete_at?: string | null
+          acknowledged_by_coach_at?: string | null
+          athlete_id?: string
+          attachments?: Json | null
+          body?: string | null
+          category?: string
+          coach_id?: string | null
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          organization_id?: string | null
+          organization_seen_at?: string | null
+          referred_to_specialty?: string | null
+          referred_to_user_id?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          visibility_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_referred_to_user_id_fkey"
+            columns: ["referred_to_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_credits: {
         Row: {
           applied_at: string
@@ -3726,6 +3834,7 @@ export type Database = {
             Returns: boolean
           }
       cleanup_ai_rate_limits: { Args: never; Returns: undefined }
+      expire_stale_recommendations: { Args: never; Returns: number }
       get_challenge_leaderboard: {
         Args: { p_challenge_id: string }
         Returns: {
