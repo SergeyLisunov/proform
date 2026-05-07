@@ -218,6 +218,33 @@ test.describe('Recommendations API — auth guard', () => {
   })
 })
 
+// Sprint W2 Day 10 — Org Teams (org_groups) API auth guard.
+test.describe('Org Teams API — auth guard', () => {
+  test('POST /api/org/teams without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/org/teams', {
+      data: { organization_id: '00000000-0000-0000-0000-000000000000', name: 'Test team' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('POST /api/org/teams/:id/members without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/org/teams/00000000-0000-0000-0000-000000000000/members', {
+      data: { athlete_id: '00000000-0000-0000-0000-000000000000' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('DELETE /api/org/teams/:id/members?athlete_id=… without auth → 401', async ({ request }) => {
+    const res = await request.delete('/api/org/teams/00000000-0000-0000-0000-000000000000/members?athlete_id=00000000-0000-0000-0000-000000000000')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET /org/teams page does not 500 unauthenticated', async ({ page }) => {
+    const res = await page.goto('/org/teams')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {
