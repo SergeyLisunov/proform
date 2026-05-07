@@ -218,6 +218,22 @@ test.describe('Recommendations API — auth guard', () => {
   })
 })
 
+// Sprint W2 Day 11 — expire-recommendations cron auth guard.
+// CRON_SECRET-protected like the existing digest crons.
+test.describe('Cron expire-recommendations — auth guard', () => {
+  test('GET /api/cron/expire-recommendations without bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/expire-recommendations')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET /api/cron/expire-recommendations with wrong bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/expire-recommendations', {
+      headers: { Authorization: 'Bearer wrong-secret-value' },
+    })
+    expect(res.status()).toBe(401)
+  })
+})
+
 // Sprint W2 Day 10 — Org Teams (org_groups) API auth guard.
 test.describe('Org Teams API — auth guard', () => {
   test('POST /api/org/teams without auth → 401', async ({ request }) => {
