@@ -4,7 +4,8 @@
   "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": ".next",
   "crons": [
-    { "path": "/api/digest/daily",  "schedule": "0 4 * * *" },
-    { "path": "/api/digest/weekly", "schedule": "0 17 * * 0" }
+    { "path": "/api/digest/daily",                   "schedule": "0 4 * * *" },
+    { "path": "/api/digest/weekly",                  "schedule": "0 17 * * 0" },
+    { "path": "/api/cron/expire-recommendations",    "schedule": "0 3 * * *" }
   ]
 }

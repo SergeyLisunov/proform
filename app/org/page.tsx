@@ -1,8 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+
+// Sprint W2 Day 11 — management widgets (dynamic-loaded to avoid bloating
+// initial bundle and to keep org owners with empty data fast).
+const OrgKpiTiles              = dynamic(() => import('@/components/organization/OrgKpiTiles'),              { ssr: false })
+const OrgRosterMatrix          = dynamic(() => import('@/components/organization/OrgRosterMatrix'),          { ssr: false })
+const OrgRecommendationsStream = dynamic(() => import('@/components/organization/OrgRecommendationsStream'), { ssr: false })
+const OrgTeamsOverview         = dynamic(() => import('@/components/organization/OrgTeamsOverview'),         { ssr: false })
 
 function getSB() {
   return createBrowserClient(
@@ -205,22 +213,16 @@ export default function OrgDashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {kpis.map(kpi => (
-          <div key={kpi.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{kpi.label}</div>
-                <div className="pf-num mt-2 text-3xl text-foreground leading-none">{kpi.value}</div>
-                <div className="mt-2 text-2xs text-muted-foreground">{kpi.hint}</div>
-              </div>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: kpi.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <i className={`ki-filled ${kpi.icon} text-base`} style={{ color: kpi.color }} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
+      {/* Sprint W2 Day 11 — Management widgets ленточка сверху ↓ */}
+      <OrgKpiTiles orgId={org.id} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <OrgRosterMatrix orgId={org.id} />
+        <OrgRecommendationsStream orgId={org.id} />
+      </div>
+
+      <OrgTeamsOverview orgId={org.id} />
+      {/* End Day 11 widgets ↑ */}
 
       <section className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3 mb-4">
