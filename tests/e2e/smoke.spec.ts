@@ -261,6 +261,29 @@ test.describe('Org Teams API — auth guard', () => {
   })
 })
 
+// Sprint W2 Day 12 — Org-view athlete profile (drill-down) + recommendation lifecycle.
+test.describe('Sprint W2 Day 12 — closing additions', () => {
+  test('GET /org/athletes/[id] page does not 500 unauth', async ({ page }) => {
+    const res = await page.goto('/org/athletes/00000000-0000-0000-0000-000000000000')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('PATCH /api/recommendations/[id] without auth → 401', async ({ request }) => {
+    const res = await request.patch('/api/recommendations/00000000-0000-0000-0000-000000000000', {
+      data: { action: 'resolve' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('PATCH /api/recommendations/[id] with invalid action → 400', async ({ request }) => {
+    const res = await request.patch('/api/recommendations/00000000-0000-0000-0000-000000000000', {
+      data: { action: 'fake_action' },
+    })
+    // Either 400 (invalid body) or 401 (unauth). Both fine — verify not 5xx.
+    expect(res.status()).toBeLessThan(500)
+  })
+})
+
 // Lead-magnet pages — new routes from commit ceb3659
 
 test.describe('tools/acwr — ACWR calculator page', () => {
