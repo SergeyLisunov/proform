@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { BulkImportDrawer } from './BulkImportDrawer'
 
 type MemberRole = 'athlete' | 'coach'
 type MemberStatus = 'active' | 'pending' | 'suspended' | 'removed'
@@ -199,6 +200,7 @@ export default function OrgMembersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | MemberStatus>('all')
   const [search, setSearch] = useState('')
   const [showInvite, setShowInvite] = useState(false)
+  const [showBulkImport, setShowBulkImport] = useState(false)
   const [toast, setToast] = useState('')
 
   const orgId = user?.id ?? ''
@@ -302,6 +304,13 @@ export default function OrgMembersPage() {
             >
               <i className="ki-filled ki-plus text-sm" />
               Добавить участника
+            </button>
+            <button
+              onClick={() => setShowBulkImport(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 text-sm font-bold text-blue-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
+            >
+              <i className="ki-filled ki-cloud-add text-sm" />
+              Импорт CSV
             </button>
           </div>
         </div>
@@ -515,6 +524,20 @@ export default function OrgMembersPage() {
       {showInvite && (
         <InviteDrawer orgId={orgId} onClose={() => setShowInvite(false)}
           onInvited={m => { setMembers(prev => [m, ...prev]); showToastMsg('Участник добавлен!') }} />
+      )}
+
+      {showBulkImport && (
+        <BulkImportDrawer
+          onClose={() => setShowBulkImport(false)}
+          onComplete={summary => {
+            // Invitees won't appear in org_members until they claim the
+            // emailed link, so we don't refresh the list — just toast.
+            const msg = summary.invited > 0
+              ? `Отправлено ${summary.invited} приглашений`
+              : 'Новых приглашений не отправлено'
+            showToastMsg(msg)
+          }}
+        />
       )}
 
       {toast && (

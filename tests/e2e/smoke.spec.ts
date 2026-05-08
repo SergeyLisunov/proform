@@ -458,3 +458,38 @@ test.describe('api/tools/lead — validation', () => {
     expect((await res.json()).error).toBe('consent_required')
   })
 })
+
+// ── Sprint W3 Day 16 (PR #31) — Bulk-invite CSV ────────────────────────────
+
+test.describe('api/org/bulk-invite — auth + validation contract', () => {
+  test('POST returns 401 when unauthenticated', async ({ request }) => {
+    const res = await request.post('/api/org/bulk-invite', {
+      data: { csv: 'a@b.com', member_role: 'athlete' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('POST with empty body → 401 (auth check first) or 400', async ({ request }) => {
+    const res = await request.post('/api/org/bulk-invite', { data: {} })
+    // Auth gate runs before body validation, so 401 is expected without
+    // a session. If a future change reorders, 400 (invalid_body) also OK.
+    expect([400, 401]).toContain(res.status())
+  })
+
+  test('POST with malformed JSON → non-5xx (graceful 400/401)', async ({ request }) => {
+    const res = await request.post('/api/org/bulk-invite', {
+      data: 'not json' as unknown as object,
+      headers: { 'Content-Type': 'application/json' },
+    })
+    expect(res.status()).toBeLessThan(500)
+  })
+
+  test('POST with invalid member_role → non-5xx', async ({ request }) => {
+    const res = await request.post('/api/org/bulk-invite', {
+      data: { csv: 'a@b.com', member_role: 'manager' },
+    })
+    expect(res.status()).toBeLessThan(500)
+    // Either 401 (no session) or 400 (invalid enum) — both fine
+    expect([400, 401]).toContain(res.status())
+  })
+})
