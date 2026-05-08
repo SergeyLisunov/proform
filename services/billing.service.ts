@@ -84,6 +84,33 @@ export async function getMySubscription(userId: string): Promise<SubscriptionRow
   return (data as SubscriptionRow | null) ?? null
 }
 
+/**
+ * Toggle cancel_at_period_end. The user keeps access until
+ * `current_period_end`, then status flips to 'cancelled' via webhook
+ * or cron. Reactivate by setting cancel_at_period_end = false.
+ */
+export async function setSubscriptionCancelAtPeriodEnd(
+  userId: string,
+  cancel: boolean,
+): Promise<SubscriptionRow | null> {
+  const sb = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (sb as any)
+    .from('subscriptions')
+    .update({
+      cancel_at_period_end: cancel,
+      cancelled_at: cancel ? new Date().toISOString() : null,
+    })
+    .eq('user_id', userId)
+    .select()
+    .single()
+  if (error) {
+    console.warn('[setSubscriptionCancelAtPeriodEnd]', error.message)
+    return null
+  }
+  return data as SubscriptionRow
+}
+
 export interface CreatePaymentIntentInput {
   /** Internal user_id */
   userId: string
