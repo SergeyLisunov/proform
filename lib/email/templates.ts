@@ -188,3 +188,111 @@ export function renderInviteEmail(input: {
   return { subject, html: wrap(subject, `${input.inviter_name} зовёт вас в ProForm`, inner) }
 }
 
+// ── Sprint W3 Day 14 — subscription lifecycle emails ───────────────────────
+
+export interface SubscriptionActivatedInput {
+  name: string
+  tariff_name: string
+  price_label: string             // "599₽ / месяц" or "Бесплатно"
+  period_end: string | null       // "ISO date — when first charge will fire"
+  trial_ends_at: string | null    // "ISO date" if applicable
+}
+
+/** Sent immediately after webhook payment.succeeded activates subscription. */
+export function renderSubscriptionActivated(input: SubscriptionActivatedInput): { subject: string; html: string } {
+  const subject = `Подписка активирована · ${input.tariff_name}`
+  const trialBadge = input.trial_ends_at
+    ? `<div style="display:inline-block;padding:6px 12px;border-radius:999px;background:#ECFEFF;color:#0891B2;font-size:11px;font-weight:700;border:1px solid #A5F3FC;margin-bottom:16px">
+         🎁 Trial-период до ${escape(new Date(input.trial_ends_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }))}
+       </div>`
+    : ''
+  const periodLine = input.period_end
+    ? `<p style="margin:8px 0 0 0;color:#64748B;font-size:13px">
+         Следующее списание: <strong>${escape(new Date(input.period_end).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }))}</strong>
+       </p>`
+    : ''
+  const inner = `
+    ${trialBadge}
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A">Спасибо, ${escape(input.name)}!</h1>
+    <p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+      Подписка <strong>${escape(input.tariff_name)}</strong> активирована. Доступ открыт прямо сейчас.
+    </p>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px;margin:16px 0">
+      <div style="font-size:11px;color:#15803D;text-transform:uppercase;letter-spacing:1px;font-weight:700">Тариф</div>
+      <div style="margin-top:6px;font-size:18px;color:#0F172A;font-weight:700">${escape(input.tariff_name)} · ${escape(input.price_label)}</div>
+      ${periodLine}
+    </div>
+    <p style="margin:24px 0 0 0">
+      <a href="${BASE_URL}/dashboard" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть платформу →
+      </a>
+    </p>
+    <p style="margin:24px 0 0 0;color:#64748B;font-size:12px;line-height:1.5">
+      Управление подпиской: <a href="${BASE_URL}/settings/billing" style="color:#EA580C;text-decoration:none">/settings/billing</a>
+    </p>
+  `
+  return { subject, html: wrap(subject, 'Подписка активирована, доступ открыт', inner) }
+}
+
+export interface SubscriptionPaymentFailedInput {
+  name: string
+  tariff_name: string
+  retry_url: string
+}
+
+/** Sent on payment.canceled / payment-failed events. */
+export function renderSubscriptionPaymentFailed(input: SubscriptionPaymentFailedInput): { subject: string; html: string } {
+  const subject = `Не удалось списать оплату · ${input.tariff_name}`
+  const inner = `
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:11px;color:#B91C1C;text-transform:uppercase;letter-spacing:1px;font-weight:700">Платёж не прошёл</div>
+      <div style="margin-top:6px;font-size:14px;color:#0F172A">${escape(input.tariff_name)}</div>
+    </div>
+    <h1 style="margin:0 0 8px 0;font-size:20px;color:#0F172A">Здравствуйте, ${escape(input.name)}</h1>
+    <p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+      Списание не прошло. Подписка пока активна — у вас есть несколько дней, чтобы обновить способ оплаты, прежде чем доступ ограничится.
+    </p>
+    <p style="margin:24px 0 0 0">
+      <a href="${escape(input.retry_url)}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Повторить оплату
+      </a>
+    </p>
+    <p style="margin:16px 0 0 0;color:#64748B;font-size:12px;line-height:1.5">
+      Если ничего не сделать в течение 7 дней — подписка перейдёт в статус «Просрочена», и платные функции скроются.
+    </p>
+  `
+  return { subject, html: wrap(subject, 'Платёж не прошёл, обновите способ оплаты', inner) }
+}
+
+export interface SubscriptionCancelledInput {
+  name: string
+  tariff_name: string
+  access_until: string | null
+}
+
+/** Sent when user cancels (cancel_at_period_end → cancelled). */
+export function renderSubscriptionCancelled(input: SubscriptionCancelledInput): { subject: string; html: string } {
+  const subject = `Подписка отменена · ${input.tariff_name}`
+  const accessLine = input.access_until
+    ? `<p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+         Доступ к платным функциям сохраняется до <strong>${escape(new Date(input.access_until).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }))}</strong>.
+       </p>`
+    : `<p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">Подписка отменена.</p>`
+  const inner = `
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A">${escape(input.name)}, мы получили вашу отмену</h1>
+    ${accessLine}
+    <p style="margin:0 0 16px 0;color:#64748B;font-size:13px;line-height:1.6">
+      После окончания периода ваш аккаунт перейдёт на тариф Free. История тренировок, контакты и данные сохраняются — можно вернуться в любой момент.
+    </p>
+    <p style="margin:24px 0 0 0">
+      <a href="${BASE_URL}/pricing" style="display:inline-block;padding:12px 24px;background:#F8FAFC;color:#0F172A;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px;border:1px solid #E2E8F0">
+        Посмотреть тарифы
+      </a>
+    </p>
+    <p style="margin:16px 0 0 0;color:#94A3B8;font-size:12px">
+      Возобновить можно через <a href="${BASE_URL}/settings/billing" style="color:#EA580C;text-decoration:none">/settings/billing</a>.
+    </p>
+  `
+  return { subject, html: wrap(subject, 'Подписка отменена', inner) }
+}
+
