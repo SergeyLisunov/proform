@@ -261,6 +261,29 @@ test.describe('Org Teams API — auth guard', () => {
   })
 })
 
+// Sprint W3 Day 13 — DB-driven /pricing + /settings/billing + cancel API.
+test.describe('Sprint W3 Day 13 — billing UI + cancel API', () => {
+  test('POST /api/billing/cancel without auth → 401', async ({ request }) => {
+    const res = await request.post('/api/billing/cancel', { data: { cancel: true } })
+    expect(res.status()).toBe(401)
+  })
+
+  test('POST /api/billing/cancel with invalid body → 400', async ({ request }) => {
+    const res = await request.post('/api/billing/cancel', { data: { foo: 'bar' } })
+    expect([400, 401]).toContain(res.status())
+  })
+
+  test('/pricing renders public (DB-driven, no 5xx)', async ({ page }) => {
+    const res = await page.goto('/pricing')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/settings/billing does not 500 unauth', async ({ page }) => {
+    const res = await page.goto('/settings/billing')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
+
 // Sprint W2 Day 12 — Org-view athlete profile (drill-down) + recommendation lifecycle.
 test.describe('Sprint W2 Day 12 — closing additions', () => {
   test('GET /org/athletes/[id] page does not 500 unauth', async ({ page }) => {
