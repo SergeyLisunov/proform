@@ -12,6 +12,7 @@
  * coach can assign athlete to group dropdown (Day 12).
  */
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { getMyOrg } from '@/services/org.service'
 import {
@@ -166,15 +167,18 @@ export default function OrgTeamsPage() {
                           : g.age_max ? `до ${g.age_max} лет`
                           : null
             return (
-              <div key={g.id} className="rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm">
+              <Link key={g.id} href={`/org/teams/${g.id}`}
+                className="rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-violet-200 no-underline block group">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold text-foreground truncate">{g.name}</h3>
+                    <h3 className="text-base font-bold text-foreground truncate group-hover:text-violet-700 transition-colors">{g.name}</h3>
                     {g.description && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{g.description}</p>
                     )}
                   </div>
-                  <button onClick={() => archive(g.id)} disabled={busyId === g.id}
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); archive(g.id) }}
+                    disabled={busyId === g.id}
                     className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0 hover:!bg-red-50"
                     title="Архивировать">
                     <i className="ki-filled ki-archive text-xs text-red-500" />
@@ -207,7 +211,7 @@ export default function OrgTeamsPage() {
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>
