@@ -261,6 +261,34 @@ test.describe('Org Teams API — auth guard', () => {
   })
 })
 
+// Sprint W3 Day 15 — Marketplace catalog (public browse).
+test.describe('Sprint W3 Day 15 — marketplace catalog', () => {
+  test('GET /marketplace renders public, no 5xx', async ({ page }) => {
+    const res = await page.goto('/marketplace')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('GET /marketplace?role=coach renders public', async ({ page }) => {
+    const res = await page.goto('/marketplace?role=coach')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('GET /marketplace?role=specialist&specialty=massage renders', async ({ page }) => {
+    const res = await page.goto('/marketplace?role=specialist&specialty=massage')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('GET /marketplace/pass_plan/:id with non-existent id renders not-found UI', async ({ page }) => {
+    const res = await page.goto('/marketplace/pass_plan/00000000-0000-0000-0000-000000000000')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('GET /marketplace/service/:id with non-existent id renders not-found UI', async ({ page }) => {
+    const res = await page.goto('/marketplace/service/00000000-0000-0000-0000-000000000000')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
+
 // Sprint W3 Day 14 — subscription activation flow + cron janitor.
 test.describe('Sprint W3 Day 14 — activation flow + cron', () => {
   test('GET /api/cron/expire-stale-pending without bearer → 401', async ({ request }) => {
