@@ -493,3 +493,43 @@ test.describe('api/org/bulk-invite — auth + validation contract', () => {
     expect([400, 401]).toContain(res.status())
   })
 })
+
+// ── Sprint W3 Day 17 (PR #32) — Team detail drill-down ─────────────────────
+
+test.describe('api/org/teams/[id] — auth contract', () => {
+  const fakeId = '00000000-0000-0000-0000-000000000000'
+
+  test('PATCH returns 401 unauthenticated', async ({ request }) => {
+    const res = await request.patch(`/api/org/teams/${fakeId}`, {
+      data: { name: 'Renamed' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('DELETE returns 401 unauthenticated', async ({ request }) => {
+    const res = await request.delete(`/api/org/teams/${fakeId}`)
+    expect(res.status()).toBe(401)
+  })
+
+  test('PATCH with empty body → non-5xx', async ({ request }) => {
+    const res = await request.patch(`/api/org/teams/${fakeId}`, { data: {} })
+    // Either 401 (no session) or 400 (EMPTY_PATCH) — both safe
+    expect([400, 401]).toContain(res.status())
+  })
+
+  test('PATCH with invalid age range → non-5xx', async ({ request }) => {
+    const res = await request.patch(`/api/org/teams/${fakeId}`, {
+      data: { age_min: 18, age_max: 12 },
+    })
+    expect(res.status()).toBeLessThan(500)
+  })
+})
+
+test.describe('public /org/teams/[id] gate', () => {
+  test('unauth visit does not 500', async ({ page }) => {
+    const fakeId = '00000000-0000-0000-0000-000000000000'
+    const res = await page.goto(`/org/teams/${fakeId}`)
+    // Either renders "not found" UI, or middleware redirects to login
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
