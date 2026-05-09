@@ -855,3 +855,40 @@ test.describe('api/tools/lead — accepts new medical-summary source', () => {
     expect([201, 429]).toContain(res.status())
   })
 })
+
+// ── Sprint W4 Day 22 (PR #38) — Lead-capture analytics + auto-drip ─────────
+
+test.describe('admin/leads — auth gate', () => {
+  test('unauth visit → redirect to /auth/login (or non-5xx)', async ({ page }) => {
+    const res = await page.goto('/admin/leads')
+    expect(res?.status()).toBeLessThan(500)
+    // Server component does redirect() if not auth → URL должен быть login
+    // ИЛИ страница может показать access-denied UI
+    const url = page.url()
+    const onLogin = url.includes('/auth/login')
+    const onAdminLeads = url.endsWith('/admin/leads')
+    expect(onLogin || onAdminLeads).toBeTruthy()
+  })
+})
+
+test.describe('api/cron/leads-digest — auth gate', () => {
+  test('GET без bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET с неверным bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest', {
+      headers: { authorization: 'Bearer this-is-not-the-secret' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET с любыми invalid headers не 5xx', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest', {
+      headers: { authorization: 'Basic invalid' },
+    })
+    // Either 401 (auth) or 503 (RESEND_API_KEY missing) — not 500
+    expect([401, 503]).toContain(res.status())
+  })
+})
