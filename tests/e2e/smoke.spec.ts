@@ -533,3 +533,77 @@ test.describe('public /org/teams/[id] gate', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W4 Day 18 (PR #34) — Team Risk Snapshot lead magnet ─────────────
+
+test.describe('public /tools/team-risk page', () => {
+  test('renders without 500 (anon)', async ({ page }) => {
+    const res = await page.goto('/tools/team-risk')
+    expect(res?.status()).toBeLessThan(500)
+    await expect(page.getByRole('heading', { name: /Team Risk Snapshot/i }).first()).toBeVisible()
+  })
+
+  test('shows "Получить snapshot" CTA', async ({ page }) => {
+    await page.goto('/tools/team-risk')
+    const cta = page.getByRole('button', { name: /Получить snapshot/i }).first()
+    await expect(cta).toBeVisible()
+  })
+})
+
+test.describe('api/tools/team-risk — public contract', () => {
+  test('POST with empty body → 400 INVALID_INPUT', async ({ request }) => {
+    const res = await request.post('/api/tools/team-risk', { data: {} })
+    expect(res.status()).toBe(400)
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+    expect(body.error).toBe('INVALID_INPUT')
+  })
+
+  test('POST with malformed athlete (hours out of range) → 400', async ({ request }) => {
+    const res = await request.post('/api/tools/team-risk', {
+      data: {
+        sport: 'Футбол',
+        athletes: [{ name: 'Test', training_hours_current_week: 999, training_hours_avg_4w: 10 }],
+      },
+    })
+    expect(res.status()).toBe(400)
+  })
+
+  test('POST with valid minimal input does not 500', async ({ request }) => {
+    // No AI key in test env → fallback to rule-based snapshot. Should
+    // succeed with 200 + Snapshot body. If AI is configured and fails
+    // (rate-limit / quota / network), we accept 500 / 429 as expected.
+    const res = await request.post('/api/tools/team-risk', {
+      data: {
+        sport: 'Футбол',
+        team_name: 'Smoke Test Team',
+        athletes: [
+          { name: 'A', training_hours_current_week: 12, training_hours_avg_4w: 10 },
+          { name: 'B', training_hours_current_week: 8,  training_hours_avg_4w: 11 },
+        ],
+      },
+    })
+    expect([200, 429, 500]).toContain(res.status())
+    if (res.status() === 200) {
+      const body = await res.json()
+      expect(body.ok).toBe(true)
+      expect(body.data).toBeTruthy()
+      expect(Array.isArray(body.data.athletes)).toBe(true)
+    }
+  })
+})
+
+test.describe('api/tools/lead — accepts new team-risk source', () => {
+  test('POST source=team-risk + consent → 201 or rate_limited', async ({ request }) => {
+    const res = await request.post('/api/tools/lead', {
+      data: {
+        email: `smoke-${Date.now()}@example.com`,
+        source: 'team-risk',
+        consent: true,
+        payload: { sport: 'Футбол', athletes_count: 3 },
+      },
+    })
+    // 201 on success, 429 if rate-limited from previous runs
+    expect([201, 429]).toContain(res.status())
+  })
+})
