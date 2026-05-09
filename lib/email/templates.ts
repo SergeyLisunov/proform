@@ -653,3 +653,165 @@ export function renderClubAuditReport(input: ClubAuditEmailInput): { subject: st
   return { subject, html: wrap(subject, `Club Audit · score ${input.health_score}/100`, inner) }
 }
 
+// ── Sprint W4 Day 21 — Medical Summary Demo lead magnet email ──────────
+
+const TRIAGE_BADGE: Record<'red_flag' | 'urgent_referral' | 'restricted_activity' | 'monitor' | 'return_to_play', { label: string; color: string; bg: string; emoji: string }> = {
+  red_flag:            { label: 'RED FLAG',            color: '#B91C1C', bg: '#FEF2F2', emoji: '🚨' },
+  urgent_referral:     { label: 'URGENT REFERRAL',     color: '#C2410C', bg: '#FFF7ED', emoji: '⚠️' },
+  restricted_activity: { label: 'RESTRICTED ACTIVITY', color: '#A16207', bg: '#FEFCE8', emoji: '🟠' },
+  monitor:             { label: 'MONITOR',             color: '#0E7490', bg: '#ECFEFF', emoji: '🟡' },
+  return_to_play:      { label: 'RETURN TO PLAY',      color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
+}
+
+export interface MedicalSummaryEmailInput {
+  age:                 number
+  sport:               string
+  triage:              'red_flag' | 'urgent_referral' | 'restricted_activity' | 'monitor' | 'return_to_play'
+  triage_explanation:  string
+  red_flags:           string[]
+  differential: Array<{
+    condition:  string
+    likelihood: 'low' | 'medium' | 'high'
+    notes:      string
+  }>
+  recommended_next_steps: {
+    imaging_suggested:      string | null
+    specialist_referral:    string | null
+    activity_modifications: string
+    follow_up_timeline:     string
+  }
+  patient_education:   string[]
+  confidence:          'low' | 'medium' | 'high'
+}
+
+/**
+ * Sent после email-capture в /tools/medical-summary lead magnet.
+ *
+ * ⚠️ Email body содержит prominent disclaimer что это AI-generated draft
+ * и НЕ диагноз. Liability framing critical для medical content.
+ */
+export function renderMedicalSummaryDemo(input: MedicalSummaryEmailInput): { subject: string; html: string } {
+  const subject = `Medical Summary Draft · ${input.sport} · ${input.age}y · ${input.triage.replace('_', ' ')}`
+  const tri = TRIAGE_BADGE[input.triage]
+
+  const redFlagsBlock = input.red_flags.length > 0
+    ? `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:14px;margin:0 0 16px 0">
+         <div style="font-size:11px;font-weight:700;color:#B91C1C;text-transform:uppercase;letter-spacing:1px">🚨 Red flags identified</div>
+         <ul style="margin:8px 0 0 0;padding-left:20px;color:#7F1D1D;font-size:13px;line-height:1.6">
+           ${input.red_flags.map(rf => `<li>${escape(rf)}</li>`).join('')}
+         </ul>
+       </div>`
+    : ''
+
+  const differentialRows = input.differential.map(d => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top;width:55%">
+        <strong style="font-size:13px;color:#0F172A">${escape(d.condition)}</strong>
+        <div style="font-size:11px;color:#64748B;margin-top:4px;line-height:1.5">${escape(d.notes)}</div>
+      </td>
+      <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top;text-align:right">
+        <span style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:10px;font-weight:700;background:#F1F5F9;color:#475569;text-transform:uppercase">${d.likelihood}</span>
+      </td>
+    </tr>`).join('')
+
+  const educationList = input.patient_education.length > 0
+    ? `<ul style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.6">
+         ${input.patient_education.map(e => `<li>${escape(e)}</li>`).join('')}
+       </ul>`
+    : ''
+
+  const inner = `
+    <!-- ⚠ Persistent disclaimer — Top -->
+    <div style="background:#FFFBEB;border:2px solid #FCD34D;border-radius:12px;padding:14px;margin-bottom:18px">
+      <div style="font-size:12px;font-weight:700;color:#92400E;line-height:1.5">
+        ⚠ AI-generated draft. NOT a diagnosis.
+      </div>
+      <div style="font-size:11px;color:#78350F;margin-top:6px;line-height:1.5">
+        Все clinical decisions требуют review licensed practitioner. Confidence level отчёта: <strong>${escape(input.confidence.toUpperCase())}</strong>.
+        Не используйте автономно для acute / emergency situations.
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:#7C3AED;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:6px">
+      Medical Summary Demo
+    </div>
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A;line-height:1.3">
+      ${escape(input.sport)} · ${input.age} лет
+    </h1>
+
+    <!-- Triage hero -->
+    <div style="background:${tri.bg};border:2px solid ${tri.color}55;border-radius:14px;padding:14px;margin:12px 0 18px 0">
+      <div style="font-size:11px;font-weight:700;color:${tri.color};text-transform:uppercase;letter-spacing:1px">
+        ${tri.emoji} Triage Classification
+      </div>
+      <div style="font-size:18px;font-weight:800;color:${tri.color};margin-top:6px">
+        ${tri.label}
+      </div>
+      <p style="margin:8px 0 0 0;color:#0F172A;font-size:13px;line-height:1.6">${escape(input.triage_explanation)}</p>
+    </div>
+
+    ${redFlagsBlock}
+
+    <!-- Differential -->
+    <h2 style="margin:0 0 8px 0;font-size:14px;color:#0F172A;text-transform:uppercase;letter-spacing:1px;font-weight:700">🧠 Differential</h2>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:18px">
+      ${differentialRows}
+    </table>
+
+    <!-- Next steps -->
+    <h2 style="margin:0 0 8px 0;font-size:14px;color:#0F172A;text-transform:uppercase;letter-spacing:1px;font-weight:700">🩺 Recommended next steps</h2>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:18px">
+      ${input.recommended_next_steps.imaging_suggested ? `
+        <tr><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;width:38%">
+          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;font-weight:700">Imaging</div>
+        </td><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9">
+          <div style="font-size:13px;color:#0F172A">${escape(input.recommended_next_steps.imaging_suggested)}</div>
+        </td></tr>` : ''}
+      ${input.recommended_next_steps.specialist_referral ? `
+        <tr><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9">
+          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;font-weight:700">Specialist Referral</div>
+        </td><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9">
+          <div style="font-size:13px;color:#0F172A">${escape(input.recommended_next_steps.specialist_referral)}</div>
+        </td></tr>` : ''}
+      <tr><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9">
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;font-weight:700">Activity Modifications</div>
+      </td><td style="padding:10px 12px;border-bottom:1px solid #F1F5F9">
+        <div style="font-size:13px;color:#0F172A">${escape(input.recommended_next_steps.activity_modifications)}</div>
+      </td></tr>
+      <tr><td style="padding:10px 12px">
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;font-weight:700">Follow-up</div>
+      </td><td style="padding:10px 12px">
+        <div style="font-size:13px;color:#0F172A">${escape(input.recommended_next_steps.follow_up_timeline)}</div>
+      </td></tr>
+    </table>
+
+    ${input.patient_education.length > 0 ? `
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px;margin:0 0 18px 0">
+        <div style="font-size:11px;font-weight:700;color:#1D4ED8;text-transform:uppercase;letter-spacing:1px">📘 Patient education</div>
+        ${educationList}
+      </div>
+    ` : ''}
+
+    <!-- ⚠ Disclaimer footer -->
+    <div style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:10px;padding:12px;margin:18px 0 0 0">
+      <div style="font-size:11px;color:#475569;line-height:1.55">
+        <strong>Disclaimer:</strong> Этот summary создан AI на основе предоставленных данных. Он НЕ заменяет clinical examination, imaging, lab work или judgment licensed practitioner. Если есть signs of acute distress — refer to emergency services.
+      </div>
+    </div>
+
+    <p style="margin:24px 0 12px 0;color:#0F172A;font-size:14px;line-height:1.6">
+      Хотите вести медицинскую документацию атлетов в одной системе?
+    </p>
+    <p style="margin:0">
+      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=medical-summary&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#8B5CF6,#A21CAF);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть ProForm бесплатно →
+      </a>
+    </p>
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      ProForm для врачей: structured recommendations с visibility levels (athlete only / coach + athlete / org_full),
+      integration с тренировочными данными, автоматический dispatch уведомлений.
+    </p>
+  `
+  return { subject, html: wrap(subject, `Medical Summary Draft · ${input.triage.replace('_', ' ')}`, inner) }
+}
+

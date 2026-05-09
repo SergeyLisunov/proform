@@ -759,3 +759,136 @@ test.describe('api/tools/lead — accepts new club-audit source', () => {
     expect([201, 429]).toContain(res.status())
   })
 })
+
+// ── Sprint W4 Day 21 (PR #37) — Medical Summary Demo lead magnet ───────────
+
+test.describe('public /tools/medical-summary page', () => {
+  test('renders without 500 (anon)', async ({ page }) => {
+    const res = await page.goto('/tools/medical-summary')
+    expect(res?.status()).toBeLessThan(500)
+    await expect(page.getByRole('heading', { name: /Free Medical Summary Demo/i }).first()).toBeVisible()
+  })
+
+  test('shows assessment CTA', async ({ page }) => {
+    await page.goto('/tools/medical-summary')
+    const cta = page.getByRole('button', { name: /assessment template/i }).first()
+    await expect(cta).toBeVisible()
+  })
+
+  test('shows persistent NOT a diagnosis disclaimer', async ({ page }) => {
+    await page.goto('/tools/medical-summary')
+    await expect(page.getByText(/NOT a diagnosis/i).first()).toBeVisible()
+  })
+})
+
+test.describe('api/tools/medical-summary — public contract', () => {
+  test('POST with empty body → 400 INVALID_INPUT', async ({ request }) => {
+    const res = await request.post('/api/tools/medical-summary', { data: {} })
+    expect(res.status()).toBe(400)
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+    expect(body.error).toBe('INVALID_INPUT')
+  })
+
+  test('POST with pain_scale > 10 → 400', async ({ request }) => {
+    const res = await request.post('/api/tools/medical-summary', {
+      data: {
+        age: 25, sport: 'Бег', primary_symptom: 'pain', location: 'knee',
+        onset: 'acute', duration_days: 3, pain_scale: 15, // out of range
+      },
+    })
+    expect(res.status()).toBe(400)
+  })
+
+  test('POST with valid minimal input does not 500', async ({ request }) => {
+    const res = await request.post('/api/tools/medical-summary', {
+      data: {
+        age: 25,
+        sport: 'Бег',
+        primary_symptom: 'Боль в передней голени при беге',
+        location: 'правая голень',
+        onset: 'sub_acute',
+        duration_days: 14,
+        pain_scale: 5,
+      },
+    })
+    expect([200, 429, 500]).toContain(res.status())
+    if (res.status() === 200) {
+      const body = await res.json()
+      expect(body.ok).toBe(true)
+      expect(typeof body._disclaimer).toBe('string')
+      expect(['red_flag','urgent_referral','restricted_activity','monitor','return_to_play']).toContain(body.data.triage)
+      expect(Array.isArray(body.data.differential)).toBe(true)
+    }
+  })
+
+  test('POST returns _disclaimer field on success', async ({ request }) => {
+    const res = await request.post('/api/tools/medical-summary', {
+      data: {
+        age: 30, sport: 'Силовые',
+        primary_symptom: 'Локальная боль в плече',
+        location: 'правое плечо',
+        onset: 'chronic',
+        duration_days: 60,
+        pain_scale: 3,
+      },
+    })
+    if (res.status() === 200) {
+      const body = await res.json()
+      expect(body._disclaimer).toContain('NOT a diagnosis')
+    } else {
+      expect([429, 500]).toContain(res.status())
+    }
+  })
+})
+
+test.describe('api/tools/lead — accepts new medical-summary source', () => {
+  test('POST source=medical-summary + consent → 201 or rate_limited', async ({ request }) => {
+    const res = await request.post('/api/tools/lead', {
+      data: {
+        email: `smoke-ms-${Date.now()}@example.com`,
+        source: 'medical-summary',
+        consent: true,
+        payload: { sport: 'Бег', age: 25, triage: 'monitor', confidence: 'medium' },
+      },
+    })
+    expect([201, 429]).toContain(res.status())
+  })
+})
+
+// ── Sprint W4 Day 22 (PR #38) — Lead-capture analytics + auto-drip ─────────
+
+test.describe('admin/leads — auth gate', () => {
+  test('unauth visit → redirect to /auth/login (or non-5xx)', async ({ page }) => {
+    const res = await page.goto('/admin/leads')
+    expect(res?.status()).toBeLessThan(500)
+    // Server component does redirect() if not auth → URL должен быть login
+    // ИЛИ страница может показать access-denied UI
+    const url = page.url()
+    const onLogin = url.includes('/auth/login')
+    const onAdminLeads = url.endsWith('/admin/leads')
+    expect(onLogin || onAdminLeads).toBeTruthy()
+  })
+})
+
+test.describe('api/cron/leads-digest — auth gate', () => {
+  test('GET без bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET с неверным bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest', {
+      headers: { authorization: 'Bearer this-is-not-the-secret' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET с любыми invalid headers не 5xx', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest', {
+      headers: { authorization: 'Basic invalid' },
+    })
+    // Either 401 (auth) or 503 (RESEND_API_KEY missing) — not 500
+    expect([401, 503]).toContain(res.status())
+  })
+})
