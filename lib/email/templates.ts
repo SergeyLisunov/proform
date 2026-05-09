@@ -520,3 +520,136 @@ export function renderAdaptivePlanPreview(input: AdaptivePlanPreviewEmailInput):
   return { subject, html: wrap(subject, `7-day plan · ${input.sport} · ${input.level}`, inner) }
 }
 
+// ── Sprint W4 Day 20 — Club Audit lead magnet email ───────────────────
+
+const HEALTH_BADGE: Record<'critical' | 'at-risk' | 'stable' | 'healthy', { label: string; color: string; bg: string; emoji: string }> = {
+  critical: { label: 'CRITICAL', color: '#B91C1C', bg: '#FEF2F2', emoji: '🚨' },
+  'at-risk':{ label: 'AT RISK',  color: '#C2410C', bg: '#FFF7ED', emoji: '⚠️' },
+  stable:   { label: 'STABLE',   color: '#A16207', bg: '#FEFCE8', emoji: '🟡' },
+  healthy:  { label: 'HEALTHY',  color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
+}
+
+const SEVERITY_BADGE_EMAIL: Record<'low' | 'medium' | 'high', { color: string; bg: string }> = {
+  low:    { color: '#15803D', bg: '#F0FDF4' },
+  medium: { color: '#C2410C', bg: '#FFF7ED' },
+  high:   { color: '#B91C1C', bg: '#FEF2F2' },
+}
+
+export interface ClubAuditEmailInput {
+  club_name?:                 string | null
+  primary_sport:              string
+  health_score:               number
+  health_label:               'critical' | 'at-risk' | 'stable' | 'healthy'
+  summary:                    string
+  risk_areas: Array<{
+    name:                string
+    severity:            'low' | 'medium' | 'high'
+    current_state:       string
+    recommended_action:  string
+    proform_helps_with?: string
+  }>
+  top_3_priorities:           string[]
+  estimated_revenue_at_risk?: string
+  next_steps:                 string
+}
+
+/**
+ * Sent после email-capture в /tools/club-audit lead magnet. Готов
+ * для будущей dispatch (admin batch outreach или dedicated endpoint).
+ */
+export function renderClubAuditReport(input: ClubAuditEmailInput): { subject: string; html: string } {
+  const clubLabel = input.club_name ? `${escape(input.club_name)} · ${escape(input.primary_sport)}` : escape(input.primary_sport)
+  const subject = `Club Audit · ${input.club_name ?? input.primary_sport} · score ${input.health_score}/100`
+  const healthMeta = HEALTH_BADGE[input.health_label]
+
+  const riskRows = input.risk_areas.map(r => {
+    const sev = SEVERITY_BADGE_EMAIL[r.severity]
+    return `
+      <tr>
+        <td style="padding:14px 16px;border-bottom:1px solid #F1F5F9;vertical-align:top">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0F172A">${escape(r.name)}</strong>
+            <span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:${sev.bg};color:${sev.color}">${r.severity.toUpperCase()}</span>
+          </div>
+          <div style="font-size:12px;color:#475569;line-height:1.55;margin-bottom:6px">
+            <strong style="color:#0F172A">Сейчас:</strong> ${escape(r.current_state)}
+          </div>
+          <div style="font-size:12px;color:#475569;line-height:1.55">
+            <strong style="color:#0F172A">Действие:</strong> ${escape(r.recommended_action)}
+          </div>
+          ${r.proform_helps_with ? `
+            <div style="margin-top:8px;font-size:11px;color:#15803D;font-style:italic;background:#F0FDF4;border-left:3px solid #BBF7D0;padding:6px 10px;border-radius:6px">
+              💡 ${escape(r.proform_helps_with)}
+            </div>
+          ` : ''}
+        </td>
+      </tr>`
+  }).join('')
+
+  const prioritiesList = input.top_3_priorities.length > 0
+    ? `<ol style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.6">
+         ${input.top_3_priorities.map(p => `<li>${escape(p)}</li>`).join('')}
+       </ol>`
+    : ''
+
+  const inner = `
+    <div style="font-size:11px;color:#059669;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:6px">
+      Club Audit
+    </div>
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A;line-height:1.3">${clubLabel}</h1>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:12px 0 18px 0">
+      <tr>
+        <td style="vertical-align:middle;width:140px">
+          <div style="background:${healthMeta.bg};border:2px solid ${healthMeta.color}33;border-radius:14px;padding:14px;text-align:center">
+            <div style="font-size:36px;font-weight:800;color:${healthMeta.color};line-height:1">${input.health_score}</div>
+            <div style="font-size:10px;font-weight:700;color:${healthMeta.color};text-transform:uppercase;letter-spacing:1px;margin-top:4px">/ 100</div>
+            <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;background:white;color:${healthMeta.color};border:1px solid ${healthMeta.color}55">
+              ${healthMeta.emoji} ${healthMeta.label}
+            </span>
+          </div>
+        </td>
+        <td style="padding-left:16px;vertical-align:top">
+          <p style="margin:0 0 8px 0;color:#475569;font-size:14px;line-height:1.6">${escape(input.summary)}</p>
+          ${input.estimated_revenue_at_risk ? `
+            <div style="display:inline-block;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:6px 10px;font-size:12px;color:#9A3412;font-weight:600">
+              💸 ${escape(input.estimated_revenue_at_risk)}
+            </div>
+          ` : ''}
+        </td>
+      </tr>
+    </table>
+
+    <h2 style="margin:0 0 8px 0;font-size:14px;color:#0F172A;text-transform:uppercase;letter-spacing:1px;font-weight:700">Области риска</h2>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:18px">
+      ${riskRows}
+    </table>
+
+    ${input.top_3_priorities.length > 0 ? `
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px;margin:0 0 14px 0">
+        <div style="font-size:11px;font-weight:700;color:#1D4ED8;text-transform:uppercase;letter-spacing:1px">🎯 Top-3 приоритеты на 30 дней</div>
+        ${prioritiesList}
+      </div>
+    ` : ''}
+
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:14px;margin:0 0 18px 0">
+      <div style="font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:1px">Next Steps · 7-14 дней</div>
+      <p style="margin:8px 0 0 0;color:#0F172A;font-size:13px;line-height:1.6">${escape(input.next_steps)}</p>
+    </div>
+
+    <p style="margin:24px 0 12px 0;color:#0F172A;font-size:14px;line-height:1.6">
+      Хотите эти метрики автоматически в Org Dashboard?
+    </p>
+    <p style="margin:0">
+      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=club-audit&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#10B981,#0F766E);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть ProForm бесплатно →
+      </a>
+    </p>
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      ProForm для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спорт.врачей,
+      автоматизированный биллинг. Подключение — 30 минут с CSV-импорта.
+    </p>
+  `
+  return { subject, html: wrap(subject, `Club Audit · score ${input.health_score}/100`, inner) }
+}
+

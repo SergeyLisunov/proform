@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic'
  * + source, лимит 20 вставок / час на IP.
  */
 
-const VALID_SOURCES = new Set(['acwr', 'overtraining', 'templates', 'team-risk', 'adaptive-plan', 'other'])
+const VALID_SOURCES = new Set(['acwr', 'overtraining', 'templates', 'team-risk', 'adaptive-plan', 'club-audit', 'other'])
 
 function sha(s: string): string {
   return crypto.createHash('sha256').update(s).digest('hex').slice(0, 48)
