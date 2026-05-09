@@ -296,3 +296,123 @@ export function renderSubscriptionCancelled(input: SubscriptionCancelledInput): 
   return { subject, html: wrap(subject, 'Подписка отменена', inner) }
 }
 
+// ── Sprint W4 Day 18 — Team Risk Snapshot lead magnet email ───────────
+
+const STATUS_BADGE: Record<'ok' | 'watch' | 'risk', { label: string; color: string; bg: string; emoji: string }> = {
+  ok:    { label: 'OK',    color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
+  watch: { label: 'WATCH', color: '#A16207', bg: '#FEFCE8', emoji: '🟡' },
+  risk:  { label: 'RISK',  color: '#B91C1C', bg: '#FEF2F2', emoji: '🔴' },
+}
+
+export interface TeamRiskSnapshotEmailInput {
+  sport:       string
+  team_name?:  string | null
+  overall:     string
+  athletes:    Array<{ name: string; status: 'ok' | 'watch' | 'risk'; reason: string; action: string }>
+  priorities:  string[]
+}
+
+/**
+ * Sent после email-capture в /tools/team-risk lead magnet.
+ *
+ * Текущий /api/tools/lead не диспетчит email напрямую — этот рендерер
+ * готов для будущей интеграции (admin batch outreach или dedicated
+ * /api/tools/team-risk/email endpoint).
+ */
+export function renderTeamRiskSnapshot(input: TeamRiskSnapshotEmailInput): { subject: string; html: string } {
+  const teamLabel = input.team_name ? `${escape(input.team_name)} · ${escape(input.sport)}` : escape(input.sport)
+  const subject = `Team Risk Snapshot · ${input.team_name ?? input.sport}`
+
+  const counts = {
+    ok:    input.athletes.filter(a => a.status === 'ok').length,
+    watch: input.athletes.filter(a => a.status === 'watch').length,
+    risk:  input.athletes.filter(a => a.status === 'risk').length,
+  }
+
+  const athleteRows = input.athletes.map(a => {
+    const badge = STATUS_BADGE[a.status]
+    return `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top;width:38%">
+          <div style="font-size:13px;font-weight:700;color:#0F172A">${escape(a.name)}</div>
+          <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:${badge.bg};color:${badge.color}">
+            ${badge.emoji} ${badge.label}
+          </span>
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top">
+          <div style="font-size:12px;color:#475569;line-height:1.5">
+            <strong style="color:#0F172A">Причина:</strong> ${escape(a.reason)}
+          </div>
+          <div style="font-size:12px;color:#475569;line-height:1.5;margin-top:4px">
+            <strong style="color:#0F172A">Действие:</strong> ${escape(a.action)}
+          </div>
+        </td>
+      </tr>`
+  }).join('')
+
+  const prioritiesList = input.priorities.length > 0
+    ? `<ol style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.6">
+         ${input.priorities.map(p => `<li>${escape(p)}</li>`).join('')}
+       </ol>`
+    : ''
+
+  const inner = `
+    <div style="font-size:11px;color:#7C3AED;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:6px">
+      Team Risk Snapshot
+    </div>
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A;line-height:1.3">${teamLabel}</h1>
+    <p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+      ${escape(input.overall)}
+    </p>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px 0">
+      <tr>
+        <td style="padding:0 4px 0 0;width:33.33%">
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:800;color:#15803D">${counts.ok}</div>
+            <div style="font-size:10px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:1px;margin-top:2px">🟢 В норме</div>
+          </div>
+        </td>
+        <td style="padding:0 2px;width:33.33%">
+          <div style="background:#FEFCE8;border:1px solid #FDE68A;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:800;color:#A16207">${counts.watch}</div>
+            <div style="font-size:10px;font-weight:700;color:#A16207;text-transform:uppercase;letter-spacing:1px;margin-top:2px">🟡 Наблюдение</div>
+          </div>
+        </td>
+        <td style="padding:0 0 0 4px;width:33.33%">
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:800;color:#B91C1C">${counts.risk}</div>
+            <div style="font-size:10px;font-weight:700;color:#B91C1C;text-transform:uppercase;letter-spacing:1px;margin-top:2px">🔴 Риск</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <h2 style="margin:0 0 8px 0;font-size:14px;color:#0F172A;text-transform:uppercase;letter-spacing:1px;font-weight:700">Состав</h2>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:18px">
+      ${athleteRows}
+    </table>
+
+    ${input.priorities.length > 0 ? `
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px;margin:0 0 18px 0">
+        <div style="font-size:11px;font-weight:700;color:#1D4ED8;text-transform:uppercase;letter-spacing:1px">🎯 Приоритеты на 7-14 дней</div>
+        ${prioritiesList}
+      </div>
+    ` : ''}
+
+    <p style="margin:24px 0 12px 0;color:#0F172A;font-size:14px;line-height:1.6">
+      Хотите видеть snapshot автоматически по всем тренировкам команды?
+    </p>
+    <p style="margin:0">
+      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=team-risk&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть ProForm бесплатно →
+      </a>
+    </p>
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      ProForm — платформа для атлетов, тренеров и спортивных врачей. Подключите Garmin / Whoop / ручной ввод —
+      и risk-светофор обновляется в реальном времени.
+    </p>
+  `
+  return { subject, html: wrap(subject, `Team Risk Snapshot · ${input.athletes.length} атлетов`, inner) }
+}
+
