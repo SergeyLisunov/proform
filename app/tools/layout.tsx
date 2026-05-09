@@ -17,8 +17,9 @@ export default function ToolsLayout({ children }: { children: React.ReactNode })
             <span className="font-bold text-lg">ProForm</span>
           </Link>
           <nav className="flex items-center gap-4 text-sm">
+            <Link href="/tools/adaptive-plan" className="text-slate-600 hover:text-slate-900">7-day Plan</Link>
             <Link href="/tools/team-risk" className="text-slate-600 hover:text-slate-900">Team Risk</Link>
-            <Link href="/tools/acwr" className="text-slate-600 hover:text-slate-900">ACWR</Link>
+            <Link href="/tools/acwr" className="text-slate-600 hover:text-slate-900 hidden sm:inline">ACWR</Link>
             <Link href="/tools/overtraining" className="text-slate-600 hover:text-slate-900 hidden sm:inline">Перетренированность</Link>
             <Link href="/pricing" className="text-slate-600 hover:text-slate-900 hidden sm:inline">Тарифы</Link>
             <Link href="/auth/login"
