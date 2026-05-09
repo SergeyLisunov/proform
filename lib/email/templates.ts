@@ -416,3 +416,107 @@ export function renderTeamRiskSnapshot(input: TeamRiskSnapshotEmailInput): { sub
   return { subject, html: wrap(subject, `Team Risk Snapshot · ${input.athletes.length} атлетов`, inner) }
 }
 
+// ── Sprint W4 Day 19 — Adaptive Plan Preview lead magnet email ────────
+
+const INTENSITY_BADGE: Record<'easy' | 'moderate' | 'hard' | 'rest', { label: string; color: string; bg: string; emoji: string }> = {
+  rest:     { label: 'REST',  color: '#475569', bg: '#F8FAFC', emoji: '🛌' },
+  easy:     { label: 'EASY',  color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
+  moderate: { label: 'MOD',   color: '#0E7490', bg: '#ECFEFF', emoji: '🟦' },
+  hard:     { label: 'HARD',  color: '#B91C1C', bg: '#FEF2F2', emoji: '🔥' },
+}
+
+export interface AdaptivePlanPreviewEmailInput {
+  sport:        string
+  goal?:        string | null
+  level:        string
+  overview:     string
+  weekly_load_assessment: 'low' | 'moderate' | 'high' | 'overtraining'
+  days: Array<{
+    day:           number
+    weekday:       string
+    activity_type: string
+    duration_min:  number
+    intensity:     'easy' | 'moderate' | 'hard' | 'rest'
+    notes:         string
+  }>
+  rationale:    string
+  red_flags:    string[]
+}
+
+/**
+ * Sent после email-capture в /tools/adaptive-plan lead magnet. Готов
+ * для будущей dispatch (admin batch outreach или dedicated endpoint).
+ */
+export function renderAdaptivePlanPreview(input: AdaptivePlanPreviewEmailInput): { subject: string; html: string } {
+  const subject = `Free 7-day Adaptive Plan · ${input.sport}`
+
+  const dayRows = input.days.map(d => {
+    const badge = INTENSITY_BADGE[d.intensity]
+    return `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top;width:18%">
+          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;font-weight:700">День ${d.day}</div>
+          <div style="font-size:13px;font-weight:700;color:#0F172A;margin-top:2px">${escape(d.weekday)}</div>
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top;width:22%">
+          <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;background:${badge.bg};color:${badge.color}">
+            ${badge.emoji} ${badge.label}
+          </span>
+          <div style="font-size:12px;color:#475569;margin-top:4px">${d.duration_min > 0 ? `${d.duration_min} мин` : '—'}</div>
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top">
+          <div style="font-size:13px;font-weight:600;color:#0F172A">${escape(d.activity_type)}</div>
+          <div style="font-size:12px;color:#64748B;margin-top:4px;line-height:1.5">${escape(d.notes)}</div>
+        </td>
+      </tr>`
+  }).join('')
+
+  const redFlagsBlock = input.red_flags.length > 0
+    ? `<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:14px;margin:0 0 18px 0">
+         <div style="font-size:11px;font-weight:700;color:#9A3412;text-transform:uppercase;letter-spacing:1px">⚠️ На что обратить внимание</div>
+         <ul style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.6">
+           ${input.red_flags.map(rf => `<li>${escape(rf)}</li>`).join('')}
+         </ul>
+       </div>`
+    : ''
+
+  const inner = `
+    <div style="font-size:11px;color:#2563EB;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:6px">
+      Free 7-day Adaptive Plan
+    </div>
+    <h1 style="margin:0 0 8px 0;font-size:22px;color:#0F172A;line-height:1.3">
+      Ваш план · ${escape(input.sport)}
+    </h1>
+    ${input.goal ? `<p style="margin:0 0 4px 0;color:#64748B;font-size:13px">Цель: ${escape(input.goal)}</p>` : ''}
+    <p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+      ${escape(input.overview)}
+    </p>
+
+    <h2 style="margin:0 0 8px 0;font-size:14px;color:#0F172A;text-transform:uppercase;letter-spacing:1px;font-weight:700">7 дней</h2>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:18px">
+      ${dayRows}
+    </table>
+
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px;margin:0 0 14px 0">
+      <div style="font-size:11px;font-weight:700;color:#1D4ED8;text-transform:uppercase;letter-spacing:1px">🧠 Логика плана</div>
+      <p style="margin:6px 0 0 0;color:#0F172A;font-size:13px;line-height:1.6">${escape(input.rationale)}</p>
+    </div>
+
+    ${redFlagsBlock}
+
+    <p style="margin:24px 0 12px 0;color:#0F172A;font-size:14px;line-height:1.6">
+      Хотите свежий план каждую неделю автоматически?
+    </p>
+    <p style="margin:0">
+      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=adaptive-plan&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть ProForm бесплатно →
+      </a>
+    </p>
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      Подключите Garmin / Whoop / Apple Health — каждую неделю AI обновляет план
+      на основе фактической нагрузки и recovery.
+    </p>
+  `
+  return { subject, html: wrap(subject, `7-day plan · ${input.sport} · ${input.level}`, inner) }
+}
+

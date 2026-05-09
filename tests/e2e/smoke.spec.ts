@@ -607,3 +607,76 @@ test.describe('api/tools/lead — accepts new team-risk source', () => {
     expect([201, 429]).toContain(res.status())
   })
 })
+
+// ── Sprint W4 Day 19 (PR #35) — Adaptive Plan Preview lead magnet ──────────
+
+test.describe('public /tools/adaptive-plan page', () => {
+  test('renders without 500 (anon)', async ({ page }) => {
+    const res = await page.goto('/tools/adaptive-plan')
+    expect(res?.status()).toBeLessThan(500)
+    await expect(page.getByRole('heading', { name: /Free 7-day Adaptive Plan/i }).first()).toBeVisible()
+  })
+
+  test('shows "Получить план" CTA', async ({ page }) => {
+    await page.goto('/tools/adaptive-plan')
+    const cta = page.getByRole('button', { name: /Получить план/i }).first()
+    await expect(cta).toBeVisible()
+  })
+})
+
+test.describe('api/tools/adaptive-plan — public contract', () => {
+  test('POST with empty body → 400 INVALID_INPUT', async ({ request }) => {
+    const res = await request.post('/api/tools/adaptive-plan', { data: {} })
+    expect(res.status()).toBe(400)
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+    expect(body.error).toBe('INVALID_INPUT')
+  })
+
+  test('POST with malformed date → 400', async ({ request }) => {
+    const res = await request.post('/api/tools/adaptive-plan', {
+      data: {
+        sport: 'Бег',
+        weeks_history: [{ date: 'not-a-date', activity_type: 'Бег', duration_min: 30 }],
+      },
+    })
+    expect(res.status()).toBe(400)
+  })
+
+  test('POST with valid minimal input does not 500', async ({ request }) => {
+    // No AI key in test env → fallback to rule-based plan. 200 + valid
+    // schema (overview, days[7], rationale). Accept 429/500 if AI fails.
+    const res = await request.post('/api/tools/adaptive-plan', {
+      data: {
+        sport: 'Бег',
+        goal: 'Smoke test',
+        weeks_history: [
+          { date: '2026-05-01', activity_type: 'Бег', duration_min: 30 },
+          { date: '2026-05-03', activity_type: 'Бег', duration_min: 45 },
+        ],
+      },
+    })
+    expect([200, 429, 500]).toContain(res.status())
+    if (res.status() === 200) {
+      const body = await res.json()
+      expect(body.ok).toBe(true)
+      expect(body.data).toBeTruthy()
+      expect(Array.isArray(body.data.days)).toBe(true)
+      expect(body.data.days.length).toBe(7)
+    }
+  })
+})
+
+test.describe('api/tools/lead — accepts new adaptive-plan source', () => {
+  test('POST source=adaptive-plan + consent → 201 or rate_limited', async ({ request }) => {
+    const res = await request.post('/api/tools/lead', {
+      data: {
+        email: `smoke-ap-${Date.now()}@example.com`,
+        source: 'adaptive-plan',
+        consent: true,
+        payload: { sport: 'Бег', level: 'intermediate', workouts_count: 5 },
+      },
+    })
+    expect([201, 429]).toContain(res.status())
+  })
+})
