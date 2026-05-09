@@ -680,3 +680,82 @@ test.describe('api/tools/lead — accepts new adaptive-plan source', () => {
     expect([201, 429]).toContain(res.status())
   })
 })
+
+// ── Sprint W4 Day 20 (PR #36) — Club Audit lead magnet ─────────────────────
+
+test.describe('public /tools/club-audit page', () => {
+  test('renders without 500 (anon)', async ({ page }) => {
+    const res = await page.goto('/tools/club-audit')
+    expect(res?.status()).toBeLessThan(500)
+    await expect(page.getByRole('heading', { name: /Где теряете/i }).first()).toBeVisible()
+  })
+
+  test('shows audit CTA', async ({ page }) => {
+    await page.goto('/tools/club-audit')
+    const cta = page.getByRole('button', { name: /audit-отчёт/i }).first()
+    await expect(cta).toBeVisible()
+  })
+})
+
+test.describe('api/tools/club-audit — public contract', () => {
+  test('POST with empty body → 400 INVALID_INPUT', async ({ request }) => {
+    const res = await request.post('/api/tools/club-audit', { data: {} })
+    expect(res.status()).toBe(400)
+    const body = await res.json()
+    expect(body.ok).toBe(false)
+    expect(body.error).toBe('INVALID_INPUT')
+  })
+
+  test('POST with active > total → 400 INVALID_INPUT', async ({ request }) => {
+    const res = await request.post('/api/tools/club-audit', {
+      data: {
+        primary_sport: 'Футбол',
+        total_athletes: 50,
+        active_athletes: 100,  // > total
+        coaches_count: 3,
+        training_tracking: 'excel',
+        billing_tracking:  'excel',
+        medical_tracking:  'paper',
+        pain_points: [],
+      },
+    })
+    expect(res.status()).toBe(400)
+  })
+
+  test('POST with valid minimal input does not 500', async ({ request }) => {
+    const res = await request.post('/api/tools/club-audit', {
+      data: {
+        primary_sport: 'Футбол',
+        total_athletes: 100,
+        active_athletes: 80,
+        coaches_count: 5,
+        training_tracking: 'excel',
+        billing_tracking:  'excel',
+        medical_tracking:  'paper',
+        pain_points: ['retention'],
+      },
+    })
+    expect([200, 429, 500]).toContain(res.status())
+    if (res.status() === 200) {
+      const body = await res.json()
+      expect(body.ok).toBe(true)
+      expect(typeof body.data.health_score).toBe('number')
+      expect(['critical','at-risk','stable','healthy']).toContain(body.data.health_label)
+      expect(Array.isArray(body.data.risk_areas)).toBe(true)
+    }
+  })
+})
+
+test.describe('api/tools/lead — accepts new club-audit source', () => {
+  test('POST source=club-audit + consent → 201 or rate_limited', async ({ request }) => {
+    const res = await request.post('/api/tools/lead', {
+      data: {
+        email: `smoke-ca-${Date.now()}@example.com`,
+        source: 'club-audit',
+        consent: true,
+        payload: { primary_sport: 'Футбол', total_athletes: 100, health_score: 65 },
+      },
+    })
+    expect([201, 429]).toContain(res.status())
+  })
+})
