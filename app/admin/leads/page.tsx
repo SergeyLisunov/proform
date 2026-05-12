@@ -16,8 +16,9 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import {
-  listLeads,
+  listLeadsWithUserInfo,
   getFunnelStats,
+  getConversionFunnel,
   type LeadSource,
 } from '@/services/admin-leads.service'
 
@@ -79,15 +80,24 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
   const offset           = (page - 1) * limit
 
   // ── Fetch data ────────────────────────────────────────────────────
-  const [stats, leads] = await Promise.all([
+  const [stats, conversion, leads] = await Promise.all([
     getFunnelStats(),
-    listLeads({ source: filterSource, dispatched: filterDispatched, limit, offset }),
+    getConversionFunnel(),
+    listLeadsWithUserInfo({ source: filterSource, dispatched: filterDispatched, limit, offset }),
   ])
 
-  const totalLeads = stats.reduce((acc, s) => acc + s.total, 0)
+  const totalLeads      = stats.reduce((acc, s) => acc + s.total, 0)
   const totalDispatched = stats.reduce((acc, s) => acc + s.dispatched, 0)
-  const totalPending = stats.reduce((acc, s) => acc + s.pending, 0)
-  const totalFailed = stats.reduce((acc, s) => acc + s.failed, 0)
+  const totalPending    = stats.reduce((acc, s) => acc + s.pending, 0)
+  const totalFailed     = stats.reduce((acc, s) => acc + s.failed, 0)
+  const totalConverted  = conversion.reduce((acc, c) => acc + c.converted_to_users, 0)
+  const totalPaid       = conversion.reduce((acc, c) => acc + c.converted_to_paid, 0)
+  const overallConvPct  = totalLeads > 0 ? Math.round((totalConverted / totalLeads) * 1000) / 10 : 0
+
+  // Index conversion stats by source for funnel table merge
+  const convBySource = new Map<LeadSource, typeof conversion[0]>()
+  for (const c of conversion) convBySource.set(c.source, c)
+
   const totalPages = Math.max(1, Math.ceil(leads.total / limit))
 
   return (
@@ -109,11 +119,13 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       </div>
 
       {/* Top counters */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <CounterTile label="Всего leads"           value={totalLeads}      color="#0F172A" />
-        <CounterTile label="Email отправлено"      value={totalDispatched} color="#15803D" />
-        <CounterTile label="Pending"               value={totalPending}    color="#0891B2" />
-        <CounterTile label="Failed (3+ attempts)"  value={totalFailed}     color="#B91C1C" />
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <CounterTile label="Всего leads"             value={totalLeads}      color="#0F172A" />
+        <CounterTile label="Email отправлено"        value={totalDispatched} color="#15803D" />
+        <CounterTile label="Pending"                 value={totalPending}    color="#0891B2" />
+        <CounterTile label="Failed (3+ attempts)"    value={totalFailed}     color="#B91C1C" />
+        <CounterTile label="Converted → users"       value={totalConverted}  color="#7C3AED" subtitle={`${overallConvPct}% conv. rate`} />
+        <CounterTile label="Converted → paid"        value={totalPaid}       color="#EA580C" />
       </div>
 
       {/* Funnel by source */}
@@ -126,16 +138,20 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                 <th className="pb-2 pr-4">Source</th>
                 <th className="pb-2 pr-4 text-right">Total</th>
                 <th className="pb-2 pr-4 text-right">Dispatched</th>
-                <th className="pb-2 pr-4 text-right">Pending</th>
-                <th className="pb-2 pr-4 text-right">Failed</th>
+                <th className="pb-2 pr-4 text-right">Converted</th>
+                <th className="pb-2 pr-4 text-right">Paid</th>
                 <th className="pb-2 pr-4 text-right">Conv. rate</th>
+                <th className="pb-2 pr-4 text-right">Failed</th>
                 <th className="pb-2">Last lead</th>
               </tr>
             </thead>
             <tbody>
               {stats.map(s => {
                 const meta = SOURCE_META[s.source]
-                const convRate = s.total > 0 ? Math.round((s.dispatched / s.total) * 100) : 0
+                const conv = convBySource.get(s.source)
+                const converted    = conv?.converted_to_users ?? 0
+                const paid         = conv?.converted_to_paid ?? 0
+                const convRatePct  = conv?.conversion_rate_percent ?? 0
                 return (
                   <tr key={s.source} className="border-b border-border/50 last:border-0">
                     <td className="py-2.5 pr-4">
@@ -146,9 +162,10 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                     </td>
                     <td className="py-2.5 pr-4 text-right font-bold text-foreground">{s.total}</td>
                     <td className="py-2.5 pr-4 text-right text-emerald-700 font-semibold">{s.dispatched}</td>
-                    <td className="py-2.5 pr-4 text-right text-cyan-700">{s.pending}</td>
+                    <td className="py-2.5 pr-4 text-right text-violet-700 font-semibold">{converted}</td>
+                    <td className="py-2.5 pr-4 text-right text-orange-700 font-semibold">{paid}</td>
+                    <td className="py-2.5 pr-4 text-right text-muted-foreground">{convRatePct}%</td>
                     <td className="py-2.5 pr-4 text-right text-red-700">{s.failed}</td>
-                    <td className="py-2.5 pr-4 text-right text-muted-foreground">{convRate}%</td>
                     <td className="py-2.5 text-xs text-muted-foreground">
                       {s.most_recent_at ? new Date(s.most_recent_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : '—'}
                     </td>
@@ -157,7 +174,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
               })}
               {stats.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
                     Пока нет leads. Откройте /tools/team-risk и заполните пример → появится первая запись.
                   </td>
                 </tr>
@@ -202,6 +219,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                     <th className="pb-2 pr-3">Source</th>
                     <th className="pb-2 pr-3">Captured</th>
                     <th className="pb-2 pr-3">Dispatched</th>
+                    <th className="pb-2 pr-3">Converted</th>
                     <th className="pb-2 pr-3 text-right">Attempts</th>
                     <th className="pb-2">Payload meta</th>
                   </tr>
@@ -231,6 +249,15 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                             <span className="text-red-700">❌ Failed</span>
                           ) : (
                             <span className="text-cyan-700">⏳ Pending</span>
+                          )}
+                        </td>
+                        <td className="py-2 pr-3 text-xs">
+                          {r.converted_at ? (
+                            <span className="text-violet-700 font-semibold" title={r.user_name ? `${r.user_name} (${r.user_role ?? 'user'})` : 'Signup detected'}>
+                              🎯 {r.user_role ? r.user_role.slice(0, 3).toUpperCase() : 'USR'} · {new Date(r.converted_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
                           )}
                         </td>
                         <td className="py-2 pr-3 text-right text-xs text-muted-foreground">{r.email_attempts}</td>
@@ -284,11 +311,14 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-function CounterTile({ label, value, color }: { label: string; value: number; color: string }) {
+function CounterTile({ label, value, color, subtitle }: { label: string; value: number; color: string; subtitle?: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="pf-num text-2xl font-bold mt-1" style={{ color }}>{value}</div>
+      {subtitle && (
+        <div className="text-[10px] font-semibold mt-0.5" style={{ color }}>{subtitle}</div>
+      )}
     </div>
   )
 }

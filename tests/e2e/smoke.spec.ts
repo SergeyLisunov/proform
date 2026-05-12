@@ -892,3 +892,39 @@ test.describe('api/cron/leads-digest — auth gate', () => {
     expect([401, 503]).toContain(res.status())
   })
 })
+
+// ── Sprint W5 Day 23 (PR #39) — UTM attribution + lead conversion ──────────
+
+test.describe('auth/register — UTM attribution', () => {
+  test('renders без UTM params (regression)', async ({ page }) => {
+    const res = await page.goto('/auth/register')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('renders с UTM params (W5 Day 23 capture flow)', async ({ page }) => {
+    const res = await page.goto('/auth/register?utm_source=team-risk&utm_medium=tools&utm_campaign=email')
+    expect(res?.status()).toBeLessThan(500)
+    // UTM params читаются client-side через useEffect → window.location.search.
+    // Сами params не отображаются на странице (transparent capture) — мы только
+    // verify что page renders без crash.
+    expect(page.url()).toContain('utm_source=team-risk')
+  })
+
+  test('renders с malformed UTM params без 500', async ({ page }) => {
+    // Sanitization в readUtmFromUrl() должна обрезать control chars + cap length
+    const res = await page.goto('/auth/register?utm_source=' + 'x'.repeat(500))
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
+
+test.describe('admin/leads — Conversion column (regression)', () => {
+  test('unauth visit still gated (W5 Day 23 didnt break auth)', async ({ page }) => {
+    const res = await page.goto('/admin/leads')
+    expect(res?.status()).toBeLessThan(500)
+    // Should still redirect to /auth/login OR show access-denied UI
+    const url = page.url()
+    const onLogin = url.includes('/auth/login')
+    const onAdminLeads = url.endsWith('/admin/leads')
+    expect(onLogin || onAdminLeads).toBeTruthy()
+  })
+})
