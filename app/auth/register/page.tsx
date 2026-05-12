@@ -1,8 +1,47 @@
 'use client'
 
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+
+// ── UTM attribution (Sprint W5 Day 23 / PR #39) ───────────────────────
+// Reads UTM params from URL on mount and passes them to signUp() options.data.
+// handle_new_auth_user() trigger (migration 061) копирует их в users.utm_*
+// и автоматически matches tool_leads по email (sets user_id + converted_at).
+//
+// Using window.location.search вместо useSearchParams() — избегаем
+// Suspense boundary requirement для full page (page is client-only).
+interface UtmCapture {
+  utm_source:      string | null
+  utm_medium:      string | null
+  utm_campaign:    string | null
+  utm_content:     string | null
+  utm_term:        string | null
+  signup_referrer: string | null
+}
+
+function readUtmFromUrl(): UtmCapture {
+  if (typeof window === 'undefined') {
+    return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null, utm_term: null, signup_referrer: null }
+  }
+  const sp = new URLSearchParams(window.location.search)
+  const safe = (key: string, max = 80): string | null => {
+    const v = sp.get(key)?.trim()
+    if (!v) return null
+    // Lightweight sanitization — strip control chars, cap length
+    return v.replace(/[\x00-\x1F\x7F]/g, '').slice(0, max) || null
+  }
+  return {
+    utm_source:      safe('utm_source',   80),
+    utm_medium:      safe('utm_medium',   80),
+    utm_campaign:    safe('utm_campaign', 120),
+    utm_content:     safe('utm_content',  120),
+    utm_term:        safe('utm_term',     120),
+    signup_referrer: typeof document !== 'undefined'
+      ? (document.referrer ? document.referrer.slice(0, 500) : null)
+      : null,
+  }
+}
 
 type Role = 'athlete' | 'coach' | 'organization' | 'doctor'
 type Plan = 'free' | 'pro' | 'team'
@@ -198,6 +237,13 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // UTM capture — read once on mount, persist в state до signUp
+  const [utm, setUtm] = useState<UtmCapture>({
+    utm_source: null, utm_medium: null, utm_campaign: null,
+    utm_content: null, utm_term: null, signup_referrer: null,
+  })
+  useEffect(() => { setUtm(readUtmFromUrl()) }, [])
+
   const [athleteForm, setAthleteForm] = useState({
     first_name: '',
     last_name: '',
@@ -241,7 +287,19 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { name, role: selectedRole },
+        data: {
+          name,
+          role: selectedRole,
+          // UTM attribution — picked up by handle_new_auth_user() trigger
+          // (migration 061) which copies in users.utm_* + auto-matches
+          // tool_leads by email.
+          ...(utm.utm_source      ? { utm_source:      utm.utm_source }      : {}),
+          ...(utm.utm_medium      ? { utm_medium:      utm.utm_medium }      : {}),
+          ...(utm.utm_campaign    ? { utm_campaign:    utm.utm_campaign }    : {}),
+          ...(utm.utm_content     ? { utm_content:     utm.utm_content }     : {}),
+          ...(utm.utm_term        ? { utm_term:        utm.utm_term }        : {}),
+          ...(utm.signup_referrer ? { signup_referrer: utm.signup_referrer } : {}),
+        },
       },
     })
 
