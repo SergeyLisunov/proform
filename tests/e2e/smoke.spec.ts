@@ -1032,3 +1032,26 @@ test.describe('doctor-inquiries notify + convert endpoints — auth gate', () =>
     expect([400, 401]).toContain(res.status())
   })
 })
+
+// ── Sprint W6 Day 29 (PR #47) — Notification prefs enforcement on cron + email routes ──
+
+test.describe('cron + email prefs enforcement — auth gate intact', () => {
+  test('GET /api/digest/daily без CRON_SECRET → 401', async ({ request }) => {
+    const res = await request.get('/api/digest/daily')
+    expect(res.status()).toBe(401)
+    const body = await res.json().catch(() => ({}))
+    expect(body.ok).toBe(false)
+  })
+
+  test('GET /api/digest/weekly без CRON_SECRET → 401', async ({ request }) => {
+    const res = await request.get('/api/digest/weekly')
+    expect(res.status()).toBe(401)
+    const body = await res.json().catch(() => ({}))
+    expect(body.ok).toBe(false)
+  })
+
+  test('GET /api/cron/leads-digest без CRON_SECRET → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/leads-digest')
+    expect(res.status()).toBe(401)
+  })
+})

@@ -20,6 +20,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { renderDoctorInquiryEmail } from '@/lib/email/templates'
+import { isChannelAllowed, type PrefsBag } from '@/services/notification-prefs-server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -42,7 +43,7 @@ const URGENCY_LABELS: Record<'routine' | 'urgent' | 'red_flag', string> = {
   red_flag: 'Red Flag (24 ч)',
 }
 
-interface NamedUser { id: string; name: string | null; email: string | null }
+interface NamedUser { id: string; name: string | null; email: string | null; notification_prefs?: PrefsBag }
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -90,12 +91,16 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   // ── Resolve recipients ───────────────────────────────────────────────
   let recipients: NamedUser[] = []
   if (inquiry.doctor_id) {
-    const { data } = await admin.from('users').select('id, name, email').eq('id', inquiry.doctor_id).maybeSingle()
+    const { data } = await admin
+      .from('users')
+      .select('id, name, email, notification_prefs')
+      .eq('id', inquiry.doctor_id)
+      .maybeSingle()
     if (data) recipients = [data as NamedUser]
   } else {
     const { data } = await admin
       .from('users')
-      .select('id, name, email')
+      .select('id, name, email, notification_prefs')
       .eq('role', 'doctor')
       .not('email', 'is', null)
       .limit(MAX_OPEN_QUEUE_FANOUT)
@@ -103,6 +108,21 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   }
   if (recipients.length === 0) {
     return NextResponse.json({ ok: true, sent_count: 0, recipients: [], note: 'NO_RECIPIENTS' })
+  }
+
+  // W6 Day 29: filter out doctors who opted out of inquiry_email channel.
+  // Open-queue case: if all candidates opted out, the inquiry still
+  // appears in their /doctor/inquiries UI — they just won't get an email.
+  const optedInRecipients = recipients.filter(r =>
+    isChannelAllowed(r.notification_prefs, 'inquiry_email'),
+  )
+  const optedOutCount = recipients.length - optedInRecipients.length
+  recipients = optedInRecipients
+  if (recipients.length === 0) {
+    return NextResponse.json({
+      ok: true, sent_count: 0, recipients: [], skipped_pref: optedOutCount,
+      note: 'ALL_RECIPIENTS_OPTED_OUT',
+    })
   }
 
   // ── Resolve coach + athlete display names for the email body ─────────
@@ -162,5 +182,10 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     console.warn('[doctor-inquiry.notify] Resend init failed:', e instanceof Error ? e.message : e)
   }
 
-  return NextResponse.json({ ok: true, sent_count: sent, recipients: sentIds })
+  return NextResponse.json({
+    ok: true,
+    sent_count:   sent,
+    recipients:   sentIds,
+    skipped_pref: optedOutCount,
+  })
 }

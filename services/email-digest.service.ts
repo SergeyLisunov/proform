@@ -4,6 +4,7 @@ import {
   renderAthleteDailyDigest, renderCoachWeeklyDigest,
   type AthleteDailyEvent, type CoachWeeklyAthleteStat,
 } from '@/lib/email/templates'
+import { isChannelAllowed, type PrefsBag } from './notification-prefs-server'
 
 const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
 
@@ -25,7 +26,13 @@ function in30ISO(): string {
   return new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10)
 }
 
-interface DigestResult { sent: number; skipped: number; errors: string[] }
+interface DigestResult {
+  sent:           number
+  skipped:        number
+  /** W6 Day 29: distinct subset of skipped — opted out via notification_prefs. */
+  skipped_pref?:  number
+  errors:         string[]
+}
 
 /**
  * Daily athlete digest. For each athlete, collects today's events and
@@ -33,25 +40,33 @@ interface DigestResult { sent: number; skipped: number; errors: string[] }
  * we still send once per week (Sunday) as a gentle "free day" note.
  */
 export async function runAthleteDailyDigest(): Promise<DigestResult> {
-  const result: DigestResult = { sent: 0, skipped: 0, errors: [] }
+  const result: DigestResult = { sent: 0, skipped: 0, skipped_pref: 0, errors: [] }
   const resend = getResend()
   if (!resend) { result.errors.push('RESEND_API_KEY missing'); return result }
 
   const sb = createAdminClient()
   const today = todayISO()
 
-  // Fetch all athletes with email
+  // Fetch all athletes with email + their prefs (W6 Day 29: filter
+  // opt-outs server-side rather than per-row RPC).
   const { data: athletesRaw, error: aErr } = await sb
     .from('users')
-    .select('id, name, email, role')
+    .select('id, name, email, role, notification_prefs')
     .eq('role', 'athlete')
   if (aErr) { result.errors.push(`users: ${aErr.message}`); return result }
   const athletes = (athletesRaw ?? []) as Array<{
     id: string; name: string | null; email: string | null; role: string
+    notification_prefs: PrefsBag
   }>
 
   for (const a of athletes) {
     if (!a.email) { result.skipped++; continue }
+    // W6 Day 29: respect users.notification_prefs.daily_digest_email
+    if (!isChannelAllowed(a.notification_prefs, 'daily_digest_email')) {
+      result.skipped++
+      result.skipped_pref = (result.skipped_pref ?? 0) + 1
+      continue
+    }
 
     // Today's coach sessions
     const { data: csRaw } = await sb
@@ -138,7 +153,7 @@ export async function runAthleteDailyDigest(): Promise<DigestResult> {
  * and average recovery score.
  */
 export async function runCoachWeeklyDigest(): Promise<DigestResult> {
-  const result: DigestResult = { sent: 0, skipped: 0, errors: [] }
+  const result: DigestResult = { sent: 0, skipped: 0, skipped_pref: 0, errors: [] }
   const resend = getResend()
   if (!resend) { result.errors.push('RESEND_API_KEY missing'); return result }
 
@@ -149,14 +164,21 @@ export async function runCoachWeeklyDigest(): Promise<DigestResult> {
 
   const { data: coachesRaw } = await sb
     .from('users')
-    .select('id, name, email, role')
+    .select('id, name, email, role, notification_prefs')
     .eq('role', 'coach')
   const coaches = (coachesRaw ?? []) as Array<{
     id: string; name: string | null; email: string | null; role: string
+    notification_prefs: PrefsBag
   }>
 
   for (const c of coaches) {
     if (!c.email) { result.skipped++; continue }
+    // W6 Day 29: respect users.notification_prefs.coach_weekly_email
+    if (!isChannelAllowed(c.notification_prefs, 'coach_weekly_email')) {
+      result.skipped++
+      result.skipped_pref = (result.skipped_pref ?? 0) + 1
+      continue
+    }
 
     const { data: linksRaw } = await sb
       .from('trainer_athletes')

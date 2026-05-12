@@ -25,6 +25,8 @@ import {
   type LeadSource,
 } from '@/services/admin-leads.service'
 import { renderLeadDrip } from '@/lib/email/lead-drip-templates'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { isChannelAllowed, type PrefsBag } from '@/services/notification-prefs-server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -39,6 +41,9 @@ interface DispatchResult {
   dispatched:   number
   failed:       number
   skipped:      number
+  /** Sprint W6 Day 29: subset of `skipped` — matched user opted out
+   *  of `drip_marketing_email` via /settings/notifications. */
+  skipped_pref?: number
   by_source:    Partial<Record<LeadSource, { dispatched: number; failed: number }>>
   duration_ms:  number
 }
@@ -86,10 +91,30 @@ export async function GET(req: Request) {
     } satisfies DispatchResult)
   }
 
+  // ── W6 Day 29: batch-fetch prefs for leads that have a matched user.
+  //    Pre-signup leads (user_id IS NULL) get the drip — they opted in
+  //    via the tool form. Post-signup leads gate on
+  //    notification_prefs.drip_marketing_email.
+  const matchedUserIds = Array.from(new Set(
+    pending.map(l => l.user_id).filter((id): id is string => !!id),
+  ))
+  const prefsByUserId = new Map<string, PrefsBag>()
+  if (matchedUserIds.length > 0) {
+    const admin = createAdminClient()
+    const { data: usersRows } = await admin
+      .from('users')
+      .select('id, notification_prefs')
+      .in('id', matchedUserIds)
+    for (const u of (usersRows ?? []) as Array<{ id: string; notification_prefs: PrefsBag }>) {
+      prefsByUserId.set(u.id, u.notification_prefs)
+    }
+  }
+
   // ── Process each ──────────────────────────────────────────────────
-  let dispatched = 0
-  let failed     = 0
-  let skipped    = 0
+  let dispatched   = 0
+  let failed       = 0
+  let skipped      = 0
+  let skipped_pref = 0
   const by_source: DispatchResult['by_source'] = {}
 
   function tally(source: LeadSource, kind: 'dispatched' | 'failed') {
@@ -99,6 +124,19 @@ export async function GET(req: Request) {
   }
 
   for (const lead of pending) {
+    // W6 Day 29: opt-out check for matched users
+    if (lead.user_id) {
+      const prefs = prefsByUserId.get(lead.user_id)
+      if (!isChannelAllowed(prefs, 'drip_marketing_email')) {
+        // Mark as dispatched to prevent endless retries — user opted out.
+        // Lead remains in DB for analytics, but won't be re-attempted.
+        await markDispatched(lead.id)
+        skipped++
+        skipped_pref++
+        continue
+      }
+    }
+
     const drip = renderLeadDrip({ source: lead.source as 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary', payload: lead.payload })
     if (!drip) {
       skipped++
@@ -137,6 +175,7 @@ export async function GET(req: Request) {
     dispatched,
     failed,
     skipped,
+    skipped_pref,
     by_source,
     duration_ms: Date.now() - start,
   }
