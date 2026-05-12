@@ -928,3 +928,17 @@ test.describe('admin/leads — Conversion column (regression)', () => {
     expect(onLogin || onAdminLeads).toBeTruthy()
   })
 })
+
+// ── Sprint W5 Day 25 (PR #41) — Athlete Goals & Progress ──────────────────
+
+test.describe('athlete/goals + /athlete/progress — auth gate + render', () => {
+  test('/athlete/goals renders без 500 (unauth → "войдите" UI)', async ({ page }) => {
+    const res = await page.goto('/athlete/goals')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/athlete/progress renders без 500', async ({ page }) => {
+    const res = await page.goto('/athlete/progress')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
