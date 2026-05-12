@@ -989,3 +989,17 @@ test.describe('coach/plans — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W5 Day 27 (PR #44) — Athlete Dashboard + Notification Prefs ────
+
+test.describe('athlete/dashboard + settings/notifications — auth gate + render', () => {
+  test('/athlete/dashboard renders без 500 (unauth → "войдите" UI)', async ({ page }) => {
+    const res = await page.goto('/athlete/dashboard')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/settings/notifications renders без 500 (unauth → "войдите" UI)', async ({ page }) => {
+    const res = await page.goto('/settings/notifications')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
