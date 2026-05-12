@@ -928,3 +928,22 @@ test.describe('admin/leads — Conversion column (regression)', () => {
     expect(onLogin || onAdminLeads).toBeTruthy()
   })
 })
+
+// ── Sprint W5 Day 24 (PR #40) — Coach Workout Builder ──────────────────────
+
+test.describe('coach/plans — auth gate + render', () => {
+  test('/coach/plans renders without 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/coach/plans')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/coach/plans/new renders without 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/coach/plans/new')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/coach/plans/<fake-id> renders without 500', async ({ page }) => {
+    const res = await page.goto('/coach/plans/00000000-0000-0000-0000-000000000000')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
