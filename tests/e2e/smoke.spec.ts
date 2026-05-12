@@ -1088,3 +1088,27 @@ test.describe('/onboarding wizards (Org + Doctor) — auth gate + render', () =>
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W6 Day 32 (PR #50) — Marketplace seeding + A/B test infrastructure ──
+
+test.describe('/marketplace search + A/B admin', () => {
+  test('/marketplace renders без 500 (catalog page)', async ({ page }) => {
+    const res = await page.goto('/marketplace')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/marketplace?q=консультация renders без 500', async ({ page }) => {
+    const res = await page.goto('/marketplace?q=%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/marketplace?sort=price_asc renders без 500', async ({ page }) => {
+    const res = await page.goto('/marketplace?sort=price_asc')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/admin/ab-tests renders без 500 (unauth → redirect to /login)', async ({ page }) => {
+    const res = await page.goto('/admin/ab-tests')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})

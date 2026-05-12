@@ -137,7 +137,14 @@ export async function GET(req: Request) {
       }
     }
 
-    const drip = renderLeadDrip({ source: lead.source as 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary', payload: lead.payload })
+    // W6 Day 32: pick A/B variant from payload (set by /api/tools/lead).
+    const rawVariant = (lead.payload as Record<string, unknown> | null)?.ab_variant
+    const variant: 'a' | 'b' = rawVariant === 'b' ? 'b' : 'a'
+    const drip = renderLeadDrip({
+      source: lead.source as 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary',
+      payload: lead.payload,
+      variant,
+    })
     if (!drip) {
       skipped++
       continue

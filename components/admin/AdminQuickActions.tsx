@@ -36,6 +36,13 @@ const ACTIONS: QuickAction[] = [
     bg: '#F0FDF4', color: '#15803D', border: '#BBF7D0',
   },
   {
+    href: '/admin/ab-tests',
+    icon: 'ki-chart-pie-simple',
+    label: 'A/B тесты',
+    hint: 'Drip-конверсия по вариантам',
+    bg: '#F5F3FF', color: '#7C3AED', border: '#DDD6FE',
+  },
+  {
     href: 'https://supabase.com/dashboard/project/hhyjihbctidtucvpgjzv',
     external: true,
     icon: 'ki-data',

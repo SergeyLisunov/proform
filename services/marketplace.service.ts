@@ -131,21 +131,28 @@ function serviceToOffering(r: CoachServiceRow): Offering {
   }
 }
 
+export type OfferingSort = 'newest' | 'price_asc' | 'price_desc'
+
 export interface ListOfferingsFilter {
-  sellerRole?: SellerRole
+  sellerRole?:  SellerRole
   serviceType?: ServiceType
-  specialty?: SellerSpecialty
+  specialty?:   SellerSpecialty
+  /** Sprint W6 Day 32: case-insensitive substring match on title/description. */
+  q?:           string
+  /** Sprint W6 Day 32: 'newest' (default) | 'price_asc' | 'price_desc'. */
+  sort?:        OfferingSort
   /** Limit results; default 100 */
-  limit?: number
+  limit?:       number
 }
 
 /**
- * Returns a unified list of active offerings across both tables. Sorts
- * by created_at DESC. Filters apply to BOTH tables consistently.
+ * Returns a unified list of active offerings across both tables. Filters
+ * apply to BOTH tables consistently; sort happens after the merge.
  */
 export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<Offering[]> {
   const sb = createClient()
   const limit = filter.limit ?? 100
+  const sort  = filter.sort ?? 'newest'
 
   let pq = sb.from('coach_pass_plans').select('*').eq('is_active', true).limit(limit)
   let sq = sb.from('coach_services').select('*').eq('is_active', true).limit(limit)
@@ -162,6 +169,12 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
     pq = pq.eq('seller_specialty', filter.specialty)
     sq = sq.eq('seller_specialty', filter.specialty)
   }
+  // W6 Day 32: text search via ilike on title OR description.
+  if (filter.q && filter.q.trim().length > 0) {
+    const needle = `%${filter.q.trim().replace(/[%_]/g, m => `\\${m}`)}%`
+    pq = pq.or(`title.ilike.${needle},description.ilike.${needle}`)
+    sq = sq.or(`title.ilike.${needle},description.ilike.${needle}`)
+  }
 
   const [{ data: passes }, { data: services }] = await Promise.all([pq, sq])
 
@@ -169,8 +182,40 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
     ...((passes  ?? []) as CoachPassPlanRow[]).map(passPlanToOffering),
     ...((services ?? []) as CoachServiceRow[]).map(serviceToOffering),
   ]
-  all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  if (sort === 'price_asc')  all.sort((a, b) => a.price_cents - b.price_cents)
+  else if (sort === 'price_desc') all.sort((a, b) => b.price_cents - a.price_cents)
+  else                       all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   return all.slice(0, limit)
+}
+
+/**
+ * Sprint W6 Day 32: returns offerings whose seller has is_featured=true.
+ * Used by the /marketplace featured-carousel above the main catalog.
+ * Hard cap: 6 cards (2 sellers × ~3 offerings, but typically each has 2).
+ */
+export async function listFeaturedOfferings(): Promise<Offering[]> {
+  const sb = createClient()
+  // Step 1: find featured sellers (small set, fast query).
+  const { data: featuredSellers } = await sb
+    .from('users')
+    .select('id')
+    .eq('is_featured', true)
+    .limit(10)
+  const featuredIds = ((featuredSellers ?? []) as Array<{ id: string }>).map(s => s.id)
+  if (featuredIds.length === 0) return []
+
+  // Step 2: fetch their active offerings.
+  const [{ data: passes }, { data: services }] = await Promise.all([
+    sb.from('coach_pass_plans').select('*').eq('is_active', true).in('coach_id', featuredIds).limit(6),
+    sb.from('coach_services').select('*').eq('is_active', true).in('coach_id', featuredIds).limit(6),
+  ])
+
+  const all: Offering[] = [
+    ...((passes  ?? []) as CoachPassPlanRow[]).map(passPlanToOffering),
+    ...((services ?? []) as CoachServiceRow[]).map(serviceToOffering),
+  ]
+  all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  return all.slice(0, 6)
 }
 
 /**
@@ -187,17 +232,17 @@ export async function getOffering(kind: OfferingKind, id: string): Promise<Offer
     : serviceToOffering(data as CoachServiceRow)
 }
 
-/** Resolve seller user info (name, avatar) for a list of offerings. */
+/** Resolve seller user info (name, avatar, demo + featured flags) for a list of offerings. */
 export async function resolveSellers(
   offerings: Offering[],
-): Promise<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null }>> {
+): Promise<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean }>> {
   if (offerings.length === 0) return new Map()
   const sb = createClient()
   const ids = Array.from(new Set(offerings.map(o => o.seller_id)))
   const { data } = await sb
     .from('users')
-    .select('id, name, avatar_url, role')
+    .select('id, name, avatar_url, role, is_demo, is_featured')
     .in('id', ids)
-  return new Map(((data ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; role: string | null }>)
-    .map(u => [u.id, u]))
+  return new Map(((data ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean | null; is_featured: boolean | null }>)
+    .map(u => [u.id, { ...u, is_demo: u.is_demo ?? false, is_featured: u.is_featured ?? false }]))
 }

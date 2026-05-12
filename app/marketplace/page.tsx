@@ -23,9 +23,10 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
-  listOfferings, resolveSellers,
+  listOfferings, listFeaturedOfferings, resolveSellers,
   ROLE_META, SPECIALTY_META, SERVICE_TYPE_META,
   type Offering, type SellerRole, type ServiceType, type SellerSpecialty,
+  type OfferingSort,
 } from '@/services/marketplace.service'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
@@ -63,37 +64,55 @@ function MarketplaceInner() {
   const role     = (searchParams.get('role')     ?? '') as SellerRole | ''
   const type     = (searchParams.get('type')     ?? '') as ServiceType | ''
   const specialty= (searchParams.get('specialty')?? '') as SellerSpecialty | ''
+  const q        = (searchParams.get('q')        ?? '')
+  const sort     = ((searchParams.get('sort')    ?? 'newest') as OfferingSort)
 
   const [offerings, setOfferings] = useState<Offering[]>([])
-  const [sellers, setSellers]     = useState<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null }>>(new Map())
+  const [featured, setFeatured]   = useState<Offering[]>([])
+  const [sellers, setSellers]     = useState<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean }>>(new Map())
   const [loading, setLoading]     = useState(true)
+  const [searchInput, setSearchInput] = useState(q)
+
+  useEffect(() => { setSearchInput(q) }, [q])
 
   const load = useCallback(async () => {
     setLoading(true)
-    const list = await listOfferings({
-      sellerRole:  role     || undefined,
-      serviceType: type     || undefined,
-      specialty:   specialty|| undefined,
-      limit: 100,
-    })
+    const [list, feat] = await Promise.all([
+      listOfferings({
+        sellerRole:  role     || undefined,
+        serviceType: type     || undefined,
+        specialty:   specialty|| undefined,
+        q:           q        || undefined,
+        sort:        sort,
+        limit:       100,
+      }),
+      // Only show featured carousel when there are no filters AND no search.
+      role || type || specialty || q ? Promise.resolve([] as Offering[]) : listFeaturedOfferings(),
+    ])
     setOfferings(list)
-    const map = await resolveSellers(list)
+    setFeatured(feat)
+    const map = await resolveSellers([...feat, ...list])
     setSellers(map)
     setLoading(false)
-  }, [role, type, specialty])
+  }, [role, type, specialty, q, sort])
 
   useEffect(() => { load() }, [load])
 
-  const setFilter = (key: 'role' | 'type' | 'specialty', value: string) => {
+  const setFilter = (key: 'role' | 'type' | 'specialty' | 'q' | 'sort', value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     if (value) params.set(key, value)
     else        params.delete(key)
     router.push(`/marketplace?${params.toString()}`)
   }
 
-  const clearFilters = () => router.push('/marketplace')
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault()
+    setFilter('q', searchInput.trim())
+  }
 
-  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0)
+  const clearFilters = () => { setSearchInput(''); router.push('/marketplace') }
+
+  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0) + (q ? 1 : 0)
 
   const grouped = useMemo(() => {
     // Group by service_type for display
@@ -126,6 +145,26 @@ function MarketplaceInner() {
           оплата через ЮKassa, чек 54-ФЗ автоматически.
         </p>
       </div>
+
+      {/* Search + Sort row — W6 Day 32 */}
+      <form onSubmit={submitSearch} className="flex items-stretch gap-2 mb-4">
+        <div className="relative flex-1">
+          <i className="ki-filled ki-magnifier pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground" />
+          <input type="search" value={searchInput} onChange={e => setSearchInput(e.target.value)}
+            placeholder="Поиск по названию или описанию"
+            className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-sm outline-none focus:border-orange-400" />
+        </div>
+        <button type="submit"
+          className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 text-sm font-bold whitespace-nowrap">
+          Найти
+        </button>
+        <select value={sort} onChange={e => setFilter('sort', e.target.value === 'newest' ? '' : e.target.value)}
+          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold outline-none focus:border-orange-400">
+          <option value="newest">Сначала новые</option>
+          <option value="price_asc">Сначала дешевле</option>
+          <option value="price_desc">Сначала дороже</option>
+        </select>
+      </form>
 
       {/* Filters */}
       <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex flex-col gap-3">
@@ -184,6 +223,45 @@ function MarketplaceInner() {
           </div>
         </div>
       </div>
+
+      {/* Featured carousel (only without filters/search) — W6 Day 32 */}
+      {!loading && featured.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">⭐</span>
+            <h2 className="text-lg font-bold text-foreground">Рекомендуем</h2>
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+              Featured
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {featured.map(o => {
+              const seller = sellers.get(o.seller_id)
+              const roleMeta = ROLE_META[o.seller_role]
+              return (
+                <Link key={`feat-${o.kind}-${o.id}`}
+                  href={`/marketplace/${o.kind}/${o.id}`}
+                  className="rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col gap-3 no-underline">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-base font-bold text-foreground line-clamp-2">{o.title}</h3>
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
+                      style={{ background: roleMeta.bg, color: roleMeta.color }}>
+                      {roleMeta.emoji} {roleMeta.label}
+                    </span>
+                  </div>
+                  {o.description && <p className="text-xs text-muted-foreground line-clamp-2 flex-1">{o.description}</p>}
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-amber-200">
+                    <div className="pf-num text-xl font-bold text-foreground">{fmtPrice(o.price_cents, o.currency)}</div>
+                    {seller && (
+                      <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">{seller.name ?? '—'}</span>
+                    )}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Catalog */}
       {loading ? (
@@ -252,16 +330,24 @@ function MarketplaceInner() {
                             )}
                           </div>
                           {seller && (
-                            <div className="flex items-center gap-1.5 max-w-[140px]">
+                            <div className="flex items-center gap-1.5 max-w-[160px]">
                               <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700 overflow-hidden shrink-0">
                                 {seller.avatar_url
                                   // eslint-disable-next-line @next/next/no-img-element
                                   ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
                                   : (seller.name ?? '?').charAt(0).toUpperCase()}
                               </div>
-                              <span className="text-[11px] text-muted-foreground truncate">
-                                {seller.name ?? '—'}
-                              </span>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-[11px] text-muted-foreground truncate">
+                                  {seller.name ?? '—'}
+                                </span>
+                                {seller.is_demo && (
+                                  <span title="Demo-профиль — реальные тренеры скоро"
+                                    className="text-[9px] font-bold uppercase tracking-wider text-amber-700">
+                                    DEMO
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>
