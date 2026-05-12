@@ -78,7 +78,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | **Core (обязательно)** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SITE_URL` | Авторизация, чтение БД, серверные роуты |
 | **AI** | `ANTHROPIC_API_KEY` | `/api/ai/adaptive-plan`, `/api/diary/weekly-summary`, разборы тренировок. Без — все AI-эндпоинты возвращают `503 AI_NOT_CONFIGURED` |
 | **Email** | `RESEND_API_KEY`, `RESEND_FROM`, `CRON_SECRET` | Digest-рассылки, инвайты, newsletters, Vercel Cron |
-| **Stripe** | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_TEAM` | Биллинг и подписки |
+| **Billing (ЮKassa)** | `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY`, `YOOKASSA_API_URL`, `YOOKASSA_RETURN_URL`, `YOOKASSA_TEST_MODE`, `PAYMENTS_PROVIDER` | Подписки, СБП, Mir Pay, 54-ФЗ. Без — `/api/billing/checkout` возвращает 503 |
 | **Wearables** | `WHOOP_CLIENT_ID`/`SECRET`, `GARMIN_CONSUMER_KEY`/`SECRET` | OAuth для Whoop / Garmin. Apple Health работает без env (file-upload) |
 | **AI search (опц.)** | `HF_API_TOKEN`, `HF_EMBED_MODEL` | Семантический поиск по дневнику |
 | **Sentry (опц.)** | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_DSN` | Error tracking. SDK вшит, но `init()` пропускается без DSN |

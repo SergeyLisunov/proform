@@ -4,8 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-// Nominal monthly price per plan (used as MRR proxy when Stripe prices are not
-// synced into the DB). Override via env if needed.
+// Nominal monthly price per plan (used as MRR proxy when ЮKassa tariffs are
+// not synced into the DB). Override via env if needed.
 const PLAN_PRICE_MONTH: Record<'free' | 'pro' | 'team', number> = {
   free: 0,
   pro:  Number(process.env.ADMIN_PRICE_PRO  ?? 990),
@@ -169,14 +169,14 @@ export default async function AdminCommercePage() {
                 Коммерция
               </span>
               <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-green-700">
-                Подписки · Stripe
+                Подписки · ЮKassa
               </span>
             </div>
             <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-foreground">
               Коммерческая панель
             </h1>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              MRR, churn, распределение тарифов и последние платежи. Данные обновляются в реальном времени по Stripe-вебхукам.
+              MRR, churn, распределение тарифов и последние платежи. Данные обновляются в реальном времени по ЮKassa-вебхукам.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -187,11 +187,11 @@ export default async function AdminCommercePage() {
               ← Админка
             </Link>
             <Link
-              href="https://dashboard.stripe.com"
+              href="https://yookassa.ru/my"
               target="_blank"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#635BFF] to-[#7A73FF] px-3.5 py-2 text-xs font-semibold text-white shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F97316] to-[#EA580C] px-3.5 py-2 text-xs font-semibold text-white shadow-sm"
             >
-              Stripe Dashboard →
+              ЮKassa Dashboard →
             </Link>
           </div>
         </div>
@@ -314,7 +314,7 @@ export default async function AdminCommercePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Счета</div>
-              <h2 className="mt-1 text-lg font-semibold text-foreground">Последние инвойсы Stripe</h2>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">Последние инвойсы</h2>
             </div>
             <span className="text-2xs text-muted-foreground">{invoices.length}</span>
           </div>
@@ -348,7 +348,7 @@ export default async function AdminCommercePage() {
       </section>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
-        MRR — прогнозный, рассчитан как число активных подписок × номинальная цена тарифа. Настройте цены через переменные окружения <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_PRO</code> и <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_TEAM</code>, либо синхронизируйте Stripe-прайсы в БД.
+        MRR — прогнозный, рассчитан как число активных подписок × номинальная цена тарифа. Настройте цены через переменные окружения <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_PRO</code> и <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_TEAM</code>, либо синхронизируйте ЮKassa-тарифы в БД через таблицу <code className="rounded bg-muted px-1 py-0.5">tariffs</code>.
       </div>
     </div>
   )

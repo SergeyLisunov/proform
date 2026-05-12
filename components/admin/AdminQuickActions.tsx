@@ -32,7 +32,7 @@ const ACTIONS: QuickAction[] = [
     href: '/admin/commerce',
     icon: 'ki-credit-cart',
     label: 'Биллинг',
-    hint: 'Подписки и Stripe',
+    hint: 'Подписки и ЮKassa',
     bg: '#F0FDF4', color: '#15803D', border: '#BBF7D0',
   },
   {

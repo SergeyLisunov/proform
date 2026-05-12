@@ -17,9 +17,9 @@
  *   - Email notifications
  *
  * The provider boundary is intentional: this service NEVER touches
- * Stripe SDK or YooKassa SDK directly — it goes through the
- * PaymentProvider interface in lib/payments. Tests can swap a mock
- * provider in.
+ * the YooKassa SDK directly — it goes through the PaymentProvider
+ * interface in lib/payments. Tests can swap a mock provider in.
+ * (Sprint W6 Day 28: Stripe was removed; ЮKassa is the sole provider.)
  */
 import { randomUUID } from 'node:crypto'
 import { createClient } from '@/lib/supabase/server'
@@ -115,7 +115,7 @@ export interface CreatePaymentIntentInput {
   /** Internal user_id */
   userId: string
   tariffCode: string
-  /** ИЛИ 'stripe', 'yookassa' — defaults from PAYMENTS_PROVIDER env */
+  /** Always 'yookassa' since W6 Day 28 (Stripe removed). Kept for future Альфа-Банк. */
   provider: Exclude<ProviderId, 'manual'>
   /** URL ЮKassa redirects user back to after pay/cancel */
   returnUrl: string
