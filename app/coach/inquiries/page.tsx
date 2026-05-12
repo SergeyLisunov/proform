@@ -72,7 +72,10 @@ export default function CoachInquiriesPage() {
         urgency,
       })
       if (!result) { setFormError('Не удалось создать запрос'); return }
-      // TODO: optional — POST /api/coach/inquiries/[id]/notify для email через Resend
+      // Sprint W6 Day 28: fire-and-forget email notification to doctor(s).
+      // Silent fail — inquiry stays in queue even if email delivery breaks.
+      fetch(`/api/doctor-inquiries/${result.id}/notify`, { method: 'POST' })
+        .catch(e => console.warn('[coach/inquiries] notify failed', e))
       setShowCreate(false)
       setQuestion('')
       await load()

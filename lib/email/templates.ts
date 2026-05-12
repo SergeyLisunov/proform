@@ -815,3 +815,88 @@ export function renderMedicalSummaryDemo(input: MedicalSummaryEmailInput): { sub
   return { subject, html: wrap(subject, `Medical Summary Draft · ${input.triage.replace('_', ' ')}`, inner) }
 }
 
+// ── Doctor inquiry notification email (Sprint W6 Day 28) ────────────────────
+
+export interface DoctorInquiryEmailInput {
+  doctor_name:   string
+  coach_name:    string
+  athlete_name:  string
+  question_type: string         // e.g. "Допуск к нагрузке"
+  type_emoji:    string         // e.g. "✅"
+  urgency:       'routine' | 'urgent' | 'red_flag'
+  urgency_label: string         // e.g. "Routine (7 дн)"
+  question:      string
+  expires_at:    string         // ISO
+  inquiry_url:   string         // deep link to /doctor/inquiries?id=X
+}
+
+/**
+ * Email to doctor when coach creates an inquiry. Subject is
+ * urgency-prefixed so it stands out in inbox. Body is short:
+ * who/what/why + CTA. Inline styles only.
+ */
+export function renderDoctorInquiryEmail(input: DoctorInquiryEmailInput): { subject: string; html: string } {
+  const urgencyPrefix = input.urgency === 'red_flag' ? '🔴 RED FLAG (24ч) · '
+    : input.urgency === 'urgent' ? '🟠 СРОЧНО (72ч) · '
+    : ''
+  const subject = `${urgencyPrefix}Запрос врачу: ${input.athlete_name} (${input.question_type})`
+
+  const urgencyBg = input.urgency === 'red_flag' ? '#FEF2F2'
+    : input.urgency === 'urgent' ? '#FFF7ED' : '#F8FAFC'
+  const urgencyColor = input.urgency === 'red_flag' ? '#B91C1C'
+    : input.urgency === 'urgent' ? '#C2410C' : '#475569'
+  const urgencyBorder = input.urgency === 'red_flag' ? '#FECACA'
+    : input.urgency === 'urgent' ? '#FED7AA' : '#E2E8F0'
+
+  const expiresFmt = (() => {
+    try {
+      return new Date(input.expires_at).toLocaleDateString('ru-RU', {
+        day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+      })
+    } catch { return input.expires_at }
+  })()
+
+  const inner = `
+    <h1 style="font-size:22px;line-height:1.3;margin:0 0 12px 0;color:#0F172A;font-weight:700">
+      Запрос медицинского заключения
+    </h1>
+    <p style="margin:0 0 18px 0;color:#475569;font-size:14px;line-height:1.5">
+      Здравствуйте, ${escape(input.doctor_name)}. Тренер
+      <strong style="color:#0F172A">${escape(input.coach_name)}</strong> запросил ваше
+      мнение по атлету <strong style="color:#0F172A">${escape(input.athlete_name)}</strong>.
+    </p>
+
+    <div style="background:${urgencyBg};border:1px solid ${urgencyBorder};border-radius:12px;padding:14px 16px;margin:0 0 18px 0">
+      <div style="margin-bottom:6px">
+        <span style="font-size:11px;font-weight:700;color:${urgencyColor};text-transform:uppercase;letter-spacing:1px">
+          ${escape(input.urgency_label)}
+        </span>
+      </div>
+      <div style="font-size:13px;color:#0F172A;font-weight:600;margin-bottom:8px">
+        ${escape(input.type_emoji)} ${escape(input.question_type)}
+      </div>
+      <p style="margin:0;color:#0F172A;font-size:14px;line-height:1.55;white-space:pre-wrap">${escape(input.question)}</p>
+    </div>
+
+    <table role="presentation" width="100%" style="margin:0 0 18px 0;font-size:12px;color:#64748B">
+      <tr><td style="padding:6px 0;border-bottom:1px dashed #E2E8F0">
+        <strong style="color:#475569">Срок ответа</strong>
+      </td><td align="right" style="padding:6px 0;border-bottom:1px dashed #E2E8F0">
+        <strong style="color:${urgencyColor}">${escape(expiresFmt)}</strong>
+      </td></tr>
+    </table>
+
+    <p style="margin:0 0 12px 0">
+      <a href="${input.inquiry_url}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Ответить в ProForm →
+      </a>
+    </p>
+
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      Ваш ответ будет виден тренеру и атлету (summary). Если запрос больше неактуален —
+      coach его отменит, либо он автоматически expires по сроку.
+    </p>
+  `
+  return { subject, html: wrap(subject, `${urgencyPrefix}${input.athlete_name}: ${input.question_type}`, inner) }
+}
+

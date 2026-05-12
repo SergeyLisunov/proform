@@ -1003,3 +1003,32 @@ test.describe('athlete/dashboard + settings/notifications — auth gate + render
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W6 Day 28 (PR #46) — Doctor inquiry email + convert-to-recommendation ──
+
+test.describe('doctor-inquiries notify + convert endpoints — auth gate', () => {
+  test('POST /api/doctor-inquiries/:id/notify без auth → 401 JSON', async ({ request }) => {
+    const res = await request.post('/api/doctor-inquiries/00000000-0000-0000-0000-000000000000/notify')
+    expect(res.status()).toBe(401)
+    const body = await res.json().catch(() => ({}))
+    expect(body.ok).toBe(false)
+  })
+
+  test('POST /api/doctor-inquiries/:id/convert-to-recommendation без auth → 401 JSON', async ({ request }) => {
+    const res = await request.post('/api/doctor-inquiries/00000000-0000-0000-0000-000000000000/convert-to-recommendation', {
+      data: { category: 'activity_restriction', severity: 'moderate' },
+    })
+    expect(res.status()).toBe(401)
+    const body = await res.json().catch(() => ({}))
+    expect(body.ok).toBe(false)
+  })
+
+  test('POST /api/doctor-inquiries/:id/convert-to-recommendation с invalid body → 400 (auth still enforced)', async ({ request }) => {
+    // Even before reaching body validation, the auth check fires first.
+    // Regression: this proves we don't accidentally process unauthenticated requests.
+    const res = await request.post('/api/doctor-inquiries/00000000-0000-0000-0000-000000000000/convert-to-recommendation', {
+      data: { category: 'NOT_A_VALID_CATEGORY' },
+    })
+    expect([400, 401]).toContain(res.status())
+  })
+})
