@@ -26,7 +26,9 @@ function wrap(title: string, preheader: string, inner: string): string {
           <tr><td style="padding:20px 32px;border-top:1px solid #F1F5F9;background:#F8FAFC;font-size:11px;color:#64748B;text-align:center">
             <a href="${BASE_URL}" style="color:#EA580C;text-decoration:none;font-weight:600">Открыть ProForm</a>
             &nbsp;·&nbsp;
-            <a href="${BASE_URL}/settings?tab=notifications" style="color:#64748B;text-decoration:underline">Настройки уведомлений</a>
+            <a href="${BASE_URL}/settings/notifications?ref=email" style="color:#64748B;text-decoration:underline">Настройки уведомлений</a>
+            &nbsp;·&nbsp;
+            <a href="${BASE_URL}/settings/notifications?ref=email&action=unsubscribe" style="color:#64748B;text-decoration:underline">Отписаться</a>
           </td></tr>
         </table>
       </td></tr>

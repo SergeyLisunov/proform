@@ -245,6 +245,10 @@ export interface PendingLead {
   source:   LeadSource
   payload:  Record<string, unknown> | null
   attempts: number
+  /** Sprint W6 Day 29: present if lead was matched to a user via
+   * `match_leads_to_user` (W5 Day 23). Used by leads-digest cron to
+   * gate dispatch on users.notification_prefs.drip_marketing_email. */
+  user_id:  string | null
 }
 
 export interface PendingFilter {
@@ -273,7 +277,7 @@ export async function listPendingForDispatch(filter: PendingFilter = {}): Promis
 
   const { data, error } = await admin
     .from('tool_leads')
-    .select('id, email, source, payload, email_attempts')
+    .select('id, email, source, payload, email_attempts, user_id')
     .is('email_dispatched_at', null)
     .lt('email_attempts', maxAttempts)
     .gte('created_at', sinceDate.toISOString())
@@ -292,12 +296,14 @@ export async function listPendingForDispatch(filter: PendingFilter = {}): Promis
     source:         string
     payload:        Record<string, unknown> | null
     email_attempts: number
+    user_id:        string | null
   }>).map(r => ({
     id:       r.id,
     email:    r.email,
     source:   r.source as LeadSource,
     payload:  r.payload,
     attempts: r.email_attempts,
+    user_id:  r.user_id ?? null,
   }))
 }
 
