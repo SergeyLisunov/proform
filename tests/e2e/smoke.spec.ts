@@ -942,3 +942,31 @@ test.describe('athlete/goals + /athlete/progress — auth gate + render', () => 
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W5 Day 26 (PR #43) — Doctor↔Coach Inquiry workflow ────────────
+
+test.describe('coach/inquiries + doctor/inquiries — auth gate + render', () => {
+  test('/coach/inquiries renders без 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/coach/inquiries')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/doctor/inquiries renders без 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/doctor/inquiries')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
+
+test.describe('api/cron/expire-inquiries — auth gate', () => {
+  test('GET без bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/expire-inquiries')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET с неверным bearer → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/expire-inquiries', {
+      headers: { authorization: 'Bearer not-the-secret' },
+    })
+    expect(res.status()).toBe(401)
+  })
+})
