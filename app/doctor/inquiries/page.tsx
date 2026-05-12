@@ -27,6 +27,56 @@ export default function DoctorInquiriesPage() {
   const [responseInputs, setResponseInputs] = useState<Record<string, string>>({})
   const [busyId, setBusyId]                 = useState<string | null>(null)
 
+  // ── Sprint W6 Day 28: "Save as restriction" → recommendations ──────
+  const [convertOpenId, setConvertOpenId]     = useState<string | null>(null)
+  const [convertCategory, setConvertCategory] = useState<string>('activity_restriction')
+  const [convertSeverity, setConvertSeverity] = useState<string>('moderate')
+  const [convertValidUntil, setConvertValidUntil] = useState<string>('')
+  const [convertBusy, setConvertBusy]         = useState(false)
+  const [convertError, setConvertError]       = useState<string | null>(null)
+  const [convertedMap, setConvertedMap]       = useState<Record<string, { id: string; title: string }>>({})
+
+  function openConvertForm(id: string) {
+    const d = new Date()
+    d.setDate(d.getDate() + 30)
+    setConvertValidUntil(d.toISOString().slice(0, 10))
+    setConvertCategory('activity_restriction')
+    setConvertSeverity('moderate')
+    setConvertError(null)
+    setConvertOpenId(id)
+  }
+
+  async function handleConvert(inquiryId: string) {
+    setConvertBusy(true); setConvertError(null)
+    try {
+      const res = await fetch(`/api/doctor-inquiries/${inquiryId}/convert-to-recommendation`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          category: convertCategory,
+          severity: convertSeverity,
+          valid_until: convertValidUntil || null,
+        }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok || !j.ok) {
+        setConvertError(j.error ?? `HTTP ${res.status}`)
+        return
+      }
+      if (j.recommendation) {
+        setConvertedMap(prev => ({
+          ...prev,
+          [inquiryId]: { id: j.recommendation.id, title: j.recommendation.title },
+        }))
+        setConvertOpenId(null)
+      }
+    } catch (e) {
+      setConvertError(e instanceof Error ? e.message : 'CONVERT_FAILED')
+    } finally {
+      setConvertBusy(false)
+    }
+  }
+
   const load = useCallback(async () => {
     setLoading(true)
     const list = await listMyDoctorInquiries()
@@ -171,6 +221,74 @@ export default function DoctorInquiriesPage() {
                       Ваш ответ · {i.responded_at ? new Date(i.responded_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}
                     </div>
                     <p className="text-sm text-foreground whitespace-pre-wrap">{i.response}</p>
+                  </div>
+                )}
+
+                {/* Sprint W6 Day 28: one-click "save as restriction" → recommendation */}
+                {i.response && i.status === 'answered' && (
+                  <div className="mb-2">
+                    {convertedMap[i.id] ? (
+                      <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-800 flex items-center gap-2">
+                        <i className="ki-filled ki-check-circle text-sm" />
+                        <span>Создана рекомендация: <strong>{convertedMap[i.id].title}</strong></span>
+                      </div>
+                    ) : convertOpenId === i.id ? (
+                      <div className="rounded-xl border border-violet-200 bg-violet-50/30 p-3 space-y-2.5">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-violet-800">
+                          Сохранить как ограничение
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            Категория
+                            <select value={convertCategory} onChange={e => setConvertCategory(e.target.value)}
+                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400">
+                              <option value="activity_restriction">Ограничение активности</option>
+                              <option value="load_restriction">Ограничение нагрузки</option>
+                              <option value="recovery">Восстановление</option>
+                              <option value="observation">Наблюдение</option>
+                              <option value="clearance">Допуск</option>
+                              <option value="referral">Направление</option>
+                              <option value="general">Общая рекомендация</option>
+                            </select>
+                          </label>
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            Тяжесть
+                            <select value={convertSeverity} onChange={e => setConvertSeverity(e.target.value)}
+                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400">
+                              <option value="low">Низкая</option>
+                              <option value="moderate">Умеренная</option>
+                              <option value="high">Высокая</option>
+                              <option value="critical">Критическая</option>
+                            </select>
+                          </label>
+                        </div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">
+                          Действует до
+                          <input type="date" value={convertValidUntil}
+                            onChange={e => setConvertValidUntil(e.target.value)}
+                            className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400" />
+                        </label>
+                        {convertError && (
+                          <div className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs text-red-700">{convertError}</div>
+                        )}
+                        <div className="flex items-center gap-2 pt-1">
+                          <button onClick={() => handleConvert(i.id)} disabled={convertBusy}
+                            className="flex-1 rounded-lg bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 text-xs font-bold disabled:opacity-50">
+                            {convertBusy ? 'Сохраняем…' : 'Создать рекомендацию'}
+                          </button>
+                          <button onClick={() => setConvertOpenId(null)} disabled={convertBusy}
+                            className="rounded-lg border border-border bg-background hover:bg-muted px-3 py-1.5 text-xs font-semibold">
+                            Отмена
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button onClick={() => openConvertForm(i.id)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 px-3 py-1.5 text-xs font-semibold">
+                        <i className="ki-filled ki-plus text-xs" />
+                        Сохранить как ограничение
+                      </button>
+                    )}
                   </div>
                 )}
 

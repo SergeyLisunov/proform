@@ -3,6 +3,7 @@ import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
+import AskDoctorButton from '@/components/medical/AskDoctorButton'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F97316', bg: '#FFF7ED' },
@@ -287,15 +288,24 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
           {/* Action button */}
           {!isOwn && connType && (
-            <div style={{ flexShrink: 0 }}>
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
               {connectionStatus === 'active' ? (
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: '#F0FDF4', color: '#16A34A', border: '1.5px solid #BBF7D0',
-                }}>
-                  <i className="ki-filled ki-check-circle text-sm" />Связаны
-                </span>
+                <>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                    background: '#F0FDF4', color: '#16A34A', border: '1.5px solid #BBF7D0',
+                  }}>
+                    <i className="ki-filled ki-check-circle text-sm" />Связаны
+                  </span>
+                  {/* W6 Day 28: coach → athlete drawer to ask doctor */}
+                  {user && user.role === 'coach' && profile.role === 'athlete' && (
+                    <AskDoctorButton
+                      athleteId={profile.id}
+                      athleteName={displayName}
+                    />
+                  )}
+                </>
               ) : connectionStatus === 'pending' ? (
                 <button onClick={handleCancel} disabled={acting} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
