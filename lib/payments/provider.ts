@@ -1,9 +1,10 @@
 /**
- * Payment provider abstraction — Sprint W2 Day 7 (re-scoped to ЮKassa).
+ * Payment provider abstraction — Sprint W6 Day 28 (ЮKassa-only).
  *
- * The platform supports multiple payment providers in production:
- * Stripe (legacy, USD/EUR markets, kept untouched) and ЮKassa (RU/CIS
- * primary, recurring + 54-ФЗ + СБП). Future: Альфа-Банк as backup.
+ * The platform targets RU/CIS market exclusively (Sprint W6 pivot).
+ * Stripe was removed in W6 Day 28; ЮKassa is the sole active provider
+ * with native СБП, Mir Pay, SberPay, 54-ФЗ fiscalization, and recurring.
+ * Future: Альфа-Банк as backup.
  *
  * Routes (api/billing/checkout, api/webhooks/*) talk to a provider via
  * this interface so business logic stays gateway-agnostic. Adding a
@@ -20,9 +21,9 @@
  *   processing, etc).
  */
 
-export type ProviderId = 'stripe' | 'yookassa' | 'manual'
+export type ProviderId = 'yookassa' | 'manual'
 
-export type Currency = 'RUB' | 'USD' | 'EUR' | 'KZT'
+export type Currency = 'RUB' | 'KZT'
 
 export type PaymentStatus =
   | 'pending'

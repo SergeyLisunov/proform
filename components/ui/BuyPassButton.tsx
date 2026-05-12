@@ -3,9 +3,14 @@
 import { useState } from 'react'
 
 /**
- * Button that starts a Stripe Checkout session for a coach_pass_plan and
- * redirects the athlete to the hosted page. On success Stripe returns them
- * to /calendar?pass=success and the webhook creates the athlete_pass row.
+ * Button that starts a checkout session for a coach_pass_plan and
+ * redirects the athlete to the hosted payment page.
+ *
+ * Sprint W6 Day 28: Stripe was removed and ЮKassa Split Payments
+ * (Marketplace flow) are not yet activated on the merchant side, so
+ * the checkout endpoint returns 503 MARKETPLACE_SPLIT_PAYMENTS_PENDING.
+ * The button surfaces this gracefully ("платежи временно недоступны").
+ * Re-enable by activating Split Payments in the ЮKassa merchant cabinet.
  */
 export default function BuyPassButton({
   passPlanId,
@@ -24,7 +29,8 @@ export default function BuyPassButton({
   const [error, setError] = useState<string | null>(null)
 
   const handleClick = async () => {
-    setBusy(true); setError(null)
+    setBusy(true)
+    setError(null)
     try {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
@@ -32,9 +38,15 @@ export default function BuyPassButton({
         body: JSON.stringify({ passPlanId }),
       })
       const json = await res.json().catch(() => ({}))
+      if (res.status === 503 && json.error === 'MARKETPLACE_SPLIT_PAYMENTS_PENDING') {
+        setError('Оплата абонементов скоро будет доступна. Свяжитесь с тренером напрямую.')
+        setBusy(false)
+        return
+      }
       if (!res.ok || !json.url) {
-        setError(json.error ?? `HTTP ${res.status}`)
-        setBusy(false); return
+        setError(json.message ?? json.error ?? `HTTP ${res.status}`)
+        setBusy(false)
+        return
       }
       window.location.href = json.url
     } catch (e) {
@@ -55,7 +67,9 @@ export default function BuyPassButton({
         {busy ? 'Переходим к оплате…' : (children ?? (priceLabel ? `Купить за ${priceLabel}` : 'Купить абонемент'))}
       </button>
       {error && (
-        <div className="text-[11px] text-red-600">Ошибка: {error}</div>
+        <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+          {error}
+        </div>
       )}
     </div>
   )
