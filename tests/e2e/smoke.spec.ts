@@ -970,3 +970,22 @@ test.describe('api/cron/expire-inquiries — auth gate', () => {
     expect(res.status()).toBe(401)
   })
 })
+
+// ── Sprint W5 Day 24 RETARGET (PR #43) — Coach Workout Builder ────────────
+
+test.describe('coach/plans — auth gate + render', () => {
+  test('/coach/plans renders без 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/coach/plans')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/coach/plans/new renders без 500 (unauth → access denied UI)', async ({ page }) => {
+    const res = await page.goto('/coach/plans/new')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/coach/plans/<fake-id> renders без 500', async ({ page }) => {
+    const res = await page.goto('/coach/plans/00000000-0000-0000-0000-000000000000')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
