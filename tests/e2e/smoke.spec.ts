@@ -1055,3 +1055,22 @@ test.describe('cron + email prefs enforcement — auth gate intact', () => {
     expect(res.status()).toBe(401)
   })
 })
+
+// ── Sprint W6 Day 30 (PR #48) — Onboarding wizards: Athlete + Coach ──
+
+test.describe('/onboarding wizards — auth gate + render', () => {
+  test('/onboarding renders без 500 (unauth → redirect)', async ({ page }) => {
+    const res = await page.goto('/onboarding')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/onboarding/athlete renders без 500', async ({ page }) => {
+    const res = await page.goto('/onboarding/athlete')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/onboarding/coach renders без 500', async ({ page }) => {
+    const res = await page.goto('/onboarding/coach')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
