@@ -81,10 +81,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 })
   }
 
+  // Sprint W6 Day 32: assign A/B variant on insert (50/50). Stored in
+  // tool_leads.payload.ab_variant; cron/leads-digest reads it to render
+  // the right subject; /admin/ab-tests aggregates conversion by variant.
+  // Only for the 4 drip-eligible sources — legacy sources skip.
+  const DRIP_SOURCES = new Set(['team-risk', 'adaptive-plan', 'club-audit', 'medical-summary'])
+  const enrichedPayload: Record<string, unknown> = { ...(payload ?? {}) }
+  if (DRIP_SOURCES.has(source) && enrichedPayload.ab_variant !== 'a' && enrichedPayload.ab_variant !== 'b') {
+    enrichedPayload.ab_variant = Math.random() < 0.5 ? 'a' : 'b'
+  }
+
   const { error } = await admin.from('tool_leads').insert({
     email,
     source,
-    payload,
+    payload: enrichedPayload,
     ip_hash: ipHash,
     user_agent: userAgent,
   })

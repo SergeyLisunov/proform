@@ -306,22 +306,52 @@ export function renderMedicalSummaryDrip(payload: MedicalSummaryDripPayload | nu
 // ── Dispatcher ─────────────────────────────────────────────────────────
 
 export type LeadDripSource = 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary'
+export type LeadDripVariant = 'a' | 'b'
 
 export interface LeadDripInput {
   source:  LeadDripSource
   payload: Record<string, unknown> | null | undefined
+  /** Sprint W6 Day 32: A/B test variant. Defaults to 'a' for back-compat. */
+  variant?: LeadDripVariant
+}
+
+/**
+ * Subject re-framings for variant B. Same source, slightly different
+ * angle so we can A/B-test which subject pattern lands better.
+ *   A: declarative — "5 способов автоматизировать risk monitoring..."
+ *   B: question / curiosity hook — "Знаете ли вы где скрытые риски..."
+ *
+ * Keep variants directionally different but not so different that
+ * results become uninterpretable. Subject is the highest-leverage
+ * difference (drives open rate); body stays identical.
+ */
+const VARIANT_B_SUBJECTS: Record<LeadDripSource, string> = {
+  'team-risk':       'Знаете ли вы где скрытые риски в вашей команде?',
+  'adaptive-plan':   'Что если ваш тренировочный план перестроится сам?',
+  'club-audit':      'Готов ли ваш клуб к национальному уровню?',
+  'medical-summary': 'Хотите single-source-of-truth для медицинской документации?',
 }
 
 /**
  * Single dispatcher по source. Cron iterates leads и вызывает эту функцию.
  * Возвращает null если source не имеет drip template (acwr / overtraining /
  * templates / other — старые W1 sources, для них drip не подготовлен).
+ *
+ * Sprint W6 Day 32: variant param swaps the subject line only (body
+ * identical). Tracked via tool_leads.payload.ab_variant for /admin/ab-tests.
  */
 export function renderLeadDrip(input: LeadDripInput): { subject: string; html: string } | null {
-  switch (input.source) {
-    case 'team-risk':       return renderTeamRiskDrip(input.payload as TeamRiskDripPayload)
-    case 'adaptive-plan':   return renderAdaptivePlanDrip(input.payload as AdaptivePlanDripPayload)
-    case 'club-audit':      return renderClubAuditDrip(input.payload as ClubAuditDripPayload)
-    case 'medical-summary': return renderMedicalSummaryDrip(input.payload as MedicalSummaryDripPayload)
+  const out = (() => {
+    switch (input.source) {
+      case 'team-risk':       return renderTeamRiskDrip(input.payload as TeamRiskDripPayload)
+      case 'adaptive-plan':   return renderAdaptivePlanDrip(input.payload as AdaptivePlanDripPayload)
+      case 'club-audit':      return renderClubAuditDrip(input.payload as ClubAuditDripPayload)
+      case 'medical-summary': return renderMedicalSummaryDrip(input.payload as MedicalSummaryDripPayload)
+    }
+  })()
+  if (!out) return null
+  if (input.variant === 'b') {
+    out.subject = VARIANT_B_SUBJECTS[input.source]
   }
+  return out
 }
