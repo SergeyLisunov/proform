@@ -1074,3 +1074,17 @@ test.describe('/onboarding wizards — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W6 Day 31 (PR #49) — Onboarding wizards: Organization + Doctor ──
+
+test.describe('/onboarding wizards (Org + Doctor) — auth gate + render', () => {
+  test('/onboarding/organization renders без 500', async ({ page }) => {
+    const res = await page.goto('/onboarding/organization')
+    expect(res?.status()).toBeLessThan(500)
+  })
+
+  test('/onboarding/doctor renders без 500', async ({ page }) => {
+    const res = await page.goto('/onboarding/doctor')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})

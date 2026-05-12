@@ -34,7 +34,9 @@ export default function OnboardingDispatcherPage() {
       const role = user.role
       if (role === 'athlete') router.replace('/onboarding/athlete')
       else if (role === 'coach' || role === 'trainer') router.replace('/onboarding/coach')
-      else router.replace('/dashboard')   // org + doctor — Day 31
+      else if (role === 'organization') router.replace('/onboarding/organization')
+      else if (role === 'doctor') router.replace('/onboarding/doctor')
+      else router.replace('/dashboard')   // admin — skip wizard
     })()
     return () => { cancelled = true }
   }, [user, loading, router])

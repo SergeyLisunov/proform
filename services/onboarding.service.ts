@@ -25,6 +25,28 @@ export interface CoachWizardData {
   first_invite_sent?:  boolean
 }
 
+export interface OrgWizardData {
+  org_name?:        string
+  org_type?:        string   // club | federation | team | school | gym | academy | other
+  sport_type?:      string
+  description?:     string
+  city?:            string
+  profile_public?:  boolean
+  invite_emails?:   string[]      // up to 3 first athlete invites
+  invites_sent?:    number        // count of /api/invite POSTs that succeeded
+  org_row_created?: boolean
+}
+
+export interface DoctorWizardData {
+  medical_specialty?:  string   // cardiology | orthopedic | sports_medicine | general | other
+  main_focus?:         string
+  weekly_hours?:       number
+  preferred_days?:     string[]   // mon | tue | wed | thu | fri | sat | sun
+  consent_152fz?:      boolean
+  accept_terms?:       boolean
+  emergency_contact?:  boolean
+}
+
 export interface OnboardingState {
   completed?:          boolean
   started_at?:         string
@@ -33,9 +55,8 @@ export interface OnboardingState {
   role_when_started?:  WizardRole
   athlete?:            AthleteWizardData
   coach?:              CoachWizardData
-  /** Sub-key reserved for W6 Day 31 (Org + Doctor wizards). */
-  organization?:       Record<string, unknown>
-  doctor?:             Record<string, unknown>
+  organization?:       OrgWizardData
+  doctor?:             DoctorWizardData
 }
 
 /** Loads current user's onboarding state, or {} if missing. */
