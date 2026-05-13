@@ -141,6 +141,13 @@ export interface ListOfferingsFilter {
   q?:           string
   /** Sprint W6 Day 32: 'newest' (default) | 'price_asc' | 'price_desc'. */
   sort?:        OfferingSort
+  /** Sprint W8 Day 42: filter by delivery format (online/offline/hybrid).
+   *  Only `coach_services` has a `format` column — when this filter is set,
+   *  pass_plans are excluded entirely (they have no format concept). */
+  format?:      'online' | 'offline' | 'hybrid'
+  /** Sprint W8 Day 42: maximum price in whole RUB. Kind-aware comparison:
+   *  pass_plans store cents (divide by 100); services store whole RUB (use as-is). */
+  priceMaxRub?: number
   /** Limit results; default 100 */
   limit?:       number
 }
@@ -176,12 +183,34 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
     sq = sq.or(`title.ilike.${needle},description.ilike.${needle}`)
   }
 
-  const [{ data: passes }, { data: services }] = await Promise.all([pq, sq])
+  // W8 Day 42: format filter only narrows services (pass_plans have no format column).
+  // When format is set we exclude pass_plans entirely — they have no format concept.
+  const skipPasses = !!filter.format
+  if (filter.format) {
+    sq = sq.eq('format', filter.format)
+  }
 
-  const all: Offering[] = [
+  const [{ data: passes }, { data: services }] = await Promise.all([
+    skipPasses ? Promise.resolve({ data: [] as CoachPassPlanRow[] }) : pq,
+    sq,
+  ])
+
+  let all: Offering[] = [
     ...((passes  ?? []) as CoachPassPlanRow[]).map(passPlanToOffering),
     ...((services ?? []) as CoachServiceRow[]).map(serviceToOffering),
   ]
+
+  // W8 Day 42: post-merge price filter with kind-aware semantics.
+  // pass_plans.price_cents stores cents → /100 = RUB
+  // coach_services.price_amount stores whole RUB (normalized into Offering.price_cents)
+  if (typeof filter.priceMaxRub === 'number' && filter.priceMaxRub >= 0) {
+    const cap = filter.priceMaxRub
+    all = all.filter(o => {
+      const rub = o.kind === 'pass_plan' ? Math.round(o.price_cents / 100) : o.price_cents
+      return rub <= cap
+    })
+  }
+
   if (sort === 'price_asc')  all.sort((a, b) => a.price_cents - b.price_cents)
   else if (sort === 'price_desc') all.sort((a, b) => b.price_cents - a.price_cents)
   else                       all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
