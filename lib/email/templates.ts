@@ -902,3 +902,141 @@ export function renderDoctorInquiryEmail(input: DoctorInquiryEmailInput): { subj
   return { subject, html: wrap(subject, `${urgencyPrefix}${input.athlete_name}: ${input.question_type}`, inner) }
 }
 
+// ── Org weekly activity digest (Sprint W8 Day 41) ──────────────────────────
+
+export interface OrgWeeklyDigestEvent {
+  type:       'member_joined' | 'inquiry_created' | 'inquiry_answered' | 'recommendation_issued'
+  summary:    string
+  actor_name: string | null
+  target_name:string | null
+  timestamp:  string
+  tone?:      'info' | 'warning' | 'critical' | 'success'
+}
+
+export interface OrgWeeklyDigestInput {
+  org_name:   string
+  events:     OrgWeeklyDigestEvent[]
+  counts:     {
+    member_joined:         number
+    inquiry_created:       number
+    inquiry_answered:      number
+    recommendation_issued: number
+  }
+  activity_url: string
+}
+
+/**
+ * Sunday digest email for org admins summarising the week's
+ * cross-cutting events. Mirrors /org/activity page UX but rendered
+ * for email (inline styles, table-based layout).
+ */
+export function renderOrgWeeklyDigest(input: OrgWeeklyDigestInput): { subject: string; html: string } {
+  const totalEvents = input.events.length
+  const subject = totalEvents > 0
+    ? `${escape(input.org_name)}: ${totalEvents} событий за неделю`
+    : `${escape(input.org_name)}: тихая неделя`
+
+  const TYPE_LABELS: Record<OrgWeeklyDigestEvent['type'], { label: string; emoji: string; color: string }> = {
+    member_joined:         { label: 'Новый член',      emoji: '👋', color: '#16A34A' },
+    inquiry_created:       { label: 'Запрос врачу',    emoji: '❓', color: '#7C3AED' },
+    inquiry_answered:      { label: 'Ответ врача',     emoji: '✅', color: '#0891B2' },
+    recommendation_issued: { label: 'Рекомендация',    emoji: '🩺', color: '#B91C1C' },
+  }
+
+  const TONE_COLOR: Record<NonNullable<OrgWeeklyDigestEvent['tone']>, string> = {
+    info:     '#94A3B8',
+    warning:  '#F59E0B',
+    critical: '#DC2626',
+    success:  '#10B981',
+  }
+
+  const kpiTiles = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px 0">
+      <tr>
+        ${kpiTile('👋 Новые члены',  input.counts.member_joined,         '#16A34A')}
+        ${kpiTile('❓ Запросов',      input.counts.inquiry_created,       '#7C3AED')}
+      </tr>
+      <tr><td style="height:6px"></td><td style="height:6px"></td></tr>
+      <tr>
+        ${kpiTile('✅ Ответов',       input.counts.inquiry_answered,      '#0891B2')}
+        ${kpiTile('🩺 Рекомендаций',  input.counts.recommendation_issued, '#B91C1C')}
+      </tr>
+    </table>
+  `
+
+  const eventRows = input.events.slice(0, 8).map(e => {
+    const meta = TYPE_LABELS[e.type]
+    const toneColor = e.tone ? TONE_COLOR[e.tone] : '#CBD5E1'
+    const actor = e.actor_name ? escape(e.actor_name) : '—'
+    const target = e.target_name && e.target_name !== e.actor_name ? ` · атлет: <strong>${escape(e.target_name)}</strong>` : ''
+    return `
+      <tr><td style="padding:10px 0;border-bottom:1px solid #F1F5F9">
+        <table role="presentation" width="100%"><tr>
+          <td width="6" style="background:${toneColor};border-radius:2px"></td>
+          <td style="padding-left:12px">
+            <div style="font-size:10px;font-weight:700;color:${meta.color};text-transform:uppercase;letter-spacing:1px">
+              ${meta.emoji} ${meta.label}
+            </div>
+            <div style="font-size:13px;color:#0F172A;margin-top:3px">${escape(e.summary)}</div>
+            <div style="font-size:11px;color:#64748B;margin-top:3px">
+              <strong>${actor}</strong>${target}
+            </div>
+          </td>
+        </tr></table>
+      </td></tr>
+    `
+  }).join('')
+
+  const moreLink = totalEvents > 8
+    ? `<p style="margin:6px 0 0 0;text-align:center"><a href="${input.activity_url}" style="color:#2563EB;font-size:12px;font-weight:600">Ещё ${totalEvents - 8} событий →</a></p>`
+    : ''
+
+  const inner = totalEvents === 0 ? `
+    <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A;line-height:1.3">
+      Тихая неделя в ${escape(input.org_name)}
+    </h1>
+    <p style="margin:0 0 16px 0;color:#475569;font-size:14px;line-height:1.6">
+      За последние 7 дней значимых событий не было — никто не присоединялся, не было запросов врачам или новых рекомендаций.
+    </p>
+    <p style="margin:0 0 12px 0">
+      <a href="${input.activity_url}" style="display:inline-block;padding:12px 24px;background:#2563EB;color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">Открыть панель организации →</a>
+    </p>
+  ` : `
+    <h1 style="margin:0 0 6px 0;font-size:22px;color:#0F172A;line-height:1.3">
+      ${escape(input.org_name)} — еженедельная сводка
+    </h1>
+    <p style="margin:0 0 18px 0;color:#64748B;font-size:13px">
+      Что происходило в команде за последние 7 дней.
+    </p>
+
+    ${kpiTiles}
+
+    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:6px 14px;margin:0 0 18px 0">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${eventRows}</table>
+    </div>
+    ${moreLink}
+
+    <p style="margin:18px 0 0 0">
+      <a href="${input.activity_url}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">Открыть полную ленту событий →</a>
+    </p>
+
+    <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
+      Сводка приходит раз в неделю, по воскресеньям. Если в команде ничего не происходило, письма не будет.
+    </p>
+  `
+  return { subject, html: wrap(subject, `${totalEvents} событий за неделю`, inner) }
+}
+
+function kpiTile(label: string, value: number, color: string): string {
+  return `
+    <td width="50%" style="padding:0 4px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #E2E8F0;border-radius:12px">
+        <tr><td style="padding:14px 16px">
+          <div style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:1px">${label}</div>
+          <div style="font-size:24px;font-weight:700;color:${color};margin-top:4px">${value}</div>
+        </td></tr>
+      </table>
+    </td>
+  `
+}
+

@@ -24,6 +24,7 @@
  *   issues queries as the calling user via SSR supabase client.
  */
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export type OrgEventType =
   | 'member_joined'
@@ -75,6 +76,175 @@ async function resolveNames(userIds: string[]): Promise<Map<string, string>> {
 
 const SINCE_WINDOW_DAYS = 30
 const FEED_LIMIT = 50
+
+// ── Admin-client variant for cron iteration (W8 Day 41) ──────────────────
+
+/**
+ * Same aggregation as getRecentOrgActivity but works in cron context
+ * where there's no authenticated user — pulls activity for an explicit
+ * orgId via service-role admin client. Used by /api/cron/org-weekly-digest
+ * to iterate across all orgs.
+ *
+ * Window is parameterizable (digest uses 7d, in-app feed uses 30d).
+ */
+export async function findActivityForOrg(
+  orgId: string,
+  windowDays: number = SINCE_WINDOW_DAYS,
+  limit: number = FEED_LIMIT,
+): Promise<OrgEvent[]> {
+  const admin = createAdminClient()
+  const since = new Date(Date.now() - windowDays * 24 * 3600 * 1000).toISOString()
+
+  // Roster snapshot
+  const { data: memberRows } = await admin
+    .from('org_members')
+    .select('user_id')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .limit(2000)
+  const athleteIds = ((memberRows ?? []) as Array<{ user_id: string }>).map(r => r.user_id)
+
+  // 4 parallel queries (same as SSR variant)
+  const [memberJoins, inquiriesCreated, inquiriesAnswered, recsIssued] = await Promise.all([
+    adminFetchMemberJoins(admin, orgId, since),
+    athleteIds.length > 0 ? adminFetchInquiriesCreated(admin, athleteIds, since) : Promise.resolve([] as OrgEvent[]),
+    athleteIds.length > 0 ? adminFetchInquiriesAnswered(admin, athleteIds, since) : Promise.resolve([] as OrgEvent[]),
+    athleteIds.length > 0 ? adminFetchRecsIssued(admin, athleteIds, since) : Promise.resolve([] as OrgEvent[]),
+  ])
+
+  const all = [...memberJoins, ...inquiriesCreated, ...inquiriesAnswered, ...recsIssued]
+  if (all.length === 0) return []
+
+  // Batch name resolution
+  const allUserIds = [
+    ...all.map(e => e.actor_id).filter((x): x is string => !!x),
+    ...all.map(e => e.target_id).filter((x): x is string => !!x),
+  ]
+  if (allUserIds.length > 0) {
+    const unique = Array.from(new Set(allUserIds))
+    const { data } = await admin.from('users').select('id, name').in('id', unique)
+    const names = new Map<string, string>()
+    for (const u of (data ?? []) as Array<{ id: string; name: string | null }>) {
+      if (u.name) names.set(u.id, u.name)
+    }
+    for (const e of all) {
+      if (e.actor_id  && !e.actor_name)  e.actor_name  = names.get(e.actor_id)  ?? null
+      if (e.target_id && !e.target_name) e.target_name = names.get(e.target_id) ?? null
+    }
+  }
+
+  all.sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0))
+  return all.slice(0, limit)
+}
+
+// Internal per-source fetchers using passed admin client. Mirror SSR variants.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function adminFetchMemberJoins(admin: any, orgId: string, sinceIso: string): Promise<OrgEvent[]> {
+  const { data } = await admin
+    .from('org_members')
+    .select('id, user_id, member_role, status, joined_at, created_at')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .gte('joined_at', sinceIso)
+    .order('joined_at', { ascending: false })
+    .limit(50)
+  const rows = (data ?? []) as Array<{ id: string; user_id: string; member_role: string; joined_at: string; created_at: string }>
+  return rows.map(r => ({
+    type:        'member_joined' as const,
+    timestamp:   r.joined_at ?? r.created_at,
+    actor_id:    r.user_id,
+    actor_name:  null,
+    target_id:   r.user_id,
+    target_name: null,
+    entity_id:   r.id,
+    summary:     `Новый ${r.member_role === 'coach' ? 'тренер' : r.member_role === 'admin' ? 'администратор' : 'атлет'} в организации`,
+    tone:        'success',
+  }))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function adminFetchInquiriesCreated(admin: any, athleteIds: string[], sinceIso: string): Promise<OrgEvent[]> {
+  const { data } = await admin
+    .from('doctor_inquiries')
+    .select('id, coach_id, athlete_id, urgency, question_type, status, created_at')
+    .in('athlete_id', athleteIds)
+    .gte('created_at', sinceIso)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  const rows = (data ?? []) as Array<{
+    id: string; coach_id: string; athlete_id: string
+    urgency: 'routine' | 'urgent' | 'red_flag'; question_type: string
+    status: string; created_at: string
+  }>
+  return rows.map(r => ({
+    type:        'inquiry_created' as const,
+    timestamp:   r.created_at,
+    actor_id:    r.coach_id,
+    actor_name:  null,
+    target_id:   r.athlete_id,
+    target_name: null,
+    entity_id:   r.id,
+    summary:     `Запрос врачу: ${r.question_type.replace(/_/g, ' ')}`,
+    tone:        r.urgency === 'red_flag' ? 'critical' : r.urgency === 'urgent' ? 'warning' : 'info',
+  }))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function adminFetchInquiriesAnswered(admin: any, athleteIds: string[], sinceIso: string): Promise<OrgEvent[]> {
+  const { data } = await admin
+    .from('doctor_inquiries')
+    .select('id, coach_id, athlete_id, doctor_id, urgency, question_type, status, responded_at')
+    .in('athlete_id', athleteIds)
+    .eq('status', 'answered')
+    .not('responded_at', 'is', null)
+    .gte('responded_at', sinceIso)
+    .order('responded_at', { ascending: false })
+    .limit(50)
+  const rows = (data ?? []) as Array<{
+    id: string; coach_id: string; athlete_id: string; doctor_id: string | null
+    urgency: 'routine' | 'urgent' | 'red_flag'; question_type: string
+    status: string; responded_at: string
+  }>
+  return rows.map(r => ({
+    type:        'inquiry_answered' as const,
+    timestamp:   r.responded_at,
+    actor_id:    r.doctor_id,
+    actor_name:  null,
+    target_id:   r.athlete_id,
+    target_name: null,
+    entity_id:   r.id,
+    summary:     `Врач ответил на запрос: ${r.question_type.replace(/_/g, ' ')}`,
+    tone:        'success',
+  }))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function adminFetchRecsIssued(admin: any, athleteIds: string[], sinceIso: string): Promise<OrgEvent[]> {
+  const { data } = await admin
+    .from('recommendations')
+    .select('id, doctor_id, athlete_id, coach_id, category, severity, visibility_level, status, created_at')
+    .in('athlete_id', athleteIds)
+    .gte('created_at', sinceIso)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  const rows = (data ?? []) as Array<{
+    id: string; doctor_id: string; athlete_id: string; coach_id: string | null
+    category: string; severity: 'low' | 'moderate' | 'high' | 'critical'
+    visibility_level: string; status: string; created_at: string
+  }>
+  return rows.map(r => ({
+    type:        'recommendation_issued' as const,
+    timestamp:   r.created_at,
+    actor_id:    r.doctor_id,
+    actor_name:  null,
+    target_id:   r.athlete_id,
+    target_name: null,
+    entity_id:   r.id,
+    summary:     `Рекомендация: ${r.category.replace(/_/g, ' ')} (${r.severity})`,
+    tone:        r.severity === 'critical' ? 'critical' : r.severity === 'high' ? 'warning' : 'info',
+  }))
+}
 
 /**
  * Returns the most recent 50 org-relevant events from the last 30 days
