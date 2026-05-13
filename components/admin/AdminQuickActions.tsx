@@ -43,6 +43,13 @@ const ACTIONS: QuickAction[] = [
     bg: '#F5F3FF', color: '#7C3AED', border: '#DDD6FE',
   },
   {
+    href: '/admin/onboarding-funnel',
+    icon: 'ki-rocket',
+    label: 'Funnel',
+    hint: 'Wizard dropoff per persona',
+    bg: '#FFF7ED', color: '#F97316', border: '#FED7AA',
+  },
+  {
     href: 'https://supabase.com/dashboard/project/hhyjihbctidtucvpgjzv',
     external: true,
     icon: 'ki-data',

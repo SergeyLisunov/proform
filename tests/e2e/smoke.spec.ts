@@ -1158,3 +1158,12 @@ test.describe('coach/services — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W7 Day 36 (PR #54) — Onboarding funnel admin dashboard ─────────
+
+test.describe('admin/onboarding-funnel — auth gate + render', () => {
+  test('/admin/onboarding-funnel renders без 500 (unauth → redirect)', async ({ page }) => {
+    const res = await page.goto('/admin/onboarding-funnel')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
