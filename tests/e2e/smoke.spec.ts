@@ -1194,3 +1194,12 @@ test.describe('athlete/passes — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W8 Day 40 (PR #58) — Adherence nudge cron ──────────────────────
+
+test.describe('adherence-nudge cron — auth gate', () => {
+  test('GET /api/cron/adherence-nudge without CRON_SECRET → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/adherence-nudge')
+    expect(res.status()).toBe(401)
+  })
+})
