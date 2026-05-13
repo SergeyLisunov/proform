@@ -1203,3 +1203,12 @@ test.describe('adherence-nudge cron — auth gate', () => {
     expect(res.status()).toBe(401)
   })
 })
+
+// ── Sprint W8 Day 41 (PR #59) — Org weekly digest cron ───────────────────
+
+test.describe('org-weekly-digest cron — auth gate', () => {
+  test('GET /api/cron/org-weekly-digest without CRON_SECRET → 401', async ({ request }) => {
+    const res = await request.get('/api/cron/org-weekly-digest')
+    expect(res.status()).toBe(401)
+  })
+})

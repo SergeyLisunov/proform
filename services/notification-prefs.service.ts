@@ -23,6 +23,8 @@ export type NotificationChannel =
   /** Sprint W8 Day 40: gentle reminders when athlete misses prescribed
    *  workouts OR has a pass expiring within 7 days. Dispatched daily. */
   | 'adherence_email'
+  /** Sprint W8 Day 41: Sunday digest of cross-cutting events for org admins. */
+  | 'org_digest_email'
 
 export interface ChannelMeta {
   key:          NotificationChannel
@@ -87,6 +89,14 @@ export const CHANNELS: ChannelMeta[] = [
     label:       'Напоминания о тренировках',
     description: 'Мягкое напоминание если пропускаете несколько prescribed тренировок подряд или абонемент скоро истекает. Раз в 7 дней максимум.',
     icon:        'ki-bell',
+    category:    'core',
+    default:     true,
+  },
+  {
+    key:         'org_digest_email',
+    label:       'Еженедельная сводка организации',
+    description: 'Воскресный email с обзором событий в команде: новые члены, запросы врачам, рекомендации. Не приходит если за неделю ничего не было.',
+    icon:        'ki-element-11',
     category:    'core',
     default:     true,
   },
