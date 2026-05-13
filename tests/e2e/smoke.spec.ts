@@ -1176,3 +1176,12 @@ test.describe('org/activity — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W8 Day 38 (PR #56) — Coach pass-plans builder UI ───────────────
+
+test.describe('coach/pass-plans — auth gate + render', () => {
+  test('/coach/pass-plans renders без 500 (unauth → middleware redirect)', async ({ page }) => {
+    const res = await page.goto('/coach/pass-plans')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
