@@ -192,6 +192,17 @@ export default function OrgDashboard() {
                   <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
                   Новая публикация
                 </Link>
+                {/* W7 Day 37: cross-cutting activity feed */}
+                <Link href="/org/activity" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 16px', borderRadius: 14, textDecoration: 'none',
+                  border: '1px solid #BFDBFE',
+                  background: 'rgba(239,246,255,0.85)',
+                  color: '#1D4ED8', fontSize: 13, fontWeight: 700,
+                }}>
+                  <i className="ki-filled ki-rocket" style={{ fontSize: 14 }} />
+                  Лента событий
+                </Link>
               </div>
             </div>
 

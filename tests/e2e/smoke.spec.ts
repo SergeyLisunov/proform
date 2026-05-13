@@ -1167,3 +1167,12 @@ test.describe('admin/onboarding-funnel — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W7 Day 37 (PR #55) — Org activity feed ─────────────────────────
+
+test.describe('org/activity — auth gate + render', () => {
+  test('/org/activity renders без 500 (unauth → redirect)', async ({ page }) => {
+    const res = await page.goto('/org/activity')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
