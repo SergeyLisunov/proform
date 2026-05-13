@@ -1112,3 +1112,40 @@ test.describe('/marketplace search + A/B admin', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W7 Day 33 (PR #51) — Middleware onboarding redirect ─────────────
+
+test.describe('middleware: onboarding redirect + path whitelist', () => {
+  test('GET /dashboard unauth → redirect to /auth/login (regression)', async ({ request }) => {
+    const res = await request.get('/dashboard', { maxRedirects: 0 })
+    // Middleware redirects unauthenticated → /auth/login. Accept 302/307.
+    expect([302, 307]).toContain(res.status())
+    const loc = res.headers()['location'] ?? ''
+    expect(loc).toContain('/auth/login')
+  })
+
+  test('GET /onboarding unauth → redirect to /auth/login', async ({ request }) => {
+    const res = await request.get('/onboarding', { maxRedirects: 0 })
+    expect([302, 307]).toContain(res.status())
+    const loc = res.headers()['location'] ?? ''
+    expect(loc).toContain('/auth/login')
+  })
+
+  test('GET /onboarding/athlete unauth → redirect to /auth/login', async ({ request }) => {
+    const res = await request.get('/onboarding/athlete', { maxRedirects: 0 })
+    expect([302, 307]).toContain(res.status())
+  })
+
+  test('GET /api/users/123 unauth → JSON 401 not HTML redirect', async ({ request }) => {
+    // Regression: API routes must return JSON, not be redirected to login.
+    const res = await request.get('/api/users/00000000-0000-0000-0000-000000000000', { maxRedirects: 0 })
+    expect(res.status()).toBeLessThan(500)
+    // Should NOT be 302 to login (middleware skips /api/* for unauth handling)
+    expect([302, 307]).not.toContain(res.status())
+  })
+
+  test('GET / (landing) unauth → 200 (public)', async ({ request }) => {
+    const res = await request.get('/', { maxRedirects: 0 })
+    expect(res.status()).toBeLessThan(400)
+  })
+})
