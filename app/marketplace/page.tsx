@@ -66,6 +66,10 @@ function MarketplaceInner() {
   const specialty= (searchParams.get('specialty')?? '') as SellerSpecialty | ''
   const q        = (searchParams.get('q')        ?? '')
   const sort     = ((searchParams.get('sort')    ?? 'newest') as OfferingSort)
+  // W8 Day 42: format + price facets
+  const format   = (searchParams.get('format')   ?? '') as 'online' | 'offline' | 'hybrid' | ''
+  const priceMaxRub = Number.parseInt(searchParams.get('price_max') ?? '', 10)
+  const priceMax    = Number.isFinite(priceMaxRub) && priceMaxRub > 0 ? priceMaxRub : null
 
   const [offerings, setOfferings] = useState<Offering[]>([])
   const [featured, setFeatured]   = useState<Offering[]>([])
@@ -84,21 +88,23 @@ function MarketplaceInner() {
         specialty:   specialty|| undefined,
         q:           q        || undefined,
         sort:        sort,
+        format:      format   || undefined,
+        priceMaxRub: priceMax ?? undefined,
         limit:       100,
       }),
       // Only show featured carousel when there are no filters AND no search.
-      role || type || specialty || q ? Promise.resolve([] as Offering[]) : listFeaturedOfferings(),
+      role || type || specialty || q || format || priceMax ? Promise.resolve([] as Offering[]) : listFeaturedOfferings(),
     ])
     setOfferings(list)
     setFeatured(feat)
     const map = await resolveSellers([...feat, ...list])
     setSellers(map)
     setLoading(false)
-  }, [role, type, specialty, q, sort])
+  }, [role, type, specialty, q, sort, format, priceMax])
 
   useEffect(() => { load() }, [load])
 
-  const setFilter = (key: 'role' | 'type' | 'specialty' | 'q' | 'sort', value: string) => {
+  const setFilter = (key: 'role' | 'type' | 'specialty' | 'q' | 'sort' | 'format' | 'price_max', value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     if (value) params.set(key, value)
     else        params.delete(key)
@@ -112,7 +118,15 @@ function MarketplaceInner() {
 
   const clearFilters = () => { setSearchInput(''); router.push('/marketplace') }
 
-  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0) + (q ? 1 : 0)
+  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0) + (q ? 1 : 0) + (format ? 1 : 0) + (priceMax ? 1 : 0)
+
+  // W8 Day 42: compute "new this month" cutoff once per render
+  const newCutoff = useMemo(() => {
+    const d = new Date()
+    d.setDate(1)
+    d.setHours(0, 0, 0, 0)
+    return d.toISOString()
+  }, [])
 
   const grouped = useMemo(() => {
     // Group by service_type for display
@@ -222,6 +236,29 @@ function MarketplaceInner() {
             ))}
           </div>
         </div>
+
+        {/* W8 Day 42: Format */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">Формат</div>
+          <div className="flex flex-wrap gap-1.5">
+            <FilterChip label="Любой" active={!format} onClick={() => setFilter('format', '')} />
+            <FilterChip label="💻 Онлайн"  active={format === 'online'}  onClick={() => setFilter('format', 'online')} />
+            <FilterChip label="🏟 Очно"    active={format === 'offline'} onClick={() => setFilter('format', 'offline')} />
+            <FilterChip label="🔀 Гибрид"   active={format === 'hybrid'}  onClick={() => setFilter('format', 'hybrid')} />
+          </div>
+          <p className="mt-1 text-[10px] text-muted-foreground">При выборе формата абонементы (pass-plans) исключаются — у них нет формата.</p>
+        </div>
+
+        {/* W8 Day 42: Price range presets */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">Цена</div>
+          <div className="flex flex-wrap gap-1.5">
+            <FilterChip label="Любая"          active={!priceMax}                onClick={() => setFilter('price_max', '')} />
+            <FilterChip label="до 5 000 ₽"     active={priceMax === 5000}        onClick={() => setFilter('price_max', '5000')} />
+            <FilterChip label="до 15 000 ₽"    active={priceMax === 15000}       onClick={() => setFilter('price_max', '15000')} />
+            <FilterChip label="до 50 000 ₽"    active={priceMax === 50000}       onClick={() => setFilter('price_max', '50000')} />
+          </div>
+        </div>
       </div>
 
       {/* Featured carousel (only without filters/search) — W6 Day 32 */}
@@ -297,6 +334,9 @@ function MarketplaceInner() {
                   {offs.map(o => {
                     const seller = sellers.get(o.seller_id)
                     const roleMeta = ROLE_META[o.seller_role]
+                    // W8 Day 42: compute badges per card
+                    const isFeatured = seller?.is_featured === true
+                    const isNew      = o.created_at >= newCutoff
                     return (
                       <Link key={`${o.kind}-${o.id}`}
                         href={`/marketplace/${o.kind}/${o.id}`}
@@ -308,6 +348,22 @@ function MarketplaceInner() {
                             {roleMeta.emoji} {roleMeta.label}
                           </span>
                         </div>
+
+                        {/* W8 Day 42: badge row */}
+                        {(isFeatured || isNew) && (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {isFeatured && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                                ⭐ Featured
+                              </span>
+                            )}
+                            {isNew && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                                🆕 New this month
+                              </span>
+                            )}
+                          </div>
+                        )}
 
                         {o.description && (
                           <p className="text-xs text-muted-foreground line-clamp-3 flex-1">{o.description}</p>
