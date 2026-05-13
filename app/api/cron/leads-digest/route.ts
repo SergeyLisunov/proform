@@ -33,7 +33,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
-const BATCH_LIMIT = 50
+/** Sprint W7 Day 35: throttle bumped from 50 → 80 to absorb 3-touch
+ *  cadence load while staying under Resend free tier 100/day limit. */
+const BATCH_LIMIT = 80
 
 interface DispatchResult {
   ok:           true
@@ -44,6 +46,8 @@ interface DispatchResult {
   /** Sprint W6 Day 29: subset of `skipped` — matched user opted out
    *  of `drip_marketing_email` via /settings/notifications. */
   skipped_pref?: number
+  /** Sprint W7 Day 35: breakdown by drip touch (1=first email, 2=+7d, 3=+14d). */
+  by_touch?:    { 1: number; 2: number; 3: number }
   by_source:    Partial<Record<LeadSource, { dispatched: number; failed: number }>>
   duration_ms:  number
 }
@@ -116,6 +120,7 @@ export async function GET(req: Request) {
   let skipped      = 0
   let skipped_pref = 0
   const by_source: DispatchResult['by_source'] = {}
+  const by_touch: { 1: number; 2: number; 3: number } = { 1: 0, 2: 0, 3: 0 }
 
   function tally(source: LeadSource, kind: 'dispatched' | 'failed') {
     const s = by_source[source] ?? { dispatched: 0, failed: 0 }
@@ -128,9 +133,10 @@ export async function GET(req: Request) {
     if (lead.user_id) {
       const prefs = prefsByUserId.get(lead.user_id)
       if (!isChannelAllowed(prefs, 'drip_marketing_email')) {
-        // Mark as dispatched to prevent endless retries — user opted out.
-        // Lead remains in DB for analytics, but won't be re-attempted.
-        await markDispatched(lead.id)
+        // Mark as dispatched (at current touch level) to advance the
+        // cadence state — user opted out, no more retries this stage.
+        // Lead remains in DB for analytics, won't be re-attempted.
+        await markDispatched(lead.id, lead.touch)
         skipped++
         skipped_pref++
         continue
@@ -140,10 +146,12 @@ export async function GET(req: Request) {
     // W6 Day 32: pick A/B variant from payload (set by /api/tools/lead).
     const rawVariant = (lead.payload as Record<string, unknown> | null)?.ab_variant
     const variant: 'a' | 'b' = rawVariant === 'b' ? 'b' : 'a'
+    // W7 Day 35: pass touch so renderer applies cadence prefix.
     const drip = renderLeadDrip({
       source: lead.source as 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary',
       payload: lead.payload,
       variant,
+      touch: lead.touch,
     })
     if (!drip) {
       skipped++
@@ -157,9 +165,11 @@ export async function GET(req: Request) {
         subject: drip.subject,
         html:    drip.html,
       })
-      const ok = await markDispatched(lead.id)
+      // W7 Day 35: advance the cadence state machine atomically.
+      const ok = await markDispatched(lead.id, lead.touch)
       if (ok) {
         dispatched++
+        by_touch[lead.touch]++
         tally(lead.source, 'dispatched')
       } else {
         // DB update failed — count as failed для retry
@@ -183,6 +193,7 @@ export async function GET(req: Request) {
     failed,
     skipped,
     skipped_pref,
+    by_touch,
     by_source,
     duration_ms: Date.now() - start,
   }

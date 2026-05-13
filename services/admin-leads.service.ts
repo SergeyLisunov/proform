@@ -239,6 +239,14 @@ export async function getFunnelStats(): Promise<FunnelStat[]> {
   return Array.from(bySource.values()).sort((a, b) => b.total - a.total)
 }
 
+export type DripTouch = 1 | 2 | 3
+
+/** Sprint W7 Day 35: cadence gaps between touches (days). */
+const TOUCH_GAP_DAYS: Record<2 | 3, number> = {
+  2: 7,
+  3: 14,
+}
+
 export interface PendingLead {
   id:       string
   email:    string
@@ -249,6 +257,8 @@ export interface PendingLead {
    * `match_leads_to_user` (W5 Day 23). Used by leads-digest cron to
    * gate dispatch on users.notification_prefs.drip_marketing_email. */
   user_id:  string | null
+  /** Sprint W7 Day 35: which touch is this — 1 (first), 2 (+7d), or 3 (+14d). */
+  touch:    DripTouch
 }
 
 export interface PendingFilter {
@@ -260,10 +270,29 @@ export interface PendingFilter {
   sinceDate?:   Date
 }
 
+interface LeadQueryRow {
+  id:                  string
+  email:               string
+  source:              string
+  payload:             Record<string, unknown> | null
+  email_attempts:      number
+  user_id:             string | null
+  dispatched_touches:  number
+  last_touch_at:       string | null
+}
+
 /**
- * Iterator для cron: leads ready for first dispatch OR retry, ограниченные
- * по time window и max attempts. Sorted by created_at ASC (oldest first
- * — fairness).
+ * Iterator для cron: leads ready for next drip touch.
+ *
+ * Sprint W7 Day 35 — supports 3-touch cadence:
+ *   - Touch 1: never dispatched (dispatched_touches = 0)
+ *   - Touch 2: one touch sent, ≥7 days ago, not yet converted
+ *   - Touch 3: two touches sent, ≥14 days ago since last, not converted
+ *
+ * Issues 3 parallel queries (cheap thanks to partial index
+ * idx_tool_leads_cadence_active), merges, sorts by created_at ASC,
+ * slices to limit. Always returns the `touch` number per lead so the
+ * cron renderer knows which template variant to send.
  */
 export async function listPendingForDispatch(filter: PendingFilter = {}): Promise<PendingLead[]> {
   const admin = createAdminClient()
@@ -271,50 +300,107 @@ export async function listPendingForDispatch(filter: PendingFilter = {}): Promis
   const maxAttempts = Math.max(1, filter.maxAttempts ?? 3)
   const sinceDate   = filter.sinceDate ?? new Date(Date.now() - 30 * 24 * 3600_000)
 
-  // Only sources that have drip templates (W4 lead-magnets); skip
-  // legacy acwr/overtraining/templates/other.
   const dripSources: LeadSource[] = ['team-risk', 'adaptive-plan', 'club-audit', 'medical-summary']
+  const cutoff2 = new Date(Date.now() - TOUCH_GAP_DAYS[2] * 24 * 3600_000).toISOString()
+  const cutoff3 = new Date(Date.now() - TOUCH_GAP_DAYS[3] * 24 * 3600_000).toISOString()
 
-  const { data, error } = await admin
+  const baseSelect = 'id, email, source, payload, email_attempts, user_id, dispatched_touches, last_touch_at'
+
+  // Touch 1: never dispatched. Filter on email_dispatched_at IS NULL preserves
+  // the original semantics (lead never received anything).
+  const q1 = admin
     .from('tool_leads')
-    .select('id, email, source, payload, email_attempts, user_id')
+    .select(baseSelect)
     .is('email_dispatched_at', null)
+    .eq('dispatched_touches', 0)
     .lt('email_attempts', maxAttempts)
+    .is('converted_at', null)
     .gte('created_at', sinceDate.toISOString())
     .in('source', dripSources)
     .order('created_at', { ascending: true })
     .limit(limit)
 
-  if (error) {
-    console.warn('[admin-leads.listPendingForDispatch]', error.message)
-    return []
-  }
+  // Touch 2: first email sent ≥7 days ago, not converted.
+  const q2 = admin
+    .from('tool_leads')
+    .select(baseSelect)
+    .eq('dispatched_touches', 1)
+    .lte('last_touch_at', cutoff2)
+    .is('converted_at', null)
+    .lt('email_attempts', maxAttempts + 1)   // allow 1 more retry for cadence stage
+    .gte('created_at', sinceDate.toISOString())
+    .in('source', dripSources)
+    .order('last_touch_at', { ascending: true })
+    .limit(limit)
 
-  return ((data ?? []) as Array<{
-    id:             string
-    email:          string
-    source:         string
-    payload:        Record<string, unknown> | null
-    email_attempts: number
-    user_id:        string | null
-  }>).map(r => ({
-    id:       r.id,
-    email:    r.email,
-    source:   r.source as LeadSource,
-    payload:  r.payload,
-    attempts: r.email_attempts,
-    user_id:  r.user_id ?? null,
+  // Touch 3: second email sent ≥14 days ago, not converted.
+  const q3 = admin
+    .from('tool_leads')
+    .select(baseSelect)
+    .eq('dispatched_touches', 2)
+    .lte('last_touch_at', cutoff3)
+    .is('converted_at', null)
+    .lt('email_attempts', maxAttempts + 2)
+    .gte('created_at', sinceDate.toISOString())
+    .in('source', dripSources)
+    .order('last_touch_at', { ascending: true })
+    .limit(limit)
+
+  const [r1, r2, r3] = await Promise.all([q1, q2, q3])
+  if (r1.error) console.warn('[admin-leads.listPendingForDispatch touch1]', r1.error.message)
+  if (r2.error) console.warn('[admin-leads.listPendingForDispatch touch2]', r2.error.message)
+  if (r3.error) console.warn('[admin-leads.listPendingForDispatch touch3]', r3.error.message)
+
+  const rows: Array<{ row: LeadQueryRow; touch: DripTouch }> = [
+    ...((r1.data ?? []) as LeadQueryRow[]).map(row => ({ row, touch: 1 as DripTouch })),
+    ...((r2.data ?? []) as LeadQueryRow[]).map(row => ({ row, touch: 2 as DripTouch })),
+    ...((r3.data ?? []) as LeadQueryRow[]).map(row => ({ row, touch: 3 as DripTouch })),
+  ]
+  // Fairness: touch 2/3 leads cut to front (longer waiting); within same touch,
+  // older leads first. We approximate by sorting by (touch DESC, key ASC) so
+  // touches 3 and 2 don't get crowded out by a flood of touch-1 inserts.
+  rows.sort((a, b) => {
+    if (a.touch !== b.touch) return b.touch - a.touch  // higher touch first
+    const akey = a.row.last_touch_at ?? a.row.email   // stable fallback
+    const bkey = b.row.last_touch_at ?? b.row.email
+    return akey < bkey ? -1 : akey > bkey ? 1 : 0
+  })
+
+  return rows.slice(0, limit).map(({ row, touch }) => ({
+    id:       row.id,
+    email:    row.email,
+    source:   row.source as LeadSource,
+    payload:  row.payload,
+    attempts: row.email_attempts,
+    user_id:  row.user_id ?? null,
+    touch,
   }))
 }
 
-export async function markDispatched(leadId: string): Promise<boolean> {
+/**
+ * Mark a lead as dispatched (atomically increments touch counter
+ * + updates last_touch_at). Sprint W7 Day 35.
+ *
+ * Touch 1 also writes email_dispatched_at for backward compat with
+ * legacy code that filters on that column (e.g. admin lead list).
+ */
+export async function markDispatched(leadId: string, touch: DripTouch = 1): Promise<boolean> {
   const admin = createAdminClient()
+  const now = new Date().toISOString()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const payload: Record<string, any> = {
+    dispatched_touches: touch,
+    last_touch_at:      now,
+    email_last_error:   null,
+  }
+  if (touch === 1) {
+    payload.email_dispatched_at = now
+  }
+
   const { error } = await admin
     .from('tool_leads')
-    .update({
-      email_dispatched_at: new Date().toISOString(),
-      email_last_error:    null,
-    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update(payload as any)
     .eq('id', leadId)
   if (error) {
     console.warn('[admin-leads.markDispatched]', error.message)

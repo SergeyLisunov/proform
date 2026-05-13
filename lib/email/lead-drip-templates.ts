@@ -307,12 +307,27 @@ export function renderMedicalSummaryDrip(payload: MedicalSummaryDripPayload | nu
 
 export type LeadDripSource = 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary'
 export type LeadDripVariant = 'a' | 'b'
+export type LeadDripTouch = 1 | 2 | 3
 
 export interface LeadDripInput {
   source:  LeadDripSource
   payload: Record<string, unknown> | null | undefined
   /** Sprint W6 Day 32: A/B test variant. Defaults to 'a' for back-compat. */
   variant?: LeadDripVariant
+  /** Sprint W7 Day 35: drip cadence touch number. Defaults to 1. */
+  touch?:  LeadDripTouch
+}
+
+/**
+ * Subject prefix per touch — escalates urgency without changing the body.
+ * Touch 1 = original (no prefix). Touch 2 = "Напоминание · …". Touch 3 =
+ * "Последнее напоминание · …". Keeps subject the only A/B variable while
+ * the cadence-prefix is additive.
+ */
+const TOUCH_SUBJECT_PREFIX: Record<LeadDripTouch, string> = {
+  1: '',
+  2: 'Напоминание · ',
+  3: 'Последнее напоминание · ',
 }
 
 /**
@@ -352,6 +367,11 @@ export function renderLeadDrip(input: LeadDripInput): { subject: string; html: s
   if (!out) return null
   if (input.variant === 'b') {
     out.subject = VARIANT_B_SUBJECTS[input.source]
+  }
+  // Sprint W7 Day 35: cadence prefix (touch 2/3 only).
+  const touch = input.touch ?? 1
+  if (touch > 1) {
+    out.subject = TOUCH_SUBJECT_PREFIX[touch] + out.subject
   }
   return out
 }
