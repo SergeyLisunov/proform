@@ -17,6 +17,7 @@ import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { listMyGoals, STATUS_META as GOAL_STATUS_META, type AthleteGoal } from '@/services/athlete-goals.service'
+import { countMyActivePasses } from '@/services/athlete-passes.service'
 
 interface PrescribedWorkout {
   id:                    string
@@ -44,6 +45,8 @@ export default function AthleteDashboardPage() {
   const [recs, setRecs]         = useState<RecentRec[]>([])
   const [loading, setLoading]   = useState(true)
   const [name, setName]         = useState<string | null>(null)
+  /** W8 Day 39: count of currently-usable passes for the quick-link badge. */
+  const [activePassesCount, setActivePassesCount] = useState<number>(0)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -62,7 +65,7 @@ export default function AthleteDashboardPage() {
     weekEnd.setDate(weekEnd.getDate() + 7)
     const weekEndStr = weekEnd.toISOString().slice(0, 10)
 
-    const [workoutsRes, goalsList, recsRes] = await Promise.all([
+    const [workoutsRes, goalsList, recsRes, passes] = await Promise.all([
       sb
         .from('workouts')
         .select('id, event_date, activity_type, name, activity_duration_min, completion_status, prescribed_note')
@@ -79,11 +82,13 @@ export default function AthleteDashboardPage() {
         .eq('athlete_id', me.id)
         .order('created_at', { ascending: false })
         .limit(5),
+      countMyActivePasses(),
     ])
 
     setWorkouts(((workoutsRes.data ?? []) as PrescribedWorkout[]))
     setGoals(goalsList.slice(0, 3))
     setRecs(((recsRes.data ?? []) as RecentRec[]))
+    setActivePassesCount(passes)
     setLoading(false)
   }, [])
 
@@ -139,11 +144,19 @@ export default function AthleteDashboardPage() {
         )}
       </section>
 
-      {/* Quick links */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* Quick links — W8 Day 39 added /athlete/passes (5th tile) */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <QuickLink href="/athlete/goals"      icon="ki-flag"          color="#EA580C" bg="#FFF7ED" border="#FED7AA" label="Цели" />
         <QuickLink href="/athlete/progress"   icon="ki-chart-line-up" color="#2563EB" bg="#EFF6FF" border="#BFDBFE" label="Прогресс" />
         <QuickLink href="/calendar"           icon="ki-calendar-2"    color="#15803D" bg="#F0FDF4" border="#BBF7D0" label="Календарь" />
+        <QuickLink
+          href="/athlete/passes"
+          icon="ki-cup"
+          color="#D97706"
+          bg="#FFFBEB"
+          border="#FCD34D"
+          label={activePassesCount > 0 ? `Абонементы · ${activePassesCount}` : 'Абонементы'}
+        />
         <QuickLink href="/settings/notifications" icon="ki-notification" color="#7C3AED" bg="#FAF5FF" border="#E9D5FF" label="Уведомления" />
       </div>
 
