@@ -1079,6 +1079,10 @@ export default function RegisterPage() {
                     Проверьте почту <span className="font-semibold text-foreground">{email}</span> и подтвердите адрес,
                     затем войдите в приложение.
                   </p>
+                  {/* W7 Day 33: telegraph the next step so users know what's coming */}
+                  <p className="mt-2 text-2sm text-muted-foreground">
+                    После входа — короткая настройка профиля (3-4 минуты).
+                  </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Link
