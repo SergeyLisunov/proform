@@ -20,6 +20,9 @@ export type NotificationChannel =
   | 'inquiry_email'
   | 'drip_marketing_email'
   | 'marketplace_email'
+  /** Sprint W8 Day 40: gentle reminders when athlete misses prescribed
+   *  workouts OR has a pass expiring within 7 days. Dispatched daily. */
+  | 'adherence_email'
 
 export interface ChannelMeta {
   key:          NotificationChannel
@@ -77,6 +80,14 @@ export const CHANNELS: ChannelMeta[] = [
     description: 'Новые offerings от тренеров/специалистов в категориях, на которые вы подписаны.',
     icon:        'ki-shop',
     category:    'marketing',
+    default:     true,
+  },
+  {
+    key:         'adherence_email',
+    label:       'Напоминания о тренировках',
+    description: 'Мягкое напоминание если пропускаете несколько prescribed тренировок подряд или абонемент скоро истекает. Раз в 7 дней максимум.',
+    icon:        'ki-bell',
+    category:    'core',
     default:     true,
   },
 ]
