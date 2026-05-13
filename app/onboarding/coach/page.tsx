@@ -248,12 +248,31 @@ export default function CoachOnboardingPage() {
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-foreground">Coach Services · /coach/services</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Создавайте offerings для marketplace: консультации, планы, оценки.
+                  Разовые услуги: консультации, разовые занятия, оценки.
                   Активные карточки появятся в общем каталоге.
                 </p>
                 <Link href="/coach/services"
                   className="mt-2 inline-flex items-center gap-1 rounded-lg border border-orange-200 bg-white hover:bg-orange-50 text-orange-700 px-3 py-1.5 text-xs font-semibold">
                   Открыть редактор услуг →
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* W8 Day 38: pass-plans (multi-session subscriptions) */}
+          <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                <i className="ki-filled ki-cup text-lg" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-foreground">Pass plans · /coach/pass-plans</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Многосессионные абонементы: пакеты тренировок, безлимит на месяц, групповые блоки.
+                </p>
+                <Link href="/coach/pass-plans"
+                  className="mt-2 inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white hover:bg-amber-50 text-amber-700 px-3 py-1.5 text-xs font-semibold">
+                  Открыть редактор абонементов →
                 </Link>
               </div>
             </div>
