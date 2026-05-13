@@ -1185,3 +1185,12 @@ test.describe('coach/pass-plans — auth gate + render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 })
+
+// ── Sprint W8 Day 39 (PR #57) — Athlete "My Passes" management page ───────
+
+test.describe('athlete/passes — auth gate + render', () => {
+  test('/athlete/passes renders без 500 (unauth → middleware redirect)', async ({ page }) => {
+    const res = await page.goto('/athlete/passes')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})
