@@ -1149,3 +1149,12 @@ test.describe('middleware: onboarding redirect + path whitelist', () => {
     expect(res.status()).toBeLessThan(400)
   })
 })
+
+// ── Sprint W7 Day 34 (PR #52) — Coach service builder UI ──────────────────
+
+test.describe('coach/services — auth gate + render', () => {
+  test('/coach/services renders без 500 (unauth → middleware redirect)', async ({ page }) => {
+    const res = await page.goto('/coach/services')
+    expect(res?.status()).toBeLessThan(500)
+  })
+})

@@ -239,6 +239,26 @@ export default function CoachOnboardingPage() {
             </div>
           </div>
 
+          {/* W7 Day 34: highlight the new service builder */}
+          <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center flex-shrink-0">
+                <i className="ki-filled ki-shop text-lg" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-foreground">Coach Services · /coach/services</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Создавайте offerings для marketplace: консультации, планы, оценки.
+                  Активные карточки появятся в общем каталоге.
+                </p>
+                <Link href="/coach/services"
+                  className="mt-2 inline-flex items-center gap-1 rounded-lg border border-orange-200 bg-white hover:bg-orange-50 text-orange-700 px-3 py-1.5 text-xs font-semibold">
+                  Открыть редактор услуг →
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <p className="text-[11px] text-muted-foreground text-center">
             После завершения откроется ваша панель тренера. Эти шаги можно пройти снова в любой момент.
           </p>
