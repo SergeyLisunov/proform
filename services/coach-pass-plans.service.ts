@@ -111,7 +111,7 @@ export async function createPassPlan(input: CreatePassPlanInput): Promise<CoachP
   const { data: meRow } = await sb.from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
   const me = meRow as { id: string; role: string } | null
   if (!me) return null
-  if (me.role !== 'coach' && me.role !== 'trainer') return null
+  if (me.role !== 'coach') return null
 
   // Validation
   if (input.title.trim().length < 3 || input.title.trim().length > 120) return null

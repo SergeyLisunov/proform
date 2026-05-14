@@ -16,7 +16,7 @@ export default function NewPlanPage() {
 
   useEffect(() => {
     if (userLoading) return
-    setAllowed(!!user && (user.role === 'coach' || user.role === 'trainer'))
+    setAllowed(!!user && (user.role === 'coach'))
   }, [user, userLoading])
 
   if (userLoading || allowed === null) {

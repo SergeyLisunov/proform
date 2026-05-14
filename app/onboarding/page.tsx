@@ -33,7 +33,7 @@ export default function OnboardingDispatcherPage() {
       }
       const role = user.role
       if (role === 'athlete') router.replace('/onboarding/athlete')
-      else if (role === 'coach' || role === 'trainer') router.replace('/onboarding/coach')
+      else if (role === 'coach') router.replace('/onboarding/coach')
       else if (role === 'organization') router.replace('/onboarding/organization')
       else if (role === 'doctor') router.replace('/onboarding/doctor')
       else router.replace('/dashboard')   // admin — skip wizard

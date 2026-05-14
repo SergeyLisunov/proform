@@ -179,7 +179,7 @@ export default function TeamRiskCalculator() {
     })
   }, [rows])
 
-  const canSubmit = validRows.length >= 1 && phase === 'idle'
+  const canSubmit = validRows.length >= 1
 
   // ── Mutations ──────────────────────────────────────────────────────
   function emptyRow(id: string): AthleteRow {
@@ -457,9 +457,9 @@ export default function TeamRiskCalculator() {
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50 disabled:opacity-50">
               + Атлет ({rows.length}/12)
             </button>
-            <button onClick={handleAnalyze} disabled={!canSubmit || phase === 'analyzing'}
+            <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
               className="rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
-              {phase === 'analyzing' ? 'Анализируем…' : `Получить snapshot (${validRows.length})`}
+              {phase !== 'idle' && phase !== 'result' && phase !== 'submitted' ? 'Анализируем…' : `Получить snapshot (${validRows.length})`}
             </button>
           </div>
 
