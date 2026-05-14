@@ -413,7 +413,11 @@ export default function AdminPage() {
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Управление пользователями</div>
                       <h3 className="mt-2 text-lg font-semibold text-foreground">Роли, статусы и последние входы</h3>
                     </div>
-                    <button className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-100">
+                    <button
+                      disabled
+                      title="Создание пользователей админом — Sprint W10. Сейчас регистрация через /auth/register"
+                      className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 transition-colors opacity-60 cursor-not-allowed"
+                    >
                       <i className="ki-filled ki-plus text-xs" />
                       Новый пользователь
                     </button>
@@ -449,7 +453,11 @@ export default function AdminPage() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <button className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:border-orange-200 hover:text-orange-700">
+                            <button
+                              disabled
+                              title="Редактирование профиля — Sprint W10. Сейчас пользователь правит сам через /settings"
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground opacity-60 cursor-not-allowed"
+                            >
                               <i className="ki-filled ki-pencil text-xs" />
                             </button>
                             <select className="rounded-xl border border-border bg-background px-3 py-2 text-2xs text-muted-foreground outline-none transition-colors focus:border-orange-400">
@@ -535,7 +543,11 @@ export default function AdminPage() {
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Журнал действий</div>
                   <h3 className="mt-2 text-lg font-semibold text-foreground">Входы, изменения и чувствительные операции</h3>
                 </div>
-                <button className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-orange-200 hover:text-orange-700">
+                <button
+                  disabled
+                  title="Экспорт audit-журнала в CSV — Sprint W10"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground opacity-60 cursor-not-allowed"
+                >
                   <i className="ki-filled ki-abstract-26 text-xs" />
                   Экспорт CSV
                 </button>
@@ -656,7 +668,16 @@ export default function AdminPage() {
                 Назначение связывает тестового атлета с тренером в рамках демонстрационного admin-сценария.
               </div>
               <div className="flex gap-2 pt-1">
-                <button className="kt-btn kt-btn-primary flex-1">Назначить</button>
+                <button
+                  onClick={() => {
+                    // Demo flow — реальное назначение через RPC будет в Sprint W10.
+                    setShowAssign(false)
+                  }}
+                  className="kt-btn kt-btn-primary flex-1"
+                  title="Демо-режим — закроет диалог. Реальное назначение в Sprint W10"
+                >
+                  Назначить
+                </button>
                 <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, type ReactNode } from 'react'
+import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
@@ -350,11 +351,19 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Работа тренера</p>
             <p className="mt-2 text-sm font-semibold text-foreground">Комментируйте, просматривайте и ставьте метку из одной панели.</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+              <button
+                disabled
+                title="Скоро — пока используйте /diary для комментариев"
+                className="kt-btn kt-btn-sm kt-btn-outline gap-1.5 opacity-60 cursor-not-allowed"
+              >
                 <i className="ki-filled ki-message-text text-xs" />
                 Комментарий
               </button>
-              <button className="kt-btn kt-btn-sm kt-btn-primary gap-1.5">
+              <button
+                disabled
+                title="Скоро — отметка сессии появится в Sprint W10"
+                className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 opacity-60 cursor-not-allowed"
+              >
                 <i className="ki-filled ki-tag text-xs" />
                 Отметить сессию
               </button>
@@ -745,14 +754,21 @@ export default function AthletesPage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button className="kt-btn kt-btn-outline gap-2">
+              <button
+                disabled
+                title="Фильтр в разработке — пока используйте вкладки выше"
+                className="kt-btn kt-btn-outline gap-2 opacity-60 cursor-not-allowed"
+              >
                 <i className="ki-filled ki-filter text-xs" />
                 Фильтр
               </button>
-              <button className="kt-btn kt-btn-primary gap-2">
+              <Link
+                href="/network?tab=find&type=people"
+                className="kt-btn kt-btn-primary gap-2 no-underline"
+              >
                 <i className="ki-filled ki-plus text-sm" />
                 Добавить атлета
-              </button>
+              </Link>
             </div>
           </div>
 
