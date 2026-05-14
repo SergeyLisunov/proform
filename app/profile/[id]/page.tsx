@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
 import AskDoctorButton from '@/components/medical/AskDoctorButton'
+import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F97316', bg: '#FFF7ED' },
@@ -381,6 +382,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Coach — rich profile */}
       {profile.role === 'coach' && <CoachProfile profile={profile} />}
+      {profile.role === 'coach' && <CoachReviewsBlock coachId={profile.id} summary={null} />}
       {profile.role === 'doctor' && <DoctorProfile profile={profile} />}
       {profile.role === 'organization' && <OrgProfile profile={profile} />}
 
