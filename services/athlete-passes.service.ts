@@ -179,6 +179,67 @@ export async function useSession(passId: string): Promise<{ ok: boolean; remaini
   return { ok: true, remaining: updated.total_sessions - updated.used_sessions }
 }
 
+// ── Coach side ─────────────────────────────────────────────────────────────
+
+export interface AthletePassWithAthlete extends AthletePass {
+  athlete_name:       string | null
+  athlete_avatar_url: string | null
+  athlete_nickname:   string | null
+}
+
+/**
+ * Returns ALL currently-usable passes the CURRENT COACH has issued.
+ *
+ * Filter: coach_id = me AND status='active' AND expires_at >= today
+ *         AND used_sessions < total_sessions.
+ *
+ * Sorted by expires_at ASC (most-urgent first), then by athlete_name.
+ *
+ * Used by the coach-facing /coach/passes page to mark sessions used
+ * after a real training session (W9 Day 43 — useSession UI binding).
+ */
+export async function listMyIssuedPasses(): Promise<AthletePassWithAthlete[]> {
+  const sb = createClient()
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) return []
+  const { data: meRow } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string } | null
+  if (!me) return []
+
+  const today = new Date().toISOString().slice(0, 10)
+  const { data, error } = await sb
+    .from('athlete_passes')
+    .select('*')
+    .eq('coach_id', me.id)
+    .eq('status', 'active')
+    .gte('expires_at', today)
+    .order('expires_at', { ascending: true })
+  if (error) {
+    console.warn('[athlete-passes.listMyIssuedPasses]', error.message)
+    return []
+  }
+  const passes = (data ?? []) as AthletePass[]
+  if (passes.length === 0) return []
+
+  const athleteIds = Array.from(new Set(passes.map(p => p.athlete_id)))
+  const { data: users } = await sb
+    .from('users')
+    .select('id, name, avatar_url, nickname')
+    .in('id', athleteIds)
+  const map = new Map<string, { name: string | null; avatar_url: string | null; nickname: string | null }>()
+  for (const u of (users ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; nickname: string | null }>) {
+    map.set(u.id, { name: u.name, avatar_url: u.avatar_url, nickname: u.nickname })
+  }
+  return passes
+    .filter(p => p.used_sessions < p.total_sessions)
+    .map(p => ({
+      ...p,
+      athlete_name:       map.get(p.athlete_id)?.name       ?? null,
+      athlete_avatar_url: map.get(p.athlete_id)?.avatar_url ?? null,
+      athlete_nickname:   map.get(p.athlete_id)?.nickname   ?? null,
+    }))
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 async function enrichWithCoach(

@@ -69,6 +69,13 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
       hint: 'График стартов',
       bg: '#F0FDF4', color: '#15803D', border: '#BBF7D0',
     },
+    {
+      href: '/coach/passes',
+      icon: 'ki-minus-squared',
+      label: 'Списать сессию',
+      hint: 'Абонементы атлетов',
+      bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA',
+    },
   ]
 
   return (
