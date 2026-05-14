@@ -1171,7 +1171,13 @@ function CoachDiary() {
                   </div>
                   <div className="text-2xs text-muted-foreground">{entry.date} · Sara Kowalski</div>
                 </div>
-                <button className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-pencil text-xs text-muted-foreground" /></button>
+                <button
+                  disabled
+                  title="Редактирование существующих записей — Sprint W10. Сейчас создавайте новую запись"
+                  className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost opacity-50 cursor-not-allowed"
+                >
+                  <i className="ki-filled ki-pencil text-xs text-muted-foreground" />
+                </button>
               </div>
               <p className="text-sm text-foreground/80 leading-relaxed mb-3">{entry.note}</p>
               <div className="flex items-center gap-2 flex-wrap">
@@ -1197,7 +1203,16 @@ function CoachDiary() {
                 <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Категория</label><select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">{['performance','health','motivation','technique','tactical'].map(c=><option key={c} value={c}>{c}</option>)}</select></div>
               </div>
               <div className="flex gap-2 pt-1">
-                <button className="flex-1 kt-btn kt-btn-primary">Сохранить запись</button>
+                <button
+                  onClick={() => {
+                    // Demo flow — реальное сохранение записи дневника появится в Sprint W10.
+                    setShowForm(false)
+                  }}
+                  className="flex-1 kt-btn kt-btn-primary"
+                  title="Демо-режим — закроет форму. Реальное сохранение в Sprint W10"
+                >
+                  Сохранить запись
+                </button>
                 <button onClick={() => setShowForm(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>
             </div>
