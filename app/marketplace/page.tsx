@@ -28,6 +28,7 @@ import {
   type Offering, type SellerRole, type ServiceType, type SellerSpecialty,
   type OfferingSort,
 } from '@/services/marketplace.service'
+import { getReviewSummaries } from '@/services/coach-reviews.service'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
 const TYPE_OPTIONS: ServiceType[] = [
@@ -74,6 +75,8 @@ function MarketplaceInner() {
   const [offerings, setOfferings] = useState<Offering[]>([])
   const [featured, setFeatured]   = useState<Offering[]>([])
   const [sellers, setSellers]     = useState<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean }>>(new Map())
+  // W9 Day 44: ratings summary per seller_id (only populated for coach sellers with >=1 review)
+  const [ratings, setRatings]     = useState<Map<string, { avg_rating: number; review_count: number }>>(new Map())
   const [loading, setLoading]     = useState(true)
   const [searchInput, setSearchInput] = useState(q)
 
@@ -99,6 +102,12 @@ function MarketplaceInner() {
     setFeatured(feat)
     const map = await resolveSellers([...feat, ...list])
     setSellers(map)
+    // W9 Day 44: batched rating summaries for all visible coach sellers
+    const sellerIds = Array.from(new Set([...feat, ...list].map(o => o.seller_id)))
+    const summaries = await getReviewSummaries(sellerIds)
+    const ratingsMap = new Map<string, { avg_rating: number; review_count: number }>()
+    for (const [k, v] of summaries) ratingsMap.set(k, { avg_rating: v.avg_rating, review_count: v.review_count })
+    setRatings(ratingsMap)
     setLoading(false)
   }, [role, type, specialty, q, sort, format, priceMax])
 
@@ -289,9 +298,20 @@ function MarketplaceInner() {
                   {o.description && <p className="text-xs text-muted-foreground line-clamp-2 flex-1">{o.description}</p>}
                   <div className="flex items-center justify-between gap-2 pt-2 border-t border-amber-200">
                     <div className="pf-num text-xl font-bold text-foreground">{fmtPrice(o.price_cents, o.currency)}</div>
-                    {seller && (
-                      <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">{seller.name ?? '—'}</span>
-                    )}
+                    <div className="flex items-center gap-2 min-w-0">
+                      {ratings.get(o.seller_id) && (
+                        <span
+                          title={`${ratings.get(o.seller_id)!.review_count} отзывов`}
+                          className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 px-1.5 py-0.5 text-[10px] font-bold shrink-0"
+                        >
+                          ★ {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                          <span className="font-normal opacity-70">·{ratings.get(o.seller_id)!.review_count}</span>
+                        </span>
+                      )}
+                      {seller && (
+                        <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">{seller.name ?? '—'}</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               )
@@ -397,12 +417,23 @@ function MarketplaceInner() {
                                 <span className="text-[11px] text-muted-foreground truncate">
                                   {seller.name ?? '—'}
                                 </span>
-                                {seller.is_demo && (
-                                  <span title="Demo-профиль — реальные тренеры скоро"
-                                    className="text-[9px] font-bold uppercase tracking-wider text-amber-700">
-                                    DEMO
-                                  </span>
-                                )}
+                                <div className="flex items-center gap-1">
+                                  {ratings.get(o.seller_id) && (
+                                    <span
+                                      title={`${ratings.get(o.seller_id)!.review_count} отзывов · среднее ${ratings.get(o.seller_id)!.avg_rating.toFixed(1)}`}
+                                      className="text-[10px] font-bold text-amber-700"
+                                    >
+                                      ★ {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                                      <span className="font-normal text-muted-foreground"> ({ratings.get(o.seller_id)!.review_count})</span>
+                                    </span>
+                                  )}
+                                  {seller.is_demo && (
+                                    <span title="Demo-профиль — реальные тренеры скоро"
+                                      className="text-[9px] font-bold uppercase tracking-wider text-amber-700">
+                                      DEMO
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           )}
