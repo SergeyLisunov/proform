@@ -124,7 +124,7 @@ export async function createService(input: CreateServiceInput): Promise<CoachSer
   const { data: meRow } = await sb.from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
   const me = meRow as { id: string; role: string } | null
   if (!me) return null
-  if (me.role !== 'coach' && me.role !== 'trainer') return null
+  if (me.role !== 'coach') return null
 
   if (input.title.trim().length < 3 || input.title.trim().length > 120) return null
   if (!Number.isInteger(input.price_amount) || input.price_amount < 0 || input.price_amount > 10_000_000) return null

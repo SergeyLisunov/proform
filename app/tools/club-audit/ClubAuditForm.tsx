@@ -135,8 +135,7 @@ export default function ClubAuditForm() {
   const canSubmit =
     typeof totalAthletes === 'number' && totalAthletes > 0 &&
     typeof activeAthletes === 'number' && activeAthletes >= 0 && activeAthletes <= totalAthletes &&
-    typeof coachesCount === 'number' && coachesCount > 0 &&
-    phase === 'idle'
+    typeof coachesCount === 'number' && coachesCount > 0
 
   function togglePain(p: PainPoint) {
     setPainPoints(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
@@ -431,7 +430,7 @@ export default function ClubAuditForm() {
           </div>
 
           <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-slate-200">
-            <button onClick={handleAnalyze} disabled={!canSubmit || phase === 'analyzing'}
+            <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
               className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Анализируем клуб…' : 'Получить audit-отчёт →'}
             </button>

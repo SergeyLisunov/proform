@@ -139,8 +139,7 @@ export default function MedicalSummaryForm() {
     typeof age === 'number' && age > 0 &&
     primarySymptom.trim().length >= 5 &&
     location.trim().length >= 3 &&
-    typeof durationDays === 'number' && durationDays >= 0 &&
-    phase === 'idle'
+    typeof durationDays === 'number' && durationDays >= 0
 
   function fillSample() {
     setAge(SAMPLE_INPUT.age); setSex(SAMPLE_INPUT.sex); setSport(SAMPLE_INPUT.sport); setLevel(SAMPLE_INPUT.level)
@@ -459,7 +458,7 @@ export default function MedicalSummaryForm() {
           </FormSection>
 
           <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-slate-200">
-            <button onClick={handleAnalyze} disabled={!canSubmit || phase === 'analyzing'}
+            <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
               className="rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-600 hover:from-violet-600 hover:to-fuchsia-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Анализируем case…' : 'Получить assessment template →'}
             </button>

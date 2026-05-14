@@ -133,7 +133,7 @@ export default function AdaptivePlanForm() {
     })
   }, [rows])
 
-  const canSubmit = validRows.length >= 1 && phase === 'idle'
+  const canSubmit = validRows.length >= 1
 
   function emptyRow(id: string): WorkoutRow {
     return { id, date: '', activity_type: 'Бег', duration_min: '', perceived_load: '', recovery_score: '', felt: '' }
@@ -433,7 +433,7 @@ export default function AdaptivePlanForm() {
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50 disabled:opacity-50">
               + Тренировка ({rows.length}/30)
             </button>
-            <button onClick={handleAnalyze} disabled={!canSubmit || phase === 'analyzing'}
+            <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
               className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Генерируем план…' : `Получить план (${validRows.length})`}
             </button>

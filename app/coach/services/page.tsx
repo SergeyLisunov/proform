@@ -80,7 +80,7 @@ export default function CoachServicesPage() {
 
   useEffect(() => {
     if (userLoading) return
-    if (!user || (user.role !== 'coach' && user.role !== 'trainer')) {
+    if (!user || (user.role !== 'coach')) {
       setLoading(false); return
     }
     load()
@@ -203,7 +203,7 @@ export default function CoachServicesPage() {
     )
   }
 
-  if (!user || (user.role !== 'coach' && user.role !== 'trainer')) {
+  if (!user || (user.role !== 'coach')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />

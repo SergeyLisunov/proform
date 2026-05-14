@@ -34,7 +34,6 @@ interface RecentRec {
   title:        string | null
   body:         string | null
   created_at:   string
-  source_role:  string | null
 }
 
 export default function AthleteDashboardPage() {
@@ -78,7 +77,7 @@ export default function AthleteDashboardPage() {
       listMyGoals('active'),
       sb
         .from('recommendations')
-        .select('id, title, body, created_at, source_role')
+        .select('id, title, body, created_at')
         .eq('athlete_id', me.id)
         .order('created_at', { ascending: false })
         .limit(5),
@@ -297,11 +296,10 @@ export default function AthleteDashboardPage() {
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-foreground line-clamp-1">
                       {r.title ?? 'Рекомендация'}
-                      {r.source_role && (
-                        <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                          · {r.source_role === 'doctor' ? '🩺 Врач' : r.source_role === 'coach' ? '👤 Тренер' : r.source_role}
-                        </span>
-                      )}
+                      {/* Schema W5 Day 27: doctor_id NOT NULL → all recs are from doctor. */}
+                      <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                        · 🩺 Врач
+                      </span>
                     </div>
                     {r.body && <div className="text-[12px] text-muted-foreground line-clamp-2 mt-0.5">{r.body}</div>}
                   </div>
