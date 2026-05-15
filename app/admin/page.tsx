@@ -5,6 +5,11 @@ import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
+import {
+  listCoachesForVerification, setCoachVerification,
+  type VerifiableCoach,
+} from '@/services/admin-verifications.service'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 function getSB() {
   return createBrowserClient(
@@ -13,7 +18,7 @@ function getSB() {
   )
 }
 
-type AdminTab = 'users' | 'privacy' | 'audit' | 'system'
+type AdminTab = 'users' | 'verification' | 'privacy' | 'audit' | 'system'
 
 type DBUser = { id: string; name: string; email: string; role: string; created_at: string }
 type RecentActivity = { id: string; actor: string; action: string; detail: string; table_name: string; created_at: string }
@@ -61,6 +66,7 @@ const SYSTEM_SERVICES = [
 
 const TABS: { id: AdminTab; label: string; icon: string; hint: string }[] = [
   { id: 'users', label: 'Пользователи', icon: 'ki-people', hint: 'Роли, статусы и доступы' },
+  { id: 'verification', label: 'Верификация', icon: 'ki-verify', hint: 'Подтверждение тренеров' },
   { id: 'privacy', label: 'Приватность', icon: 'ki-lock', hint: 'Политики видимости данных' },
   { id: 'audit', label: 'Журнал действий', icon: 'ki-notepad-edit', hint: 'Последние изменения и входы' },
   { id: 'system', label: 'Система', icon: 'ki-setting-2', hint: 'Ключевые сервисы и контуры' },
@@ -153,6 +159,31 @@ export default function AdminPage() {
   const [activity, setActivity] = useState<RecentActivity[]>([])
   const [actLoading, setActLoading] = useState(false)
 
+  // W9 Day 45: verification tab
+  const [verCoaches, setVerCoaches] = useState<VerifiableCoach[]>([])
+  const [verLoading, setVerLoading] = useState(false)
+  const [verBusy, setVerBusy] = useState<string | null>(null)
+
+  const loadVerCoaches = useCallback(async () => {
+    setVerLoading(true)
+    const list = await listCoachesForVerification()
+    setVerCoaches(list)
+    setVerLoading(false)
+  }, [])
+
+  const onToggleVerification = useCallback(async (coach: VerifiableCoach) => {
+    if (verBusy) return
+    setVerBusy(coach.id)
+    const res = await setCoachVerification({ coachId: coach.id, verified: !coach.is_verified })
+    setVerBusy(null)
+    if (!res.ok) {
+      toastError(res.error ?? 'Не удалось переключить верификацию')
+      return
+    }
+    success(coach.is_verified ? 'Верификация снята' : 'Тренер верифицирован')
+    void loadVerCoaches()
+  }, [verBusy, loadVerCoaches, success, toastError])
+
   // Assign modal
   const [showAssign, setShowAssign] = useState(false)
   const [assignAthlete, setAssignAthlete] = useState('')
@@ -213,6 +244,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (tab === 'audit' && activity.length === 0) loadActivity()
+    if (tab === 'verification' && verCoaches.length === 0) void loadVerCoaches()
   }, [tab, activity.length, loadActivity])
 
   async function changeRole(userId: string, newRole: string) {
@@ -472,6 +504,87 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'verification' && (
+            <div className="space-y-5">
+              <div className="rounded-[26px] border border-border bg-background p-5">
+                <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
+                  <div>
+                    <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Верификация тренеров</div>
+                    <h3 className="mt-2 text-lg font-semibold text-foreground">Подтверждение личности и квалификации</h3>
+                    <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+                      Включите бейдж только после проверки документов и опыта тренера.
+                      Verified-бейдж отображается на профиле, в marketplace и других местах как сигнал доверия.
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="pf-num text-3xl font-bold text-foreground">
+                      {verCoaches.filter(c => c.is_verified).length}
+                      <span className="text-base text-muted-foreground font-normal"> / {verCoaches.length}</span>
+                    </div>
+                    <div className="text-2xs text-muted-foreground">верифицировано</div>
+                  </div>
+                </div>
+
+                {verLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+                  </div>
+                ) : verCoaches.length === 0 ? (
+                  <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
+                    <i className="ki-filled ki-people text-3xl text-muted-foreground mb-2 block" />
+                    <p className="text-sm text-muted-foreground">Тренеров пока нет в базе.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {verCoaches.map(c => {
+                      const busy = verBusy === c.id
+                      return (
+                        <div key={c.id}
+                          className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3 flex-wrap">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-sm font-bold pf-num text-foreground overflow-hidden">
+                            {c.avatar_url
+                              // eslint-disable-next-line @next/next/no-img-element
+                              ? <img src={c.avatar_url} alt="" className="w-full h-full object-cover" />
+                              : getInitials(c.name ?? c.nickname ?? '?')}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <Link href={`/profile/${c.id}`} className="text-sm font-semibold text-foreground hover:text-orange-600 truncate">
+                                {c.name ?? c.nickname ?? 'Без имени'}
+                              </Link>
+                              {c.is_verified && <VerifiedBadge size="sm" />}
+                            </div>
+                            <div className="truncate font-mono text-2xs text-muted-foreground">{c.email ?? '—'}</div>
+                            {c.is_verified && c.verified_at && (
+                              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                Верифицирован {new Date(c.verified_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => onToggleVerification(c)}
+                            disabled={busy}
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold shadow-sm transition disabled:cursor-not-allowed ${
+                              c.is_verified
+                                ? 'bg-card border border-border text-muted-foreground hover:bg-accent'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            } ${busy ? 'opacity-60' : ''}`}
+                          >
+                            {busy
+                              ? <><div className="w-3 h-3 border-2 border-current/40 border-t-current rounded-full pf-spin" /> Обновляю…</>
+                              : c.is_verified
+                                ? <><i className="ki-filled ki-cross text-xs" /> Снять</>
+                                : <><i className="ki-filled ki-verify text-xs" /> Верифицировать</>}
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}
