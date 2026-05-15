@@ -29,6 +29,7 @@ import {
   type OfferingSort,
 } from '@/services/marketplace.service'
 import { getReviewSummaries } from '@/services/coach-reviews.service'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
 const TYPE_OPTIONS: ServiceType[] = [
@@ -74,7 +75,7 @@ function MarketplaceInner() {
 
   const [offerings, setOfferings] = useState<Offering[]>([])
   const [featured, setFeatured]   = useState<Offering[]>([])
-  const [sellers, setSellers]     = useState<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean }>>(new Map())
+  const [sellers, setSellers]     = useState<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean; is_verified: boolean }>>(new Map())
   // W9 Day 44: ratings summary per seller_id (only populated for coach sellers with >=1 review)
   const [ratings, setRatings]     = useState<Map<string, { avg_rating: number; review_count: number }>>(new Map())
   const [loading, setLoading]     = useState(true)
@@ -309,7 +310,10 @@ function MarketplaceInner() {
                         </span>
                       )}
                       {seller && (
-                        <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">{seller.name ?? '—'}</span>
+                        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground truncate max-w-[140px]">
+                          {seller.name ?? '—'}
+                          {seller.is_verified && <VerifiedBadge size="sm" />}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -414,8 +418,9 @@ function MarketplaceInner() {
                                   : (seller.name ?? '?').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex flex-col min-w-0">
-                                <span className="text-[11px] text-muted-foreground truncate">
+                                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground truncate">
                                   {seller.name ?? '—'}
+                                  {seller.is_verified && <VerifiedBadge size="sm" />}
                                 </span>
                                 <div className="flex items-center gap-1">
                                   {ratings.get(o.seller_id) && (

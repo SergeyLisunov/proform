@@ -261,17 +261,23 @@ export async function getOffering(kind: OfferingKind, id: string): Promise<Offer
     : serviceToOffering(data as CoachServiceRow)
 }
 
-/** Resolve seller user info (name, avatar, demo + featured flags) for a list of offerings. */
+/** Resolve seller user info (name, avatar, demo + featured + verified flags) for a list of offerings. */
 export async function resolveSellers(
   offerings: Offering[],
-): Promise<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean }>> {
+): Promise<Map<string, { id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean; is_featured: boolean; is_verified: boolean }>> {
   if (offerings.length === 0) return new Map()
   const sb = createClient()
   const ids = Array.from(new Set(offerings.map(o => o.seller_id)))
   const { data } = await sb
     .from('users')
-    .select('id, name, avatar_url, role, is_demo, is_featured')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .select('id, name, avatar_url, role, is_demo, is_featured, is_verified' as any)
     .in('id', ids)
-  return new Map(((data ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean | null; is_featured: boolean | null }>)
-    .map(u => [u.id, { ...u, is_demo: u.is_demo ?? false, is_featured: u.is_featured ?? false }]))
+  return new Map(((data ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean | null; is_featured: boolean | null; is_verified: boolean | null }>)
+    .map(u => [u.id, {
+      ...u,
+      is_demo:     u.is_demo     ?? false,
+      is_featured: u.is_featured ?? false,
+      is_verified: u.is_verified ?? false,
+    }]))
 }

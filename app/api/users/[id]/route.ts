@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   // Coaches/doctors hold the split fields in their role tables.
   const { data: profile } = await supabase
     .from('users')
-    .select('id, nickname, name, role, avatar_url, sport, discipline, city, country, bio, coach_specialization, experience_years, is_searchable')
+    .select('id, nickname, name, role, avatar_url, sport, discipline, city, country, bio, coach_specialization, experience_years, is_searchable, is_verified, verified_at')
     .eq('id', id)
     .single()
 

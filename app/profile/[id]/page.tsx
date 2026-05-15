@@ -5,6 +5,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
 import AskDoctorButton from '@/components/medical/AskDoctorButton'
 import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F97316', bg: '#FFF7ED' },
@@ -21,6 +22,9 @@ type Profile = {
   last_name: string | null
   role: string
   avatar_url: string | null
+  // W9 Day 45: admin-issued verification
+  is_verified?: boolean
+  verified_at?: string | null
   sport: string | null
   discipline: string | null
   city: string | null
@@ -264,6 +268,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99,
                 background: roleMeta.bg, color: roleMeta.color, border: `1px solid ${roleMeta.color}22`,
               }}>{roleMeta.label}</span>
+              {profile.is_verified && <VerifiedBadge size="md" />}
             </div>
             {profile.nickname && (
               <p style={{ fontSize: 13, color: 'var(--muted-foreground)', margin: '3px 0 0' }}>@{profile.nickname}</p>
