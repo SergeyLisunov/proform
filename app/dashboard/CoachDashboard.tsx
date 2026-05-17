@@ -8,6 +8,7 @@ import ReferralPanel from '@/components/coach/ReferralPanel'
 import type { Database } from '@/types/database'
 
 import CoachRestrictionsWidget from '@/components/coach/CoachRestrictionsWidget'
+import CoachReputationCard from '@/components/coach/CoachReputationCard'
 
 const CoachHeroBar          = dynamic(() => import('@/components/coach/CoachHeroBar'),         { ssr: false })
 const CoachQuickActions     = dynamic(() => import('@/components/coach/CoachQuickActions'),    { ssr: false })
@@ -84,6 +85,27 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
     ? Math.round(recoveryValues.reduce((s, v) => s + v, 0) / recoveryValues.length)
     : 0
 
+  // W9 Day 47: reputation card stats (verification + rating + active passes)
+  const today = new Date().toISOString().slice(0, 10)
+  const [
+    { data: meRow },
+    { data: reviewSummary },
+    { count: activePassesCount },
+  ] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('users').select('is_verified').eq('id', userId).maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('coach_review_summary').select('avg_rating, review_count').eq('coach_id', userId).maybeSingle(),
+    supabase.from('athlete_passes')
+      .select('id', { count: 'exact', head: true })
+      .eq('coach_id', userId)
+      .eq('status', 'active')
+      .gte('expires_at', today),
+  ])
+  const isVerified = (meRow as { is_verified: boolean | null } | null)?.is_verified === true
+  const avgRating = (reviewSummary as { avg_rating: number | null } | null)?.avg_rating ?? null
+  const reviewCount = (reviewSummary as { review_count: number | null } | null)?.review_count ?? 0
+
   const firstName = name.split(' ')[0] || name
   const AT_COLORS = ['#2563EB', '#F97316', '#16A34A', '#7C3AED', '#D97706', '#DC2626']
 
@@ -101,6 +123,14 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
           pendingRequests: pending.length,
           weekDiaryEntries: diaryThisWeekCount,
         }}
+      />
+
+      {/* 1.5. REPUTATION — W9 Day 47: verified + rating + active passes at a glance */}
+      <CoachReputationCard
+        isVerified={isVerified}
+        avgRating={avgRating}
+        reviewCount={reviewCount}
+        activePassesCount={activePassesCount ?? 0}
       />
 
       {/* 2. AT-RISK ATHLETES */}
