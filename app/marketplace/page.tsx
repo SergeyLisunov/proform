@@ -72,6 +72,8 @@ function MarketplaceInner() {
   const format   = (searchParams.get('format')   ?? '') as 'online' | 'offline' | 'hybrid' | ''
   const priceMaxRub = Number.parseInt(searchParams.get('price_max') ?? '', 10)
   const priceMax    = Number.isFinite(priceMaxRub) && priceMaxRub > 0 ? priceMaxRub : null
+  // W9 Day 46: verified-only toggle
+  const verifiedOnly = searchParams.get('verified') === '1'
 
   const [offerings, setOfferings] = useState<Offering[]>([])
   const [featured, setFeatured]   = useState<Offering[]>([])
@@ -87,20 +89,21 @@ function MarketplaceInner() {
     setLoading(true)
     const [list, feat] = await Promise.all([
       listOfferings({
-        sellerRole:  role     || undefined,
-        serviceType: type     || undefined,
-        specialty:   specialty|| undefined,
-        q:           q        || undefined,
-        sort:        sort,
-        format:      format   || undefined,
-        priceMaxRub: priceMax ?? undefined,
-        limit:       100,
+        sellerRole:   role     || undefined,
+        serviceType:  type     || undefined,
+        specialty:    specialty|| undefined,
+        q:            q        || undefined,
+        sort:         sort,
+        format:       format   || undefined,
+        priceMaxRub:  priceMax ?? undefined,
+        verifiedOnly: verifiedOnly || undefined,
+        limit:        100,
       }),
       // Only show featured carousel when there are no filters AND no search.
-      role || type || specialty || q || format || priceMax ? Promise.resolve([] as Offering[]) : listFeaturedOfferings(),
+      role || type || specialty || q || format || priceMax || verifiedOnly
+        ? Promise.resolve([] as Offering[])
+        : listFeaturedOfferings(),
     ])
-    setOfferings(list)
-    setFeatured(feat)
     const map = await resolveSellers([...feat, ...list])
     setSellers(map)
     // W9 Day 44: batched rating summaries for all visible coach sellers
@@ -108,13 +111,34 @@ function MarketplaceInner() {
     const summaries = await getReviewSummaries(sellerIds)
     const ratingsMap = new Map<string, { avg_rating: number; review_count: number }>()
     for (const [k, v] of summaries) ratingsMap.set(k, { avg_rating: v.avg_rating, review_count: v.review_count })
+
+    // W9 Day 46: client-side rating sort happens AFTER ratings are
+    // resolved. Service can't sort by rating because it doesn't join
+    // the coach_review_summary view. Coaches with no reviews fall to
+    // the bottom (treated as rating=0).
+    let listSorted = list
+    if (sort === 'rating_desc') {
+      listSorted = [...list].sort((a, b) => {
+        const ra = ratingsMap.get(a.seller_id)?.avg_rating ?? 0
+        const rb = ratingsMap.get(b.seller_id)?.avg_rating ?? 0
+        if (rb !== ra) return rb - ra
+        // Tie-break: more reviews wins, then newest
+        const ca = ratingsMap.get(a.seller_id)?.review_count ?? 0
+        const cb = ratingsMap.get(b.seller_id)?.review_count ?? 0
+        if (cb !== ca) return cb - ca
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+    }
+
+    setOfferings(listSorted)
+    setFeatured(feat)
     setRatings(ratingsMap)
     setLoading(false)
-  }, [role, type, specialty, q, sort, format, priceMax])
+  }, [role, type, specialty, q, sort, format, priceMax, verifiedOnly])
 
   useEffect(() => { load() }, [load])
 
-  const setFilter = (key: 'role' | 'type' | 'specialty' | 'q' | 'sort' | 'format' | 'price_max', value: string) => {
+  const setFilter = (key: 'role' | 'type' | 'specialty' | 'q' | 'sort' | 'format' | 'price_max' | 'verified', value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     if (value) params.set(key, value)
     else        params.delete(key)
@@ -128,7 +152,7 @@ function MarketplaceInner() {
 
   const clearFilters = () => { setSearchInput(''); router.push('/marketplace') }
 
-  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0) + (q ? 1 : 0) + (format ? 1 : 0) + (priceMax ? 1 : 0)
+  const activeFiltersCount = (role ? 1 : 0) + (type ? 1 : 0) + (specialty ? 1 : 0) + (q ? 1 : 0) + (format ? 1 : 0) + (priceMax ? 1 : 0) + (verifiedOnly ? 1 : 0)
 
   // W8 Day 42: compute "new this month" cutoff once per render
   const newCutoff = useMemo(() => {
@@ -187,15 +211,31 @@ function MarketplaceInner() {
           <option value="newest">Сначала новые</option>
           <option value="price_asc">Сначала дешевле</option>
           <option value="price_desc">Сначала дороже</option>
+          <option value="rating_desc">По рейтингу ★</option>
         </select>
       </form>
 
       {/* Filters */}
       <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <i className="ki-filled ki-filter text-sm text-muted-foreground" />
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Фильтры</span>
+            {/* W9 Day 46: verified-only toggle */}
+            <button
+              type="button"
+              onClick={() => setFilter('verified', verifiedOnly ? '' : '1')}
+              aria-pressed={verifiedOnly}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-colors ${
+                verifiedOnly
+                  ? 'bg-blue-600 text-white border border-blue-700 shadow-sm'
+                  : 'bg-card text-blue-700 border border-blue-200 hover:bg-blue-50'
+              }`}
+              title="Показать только верифицированных тренеров"
+            >
+              <i className="ki-filled ki-verify text-xs" />
+              {verifiedOnly ? 'Только Verified ✓' : 'Только Verified'}
+            </button>
           </div>
           {activeFiltersCount > 0 && (
             <button onClick={clearFilters}
