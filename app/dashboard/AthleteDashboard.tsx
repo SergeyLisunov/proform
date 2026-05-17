@@ -21,6 +21,7 @@ const AthleteConnectionsPanel = dynamic(
 )
 const AthleteFeedbackCard     = dynamic(() => import('@/components/ui/AthleteFeedbackCard'),       { ssr: false })
 const AthletePassportPanel    = dynamic(() => import('@/components/athlete/AthletePassportPanel'), { ssr: false })
+import AthleteDiscoverCTA from '@/components/athlete/AthleteDiscoverCTA'
 
 type DailyMetricRow = Database['public']['Tables']['daily_metrics']['Row']
 type WorkoutRow = Database['public']['Tables']['workouts']['Row']
@@ -39,11 +40,21 @@ const TYPE_ICON: Record<string, string> = {
 export default async function AthleteDashboard({ userId, name }: { userId: string; name: string }) {
   const supabase = await createClient()
 
-  const [{ data: metricsData }, { data: workoutsData }, { data: commentsData }] = await Promise.all([
+  const [
+    { data: metricsData },
+    { data: workoutsData },
+    { data: commentsData },
+    { count: connectionsCount },
+  ] = await Promise.all([
     supabase.from('daily_metrics').select('*').eq('athlete_id', userId).order('date', { ascending: false }).limit(56),
     supabase.from('workouts').select('*').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(8),
     supabase.from('workout_comments').select('body, created_at').order('created_at', { ascending: false }).limit(3),
+    // W9 Day 47: count accepted coach-athlete connections to gate the discover CTA
+    supabase.from('trainer_athletes')
+      .select('id', { count: 'exact', head: true })
+      .eq('athlete_id', userId).eq('status', 'accepted'),
   ])
+  const hasNoConnections = (connectionsCount ?? 0) === 0
   const metrics = (metricsData ?? []) as DailyMetricRow[]
   const workouts = (workoutsData ?? []) as WorkoutRow[]
   const comments = (commentsData ?? []) as Pick<WorkoutCommentRow, 'body' | 'created_at'>[]
@@ -85,6 +96,9 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
           sleep_hours: latest.sleep_hours ?? null,
         } : null}
       />
+
+      {/* W9 Day 47: discover CTA — only when athlete has zero coach connections */}
+      <AthleteDiscoverCTA hasNoConnections={hasNoConnections} />
 
       {/* 1.5. DAILY WELLNESS CHECK-IN — Sprint W1 Day 3, ритуал утра */}
       <DailyWellnessCard athleteId={userId} />

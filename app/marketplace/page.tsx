@@ -371,16 +371,34 @@ function MarketplaceInner() {
         </div>
       ) : offerings.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-16 text-center">
-          <i className="ki-filled ki-shop text-4xl text-muted-foreground mb-3 block" />
-          <h3 className="text-lg font-semibold text-foreground">Услуг по вашему запросу пока нет</h3>
-          <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-            Попробуйте сбросить фильтры или вернуться позже — каталог обновляется регулярно.
-          </p>
-          {activeFiltersCount > 0 && (
-            <button onClick={clearFilters}
-              className="mt-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold">
-              Сбросить фильтры
-            </button>
+          {verifiedOnly ? (
+            <>
+              <i className="ki-filled ki-verify text-4xl text-blue-500 mb-3 block" />
+              <h3 className="text-lg font-semibold text-foreground">Verified-тренеров пока нет</h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                Программа верификации только запускается. Снимите фильтр, чтобы увидеть всех доступных тренеров.
+              </p>
+              <button
+                onClick={() => setFilter('verified', '')}
+                className="mt-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-sm font-bold"
+              >
+                Показать всех
+              </button>
+            </>
+          ) : (
+            <>
+              <i className="ki-filled ki-shop text-4xl text-muted-foreground mb-3 block" />
+              <h3 className="text-lg font-semibold text-foreground">Услуг по вашему запросу пока нет</h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                Попробуйте сбросить фильтры или вернуться позже — каталог обновляется регулярно.
+              </p>
+              {activeFiltersCount > 0 && (
+                <button onClick={clearFilters}
+                  className="mt-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold">
+                  Сбросить фильтры
+                </button>
+              )}
+            </>
           )}
         </div>
       ) : (
