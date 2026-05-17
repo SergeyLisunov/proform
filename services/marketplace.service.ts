@@ -131,7 +131,7 @@ function serviceToOffering(r: CoachServiceRow): Offering {
   }
 }
 
-export type OfferingSort = 'newest' | 'price_asc' | 'price_desc'
+export type OfferingSort = 'newest' | 'price_asc' | 'price_desc' | 'rating_desc'
 
 export interface ListOfferingsFilter {
   sellerRole?:  SellerRole
@@ -139,7 +139,10 @@ export interface ListOfferingsFilter {
   specialty?:   SellerSpecialty
   /** Sprint W6 Day 32: case-insensitive substring match on title/description. */
   q?:           string
-  /** Sprint W6 Day 32: 'newest' (default) | 'price_asc' | 'price_desc'. */
+  /** Sprint W6 Day 32 + W9 Day 46: 'newest' (default) | 'price_asc' |
+   *  'price_desc' | 'rating_desc'. Rating sort is applied client-side
+   *  AFTER ratings are fetched, since this service doesn't know about
+   *  the coach_review_summary view. */
   sort?:        OfferingSort
   /** Sprint W8 Day 42: filter by delivery format (online/offline/hybrid).
    *  Only `coach_services` has a `format` column — when this filter is set,
@@ -148,6 +151,10 @@ export interface ListOfferingsFilter {
   /** Sprint W8 Day 42: maximum price in whole RUB. Kind-aware comparison:
    *  pass_plans store cents (divide by 100); services store whole RUB (use as-is). */
   priceMaxRub?: number
+  /** Sprint W9 Day 46: when true, only offerings from verified coaches
+   *  (users.is_verified = true) are returned. Adds a pre-fetch step
+   *  to resolve the set of verified seller_ids. */
+  verifiedOnly?: boolean
   /** Limit results; default 100 */
   limit?:       number
 }
@@ -190,6 +197,23 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
     sq = sq.eq('format', filter.format)
   }
 
+  // W9 Day 46: when verifiedOnly is set, pre-fetch the verified seller_ids
+  // and constrain both queries via .in('coach_id', verifiedIds). If there
+  // are zero verified coaches yet (early bootstrap), short-circuit to []
+  // to avoid emitting empty IN-clause syntax errors.
+  if (filter.verifiedOnly) {
+    const sb2 = createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: verifiedRows } = await (sb2 as any)
+      .from('users')
+      .select('id')
+      .eq('is_verified', true)
+    const verifiedIds = ((verifiedRows ?? []) as Array<{ id: string }>).map(r => r.id)
+    if (verifiedIds.length === 0) return []
+    pq = pq.in('coach_id', verifiedIds)
+    sq = sq.in('coach_id', verifiedIds)
+  }
+
   const [{ data: passes }, { data: services }] = await Promise.all([
     skipPasses ? Promise.resolve({ data: [] as CoachPassPlanRow[] }) : pq,
     sq,
@@ -213,6 +237,10 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
 
   if (sort === 'price_asc')  all.sort((a, b) => a.price_cents - b.price_cents)
   else if (sort === 'price_desc') all.sort((a, b) => b.price_cents - a.price_cents)
+  // 'rating_desc' is handled client-side by the marketplace page after
+  // ratings are fetched (this service doesn't join coach_review_summary).
+  // Falls through to 'newest' here so callers that DON'T do client-side
+  // re-sort still get a stable order.
   else                       all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   return all.slice(0, limit)
 }
