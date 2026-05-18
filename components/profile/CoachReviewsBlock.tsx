@@ -17,6 +17,7 @@ import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import {
   listReviewsForCoach, getMyReviewForCoach, upsertReview, deleteMyReview,
+  replyToReview,
   type CoachReviewWithAuthor, type CoachReview, type ReviewSummary,
 } from '@/services/coach-reviews.service'
 
@@ -70,6 +71,11 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
   const [formError, setFormError]   = useState<string | null>(null)
   const [toast, setToast]           = useState<{ ok: boolean; msg: string } | null>(null)
 
+  // W10 Day 48: reply state — one editable reply at a time
+  const [replyingId, setReplyingId] = useState<string | null>(null)
+  const [replyText, setReplyText]   = useState('')
+  const [replySaving, setReplySaving] = useState(false)
+
   const refresh = useCallback(async () => {
     const [list, mine] = await Promise.all([
       listReviewsForCoach(coachId),
@@ -95,6 +101,34 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
 
   const isSelf = !!user && user.id === coachId
   const canWrite = !!user && !isSelf && !userLoading
+  // W10 Day 48: coach can reply to reviews ON THEIR OWN profile
+  const canReply = !!user && isSelf && user.role === 'coach'
+
+  const onStartReply = useCallback((review: CoachReviewWithAuthor) => {
+    setReplyingId(review.id)
+    setReplyText(review.coach_response ?? '')
+  }, [])
+
+  const onCancelReply = useCallback(() => {
+    setReplyingId(null)
+    setReplyText('')
+  }, [])
+
+  const onSubmitReply = useCallback(async () => {
+    if (!replyingId || replySaving) return
+    setReplySaving(true)
+    const res = await replyToReview({ reviewId: replyingId, response: replyText })
+    setReplySaving(false)
+    if (!res.ok) {
+      setToast({ ok: false, msg: res.error ?? 'Не удалось сохранить ответ' })
+      return
+    }
+    const isClear = replyText.trim().length === 0
+    setToast({ ok: true, msg: isClear ? 'Ответ удалён' : 'Ответ опубликован' })
+    setReplyingId(null)
+    setReplyText('')
+    await refresh()
+  }, [replyingId, replyText, replySaving, refresh])
 
   const onSubmit = useCallback(async () => {
     if (saving) return
@@ -303,6 +337,98 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                 </div>
                 {r.comment && (
                   <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, whiteSpace: 'pre-wrap', margin: 0 }}>{r.comment}</p>
+                )}
+
+                {/* W10 Day 48: coach response thread */}
+                {r.coach_response && replyingId !== r.id && (
+                  <div style={{
+                    marginTop: 10, padding: '10px 12px',
+                    borderRadius: 12, borderLeft: '3px solid #16A34A',
+                    background: '#F0FDF4',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        <i className="ki-filled ki-message-text text-[10px]" style={{ marginRight: 4 }} />
+                        Ответ тренера
+                      </span>
+                      <span style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>
+                        {r.coach_response_at && fmtDate(r.coach_response_at)}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, whiteSpace: 'pre-wrap', margin: 0 }}>{r.coach_response}</p>
+                    {canReply && (
+                      <button
+                        type="button"
+                        onClick={() => onStartReply(r)}
+                        style={{ marginTop: 6, padding: '4px 10px', borderRadius: 8, background: 'transparent', color: '#15803D', fontSize: 11, fontWeight: 600, border: '1px solid #BBF7D0', cursor: 'pointer' }}
+                      >
+                        Редактировать ответ
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* W10 Day 48: reply form (inline) */}
+                {canReply && replyingId === r.id && (
+                  <div style={{
+                    marginTop: 10, padding: 12, borderRadius: 12,
+                    background: '#F0FDF4', border: '1px solid #BBF7D0',
+                  }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                      {r.coach_response ? 'Редактирование ответа' : 'Ответ атлету'}
+                    </p>
+                    <textarea
+                      value={replyText}
+                      onChange={e => setReplyText(e.target.value.slice(0, 800))}
+                      rows={3}
+                      placeholder="Поблагодарите атлета или ответьте на критику..."
+                      style={{
+                        width: '100%', padding: 8, borderRadius: 10,
+                        border: '1px solid #BBF7D0', background: 'var(--card)',
+                        fontSize: 13, color: 'var(--foreground)', resize: 'vertical', minHeight: 60,
+                      }}
+                    />
+                    <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3, textAlign: 'right' }}>{replyText.length}/800</p>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={onSubmitReply}
+                        disabled={replySaving}
+                        style={{
+                          padding: '6px 12px', borderRadius: 10,
+                          background: '#16A34A', color: '#fff', fontSize: 12, fontWeight: 700,
+                          border: '1px solid #15803D', cursor: replySaving ? 'wait' : 'pointer',
+                          opacity: replySaving ? 0.7 : 1,
+                        }}
+                      >
+                        {replySaving ? 'Сохраняю…' : (replyText.trim() ? 'Опубликовать' : 'Очистить ответ')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={onCancelReply}
+                        style={{ padding: '6px 12px', borderRadius: 10, background: 'var(--card)', color: 'var(--foreground)', fontSize: 12, fontWeight: 600, border: '1px solid var(--border)', cursor: 'pointer' }}
+                      >
+                        Отмена
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty-state CTA for coach to start a reply */}
+                {canReply && !r.coach_response && replyingId !== r.id && (
+                  <button
+                    type="button"
+                    onClick={() => onStartReply(r)}
+                    style={{
+                      marginTop: 8, padding: '6px 12px', borderRadius: 10,
+                      background: 'transparent', color: '#15803D', fontSize: 12, fontWeight: 600,
+                      border: '1px dashed #BBF7D0', cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                    }}
+                  >
+                    <i className="ki-filled ki-message-text text-xs" />
+                    Ответить атлету
+                  </button>
                 )}
               </div>
             )

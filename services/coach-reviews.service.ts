@@ -16,13 +16,16 @@
 import { createClient } from '@/lib/supabase/client'
 
 export interface CoachReview {
-  id:         string
-  coach_id:   string
-  athlete_id: string
-  rating:     number
-  comment:    string | null
-  created_at: string
-  updated_at: string
+  id:                string
+  coach_id:          string
+  athlete_id:        string
+  rating:            number
+  comment:           string | null
+  // W10 Day 48: coach can reply to review (1:1, see migration 073)
+  coach_response:    string | null
+  coach_response_at: string | null
+  created_at:        string
+  updated_at:        string
 }
 
 export interface CoachReviewWithAuthor extends CoachReview {
@@ -188,6 +191,47 @@ export async function deleteMyReview(coachId: string): Promise<{ ok: boolean; er
     .eq('athlete_id', me.id)
   if (error) {
     console.warn('[coach-reviews.deleteMyReview]', error.message)
+    return { ok: false, error: error.message }
+  }
+  return { ok: true, error: null }
+}
+
+// ── Coach responses (W10 Day 48) ──────────────────────────────────────────
+
+export interface ReplyInput {
+  reviewId: string
+  response: string   // empty/whitespace → treated as delete
+}
+
+/**
+ * Coach (subject of the review) writes / edits / deletes their response.
+ * RLS layer (migration 073) enforces coach_id = get_my_user_id().
+ *
+ * Empty trimmed response → clears the field (delete-by-empty pattern).
+ * Sets coach_response_at to now() on update, null on clear.
+ */
+export async function replyToReview(input: ReplyInput): Promise<{ ok: boolean; error: string | null }> {
+  const sb = createClient()
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) return { ok: false, error: 'Не авторизован' }
+  const { data: meRow } = await sb.from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string; role: string } | null
+  if (!me) return { ok: false, error: 'Профиль не найден' }
+  if (me.role !== 'coach') return { ok: false, error: 'Отвечать могут только тренеры' }
+
+  const trimmed = input.response.trim()
+  const payload = trimmed.length === 0
+    ? { coach_response: null,    coach_response_at: null }
+    : { coach_response: trimmed, coach_response_at: new Date().toISOString() }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (sb as any)
+    .from('coach_reviews')
+    .update(payload)
+    .eq('id', input.reviewId)
+    .eq('coach_id', me.id)   // belt-and-braces vs RLS
+  if (error) {
+    console.warn('[coach-reviews.replyToReview]', error.message)
     return { ok: false, error: error.message }
   }
   return { ok: true, error: null }
