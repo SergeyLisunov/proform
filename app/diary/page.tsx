@@ -3,7 +3,6 @@ import { useEffect, useState, useMemo } from 'react'
 import { useToast } from '@/lib/hooks/useToast'
 import ReactDOM from 'react-dom'
 import { useUser } from '@/lib/hooks/useUser'
-import { DEMO_DIARY, RISK_COLORS } from '@/lib/utils/data'
 import CoachDiaryClient from '@/components/coach/CoachDiaryClient'
 import MedicalDiaryClient from '@/components/doctor/MedicalDiaryClient'
 import { getWorkouts, createWorkout } from '@/services/workouts.service'
@@ -16,9 +15,6 @@ const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'
 
 // ── константы ──────────────────────────────────────────────────────────────────
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
-const RISK_FILTER = ['all', 'low', 'moderate', 'high']
-const CATEGORY_FILTER = ['all', 'performance', 'health', 'motivation', 'technique']
-
 const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
   'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C' },
@@ -1098,128 +1094,6 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
       </div>
     </>,
     document.body
-  )
-}
-
-// ── COACH DIARY ────────────────────────────────────────────────────────────────
-function CoachDiary() {
-  const [riskFilter, setRiskFilter] = useState('all')
-  const [catFilter,  setCatFilter]  = useState('all')
-  const [showForm,   setShowForm]   = useState(false)
-
-  const filtered = DEMO_DIARY.filter(d =>
-    (riskFilter === 'all' || d.risk === riskFilter) &&
-    (catFilter === 'all' || d.category === catFilter)
-  )
-
-  return (
-    <div className="flex flex-col gap-5 pf-enter">
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Журнал наблюдений</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Дневник тренера</h2>
-        </div>
-        <button onClick={() => setShowForm(true)} className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-plus text-sm" />Новая запись
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-        {[
-          { label:'Всего записей', value:DEMO_DIARY.length, bg:'bg-blue-50 text-blue-600', icon:'ki-book-open' },
-          { label:'Высокий риск',  value:DEMO_DIARY.filter(d=>d.risk==='high'||d.risk==='critical').length, bg:'bg-red-50 text-red-500', icon:'ki-warning-2' },
-          { label:'Умеренный',     value:DEMO_DIARY.filter(d=>d.risk==='moderate').length, bg:'bg-orange-50 text-orange-500', icon:'ki-information-2' },
-          { label:'В норме',       value:DEMO_DIARY.filter(d=>d.risk==='low').length, bg:'bg-green-50 text-green-600', icon:'ki-check-circle' },
-        ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}><i className={`ki-filled ${s.icon} text-base`} /></div>
-            <div><div className="pf-num text-2xl text-foreground">{s.value}</div><div className="text-2xs text-muted-foreground">{s.label}</div></div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex gap-1.5 flex-wrap">
-          {RISK_FILTER.map(f => (
-            <button key={f} onClick={() => setRiskFilter(f)} className={['px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize', riskFilter===f?'bg-orange-50 border-orange-200 text-orange-600':'bg-card border-border text-muted-foreground hover:border-orange-200'].join(' ')}>
-              {f === 'all' ? 'Все риски' : f}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-1.5 flex-wrap ml-auto">
-          {CATEGORY_FILTER.map(f => (
-            <button key={f} onClick={() => setCatFilter(f)} className={['px-2.5 py-1.5 rounded-lg text-2sm font-medium border transition-all capitalize', catFilter===f?'bg-blue-50 border-blue-200 text-blue-600':'bg-card border-border text-muted-foreground hover:border-blue-200'].join(' ')}>
-              {f === 'all' ? 'Все категории' : f}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {filtered.map((entry, i) => {
-          const rc = RISK_COLORS[entry.risk as keyof typeof RISK_COLORS]
-          return (
-            <div key={i} className="bg-card border border-border rounded-xl p-5 hover:border-orange-200 hover:shadow-sm transition-all">
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-sm font-semibold text-foreground">{entry.title}</span>
-                    <span className="text-2xs font-bold px-2 py-0.5 rounded-full border" style={{ background:rc.bg,color:rc.text,borderColor:rc.border }}>
-                      <i className={`ki-filled ${rc.icon} mr-1 text-[10px]`} />{entry.risk.charAt(0).toUpperCase()+entry.risk.slice(1)} риск
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-border/60 text-muted-foreground capitalize">{entry.category}</span>
-                  </div>
-                  <div className="text-2xs text-muted-foreground">{entry.date} · Sara Kowalski</div>
-                </div>
-                <button
-                  disabled
-                  title="Редактирование существующих записей — Sprint W10. Сейчас создавайте новую запись"
-                  className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost opacity-50 cursor-not-allowed"
-                >
-                  <i className="ki-filled ki-pencil text-xs text-muted-foreground" />
-                </button>
-              </div>
-              <p className="text-sm text-foreground/80 leading-relaxed mb-3">{entry.note}</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {entry.tags.map(tag => <span key={tag} className="px-2 py-0.5 rounded-full text-2xs font-medium bg-accent border border-border text-muted-foreground">#{tag}</span>)}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="pf-num text-xl text-foreground">Новая запись в дневник</h3>
-              <button onClick={() => setShowForm(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Заголовок</label><input className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400" placeholder="Заголовок наблюдения..." /></div>
-              <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Заметка</label><textarea rows={4} className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400 resize-none" placeholder="Подробное наблюдение..." /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Уровень риска</label><select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">{['low','moderate','high','critical'].map(r=><option key={r} value={r}>{r}</option>)}</select></div>
-                <div><label className="block text-2xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Категория</label><select className="w-full px-3 py-2.5 rounded-xl border border-input bg-background text-sm outline-none focus:border-orange-400">{['performance','health','motivation','technique','tactical'].map(c=><option key={c} value={c}>{c}</option>)}</select></div>
-              </div>
-              <div className="flex gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    // Demo flow — реальное сохранение записи дневника появится в Sprint W10.
-                    setShowForm(false)
-                  }}
-                  className="flex-1 kt-btn kt-btn-primary"
-                  title="Демо-режим — закроет форму. Реальное сохранение в Sprint W10"
-                >
-                  Сохранить запись
-                </button>
-                <button onClick={() => setShowForm(false)} className="kt-btn kt-btn-outline">Отмена</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
   )
 }
 
