@@ -79,6 +79,39 @@ export async function listReviewsForCoach(coachId: string): Promise<CoachReviewW
 }
 
 /**
+ * Batched variant of getMyReviewForCoach — returns a Map of coach_id
+ * to (review|null) for the current user. Used by the athlete-passes
+ * prompt (W10 Day 49) to filter "reviewable" coaches without N
+ * round-trips.
+ *
+ * Coaches I HAVEN'T reviewed are absent from the map.
+ */
+export async function getMyReviewsByCoachIds(coachIds: string[]): Promise<Map<string, CoachReview>> {
+  const map = new Map<string, CoachReview>()
+  if (coachIds.length === 0) return map
+  const sb = createClient()
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) return map
+  const { data: meRow } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string } | null
+  if (!me) return map
+  const uniq = Array.from(new Set(coachIds))
+  const { data, error } = await sb
+    .from('coach_reviews')
+    .select('*')
+    .eq('athlete_id', me.id)
+    .in('coach_id', uniq)
+  if (error) {
+    console.warn('[coach-reviews.getMyReviewsByCoachIds]', error.message)
+    return map
+  }
+  for (const row of (data ?? []) as CoachReview[]) {
+    map.set(row.coach_id, row)
+  }
+  return map
+}
+
+/**
  * Returns the current authenticated athlete's review for this coach
  * (if any). Useful to pre-fill the edit form.
  */
