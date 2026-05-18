@@ -10,6 +10,10 @@ import {
   type VerifiableCoach,
 } from '@/services/admin-verifications.service'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import {
+  listMyAdminInvites, revokeAdminInvite,
+  type AdminUserInvite, type AdminInviteRole,
+} from '@/services/admin-invites.service'
 
 function getSB() {
   return createBrowserClient(
@@ -171,6 +175,68 @@ export default function AdminPage() {
     setVerLoading(false)
   }, [])
 
+  // W10 Day 51: admin invite flow
+  const [invites, setInvites] = useState<AdminUserInvite[]>([])
+  const [invitesLoading, setInvitesLoading] = useState(false)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState<AdminInviteRole>('coach')
+  const [inviteSaving, setInviteSaving] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+
+  const loadInvites = useCallback(async () => {
+    setInvitesLoading(true)
+    const list = await listMyAdminInvites({ limit: 50 })
+    setInvites(list)
+    setInvitesLoading(false)
+  }, [])
+
+  const onSubmitInvite = useCallback(async () => {
+    if (inviteSaving) return
+    setInviteError(null)
+    const email = inviteEmail.trim().toLowerCase()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setInviteError('Введите корректный email')
+      return
+    }
+    setInviteSaving(true)
+    try {
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role: inviteRole }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const errMap: Record<string, string> = {
+          user_already_exists: 'Пользователь с таким email уже зарегистрирован',
+          invalid_email:       'Некорректный email',
+          invalid_role:        'Недопустимая роль',
+          admin_only:          'Доступно только администраторам',
+        }
+        setInviteError(errMap[data?.error] ?? (data?.error || 'Не удалось отправить приглашение'))
+        return
+      }
+      success(data.email_sent ? 'Приглашение отправлено на почту' : 'Приглашение создано (email не настроен)')
+      setShowInviteModal(false)
+      setInviteEmail('')
+      setInviteRole('coach')
+      void loadInvites()
+    } finally {
+      setInviteSaving(false)
+    }
+  }, [inviteSaving, inviteEmail, inviteRole, success, loadInvites])
+
+  const onRevokeInvite = useCallback(async (inviteId: string) => {
+    const res = await revokeAdminInvite(inviteId)
+    if (!res.ok) {
+      toastError(res.error ?? 'Не удалось отозвать приглашение')
+      return
+    }
+    success('Приглашение отозвано')
+    void loadInvites()
+  }, [success, toastError, loadInvites])
+
   const onToggleVerification = useCallback(async (coach: VerifiableCoach) => {
     if (verBusy) return
     setVerBusy(coach.id)
@@ -245,6 +311,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (tab === 'audit' && activity.length === 0) loadActivity()
     if (tab === 'verification' && verCoaches.length === 0) void loadVerCoaches()
+    if (tab === 'users' && invites.length === 0) void loadInvites()
   }, [tab, activity.length, loadActivity])
 
   async function changeRole(userId: string, newRole: string) {
@@ -446,9 +513,8 @@ export default function AdminPage() {
                       <h3 className="mt-2 text-lg font-semibold text-foreground">Роли, статусы и последние входы</h3>
                     </div>
                     <button
-                      disabled
-                      title="Создание пользователей админом — Sprint W10. Сейчас регистрация через /auth/register"
-                      className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 transition-colors opacity-60 cursor-not-allowed"
+                      onClick={() => setShowInviteModal(true)}
+                      className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-100"
                     >
                       <i className="ki-filled ki-plus text-xs" />
                       Новый пользователь
@@ -503,6 +569,76 @@ export default function AdminPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* W10 Day 51: pending admin-issued invites */}
+                <div className="rounded-[26px] border border-border bg-background p-5">
+                  <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+                    <div>
+                      <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Приглашения</div>
+                      <h3 className="mt-2 text-lg font-semibold text-foreground">
+                        Отправленные приглашения
+                        {invites.filter(i => i.status === 'pending').length > 0 && (
+                          <span className="ml-2 pf-num text-sm text-orange-700">
+                            ({invites.filter(i => i.status === 'pending').length} активных)
+                          </span>
+                        )}
+                      </h3>
+                    </div>
+                  </div>
+                  {invitesLoading ? (
+                    <div className="py-6 text-center">
+                      <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full pf-spin mx-auto" />
+                    </div>
+                  ) : invites.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      Пока не было отправлено приглашений. Используйте кнопку «Новый пользователь» выше.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {invites.map(inv => {
+                        const isPending = inv.status === 'pending'
+                        const roleLabel = ROLE_LABEL[inv.target_role] ?? inv.target_role
+                        const statusLabel = inv.status === 'pending' ? 'Ожидает'
+                          : inv.status === 'claimed' ? 'Принято'
+                          : inv.status === 'expired' ? 'Истекло'
+                          : 'Отозвано'
+                        return (
+                          <div key={inv.id} className="rounded-2xl border border-border bg-card p-3 flex items-center gap-3 flex-wrap">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-mono text-sm font-semibold text-foreground truncate">{inv.email}</span>
+                                <span className="inline-flex items-center rounded-full bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 text-2xs font-semibold">
+                                  {roleLabel}
+                                </span>
+                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-semibold ${
+                                  isPending ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                  : inv.status === 'claimed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-muted text-muted-foreground border border-border'
+                                }`}>
+                                  {statusLabel}
+                                </span>
+                              </div>
+                              <div className="mt-0.5 text-2xs text-muted-foreground">
+                                Создано {new Date(inv.created_at).toLocaleDateString('ru-RU')}
+                                {isPending && ` · истекает ${new Date(inv.expires_at).toLocaleDateString('ru-RU')}`}
+                                {inv.claimed_at && ` · принято ${new Date(inv.claimed_at).toLocaleDateString('ru-RU')}`}
+                              </div>
+                            </div>
+                            {isPending && (
+                              <button
+                                onClick={() => onRevokeInvite(inv.id)}
+                                className="rounded-xl border border-border bg-card hover:bg-accent text-muted-foreground px-3 py-1.5 text-xs font-semibold"
+                                title="Отозвать приглашение"
+                              >
+                                Отозвать
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -751,6 +887,72 @@ export default function AdminPage() {
           )}
         </div>
       </section>
+
+      {showInviteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-[28px] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Приглашения</div>
+                <h3 className="pf-num mt-2 text-xl text-foreground">Новый пользователь</h3>
+              </div>
+              <button
+                onClick={() => { setShowInviteModal(false); setInviteError(null) }}
+                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+              >
+                <i className="ki-filled ki-cross text-sm" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={e => setInviteEmail(e.target.value)}
+                  placeholder="newuser@example.com"
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Роль</label>
+                <select
+                  value={inviteRole}
+                  onChange={e => setInviteRole(e.target.value as AdminInviteRole)}
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                >
+                  <option value="athlete">Атлет</option>
+                  <option value="coach">Тренер</option>
+                  <option value="doctor">Врач</option>
+                  <option value="organization">Организация</option>
+                </select>
+              </div>
+              <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-2sm text-muted-foreground">
+                Пользователь получит email со ссылкой на регистрацию с предзаполненной ролью.
+                Приглашение активно 30 дней.
+              </div>
+              {inviteError && (
+                <p className="text-xs text-red-600">{inviteError}</p>
+              )}
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={onSubmitInvite}
+                  disabled={inviteSaving}
+                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                >
+                  {inviteSaving ? 'Отправляю…' : 'Отправить приглашение'}
+                </button>
+                <button
+                  onClick={() => { setShowInviteModal(false); setInviteError(null) }}
+                  className="kt-btn kt-btn-outline"
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAssign && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
