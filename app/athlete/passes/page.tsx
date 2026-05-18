@@ -15,13 +15,15 @@
  * Read-only for athlete — coach decrements sessions via separate UI
  * (athletes don't self-use, prevents fraud).
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import {
   listMyActivePasses, listMyExpiredPasses,
   type AthletePassWithCoach,
 } from '@/services/athlete-passes.service'
+import { getMyReviewsByCoachIds } from '@/services/coach-reviews.service'
+import AthleteReviewPrompt from '@/components/athlete/AthleteReviewPrompt'
 
 function fmtDate(iso: string): string {
   try {
@@ -48,6 +50,9 @@ export default function AthletePassesPage() {
   const [expired, setExpired]   = useState<AthletePassWithCoach[]>([])
   const [loading, setLoading]   = useState(true)
   const [showExpired, setShowExpired] = useState(false)
+  // W10 Day 49: set of coach_ids athlete has already reviewed (or chose to skip)
+  const [reviewedCoachIds, setReviewedCoachIds] = useState<Set<string>>(new Set())
+  const [dismissedCoachIds, setDismissedCoachIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (userLoading) return
@@ -58,10 +63,30 @@ export default function AthletePassesPage() {
       if (cancelled) return
       setActive(a)
       setExpired(e)
+      // W10 Day 49: batch-lookup my existing reviews for all coaches I have used_up passes with
+      const coachIds = Array.from(new Set(
+        e.filter(p => p.used_sessions >= p.total_sessions || p.status === 'used_up').map(p => p.coach_id),
+      ))
+      const reviewsMap = await getMyReviewsByCoachIds(coachIds)
+      if (cancelled) return
+      setReviewedCoachIds(new Set(reviewsMap.keys()))
       setLoading(false)
     })()
     return () => { cancelled = true }
   }, [user, userLoading])
+
+  // Reviewable coaches: have used_up pass + not yet reviewed + not session-dismissed.
+  // One prompt per coach (group by coach_id; pick most recently expired pass for context title).
+  const reviewableCoaches = useMemo(() => {
+    const used = expired.filter(p => p.used_sessions >= p.total_sessions || p.status === 'used_up')
+    const byCoach = new Map<string, AthletePassWithCoach>()
+    for (const p of used) {
+      if (reviewedCoachIds.has(p.coach_id) || dismissedCoachIds.has(p.coach_id)) continue
+      const prev = byCoach.get(p.coach_id)
+      if (!prev || (prev.expires_at < p.expires_at)) byCoach.set(p.coach_id, p)
+    }
+    return Array.from(byCoach.values())
+  }, [expired, reviewedCoachIds, dismissedCoachIds])
 
   if (userLoading || loading) {
     return (
@@ -184,6 +209,29 @@ export default function AthletePassesPage() {
               </div>
             )
           })}
+        </section>
+      )}
+
+      {/* W10 Day 49: review prompt for closed passes (one per coach) */}
+      {reviewableCoaches.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xs font-bold uppercase tracking-[0.24em] text-amber-700">
+            Поделитесь впечатлением · {reviewableCoaches.length}
+          </h2>
+          {reviewableCoaches.map(p => (
+            <AthleteReviewPrompt
+              key={p.coach_id}
+              coachId={p.coach_id}
+              coachName={p.coach_name}
+              coachAvatarUrl={p.coach_avatar_url}
+              contextTitle={p.title}
+              onDismiss={() => setDismissedCoachIds(prev => {
+                const next = new Set(prev)
+                next.add(p.coach_id)
+                return next
+              })}
+            />
+          ))}
         </section>
       )}
 
