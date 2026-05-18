@@ -242,7 +242,22 @@ export default function RegisterPage() {
     utm_source: null, utm_medium: null, utm_campaign: null,
     utm_content: null, utm_term: null, signup_referrer: null,
   })
-  useEffect(() => { setUtm(readUtmFromUrl()) }, [])
+  // W10 Day 52: admin invite token — read on mount, claim after signUp
+  const [inviteToken, setInviteToken] = useState<string | null>(null)
+  useEffect(() => {
+    setUtm(readUtmFromUrl())
+    if (typeof window === 'undefined') return
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const token = params.get('invite')
+      const roleParam = params.get('role')
+      if (token && /^[0-9a-f-]{36}$/i.test(token)) setInviteToken(token)
+      if (roleParam && (roleParam === 'athlete' || roleParam === 'coach' || roleParam === 'doctor' || roleParam === 'organization')) {
+        setSelectedRole(roleParam as Role)
+        setStep('account')
+      }
+    } catch { /* noop */ }
+  }, [])
 
   const [athleteForm, setAthleteForm] = useState({
     first_name: '',
@@ -307,6 +322,19 @@ export default function RegisterPage() {
       setError(signUpError.message)
       setLoading(false)
       return
+    }
+
+    // W10 Day 52: claim admin invite (silent-fail, never blocks signup flow)
+    if (inviteToken) {
+      try {
+        await fetch('/api/admin/invite/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: inviteToken, email }),
+        })
+      } catch (e) {
+        console.warn('[register] invite claim failed:', e instanceof Error ? e.message : e)
+      }
     }
 
     setLoading(false)
