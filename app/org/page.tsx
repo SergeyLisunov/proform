@@ -203,6 +203,18 @@ export default function OrgDashboard() {
                   <i className="ki-filled ki-rocket" style={{ fontSize: 14 }} />
                   Лента событий
                 </Link>
+                {/* W11 Day 54: org health snapshot one-pager */}
+                <Link href="/org/health" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 16px', borderRadius: 14, textDecoration: 'none',
+                  border: '1px solid #BAE6FD',
+                  background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                  color: 'white', fontSize: 13, fontWeight: 700,
+                  boxShadow: '0 10px 24px rgba(37,99,235,0.22)',
+                }}>
+                  <i className="ki-filled ki-chart-pie-simple" style={{ fontSize: 14 }} />
+                  Health Snapshot
+                </Link>
               </div>
             </div>
 
