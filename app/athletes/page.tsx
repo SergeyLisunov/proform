@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useMemo, type ReactNode } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
+import { createDiaryEntry } from '@/services/coach-diary.service'
 
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 
@@ -231,6 +233,44 @@ function AthleteCard({
 }
 
 function AthleteDetail({ athlete }: { athlete: Athlete }) {
+  const { user } = useUser()
+  // W11 Day 53: inline comment drawer (replaces disabled button from PR #63 audit)
+  const [commentOpen,  setCommentOpen]  = useState(false)
+  const [cTitle,       setCTitle]       = useState('')
+  const [cNote,        setCNote]        = useState('')
+  const [cSaving,      setCSaving]      = useState(false)
+  const [cError,       setCError]       = useState<string | null>(null)
+  const [cToast,       setCToast]       = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!cToast) return
+    const t = setTimeout(() => setCToast(null), 3000)
+    return () => clearTimeout(t)
+  }, [cToast])
+
+  const onSubmitComment = async () => {
+    if (cSaving) return
+    if (!user?.id) { setCError('Не авторизован'); return }
+    if (!cNote.trim()) { setCError('Заметка не может быть пустой'); return }
+    setCSaving(true)
+    setCError(null)
+    const res = await createDiaryEntry({
+      coach_id:   user.id,
+      athlete_id: athlete.id,
+      date:       new Date().toISOString().slice(0, 10),
+      entry_type: 'observation',
+      title:      cTitle.trim() || null,
+      note:       cNote.trim(),
+      is_shared_with_athlete: false,
+    })
+    setCSaving(false)
+    if (!res) { setCError('Не удалось сохранить — попробуйте ещё раз'); return }
+    setCommentOpen(false)
+    setCTitle('')
+    setCNote('')
+    setCToast(`Комментарий сохранён в дневнике для ${athlete.name}`)
+  }
+
   const [tab, setTab] = useState<TabType>('overview')
   const rc = recoveryColor(athlete.recovery)
   const rr = RISK_COLORS[athlete.risk]
@@ -352,21 +392,20 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <p className="mt-2 text-sm font-semibold text-foreground">Комментируйте, просматривайте и ставьте метку из одной панели.</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
-                disabled
-                title="Скоро — пока используйте /diary для комментариев"
-                className="kt-btn kt-btn-sm kt-btn-outline gap-1.5 opacity-60 cursor-not-allowed"
+                onClick={() => setCommentOpen(true)}
+                className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
               >
                 <i className="ki-filled ki-message-text text-xs" />
                 Комментарий
               </button>
-              <button
-                disabled
-                title="Скоро — отметка сессии появится в Sprint W10"
-                className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 opacity-60 cursor-not-allowed"
+              <Link
+                href="/coach/passes"
+                className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 no-underline"
+                title="Списать сессию с активного абонемента"
               >
                 <i className="ki-filled ki-tag text-xs" />
                 Отметить сессию
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -631,6 +670,81 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
           </div>
         )}
       </div>
+
+      {/* W11 Day 53: inline comment drawer — closes the disabled-button audit from PR #63 */}
+      {commentOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-xl">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <p className="text-2xs font-bold uppercase tracking-[0.18em] text-orange-700">Комментарий</p>
+                <h3 className="mt-1 text-lg font-bold text-foreground">Заметка по атлету «{athlete.name}»</h3>
+              </div>
+              <button
+                onClick={() => { setCommentOpen(false); setCError(null) }}
+                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                aria-label="Закрыть"
+              >
+                <i className="ki-filled ki-cross text-sm" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Заголовок (опционально)</label>
+                <input
+                  value={cTitle}
+                  onChange={e => setCTitle(e.target.value.slice(0, 120))}
+                  placeholder="Короткий заголовок…"
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Заметка</label>
+                <textarea
+                  value={cNote}
+                  onChange={e => setCNote(e.target.value.slice(0, 2000))}
+                  rows={5}
+                  placeholder="Что вы заметили? Что важно зафиксировать…"
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-vertical"
+                  style={{ minHeight: 100 }}
+                />
+                <p className="mt-1 text-right text-[10px] text-muted-foreground">{cNote.length}/2000</p>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Заметка сохраняется в журнале наблюдений ({' '}
+                <Link href="/diary" className="text-orange-600 hover:underline">/diary</Link>
+                {' '}) и не видна атлету по умолчанию.
+              </p>
+              {cError && (
+                <p className="text-xs text-red-600">{cError}</p>
+              )}
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={onSubmitComment}
+                  disabled={cSaving}
+                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                >
+                  {cSaving ? 'Сохраняю…' : 'Сохранить'}
+                </button>
+                <button
+                  onClick={() => { setCommentOpen(false); setCError(null) }}
+                  className="kt-btn kt-btn-outline"
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast after save */}
+      {cToast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2 max-w-md bg-emerald-600 text-white">
+          <i className="ki-filled ki-check-circle text-sm" />
+          {cToast}
+        </div>
+      )}
     </Surface>
   )
 }
@@ -715,7 +829,46 @@ export default function AthletesPage() {
     )
   }
 
-  const selectedAthlete = athletes[selected] ?? null
+  // W11 Day 53: URL-driven filter — closes the disabled «Фильтр» button from PR #63 audit
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const riskParam = searchParams.get('risk') ?? 'all'
+  const sportParam = searchParams.get('sport') ?? ''
+
+  const sportOptions = useMemo(() => {
+    const set = new Set<string>()
+    for (const a of athletes) if (a.sport_type) set.add(a.sport_type)
+    return Array.from(set).sort()
+  }, [athletes])
+
+  const filteredAthletes = useMemo(() => {
+    let arr = athletes
+    if (riskParam !== 'all' && (riskParam === 'low' || riskParam === 'moderate' || riskParam === 'high' || riskParam === 'critical')) {
+      arr = arr.filter(a => a.risk === riskParam)
+    }
+    if (sportParam) {
+      const needle = sportParam.toLowerCase()
+      arr = arr.filter(a => (a.sport_type ?? '').toLowerCase() === needle)
+    }
+    return arr
+  }, [athletes, riskParam, sportParam])
+
+  // Keep selected index valid when filter narrows the list
+  useEffect(() => {
+    if (filteredAthletes.length === 0) return
+    if (selected >= filteredAthletes.length) setSelected(0)
+  }, [filteredAthletes.length, selected])
+
+  const setFilter = (key: 'risk' | 'sport', value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value && value !== 'all') params.set(key, value)
+    else params.delete(key)
+    router.push(`/athletes?${params.toString()}`)
+  }
+
+  const activeFiltersCount = (riskParam !== 'all' ? 1 : 0) + (sportParam ? 1 : 0)
+
+  const selectedAthlete = filteredAthletes[selected] ?? null
   const averageRecovery = athletes.length ? Math.round(athletes.reduce((t, a) => t + a.recovery, 0) / athletes.length) : 0
   const riskCount = athletes.filter(a => a.risk !== 'low').length
   const readyCount = athletes.filter(a => a.recovery >= 70).length
@@ -754,14 +907,16 @@ export default function AthletesPage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button
-                disabled
-                title="Фильтр в разработке — пока используйте вкладки выше"
-                className="kt-btn kt-btn-outline gap-2 opacity-60 cursor-not-allowed"
-              >
-                <i className="ki-filled ki-filter text-xs" />
-                Фильтр
-              </button>
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={() => router.push('/athletes')}
+                  className="kt-btn kt-btn-outline gap-2"
+                  title="Сбросить все фильтры"
+                >
+                  <i className="ki-filled ki-cross-circle text-xs" />
+                  Сбросить ({activeFiltersCount})
+                </button>
+              )}
               <Link
                 href="/network?tab=find&type=people"
                 className="kt-btn kt-btn-primary gap-2 no-underline"
@@ -833,6 +988,73 @@ export default function AthletesPage() {
         ))}
       </div>
 
+      {/* W11 Day 53: filter chip row — risk + sport, URL-driven */}
+      {athletes.length > 0 && (
+        <Surface className="px-4 py-3 md:px-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Риск</span>
+            <div className="flex flex-wrap gap-1.5">
+              {(['all', 'low', 'moderate', 'high', 'critical'] as const).map(level => {
+                const active = riskParam === level
+                const count = level === 'all'
+                  ? athletes.length
+                  : athletes.filter(a => a.risk === level).length
+                return (
+                  <button
+                    key={level}
+                    onClick={() => setFilter('risk', level)}
+                    className={[
+                      'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all',
+                      active
+                        ? 'bg-orange-50 border-orange-200 text-orange-700'
+                        : 'bg-card border-border text-muted-foreground hover:border-orange-200',
+                    ].join(' ')}
+                  >
+                    {level === 'all' ? 'Все' : level}
+                    <span className="opacity-60 font-normal pf-num">{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {sportOptions.length > 0 && (
+              <>
+                <span className="ml-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Спорт</span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => setFilter('sport', '')}
+                    className={[
+                      'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all',
+                      !sportParam
+                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                        : 'bg-card border-border text-muted-foreground hover:border-blue-200',
+                    ].join(' ')}
+                  >
+                    Все
+                  </button>
+                  {sportOptions.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setFilter('sport', s)}
+                      className={[
+                        'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all capitalize',
+                        sportParam.toLowerCase() === s.toLowerCase()
+                          ? 'bg-blue-50 border-blue-200 text-blue-700'
+                          : 'bg-card border-border text-muted-foreground hover:border-blue-200',
+                      ].join(' ')}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            <div className="ml-auto text-[11px] text-muted-foreground">
+              Показано: <span className="pf-num font-semibold text-foreground">{filteredAthletes.length}</span> / {athletes.length}
+            </div>
+          </div>
+        </Surface>
+      )}
+
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
         <Surface className="h-fit">
           <div className="border-b border-border px-5 py-4">
@@ -854,8 +1076,19 @@ export default function AthletesPage() {
                 <p className="text-sm text-muted-foreground">Атлетов пока нет</p>
                 <p className="text-2xs text-muted-foreground/60">Пригласите атлета через раздел Связи</p>
               </div>
+            ) : filteredAthletes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+                <i className="ki-filled ki-filter text-2xl text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">По выбранным фильтрам никого нет</p>
+                <button
+                  onClick={() => router.push('/athletes')}
+                  className="mt-1 text-2xs text-orange-600 hover:underline font-semibold"
+                >
+                  Сбросить фильтры
+                </button>
+              </div>
             ) : (
-              athletes.map((athlete, index) => (
+              filteredAthletes.map((athlete, index) => (
                 <AthleteCard
                   key={athlete.id}
                   athlete={athlete}
