@@ -25,6 +25,8 @@ export type NotificationChannel =
   | 'adherence_email'
   /** Sprint W8 Day 41: Sunday digest of cross-cutting events for org admins. */
   | 'org_digest_email'
+  /** Sprint W11 Day 55: athlete receives email when coach replies to their review. */
+  | 'coach_reply_email'
 
 export interface ChannelMeta {
   key:          NotificationChannel
@@ -98,6 +100,14 @@ export const CHANNELS: ChannelMeta[] = [
     description: 'Воскресный email с обзором событий в команде: новые члены, запросы врачам, рекомендации. Не приходит если за неделю ничего не было.',
     icon:        'ki-element-11',
     category:    'core',
+    default:     true,
+  },
+  {
+    key:         'coach_reply_email',
+    label:       'Ответы тренера на ваши отзывы',
+    description: 'Email когда тренер отвечает на ваш отзыв. Помогает не пропустить ответ и продолжить диалог. Disable если не хотите получать такие уведомления.',
+    icon:        'ki-message-text',
+    category:    'collaboration',
     default:     true,
   },
 ]

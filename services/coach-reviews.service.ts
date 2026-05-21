@@ -209,6 +209,45 @@ export async function upsertReview(input: UpsertReviewInput): Promise<{ ok: bool
   return { ok: true, error: null }
 }
 
+/**
+ * W11 Day 55: replyToReview — coach posts/updates/clears reply to a review.
+ *
+ * Routed through /api/coach-reviews/[id]/reply so the email side-effect
+ * (Resend) runs server-side respecting notification_prefs.coach_reply_email.
+ * Empty-trimmed response → backend clears the fields (delete-by-empty
+ * pattern from W10 Day 48). When clearing, no email sent.
+ */
+export interface ReplyToReviewInput {
+  reviewId: string
+  response: string
+}
+
+export async function replyToReview(input: ReplyToReviewInput): Promise<{ ok: boolean; error: string | null }> {
+  try {
+    const res = await fetch(`/api/coach-reviews/${input.reviewId}/reply`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ response: input.response }),
+    })
+    const data: { error?: string; ok?: boolean } = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      const errMap: Record<string, string> = {
+        coach_only:        'Только тренер может отвечать на отзывы',
+        not_your_review:   'Можно отвечать только на свои отзывы',
+        review_not_found:  'Отзыв не найден',
+        invalid_id:        'Некорректный идентификатор',
+        Unauthorized:      'Не авторизован',
+      }
+      return { ok: false, error: errMap[data?.error ?? ''] ?? data?.error ?? 'Не удалось сохранить ответ' }
+    }
+    return { ok: true, error: null }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'network_error'
+    console.warn('[coach-reviews.replyToReview]', msg)
+    return { ok: false, error: msg }
+  }
+}
+
 export async function deleteMyReview(coachId: string): Promise<{ ok: boolean; error: string | null }> {
   const sb = createClient()
   const { data: auth } = await sb.auth.getUser()
