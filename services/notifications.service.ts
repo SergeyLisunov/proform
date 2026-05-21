@@ -16,6 +16,24 @@ export type NotificationType =
   | 'connection_terminated'
   | 'broadcast'
   | 'system'
+  // W12 Day 60: review-system + pass-system in-app surface
+  | 'coach_replied_to_review' // coach reply → notify athlete
+  | 'new_review_for_coach'    // athlete review → notify coach
+  | 'pass_session_used'       // coach decremented → notify athlete
+
+export interface NotificationRow {
+  id:          string
+  user_id:     string
+  type:        NotificationType
+  title:       string
+  body:        string | null
+  entity_type: string | null
+  entity_id:   string | null
+  action_url:  string | null
+  is_read:     boolean
+  is_archived: boolean
+  created_at:  string
+}
 
 export interface NotifyInput {
   user_id: string
@@ -70,4 +88,79 @@ export async function getUnreadCount(userId: string): Promise<number> {
     .eq('is_read', false)
     .eq('is_archived', false)
   return count ?? 0
+}
+
+/**
+ * W12 Day 60: List the current authenticated user's notifications,
+ * newest first. RLS gates: notifications_user_select policy already
+ * restricts to user_id = get_my_user_id().
+ */
+export async function listMyNotifications(opts?: {
+  limit?: number
+  includeArchived?: boolean
+}): Promise<NotificationRow[]> {
+  const sb = createClient()
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) return []
+  const { data: meRow } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string } | null
+  if (!me) return []
+  let q = sb
+    .from('notifications')
+    .select('*')
+    .eq('user_id', me.id)
+    .order('created_at', { ascending: false })
+    .limit(opts?.limit ?? 50)
+  if (!opts?.includeArchived) {
+    q = q.eq('is_archived', false)
+  }
+  const { data, error } = await q
+  if (error) {
+    console.warn('[listMyNotifications]', error.message)
+    return []
+  }
+  return (data ?? []) as NotificationRow[]
+}
+
+/**
+ * Marks given notification ids as read (idempotent — already-read rows
+ * untouched). Returns the count of rows that flipped state.
+ */
+export async function markNotificationsRead(ids: string[]): Promise<{ ok: boolean }> {
+  if (ids.length === 0) return { ok: true }
+  const sb = createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (sb as any)
+    .from('notifications')
+    .update({ is_read: true })
+    .in('id', ids)
+    .eq('is_read', false)
+  if (error) {
+    console.warn('[markNotificationsRead]', error.message)
+    return { ok: false }
+  }
+  return { ok: true }
+}
+
+/**
+ * Marks ALL unread notifications of the current user as read.
+ */
+export async function markAllNotificationsRead(): Promise<{ ok: boolean; affected: number }> {
+  const sb = createClient()
+  const { data: auth } = await sb.auth.getUser()
+  if (!auth?.user) return { ok: false, affected: 0 }
+  const { data: meRow } = await sb.from('users').select('id').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string } | null
+  if (!me) return { ok: false, affected: 0 }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error, count } = await (sb as any)
+    .from('notifications')
+    .update({ is_read: true }, { count: 'exact' })
+    .eq('user_id', me.id)
+    .eq('is_read', false)
+  if (error) {
+    console.warn('[markAllNotificationsRead]', error.message)
+    return { ok: false, affected: 0 }
+  }
+  return { ok: true, affected: count ?? 0 }
 }

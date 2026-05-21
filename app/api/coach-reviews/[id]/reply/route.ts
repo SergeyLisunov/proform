@@ -185,6 +185,23 @@ export async function POST(
     }
   }
 
+  // W12 Day 60: in-app notification to athlete (parallel-channel to email).
+  // Server-side via admin client — athlete's row not always RLS-readable by coach.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any).from('notifications').insert({
+      user_id:     review.athlete_id,
+      type:        'coach_replied_to_review',
+      title:       `${coach?.name ?? 'Тренер'} ответил на ваш отзыв`,
+      body:        trimmed.slice(0, 140),
+      entity_type: 'coach_review',
+      entity_id:   reviewId,
+      action_url:  `${APP_URL}/profile/${review.coach_id}#review-${review.athlete_id}`,
+    })
+  } catch (e) {
+    console.warn('[coach-reviews/reply] in-app notify failed:', e instanceof Error ? e.message : e)
+  }
+
   return NextResponse.json({
     ok: true,
     email_sent: emailSent,
