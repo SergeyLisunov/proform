@@ -181,6 +181,13 @@ export default function AdminPage() {
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<AdminInviteRole>('coach')
+  // W12 Day 58: bulk invite mode (wires W11 Day 57 endpoint)
+  const [inviteMode, setInviteMode] = useState<'single' | 'bulk'>('single')
+  const [bulkEmails, setBulkEmails] = useState('')
+  const [bulkSaving, setBulkSaving] = useState(false)
+  interface BulkResultRow { email: string; status: 'sent' | 'reused' | 'user_exists' | 'invalid' | 'failed'; error?: string }
+  interface BulkSummary { total: number; sent: number; reused: number; user_exists: number; invalid: number; failed: number }
+  const [bulkResults, setBulkResults] = useState<{ summary: BulkSummary; results: BulkResultRow[] } | null>(null)
   const [inviteSaving, setInviteSaving] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
 
@@ -226,6 +233,52 @@ export default function AdminPage() {
       setInviteSaving(false)
     }
   }, [inviteSaving, inviteEmail, inviteRole, success, loadInvites])
+
+  // W12 Day 58: parse newline / comma / whitespace separated emails;
+  // dedup + lowercase. Cap at 50 (matches server MAX_BATCH).
+  const parsedBulkEmails = useMemo(() => {
+    const arr = bulkEmails.split(/[\s,;]+/g).map(s => s.trim().toLowerCase()).filter(Boolean)
+    return Array.from(new Set(arr))
+  }, [bulkEmails])
+
+  const onSubmitBulkInvite = useCallback(async () => {
+    if (bulkSaving) return
+    setInviteError(null)
+    setBulkResults(null)
+    if (parsedBulkEmails.length === 0) {
+      setInviteError('Вставьте хотя бы один email')
+      return
+    }
+    if (parsedBulkEmails.length > 50) {
+      setInviteError(`Максимум 50 email за раз (сейчас ${parsedBulkEmails.length})`)
+      return
+    }
+    setBulkSaving(true)
+    try {
+      const res = await fetch('/api/admin/invite/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails: parsedBulkEmails, role: inviteRole }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const errMap: Record<string, string> = {
+          batch_too_large: `Максимум 50 email за раз`,
+          empty_emails:    'Email список пуст',
+          invalid_role:    'Недопустимая роль',
+          admin_only:      'Доступно только администраторам',
+        }
+        setInviteError(errMap[data?.error] ?? (data?.error || 'Не удалось отправить bulk-приглашение'))
+        return
+      }
+      setBulkResults({ summary: data.summary, results: data.results })
+      const sentLabel = `${data.summary.sent + data.summary.reused} / ${data.summary.total}`
+      success(`Bulk-приглашения отправлены: ${sentLabel}`)
+      void loadInvites()
+    } finally {
+      setBulkSaving(false)
+    }
+  }, [bulkSaving, parsedBulkEmails, inviteRole, success, loadInvites])
 
   const onRevokeInvite = useCallback(async (inviteId: string) => {
     const res = await revokeAdminInvite(inviteId)
@@ -890,30 +943,84 @@ export default function AdminPage() {
 
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-[28px] border border-border bg-card p-6 shadow-xl">
+          <div className={`w-full ${inviteMode === 'bulk' ? 'max-w-xl' : 'max-w-md'} rounded-[28px] border border-border bg-card p-6 shadow-xl max-h-[90vh] overflow-y-auto`}>
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Приглашения</div>
-                <h3 className="pf-num mt-2 text-xl text-foreground">Новый пользователь</h3>
+                <h3 className="pf-num mt-2 text-xl text-foreground">
+                  {inviteMode === 'bulk' ? 'Массовое приглашение' : 'Новый пользователь'}
+                </h3>
               </div>
               <button
-                onClick={() => { setShowInviteModal(false); setInviteError(null) }}
+                onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
                 className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
               >
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
+
+            {/* W12 Day 58: mode toggle */}
+            <div className="mb-4 inline-flex rounded-2xl border border-border bg-background p-1">
+              <button
+                onClick={() => { setInviteMode('single'); setBulkResults(null); setInviteError(null) }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition ${
+                  inviteMode === 'single'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Один email
+              </button>
+              <button
+                onClick={() => { setInviteMode('bulk'); setInviteError(null) }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition ${
+                  inviteMode === 'bulk'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Массово (до 50)
+              </button>
+            </div>
+
             <div className="flex flex-col gap-3">
-              <div>
-                <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={e => setInviteEmail(e.target.value)}
-                  placeholder="newuser@example.com"
-                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
-                />
-              </div>
+              {inviteMode === 'single' ? (
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    placeholder="newuser@example.com"
+                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Список email (через запятую, пробел или новую строку)
+                  </label>
+                  <textarea
+                    value={bulkEmails}
+                    onChange={e => setBulkEmails(e.target.value)}
+                    rows={6}
+                    placeholder="coach1@example.com&#10;coach2@example.com&#10;coach3@example.com"
+                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-vertical font-mono"
+                    style={{ minHeight: 110 }}
+                  />
+                  <div className="mt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground">
+                      {parsedBulkEmails.length === 0
+                        ? 'Вставьте до 50 адресов'
+                        : `Распознано: ${parsedBulkEmails.length}${parsedBulkEmails.length > 50 ? ' (превышает лимит 50)' : ''}`}
+                    </span>
+                    {parsedBulkEmails.length > 50 && (
+                      <span className="text-red-600 font-semibold">⚠ обрежется до 50</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Роль</label>
                 <select
@@ -927,26 +1034,94 @@ export default function AdminPage() {
                   <option value="organization">Организация</option>
                 </select>
               </div>
+
               <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-2sm text-muted-foreground">
-                Пользователь получит email со ссылкой на регистрацию с предзаполненной ролью.
-                Приглашение активно 30 дней.
+                {inviteMode === 'bulk'
+                  ? 'Каждый пользователь получит свою ссылку с предзаполненной ролью. Существующие пользователи будут пропущены. Дубликаты email на pending-инвайт переиспользуются.'
+                  : 'Пользователь получит email со ссылкой на регистрацию с предзаполненной ролью. Приглашение активно 30 дней.'}
               </div>
+
               {inviteError && (
                 <p className="text-xs text-red-600">{inviteError}</p>
               )}
+
+              {/* W12 Day 58: bulk results summary */}
+              {bulkResults && (
+                <div className="rounded-2xl border border-border bg-background/60 p-4">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted-foreground">Результат</span>
+                    {bulkResults.summary.sent > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold">
+                        Sent: {bulkResults.summary.sent}
+                      </span>
+                    )}
+                    {bulkResults.summary.reused > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 text-[10px] font-bold">
+                        Reused: {bulkResults.summary.reused}
+                      </span>
+                    )}
+                    {bulkResults.summary.user_exists > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 text-[10px] font-bold">
+                        Уже есть: {bulkResults.summary.user_exists}
+                      </span>
+                    )}
+                    {bulkResults.summary.invalid > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5 text-[10px] font-bold">
+                        Invalid: {bulkResults.summary.invalid}
+                      </span>
+                    )}
+                    {bulkResults.summary.failed > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 text-[10px] font-bold">
+                        Ошибка: {bulkResults.summary.failed}
+                      </span>
+                    )}
+                  </div>
+                  <div className="max-h-44 overflow-y-auto divide-y divide-border">
+                    {bulkResults.results.map(r => {
+                      const statusMeta: Record<string, { color: string; label: string }> = {
+                        sent:        { color: 'text-emerald-700',     label: 'Отправлено' },
+                        reused:      { color: 'text-blue-700',        label: 'Переиспользовано' },
+                        user_exists: { color: 'text-amber-700',       label: 'Уже зарегистрирован' },
+                        invalid:     { color: 'text-muted-foreground',label: 'Невалидный' },
+                        failed:      { color: 'text-red-700',         label: 'Ошибка' },
+                      }
+                      const meta = statusMeta[r.status] ?? { color: '', label: r.status }
+                      return (
+                        <div key={r.email} className="flex items-center justify-between py-1.5 text-xs">
+                          <span className="font-mono text-foreground truncate flex-1 mr-2">{r.email}</span>
+                          <span className={`${meta.color} font-semibold shrink-0`}>{meta.label}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2 pt-1">
+                {inviteMode === 'bulk' ? (
+                  <button
+                    onClick={onSubmitBulkInvite}
+                    disabled={bulkSaving || parsedBulkEmails.length === 0}
+                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  >
+                    {bulkSaving
+                      ? 'Отправляю…'
+                      : `Отправить ${parsedBulkEmails.length > 0 ? parsedBulkEmails.length : ''} приглашений`}
+                  </button>
+                ) : (
+                  <button
+                    onClick={onSubmitInvite}
+                    disabled={inviteSaving}
+                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  >
+                    {inviteSaving ? 'Отправляю…' : 'Отправить приглашение'}
+                  </button>
+                )}
                 <button
-                  onClick={onSubmitInvite}
-                  disabled={inviteSaving}
-                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
-                >
-                  {inviteSaving ? 'Отправляю…' : 'Отправить приглашение'}
-                </button>
-                <button
-                  onClick={() => { setShowInviteModal(false); setInviteError(null) }}
+                  onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
                   className="kt-btn kt-btn-outline"
                 >
-                  Отмена
+                  {bulkResults ? 'Закрыть' : 'Отмена'}
                 </button>
               </div>
             </div>
