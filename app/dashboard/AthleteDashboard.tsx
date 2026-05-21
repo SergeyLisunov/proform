@@ -22,6 +22,7 @@ const AthleteConnectionsPanel = dynamic(
 const AthleteFeedbackCard     = dynamic(() => import('@/components/ui/AthleteFeedbackCard'),       { ssr: false })
 const AthletePassportPanel    = dynamic(() => import('@/components/athlete/AthletePassportPanel'), { ssr: false })
 import AthleteDiscoverCTA from '@/components/athlete/AthleteDiscoverCTA'
+import AthleteAdherenceCard, { type AdherenceNudgeRow } from '@/components/athlete/AthleteAdherenceCard'
 
 type DailyMetricRow = Database['public']['Tables']['daily_metrics']['Row']
 type WorkoutRow = Database['public']['Tables']['workouts']['Row']
@@ -40,11 +41,14 @@ const TYPE_ICON: Record<string, string> = {
 export default async function AthleteDashboard({ userId, name }: { userId: string; name: string }) {
   const supabase = await createClient()
 
+  // W11 Day 56: workout_nudges from W8 Day 40 — gate the adherence card
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString()
   const [
     { data: metricsData },
     { data: workoutsData },
     { data: commentsData },
     { count: connectionsCount },
+    { data: nudgesData },
   ] = await Promise.all([
     supabase.from('daily_metrics').select('*').eq('athlete_id', userId).order('date', { ascending: false }).limit(56),
     supabase.from('workouts').select('*').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(8),
@@ -53,8 +57,17 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
     supabase.from('trainer_athletes')
       .select('id', { count: 'exact', head: true })
       .eq('athlete_id', userId).eq('status', 'accepted'),
+    // W11 Day 56: recent adherence nudges (W8 Day 40 log) — last 30 days, newest-first
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('workout_nudges')
+      .select('id, nudge_type, sent_at, payload')
+      .eq('athlete_id', userId)
+      .gte('sent_at', thirtyDaysAgo)
+      .order('sent_at', { ascending: false })
+      .limit(5),
   ])
   const hasNoConnections = (connectionsCount ?? 0) === 0
+  const nudges = (nudgesData ?? []) as AdherenceNudgeRow[]
   const metrics = (metricsData ?? []) as DailyMetricRow[]
   const workouts = (workoutsData ?? []) as WorkoutRow[]
   const comments = (commentsData ?? []) as Pick<WorkoutCommentRow, 'body' | 'created_at'>[]
@@ -99,6 +112,9 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {/* W9 Day 47: discover CTA — only when athlete has zero coach connections */}
       <AthleteDiscoverCTA hasNoConnections={hasNoConnections} />
+
+      {/* W11 Day 56: adherence widget — only renders if athlete has nudges in last 30d */}
+      <AthleteAdherenceCard nudges={nudges} />
 
       {/* 1.5. DAILY WELLNESS CHECK-IN — Sprint W1 Day 3, ритуал утра */}
       <DailyWellnessCard athleteId={userId} />
