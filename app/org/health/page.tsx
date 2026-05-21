@@ -71,6 +71,14 @@ export default function OrgHealthPage() {
     }
   }, [])
 
+  // W12 Day 59: trigger native print (browser «Save as PDF» pipeline).
+  // Print stylesheet in globals.css hides interactive controls + forces
+  // exact colors so gradients/risk bars survive.
+  const onDownloadPdf = useCallback(() => {
+    if (typeof window === 'undefined') return
+    window.print()
+  }, [])
+
   if (userLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -112,12 +120,22 @@ export default function OrgHealthPage() {
 
   return (
     <div className="pf-enter max-w-5xl mx-auto px-4 py-8 flex flex-col gap-5">
-      <div className="mb-1">
+      <div className="mb-1 print-hide">
         <Link href="/org"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
           <i className="ki-filled ki-arrow-left text-sm" />
           К организации
         </Link>
+      </div>
+
+      {/* W12 Day 59: print-only watermark banner (hidden on screen) */}
+      <div className="print-only" style={{ marginBottom: 14, paddingBottom: 10, borderBottom: '2px solid #1D4ED8' }}>
+        <p style={{ fontSize: 10, fontWeight: 700, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.18em', margin: 0 }}>
+          ProForm · Health Snapshot
+        </p>
+        <p style={{ fontSize: 11, color: '#475569', margin: '4px 0 0' }}>
+          Сгенерировано для «{snapshot.org_name}» · {new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} · Данные защищены RLS
+        </p>
       </div>
 
       {/* Hero */}
@@ -134,13 +152,24 @@ export default function OrgHealthPage() {
               Создан {new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
-          <button
-            onClick={onShare}
-            className="inline-flex items-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-sm"
-          >
-            <i className="ki-filled ki-copy text-sm" />
-            Поделиться отчётом
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 print-hide">
+            <button
+              onClick={onShare}
+              className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-sm"
+              title="Скопировать ссылку — recipient видит ту же страницу, если у него доступ к организации"
+            >
+              <i className="ki-filled ki-copy text-sm" />
+              Поделиться отчётом
+            </button>
+            <button
+              onClick={onDownloadPdf}
+              className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-blue-200 bg-card hover:bg-blue-50 text-blue-700 px-4 py-2.5 text-sm font-bold"
+              title="Открывает диалог печати браузера — выберите «Сохранить как PDF»"
+            >
+              <i className="ki-filled ki-printer text-sm" />
+              Скачать PDF
+            </button>
+          </div>
         </div>
       </section>
 
@@ -297,11 +326,19 @@ export default function OrgHealthPage() {
       )}
 
       {/* Footer CTA */}
-      <section className="rounded-2xl border border-dashed border-border bg-background/70 px-5 py-4 text-[12px] text-muted-foreground leading-relaxed">
+      <section className="rounded-2xl border border-dashed border-border bg-background/70 px-5 py-4 text-[12px] text-muted-foreground leading-relaxed print-hide">
         <strong className="text-foreground">Health Snapshot</strong> — наглядный отчёт для еженедельных
         обзоров и переговоров. Перешлите ссылку owner'у клуба или board'у — данные доступны только тем,
-        кто залогинен в организацию (RLS).
+        кто залогинен в организацию (RLS). Кнопка «Скачать PDF» открывает диалог печати —
+        сохраните файл и отправьте по email.
       </section>
+
+      {/* W12 Day 59: print-only footer */}
+      <div className="print-only" style={{ marginTop: 16, paddingTop: 8, borderTop: '1px solid #e5e7eb' }}>
+        <p style={{ fontSize: 9, color: '#94a3b8', margin: 0, textAlign: 'center' }}>
+          Этот отчёт сгенерирован платформой ProForm. Полные данные доступны на proform-delta.vercel.app для авторизованных членов организации.
+        </p>
+      </div>
 
       {/* Toast */}
       {shareToast && (

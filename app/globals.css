@@ -6,6 +6,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* W12 Day 59: print stylesheet for forwardable PDF (Org Health Snapshot).
+   - Force exact colors on all printed surfaces so gradients/bars survive
+     the print pipeline.
+   - A4 page geometry with sensible margins for one-page reports.
+   - `.print-only` reveals a watermark banner that's hidden on screen. */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-hide {
+    display: none !important;
+  }
+}
+.print-only {
+  display: none;
+}
+
 :root {
   --pf-font-sans: "DM Sans", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
   --pf-font-display: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
