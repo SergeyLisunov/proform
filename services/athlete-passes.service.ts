@@ -176,6 +176,27 @@ export async function useSession(passId: string): Promise<{ ok: boolean; remaini
     .select('used_sessions, total_sessions')
     .maybeSingle()
   if (updErr || !updated) return { ok: false, remaining: null }
+
+  // W12 Day 60: in-app notification к athlete о том что сессия списана.
+  // Silent-fail — never blocks the decrement.
+  try {
+    const { notify } = await import('@/services/notifications.service')
+    const remaining = updated.total_sessions - updated.used_sessions
+    await notify({
+      user_id:     row.athlete_id as string,
+      type:        'pass_session_used',
+      title:       'Сессия списана',
+      body:        remaining > 0
+        ? `Осталось ${remaining} из ${updated.total_sessions}. ${reachesCap ? '' : 'Хорошей тренировки!'}`
+        : 'Это была последняя сессия абонемента — продлите план, если хотите продолжить.',
+      entity_type: 'athlete_pass',
+      entity_id:   passId,
+      action_url:  '/athlete/passes',
+    })
+  } catch (e) {
+    console.warn('[useSession notify]', e instanceof Error ? e.message : e)
+  }
+
   return { ok: true, remaining: updated.total_sessions - updated.used_sessions }
 }
 

@@ -15,13 +15,17 @@ type Notification = {
 }
 
 const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
-  invitation_received:   { icon: 'ki-user-plus',       color: '#F97316', bg: '#FFF7ED' },
-  invitation_accepted:   { icon: 'ki-check-circle',    color: '#16A34A', bg: '#F0FDF4' },
-  invitation_declined:   { icon: 'ki-cross-circle',    color: '#DC2626', bg: '#FEF2F2' },
-  invitation_cancelled:  { icon: 'ki-information-5',   color: '#64748B', bg: '#F8FAFC' },
-  connection_terminated: { icon: 'ki-disconnect',      color: '#DC2626', bg: '#FEF2F2' },
-  broadcast:             { icon: 'ki-notification-on', color: '#2563EB', bg: '#EFF6FF' },
-  system:                { icon: 'ki-setting-2',        color: '#7C3AED', bg: '#F5F3FF' },
+  invitation_received:     { icon: 'ki-user-plus',       color: '#F97316', bg: '#FFF7ED' },
+  invitation_accepted:     { icon: 'ki-check-circle',    color: '#16A34A', bg: '#F0FDF4' },
+  invitation_declined:     { icon: 'ki-cross-circle',    color: '#DC2626', bg: '#FEF2F2' },
+  invitation_cancelled:    { icon: 'ki-information-5',   color: '#64748B', bg: '#F8FAFC' },
+  connection_terminated:   { icon: 'ki-disconnect',      color: '#DC2626', bg: '#FEF2F2' },
+  broadcast:               { icon: 'ki-notification-on', color: '#2563EB', bg: '#EFF6FF' },
+  system:                  { icon: 'ki-setting-2',       color: '#7C3AED', bg: '#F5F3FF' },
+  // W12 Day 60: review-system + pass-system events
+  coach_replied_to_review: { icon: 'ki-message-text',    color: '#16A34A', bg: '#F0FDF4' },
+  new_review_for_coach:    { icon: 'ki-star',            color: '#F59E0B', bg: '#FFFBEB' },
+  pass_session_used:       { icon: 'ki-minus-squared',   color: '#F97316', bg: '#FFF7ED' },
 }
 
 function getTypeMeta(type: string) {

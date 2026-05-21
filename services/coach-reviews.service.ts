@@ -206,6 +206,27 @@ export async function upsertReview(input: UpsertReviewInput): Promise<{ ok: bool
     console.warn('[coach-reviews.upsertReview]', error.message)
     return { ok: false, error: error.message }
   }
+
+  // W12 Day 60: in-app notification к coach. Silent-fail — never blocks
+  // the review write. Existing notify() is browser-client (W3 pattern).
+  try {
+    const { notify } = await import('@/services/notifications.service')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: meRow2 } = await (sb as any).from('users').select('name, nickname').eq('id', me.id).maybeSingle()
+    const athleteLabel = (meRow2?.name ?? meRow2?.nickname ?? 'Атлет') as string
+    await notify({
+      user_id:     input.coach_id,
+      type:        'new_review_for_coach',
+      title:       `${athleteLabel} оставил отзыв`,
+      body:        (input.comment?.trim() || `Оценка: ${Math.round(input.rating)} из 5`).slice(0, 140),
+      entity_type: 'coach_review',
+      entity_id:   input.coach_id,   // own profile review-block anchor
+      action_url:  `/profile/${input.coach_id}`,
+    })
+  } catch (e) {
+    console.warn('[upsertReview notify]', e instanceof Error ? e.message : e)
+  }
+
   return { ok: true, error: null }
 }
 
