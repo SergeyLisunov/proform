@@ -289,43 +289,7 @@ export async function deleteMyReview(coachId: string): Promise<{ ok: boolean; er
   return { ok: true, error: null }
 }
 
-// ── Coach responses (W10 Day 48) ──────────────────────────────────────────
-
-export interface ReplyInput {
-  reviewId: string
-  response: string   // empty/whitespace → treated as delete
-}
-
-/**
- * Coach (subject of the review) writes / edits / deletes their response.
- * RLS layer (migration 073) enforces coach_id = get_my_user_id().
- *
- * Empty trimmed response → clears the field (delete-by-empty pattern).
- * Sets coach_response_at to now() on update, null on clear.
- */
-export async function replyToReview(input: ReplyInput): Promise<{ ok: boolean; error: string | null }> {
-  const sb = createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return { ok: false, error: 'Не авторизован' }
-  const { data: meRow } = await sb.from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
-  const me = meRow as { id: string; role: string } | null
-  if (!me) return { ok: false, error: 'Профиль не найден' }
-  if (me.role !== 'coach') return { ok: false, error: 'Отвечать могут только тренеры' }
-
-  const trimmed = input.response.trim()
-  const payload = trimmed.length === 0
-    ? { coach_response: null,    coach_response_at: null }
-    : { coach_response: trimmed, coach_response_at: new Date().toISOString() }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (sb as any)
-    .from('coach_reviews')
-    .update(payload)
-    .eq('id', input.reviewId)
-    .eq('coach_id', me.id)   // belt-and-braces vs RLS
-  if (error) {
-    console.warn('[coach-reviews.replyToReview]', error.message)
-    return { ok: false, error: error.message }
-  }
-  return { ok: true, error: null }
-}
+// W10 Day 48 «direct Supabase replyToReview» dead code removed (W12 hotfix).
+// Modern implementation lives above (W11 Day 55) — routes через
+// /api/coach-reviews/[id]/reply for email + in-app notify side-effects.
+// The duplicate definition broke Vercel SWC compile despite passing local tsc.
