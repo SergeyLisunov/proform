@@ -37,12 +37,16 @@ interface LeadRow {
   email_dispatched_at:  string | null
   converted_at:         string | null
   user_id:              string | null
+  // W13 Day 66: touch-level funnel breakdown
+  dispatched_touches:   number | null
 }
 
 interface Cell {
   leads:        number
   dispatched:   number
   converted:    number
+  // W13 Day 66: per-touch counts (0=fresh, 1/2/3 — after each touch)
+  touches:      [number, number, number, number]
 }
 
 function fmtPct(n: number): string {
@@ -53,6 +57,41 @@ function tone(cvr: number): { bg: string; color: string } {
   if (cvr >= 0.15) return { bg: '#F0FDF4', color: '#15803D' }
   if (cvr >= 0.05) return { bg: '#FFF7ED', color: '#C2410C' }
   return { bg: '#FEF2F2', color: '#B91C1C' }
+}
+
+/**
+ * W13 Day 66: Two-proportion Z-test (pooled).
+ *
+ * H0: p_a = p_b (variants are equivalent)
+ * H1: p_a ≠ p_b (one wins)
+ *
+ * Returns z-statistic + two-tailed p-value. p < 0.05 → reject H0.
+ *
+ * Why pooled-Z: simplest standard test for binary outcome (converted yes/no)
+ * across two independent samples. Normal approximation OK at n ≥ 30 per group;
+ * we additionally gate with a hard «need 100+ per variant» rule (industry
+ * heuristic for marketing tests где noise floor высокий).
+ */
+function pooledZTest(
+  aConverted: number, aSize: number,
+  bConverted: number, bSize: number,
+): { z: number; pValue: number; isSignificant: boolean } {
+  if (aSize < 30 || bSize < 30) {
+    return { z: 0, pValue: 1, isSignificant: false }
+  }
+  const pA = aConverted / aSize
+  const pB = bConverted / bSize
+  const pPool = (aConverted + bConverted) / (aSize + bSize)
+  const se = Math.sqrt(pPool * (1 - pPool) * (1 / aSize + 1 / bSize))
+  if (se === 0) return { z: 0, pValue: 1, isSignificant: false }
+  const z = (pB - pA) / se
+  // Two-tailed p-value via normal approximation (Abramowitz & Stegun formula).
+  const absZ = Math.abs(z)
+  const t = 1 / (1 + 0.2316419 * absZ)
+  const d = 0.3989423 * Math.exp(-absZ * absZ / 2)
+  const probGreater = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))))
+  const pValue = 2 * probGreater
+  return { z, pValue, isSignificant: pValue < 0.05 }
 }
 
 export default async function AbTestsPage() {
@@ -69,7 +108,8 @@ export default async function AbTestsPage() {
 
   const { data: leadsRaw } = await supabase
     .from('tool_leads')
-    .select('source, payload, email_dispatched_at, converted_at, user_id')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .select('source, payload, email_dispatched_at, converted_at, user_id, dispatched_touches' as any)
     .in('source', ['team-risk', 'adaptive-plan', 'club-audit', 'medical-summary'])
   const leads = (leadsRaw ?? []) as LeadRow[]
 
@@ -78,7 +118,8 @@ export default async function AbTestsPage() {
   const ensureKey = (source: Source, variant: Variant): Cell => {
     const k = `${source}/${variant}`
     let c = grid.get(k)
-    if (!c) { c = { leads: 0, dispatched: 0, converted: 0 }; grid.set(k, c) }
+    if (!c) c = { leads: 0, dispatched: 0, converted: 0, touches: [0, 0, 0, 0] }
+    grid.set(k, c)
     return c
   }
 
@@ -90,6 +131,9 @@ export default async function AbTestsPage() {
     cell.leads++
     if (l.email_dispatched_at) cell.dispatched++
     if (l.converted_at || l.user_id) cell.converted++
+    // W13 Day 66: bucket by touch level (0/1/2/3)
+    const t = Math.min(3, Math.max(0, l.dispatched_touches ?? 0))
+    cell.touches[t]++
   }
 
   const sources: Source[] = ['team-risk', 'adaptive-plan', 'club-audit', 'medical-summary']
@@ -102,13 +146,24 @@ export default async function AbTestsPage() {
     sampleSize: number
   }
   const summaries: SourceSummary[] = sources.map(source => {
-    const a = grid.get(`${source}/a`) ?? { leads: 0, dispatched: 0, converted: 0 }
-    const b = grid.get(`${source}/b`) ?? { leads: 0, dispatched: 0, converted: 0 }
+    const a = grid.get(`${source}/a`) ?? { leads: 0, dispatched: 0, converted: 0, touches: [0, 0, 0, 0] as [number, number, number, number] }
+    const b = grid.get(`${source}/b`) ?? { leads: 0, dispatched: 0, converted: 0, touches: [0, 0, 0, 0] as [number, number, number, number] }
     const aCvr = a.leads > 0 ? a.converted / a.leads : 0
     const bCvr = b.leads > 0 ? b.converted / b.leads : 0
     const lift = aCvr > 0 ? (bCvr - aCvr) / aCvr : 0
     return { source, a, b, lift, sampleSize: a.leads + b.leads }
   })
+
+  // W13 Day 66: Per-source statistical significance (Z-test) + winner verdict.
+  // Used to flip «inconclusive» → «winner detected» chip in the table below.
+  const verdicts = summaries.map(s => {
+    const ztest = pooledZTest(s.a.converted, s.a.leads, s.b.converted, s.b.leads)
+    let label: 'a_wins' | 'b_wins' | 'inconclusive' | 'too_small' = 'inconclusive'
+    if (s.sampleSize < 100) label = 'too_small'
+    else if (ztest.isSignificant) label = s.lift > 0 ? 'b_wins' : 'a_wins'
+    return { source: s.source, ztest, label }
+  })
+  const verdictMap = new Map(verdicts.map(v => [v.source, v]))
 
   const totalLeads      = leads.length
   const totalDispatched = leads.filter(l => l.email_dispatched_at).length
@@ -172,6 +227,7 @@ export default async function AbTestsPage() {
                 <th className="py-2 pr-3">B · cvr</th>
                 <th className="py-2 pr-3">Lift</th>
                 <th className="py-2 pr-3">Sample</th>
+                <th className="py-2 pr-3">Verdict</th>
               </tr>
             </thead>
             <tbody>
@@ -195,9 +251,77 @@ export default async function AbTestsPage() {
                         {s.sampleSize}{insufficient ? ' ⚠' : ' ✓'}
                       </span>
                     </td>
+                    <td className="py-3 pr-3 text-xs">
+                      {(() => {
+                        const v = verdictMap.get(s.source)
+                        if (!v) return <span className="text-muted-foreground">—</span>
+                        if (v.label === 'too_small') {
+                          return <span className="rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5">Need 100+</span>
+                        }
+                        if (v.label === 'a_wins') {
+                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A wins ✓</span>
+                        }
+                        if (v.label === 'b_wins') {
+                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B wins ✓</span>
+                        }
+                        return <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, not significant`}>Inconclusive</span>
+                      })()}
+                    </td>
                   </tr>
                 )
               })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* W13 Day 66: Touch funnel — drip cadence (W7 Day 35) breakdown per variant */}
+      <section className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+        <div className="mb-4">
+          <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">3-touch drip funnel</div>
+          <h2 className="mt-1 text-lg font-semibold text-foreground">Где конвертируются — после какого touch</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Funnel показывает сколько leads застряли на каждом touch level. Touch 0 = ещё не отправляли (fresh); 1/2/3 = после первого/второго/третьего email. Big drop с touch 1 → touch 2 значит cadence работает (или leads разрешились).
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-2xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="py-2 pr-3">Источник</th>
+                <th className="py-2 pr-3">Variant</th>
+                <th className="py-2 pr-3">T0 fresh</th>
+                <th className="py-2 pr-3">T1</th>
+                <th className="py-2 pr-3">T2</th>
+                <th className="py-2 pr-3">T3 final</th>
+                <th className="py-2 pr-3">Reached T3</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summaries.flatMap(s => ['a', 'b'].map(variant => {
+                const cell = variant === 'a' ? s.a : s.b
+                const t = cell.touches
+                const reachedT3pct = cell.leads > 0 ? (t[3] / cell.leads) * 100 : 0
+                return (
+                  <tr key={`${s.source}/${variant}`} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-3 font-semibold text-foreground">{variant === 'a' ? SOURCE_LABELS[s.source] : ''}</td>
+                    <td className="py-2 pr-3">
+                      <span className={`rounded-full px-2 py-0.5 text-2xs font-semibold ${variant === 'a' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                        {variant.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-3 pf-num text-muted-foreground">{t[0]}</td>
+                    <td className="py-2 pr-3 pf-num text-muted-foreground">{t[1]}</td>
+                    <td className="py-2 pr-3 pf-num text-muted-foreground">{t[2]}</td>
+                    <td className="py-2 pr-3 pf-num text-muted-foreground">{t[3]}</td>
+                    <td className="py-2 pr-3 pf-num text-xs">
+                      {cell.leads > 0
+                        ? <span className="text-foreground">{t[3]} <span className="text-muted-foreground">({reachedT3pct.toFixed(1)}%)</span></span>
+                        : <span className="text-muted-foreground">—</span>}
+                    </td>
+                  </tr>
+                )
+              }))}
             </tbody>
           </table>
         </div>
