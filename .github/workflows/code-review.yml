@@ -29,8 +29,24 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: TypeScript check
+        # W13 Day 63: HARD blocker (previously continue-on-error).
+        # tsc --noEmit ловит duplicate exports + type errors локально.
+        # W12 «ghost-merge» incident случился потому что local SWC tolerated
+        # duplicate replyToReview() но Vercel SWC ломал build silently
+        # на каждый последующий merge. Tsc запрещает оба класса bug-ов.
         run: npx tsc --noEmit
-        continue-on-error: true
+
+      - name: Next.js build (SWC parity check)
+        # W13 Day 63: catches SWC-level duplicate exports / module resolution
+        # issues что tsc может пропустить. Same Next.js build что Vercel
+        # запускает на prod — parity gate перед merge.
+        run: npm run build
+        env:
+          # Build needs these for static prerender of public pages.
+          # Provide empty placeholder if not set in secrets — most envs
+          # have at minimum these two.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
 
       - name: Claude Code Review
         # Optional review step. Requires the Claude Code GitHub App to be
