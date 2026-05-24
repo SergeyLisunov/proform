@@ -3,7 +3,7 @@
 import { type FormEvent, type KeyboardEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset, Zap } from 'lucide-react'
+import { Activity, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const DEMO_PASSWORD = 'proform123'
@@ -52,9 +52,15 @@ const TEST_ACCOUNTS = [
 ]
 
 const FEATURE_STRIPS = [
-  { icon: Zap, label: 'Аналитика с поддержкой WHOOP' },
-  { icon: ShieldCheck, label: 'Прозрачность для тренера' },
-  { icon: TimerReset, label: 'Быстрый demo-доступ' },
+  { icon: Users, label: '5 ролей вокруг карточки спортсмена' },
+  { icon: ShieldCheck, label: 'Доступ по роли — на уровне базы данных' },
+  { icon: Activity, label: 'Тренировки, восстановление и медданные в одном flow' },
+]
+
+const ROLE_STATS = [
+  { value: '5', label: 'ролей' },
+  { value: '1', label: 'карточка спортсмена' },
+  { value: '∞', label: 'групп и команд' },
 ]
 
 function getSafeRedirect(target: string | null) {
@@ -179,25 +185,27 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="pf-num text-[24px] tracking-wide text-white">ProForm</div>
-              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Платформа атлета</div>
+              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Спортивная платформа</div>
             </div>
           </div>
 
           <div className="relative flex-1 px-10 pb-10 pt-12">
             <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-300">
-              Тренировочный интеллект
+              Для клубов, академий и команд
             </div>
 
-            <p className="pf-num mb-5 mt-8 text-[64px] leading-[0.92] text-white">
-              BUILD
+            <p className="pf-num mb-5 mt-8 text-[60px] leading-[0.95] text-white">
+              ОДНА
               <br />
-              <span className="text-orange-500">РИТМ.</span>
+              <span className="text-orange-500">СИСТЕМА.</span>
               <br />
-              ВЫИГРЫВАЙ ЦИКЛ.
+              ВОКРУГ
+              <br />
+              СПОРТСМЕНА.
             </p>
 
-            <p className="max-w-[280px] text-sm leading-relaxed text-zinc-400">
-              Тренировки, восстановление, тренерская обратная связь и командная координация в одном рабочем процессе.
+            <p className="max-w-[300px] text-sm leading-relaxed text-zinc-400">
+              Тренер, спортсмен, врач и клуб — работают в одном рабочем пространстве. Без чатов, таблиц и потерянных данных.
             </p>
 
             <div className="mt-8 grid gap-3">
@@ -216,11 +224,7 @@ export default function LoginPage() {
           </div>
 
           <div className="relative grid grid-cols-3 gap-3 border-t border-white/10 px-10 py-7">
-            {[
-              { value: '100K', label: 'записей' },
-              { value: '286', label: 'атлетов' },
-              { value: '39', label: 'метрик' },
-            ].map((item) => (
+            {ROLE_STATS.map((item) => (
               <div key={item.label}>
                 <div className="pf-num text-[30px] text-white">{item.value}</div>
                 <div className="mt-1 text-2xs uppercase tracking-[0.28em] text-zinc-600">{item.label}</div>
@@ -237,7 +241,7 @@ export default function LoginPage() {
               </div>
               <div>
                 <div className="pf-num text-2xl text-foreground">ProForm</div>
-                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Платформа атлета</div>
+                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Спортивная платформа</div>
               </div>
             </div>
 
@@ -249,7 +253,7 @@ export default function LoginPage() {
           <div className="max-w-[520px]">
             <h1 className="pf-num text-[42px] leading-none text-foreground sm:text-[48px]">Войти</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-              Возвращайтесь в тренировочный ритм без лишних действий. Вход запоминает последний email и поддерживает быстрый demo-сценарий.
+              Прогресс спортсмена в одной системе для всех, кто рядом. Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.
             </p>
 
             {redirectTo !== '/dashboard' && (
