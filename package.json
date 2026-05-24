@@ -10,7 +10,8 @@
     "lint:dead": "knip --no-progress",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "lint:duplicates": "bash scripts/audit-duplicate-exports.sh"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",

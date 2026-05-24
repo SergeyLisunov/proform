@@ -3,5 +3,9 @@
     "next/core-web-vitals"
   ],
   "plugins": ["@typescript-eslint"],
-  "parser": "@typescript-eslint/parser"
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "no-redeclare": "off",
+    "@typescript-eslint/no-redeclare": "error"
+  }
 }
