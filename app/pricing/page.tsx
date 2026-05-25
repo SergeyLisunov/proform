@@ -160,7 +160,7 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="pf-enter max-w-6xl mx-auto px-4 py-8">
+    <main id="main-content" className="pf-enter max-w-6xl mx-auto px-4 py-8">
       {/* Back nav */}
       <div className="mb-6">
         <Link href="/dashboard"
@@ -293,6 +293,6 @@ export default function PricingPage() {
       <p className="text-center text-xs text-muted-foreground mt-8">
         Безопасная оплата через ЮKassa · 54-ФЗ автофискализация · Отмена в любой момент
       </p>
-    </div>
+    </main>
   )
 }

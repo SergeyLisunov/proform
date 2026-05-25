@@ -19,6 +19,7 @@
  */
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import SkipToContent from '@/components/layout/SkipToContent'
 import StickyNav from '@/components/landing/StickyNav'
 import HeroSection from '@/components/landing/HeroSection'
 import RoleSection from '@/components/landing/RoleSection'
@@ -41,17 +42,20 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-white">
+    <>
+      <SkipToContent />
       <StickyNav />
-      <HeroSection />
-      <RoleSection />
-      <WorkflowSection />
-      <BenefitsSection />
-      <UseCasesSection />
-      <WearablesSection />
-      <SecuritySection />
-      <FaqSection />
-      <FinalCtaSection />
+      <main id="main-content" className="min-h-screen w-full bg-white">
+        <HeroSection />
+        <RoleSection />
+        <WorkflowSection />
+        <BenefitsSection />
+        <UseCasesSection />
+        <WearablesSection />
+        <SecuritySection />
+        <FaqSection />
+        <FinalCtaSection />
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-border bg-slate-900 px-4 py-10 text-slate-400 sm:px-6 lg:px-10">
@@ -71,6 +75,6 @@ export default async function HomePage() {
           © {new Date().getFullYear()} ProForm · Хостинг данных в Supabase EU-Central · RLS-политики на каждой таблице
         </div>
       </footer>
-    </main>
+    </>
   )
 }

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 pf-enter">
+    <main id="main-content" className="mx-auto max-w-3xl px-4 py-10 pf-enter">
       <div className="mb-6">
         <Link
           href="/"
@@ -167,6 +167,6 @@ export default function TermsPage() {
           </p>
         </footer>
       </article>
-    </div>
+    </main>
   )
 }
