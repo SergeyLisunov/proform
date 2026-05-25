@@ -1,178 +1,107 @@
 /**
- * <HeroSection /> — Sprint W14 Day 71.
+ * <HeroSection /> — W16 Day 78 REBUILD.
  *
- * Top-of-fold marketing hero. Answers «что это / для кого / что я могу
- * сделать прямо сейчас» в первом экране.
+ * Previous version (W14 Day 71 + W15 Day 77) был variant-aware grid с
+ * right-col mockup composition. Feedback: «всё криво» — dark blocks
+ * right of Hero, CTAs не видны, cramped на mobile, variant B copy не
+ * sells. Rebuilt к single-voice centered hero, massive contrast CTAs,
+ * trust-strip с 3 micro-facts, no decorative mockup.
  *
- * Layout:
- *   - Left col (60%): eyebrow + H1 + subline + 2 CTAs + trust line
- *   - Right col (40%): visual mockup composition (3 layered cards
- *     suggesting athlete card + coach panel + doctor note)
+ * A/B harness retired (W15 Day 77 work — variant cookie middleware
+ * removed, variants.ts deleted, single H1 ships). When second test
+ * нужен — wire через `app/admin/landing-ab` (calculator kept).
  *
- * Mobile: stack vertical, mockup shrinks к single representative card.
+ * Layout principles:
+ *   - Single column, centered, max-w-4xl — no left/right asymmetry
+ *   - Mobile-first padding: py-16 → sm:py-20 → lg:py-28
+ *   - H1 scales с clamp() для smooth viewport adaptation
+ *   - 2 CTAs: primary register + secondary anchor к /#tools (LeadMagnetSection)
+ *   - Trust-strip chips: 3 micro-facts (5 ролей / 10-min onboarding / 152-ФЗ)
+ *   - Zero overlapping absolute elements
  */
-import { ArrowRight, Building2, Heart, Stethoscope, Target, User } from 'lucide-react'
+import { ArrowRight, Building2, Clock, ShieldCheck, Users } from 'lucide-react'
 import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
-import { getLandingVariant } from '@/lib/landing/get-variant'
-import { LANDING_VARIANTS } from '@/lib/landing/variants'
 
-/**
- * W14 Day 71 base. W15 Day 77 — variant-aware. Reads `pf-landing-ab`
- * cookie (set by middleware), renders A or B copy from
- * `lib/landing/variants.ts`. Hero CTA events carry `variant` prop для
- * downstream A/B analysis.
- *
- * Visual mockup composition (right col) — variant-AGNOSTIC. We test copy,
- * not visual styling.
- */
-function HighlightedH1({ text, highlight }: { text: string; highlight: string }) {
-  // Splits H1 around highlight substring and wraps highlight in orange span.
-  // If highlight не найден (shouldn't happen — variants контролируют обе строки)
-  // — renders plain text.
-  const idx = text.indexOf(highlight)
-  if (idx === -1) {
-    return <>{text}</>
-  }
-  const before = text.slice(0, idx)
-  const after  = text.slice(idx + highlight.length)
+interface TrustChipProps {
+  icon:  typeof Users
+  label: string
+}
+
+function TrustChip({ icon: Icon, label }: TrustChipProps) {
   return (
-    <>
-      {before}
-      <span className="text-orange-500">{highlight}</span>
-      {after}
-    </>
+    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-foreground shadow-sm">
+      <Icon
+        aria-hidden="true"
+        size={15}
+        strokeWidth={2.2}
+        className="text-orange-600"
+      />
+      {label}
+    </div>
   )
 }
 
 export default function HeroSection() {
-  const variant = getLandingVariant()
-  const copy = LANDING_VARIANTS[variant]
-
   return (
     <section
-      className="relative w-full overflow-hidden"
-      data-variant={variant}
-      style={{
-        background:
-          'radial-gradient(circle at top right, rgba(249,115,22,0.10), transparent 38%), linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 100%)',
-      }}
+      className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.12),_transparent_55%),linear-gradient(180deg,_#FFFFFF_0%,_#FFF7ED_100%)]"
     >
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-12 lg:px-10 lg:py-24">
-        {/* Left col — variant-rendered copy */}
-        <div className="flex flex-col justify-center">
-          <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            {copy.eyebrow}
-          </p>
-          <h1 className="pf-num mt-3 text-[clamp(2.4rem,6vw,4.5rem)] font-bold leading-[0.95] tracking-tight text-foreground">
-            <HighlightedH1 text={copy.h1} highlight={copy.h1Highlight} />
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {copy.sub}
-          </p>
+      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-10 lg:py-28">
+        {/* Eyebrow chip */}
+        <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-1.5 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
+          <Building2 aria-hidden="true" size={13} />
+          Спортивная платформа для клубов и команд
+        </span>
 
-          {/* CTAs — events carry variant prop для A/B analysis */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <TrackedCtaLink
-              href="/auth/register"
-              event={{ name: 'landing.hero_cta_primary_click', variant }}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-xl no-underline"
-            >
-              {copy.primaryCta}
-              <ArrowRight size={18} />
-            </TrackedCtaLink>
-            <TrackedCtaLink
-              href="/auth/login?demo=coach"
-              event={{ name: 'landing.hero_cta_demo_click', variant }}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-6 py-3.5 text-base font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 no-underline"
-            >
-              {copy.demoCta}
-            </TrackedCtaLink>
-          </div>
+        {/* H1 — value prop в одной фразе */}
+        <h1 className="pf-num mt-6 text-[clamp(2.2rem,6vw,4.5rem)] font-bold leading-[1.02] tracking-tight text-foreground">
+          Тренировочный процесс клуба
+          <br />
+          <span className="text-orange-500">без хаоса</span> в чатах и таблицах
+        </h1>
 
-          {/* Trust line */}
-          <p className="mt-6 text-sm text-muted-foreground">{copy.trust}</p>
+        {/* Subhead — для кого + что получают */}
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-xl">
+          Тренер, спортсмен, врач, организация и родитель — в одной системе.
+          Прогресс виден всем, кому положено — и только им. Подключение клуба
+          за 10 минут.
+        </p>
+
+        {/* CTAs — large, high-contrast, full-width на mobile */}
+        <div className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <TrackedCtaLink
+            href="/auth/register"
+            event={{ name: 'landing.hero_cta_primary_click' }}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600 hover:shadow-xl sm:text-lg no-underline"
+          >
+            Создать клуб бесплатно
+            <ArrowRight size={20} />
+          </TrackedCtaLink>
+          <a
+            href="#tools"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-7 py-4 text-base font-bold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 sm:text-lg no-underline"
+          >
+            Попробовать AI-инструменты
+          </a>
         </div>
 
-        {/* Right col — layered visual composition (decorative — AT users
-            already heard the headline + CTAs to the left) */}
-        <div aria-hidden="true" className="relative hidden lg:block">
-          {/* Background gradient orb */}
-          <div className="absolute -right-12 top-12 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl" />
-          <div className="absolute -bottom-12 -left-12 h-64 w-64 rounded-full bg-blue-200/30 blur-3xl" />
+        {/* Sub-CTA hint */}
+        <p className="mt-4 text-sm text-muted-foreground">
+          Без банковской карты · Бесплатно во время закрытой беты ·{' '}
+          <a
+            href="/auth/login?demo=coach"
+            className="font-semibold text-orange-600 hover:underline"
+          >
+            войти в demo
+          </a>{' '}
+          одной из 5 ролей
+        </p>
 
-          {/* Athlete card — main, foreground */}
-          <div className="relative ml-10 mt-4 rounded-3xl border border-border bg-white p-5 shadow-2xl shadow-orange-500/10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                <User size={22} strokeWidth={2} />
-              </div>
-              <div>
-                <div className="text-base font-bold text-foreground">Александр Иванов</div>
-                <div className="text-xs text-muted-foreground">Атлет · Лёгкая атлетика · 19 лет</div>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-xl bg-emerald-50 px-2 py-2">
-                <div className="pf-num text-xl font-bold text-emerald-700">82%</div>
-                <div className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700/70">готов</div>
-              </div>
-              <div className="rounded-xl bg-orange-50 px-2 py-2">
-                <div className="pf-num text-xl font-bold text-orange-700">14.2</div>
-                <div className="text-[9px] font-semibold uppercase tracking-wider text-orange-700/70">нагрузка</div>
-              </div>
-              <div className="rounded-xl bg-blue-50 px-2 py-2">
-                <div className="pf-num text-xl font-bold text-blue-700">42 ms</div>
-                <div className="text-[9px] font-semibold uppercase tracking-wider text-blue-700/70">HRV</div>
-              </div>
-            </div>
-            <div className="mt-3 border-t border-border pt-3 text-xs">
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span>На сегодня</span>
-                <span className="font-semibold text-foreground">Темповая 6 км</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Coach panel — mid-layer, partial */}
-          <div className="absolute -left-2 top-32 w-56 rounded-2xl border border-border bg-white p-4 shadow-xl">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-100 text-green-600">
-                <Target size={14} strokeWidth={2} />
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-foreground truncate">Отзыв тренера</div>
-                <div className="text-[9px] text-muted-foreground">2 минуты назад</div>
-              </div>
-            </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-              Темп держал ровно. Готовность падает — снижаем интенсивность завтра.
-            </p>
-          </div>
-
-          {/* Doctor note — back-layer */}
-          <div className="absolute -right-4 top-52 w-48 rounded-2xl border border-border bg-white p-3 shadow-lg">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-red-600">
-                <Stethoscope size={12} strokeWidth={2} />
-              </div>
-              <div className="text-[10px] font-bold text-foreground">Врач</div>
-            </div>
-            <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
-              Беговая нагрузка — ОК. Контроль на следующей неделе.
-            </p>
-          </div>
-
-          {/* Organization chip */}
-          <div className="absolute bottom-4 left-16 flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 shadow-sm">
-            <Building2 size={12} className="text-blue-600" />
-            <span className="text-[11px] font-semibold text-blue-700">Клуб «Спарта»</span>
-          </div>
-
-          {/* Parent chip */}
-          <div className="absolute bottom-20 right-2 flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 shadow-sm">
-            <Heart size={12} className="text-violet-600" />
-            <span className="text-[11px] font-semibold text-violet-700">Родитель — прозрачность</span>
-          </div>
+        {/* Trust strip — 3 micro-facts */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+          <TrustChip icon={Users} label="5 ролей в одной системе" />
+          <TrustChip icon={Clock} label="Подключение за 10 минут" />
+          <TrustChip icon={ShieldCheck} label="152-ФЗ · RLS · EU-Central хостинг" />
         </div>
       </div>
     </section>

@@ -56,6 +56,44 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
+    // W16 Day 78 — lead-magnet tool pages. High-priority acquisition entry
+    // points, surfaced на landing через `<LeadMagnetSection />`.
+    {
+      url: `${SITE_URL}/tools/team-risk`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/tools/adaptive-plan`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/tools/club-audit`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/tools/medical-summary`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/tools/acwr`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/tools/overtraining`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
     // Legal stubs — `robots: { index: false }` на странице блокирует
     // индексацию, но оставляем в sitemap для прозрачности структуры.
     {
