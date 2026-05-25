@@ -3,7 +3,7 @@
 import { type FormEvent, type KeyboardEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Activity, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const DEMO_PASSWORD = 'proform123'
@@ -51,17 +51,8 @@ const TEST_ACCOUNTS = [
   },
 ]
 
-const FEATURE_STRIPS = [
-  { icon: Users, label: '5 ролей вокруг карточки спортсмена' },
-  { icon: ShieldCheck, label: 'Доступ по роли — на уровне базы данных' },
-  { icon: Activity, label: 'Тренировки, восстановление и медданные в одном flow' },
-]
-
-const ROLE_STATS = [
-  { value: '5', label: 'ролей' },
-  { value: '1', label: 'карточка спортсмена' },
-  { value: '∞', label: 'групп и команд' },
-]
+// W14 Day 71: marketing sidebar removed (now lives на public `/`).
+// Login page focused on auth + demo-accounts only.
 
 function getSafeRedirect(target: string | null) {
   if (!target || !target.startsWith('/') || target.startsWith('//')) {
@@ -164,94 +155,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.18),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-6 sm:px-6 lg:px-10">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[1180px] overflow-hidden rounded-[30px] border border-orange-100/80 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.10)]">
-        <div className="relative hidden w-[430px] shrink-0 overflow-hidden bg-zinc-950 lg:flex lg:flex-col">
-          <div
-            className="absolute inset-0 opacity-[0.05]"
-            style={{
-              backgroundImage:
-                'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-              backgroundSize: '36px 36px',
-            }}
-          />
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-transparent" />
-          <div className="absolute right-[-92px] top-[-74px] h-56 w-56 rounded-full bg-orange-500/25 blur-3xl" />
-          <div className="absolute bottom-[-120px] left-[-80px] h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
-
-          <div className="relative flex items-center gap-3 px-10 pb-0 pt-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-500/30">
-              <i className="ki-filled ki-abstract-26 text-[16px] text-white" />
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+      <div className="mx-auto flex w-full max-w-[560px] flex-col gap-6">
+        {/* Top bar: back-to-landing + logo */}
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground no-underline"
+          >
+            <ArrowLeft size={15} />
+            На главную
+          </Link>
+          <Link href="/" className="flex items-center gap-2.5 no-underline">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
+              <i className="ki-filled ki-abstract-26 text-sm text-white" />
             </div>
-            <div>
-              <div className="pf-num text-[24px] tracking-wide text-white">ProForm</div>
-              <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Спортивная платформа</div>
+            <div className="text-right">
+              <div className="pf-num text-lg text-foreground">ProForm</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground -mt-0.5">Спортивная платформа</div>
             </div>
-          </div>
-
-          <div className="relative flex-1 px-10 pb-10 pt-12">
-            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-300">
-              Для клубов, академий и команд
-            </div>
-
-            <p className="pf-num mb-5 mt-8 text-[60px] leading-[0.95] text-white">
-              ОДНА
-              <br />
-              <span className="text-orange-500">СИСТЕМА.</span>
-              <br />
-              ВОКРУГ
-              <br />
-              СПОРТСМЕНА.
-            </p>
-
-            <p className="max-w-[300px] text-sm leading-relaxed text-zinc-400">
-              Тренер, спортсмен, врач и клуб — работают в одном рабочем пространстве. Без чатов, таблиц и потерянных данных.
-            </p>
-
-            <div className="mt-8 grid gap-3">
-              {FEATURE_STRIPS.map(({ icon: Icon, label }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-orange-400">
-                    <Icon size={17} />
-                  </div>
-                  <div className="text-sm font-medium text-white">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative grid grid-cols-3 gap-3 border-t border-white/10 px-10 py-7">
-            {ROLE_STATS.map((item) => (
-              <div key={item.label}>
-                <div className="pf-num text-[30px] text-white">{item.value}</div>
-                <div className="mt-1 text-2xs uppercase tracking-[0.28em] text-zinc-600">{item.label}</div>
-              </div>
-            ))}
-          </div>
+          </Link>
         </div>
 
-        <div className="flex flex-1 flex-col justify-center px-6 py-8 sm:px-10 lg:px-14">
-          <div className="mb-8 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 lg:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-500/20">
-                <i className="ki-filled ki-abstract-26 text-sm text-white" />
-              </div>
-              <div>
-                <div className="pf-num text-2xl text-foreground">ProForm</div>
-                <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Спортивная платформа</div>
-              </div>
-            </div>
-
-            <div className="hidden rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700 sm:inline-flex">
-              Рабочее пространство
-            </div>
+        {/* Auth card */}
+        <div className="rounded-[28px] border border-orange-100/80 bg-white px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
+          {/* Header strip (small visual only — marketing moved to /) */}
+          <div className="mb-4 inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700">
+            Рабочее пространство
           </div>
 
-          <div className="max-w-[520px]">
-            <h1 className="pf-num text-[42px] leading-none text-foreground sm:text-[48px]">Войти</h1>
+          <div>
+            <h1 className="pf-num text-[40px] leading-none text-foreground sm:text-[46px]">Войти</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
               Прогресс спортсмена в одной системе для всех, кто рядом. Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.
             </p>
