@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import dynamic from 'next/dynamic'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
 import { MobileMenuProvider } from '@/lib/hooks/useMobileMenu'
@@ -95,6 +97,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </MobileMenuProvider>
         </ToastProvider>
         <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
+        {/* W15 Day 76 — Vercel Analytics + Speed Insights.
+            SDK auto-disables в development; both products GDPR-aligned
+            (cookieless, no PII). Per-event taxonomy: lib/analytics/track.ts */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

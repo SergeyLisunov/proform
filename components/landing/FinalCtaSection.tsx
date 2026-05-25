@@ -7,8 +7,8 @@
  *
  * Visual: gradient bg (warm orange→white), centered content, 2 CTAs.
  */
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
 
 export default function FinalCtaSection() {
   return (
@@ -26,19 +26,21 @@ export default function FinalCtaSection() {
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
+          <TrackedCtaLink
             href="/auth/register"
+            event={{ name: 'landing.final_cta_register_click' }}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-xl sm:w-auto no-underline"
           >
             Создать организацию
             <ArrowRight size={18} />
-          </Link>
-          <Link
+          </TrackedCtaLink>
+          <TrackedCtaLink
             href="/auth/login?demo=org"
+            event={{ name: 'landing.final_cta_demo_click' }}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-6 py-3.5 text-base font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 sm:w-auto no-underline"
           >
             Demo как организация
-          </Link>
+          </TrackedCtaLink>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">

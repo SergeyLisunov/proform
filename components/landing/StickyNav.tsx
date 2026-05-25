@@ -9,6 +9,7 @@
  * effect — matches modern marketing landing convention.
  */
 import Link from 'next/link'
+import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
 
 export default function StickyNav() {
   return (
@@ -37,20 +38,22 @@ export default function StickyNav() {
           </div>
         </Link>
 
-        {/* CTAs */}
+        {/* CTAs — tracked via TrackedCtaLink for conversion analytics */}
         <div className="flex items-center gap-2">
-          <Link
+          <TrackedCtaLink
             href="/auth/login"
+            event={{ name: 'landing.sticky_login_click' }}
             className="inline-flex items-center rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground no-underline transition-colors hover:text-foreground"
           >
             Войти
-          </Link>
-          <Link
+          </TrackedCtaLink>
+          <TrackedCtaLink
             href="/auth/register"
+            event={{ name: 'landing.sticky_register_click' }}
             className="inline-flex items-center rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-orange-600"
           >
             Создать аккаунт
-          </Link>
+          </TrackedCtaLink>
         </div>
       </nav>
     </header>
