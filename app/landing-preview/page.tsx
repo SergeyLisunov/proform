@@ -17,6 +17,9 @@
 import Link from 'next/link'
 import RoleSection from '@/components/landing/RoleSection'
 import SecuritySection from '@/components/landing/SecuritySection'
+import WorkflowSection from '@/components/landing/WorkflowSection'
+import BenefitsSection from '@/components/landing/BenefitsSection'
+import WearablesSection from '@/components/landing/WearablesSection'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,24 +52,31 @@ export default function LandingPreviewPage() {
         </p>
       </div>
 
-      {/* Section: Roles */}
+      {/* Section order: Roles → Workflow → Benefits → Wearables → Security
+          Why этот порядок:
+          1. Roles — кто целевая аудитория (orientation)
+          2. Workflow — как они работают вместе (mental model)
+          3. Benefits — что получает прospect (value)
+          4. Wearables — что подключается (integrations)
+          5. Security — почему это можно доверить (trust closer) */}
       <RoleSection />
-
-      {/* Section: Security */}
+      <WorkflowSection />
+      <BenefitsSection />
+      <WearablesSection />
       <SecuritySection />
 
-      {/* Day 70 / 71 placeholders */}
+      {/* Day 71 placeholder */}
       <section className="w-full bg-white py-20 px-4 sm:px-6 lg:px-10">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
             Дальше в roadmap
           </p>
           <h2 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
-            Здесь появятся Workflow, Benefits, Wearables, Use cases, FAQ
+            Здесь появятся Use cases, FAQ и Final CTA
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            W14 Day 70 — workflow + benefits + wearables blocks ·
-            W14 Day 71 — use cases + FAQ + final CTA + сборка в публичный <code>/</code>
+            W14 Day 71 — use cases (3 типа клиентов) + FAQ + final CTA +
+            assembly в публичный <code>/</code> + login refactor (drop marketing sidebar).
           </p>
         </div>
       </section>
