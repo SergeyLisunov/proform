@@ -29,8 +29,10 @@ import { track } from '@vercel/analytics'
  * event = добавить variant сюда + emit call site.
  */
 export type LandingEvent =
-  | { name: 'landing.hero_cta_primary_click' }
-  | { name: 'landing.hero_cta_demo_click' }
+  // W15 Day 77 — hero CTA events carry `variant: 'A' | 'B'` для A/B analysis.
+  // Other events не несут variant (общие для всех visitors).
+  | { name: 'landing.hero_cta_primary_click'; variant: 'A' | 'B' }
+  | { name: 'landing.hero_cta_demo_click';    variant: 'A' | 'B' }
   | { name: 'landing.sticky_login_click' }
   | { name: 'landing.sticky_register_click' }
   | { name: 'landing.final_cta_register_click' }

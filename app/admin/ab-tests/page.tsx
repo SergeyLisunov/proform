@@ -18,6 +18,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { pooledZTest } from '@/lib/stats/ztest'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,40 +60,10 @@ function tone(cvr: number): { bg: string; color: string } {
   return { bg: '#FEF2F2', color: '#B91C1C' }
 }
 
-/**
- * W13 Day 66: Two-proportion Z-test (pooled).
- *
- * H0: p_a = p_b (variants are equivalent)
- * H1: p_a ≠ p_b (one wins)
- *
- * Returns z-statistic + two-tailed p-value. p < 0.05 → reject H0.
- *
- * Why pooled-Z: simplest standard test for binary outcome (converted yes/no)
- * across two independent samples. Normal approximation OK at n ≥ 30 per group;
- * we additionally gate with a hard «need 100+ per variant» rule (industry
- * heuristic for marketing tests где noise floor высокий).
- */
-function pooledZTest(
-  aConverted: number, aSize: number,
-  bConverted: number, bSize: number,
-): { z: number; pValue: number; isSignificant: boolean } {
-  if (aSize < 30 || bSize < 30) {
-    return { z: 0, pValue: 1, isSignificant: false }
-  }
-  const pA = aConverted / aSize
-  const pB = bConverted / bSize
-  const pPool = (aConverted + bConverted) / (aSize + bSize)
-  const se = Math.sqrt(pPool * (1 - pPool) * (1 / aSize + 1 / bSize))
-  if (se === 0) return { z: 0, pValue: 1, isSignificant: false }
-  const z = (pB - pA) / se
-  // Two-tailed p-value via normal approximation (Abramowitz & Stegun formula).
-  const absZ = Math.abs(z)
-  const t = 1 / (1 + 0.2316419 * absZ)
-  const d = 0.3989423 * Math.exp(-absZ * absZ / 2)
-  const probGreater = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))))
-  const pValue = 2 * probGreater
-  return { z, pValue, isSignificant: pValue < 0.05 }
-}
+// W15 Day 77: pooledZTest extracted to `lib/stats/ztest.ts` for shared
+// reuse (also consumed by `/admin/landing-ab`). Math + thresholds identical
+// (two-proportion pooled, normal approx via Abramowitz & Stegun, 30-per-
+// group hard floor для validity).
 
 export default async function AbTestsPage() {
   const supabase = await createClient()

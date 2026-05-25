@@ -1,5 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import {
+  LANDING_VARIANT_COOKIE,
+  LANDING_VARIANT_MAX_AGE,
+} from '@/lib/landing/variants'
 
 /**
  * Middleware — refreshes the Supabase session cookie on every request
@@ -31,6 +35,25 @@ import { NextResponse, type NextRequest } from 'next/server'
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+
+  // W15 Day 77 — landing A/B variant assignment.
+  // Set cookie ONLY on first visit to landing (`/`). 50/50 random,
+  // 30-day persistence (returning user sees same variant — consistency
+  // beats per-visit randomization). Mutate request.cookies так что
+  // RSC render тот же request ID видит variant immediately.
+  if (
+    request.nextUrl.pathname === '/' &&
+    !request.cookies.get(LANDING_VARIANT_COOKIE)
+  ) {
+    const variant = Math.random() < 0.5 ? 'A' : 'B'
+    request.cookies.set(LANDING_VARIANT_COOKIE, variant)
+    supabaseResponse = NextResponse.next({ request })
+    supabaseResponse.cookies.set(LANDING_VARIANT_COOKIE, variant, {
+      maxAge:   LANDING_VARIANT_MAX_AGE,
+      sameSite: 'lax',
+      path:     '/',
+    })
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -23,12 +23,14 @@ iterations без guessing.
 
 | Event | Where | Props | Conversion stage |
 |---|---|---|---|
-| `landing.hero_cta_primary_click` | HeroSection — «Создать аккаунт» | — | TOFU → conversion intent |
-| `landing.hero_cta_demo_click` | HeroSection — «Открыть demo как тренер» | — | TOFU → exploration |
+| `landing.hero_cta_primary_click` | HeroSection — primary CTA | `variant: 'A' \| 'B'` (W15 Day 77 A/B) | TOFU → conversion intent |
+| `landing.hero_cta_demo_click` | HeroSection — demo CTA | `variant: 'A' \| 'B'` (W15 Day 77 A/B) | TOFU → exploration |
 | `landing.sticky_login_click` | StickyNav — «Войти» (returning user) | — | RETURN |
 | `landing.sticky_register_click` | StickyNav — «Создать аккаунт» (always-visible CTA) | — | CONSIDER → conversion intent |
 | `landing.final_cta_register_click` | FinalCtaSection — «Создать организацию» | — | CONVERT (after full read) |
 | `landing.final_cta_demo_click` | FinalCtaSection — «Demo как организация» | — | CONVERT (exploration) |
+
+**Variant prop (W15 Day 77):** Hero CTA events carry `variant: 'A' | 'B'` for downstream A/B analysis. Variant assigned by middleware on first `/` visit via cookie `pf-landing-ab` (30-day persistence). См. `lib/landing/variants.ts` для current copy table, `/admin/landing-ab` для verdict calculator.
 
 ### Engagement
 
