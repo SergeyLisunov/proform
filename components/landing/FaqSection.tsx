@@ -1,12 +1,14 @@
 /**
  * <FaqSection /> — Sprint W14 Day 71.
  *
- * 7 FAQ items. Native `<details>` accordion — no JS state, no a11y
- * tricks нужны. На mobile это нативный disclosure pattern, на desktop
- * — same.
+ * 7 FAQ items. `<details>` accordion wrapped в `<TrackedFaqItem />`
+ * (W15 Day 76) что emit'ит `landing.faq_open` event на expand. Native
+ * disclosure pattern preserved — only behaviour change = analytics
+ * tracking.
  *
  * Контент честный — никаких overpromise, никаких vendor name-drops.
  */
+import TrackedFaqItem from '@/components/analytics/TrackedFaqItem'
 
 interface FaqItem {
   q: string
@@ -61,11 +63,12 @@ export default function FaqSection() {
           </p>
         </div>
 
-        {/* Accordion — native details for zero-JS a11y */}
+        {/* Accordion — native details wrapped для analytics, zero-JS a11y preserved */}
         <div className="mt-10 space-y-3">
           {FAQ.map((item, idx) => (
-            <details
+            <TrackedFaqItem
               key={item.q}
+              question={item.q}
               className="group rounded-2xl border border-border bg-white p-5 shadow-sm transition-all open:shadow-md"
             >
               <summary className="flex cursor-pointer items-start justify-between gap-3 list-none">
@@ -81,7 +84,7 @@ export default function FaqSection() {
                 </span>
               </summary>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
-            </details>
+            </TrackedFaqItem>
           ))}
         </div>
       </div>

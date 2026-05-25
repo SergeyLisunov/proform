@@ -11,8 +11,8 @@
  *
  * Mobile: stack vertical, mockup shrinks к single representative card.
  */
-import Link from 'next/link'
 import { ArrowRight, Building2, Heart, Stethoscope, Target, User } from 'lucide-react'
+import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
 
 export default function HeroSection() {
   return (
@@ -38,21 +38,23 @@ export default function HeroSection() {
             Прогресс спортсмена видят все, кому это нужно — и только они.
           </p>
 
-          {/* CTAs */}
+          {/* CTAs — tracked via TrackedCtaLink for conversion analytics */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
+            <TrackedCtaLink
               href="/auth/register"
+              event={{ name: 'landing.hero_cta_primary_click' }}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-xl no-underline"
             >
               Создать аккаунт
               <ArrowRight size={18} />
-            </Link>
-            <Link
+            </TrackedCtaLink>
+            <TrackedCtaLink
               href="/auth/login?demo=coach"
+              event={{ name: 'landing.hero_cta_demo_click' }}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-6 py-3.5 text-base font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 no-underline"
             >
               Открыть demo как тренер
-            </Link>
+            </TrackedCtaLink>
           </div>
 
           {/* Trust line */}
