@@ -29,10 +29,9 @@ import { track } from '@vercel/analytics'
  * event = добавить variant сюда + emit call site.
  */
 export type LandingEvent =
-  // W15 Day 77 — hero CTA events carry `variant: 'A' | 'B'` для A/B analysis.
-  // Other events не несут variant (общие для всех visitors).
-  | { name: 'landing.hero_cta_primary_click'; variant: 'A' | 'B' }
-  | { name: 'landing.hero_cta_demo_click';    variant: 'A' | 'B' }
+  // W16 Day 78 — A/B harness retired, hero events single-variant теперь.
+  // Variant prop removed — `variant` всегда был бы 'A' после rebuild.
+  | { name: 'landing.hero_cta_primary_click' }
   | { name: 'landing.sticky_login_click' }
   | { name: 'landing.sticky_register_click' }
   | { name: 'landing.final_cta_register_click' }

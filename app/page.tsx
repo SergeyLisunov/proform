@@ -23,6 +23,7 @@ import SkipToContent from '@/components/layout/SkipToContent'
 import SiteFooter from '@/components/layout/SiteFooter'
 import StickyNav from '@/components/landing/StickyNav'
 import HeroSection from '@/components/landing/HeroSection'
+import LeadMagnetSection from '@/components/landing/LeadMagnetSection'
 import RoleSection from '@/components/landing/RoleSection'
 import WorkflowSection from '@/components/landing/WorkflowSection'
 import BenefitsSection from '@/components/landing/BenefitsSection'
@@ -48,6 +49,9 @@ export default async function HomePage() {
       <StickyNav />
       <main id="main-content" className="min-h-screen w-full bg-white">
         <HeroSection />
+        {/* W16 Day 78 — LeadMagnet section surfaces 6 AI-инструменты как
+            acquisition funnel entry. Anchor #tools — Hero secondary CTA jumps сюда. */}
+        <LeadMagnetSection />
         <RoleSection />
         <WorkflowSection />
         <BenefitsSection />

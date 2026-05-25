@@ -32,7 +32,18 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/auth/login', '/auth/register', '/pricing', '/legal/'],
+        allow: [
+          '/',
+          '/about',
+          '/contacts',
+          '/auth/login',
+          '/auth/register',
+          '/pricing',
+          '/legal/',
+          // W16 Day 78 — lead-magnet tools are public acquisition entry points.
+          // Removed from disallow list (was blocking indexable lead magnets).
+          '/tools/',
+        ],
         disallow: [
           '/api/',
           '/admin/',
@@ -69,7 +80,6 @@ export default function robots(): MetadataRoute.Robots {
           '/network',
           '/search',
           '/marketplace',
-          '/tools/',
           '/p/',
           '/ai/',
         ],

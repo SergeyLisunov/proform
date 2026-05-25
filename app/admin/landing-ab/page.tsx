@@ -1,26 +1,17 @@
 /**
- * /admin/landing-ab — W15 Day 77.
+ * /admin/landing-ab — W15 Day 77; updated W16 Day 78.
  *
- * Admin dashboard для landing Hero copy A/B test. Server component с
- * auth + role gating (matches existing admin pages pattern). Embeds
- * client-side `<Calculator />` widget для Z-test verdict.
+ * Admin dashboard для landing A/B tests. Calculator widget + methodology
+ * + Vercel Analytics paste workflow.
  *
- * Why not auto-fetch from Vercel:
- *   - Vercel Analytics events API requires Pro plan (we're on Hobby)
- *   - Manual paste-from-dashboard workflow OK для weekly cadence reviews
- *   - When Pro plan активен — wire `lib/analytics/fetch-events.ts` и
- *     replace `<Calculator />` с auto-populated version
- *
- * Page shows:
- *   1. Both variants side-by-side (current copy reference)
- *   2. Methodology overview — sample size, ramp-up time, decision rule
- *   3. Calculator widget — Z-test verdict
- *   4. Vercel Analytics quick-links
+ * W16 Day 78: первый test (W15 Day 77 hero copy A/B) retired — variant B
+ * не sold, landing rebuilt к single voice. Page преобразован к generic
+ * A/B harness reference: methodology + calculator stay, variant-specific
+ * display retired. When next test wires — re-add variant config display.
  */
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { LANDING_VARIANTS } from '@/lib/landing/variants'
 import Calculator from './Calculator'
 
 export const dynamic = 'force-dynamic'
@@ -60,70 +51,30 @@ export default async function LandingAbPage() {
       {/* Header */}
       <header className="mb-8">
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
-          Landing analytics
+          Landing analytics · A/B harness
         </p>
         <h1 className="pf-num mt-2 text-3xl text-foreground md:text-4xl">
           Hero copy A/B
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Тест двух вариантов headline copy на главной (`/`). Middleware
-          назначает variant cookie 50/50 при первом визите, 30-дневная persistence.
-          Hero CTA events несут `variant` prop для downstream analysis в Vercel
-          Analytics.
+          Generic harness для landing A/B tests. Calculator + Z-test verdict +
+          methodology + Vercel Analytics paste workflow. Когда новый тест
+          запущен — re-wire variant assignment в middleware и добавь variant
+          display сюда.
         </p>
       </header>
 
-      {/* Variants side-by-side */}
-      <section className="mb-8 grid gap-4 lg:grid-cols-2">
-        {(['A', 'B'] as const).map((variant) => {
-          const copy = LANDING_VARIANTS[variant]
-          const color = variant === 'A' ? '#2563EB' : '#EA580C'
-          return (
-            <article
-              key={variant}
-              className="rounded-3xl border bg-white p-6 shadow-sm"
-              style={{ borderColor: `${color}33` }}
-            >
-              <div className="mb-4 flex items-center gap-2">
-                <span
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-base font-bold text-white"
-                  style={{ background: color }}
-                >
-                  {variant}
-                </span>
-                <span className="text-sm font-semibold text-foreground">
-                  Вариант {variant} {variant === 'A' ? '(control)' : '(challenger)'}
-                </span>
-              </div>
-              <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-                {copy.eyebrow}
-              </p>
-              <h2 className="pf-num mt-2 text-xl font-bold leading-tight text-foreground md:text-2xl">
-                {copy.h1}
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {copy.sub}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span
-                  className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white"
-                  style={{ background: color }}
-                >
-                  {copy.primaryCta}
-                </span>
-                <span
-                  className="rounded-xl border-2 px-3 py-1.5 text-xs font-semibold"
-                  style={{ borderColor: `${color}88`, color }}
-                >
-                  {copy.demoCta}
-                </span>
-              </div>
-              <p className="mt-4 border-t border-border pt-3 text-2xs text-muted-foreground">
-                {copy.trust}
-              </p>
-            </article>
-          )
-        })}
+      {/* Test status banner */}
+      <section className="mb-8 rounded-3xl border border-amber-200 bg-amber-50 p-5">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-amber-800">
+          Текущий статус: тест приостановлен
+        </h2>
+        <p className="mt-2 text-sm text-amber-900/90">
+          W15 Day 77 hero copy A/B (variant A persona-driven vs B
+          tool-replacement) — retired W16 Day 78 на основе UX feedback.
+          Landing rebuilt к single voice. Calculator widget + методология
+          сохранены — used для будущих tests.
+        </p>
       </section>
 
       {/* Methodology */}
