@@ -8,11 +8,25 @@
  * Content is a holding page with key TOS clauses for the platform.
  * Full legal text должен пройти reviewу юриста перед публичным launch.
  */
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
-export const metadata = {
-  title: 'Условия использования · ProForm',
-  description: 'Правила использования платформы ProForm — обработка данных, права пользователей, ответственность.',
+export const metadata: Metadata = {
+  title: 'Условия использования',
+  description:
+    'Правила использования платформы ProForm — обработка данных (152-ФЗ), права пользователей, ограничение ответственности.',
+  alternates: { canonical: '/legal/terms' },
+  openGraph: {
+    title: 'Условия использования · ProForm',
+    description:
+      'Holding-страница TOS платформы ProForm. Полный документ проходит правовую экспертизу.',
+    url: '/legal/terms',
+  },
+  robots: {
+    // Legal stubs не индексируем пока финальный TOS не зарелизен.
+    index: false,
+    follow: true,
+  },
 }
 
 export default function TermsPage() {
