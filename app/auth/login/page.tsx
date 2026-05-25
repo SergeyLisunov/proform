@@ -155,7 +155,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+    <main
+      id="main-content"
+      className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10"
+    >
       <div className="mx-auto flex w-full max-w-[560px] flex-col gap-6">
         {/* Top bar: back-to-landing + logo */}
         <div className="flex items-center justify-between gap-4">
@@ -364,6 +367,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

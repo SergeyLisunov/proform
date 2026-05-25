@@ -13,10 +13,20 @@ import Link from 'next/link'
 export default function StickyNav() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 no-underline">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
+      <nav
+        aria-label="Главная навигация"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-10"
+      >
+        {/* Logo — на mobile только icon, нужен accessible name */}
+        <Link
+          href="/"
+          aria-label="ProForm — на главную"
+          className="flex items-center gap-2.5 no-underline"
+        >
+          <div
+            aria-hidden="true"
+            className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20"
+          >
             <i className="ki-filled ki-abstract-26 text-sm text-white" />
           </div>
           <div className="hidden sm:block">
@@ -42,7 +52,7 @@ export default function StickyNav() {
             Создать аккаунт
           </Link>
         </div>
-      </div>
+      </nav>
     </header>
   )
 }

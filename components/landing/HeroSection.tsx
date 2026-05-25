@@ -62,8 +62,9 @@ export default function HeroSection() {
           </p>
         </div>
 
-        {/* Right col — layered visual composition */}
-        <div className="relative hidden lg:block">
+        {/* Right col — layered visual composition (decorative — AT users
+            already heard the headline + CTAs to the left) */}
+        <div aria-hidden="true" className="relative hidden lg:block">
           {/* Background gradient orb */}
           <div className="absolute -right-12 top-12 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl" />
           <div className="absolute -bottom-12 -left-12 h-64 w-64 rounded-full bg-blue-200/30 blur-3xl" />
