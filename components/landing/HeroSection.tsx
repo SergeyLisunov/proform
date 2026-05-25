@@ -13,55 +13,84 @@
  */
 import { ArrowRight, Building2, Heart, Stethoscope, Target, User } from 'lucide-react'
 import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
+import { getLandingVariant } from '@/lib/landing/get-variant'
+import { LANDING_VARIANTS } from '@/lib/landing/variants'
+
+/**
+ * W14 Day 71 base. W15 Day 77 — variant-aware. Reads `pf-landing-ab`
+ * cookie (set by middleware), renders A or B copy from
+ * `lib/landing/variants.ts`. Hero CTA events carry `variant` prop для
+ * downstream A/B analysis.
+ *
+ * Visual mockup composition (right col) — variant-AGNOSTIC. We test copy,
+ * not visual styling.
+ */
+function HighlightedH1({ text, highlight }: { text: string; highlight: string }) {
+  // Splits H1 around highlight substring and wraps highlight in orange span.
+  // If highlight не найден (shouldn't happen — variants контролируют обе строки)
+  // — renders plain text.
+  const idx = text.indexOf(highlight)
+  if (idx === -1) {
+    return <>{text}</>
+  }
+  const before = text.slice(0, idx)
+  const after  = text.slice(idx + highlight.length)
+  return (
+    <>
+      {before}
+      <span className="text-orange-500">{highlight}</span>
+      {after}
+    </>
+  )
+}
 
 export default function HeroSection() {
+  const variant = getLandingVariant()
+  const copy = LANDING_VARIANTS[variant]
+
   return (
     <section
       className="relative w-full overflow-hidden"
+      data-variant={variant}
       style={{
         background:
           'radial-gradient(circle at top right, rgba(249,115,22,0.10), transparent 38%), linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 100%)',
       }}
     >
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-12 lg:px-10 lg:py-24">
-        {/* Left col — copy */}
+        {/* Left col — variant-rendered copy */}
         <div className="flex flex-col justify-center">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            Спортивная платформа
+            {copy.eyebrow}
           </p>
           <h1 className="pf-num mt-3 text-[clamp(2.4rem,6vw,4.5rem)] font-bold leading-[0.95] tracking-tight text-foreground">
-            Тренер, спортсмен, врач{' '}
-            <span className="text-orange-500">и клуб</span> — работают в одной системе
+            <HighlightedH1 text={copy.h1} highlight={copy.h1Highlight} />
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Спортивная подготовка без чатов, таблиц и потерянных данных.
-            Прогресс спортсмена видят все, кому это нужно — и только они.
+            {copy.sub}
           </p>
 
-          {/* CTAs — tracked via TrackedCtaLink for conversion analytics */}
+          {/* CTAs — events carry variant prop для A/B analysis */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <TrackedCtaLink
               href="/auth/register"
-              event={{ name: 'landing.hero_cta_primary_click' }}
+              event={{ name: 'landing.hero_cta_primary_click', variant }}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-xl no-underline"
             >
-              Создать аккаунт
+              {copy.primaryCta}
               <ArrowRight size={18} />
             </TrackedCtaLink>
             <TrackedCtaLink
               href="/auth/login?demo=coach"
-              event={{ name: 'landing.hero_cta_demo_click' }}
+              event={{ name: 'landing.hero_cta_demo_click', variant }}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-6 py-3.5 text-base font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 no-underline"
             >
-              Открыть demo как тренер
+              {copy.demoCta}
             </TrackedCtaLink>
           </div>
 
           {/* Trust line */}
-          <p className="mt-6 text-sm text-muted-foreground">
-            Бесплатно во время закрытой беты · Подключение клуба за 10 минут ·
-            Подходит для клубов, академий и performance-центров
-          </p>
+          <p className="mt-6 text-sm text-muted-foreground">{copy.trust}</p>
         </div>
 
         {/* Right col — layered visual composition (decorative — AT users
