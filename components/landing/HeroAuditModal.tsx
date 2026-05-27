@@ -20,9 +20,19 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { X } from 'lucide-react'
-import LeadCaptureForm from './LeadCaptureForm'
 import { trackEvent } from '@/lib/analytics/track'
+
+// W17 Day 85 — perf: lazy-load LeadCaptureForm (280 LOC + zod-aligned
+// validation + 9 fields) only when modal first opens. Visitor scrolls
+// past Hero without clicking → form bundle never downloaded.
+// `loading: () => null` — silent placeholder; form mount perceived as
+// instant since user just clicked + dialog animation covers small lag.
+const LeadCaptureForm = dynamic(() => import('./LeadCaptureForm'), {
+  ssr:     false,
+  loading: () => null,
+})
 
 interface HeroAuditModalProps {
   /** Trigger button label. */
@@ -40,10 +50,14 @@ export default function HeroAuditModal({
 }: HeroAuditModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [open, setOpen] = useState(false)
+  // W17 Day 85 — once modal opens, keep form mounted even after close.
+  // Preserves user input если they reopen after accidentally closing.
+  const [hasOpenedOnce, setHasOpenedOnce] = useState(false)
 
   function openModal() {
     trackEvent({ name: 'landing.audit_modal_open' })
     setOpen(true)
+    setHasOpenedOnce(true)
     dialogRef.current?.showModal()
     document.body.style.overflow = 'hidden'
   }
@@ -130,13 +144,13 @@ export default function HeroAuditModal({
           </button>
         </div>
 
-        {/* Body — form */}
+        {/* Body — form (lazy-mounted on first open) */}
         <div className="p-6 sm:p-8">
           <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
             Заполните 6 полей — пришлём персональный аудит на email.
             Без обязательств, без банковской карты.
           </p>
-          <LeadCaptureForm onSuccess={handleSuccess} />
+          {hasOpenedOnce && <LeadCaptureForm onSuccess={handleSuccess} />}
         </div>
       </dialog>
     </>
