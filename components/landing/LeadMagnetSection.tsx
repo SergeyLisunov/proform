@@ -1,65 +1,60 @@
 /**
- * <LeadMagnetSection /> — W16 Day 78 NEW.
+ * <LeadMagnetSection /> — W16 Day 78; trim W16 Day 80.
  *
- * Lead-magnet surfacing на landing. 6 free AI-инструменты which ранее
- * жили только на `/tools/*` URLs без promotion. Каждый — entry point
- * в acquisition funnel (anonymous use → email capture при export).
+ * Day 78 original shipped 6 cards в 3-col grid (paradox of choice).
+ * Day 80 trims к **3 hero tools** + featured Club Audit prominently
+ * displayed на top + ссылка «+3 ещё инструмента» для остальных 3.
  *
- * Section anchor: `#tools` — Hero secondary CTA («Попробовать
- * AI-инструменты») jumps сюда. Smooth scroll behaviour inherited от
- * браузера.
+ * Featured tool = Club Audit (★ для Org owners — primary B2B magnet).
+ * Renders как large card spanning 2 columns at lg+, отдельно над grid.
  *
- * Layout: 1 col mobile → 2 col tablet → 3 col desktop. Each card:
- * persona-coded gradient + icon + title + 1-line value + persona chip +
- * «Попробовать» CTA → /tools/{slug}.
- *
- * Tracking: clicks emit `landing.tool_card_click` (W16 Day 78 — added
- * to event taxonomy). Допустимо потеря attribution здесь так как пользователь
- * leaves landing surface к tool surface immediately.
+ * Other public tools (ACWR, Overtraining, Medical Summary) — surfaced
+ * через secondary link к combined /tools/ listing (TBD page) OR direct
+ * к each tool через text links.
  */
 import Link from 'next/link'
 import {
-  Activity,
   ArrowUpRight,
   Building2,
-  HeartPulse,
-  LineChart,
   ShieldAlert,
-  Stethoscope,
+  Sparkles,
   TrendingUp,
 } from 'lucide-react'
 
 interface LeadMagnet {
-  /** Title для card heading. */
   title:       string
-  /** Persona chip label — кто primary audience. */
   persona:     string
-  /** 1-2 sentence value description. */
   description: string
-  /** Tool route (`/tools/{slug}`). */
   href:        string
-  /** Persona-coded color hue для chip + icon background. */
-  hue:         { bg: string; chip: string; ring: string; text: string }
-  /** Lucide icon component. */
-  icon:        typeof Activity
-  /** Time-to-value claim — surfaced on card. */
+  hue:         { bg: string; ring: string; text: string }
+  icon:        typeof Building2
   ttv:         string
 }
 
-// Persona color tokens (mirror RoleSection convention).
 const HUE = {
-  coach:    { bg: '#FFF7ED', chip: '#FED7AA', ring: '#FED7AA', text: '#C2410C' },
-  athlete:  { bg: '#F0FDF4', chip: '#BBF7D0', ring: '#BBF7D0', text: '#15803D' },
-  org:      { bg: '#EFF6FF', chip: '#BFDBFE', ring: '#BFDBFE', text: '#1D4ED8' },
-  doctor:   { bg: '#FEF2F2', chip: '#FECACA', ring: '#FECACA', text: '#B91C1C' },
-  universal:{ bg: '#FAF5FF', chip: '#DDD6FE', ring: '#DDD6FE', text: '#6D28D9' },
+  org:     { bg: '#EFF6FF', ring: '#BFDBFE', text: '#1D4ED8' },
+  coach:   { bg: '#FFF7ED', ring: '#FED7AA', text: '#C2410C' },
+  athlete: { bg: '#F0FDF4', ring: '#BBF7D0', text: '#15803D' },
 }
 
-const MAGNETS: LeadMagnet[] = [
+const FEATURED: LeadMagnet = {
+  title:       'Free Club Audit',
+  persona:     'Руководитель / собственник',
+  description:
+    'Health-score клуба, top-3 области риска и план действий на 30 дней. ' +
+    'AI анализирует структуру вашей организации и подсвечивает, ' +
+    'где теряете управляемость прямо сейчас.',
+  href:        '/tools/club-audit',
+  hue:         HUE.org,
+  icon:        Building2,
+  ttv:         '60 секунд',
+}
+
+const SECONDARY: LeadMagnet[] = [
   {
     title:       'Team Risk Snapshot',
     persona:     'Тренер · Клуб',
-    description: 'Введите данные команды (3-12 атлетов) — получите светофор риска, причины и план действий на 7-14 дней.',
+    description: 'Светофор риска по команде + причины + план на 7-14 дней.',
     href:        '/tools/team-risk',
     hue:         HUE.coach,
     icon:        ShieldAlert,
@@ -68,51 +63,75 @@ const MAGNETS: LeadMagnet[] = [
   {
     title:       'Adaptive Plan',
     persona:     'Атлет',
-    description: 'AI-план тренировок на 7 дней по вашей цели + последним 4 неделям нагрузки. Учитывает recovery.',
+    description: 'AI-план тренировок на 7 дней по вашей цели + 4 неделям нагрузки.',
     href:        '/tools/adaptive-plan',
     hue:         HUE.athlete,
     icon:        TrendingUp,
     ttv:         '60 сек',
   },
-  {
-    title:       'Club Audit',
-    persona:     'Организация',
-    description: 'Health-score клуба + top-3 области риска + конкретный план на 30 дней. Для руководителя.',
-    href:        '/tools/club-audit',
-    hue:         HUE.org,
-    icon:        Building2,
-    ttv:         '60 сек',
-  },
-  {
-    title:       'Medical Summary',
-    persona:     'Спортивный врач',
-    description: 'Структурированный AI-assessment template (triage, red flags, differential, next steps) для clinical review.',
-    href:        '/tools/medical-summary',
-    hue:         HUE.doctor,
-    icon:        Stethoscope,
-    ttv:         '5 мин',
-  },
-  {
-    title:       'ACWR Калькулятор',
-    persona:     'Тренер · Атлет',
-    description: 'Введите недельную нагрузку за 4 недели — получите ACWR и цветовую зону риска травмы.',
-    href:        '/tools/acwr',
-    hue:         HUE.universal,
-    icon:        LineChart,
-    ttv:         '30 сек',
-  },
-  {
-    title:       'Тест на перетренированность',
-    persona:     'Атлет',
-    description: '10 вопросов — оценка признаков overtraining syndrome с рекомендациями. Научный чек-лист.',
-    href:        '/tools/overtraining',
-    hue:         HUE.athlete,
-    icon:        HeartPulse,
-    ttv:         '2 мин',
-  },
 ]
 
-function MagnetCard({ magnet }: { magnet: LeadMagnet }) {
+const MORE_TOOLS: Array<{ label: string; href: string }> = [
+  { label: 'Medical Summary',           href: '/tools/medical-summary' },
+  { label: 'ACWR Калькулятор',          href: '/tools/acwr' },
+  { label: 'Тест на перетренированность', href: '/tools/overtraining' },
+]
+
+function FeaturedCard() {
+  const { title, persona, description, href, hue, icon: Icon, ttv } = FEATURED
+  return (
+    <Link
+      href={href}
+      className="group flex flex-col gap-4 rounded-3xl border-2 bg-white p-7 no-underline shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-8 lg:flex-row lg:items-start lg:gap-7"
+      style={{ borderColor: hue.ring }}
+    >
+      {/* Left: icon + featured badge */}
+      <div className="flex shrink-0 items-start gap-4 lg:flex-col lg:items-stretch lg:gap-3">
+        <div
+          aria-hidden="true"
+          className="flex h-16 w-16 items-center justify-center rounded-2xl"
+          style={{ background: hue.bg, color: hue.text }}
+        >
+          <Icon size={30} strokeWidth={2} />
+        </div>
+        <div className="flex items-center gap-2 lg:flex-col lg:items-start lg:gap-1.5">
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-white"
+            style={{ background: hue.text }}
+          >
+            <Sparkles size={11} /> Рекомендуем
+          </span>
+          <span
+            className="rounded-full px-2.5 py-1 text-2xs font-bold uppercase tracking-wider"
+            style={{ background: hue.bg, color: hue.text }}
+          >
+            {ttv}
+          </span>
+        </div>
+      </div>
+
+      {/* Right: content */}
+      <div className="flex-1">
+        <h3 className="text-xl font-bold text-foreground sm:text-2xl">{title}</h3>
+        <p className="mt-1 text-2xs font-semibold uppercase tracking-wider" style={{ color: hue.text }}>
+          {persona}
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {description}
+        </p>
+        <div className="mt-4 inline-flex items-center gap-1.5 text-base font-bold" style={{ color: hue.text }}>
+          Получить аудит бесплатно
+          <ArrowUpRight
+            size={18}
+            className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function SecondaryCard({ magnet }: { magnet: LeadMagnet }) {
   const { title, persona, description, href, hue, icon: Icon, ttv } = magnet
   return (
     <Link
@@ -120,7 +139,6 @@ function MagnetCard({ magnet }: { magnet: LeadMagnet }) {
       className="group flex flex-col gap-3 rounded-3xl border-2 bg-white p-6 no-underline shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
       style={{ borderColor: hue.ring }}
     >
-      {/* Top row: icon + ttv badge */}
       <div className="flex items-start justify-between gap-3">
         <div
           aria-hidden="true"
@@ -136,24 +154,14 @@ function MagnetCard({ magnet }: { magnet: LeadMagnet }) {
           {ttv}
         </span>
       </div>
-
-      {/* Title + persona chip */}
       <div>
-        <h3 className="text-lg font-bold leading-snug text-foreground">
-          {title}
-        </h3>
+        <h3 className="text-lg font-bold leading-snug text-foreground">{title}</h3>
         <p className="mt-1 text-2xs font-semibold uppercase tracking-wider" style={{ color: hue.text }}>
           {persona}
         </p>
       </div>
-
-      {/* Value description */}
-      <p className="flex-1 text-sm leading-relaxed text-muted-foreground">
-        {description}
-      </p>
-
-      {/* CTA row */}
-      <div className="mt-2 flex items-center gap-1.5 text-sm font-bold transition-colors" style={{ color: hue.text }}>
+      <p className="flex-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <div className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold" style={{ color: hue.text }}>
         Попробовать
         <ArrowUpRight
           size={16}
@@ -181,24 +189,48 @@ export default function LeadMagnetSection() {
             id="lead-magnets-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Попробуйте платформу без регистрации
+            Попробуйте подход ProForm за 60 секунд
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            6 рабочих AI-инструментов для тренеров, атлетов, врачей и
-            организаций. Без email-форм и листов ожидания — используйте прямо
-            сейчас и решите, нужна ли вам полная платформа.
+            Без регистрации, без email-форм, без листов ожидания.
+            Используйте прямо сейчас и решите, нужна ли вам полная платформа.
           </p>
         </div>
 
-        {/* Grid */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {MAGNETS.map((m) => (
-            <MagnetCard key={m.href} magnet={m} />
+        {/* Featured card — Club Audit */}
+        <div className="mt-12">
+          <FeaturedCard />
+        </div>
+
+        {/* Secondary 2 cards */}
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          {SECONDARY.map((m) => (
+            <SecondaryCard key={m.href} magnet={m} />
           ))}
         </div>
 
+        {/* More tools — text links для остальных 3 */}
+        <div className="mt-8 rounded-2xl border border-dashed border-orange-200 bg-orange-50/40 px-5 py-4 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-orange-700">
+            + 3 ещё инструмента
+          </p>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+            {MORE_TOOLS.map((t, idx) => (
+              <span key={t.href} className="inline-flex items-center gap-2">
+                {idx > 0 && <span aria-hidden="true" className="text-orange-300">·</span>}
+                <Link
+                  href={t.href}
+                  className="font-semibold text-orange-700 no-underline hover:underline"
+                >
+                  {t.label}
+                </Link>
+              </span>
+            ))}
+          </div>
+        </div>
+
         {/* Footer hint */}
-        <p className="mt-10 text-center text-sm text-muted-foreground">
+        <p className="mt-8 text-center text-sm text-muted-foreground">
           Все инструменты работают на тех же AI-моделях, что и платная платформа.
           Понравится — перенесите данные в свой клуб за 10 минут.
         </p>

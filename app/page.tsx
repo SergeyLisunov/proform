@@ -28,6 +28,8 @@ import AntiPositioningSection from '@/components/landing/AntiPositioningSection'
 import LeadMagnetSection from '@/components/landing/LeadMagnetSection'
 import RoleSection from '@/components/landing/RoleSection'
 import WorkflowSection from '@/components/landing/WorkflowSection'
+import BeforeAfterSection from '@/components/landing/BeforeAfterSection'
+import SocialProofSection from '@/components/landing/SocialProofSection'
 import BenefitsSection from '@/components/landing/BenefitsSection'
 import UseCasesSection from '@/components/landing/UseCasesSection'
 import WearablesSection from '@/components/landing/WearablesSection'
@@ -61,7 +63,9 @@ export default async function HomePage() {
         <AntiPositioningSection />
         <WorkflowSection />
         <RoleSection />
+        <BeforeAfterSection />
         <LeadMagnetSection />
+        <SocialProofSection />
         <BenefitsSection />
         <UseCasesSection />
         <WearablesSection />
