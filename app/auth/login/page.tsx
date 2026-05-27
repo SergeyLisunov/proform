@@ -6,7 +6,17 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const DEMO_PASSWORD = 'proform123'
+// W18 Day 94 C1 SECURITY FIX:
+// Demo password gate. Previously hardcoded `'proform123'` rendered в UI
+// + auto-filled на demo login click — security exposure (admin@proform.test
+// share same password). Now sourced от NEXT_PUBLIC_DEMO_PASSWORD env var.
+// Если env unset → demo section hidden entirely + DEMO_PASSWORD null.
+//
+// For production deploy: leave NEXT_PUBLIC_DEMO_PASSWORD unset → no demo
+// access exposed. For dev/staging: set env var к whatever password seeded
+// для test accounts.
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? null
+const DEMO_ENABLED = DEMO_PASSWORD !== null
 
 const TEST_ACCOUNTS = [
   {
@@ -143,6 +153,7 @@ export default function LoginPage() {
   }
 
   function applyDemoAccount(accountEmail: string) {
+    if (!DEMO_PASSWORD) return  // demo disabled via env
     setSelectedDemoEmail(accountEmail)
     setEmail(accountEmail)
     setPassword(DEMO_PASSWORD)
@@ -150,6 +161,7 @@ export default function LoginPage() {
   }
 
   async function handleDemoLogin(accountEmail: string) {
+    if (!DEMO_PASSWORD) return  // demo disabled via env
     applyDemoAccount(accountEmail)
     await signIn(accountEmail, DEMO_PASSWORD)
   }
@@ -190,7 +202,8 @@ export default function LoginPage() {
           <div>
             <h1 className="pf-num text-[40px] leading-none text-foreground sm:text-[46px]">Войти</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-              Прогресс спортсмена в одной системе для всех, кто рядом. Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.
+              Прогресс спортсмена в одной системе для всех, кто рядом.
+              {DEMO_ENABLED ? ' Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.' : ' Войдите в свой профиль.'}
             </p>
 
             {redirectTo !== '/dashboard' && (
@@ -303,6 +316,10 @@ export default function LoginPage() {
               </Link>
             </p>
 
+            {/* W18 Day 94 C1 — entire demo section gated на DEMO_ENABLED.
+                Production (NEXT_PUBLIC_DEMO_PASSWORD unset) → hidden.
+                Dev/staging (env set) → visible с current behavior. */}
+            {DEMO_ENABLED && (
             <div className="mt-7 rounded-[24px] border border-border bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF9F4_100%)] p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -360,10 +377,10 @@ export default function LoginPage() {
               </div>
 
               <p className="mt-3 text-2xs leading-relaxed text-muted-foreground">
-                Для всех demo-аккаунтов используется пароль <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-foreground">{DEMO_PASSWORD}</code>.
-                Вы можете либо подставить данные, либо сразу войти одним кликом.
+                Demo пароль предустановлен. Нажмите «Войти в demo» — данные подставятся автоматически.
               </p>
             </div>
+            )}
           </div>
         </div>
       </div>

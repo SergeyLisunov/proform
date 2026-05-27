@@ -29,7 +29,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .is('revoked_at', null)
     .order('created_at', { ascending: false })
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, shares: data ?? [] })
 }
 
@@ -67,7 +67,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .select('token, workout_id, created_by, created_at, expires_at, revoked_at')
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, share: data })
 }
 
@@ -91,6 +91,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (token) q = q.eq('token', token)
 
   const { error } = await q
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

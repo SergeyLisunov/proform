@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       .eq('id', body.workout_id)
 
     if (error) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+      return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true, data: debrief })

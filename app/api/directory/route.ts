@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (maxPrice) qb = qb.lte('hourly_rate', maxPrice)
     if (acceptsNew) qb = qb.eq('accepts_new_athletes', true)
     const { data, error } = await qb
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    if (error) return NextResponse.json({ error: 'server_error' }, { status: 400 })
     return NextResponse.json({ items: data ?? [] })
   }
 
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     if (maxPrice) qb = qb.lte('consultation_fee', maxPrice)
     if (acceptsNew) qb = qb.eq('accepts_new_patients', true)
     const { data, error } = await qb
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    if (error) return NextResponse.json({ error: 'server_error' }, { status: 400 })
     return NextResponse.json({ items: data ?? [] })
   }
 
@@ -61,6 +61,6 @@ export async function GET(req: NextRequest) {
   if (sportType) qb = qb.eq('sport_type', sportType)
   if (orgType) qb = qb.eq('org_type', orgType)
   const { data, error } = await qb
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: 'server_error' }, { status: 400 })
   return NextResponse.json({ items: data ?? [] })
 }

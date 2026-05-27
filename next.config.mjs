@@ -27,6 +27,24 @@ const nextConfig = {
       { source: '/search', destination: '/connections', permanent: false },
     ]
   },
+  // W18 Day 94 I4 — security headers (CSP, HSTS, X-Frame-Options, etc).
+  // Applied к ALL routes via wildcard. CSP intentionally permissive для
+  // Next.js (script-src 'unsafe-inline' нужен для Next dev hydration +
+  // 'unsafe-eval' для Webpack HMR). Production may tighten further.
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+        ],
+      },
+    ]
+  },
 }
 
 export default withBundleAnalyzer(nextConfig)

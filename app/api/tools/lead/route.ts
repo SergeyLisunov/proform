@@ -100,7 +100,7 @@ export async function POST(req: Request) {
   })
   if (error) {
     // pg_column_size check или прочая валидация — отдадим общий код.
-    return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'server_error' }, { status: 400 })
   }
   return NextResponse.json({ ok: true }, { status: 201 })
 }

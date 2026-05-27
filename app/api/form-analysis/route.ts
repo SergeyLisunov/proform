@@ -104,6 +104,6 @@ export async function GET() {
     .select('id, title, sport, exercise, status, ai_summary, ai_feedback, video_public_url, frames_count, created_at')
     .order('created_at', { ascending: false })
     .limit(50)
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, items: data ?? [] })
 }

@@ -54,7 +54,7 @@ export async function POST(req: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (sb as any).from('calendar_events').insert(events)
   if (error) {
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   }
   return NextResponse.json({ ok: true, inserted: events.length })
 }

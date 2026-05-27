@@ -25,7 +25,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .eq('id', id)
     .maybeSingle()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   if (!data)  return NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 })
   return NextResponse.json({ ok: true, template: data })
 }
@@ -47,7 +47,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     .select('*')
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, template: data })
 }
 
@@ -58,6 +58,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (!auth?.user) return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
 
   const { error } = await sb.from('workout_templates').delete().eq('id', id)
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

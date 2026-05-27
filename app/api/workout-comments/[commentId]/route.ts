@@ -60,7 +60,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ commen
     `)
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, comment: data })
 }
 
@@ -73,6 +73,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ comm
   if (!guard.ok) return guard.res
 
   const { error } = await sb.from('workout_comments').delete().eq('id', commentId)
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
