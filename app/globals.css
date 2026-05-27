@@ -34,9 +34,19 @@
   display: none;
 }
 
+/* W17 Day 84 — next/font migration.
+   --font-pf-sans + --font-pf-display injected from app/layout.tsx via
+   next/font/google (subsetted, preloaded, size-adjusted fallback).
+   Manual fallback chain preserved для:
+     - Browsers без CSS var support (legacy)
+     - Cyrillic text — neither DM Sans nor Bebas Neue have Google
+       Cyrillic subset. Russian body falls к Trebuchet MS / Segoe UI;
+       Russian display falls к Impact / Arial Narrow Bold (same as
+       pre-migration Metronic CSS behavior)
+     - Network failures (next/font self-hosts но belt-and-suspenders) */
 :root {
-  --pf-font-sans: "DM Sans", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  --pf-font-display: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
+  --pf-font-sans: var(--font-pf-sans), "DM Sans", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --pf-font-display: var(--font-pf-display), "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
 }
 
 /* ── Brand tokens ─────────────────────────────────────────────────────────── */
