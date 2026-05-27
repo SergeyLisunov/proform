@@ -4,7 +4,7 @@
  * Iteration over Day 78 build. Day 78 ship was good infrastructure но copy
  * abstract («без хаоса») and missing soft conversion path. Day 79 ships:
  *
- *   - Anti-positioning H1 («не должна жить в WhatsApp») — provocative hook
+ *   - Anti-positioning H1 («не должна жить в чатах») — provocative hook
  *   - Outcome-driven sub (control / transparency / safety triad)
  *   - 3 CTAs: primary register + secondary demo + tertiary audit modal
  *   - 3 value chips below CTAs (replaces less specific trust strip)
@@ -50,40 +50,42 @@ export default function HeroSection() {
     <section
       className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.12),_transparent_55%),linear-gradient(180deg,_#FFFFFF_0%,_#FFF7ED_100%)]"
     >
-      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-10 lg:py-28">
+      <div className="mx-auto flex max-w-4xl flex-col items-center px-5 py-16 text-center sm:px-8 sm:py-22 lg:px-10 lg:py-28">
         {/* Eyebrow chip — positions ProForm как category */}
-        <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-1.5 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
+        <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
           <Building2 aria-hidden="true" size={13} />
           Операционная система спортивной организации
         </span>
 
-        {/* H1 — anti-positioning hook */}
-        <h1 className="pf-num mt-6 text-[clamp(2rem,5.5vw,4rem)] font-bold leading-[1.05] tracking-tight text-foreground">
-          Спортивная организация
-          <br />
-          не должна жить в <span className="text-orange-500">WhatsApp</span>.
+        {/* H1 — two logical lines, no orphan words on narrow viewport */}
+        <h1 className="pf-num mt-7 text-balance text-[clamp(2.25rem,6vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-8">
+          Спортивная организация{' '}
+          <span className="block sm:inline">
+            не должна{' '}
+            <span className="text-orange-500">жить в чатах.</span>
+          </span>
         </h1>
 
         {/* Subhead — outcome triad: control / transparency / safety */}
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-xl">
+        <p className="mt-6 max-w-xl text-base leading-[1.7] text-muted-foreground sm:mt-7 sm:max-w-2xl sm:text-lg lg:text-xl">
           Соберите тренеров, врачей и атлетов в одной системе.
-          Руководитель видит все. Каждый видит то, что положено.
-          Медданные защищены по 152-ФЗ.
+          Руководитель видит всё. Каждый видит то, что положено.
+          Медданные защищены по&nbsp;152-ФЗ.
         </p>
 
-        {/* CTAs — primary register + secondary demo + tertiary audit modal */}
-        <div className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+        {/* CTAs — primary register + secondary demo. min-h-11 = 44px touch target */}
+        <div className="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
           <TrackedCtaLink
             href="/auth/register"
             event={{ name: 'landing.hero_cta_primary_click' }}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600 hover:shadow-xl sm:text-lg no-underline"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-orange-500 px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600 hover:shadow-xl active:scale-[0.98] sm:text-lg no-underline"
           >
             Подключить клуб бесплатно
-            <ArrowRight size={20} />
+            <ArrowRight size={20} aria-hidden="true" />
           </TrackedCtaLink>
           <Link
             href="/auth/login?demo=coach"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-7 py-4 text-base font-bold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 sm:text-lg no-underline"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-8 py-3.5 text-base font-bold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 active:scale-[0.98] sm:text-lg no-underline"
           >
             Посмотреть демо
           </Link>
@@ -98,8 +100,8 @@ export default function HeroSection() {
         </p>
 
         {/* Audit modal trigger — soft conversion для не-готовых register */}
-        <div className="mt-8 rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-5 py-5 sm:px-7 sm:py-6">
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5 sm:text-left">
+        <div className="mt-10 w-full max-w-lg rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-5 py-5 sm:max-w-none sm:px-7 sm:py-6">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5 sm:text-left">
             <div
               aria-hidden="true"
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600"
@@ -110,23 +112,23 @@ export default function HeroSection() {
               <p className="text-sm font-bold text-foreground">
                 Не готовы регистрироваться?
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 Получите 5-минутный аудит вашего клуба — пришлём health-score,
                 top-3 риска и план на 30 дней на email.
               </p>
             </div>
             <HeroAuditModal
               buttonLabel="Получить аудит"
-              buttonClassName="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-orange-100 px-5 py-3 text-sm font-bold text-orange-700 transition-colors hover:bg-orange-200"
+              buttonClassName="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-2xl bg-orange-100 px-5 py-3 text-sm font-bold text-orange-700 transition-colors hover:bg-orange-200"
             />
           </div>
         </div>
 
         {/* Value chips — outcome triad */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
           <ValueChip icon={CheckCircle2} label="Контроль для руководителя" />
           <ValueChip icon={CheckCircle2} label="Прозрачность для тренера" />
-          <ValueChip icon={ShieldCheck} label="Безопасность для врача · 152-ФЗ" />
+          <ValueChip icon={ShieldCheck} label="Безопасность · 152-ФЗ" />
         </div>
       </div>
     </section>

@@ -27,7 +27,7 @@ interface ComparisonRow {
 const ROWS: ComparisonRow[] = [
   {
     topic:  'Инструменты',
-    before: 'Excel + WhatsApp + Notion + Google Sheets + бумажные карточки',
+    before: 'Excel + Telegram-чаты + бумажные карточки + 5 разных программ',
     after:  '1 система — ProForm',
   },
   {
@@ -121,7 +121,7 @@ export default function BeforeAfterSection() {
           {ROWS.map((row) => (
             <article
               key={row.topic}
-              className="grid gap-3 rounded-3xl border border-border bg-white p-5 shadow-sm lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-4"
+              className="grid gap-3 rounded-3xl border border-border bg-white p-5 shadow-sm lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-5"
             >
               {/* Topic */}
               <div className="flex items-center">
@@ -132,7 +132,7 @@ export default function BeforeAfterSection() {
 
               {/* Before — mobile shows «До:» label inline */}
               <div>
-                <p className="mb-1 text-2xs font-bold uppercase tracking-wider text-slate-500 lg:hidden">
+                <p className="mb-2 text-2xs font-bold uppercase tracking-wider text-slate-500 lg:hidden">
                   До
                 </p>
                 <BeforeCell text={row.before} />
@@ -140,7 +140,7 @@ export default function BeforeAfterSection() {
 
               {/* After — mobile shows «После:» label inline */}
               <div>
-                <p className="mb-1 text-2xs font-bold uppercase tracking-wider text-emerald-700 lg:hidden">
+                <p className="mb-2 text-2xs font-bold uppercase tracking-wider text-emerald-700 lg:hidden">
                   После
                 </p>
                 <AfterCell text={row.after} />

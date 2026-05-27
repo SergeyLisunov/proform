@@ -13,7 +13,7 @@ import StaticPageShell from '@/components/layout/StaticPageShell'
 export const metadata: Metadata = {
   title: 'О платформе',
   description:
-    'ProForm — единая система для тренера, спортсмена, врача, клуба и родителя. Замена Excel + WhatsApp + бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
+    'ProForm — единая система для тренера, спортсмена, врача, клуба и родителя. Замена Excel, чатов и бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
   alternates: { canonical: '/about' },
   openGraph: {
     title: 'О ProForm — единая система спортивной подготовки',
@@ -30,7 +30,7 @@ export default function AboutPage() {
         <h2 className="text-xl font-bold text-foreground">Зачем мы строим ProForm</h2>
         <p className="mt-3 text-muted-foreground">
           Спортивная подготовка в клубах и академиях фрагментирована. Тренер ведёт
-          планы в Excel, общается с родителями в WhatsApp, переписывается с врачом
+          планы в Excel, общается с родителями в Telegram, переписывается с врачом
           в почте, а карточка атлета лежит в бумажной папке. Половина рабочего дня
           уходит на пересылку данных — не на тренерскую работу.
         </p>

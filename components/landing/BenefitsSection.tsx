@@ -38,7 +38,7 @@ const BENEFITS: Benefit[] = [
   {
     icon:  IdCard,
     title: 'Единая карточка спортсмена',
-    body:  'Все данные в одном месте — тренировки, медицина, прогресс. Заменяет Excel + WhatsApp + бумажные карточки.',
+    body:  'Все данные в одном месте — тренировки, медицина, прогресс. Заменяет Excel, Telegram-чаты и бумажные карточки.',
   },
   {
     icon:  Network,
@@ -69,7 +69,7 @@ const BENEFITS: Benefit[] = [
 
 export default function BenefitsSection() {
   return (
-    <section className="w-full bg-white py-16 px-4 sm:py-20 sm:px-6 lg:px-10 lg:py-24">
+    <section className="w-full bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="max-w-3xl">
@@ -86,7 +86,7 @@ export default function BenefitsSection() {
         </div>
 
         {/* 2×3 grid — 6 highest-impact benefits */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {BENEFITS.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
