@@ -27,12 +27,14 @@ export type CycleBlock = {
 }
 
 export type CycleDay = {
-  id:       string
-  cycle_id: string
-  user_id:  string
-  day_date: string
-  day_type: DayType
-  notes:    string | null
+  id:         string
+  cycle_id:   string
+  /** W18 Day 97 — renamed от user_id (which referenced auth.users) к
+   *  athlete_id (REFERENCES public.users) per migration 077. */
+  athlete_id: string
+  day_date:   string
+  day_type:   DayType
+  notes:      string | null
 }
 
 export type CreateCycleInput = {
@@ -71,7 +73,8 @@ export async function getCycles(userId: string, from?: string, to?: string): Pro
 }
 
 export async function getCycleDays(userId: string, from?: string, to?: string): Promise<CycleDay[]> {
-  let q = sb().from('cycle_days').select('*').eq('user_id', userId)
+  // W18 Day 97 — migration 077: cycle_days.user_id → athlete_id (REFERENCES public.users)
+  let q = sb().from('cycle_days').select('*').eq('athlete_id', userId)
   if (from) q = q.gte('day_date', from)
   if (to)   q = q.lte('day_date', to)
   const { data, error } = await q
@@ -102,7 +105,8 @@ export async function createCycle(input: CreateCycleInput): Promise<CycleBlock |
   if (error) { console.error('createCycle error:', error); return null }
   const cycle = normalizeCycle(data)
   if (days && days.length > 0) {
-    const rows = days.map(d => ({ cycle_id: cycle.id, user_id, day_date: d.day_date, day_type: d.day_type, notes: d.notes || null }))
+    // W18 Day 97 — migration 077: cycle_days.user_id → athlete_id
+    const rows = days.map(d => ({ cycle_id: cycle.id, athlete_id: user_id, day_date: d.day_date, day_type: d.day_type, notes: d.notes || null }))
     const { error: daysErr } = await sb().from('cycle_days').insert(rows)
     if (daysErr) console.error('createCycleDays error:', daysErr)
   }
@@ -131,7 +135,8 @@ export async function deleteCycle(id: string): Promise<boolean> {
 export async function upsertCycleDay(userId: string, cycleId: string, dayDate: string, dayType: DayType, notes?: string): Promise<CycleDay | null> {
   const { data, error } = await sb()
     .from('cycle_days')
-    .upsert({ cycle_id: cycleId, user_id: userId, day_date: dayDate, day_type: dayType, notes: notes || null }, { onConflict: 'cycle_id,day_date' })
+    // W18 Day 97 — migration 077: cycle_days.user_id → athlete_id
+    .upsert({ cycle_id: cycleId, athlete_id: userId, day_date: dayDate, day_type: dayType, notes: notes || null }, { onConflict: 'cycle_id,day_date' })
     .select().single()
   if (error) { console.error('upsertCycleDay error:', error); return null }
   return data as CycleDay
