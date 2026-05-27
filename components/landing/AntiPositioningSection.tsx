@@ -1,64 +1,36 @@
 /**
- * <AntiPositioningSection /> — W16 Day 79 NEW.
+ * <AntiPositioningSection /> — W18 Day 89 REBUILD (RU-compliance).
  *
- * «ProForm — это НЕ...» — explicit anti-positioning vs Notion, CRM,
- * Telegram, Excel. Visitor мгновенно понимает чем мы НЕ являемся —
- * убирает категориальную путаницу до того, как мы объясняем чем являемся.
+ * «ProForm — это НЕ...» — explicit anti-positioning vs RU-safe alternatives
+ * only. Replaced Notion/Coda (US, restricted) and WhatsApp (Meta, banned
+ * in RU) with compliant reference points: Bitrix24/AmoCRM, Excel,
+ * Telegram-чат, бумажный журнал.
  *
- * Placement: сразу после PainSection, до Workflow. Pain → «не путать с
- * X/Y/Z» → solution.
- *
- * Visual: white bg, 4 cards в 2×2 grid (mobile 1 col), each с
- * strike-through icon + название alternative + почему не работает + что
- * делает ProForm иначе.
+ * 4 cards, 2×2 grid (mobile 1 col). Strike-through icon pattern preserved.
  */
-import { Database, FileSpreadsheet, MessageCircle, Network } from 'lucide-react'
+import { BookOpen, Database, FileSpreadsheet, MessageCircle } from 'lucide-react'
 
 interface NotCard {
-  /** Lucide icon — alternative platform icon. */
-  icon:         typeof MessageCircle
-  /** Alternative name (CRM, Notion, etc). */
-  alternative:  string
-  /** Why this alternative doesn't fit для спортивной организации. */
-  whyNotFit:    string
-  /** How ProForm differs. */
-  proformDoes:  string
+  icon:        typeof MessageCircle
+  alternative: string
+  whyNotFit:   string
+  proformDoes: string
 }
 
 const NOT_CARDS: NotCard[] = [
   {
-    icon:         Database,
-    alternative:  'CRM',
+    icon:        Database,
+    alternative: 'CRM (Bitrix24 / AmoCRM)',
     whyNotFit:
-      'Bitrix24 / AmoCRM построены для sales-воронок: лиды, сделки, ' +
-      'отделы продаж.',
+      'Построены для sales-воронок: лиды, сделки, KPI менеджера. ' +
+      'Тренировочного процесса, ACWR и медицинских ограничений — нет.',
     proformDoes:
-      'ProForm построен для тренировочного процесса: ACWR, recovery, ' +
-      'athlete passes, рекомендации врача — из коробки.',
+      'Athlete passes, планы нагрузки, рекомендации врача и recovery — ' +
+      'из коробки, без настройки с нуля.',
   },
   {
-    icon:         Network,
-    alternative:  'Notion / Coda',
-    whyNotFit:
-      'В Notion нужно проектировать роли, права, формулы — недели работы. ' +
-      'Медданные открыты всем, кому дашь доступ.',
-    proformDoes:
-      'Роли pre-built. Защита на уровне базы данных (RLS). ' +
-      'Медицинский слой изолирован — даже Owner не видит без права.',
-  },
-  {
-    icon:         MessageCircle,
-    alternative:  'Telegram / WhatsApp',
-    whyNotFit:
-      'В чате история теряется через 100 сообщений. ' +
-      'Медданные в незашифрованном messenger — нарушение 152-ФЗ.',
-    proformDoes:
-      'Каждый запрос привязан к контексту атлета — навсегда, ' +
-      'с правами доступа. Медданные шифруются + хостинг EU-Central.',
-  },
-  {
-    icon:         FileSpreadsheet,
-    alternative:  'Excel / Google Sheets',
+    icon:        FileSpreadsheet,
+    alternative: 'Excel-таблицы',
     whyNotFit:
       'Нет real-time, конфликты редактирования, нет ролей. ' +
       'Кто-то случайно удалил столбец — пол-команды без данных.',
@@ -66,30 +38,52 @@ const NOT_CARDS: NotCard[] = [
       'Single source of truth + role-based visibility + версионность. ' +
       'Никаких «упс, я перезаписал».',
   },
+  {
+    icon:        MessageCircle,
+    alternative: 'Telegram-чаты',
+    whyNotFit:
+      'История теряется через 100 сообщений. ' +
+      'Медданные в мессенджере — нарушение 152-ФЗ и угроза утечки.',
+    proformDoes:
+      'Каждый запрос привязан к контексту атлета навсегда, ' +
+      'с правами доступа. Медданные изолированы + хостинг EU-Central.',
+  },
+  {
+    icon:        BookOpen,
+    alternative: 'Бумажный журнал',
+    whyNotFit:
+      'Теряется, горит, промокает. Нет поиска, нет истории, ' +
+      'нет уведомлений. Тренер, который уволился, уносит знания с собой.',
+    proformDoes:
+      'Цифровая карточка атлета остаётся в организации навсегда — ' +
+      'с полной историей, доступной новому тренеру в первый день.',
+  },
 ]
 
 function NotTile({ card }: { card: NotCard }) {
   const { icon: Icon, alternative, whyNotFit, proformDoes } = card
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-white p-6 transition-colors hover:border-orange-200">
+    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-white p-6 transition-colors hover:border-orange-200 hover:shadow-sm">
       {/* Strike-through visual */}
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
-          className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-600"
+          className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600"
         >
           <Icon size={22} strokeWidth={2} />
-          {/* Diagonal line strike-through */}
+          {/* Diagonal strike-through */}
           <span
             aria-hidden="true"
             className="absolute inset-0 m-auto h-[2px] w-12 rotate-45 rounded-full bg-red-500/70"
           />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-2xs font-bold uppercase tracking-wider text-red-600">
             ProForm — это НЕ
           </p>
-          <h3 className="text-lg font-bold text-foreground">{alternative}</h3>
+          <h3 className="text-base font-bold leading-tight text-foreground sm:text-lg">
+            {alternative}
+          </h3>
         </div>
       </div>
 
@@ -123,7 +117,7 @@ export default function AntiPositioningSection() {
             id="anti-positioning-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Это не CRM, не Notion, не мессенджер и не таблица
+            Это не CRM, не таблица, не чат и не журнал
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             ProForm — операционная система спортивной организации.

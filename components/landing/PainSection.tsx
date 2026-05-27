@@ -28,7 +28,7 @@ interface PainCard {
 const PAINS: PainCard[] = [
   {
     icon:        MessagesSquare,
-    title:       '«3 чата в Telegram + 2 в WhatsApp»',
+    title:       '«5 чатов в Telegram — и ни одного порядка»',
     description:
       'Тренеры пишут одно, родители — другое, врач — в третьем. ' +
       'Кто кому ответил и где — теряется на следующий день.',
@@ -56,15 +56,15 @@ const PAINS: PainCard[] = [
 function PainTile({ pain }: { pain: PainCard }) {
   const { icon: Icon, title, description, hue } = pain
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-6 shadow-sm">
+    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5 shadow-sm sm:p-6">
       <div
         aria-hidden="true"
-        className="flex h-14 w-14 items-center justify-center rounded-2xl"
+        className="flex h-12 w-12 items-center justify-center rounded-2xl sm:h-14 sm:w-14"
         style={{ background: hue.bg, color: hue.text }}
       >
-        <Icon size={26} strokeWidth={2} />
+        <Icon size={24} strokeWidth={2} />
       </div>
-      <h3 className="text-lg font-bold leading-snug text-foreground">
+      <h3 className="text-base font-bold leading-snug text-foreground sm:text-lg">
         {title}
       </h3>
       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -95,7 +95,7 @@ export default function PainSection() {
         </div>
 
         {/* Grid — 1 col mobile → 3 col desktop */}
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:gap-6 md:grid-cols-3">
           {PAINS.map((p) => (
             <PainTile key={p.title} pain={p} />
           ))}
