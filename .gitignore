@@ -14,3 +14,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# W18 Day 90 — visual audit script output (regenerable PNGs)
+.screenshots/
