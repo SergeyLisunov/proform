@@ -12,6 +12,8 @@
     "test:e2e:install": "playwright install --with-deps chromium",
     "test:e2e:ui": "playwright test --ui",
     "lint:duplicates": "bash scripts/audit-duplicate-exports.sh",
+    "analyze": "ANALYZE=true next build",
+    "check:bundle": "node scripts/bundle-budget-check.mjs",
     "prepare": "husky"
   },
   "dependencies": {
@@ -37,6 +39,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.6",
     "@playwright/test": "^1.59.1",
     "@types/node": "^20",
     "@types/react": "^18",
