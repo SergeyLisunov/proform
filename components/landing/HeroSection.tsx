@@ -1,33 +1,37 @@
 /**
- * <HeroSection /> — W16 Day 78 REBUILD.
+ * <HeroSection /> — W16 Day 79 REWRITE.
  *
- * Previous version (W14 Day 71 + W15 Day 77) был variant-aware grid с
- * right-col mockup composition. Feedback: «всё криво» — dark blocks
- * right of Hero, CTAs не видны, cramped на mobile, variant B copy не
- * sells. Rebuilt к single-voice centered hero, massive contrast CTAs,
- * trust-strip с 3 micro-facts, no decorative mockup.
+ * Iteration over Day 78 build. Day 78 ship was good infrastructure но copy
+ * abstract («без хаоса») and missing soft conversion path. Day 79 ships:
  *
- * A/B harness retired (W15 Day 77 work — variant cookie middleware
- * removed, variants.ts deleted, single H1 ships). When second test
- * нужен — wire через `app/admin/landing-ab` (calculator kept).
+ *   - Anti-positioning H1 («не должна жить в WhatsApp») — provocative hook
+ *   - Outcome-driven sub (control / transparency / safety triad)
+ *   - 3 CTAs: primary register + secondary demo + tertiary audit modal
+ *   - 3 value chips below CTAs (replaces less specific trust strip)
+ *   - All mobile-first padding preserved (py-16 → sm:py-20 → lg:py-28)
  *
- * Layout principles:
- *   - Single column, centered, max-w-4xl — no left/right asymmetry
- *   - Mobile-first padding: py-16 → sm:py-20 → lg:py-28
- *   - H1 scales с clamp() для smooth viewport adaptation
- *   - 2 CTAs: primary register + secondary anchor к /#tools (LeadMagnetSection)
- *   - Trust-strip chips: 3 micro-facts (5 ролей / 10-min onboarding / 152-ФЗ)
- *   - Zero overlapping absolute elements
+ * Soft conversion: «Получить аудит» CTA opens <HeroAuditModal />
+ * (client component) embedded inline. Lead form posts к
+ * /api/leads/audit. Lead saved → admin reviews → manual email response
+ * (Day 80 wires Resend auto-send).
  */
-import { ArrowRight, Building2, Clock, ShieldCheck, Users } from 'lucide-react'
+import Link from 'next/link'
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react'
 import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
+import HeroAuditModal from './HeroAuditModal'
 
-interface TrustChipProps {
-  icon:  typeof Users
+interface ValueChipProps {
+  icon:  typeof CheckCircle2
   label: string
 }
 
-function TrustChip({ icon: Icon, label }: TrustChipProps) {
+function ValueChip({ icon: Icon, label }: ValueChipProps) {
   return (
     <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-foreground shadow-sm">
       <Icon
@@ -47,61 +51,82 @@ export default function HeroSection() {
       className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.12),_transparent_55%),linear-gradient(180deg,_#FFFFFF_0%,_#FFF7ED_100%)]"
     >
       <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-10 lg:py-28">
-        {/* Eyebrow chip */}
+        {/* Eyebrow chip — positions ProForm как category */}
         <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-1.5 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
           <Building2 aria-hidden="true" size={13} />
-          Спортивная платформа для клубов и команд
+          Операционная система спортивной организации
         </span>
 
-        {/* H1 — value prop в одной фразе */}
-        <h1 className="pf-num mt-6 text-[clamp(2.2rem,6vw,4.5rem)] font-bold leading-[1.02] tracking-tight text-foreground">
-          Тренировочный процесс клуба
+        {/* H1 — anti-positioning hook */}
+        <h1 className="pf-num mt-6 text-[clamp(2rem,5.5vw,4rem)] font-bold leading-[1.05] tracking-tight text-foreground">
+          Спортивная организация
           <br />
-          <span className="text-orange-500">без хаоса</span> в чатах и таблицах
+          не должна жить в <span className="text-orange-500">WhatsApp</span>.
         </h1>
 
-        {/* Subhead — для кого + что получают */}
+        {/* Subhead — outcome triad: control / transparency / safety */}
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-xl">
-          Тренер, спортсмен, врач, организация и родитель — в одной системе.
-          Прогресс виден всем, кому положено — и только им. Подключение клуба
-          за 10 минут.
+          Соберите тренеров, врачей и атлетов в одной системе.
+          Руководитель видит все. Каждый видит то, что положено.
+          Медданные защищены по 152-ФЗ.
         </p>
 
-        {/* CTAs — large, high-contrast, full-width на mobile */}
+        {/* CTAs — primary register + secondary demo + tertiary audit modal */}
         <div className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
           <TrackedCtaLink
             href="/auth/register"
             event={{ name: 'landing.hero_cta_primary_click' }}
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600 hover:shadow-xl sm:text-lg no-underline"
           >
-            Создать клуб бесплатно
+            Подключить клуб бесплатно
             <ArrowRight size={20} />
           </TrackedCtaLink>
-          <a
-            href="#tools"
+          <Link
+            href="/auth/login?demo=coach"
             className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-7 py-4 text-base font-bold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-50 sm:text-lg no-underline"
           >
-            Попробовать AI-инструменты
-          </a>
+            Посмотреть демо
+          </Link>
         </div>
 
-        {/* Sub-CTA hint */}
+        {/* Sub-CTA hint — login для returning users */}
         <p className="mt-4 text-sm text-muted-foreground">
-          Без банковской карты · Бесплатно во время закрытой беты ·{' '}
-          <a
-            href="/auth/login?demo=coach"
-            className="font-semibold text-orange-600 hover:underline"
-          >
-            войти в demo
-          </a>{' '}
-          одной из 5 ролей
+          Без банковской карты ·{' '}
+          <Link href="/auth/login" className="font-semibold text-orange-600 hover:underline">
+            войти в существующий аккаунт
+          </Link>
         </p>
 
-        {/* Trust strip — 3 micro-facts */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-          <TrustChip icon={Users} label="5 ролей в одной системе" />
-          <TrustChip icon={Clock} label="Подключение за 10 минут" />
-          <TrustChip icon={ShieldCheck} label="152-ФЗ · RLS · EU-Central хостинг" />
+        {/* Audit modal trigger — soft conversion для не-готовых register */}
+        <div className="mt-8 rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-5 py-5 sm:px-7 sm:py-6">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5 sm:text-left">
+            <div
+              aria-hidden="true"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600"
+            >
+              <Sparkles size={22} strokeWidth={2} />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-sm font-bold text-foreground">
+                Не готовы регистрироваться?
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Получите 5-минутный аудит вашего клуба — пришлём health-score,
+                top-3 риска и план на 30 дней на email.
+              </p>
+            </div>
+            <HeroAuditModal
+              buttonLabel="Получить аудит"
+              buttonClassName="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-orange-100 px-5 py-3 text-sm font-bold text-orange-700 transition-colors hover:bg-orange-200"
+            />
+          </div>
+        </div>
+
+        {/* Value chips — outcome triad */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <ValueChip icon={CheckCircle2} label="Контроль для руководителя" />
+          <ValueChip icon={CheckCircle2} label="Прозрачность для тренера" />
+          <ValueChip icon={ShieldCheck} label="Безопасность для врача · 152-ФЗ" />
         </div>
       </div>
     </section>

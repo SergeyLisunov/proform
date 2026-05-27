@@ -37,6 +37,10 @@ export type LandingEvent =
   | { name: 'landing.final_cta_register_click' }
   | { name: 'landing.final_cta_demo_click' }
   | { name: 'landing.faq_open'; question: string }
+  // W16 Day 79 — lead capture funnel events (soft conversion path)
+  | { name: 'landing.audit_modal_open' }
+  | { name: 'landing.lead_capture_submit' }
+  | { name: 'landing.lead_capture_success' }
 
 type EventProps = Record<string, string | number | boolean>
 
