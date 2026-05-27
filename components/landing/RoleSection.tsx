@@ -1,5 +1,5 @@
 /**
- * <RoleSection /> — Sprint W14 Day 69.
+ * <RoleSection /> — Sprint W14 Day 69; mobile carousel W17 Day 87.
  *
  * Самая важная новая landing-секция. ProForm — мульти-ролевая платформа,
  * и это её главная differentiation. Этот блок отвечает на «для кого
@@ -9,10 +9,15 @@
  * 4 имеют активные demo-аккаунты (link в /auth/login?demo=role).
  * Parent demo deferred — в текущем seed нет parent demo account.
  *
- * Visual: section-level eyebrow + H2 + subline, then 5-card grid:
- *   - <md: 1 column
- *   - md-lg: 2 columns
- *   - lg+: 5 columns (or 3-2 split if 5 не помещаются)
+ * Layout:
+ *   - <sm: horizontal scroll-snap carousel (W17 Day 87 mobile QA fix —
+ *     5 cards stacked vertically was long-scroll wall)
+ *   - sm-lg: 2-3 column grid
+ *   - xl+: 5-column grid (всё в один ряд)
+ *
+ * Mobile UX: snap-x mandatory + min-w-[85%] per card даёт «card +
+ * peek next» feel — user sees that more cards exist to scroll.
+ * Scrollbar visually hidden, но scroll natively works (a11y preserved).
  */
 import RoleCard, { type Role } from './RoleCard'
 
@@ -102,7 +107,7 @@ const ROLES: RoleEntry[] = [
 
 export default function RoleSection() {
   return (
-    <section className="w-full bg-white py-20 px-4 sm:px-6 lg:px-10">
+    <section className="w-full bg-white py-16 px-4 sm:py-20 sm:px-6 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="max-w-3xl">
@@ -118,8 +123,28 @@ export default function RoleSection() {
           </p>
         </div>
 
-        {/* 5-card grid */}
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {/* Mobile: horizontal carousel (W17 Day 87) — overflows max-w container */}
+        <div
+          className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:hidden"
+          aria-label="Карусель ролей — пролистайте чтобы увидеть все"
+        >
+          {ROLES.map((entry) => (
+            <div
+              key={entry.role}
+              className="snap-start shrink-0 basis-[85%]"
+            >
+              <RoleCard {...entry} />
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile scroll hint */}
+        <p className="mt-2 text-center text-xs text-muted-foreground sm:hidden">
+          → Пролистайте чтобы увидеть все 5 ролей
+        </p>
+
+        {/* Tablet+ desktop: 2-3-5 col grid (sm hidden because mobile carousel above) */}
+        <div className="mt-10 hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {ROLES.map((entry) => (
             <RoleCard key={entry.role} {...entry} />
           ))}

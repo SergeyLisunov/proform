@@ -1,24 +1,31 @@
 /**
- * <BenefitsSection /> — Sprint W14 Day 70.
+ * <BenefitsSection /> — Sprint W14 Day 70; trimmed W17 Day 87.
  *
- * 9 product benefits в 3×3 grid. Каждая benefit-card — title + body
- * + Lucide icon. Soft framing — фокус на «что pain закрывает», не
- * хайповые «AI/ML/революция» buzzwords.
+ * Was: 9 benefits в 3×3 grid (W16 mobile QA flagged as wall-of-text).
+ * Now: 6 high-impact benefits в 2×3 grid с larger icons + tighter copy.
  *
- * Visual: white background, compact cards с icon-left layout, subtle
- * hover. Less prominent than RoleSection (что строит позиционирование),
- * больше scanner-friendly checklist.
+ * Trim rationale — kept 6 most B2B-impactful, dropped 3 generic:
+ *   ✅ Единая карточка спортсмена (replaces 5 tools — primary value prop)
+ *   ✅ Координация ролей (multi-role differentiator vs CRM/Notion)
+ *   ✅ Медицинские ограничения (safety + 152-ФЗ trust)
+ *   ✅ Дневник и отзывы тренера (history preserved — addresses pain)
+ *   ✅ Отчёты и экспорт (decision-maker value — Health Snapshot PDF)
+ *   ✅ Безопасность по роли (RLS + 152-ФЗ — compliance trust)
+ *
+ *   ❌ Быстрый ввод тренировок (operational, weak B2B signal)
+ *   ❌ Прогресс и аналитика (vague — overlap с UseCases concrete metrics)
+ *   ❌ Группы и команды (overlap с RoleSection)
+ *
+ * Visual: card icons bumped к 12×12 (was 10×10), tighter card padding,
+ * still mobile-stack à 1-col, sm:2-col, lg:3-col.
  */
 import {
-  Activity,
   ClipboardList,
-  Database,
   FileSpreadsheet,
   IdCard,
   MessageSquare,
   Network,
   ShieldCheck,
-  Stethoscope,
 } from 'lucide-react'
 
 interface Benefit {
@@ -31,53 +38,38 @@ const BENEFITS: Benefit[] = [
   {
     icon:  IdCard,
     title: 'Единая карточка спортсмена',
-    body:  'Все данные в одном месте — от плана тренировок до медицинских заметок. Без поиска по чатам и таблицам.',
-  },
-  {
-    icon:  ClipboardList,
-    title: 'Быстрый ввод тренировок',
-    body:  'Тренер заносит сессию за 30 секунд — без переключений между приложениями.',
-  },
-  {
-    icon:  Activity,
-    title: 'Прогресс и аналитика',
-    body:  'Готовность, нагрузка, восстановление — измеряются автоматически по подключённым данным.',
-  },
-  {
-    icon:  MessageSquare,
-    title: 'Дневник и отзывы тренера',
-    body:  'Двусторонняя обратная связь с историей — спортсмен видит, тренер фиксирует, ничего не теряется.',
+    body:  'Все данные в одном месте — тренировки, медицина, прогресс. Заменяет Excel + WhatsApp + бумажные карточки.',
   },
   {
     icon:  Network,
-    title: 'Координация ролей',
-    body:  'Тренер, врач, родитель — каждый видит своё, без хаоса каналов и параллельных переписок.',
+    title: 'Координация 5 ролей',
+    body:  'Тренер, врач, организация, спортсмен, родитель — каждый видит своё, без хаоса параллельных чатов.',
   },
   {
-    icon:  Stethoscope,
+    icon:  ClipboardList,
+    title: 'Дневник + отзывы тренера',
+    body:  'Двусторонняя обратная связь с историей. Спортсмен видит, тренер фиксирует — ничего не теряется через 100 сообщений.',
+  },
+  {
+    icon:  MessageSquare,
     title: 'Медицинские ограничения',
-    body:  'Травмы, противопоказания, период восстановления — отдельный контур данных с правильным доступом.',
-  },
-  {
-    icon:  Database,
-    title: 'Группы и команды',
-    body:  'Спортсмены объединяются в группы; тренер видит командные метрики без сборки руками.',
+    body:  'Травмы, противопоказания, период восстановления — изолированный медицинский контур с правильным доступом.',
   },
   {
     icon:  FileSpreadsheet,
-    title: 'Отчёты и экспорт',
-    body:  'Health Snapshot, PDF-отчёты для руководства и спонсоров — в один клик из любой роли.',
+    title: 'Отчёты и Health Snapshot',
+    body:  'PDF для руководства, спонсоров, родителей — в один клик из любой роли. Forward-friendly, no login needed.',
   },
   {
     icon:  ShieldCheck,
-    title: 'Безопасность по роли',
-    body:  'Доступ — только тому, кому он нужен, на уровне базы данных. Никаких «забыли отозвать» инцидентов.',
+    title: 'RLS на уровне БД',
+    body:  '152-ФЗ + EU-Central хостинг. Доступ проверяется в PostgreSQL — даже compromised app сервер не даст чужие данные.',
   },
 ]
 
 export default function BenefitsSection() {
   return (
-    <section className="w-full bg-white py-20 px-4 sm:px-6 lg:px-10">
+    <section className="w-full bg-white py-16 px-4 sm:py-20 sm:px-6 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="max-w-3xl">
@@ -93,18 +85,21 @@ export default function BenefitsSection() {
           </p>
         </div>
 
-        {/* 3×3 grid */}
+        {/* 2×3 grid — 6 highest-impact benefits */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {BENEFITS.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="group flex items-start gap-4 rounded-2xl border border-border bg-slate-50/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-sm"
+              className="group flex items-start gap-4 rounded-2xl border border-border bg-slate-50/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-sm sm:p-6"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm transition-colors group-hover:bg-orange-500 group-hover:text-white">
-                <Icon size={18} strokeWidth={2} />
+              <div
+                aria-hidden="true"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm transition-colors group-hover:bg-orange-500 group-hover:text-white"
+              >
+                <Icon size={22} strokeWidth={2} />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-bold tracking-tight text-foreground">{title}</h3>
+                <h3 className="text-base font-bold tracking-tight text-foreground">{title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
               </div>
             </div>
