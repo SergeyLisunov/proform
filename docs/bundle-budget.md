@@ -139,7 +139,8 @@ new route exceeds.
 | Date | Trigger | Routes checked | Violations | Notes |
 |---|---|---|---|---|
 | TBD post-Day 86 deploy | Initial CI gate landing | TBD | — | First баseline run. Budget map calibrated against current main. |
-| TBD post-Day 84+85 merge | Re-baseline expected | TBD | — | After perf wins land, baseline lower. Update budget map с new headroom если significant deltas. |
+| 2026-05-27 (Day 86 PR) | Initial calibration locally | 176 | 0 | All routes within budget. Closest: `/auth/login` 200/200 kB at limit; `/pricing` 162/180 kB (10% headroom); `/` 166/200 kB (17% headroom). |
+| TBD post-W17 full merge | Re-baseline expected | — | — | After Day 84 (next/font) + Day 85 (lazy form) merged, actual landing bundle smaller. **W18 housekeeping** — tighten budget map с realistic numbers + new headroom. |
 
 ## Related
 
