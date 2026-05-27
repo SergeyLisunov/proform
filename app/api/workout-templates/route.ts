@@ -36,7 +36,7 @@ export async function GET(req: Request) {
   if (scope === 'public') q = q.eq('is_public', true)
 
   const { data, error } = await q
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, templates: data ?? [] })
 }
 
@@ -67,6 +67,6 @@ export async function POST(req: Request) {
     .select('*')
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, template: data })
 }

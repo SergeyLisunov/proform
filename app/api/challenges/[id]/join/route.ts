@@ -20,7 +20,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       { onConflict: 'challenge_id,user_id', ignoreDuplicates: true }
     )
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
 
@@ -40,6 +40,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     .eq('challenge_id', challengeId)
     .eq('user_id', meRow.id)
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     p_embedding: vector,
     p_limit: k,
   })
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
 
   const hits = (rows ?? []) as Hit[]
   if (hits.length === 0) return NextResponse.json({ ok: true, hits: [] })

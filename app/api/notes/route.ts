@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   if (search) query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'server_error' }, { status: 500 })
 
   return NextResponse.json({ notes: data ?? [] })
 }
@@ -81,6 +81,6 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'server_error' }, { status: 500 })
   return NextResponse.json({ note: data }, { status: 201 })
 }

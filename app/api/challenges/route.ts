@@ -37,7 +37,7 @@ export async function GET(req: Request) {
   if (status === 'finished') q = q.lt('ends_at', today)
 
   const { data, error } = await q
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, challenges: data ?? [] })
 }
 
@@ -72,6 +72,6 @@ export async function POST(req: Request) {
     .select('*')
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, challenge: data })
 }

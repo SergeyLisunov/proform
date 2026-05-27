@@ -182,6 +182,6 @@ export async function GET(req: Request) {
   if (athleteId) q = q.eq('athlete_id', athleteId)
 
   const { data, error } = await q
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, data: data ?? [] })
 }

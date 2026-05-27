@@ -62,6 +62,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .select('id')
     .single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, event_id: data.id })
 }
