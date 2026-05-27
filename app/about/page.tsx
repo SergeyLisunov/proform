@@ -13,7 +13,7 @@ import StaticPageShell from '@/components/layout/StaticPageShell'
 export const metadata: Metadata = {
   title: 'О платформе',
   description:
-    'ProForm — единая система для тренера, спортсмена, врача, клуба и родителя. Замена Excel, чатов и бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
+    'ProForm — единая система для тренера, спортсмена, врача и клуба. Замена Excel, чатов и бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
   alternates: { canonical: '/about' },
   openGraph: {
     title: 'О ProForm — единая система спортивной подготовки',

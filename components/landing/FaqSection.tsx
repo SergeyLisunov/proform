@@ -27,7 +27,7 @@ const FAQ: FaqItem[] = [
   // W16 Day 82 — anti-positioning objection (matches AntiPositioning section)
   {
     q: 'Чем вы отличаетесь от Bitrix24 и AmoCRM?',
-    a: 'Bitrix24 и AmoCRM построены для sales-воронок: лиды, сделки, KPI менеджера. В ProForm роли pre-built под спортивную организацию (Owner / Coach / Doctor / Athlete / Parent), защита данных на уровне базы (RLS), плюс встроенные сущности под спорт: тренировочные планы, athlete passes, рекомендации врача, ACWR. Bitrix24 — конструктор для продаж. ProForm — готовая система для спорта.',
+    a: 'Bitrix24 и AmoCRM построены для sales-воронок: лиды, сделки, KPI менеджера. В ProForm роли pre-built под спортивную организацию (Owner / Coach / Doctor / Athlete), защита данных на уровне базы (RLS), плюс встроенные сущности под спорт: тренировочные планы, athlete passes, рекомендации врача, ACWR. Bitrix24 — конструктор для продаж. ProForm — готовая система для спорта.',
   },
   // W16 Day 82 — solo-coach objection («у меня нет команды»)
   {

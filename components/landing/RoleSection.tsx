@@ -5,15 +5,15 @@
  * и это её главная differentiation. Этот блок отвечает на «для кого
  * это» в визуальном формате.
  *
- * 5 ролей: athlete / coach / organization / doctor / parent.
- * 4 имеют активные demo-аккаунты (link в /auth/login?demo=role).
- * Parent demo deferred — в текущем seed нет parent demo account.
+ * 4 ключевые роли: athlete / coach / organization / doctor.
+ * Все 4 имеют активные demo-аккаунты (link в /auth/login?demo=role).
+ * Parent role removed W18 Day 96 (audit C2 — promised but 0 implementation).
  *
  * Layout:
  *   - <sm: horizontal scroll-snap carousel (W17 Day 87 mobile QA fix —
- *     5 cards stacked vertically was long-scroll wall)
- *   - sm-lg: 2-3 column grid
- *   - xl+: 5-column grid (всё в один ряд)
+ *     cards stacked vertically was long-scroll wall)
+ *   - sm-md: 2-column grid
+ *   - lg+: 4-column grid (всё в один ряд)
  *
  * Mobile UX: snap-x mandatory + min-w-[85%] per card даёт «card +
  * peek next» feel — user sees that more cards exist to scroll.
@@ -89,20 +89,10 @@ const ROLES: RoleEntry[] = [
     accentBg:     '#FEF2F2',
     accentBorder: '#FECACA',
   },
-  {
-    role:    'parent',
-    title:   'Родитель',
-    tagline: 'Прозрачность по своему ребёнку: расписание, прогресс, медицинские ограничения.',
-    features: [
-      'Прогресс только своего ребёнка',
-      'Расписание занятий и сборов',
-      'Связь с тренером и клубом',
-    ],
-    demoEmail:    null,   // not seeded in demo yet — beta access only
-    accent:       '#7C3AED',
-    accentBg:     '#F5F3FF',
-    accentBorder: '#DDD6FE',
-  },
+  // W18 Day 96 C2 — Parent role removed от UI promise.
+  // Audit Day 93 finding: 0 pages, 0 DB schema, 0 onboarding. Promising
+  // it на landing был misleading. Parent communication still supported
+  // через PDF export + email digests (recipient flow, not logged-in role).
 ]
 
 export default function RoleSection() {
@@ -112,7 +102,7 @@ export default function RoleSection() {
         {/* Header */}
         <div className="max-w-3xl">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            5 ролей — одна карта спортсмена
+            4 ключевые роли — одна карта спортсмена
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Каждый видит только то, что нужно ему
@@ -140,11 +130,11 @@ export default function RoleSection() {
 
         {/* Mobile scroll hint */}
         <p className="mt-2 text-center text-xs text-muted-foreground sm:hidden">
-          → Пролистайте чтобы увидеть все 5 ролей
+          → Пролистайте чтобы увидеть все роли
         </p>
 
         {/* Tablet+ desktop: 2-3-5 col grid (sm hidden because mobile carousel above) */}
-        <div className="mt-10 hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="mt-10 hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-4">
           {ROLES.map((entry) => (
             <RoleCard key={entry.role} {...entry} />
           ))}
