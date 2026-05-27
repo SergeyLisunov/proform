@@ -50,7 +50,8 @@ const STEPS: Step[] = [
       { role: 'Тренер',          action: 'Ведёт планы, отзывы, контроль готовности' },
       { role: 'Атлет',           action: 'Видит план, рекомендации, прогресс' },
       { role: 'Врач',            action: 'Пишет рекомендации привязанные к атлету' },
-      { role: 'Родитель',        action: 'Видит прогресс ребёнка без чатов' },
+      // W18 Day 96 — Parent role removed (audit C2). Communication к
+      // parents preserved через PDF/email digest channels, not as role.
     ],
     hue: { bg: '#FFF7ED', ring: '#FED7AA', text: '#C2410C' },
   },
