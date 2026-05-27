@@ -126,7 +126,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       data-kt-theme="true"
       data-kt-theme-mode="light"
     >
-      <body className="antialiased flex h-full text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
+      {/* W18 Day 92 CRITICAL BUG FIX:
+          Removed `flex h-full` from body className. Metronic template assumes
+          flex-row dashboard layout, что превращало landing main + SiteFooter
+          в side-by-side columns на desktop — footer рендерился справа от
+          контента, content squashed в narrow centered column.
+          Default block layout = main + footer stack vertically correctly.
+          Dashboard pages handle their own sidebar layout internally (Metronic
+          kt-sidebar-* классы продолжают работать как CSS hooks). */}
+      <body className="antialiased text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
         <ToastProvider>
           <MobileMenuProvider>
             {children}
