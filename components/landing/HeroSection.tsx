@@ -51,24 +51,22 @@ export default function HeroSection() {
       className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.12),_transparent_55%),linear-gradient(180deg,_#FFFFFF_0%,_#FFF7ED_100%)]"
     >
       <div className="mx-auto flex max-w-4xl flex-col items-center px-5 py-16 text-center sm:px-8 sm:py-22 lg:px-10 lg:py-28">
-        {/* Eyebrow chip — positions ProForm как category */}
+        {/* Eyebrow chip — shorter copy fits one line на narrow mobile (375px) */}
         <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
           <Building2 aria-hidden="true" size={13} />
-          Операционная система спортивной организации
+          Спортивная платформа для клубов
         </span>
 
-        {/* H1 — two logical lines, no orphan words on narrow viewport */}
-        <h1 className="pf-num mt-7 text-balance text-[clamp(2.25rem,6vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-8">
-          Спортивная организация{' '}
-          <span className="block sm:inline">
-            не должна{' '}
-            <span className="text-orange-500">жить в чатах.</span>
-          </span>
+        {/* H1 — short punchy copy wraps к 2 lines max на mobile (was 4 lines) */}
+        <h1 className="pf-num mt-7 text-balance text-[clamp(2rem,7vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-8">
+          Управляйте клубом,
+          <br className="sm:hidden" />{' '}
+          <span className="text-orange-500">а не чатами.</span>
         </h1>
 
         {/* Subhead — outcome triad: control / transparency / safety */}
-        <p className="mt-6 max-w-xl text-base leading-[1.7] text-muted-foreground sm:mt-7 sm:max-w-2xl sm:text-lg lg:text-xl">
-          Соберите тренеров, врачей и атлетов в одной системе.
+        <p className="mt-6 max-w-xl text-base leading-[1.65] text-muted-foreground sm:mt-7 sm:max-w-2xl sm:text-lg lg:text-xl">
+          Тренеры, врачи и атлеты — в одной системе.
           Руководитель видит всё. Каждый видит то, что положено.
           Медданные защищены по&nbsp;152-ФЗ.
         </p>
@@ -124,11 +122,11 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Value chips — outcome triad */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-          <ValueChip icon={CheckCircle2} label="Контроль для руководителя" />
-          <ValueChip icon={CheckCircle2} label="Прозрачность для тренера" />
-          <ValueChip icon={ShieldCheck} label="Безопасность · 152-ФЗ" />
+        {/* Value chips — single horizontal row, shorter copy fits на mobile */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <ValueChip icon={CheckCircle2} label="Контроль" />
+          <ValueChip icon={CheckCircle2} label="Прозрачность" />
+          <ValueChip icon={ShieldCheck} label="152-ФЗ · RLS" />
         </div>
       </div>
     </section>
