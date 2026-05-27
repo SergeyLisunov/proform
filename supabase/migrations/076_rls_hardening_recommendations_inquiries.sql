@@ -61,7 +61,7 @@ BEGIN
     NEW.valid_until       := OLD.valid_until;
     NEW.doctor_id         := OLD.doctor_id;
     NEW.athlete_id        := OLD.athlete_id;
-    NEW.org_id            := OLD.org_id;
+    NEW.organization_id   := OLD.organization_id;
   END IF;
 
   RETURN NEW;
