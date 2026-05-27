@@ -1,4 +1,14 @@
 /** @type {import('next').NextConfig} */
+import bundleAnalyzer from '@next/bundle-analyzer'
+
+// W17 Day 86 — bundle-analyzer wrapper.
+// Enabled via `ANALYZE=true npm run build` (or `npm run analyze`).
+// In normal builds / production deploys, ANALYZE is unset and analyzer
+// adds zero overhead. Generates HTML reports в .next/analyze/ для review.
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -19,4 +29,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withBundleAnalyzer(nextConfig)
