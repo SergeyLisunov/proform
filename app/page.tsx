@@ -23,6 +23,8 @@ import SkipToContent from '@/components/layout/SkipToContent'
 import SiteFooter from '@/components/layout/SiteFooter'
 import StickyNav from '@/components/landing/StickyNav'
 import HeroSection from '@/components/landing/HeroSection'
+import PainSection from '@/components/landing/PainSection'
+import AntiPositioningSection from '@/components/landing/AntiPositioningSection'
 import LeadMagnetSection from '@/components/landing/LeadMagnetSection'
 import RoleSection from '@/components/landing/RoleSection'
 import WorkflowSection from '@/components/landing/WorkflowSection'
@@ -48,12 +50,18 @@ export default async function HomePage() {
       <SkipToContent />
       <StickyNav />
       <main id="main-content" className="min-h-screen w-full bg-white">
+        {/* W16 Day 79 — funnel re-sequence:
+            Hero → Pain → AntiPositioning → Workflow → Roles → LeadMagnets
+            → Benefits → UseCases → Wearables → Security → FAQ → FinalCTA.
+            Pain + AntiPositioning surfaced early — bridge от Hero hook
+            к solution explanation. LeadMagnets moved AFTER role + workflow
+            context — visitor понимает product до пробовать AI tools. */}
         <HeroSection />
-        {/* W16 Day 78 — LeadMagnet section surfaces 6 AI-инструменты как
-            acquisition funnel entry. Anchor #tools — Hero secondary CTA jumps сюда. */}
-        <LeadMagnetSection />
-        <RoleSection />
+        <PainSection />
+        <AntiPositioningSection />
         <WorkflowSection />
+        <RoleSection />
+        <LeadMagnetSection />
         <BenefitsSection />
         <UseCasesSection />
         <WearablesSection />

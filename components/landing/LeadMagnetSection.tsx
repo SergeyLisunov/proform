@@ -185,7 +185,7 @@ export default function LeadMagnetSection() {
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             6 рабочих AI-инструментов для тренеров, атлетов, врачей и
-            организаций. Без email-форм, без waitlist'ов — используйте прямо
+            организаций. Без email-форм и листов ожидания — используйте прямо
             сейчас и решите, нужна ли вам полная платформа.
           </p>
         </div>
