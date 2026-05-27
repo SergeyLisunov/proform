@@ -1,0 +1,26 @@
+# W17 Day 87 — Layer 0 в [[layered CI defence — each layer catches independently]]
+#
+# Runs locally на git commit BEFORE the commit is created. Blocks broken
+# commits at developer machine — faster feedback than CI catching them
+# minutes later после push.
+#
+# Scope (kept fast — <5 sec target):
+#   1. Duplicate exports audit (W13 Day 64) — bash script, ~1 sec
+#
+# Deliberately NOT в pre-commit (too slow OR redundant с CI):
+#   - npm run lint — slow (~30s), runs в CI Layer 1
+#   - tsc --noEmit — slow (~5-10s incremental), runs в CI Layer 2
+#   - npm run check:bundle — very slow (~30s full build), CI Layer 7
+#
+# Skip the hook (emergency only):
+#   git commit --no-verify -m "..."
+#
+# To uninstall:
+#   npm uninstall husky && rm -rf .husky/
+
+set -e
+
+echo "🔍 Pre-commit: duplicate exports audit..."
+npm run lint:duplicates
+
+echo "✅ Pre-commit checks passed."
