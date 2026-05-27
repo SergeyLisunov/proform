@@ -152,10 +152,28 @@ Day 83 wrap will include:
 | Date | Viewport | Tested | Score | Notes |
 |---|---|---|---|---|
 | 2026-05-27 | Static class audit | All 16 sections | ✅ | Pre-deploy code review. Live QA Day 83 wrap. |
-| TBD post-deploy | iPhone SE 375 | TBD | TBD | Manual emulation |
-| TBD post-deploy | Pixel 6 412 | TBD | TBD | Manual emulation |
-| TBD post-deploy | iPad Mini 768 | TBD | TBD | Manual emulation |
-| TBD post-deploy | Desktop 1280 | TBD | TBD | Manual emulation |
+| 2026-05-27 (Day 83) | All landing sections | Static class audit re-check | ✅ | Sprint wrap verification — all sections preserved mobile-first responsive after W16 (Day 78-83) shipped. |
+| TBD post-deploy | iPhone SE 375 | TBD | TBD | Manual emulation (W17 Day 1) |
+| TBD post-deploy | Pixel 6 412 | TBD | TBD | Manual emulation (W17 Day 1) |
+| TBD post-deploy | iPad Mini 768 | TBD | TBD | Manual emulation (W17 Day 1) |
+| TBD post-deploy | Desktop 1280 | TBD | TBD | Manual emulation (W17 Day 1) |
+
+## W16 final status (Day 83)
+
+Все 16 sections статически audited. Issues deferred к W17+:
+
+- 🟡 **RoleSection** — 5 cards = long mobile scroll. Carousel candidate W17.
+- 🟡 **BenefitsSection** — 9 benefits wall-of-text. Trim к 6 W17.
+- 🟢 **SecuritySection** — access matrix 320px readability spot-check needed (low severity).
+
+Confirmed working (no action needed, 13 sections):
+Hero · Pain · AntiPositioning · Workflow · BeforeAfter · LeadMagnet · SocialProof · UseCases · Wearables · PricingTeaser · FAQ · FinalCTA · SiteFooter · StickyNav · SkipToContent · StaticPageShell
+
+**Post-deploy manual emulation list (W17 Day 1):**
+1. Chrome DevTools → iPhone SE (375×667) — Hero CTAs + soft-conversion card
+2. Chrome DevTools → Pixel 6 (412×915) — BeforeAfter rows + LeadMagnet featured card
+3. Chrome DevTools → iPad Mini (768×1024) — 3-col layouts begin transitioning
+4. Real device check (если есть) — verify dialog modal touch behavior
 
 ## Links
 
