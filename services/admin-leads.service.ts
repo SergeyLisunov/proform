@@ -15,6 +15,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export type LeadSource =
   | 'acwr' | 'overtraining' | 'templates'
   | 'team-risk' | 'adaptive-plan' | 'club-audit' | 'medical-summary'
+  // W16 Day 79 — landing soft-conversion form (HeroAuditModal +
+  // LeadCaptureForm). Higher-trust path than tool-calculator leads
+  // (full org context: name, organization, role, size, painPoints).
+  | 'landing-audit-form'
   | 'other'
 
 export interface LeadRow {
