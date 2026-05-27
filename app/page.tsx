@@ -33,6 +33,7 @@ import SocialProofSection from '@/components/landing/SocialProofSection'
 import BenefitsSection from '@/components/landing/BenefitsSection'
 import UseCasesSection from '@/components/landing/UseCasesSection'
 import WearablesSection from '@/components/landing/WearablesSection'
+import PricingTeaserSection from '@/components/landing/PricingTeaserSection'
 import SecuritySection from '@/components/landing/SecuritySection'
 import FaqSection from '@/components/landing/FaqSection'
 import FinalCtaSection from '@/components/landing/FinalCtaSection'
@@ -69,6 +70,7 @@ export default async function HomePage() {
         <BenefitsSection />
         <UseCasesSection />
         <WearablesSection />
+        <PricingTeaserSection />
         <SecuritySection />
         <FaqSection />
         <FinalCtaSection />
