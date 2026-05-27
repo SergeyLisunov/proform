@@ -1,5 +1,5 @@
 /**
- * POST /api/leads/audit — W16 Day 79 NEW.
+ * POST /api/leads/audit — W16 Day 79; Resend wired W16 Day 80.
  *
  * Public endpoint без auth — landing soft-conversion path. Lead capture
  * form (`<LeadCaptureForm />` в `HeroAuditModal` + dedicated section) sends:
@@ -7,18 +7,23 @@
  *   { name, email, telegram?, organization, orgType, coachCount,
  *     athleteCount, painPoints[], consent }
  *
- * Inserts into existing `tool_leads` table с source='landing-audit-form'
- * (reuse W4 Day 27 infrastructure — admin view, rate-limit per IP, schema).
+ * Flow:
+ *   1. Validate payload (mirror client validation, defense in depth)
+ *   2. IP rate-limit 5/hour
+ *   3. Insert to `tool_leads` source='landing-audit-form' (W4 schema reused)
+ *   4. Send 2 emails in parallel via Resend:
+ *      - User confirmation ("получили, готовим, придёт в 24h")
+ *      - Admin notification (full payload + quick-action buttons)
+ *   5. Email failures DO NOT fail the request — lead is already captured.
+ *      Errors logged для manual reconciliation.
  *
- * Rate-limit: 5 submissions / hour per IP (strict — soft conversion form
- * = higher-trust path than tool calculators which allow 20/hr).
- *
- * Resend email send TBD (Day 80 wire) — Day 79 ships capture-only with
- * honest success UX («ответим в течение 24 часов»). Admin reviews leads
- * via `/admin/leads` (Day 82).
+ * Why split user + admin emails: user expects immediate ack (UX). Admin
+ * email triggers actual audit prep workflow (manual до Day 82 admin viewer).
  */
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { buildAdminNotificationEmail, buildUserConfirmationEmail } from '@/lib/email/audit-templates'
 import crypto from 'node:crypto'
 
 export const runtime = 'nodejs'
@@ -30,6 +35,10 @@ const ATHLETE_COUNTS = new Set(['<20', '20-50', '50-200', '200+'])
 
 const MAX_PAYLOAD_BYTES = 8_000
 const MAX_PER_IP_PER_HOUR = 5
+
+const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const ADMIN_EMAIL =
+  process.env.ADMIN_NOTIFICATIONS_EMAIL ?? 'support@proform-delta.vercel.app'
 
 interface AuditPayload {
   name?:         string
@@ -118,8 +127,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // Insert lead. Schema: tool_leads(source, email, payload jsonb, ip_hash,
-  // user_agent, consent_at). RLS allows insert via service-role client.
+  // Insert lead — single source of truth, must succeed before email send.
   const { error: insertError } = await admin
     .from('tool_leads')
     .insert({
@@ -132,13 +140,54 @@ export async function POST(req: Request) {
     })
 
   if (insertError) {
-    // Log on server, return generic error to client
     console.error('[/api/leads/audit] insert failed', insertError.message)
     return bad('server_error', 500)
   }
 
-  // TODO Day 80: send Resend email with audit template + admin notification
-  // for now: lead is captured, manual review via /admin/leads (Day 82)
+  // W16 Day 80: send user + admin emails in parallel via Resend.
+  // Email failures DO NOT fail the request — lead is already saved,
+  // admin can manually reconcile from tool_leads table / /admin/leads.
+  const RESEND_API_KEY = process.env.RESEND_API_KEY
+  if (RESEND_API_KEY) {
+    const resend = new Resend(RESEND_API_KEY)
+    const ctx = {
+      name,
+      email,
+      telegram,
+      organization,
+      orgType,
+      coachCount,
+      athleteCount,
+      painPoints: cleanPainPoints,
+    }
+    const userEmail = buildUserConfirmationEmail(ctx)
+    const adminEmail = buildAdminNotificationEmail(ctx)
+
+    const sends = await Promise.allSettled([
+      resend.emails.send({
+        from:    FROM,
+        to:      email,
+        subject: userEmail.subject,
+        html:    userEmail.html,
+      }),
+      resend.emails.send({
+        from:    FROM,
+        to:      ADMIN_EMAIL,
+        subject: adminEmail.subject,
+        html:    adminEmail.html,
+        replyTo: email,
+      }),
+    ])
+
+    sends.forEach((result, idx) => {
+      if (result.status === 'rejected') {
+        const target = idx === 0 ? 'user' : 'admin'
+        console.error(`[/api/leads/audit] resend send (${target}) failed`, result.reason)
+      }
+    })
+  } else {
+    console.warn('[/api/leads/audit] RESEND_API_KEY not configured — lead saved, no emails sent')
+  }
 
   return NextResponse.json({ ok: true })
 }
