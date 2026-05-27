@@ -115,9 +115,9 @@ export default function AntiPositioningSection() {
           </p>
           <h2
             id="anti-positioning-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Это не CRM, не таблица, не чат и не журнал
+            Это не&nbsp;CRM, не&nbsp;таблица, не&nbsp;чат и&nbsp;не&nbsp;журнал
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             ProForm — операционная система спортивной организации.
