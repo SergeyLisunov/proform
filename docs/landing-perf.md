@@ -91,6 +91,8 @@ LCP element на нашей странице = `<h1>` в HeroSection ("Трен�
 |---|---|---|---|---|---|---|
 | TBD (post-Day 74 deploy) | https://proform-delta.vercel.app/ | — | — | — | — | First baseline. Fill после Vercel preview rebuilt с Day 74 changes. |
 | TBD (post-W16 Day 83) | https://proform-delta.vercel.app/ | — | — | — | — | Landing fully rebuilt W16 (Days 78-83) — Hero anti-positioning, Pain, AntiPositioning, BeforeAfter, SocialProof, PricingTeaser sections added. Lighthouse run needed post-deploy с browser. |
+| TBD (post-W17 Day 84 deploy) | https://proform-delta.vercel.app/ | — | — | — | — | `next/font` migration (Day 84) — Bebas Neue + DM Sans self-hosted. Expected LCP improvement 200-500ms on mid-tier mobile. Lighthouse run needed для confirmation. |
+| TBD (post-W17 Day 85 deploy) | https://proform-delta.vercel.app/ | — | — | — | — | Day 85 lazy-load: LeadCaptureForm (280 LOC + zod) deferred к first modal open. Expected First Load JS shrink ~10-15kB on landing (TBD verify через bundle analyzer Day 86). |
 
 ## W16 sprint context (Day 83 update)
 
@@ -108,6 +110,28 @@ Landing structure после W16:
 - `<dialog>` element + form в HeroAuditModal = additional client JS. Lazy-load potential.
 - Email-template helpers — server-only, no client impact.
 - Hero rebuild used identical CSS gradient pattern (W14 Day 71 origin) — no new heavy deps.
+
+## W17 perf wins shipped (Day 84-85 static pre-audit)
+
+Same pattern as W15 Day 74 [[static pre-audit before live Lighthouse run]] —
+fixes shipped что ANY Lighthouse audit будет flag first, без waiting на live data.
+
+### Day 84 — `next/font` migration
+- **Was:** Bebas Neue + DM Sans loaded via Metronic CSS chain (`globals.css → styles.css → Google Fonts CSS → font files`) — render-blocking
+- **Now:** Self-hosted через `next/font/google`, automatic preload, `size-adjust` fallback descriptors
+- **Expected LCP win:** 200-500ms on mid-tier mobile (Hero H1 = LCP candidate)
+- **Subset constraint:** Neither font has Cyrillic on Google. Russian text falls к Trebuchet MS / Impact (same as before — visual parity preserved)
+
+### Day 85 — LeadCaptureForm lazy-load
+- **Was:** LeadCaptureForm (280 LOC + zod-aligned validation + 9 fields) bundled с initial landing JS — paid by every visitor including those who never click «Получить аудит»
+- **Now:** `dynamic(() => import('./LeadCaptureForm'), { ssr: false })` + conditional mount `{hasOpenedOnce && <LeadCaptureForm />}` — bundle loaded only when modal first opens
+- **Expected First Load JS shrink:** ~10-15kB on `/` route
+- **UX:** `hasOpenedOnce` state preserves form mount even after close → reopen doesn't re-fetch chunk
+
+### Day 86+ (planned)
+- `@next/bundle-analyzer` integration + per-route budget table (Layer 7 CI gate)
+- Manual Lighthouse run на Vercel preview → fill run log с numerical baseline
+- Compare First Load JS bundle delta (W17 Day 83 baseline vs Day 85 post-lazy)
 
 ## Links
 
