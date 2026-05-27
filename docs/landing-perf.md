@@ -90,6 +90,24 @@ LCP element на нашей странице = `<h1>` в HeroSection ("Трен�
 | Date | URL | Mobile Perf | Mobile A11y | Mobile BP | Mobile SEO | Notes |
 |---|---|---|---|---|---|---|
 | TBD (post-Day 74 deploy) | https://proform-delta.vercel.app/ | — | — | — | — | First baseline. Fill после Vercel preview rebuilt с Day 74 changes. |
+| TBD (post-W16 Day 83) | https://proform-delta.vercel.app/ | — | — | — | — | Landing fully rebuilt W16 (Days 78-83) — Hero anti-positioning, Pain, AntiPositioning, BeforeAfter, SocialProof, PricingTeaser sections added. Lighthouse run needed post-deploy с browser. |
+
+## W16 sprint context (Day 83 update)
+
+Landing structure после W16:
+
+- 15 sections (was 9 после W15)
+- 4 new client components: LeadCaptureForm, HeroAuditModal, BeforeAfterSection (no client state), SocialProofSection (no client state)
+- 1 new API: `POST /api/leads/audit`
+- 2 new email templates: user confirmation + admin notification
+- A/B harness retired (Calculator widget preserved)
+- Lead-magnet hierarchy: 1 featured + 2 secondary + 3 text links
+
+**Perf concerns from W16 to verify в Lighthouse:**
+- New section count = more HTML output. Verify First Load JS не bloated.
+- `<dialog>` element + form в HeroAuditModal = additional client JS. Lazy-load potential.
+- Email-template helpers — server-only, no client impact.
+- Hero rebuild used identical CSS gradient pattern (W14 Day 71 origin) — no new heavy deps.
 
 ## Links
 
