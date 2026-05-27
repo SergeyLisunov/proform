@@ -33,6 +33,9 @@ const SOURCE_META: Record<LeadSource, { label: string; emoji: string; color: str
   'adaptive-plan':   { label: '7-day Plan',     emoji: '🔵', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   'club-audit':      { label: 'Club Audit',     emoji: '🟢', color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4' },
   'medical-summary': { label: 'Medical Summary', emoji: '🟣', color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
+  // W16 Day 79 — high-trust landing form (HeroAuditModal + LeadCaptureForm).
+  // Distinct brand-orange color separates visually from tool-calculator leads.
+  'landing-audit-form': { label: 'Landing Audit', emoji: '🎯', color: '#C2410C', bg: '#FFEDD5', border: '#FDBA74' },
   other:             { label: 'Other',          emoji: '⭐', color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
 }
 
