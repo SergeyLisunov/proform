@@ -166,6 +166,14 @@ Day 83 wrap will include:
 - 🟡 **BenefitsSection** — 9 benefits wall-of-text. Trim к 6 W17.
 - 🟢 **SecuritySection** — access matrix 320px readability spot-check needed (low severity).
 
+## W17 status update (Day 88)
+
+2 of 3 W16 findings closed Day 87 (PR #110):
+
+- ✅ **RoleSection** — dual layout shipped: mobile carousel (snap-x, 85% per card + peek) + desktop grid (2/3/5 cols). Native CSS scroll-snap. Scroll hint «→ Пролистайте чтобы увидеть все 5 ролей».
+- ✅ **BenefitsSection** — trimmed 9 → 6 B2B-impactful benefits с larger icons. Kept: Единая карточка, Координация 5 ролей, Дневник + отзывы, Медограничения, Health Snapshot, RLS на уровне БД.
+- 🟢 **SecuritySection** — STILL deferred (W18+ spot-check needed на 320px viewport).
+
 Confirmed working (no action needed, 13 sections):
 Hero · Pain · AntiPositioning · Workflow · BeforeAfter · LeadMagnet · SocialProof · UseCases · Wearables · PricingTeaser · FAQ · FinalCTA · SiteFooter · StickyNav · SkipToContent · StaticPageShell
 

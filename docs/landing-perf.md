@@ -90,7 +90,10 @@ LCP element на нашей странице = `<h1>` в HeroSection ("Трен�
 | Date | URL | Mobile Perf | Mobile A11y | Mobile BP | Mobile SEO | Notes |
 |---|---|---|---|---|---|---|
 | TBD (post-Day 74 deploy) | https://proform-delta.vercel.app/ | — | — | — | — | First baseline. Fill после Vercel preview rebuilt с Day 74 changes. |
-| TBD (post-W16 Day 83) | https://proform-delta.vercel.app/ | — | — | — | — | Landing fully rebuilt W16 (Days 78-83) — Hero anti-positioning, Pain, AntiPositioning, BeforeAfter, SocialProof, PricingTeaser sections added. Lighthouse run needed post-deploy с browser. |
+| TBD (post-W16 Day 83) | https://proform-delta.vercel.app/ | — | — | — | — | Landing fully rebuilt W16 (Days 78-83) — Hero anti-positioning, Pain, AntiPositioning, BeforeAfter, SocialProof, PricingTeaser sections added. |
+| TBD (post-W17 Day 84) | https://proform-delta.vercel.app/ | — | — | — | — | `next/font` migration — Bebas Neue + DM Sans self-hosted. Expected LCP -200 к -500ms. |
+| TBD (post-W17 Day 85) | https://proform-delta.vercel.app/ | — | — | — | — | LeadCaptureForm lazy-loaded. Expected First Load JS -10 к -15kB. |
+| TBD (post-W17 Day 88) | https://proform-delta.vercel.app/ | — | — | — | — | **W17 sprint closed.** All 4 perf+CI PRs merged. CI defence 8 layers. **W18 Day 1 commitment** — dedicate browser time, fill all TBD entries. |
 
 ## W16 sprint context (Day 83 update)
 
