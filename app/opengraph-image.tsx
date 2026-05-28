@@ -2,14 +2,20 @@
  * app/opengraph-image.tsx — W15 Day 73.
  *
  * Default site-wide OG image. Renders 1200×630 PNG at request time via
- * Next.js Edge `next/og` ImageResponse. Child route segments inherit
+ * Next.js `next/og` ImageResponse. Child route segments inherit
  * unless they define their own opengraph-image.
  *
  * Design rationale:
  *   - Matches Hero gradient (warm orange wash on white) — visual continuity
- *   - System fonts only (no font fetch — keeps edge runtime resilient)
+ *   - System fonts only (no font fetch — keeps render resilient)
  *   - 4 lines max: eyebrow, tagline, persona chips, domain
  *   - Visual balance: text-block left, brand mark right
+ *
+ * W20 Day 4 — runtime: edge → nodejs. Next 16 grew the edge bundle к 1.15 MB,
+ * over the Hobby plan 1 MB Edge Function limit (Vercel deploy fail). Node
+ * serverless functions have a 250 MB limit; `next/og` ImageResponse runs in
+ * Node runtime since Next 13.3. Output identical; cold-start slightly higher
+ * (acceptable for occasionally-rendered social preview images).
  *
  * If a route needs a tailored OG image (e.g. /pricing showing top tariff),
  * add `app/<route>/opengraph-image.tsx` — it overrides this one for that
@@ -17,7 +23,7 @@
  */
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 export const alt = 'ProForm — спортивная платформа для клубов, академий и команд'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
