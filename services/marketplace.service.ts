@@ -298,8 +298,7 @@ export async function resolveSellers(
   const ids = Array.from(new Set(offerings.map(o => o.seller_id)))
   const { data } = await sb
     .from('users')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .select('id, name, avatar_url, role, is_demo, is_featured, is_verified' as any)
+    .select('id, name, avatar_url, role, is_demo, is_featured, is_verified')
     .in('id', ids)
   return new Map(((data ?? []) as Array<{ id: string; name: string | null; avatar_url: string | null; role: string | null; is_demo: boolean | null; is_featured: boolean | null; is_verified: boolean | null }>)
     .map(u => [u.id, {

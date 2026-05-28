@@ -79,8 +79,7 @@ export default async function AbTestsPage() {
 
   const { data: leadsRaw } = await supabase
     .from('tool_leads')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .select('source, payload, email_dispatched_at, converted_at, user_id, dispatched_touches' as any)
+    .select('source, payload, email_dispatched_at, converted_at, user_id, dispatched_touches')
     .in('source', ['team-risk', 'adaptive-plan', 'club-audit', 'medical-summary'])
   const leads = (leadsRaw ?? []) as LeadRow[]
 

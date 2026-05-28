@@ -30,8 +30,7 @@ export async function listCoachesForVerification(): Promise<VerifiableCoach[]> {
   const sb = createClient()
   const { data, error } = await sb
     .from('users')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .select('id, name, nickname, avatar_url, email, is_verified, verified_at, verified_by, verification_notes, created_at' as any)
+    .select('id, name, nickname, avatar_url, email, is_verified, verified_at, verified_by, verification_notes, created_at')
     .eq('role', 'coach')
     .order('is_verified', { ascending: true })
     .order('created_at', { ascending: false })

@@ -16,7 +16,10 @@ const nextConfig = {
     ],
   },
   eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
+  // W19 Day 1 — TS errors fixed (25 → 0 after type regen), build now gates
+  // on tsc. Stale generated types (migrations 071/072/074) were masking real
+  // column/table mismatches. ESLint flag still on — lint-debt cleanup pending.
+  typescript: { ignoreBuildErrors: false },
   // Next 14.2 still gates instrumentation.ts behind this flag.
   // Needed so Sentry server/edge configs load at boot.
   experimental: {
