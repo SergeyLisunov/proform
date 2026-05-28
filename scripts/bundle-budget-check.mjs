@@ -70,10 +70,14 @@ const BUDGET_KB = {
   '/tools/acwr':            140,
   '/tools/overtraining':    140,
 
-  // ── SEO infrastructure (auto-generated, expected ~0) ────────────────
-  '/sitemap.xml':            20,
-  '/robots.txt':             20,
-  '/opengraph-image':        20,
+  // ── SEO infrastructure (auto-generated) ─────────────────────────────
+  // W20 Day 1: Next 15 reports shared framework baseline (~103 kB) as First
+  // Load JS for metadata routes (Next 14 reported 0). These routes ship
+  // text/XML/image — no interactive JS to users; 103 kB is baseline
+  // attribution only. Budget bumped 20 → 115 (baseline + headroom).
+  '/sitemap.xml':           115,
+  '/robots.txt':            115,
+  '/opengraph-image':       115,
 
   // ── Default for auth-required + dynamic routes (more generous) ──────
   _default:                 250,

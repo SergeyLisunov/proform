@@ -40,7 +40,8 @@ const AdaptivePlanSchema = z.object({
   team_focus_next_week: z.string().max(200),
 })
 
-export async function GET(req: Request, { params }: { params: { athleteId: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ athleteId: string }> }) {
+  const params = await props.params;
   if (!isAiConfigured()) {
     return NextResponse.json({ ok: false, error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }

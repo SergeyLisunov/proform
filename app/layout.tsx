@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import dynamic from 'next/dynamic'
 import { Bebas_Neue, DM_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
 import { MobileMenuProvider } from '@/lib/hooks/useMobileMenu'
+import ClientOverlays from '@/components/ui/ClientOverlays'
 
 // W17 Day 84 — next/font migration.
 // Previously loaded через Metronic CSS bundle (/assets/css/styles.css) —
@@ -39,9 +39,6 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
   display: 'swap',
 })
-
-const CommandPalette = dynamic(() => import('@/components/ui/CommandPalette'), { ssr: false })
-const AiChatBubble   = dynamic(() => import('@/components/ui/AiChatBubble'),   { ssr: false })
 
 // W15 Day 73 — SEO foundation.
 // Single source of truth for metadataBase. Override per-route via layout/page
@@ -138,8 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <MobileMenuProvider>
             {children}
-            <CommandPalette />
-            <AiChatBubble />
+            <ClientOverlays />
           </MobileMenuProvider>
         </ToastProvider>
         <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />

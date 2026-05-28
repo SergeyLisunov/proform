@@ -74,10 +74,11 @@ function buildHtml(opts: { subject: string; bodyHtml: string; orgName: string | 
 function escape(s: string): string {
   return s.replace(/[&<>"']/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  } as Record<string, string>)[ch])
+  } as Record<string, string>)[ch]);
 }
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+export async function POST(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const newsletterId = params.id
 
   // ── Auth: caller must be a logged-in organization role ────────────────
