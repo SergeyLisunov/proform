@@ -6,7 +6,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // GET /api/invite/[token] — fetch invite info for the landing page
-export async function GET(_req: Request, { params }: { params: { token: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const admin = createAdminClient()
   const { data: invite } = await admin
     .from('email_invites')
@@ -43,7 +44,8 @@ export async function GET(_req: Request, { params }: { params: { token: string }
 }
 
 // POST /api/invite/[token] — claim the invite (must be signed in)
-export async function POST(_req: Request, { params }: { params: { token: string } }) {
+export async function POST(_req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const supabase = await createClient()
   const { data: { user: authUser } } = await supabase.auth.getUser()
   if (!authUser) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })

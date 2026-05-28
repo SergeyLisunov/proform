@@ -66,9 +66,9 @@ over current measured baseline (allows minor additions без trigger).
 
 | Route | Budget | Why |
 |---|---|---|
-| `/sitemap.xml` | 20 kB | Auto-generated. Should be ~0. |
-| `/robots.txt` | 20 kB | Auto-generated. Should be ~0. |
-| `/opengraph-image` | 20 kB | Edge-rendered. |
+| `/sitemap.xml` | 115 kB | Auto-generated. Next 15 attributes shared framework baseline (~103 kB) as First Load JS (Next 14 reported 0). Ships XML — no interactive JS. |
+| `/robots.txt` | 115 kB | Auto-generated. Same Next 15 baseline attribution. Ships text. |
+| `/opengraph-image` | 115 kB | Edge-rendered. Same Next 15 baseline attribution. |
 
 ### Default (auth-required + dynamic)
 
@@ -141,6 +141,7 @@ new route exceeds.
 | TBD post-Day 86 deploy | Initial CI gate landing | TBD | — | First баseline run. Budget map calibrated against current main. |
 | 2026-05-27 (Day 86 PR) | Initial calibration locally | 176 | 0 | All routes within budget. Closest: `/auth/login` 200/200 kB at limit; `/pricing` 162/180 kB (10% headroom); `/` 166/200 kB (17% headroom). |
 | TBD post-W17 full merge | Re-baseline expected | — | — | After Day 84 (next/font) + Day 85 (lazy form) merged, actual landing bundle smaller. **W18 housekeeping** — tighten budget map с realistic numbers + new headroom. |
+| 2026-05-28 (W20 Day 1) | Next 15 upgrade | 176 | 0 | Metadata routes (sitemap/robots/opengraph) budget 20→115 kB: Next 15 attributes shared framework baseline (~103 kB) as First Load JS (Next 14 reported 0). `/pricing` now 170/180 kB (94%, near limit) from React 19 baseline shift. |
 
 ## Related
 

@@ -40,7 +40,8 @@ const PatchSchema = z.object({
   { message: 'age_min must be ≤ age_max', path: ['age_min'] },
 )
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   let body: z.infer<typeof PatchSchema>
   try {
     body = PatchSchema.parse(await req.json())
@@ -96,7 +97,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   return NextResponse.json({ ok: true, data })
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const sb = await createClient()
   const { data: auth } = await sb.auth.getUser()
   if (!auth?.user) {

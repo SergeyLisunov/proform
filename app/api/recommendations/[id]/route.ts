@@ -21,7 +21,8 @@ export const dynamic = 'force-dynamic'
 
 const Schema = z.object({ action: z.enum(['resolve', 'cancel']) })
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   let body: z.infer<typeof Schema>
   try {
     body = Schema.parse(await req.json())

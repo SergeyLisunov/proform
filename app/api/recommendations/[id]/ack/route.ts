@@ -21,7 +21,8 @@ export const dynamic = 'force-dynamic'
 
 const Schema = z.object({ as: z.enum(['coach', 'athlete']) })
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   let body: z.infer<typeof Schema>
   try {
     body = Schema.parse(await req.json())

@@ -20,11 +20,8 @@ const nextConfig = {
   // on tsc. Stale generated types (migrations 071/072/074) were masking real
   // column/table mismatches. ESLint flag still on — lint-debt cleanup pending.
   typescript: { ignoreBuildErrors: false },
-  // Next 14.2 still gates instrumentation.ts behind this flag.
-  // Needed so Sentry server/edge configs load at boot.
-  experimental: {
-    instrumentationHook: true,
-  },
+  // W20 Day 1 — `experimental.instrumentationHook` removed: Next 15 loads
+  // instrumentation.ts by default (Sentry server/edge configs still boot).
   async redirects() {
     return [
       { source: '/search', destination: '/connections', permanent: false },

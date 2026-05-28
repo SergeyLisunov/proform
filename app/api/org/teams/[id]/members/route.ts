@@ -16,7 +16,8 @@ export const dynamic = 'force-dynamic'
 
 const AddSchema = z.object({ athlete_id: z.string().uuid() })
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   let body: z.infer<typeof AddSchema>
   try {
     body = AddSchema.parse(await req.json())
@@ -42,7 +43,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   return NextResponse.json({ ok: true })
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const url = new URL(req.url)
   const athleteId = url.searchParams.get('athlete_id')
   if (!athleteId) return NextResponse.json({ ok: false, error: 'athlete_id required' }, { status: 400 })

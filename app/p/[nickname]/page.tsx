@@ -7,9 +7,10 @@ import PassportShareBar from './PassportShareBar'
 export const revalidate = 300 // 5 минут
 
 export async function generateMetadata(
-  { params }: { params: { nickname: string } },
+  { params }: { params: Promise<{ nickname: string }> },
 ): Promise<Metadata> {
-  const p = await getAthletePassport(params.nickname)
+  const { nickname } = await params
+  const p = await getAthletePassport(nickname)
   if (!p) {
     return {
       title: 'Атлет не найден — ProForm',
@@ -61,9 +62,10 @@ function fmtMinutes(m: number): string {
 }
 
 export default async function AthletePassportPage(
-  { params }: { params: { nickname: string } },
+  { params }: { params: Promise<{ nickname: string }> },
 ) {
-  const p = await getAthletePassport(params.nickname)
+  const { nickname } = await params
+  const p = await getAthletePassport(nickname)
   if (!p) notFound()
 
   const url = `https://proform-delta.vercel.app/p/${p.nickname}`
