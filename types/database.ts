@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_user_invites: {
+        Row: {
+          claimed_at: string | null
+          claimed_by_user_id: string | null
+          created_at: string
+          created_by_admin_id: string
+          email: string
+          expires_at: string
+          id: string
+          status: string
+          target_role: string
+          token: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          created_by_admin_id: string
+          email: string
+          expires_at?: string
+          id?: string
+          status?: string
+          target_role: string
+          token?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          created_by_admin_id?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          status?: string
+          target_role?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_user_invites_claimed_by_user_id_fkey"
+            columns: ["claimed_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_user_invites_created_by_admin_id_fkey"
+            columns: ["created_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admins: {
         Row: {
           access_level: string | null
@@ -913,6 +967,57 @@ export type Database = {
           },
         ]
       }
+      coach_reviews: {
+        Row: {
+          athlete_id: string
+          coach_id: string
+          coach_response: string | null
+          coach_response_at: string | null
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          athlete_id: string
+          coach_id: string
+          coach_response?: string | null
+          coach_response_at?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          updated_at?: string
+        }
+        Update: {
+          athlete_id?: string
+          coach_id?: string
+          coach_response?: string | null
+          coach_response_at?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_reviews_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_reviews_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_services: {
         Row: {
           coach_id: string
@@ -1378,42 +1483,42 @@ export type Database = {
       }
       cycle_days: {
         Row: {
+          athlete_id: string
           cycle_id: string
           day_date: string
           day_type: string
           id: string
           notes: string | null
-          user_id: string
         }
         Insert: {
+          athlete_id: string
           cycle_id: string
           day_date: string
           day_type: string
           id?: string
           notes?: string | null
-          user_id: string
         }
         Update: {
+          athlete_id?: string
           cycle_id?: string
           day_date?: string
           day_type?: string
           id?: string
           notes?: string | null
-          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "cycle_days_athlete_id_fkey"
+            columns: ["athlete_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cycle_days_cycle_id_fkey"
             columns: ["cycle_id"]
             isOneToOne: false
             referencedRelation: "cycle_blocks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cycle_days_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1917,7 +2022,6 @@ export type Database = {
           payment_id: string | null
           pdf_url: string | null
           status: string
-          stripe_invoice_id: string | null
           user_id: string
         }
         Insert: {
@@ -1931,7 +2035,6 @@ export type Database = {
           payment_id?: string | null
           pdf_url?: string | null
           status?: string
-          stripe_invoice_id?: string | null
           user_id: string
         }
         Update: {
@@ -1945,7 +2048,6 @@ export type Database = {
           payment_id?: string | null
           pdf_url?: string | null
           status?: string
-          stripe_invoice_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -2881,8 +2983,6 @@ export type Database = {
           order_id: string | null
           raw: Json | null
           status: string
-          stripe_payment_intent_id: string | null
-          stripe_session_id: string | null
           subscription_id: string | null
           updated_at: string
           user_id: string
@@ -2895,8 +2995,6 @@ export type Database = {
           order_id?: string | null
           raw?: Json | null
           status?: string
-          stripe_payment_intent_id?: string | null
-          stripe_session_id?: string | null
           subscription_id?: string | null
           updated_at?: string
           user_id: string
@@ -2909,8 +3007,6 @@ export type Database = {
           order_id?: string | null
           raw?: Json | null
           status?: string
-          stripe_payment_intent_id?: string | null
-          stripe_session_id?: string | null
           subscription_id?: string | null
           updated_at?: string
           user_id?: string
@@ -3240,8 +3336,6 @@ export type Database = {
           provider: string
           started_at: string
           status: string
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
           tariff_code: string | null
           trial_ends_at: string | null
           updated_at: string
@@ -3261,8 +3355,6 @@ export type Database = {
           provider?: string
           started_at?: string
           status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           tariff_code?: string | null
           trial_ends_at?: string | null
           updated_at?: string
@@ -3282,8 +3374,6 @@ export type Database = {
           provider?: string
           started_at?: string
           status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           tariff_code?: string | null
           trial_ends_at?: string | null
           updated_at?: string
@@ -3628,6 +3718,7 @@ export type Database = {
           is_demo: boolean
           is_featured: boolean
           is_searchable: boolean
+          is_verified: boolean
           language: string | null
           name: string
           nickname: string | null
@@ -3643,6 +3734,9 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          verification_notes: string | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           auth_id?: string | null
@@ -3661,6 +3755,7 @@ export type Database = {
           is_demo?: boolean
           is_featured?: boolean
           is_searchable?: boolean
+          is_verified?: boolean
           language?: string | null
           name: string
           nickname?: string | null
@@ -3676,6 +3771,9 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           auth_id?: string | null
@@ -3694,6 +3792,7 @@ export type Database = {
           is_demo?: boolean
           is_featured?: boolean
           is_searchable?: boolean
+          is_verified?: boolean
           language?: string | null
           name?: string
           nickname?: string | null
@@ -3709,8 +3808,19 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wall_posts: {
         Row: {
@@ -4226,7 +4336,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      coach_review_summary: {
+        Row: {
+          avg_rating: number | null
+          coach_id: string | null
+          review_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_reviews_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       check_and_increment_ai_ip_rate_limit: {
