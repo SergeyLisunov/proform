@@ -28,6 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Duplicate exports check (Layer 3)
+        # W19 Day 3: wire lint:duplicates into CI. W12 ghost-merge incident —
+        # duplicate exports break Vercel SWC build silently. Husky Layer 0
+        # catches local commits; this catches --no-verify bypass at PR level.
+        run: npm run lint:duplicates
+
       - name: TypeScript check
         # W13 Day 63: HARD blocker (previously continue-on-error).
         # tsc --noEmit ловит duplicate exports + type errors локально.
@@ -36,11 +42,14 @@ jobs:
         # на каждый последующий merge. Tsc запрещает оба класса bug-ов.
         run: npx tsc --noEmit
 
-      - name: Next.js build (SWC parity check)
-        # W13 Day 63: catches SWC-level duplicate exports / module resolution
-        # issues что tsc может пропустить. Same Next.js build что Vercel
-        # запускает на prod — parity gate перед merge.
-        run: npm run build
+      - name: Next.js build + bundle budget (SWC parity + Layer 7)
+        # W13 Day 63: build catches SWC-level duplicate exports / module
+        # resolution issues что tsc может пропустить. Same Next.js build что
+        # Vercel запускает на prod — parity gate перед merge.
+        # W19 Day 3: check:bundle сам запускает `next build` (SWC parity)
+        # И проверяет per-route bundle budget (Layer 7) — один build, два gate.
+        # Падает на build error ИЛИ budget violation.
+        run: npm run check:bundle
         env:
           # Build needs these for static prerender of public pages.
           # Provide empty placeholder if not set in secrets — most envs
