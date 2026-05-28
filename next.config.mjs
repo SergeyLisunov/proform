@@ -15,10 +15,10 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
   },
-  eslint: { ignoreDuringBuilds: true },
-  // W19 Day 1 — TS errors fixed (25 → 0 after type regen), build now gates
-  // on tsc. Stale generated types (migrations 071/072/074) were masking real
-  // column/table mismatches. ESLint flag still on — lint-debt cleanup pending.
+  // W20 Day 4 — `eslint` config key removed: Next 16 no longer runs ESLint
+  // during `next build` (use `next lint` / eslint CLI separately). Key is
+  // now unrecognized. Lint runs via `npm run lint` — lint-debt cleanup pending.
+  // W19 Day 1 — TS errors fixed (25 → 0 after type regen), build gates on tsc.
   typescript: { ignoreBuildErrors: false },
   // W20 Day 1 — `experimental.instrumentationHook` removed: Next 15 loads
   // instrumentation.ts by default (Sentry server/edge configs still boot).
