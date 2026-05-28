@@ -5,13 +5,32 @@
 
 ## Цель
 
-Prevent accidental bundle bloat from reaching production. Каждый route
-имеет explicit **First Load JS budget** (в kB). If a PR pushes any route
-over its budget, `npm run check:bundle` fails — blocking merge через CI.
+Prevent accidental bundle bloat from reaching production. If a PR balloons the
+bundle, `npm run check:bundle` fails — blocking merge через CI.
 
 Builds on W15 Day 74 [[static pre-audit before live Lighthouse run]] pattern
 applied к performance: ship enforcement before numerical Lighthouse data
 arrives.
+
+## ⚠️ W21 Day 1 — metric rewrite (Next 16)
+
+**Per-route First Load JS budgets (below) are SUPERSEDED.** Next 16 removed
+per-route size columns from `next build` stdout AND does not emit
+`app-build-manifest.json` (App Router per-route chunk map) — so accurate
+per-route reconstruction isn't feasible. The check now tracks two
+highest-signal regression vectors from stable build artifacts:
+
+| Metric | Source | Budget | Measured (16.2.6) |
+|---|---|---|---|
+| **Shared First Load JS** | build-manifest.json `rootMainFiles`+`polyfillFiles` | 650 kB | 527 kB |
+| **Total client chunks** | sum `.next/static/chunks/*.js` | 4600 kB | 3762 kB |
+
+Sizes are RAW (uncompressed) on-disk bytes — consistent for regression tracking
+(the old per-route table showed gzipped, hence smaller numbers). The per-route
+tables below are retained as historical record of the W17–W20 era.
+
+A full per-route restore depends on Next exposing the App Router build manifest;
+revisit if a future Next version emits it.
 
 ## Layer 7 в CI defence model
 
@@ -142,6 +161,7 @@ new route exceeds.
 | 2026-05-27 (Day 86 PR) | Initial calibration locally | 176 | 0 | All routes within budget. Closest: `/auth/login` 200/200 kB at limit; `/pricing` 162/180 kB (10% headroom); `/` 166/200 kB (17% headroom). |
 | TBD post-W17 full merge | Re-baseline expected | — | — | After Day 84 (next/font) + Day 85 (lazy form) merged, actual landing bundle smaller. **W18 housekeeping** — tighten budget map с realistic numbers + new headroom. |
 | 2026-05-28 (W20 Day 1) | Next 15 upgrade | 176 | 0 | Metadata routes (sitemap/robots/opengraph) budget 20→115 kB: Next 15 attributes shared framework baseline (~103 kB) as First Load JS (Next 14 reported 0). `/pricing` now 170/180 kB (94%, near limit) from React 19 baseline shift. |
+| 2026-05-28 (W21 Day 1) | Next 16 metric rewrite | n/a (2 metrics) | 0 | Per-route parsing dropped (Next 16 removed stdout sizes + no app-build-manifest). New: shared First Load baseline 527/650 kB + total chunks 3762/4600 kB, measured from build-manifest.json + on-disk chunks. Layer 7 gate restored. |
 
 ## Related
 
