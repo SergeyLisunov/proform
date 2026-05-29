@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     path, file, { upsert: false, contentType: file.type || 'application/octet-stream' },
   )
   if (upErr) {
-    return NextResponse.json({ ok: false, error: upErr.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   }
 
   await admin.from('user_device_connections').upsert({

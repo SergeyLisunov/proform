@@ -170,7 +170,7 @@ export async function POST(req: Request) {
         .select('id, token, expires_at')
         .single()
       if (error || !created) {
-        results.push({ email, status: 'failed', error: error?.message ?? 'insert_failed' })
+        results.push({ email, status: 'failed', error: 'insert_failed' })
         continue
       }
       token = (created as { token: string }).token

@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       .eq('id', existing.id)
       .select()
       .single()
-    if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 })
+    if (upErr) return NextResponse.json({ error: 'server_error' }, { status: 500 })
 
     // Re-invite: trigger doesn't fire for pending→pending UPDATE, so notify manually
     await supabase.from('notifications').insert({
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (connErr) return NextResponse.json({ error: connErr.message }, { status: 500 })
+  if (connErr) return NextResponse.json({ error: 'server_error' }, { status: 500 })
 
   return NextResponse.json({ connection: conn }, { status: 201 })
 }

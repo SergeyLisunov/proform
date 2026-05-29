@@ -144,7 +144,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   if (insertErr || !created) {
     return NextResponse.json(
-      { ok: false, error: 'INSERT_FAILED', details: insertErr?.message ?? 'unknown' },
+      { ok: false, error: 'INSERT_FAILED' },
       { status: 500 },
     )
   }

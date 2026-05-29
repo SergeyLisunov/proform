@@ -59,7 +59,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     .select()
     .single()
   if (error) {
-    return NextResponse.json({ ok: false, error: 'UPDATE_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'UPDATE_FAILED' }, { status: 500 })
   }
 
   // Notify athlete + coach about status change (best effort)

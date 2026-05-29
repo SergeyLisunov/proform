@@ -132,7 +132,7 @@ export async function POST() {
     })
     if (upErr) {
       return NextResponse.json(
-        { ok: false, error: upErr.message, indexed },
+        { ok: false, error: 'server_error', indexed },
         { status: 500 }
       )
     }

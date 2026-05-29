@@ -89,7 +89,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
       )
     }
     return NextResponse.json(
-      { ok: false, error: 'UPDATE_FAILED', details: error.message },
+      { ok: false, error: 'UPDATE_FAILED' },
       { status: 500 },
     )
   }
@@ -113,7 +113,7 @@ export async function DELETE(_req: Request, props: { params: Promise<{ id: strin
 
   if (error) {
     return NextResponse.json(
-      { ok: false, error: 'ARCHIVE_FAILED', details: error.message },
+      { ok: false, error: 'ARCHIVE_FAILED' },
       { status: 500 },
     )
   }

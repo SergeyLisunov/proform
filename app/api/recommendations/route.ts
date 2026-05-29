@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     .single()
 
   if (error) {
-    return NextResponse.json({ ok: false, error: 'INSERT_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'INSERT_FAILED' }, { status: 500 })
   }
 
   // Dispatch notifications via simple inline logic (avoid module import

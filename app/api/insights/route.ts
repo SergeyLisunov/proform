@@ -130,6 +130,6 @@ export async function POST(req: NextRequest) {
     .select('*')
     .single()
 
-  if (upErr) return NextResponse.json({ ok: false, error: upErr.message }, { status: 500 })
+  if (upErr) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   return NextResponse.json({ ok: true, current: upserted, range: { ...cur, kind } })
 }

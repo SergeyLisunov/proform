@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     .single()
   if (error) {
     return NextResponse.json(
-      { ok: false, error: 'UPDATE_FAILED', details: error.message },
+      { ok: false, error: 'UPDATE_FAILED' },
       { status: 500 },
     )
   }

@@ -86,7 +86,7 @@ export async function POST(req: Request) {
       .select('id, token, expires_at')
       .single()
     if (error || !created) {
-      return NextResponse.json({ error: error?.message ?? 'insert_failed' }, { status: 500 })
+      return NextResponse.json({ error: 'insert_failed' }, { status: 500 })
     }
     token = (created as any).token
     inviteId = (created as any).id

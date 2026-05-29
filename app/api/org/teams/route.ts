@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     .select()
     .single()
   if (error) {
-    return NextResponse.json({ ok: false, error: 'INSERT_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'INSERT_FAILED' }, { status: 500 })
   }
   return NextResponse.json({ ok: true, data })
 }
