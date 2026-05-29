@@ -16,8 +16,11 @@
  *   - inquiry.status must be 'answered'
  *   - inquiry.response must be non-empty
  *
- * Notifications are dispatched by the trigger in migration 052
- * (recommendations.status='sent' → coach + athlete notifications).
+ * Notifications: dispatched inline after insert (coach + athlete). The previous
+ * version relied on a migration-052 trigger that does NOT exist for inserts —
+ * that trigger is BEFORE UPDATE only (updated_at/status), so converted
+ * recommendations notified nobody (W21 audit #3). Fan-out mirrors
+ * app/api/recommendations/route.ts.
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
@@ -147,6 +150,37 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       { ok: false, error: 'INSERT_FAILED' },
       { status: 500 },
     )
+  }
+
+  // ── Dispatch notifications (W21 audit #3) ────────────────────────────
+  // visibility is fixed 'coach_and_athlete' here → notify both the athlete
+  // and the coach who raised the inquiry. Best-effort: never fail the request
+  // on a notification error (mirrors app/api/recommendations/route.ts).
+  try {
+    const targets = [
+      {
+        user_id:     inquiry.athlete_id,
+        type:        'broadcast',
+        title:       'Рекомендация от врача',
+        body:        title,
+        entity_type: 'recommendation',
+        entity_id:   created.id,
+        action_url:  '/dashboard',
+      },
+      {
+        user_id:     inquiry.coach_id,
+        type:        'broadcast',
+        title:       'Медотметка для тренера',
+        body:        title,
+        entity_type: 'recommendation',
+        entity_id:   created.id,
+        action_url:  `/athletes/${inquiry.athlete_id}`,
+      },
+    ]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (sb as any).from('notifications').insert(targets)
+  } catch (notifyErr) {
+    console.warn('[convert-to-recommendation.notify]', notifyErr)
   }
 
   return NextResponse.json({ ok: true, recommendation: created })
