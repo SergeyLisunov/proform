@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
 import AskDoctorButton from '@/components/medical/AskDoctorButton'
+import AthleteMedicalDossier from '@/components/profile/AthleteMedicalDossier'
 import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
@@ -225,6 +226,13 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || profile.nickname || 'Пользователь'
   const roleMeta = ROLE_META[profile.role] ?? { label: profile.role, color: '#64748B', bg: '#F8FAFC' }
   const connType = user ? getConnectionType(user.role, profile.role) : null
+  // Medical dossier: only a LINKED coach/doctor/organization viewing an
+  // athlete sees the recommendations section. Data stays RLS-scoped server-side.
+  const canSeeMedicalDossier =
+    !isOwn &&
+    profile.role === 'athlete' &&
+    connectionStatus === 'active' &&
+    (user?.role === 'coach' || user?.role === 'doctor' || user?.role === 'organization')
 
   return (
     <div className="flex flex-col gap-6 pf-enter" style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}>
@@ -384,6 +392,9 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           )}
         </div>
       )}
+
+      {/* Medical dossier — linked coach/doctor/org viewing an athlete (audit #2) */}
+      {canSeeMedicalDossier && <AthleteMedicalDossier athleteId={profile.id} />}
 
       {/* Coach — rich profile */}
       {profile.role === 'coach' && <CoachProfile profile={profile} />}
