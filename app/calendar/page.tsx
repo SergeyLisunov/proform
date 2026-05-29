@@ -111,10 +111,18 @@ function enumerateDays(from: string, to: string): string[] {
   return days
 }
 
+// W21 audit fix (task 1): the strain/competition heatmap was populated from
+// hardcoded DEMO_SESSIONS / DEMO_COMPETITIONS fixtures — fake strain colors
+// shown to real users. Gated behind NEXT_PUBLIC_DEMO_MODE. Production (unset) →
+// empty heatmap (neutral cells); real calendar events still render on top.
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 function buildHeatmap() {
   const map: Record<string, { strain: number; hasComp: boolean }> = {}
-  DEMO_SESSIONS.forEach(s => { map[s.date] = { strain: s.strain, hasComp: false } })
-  DEMO_COMPETITIONS.forEach(c => { if (map[c.date]) map[c.date].hasComp = true; else map[c.date] = { strain: 0, hasComp: true } })
+  if (DEMO_MODE) {
+    DEMO_SESSIONS.forEach(s => { map[s.date] = { strain: s.strain, hasComp: false } })
+    DEMO_COMPETITIONS.forEach(c => { if (map[c.date]) map[c.date].hasComp = true; else map[c.date] = { strain: 0, hasComp: true } })
+  }
   return map
 }
 const HEATMAP = buildHeatmap()

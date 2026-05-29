@@ -741,8 +741,43 @@ function AthleteAnalytics() {
 }
 
 // ── ROOT ─────────────────────────────────────────────────────────────────────
+// W21 audit fix (task 1): the CoachAnalytics / AthleteAnalytics views below
+// render entirely from hardcoded DEMO_* fixtures (Sara K., Marcus W., …). That
+// is a showcase, not real data — shipping it to production showed fake athletes
+// to real users. Gated behind NEXT_PUBLIC_DEMO_MODE (same env-flag pattern as
+// the demo-login gate). Production (unset) → honest "coming soon" state. Real
+// analytics aggregation is a separate feature (tracked, not a critical fix).
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
+function AnalyticsComingSoon() {
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 border border-orange-100">
+        <i className="ki-filled ki-chart-line-up text-3xl text-orange-400" />
+      </div>
+      <div>
+        <h1 className="pf-num text-2xl text-foreground">Аналитика готовится</h1>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+          Графики восстановления, нагрузки и пульсовых зон появятся здесь по мере
+          накопления данных тренировок и самочувствия. Начните вести дневник —
+          и метрики соберутся автоматически.
+        </p>
+      </div>
+      <a
+        href="/diary"
+        className="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600 no-underline"
+      >
+        Перейти в дневник
+        <i className="ki-filled ki-arrow-right text-sm" />
+      </a>
+    </div>
+  )
+}
+
 export default function AnalyticsPage() {
   const { user } = useUser()
+
+  if (!DEMO_MODE) return <AnalyticsComingSoon />
 
   return user?.role === 'coach' ? <CoachAnalytics /> : <AthleteAnalytics />
 }
