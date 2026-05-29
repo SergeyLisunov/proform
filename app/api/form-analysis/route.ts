@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     .select('*')
     .single()
   if (insErr || !created) {
-    return NextResponse.json({ ok: false, error: insErr?.message || 'INSERT_FAILED' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'INSERT_FAILED' }, { status: 500 })
   }
 
   // Run AI analysis.
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .single()
     if (updErr) {
-      return NextResponse.json({ ok: false, error: updErr.message, analysis: created }, { status: 500 })
+      return NextResponse.json({ ok: false, error: 'server_error', analysis: created }, { status: 500 })
     }
     return NextResponse.json({ ok: true, analysis: updated })
   } catch (e) {

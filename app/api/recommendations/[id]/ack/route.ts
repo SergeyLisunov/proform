@@ -47,7 +47,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     .single()
 
   if (error) {
-    return NextResponse.json({ ok: false, error: 'ACK_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'ACK_FAILED' }, { status: 500 })
   }
   return NextResponse.json({ ok: true, data })
 }

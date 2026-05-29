@@ -29,7 +29,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .eq('id', id)
     .maybeSingle()
 
-  if (chErr) return NextResponse.json({ ok: false, error: chErr.message }, { status: 500 })
+  if (chErr) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   if (!ch)   return NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 })
 
   const [{ data: participants }, { data: lb }, { data: me }] = await Promise.all([

@@ -137,12 +137,15 @@ function escape(s: string): string {
 
 export async function GET(req: Request) {
   // ── Auth ──────────────────────────────────────────────────────────────
+  // W21 audit fix (#4): fail-closed. Was `if (cronSecret) {...}` — skipped auth
+  // entirely when CRON_SECRET unset, letting any anon caller trigger this.
   const cronSecret = process.env.CRON_SECRET
-  if (cronSecret) {
-    const auth = req.headers.get('authorization')
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
-    }
+  if (!cronSecret) {
+    return NextResponse.json({ ok: false, error: 'CRON_SECRET_NOT_CONFIGURED' }, { status: 503 })
+  }
+  const auth = req.headers.get('authorization')
+  if (auth !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
   }
 
   const start = Date.now()

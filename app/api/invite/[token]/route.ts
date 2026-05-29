@@ -138,7 +138,7 @@ export async function POST(_req: Request, props: { params: Promise<{ token: stri
       .select('id')
       .single()
     if (cErr || !newConn) {
-      return NextResponse.json({ ok: false, error: cErr?.message ?? 'connection_failed' }, { status: 500 })
+      return NextResponse.json({ ok: false, error: 'connection_failed' }, { status: 500 })
     }
     connectionId = (newConn as any).id
   }

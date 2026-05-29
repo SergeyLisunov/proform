@@ -38,7 +38,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     if (error.code === '23505') {
       return NextResponse.json({ ok: false, error: 'ALREADY_MEMBER' }, { status: 409 })
     }
-    return NextResponse.json({ ok: false, error: 'INSERT_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'INSERT_FAILED' }, { status: 500 })
   }
   return NextResponse.json({ ok: true })
 }
@@ -59,7 +59,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
     .eq('group_id', params.id)
     .eq('athlete_id', athleteId)
   if (error) {
-    return NextResponse.json({ ok: false, error: 'DELETE_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'DELETE_FAILED' }, { status: 500 })
   }
   return NextResponse.json({ ok: true })
 }

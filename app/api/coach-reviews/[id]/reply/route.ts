@@ -121,7 +121,7 @@ export async function POST(
     .eq('id', reviewId)
   if (updErr) {
     console.warn('[coach-reviews/reply] update failed:', updErr.message)
-    return NextResponse.json({ error: updErr.message }, { status: 500 })
+    return NextResponse.json({ error: 'server_error' }, { status: 500 })
   }
 
   // No email when clearing the reply.

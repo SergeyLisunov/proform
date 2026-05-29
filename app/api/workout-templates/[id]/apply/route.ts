@@ -30,7 +30,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .select('id, name, activity_type, duration_min, description')
     .eq('id', templateId)
     .maybeSingle()
-  if (tplErr) return NextResponse.json({ ok: false, error: tplErr.message }, { status: 500 })
+  if (tplErr) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
   if (!tpl)   return NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 })
   const tplRow = tpl as {
     id: string; name: string; activity_type: string | null; duration_min: number | null; description: string | null

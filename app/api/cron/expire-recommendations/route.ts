@@ -36,7 +36,7 @@ export async function GET(req: Request) {
   const { data, error } = await (sb as any).rpc('expire_stale_recommendations')
   if (error) {
     console.error('[cron expire-recommendations] rpc error:', error.message)
-    return NextResponse.json({ ok: false, error: 'RPC_FAILED', details: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'RPC_FAILED' }, { status: 500 })
   }
 
   return NextResponse.json({
