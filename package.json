@@ -6,7 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:dead": "knip --no-progress",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
@@ -43,6 +43,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "^16.2.6",
     "@playwright/test": "^1.59.1",
     "@types/node": "^20",
@@ -51,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8",
+    "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
     "husky": "^9.1.7",
     "knip": "^5.88.1",
