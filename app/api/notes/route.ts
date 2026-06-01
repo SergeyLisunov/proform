@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeFilterTerm } from '@/lib/utils/search'
 
 function todayISO(): string {
   const d = new Date()
@@ -33,7 +34,10 @@ export async function GET(req: NextRequest) {
 
   if (from) query = query.gte('note_date', from)
   if (to)   query = query.lte('note_date', to)
-  if (search) query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
+  if (search) {
+    const s = sanitizeFilterTerm(search)
+    if (s) query = query.or(`title.ilike.%${s}%,content.ilike.%${s}%`)
+  }
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: 'server_error' }, { status: 500 })

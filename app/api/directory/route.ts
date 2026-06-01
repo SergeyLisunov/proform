@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeFilterTerm } from '@/lib/utils/search'
 
 type DirType = 'coach' | 'doctor' | 'organization'
 
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const sp = req.nextUrl.searchParams
   const type = (sp.get('type') as DirType) ?? 'coach'
-  const q = sp.get('q')?.trim() ?? ''
+  const q = sanitizeFilterTerm(sp.get('q')?.trim() ?? '')
   const city = sp.get('city')?.trim() ?? ''
   const specialization = sp.get('specialization')?.trim() ?? ''
   const format = sp.get('format')?.trim() ?? ''

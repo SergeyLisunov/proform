@@ -57,6 +57,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
 
+  // W21 audit fix (M2): a coach could brand a challenge with ANY org_id without
+  // belonging to that org (RLS INSERT only checks owner_id + role). Verify the
+  // caller is actually a member of the org they're attaching the challenge to.
+  if (body.org_id) {
+    const { data: membership } = await sb
+      .from('org_members')
+      .select('id')
+      .eq('org_id', body.org_id)
+      .eq('user_id', meRow.id)
+      .maybeSingle()
+    if (!membership) {
+      return NextResponse.json({ ok: false, error: 'NOT_ORG_MEMBER' }, { status: 403 })
+    }
+  }
+
   const { data, error } = await sb
     .from('challenges')
     .insert({
