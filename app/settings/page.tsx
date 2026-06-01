@@ -5,6 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import RoleProfile from '@/components/settings/RoleProfile'
 import DevicesSection from '@/components/settings/DevicesSection'
+import { getErrorMessage } from '@/lib/utils/errors'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -302,8 +303,8 @@ function PasswordCard() {
       setMsg({ type:'ok', text:'Пароль успешно изменён' })
       setOldPw(''); setNewPw(''); setConfirm('')
       setTimeout(() => { setMsg(null); setOpen(false) }, 2000)
-    } catch (e: any) {
-      setMsg({ type:'err', text: e?.message ?? 'Ошибка при смене пароля' })
+    } catch (e: unknown) {
+      setMsg({ type:'err', text: getErrorMessage(e, 'Ошибка при смене пароля') })
     } finally { setSaving(false) }
   }
 
@@ -570,8 +571,8 @@ export default function SettingsPage() {
       if (form.nickname !== originalNickname) setOriginalNickname(form.nickname)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-    } catch (e: any) {
-      setSaveError(e?.message ?? 'Ошибка при сохранении')
+    } catch (e: unknown) {
+      setSaveError(getErrorMessage(e, 'Ошибка при сохранении'))
       setTimeout(() => setSaveError(null), 5000)
     } finally {
       setSaving(false)
@@ -594,8 +595,8 @@ export default function SettingsPage() {
       const cacheBusted = `${publicUrl}?t=${Date.now()}`
       await sb.from('users').update({ avatar_url: cacheBusted }).eq('id', user.id)
       setAvatarUrl(cacheBusted)
-    } catch (e: any) {
-      setSaveError(e?.message ?? 'Ошибка загрузки фото')
+    } catch (e: unknown) {
+      setSaveError(getErrorMessage(e, 'Ошибка загрузки фото'))
     } finally {
       setUploadingAvatar(false)
       if (avatarInputRef.current) avatarInputRef.current.value = ''
@@ -610,8 +611,8 @@ export default function SettingsPage() {
       await sb.from('users').update({ deleted_at: new Date().toISOString(), status: 'deletion_requested' } as any).eq('id', user!.id)
       await sb.auth.signOut()
       window.location.href = '/auth/login'
-    } catch (e: any) {
-      setSaveError(e?.message ?? 'Ошибка удаления аккаунта')
+    } catch (e: unknown) {
+      setSaveError(getErrorMessage(e, 'Ошибка удаления аккаунта'))
       setDeleting(false)
       setShowDeleteModal(false)
     }

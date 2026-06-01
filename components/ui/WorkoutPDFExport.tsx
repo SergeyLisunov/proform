@@ -4,6 +4,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { getErrorMessage } from '@/lib/utils/errors'
 
 // ── Типы ──────────────────────────────────────────────────────────────────────
 type Workout = {
@@ -397,8 +398,8 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
     setTimeout(() => {
       try {
         generatePDF(workouts, effectiveFrom, effectiveTo, user?.name ?? user?.email ?? 'Атлет')
-      } catch (e: any) {
-        warning(e?.message ?? 'Ошибка генерации PDF')
+      } catch (e: unknown) {
+        warning(getErrorMessage(e, 'Ошибка генерации PDF'))
       } finally {
         setGenerating(false)
       }

@@ -7,6 +7,7 @@ import AskDoctorButton from '@/components/medical/AskDoctorButton'
 import AthleteMedicalDossier from '@/components/profile/AthleteMedicalDossier'
 import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { getErrorMessage } from '@/lib/utils/errors'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F97316', bg: '#FFF7ED' },
@@ -190,7 +191,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setConnectionStatus('pending')
       setConnectionId(data.connection?.id ?? null)
       showToast('Приглашение отправлено', true)
-    } catch (e: any) { showToast(e.message, false) }
+    } catch (e: unknown) { showToast(getErrorMessage(e), false) }
     finally { setActing(false) }
   }
 
