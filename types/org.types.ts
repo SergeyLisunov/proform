@@ -1,4 +1,13 @@
-export type OrgMemberRole = 'athlete' | 'coach'
+// W21 audit fix: was 'athlete' | 'coach' but the DB CHECK (migration 053)
+// allows 6 values — org.service.ts cast owners/admins/doctors to a too-narrow
+// type. Widened to match the constraint.
+export type OrgMemberRole =
+  | 'org_owner'
+  | 'org_admin'
+  | 'coach'
+  | 'doctor'
+  | 'specialist'
+  | 'athlete'
 export type MemberStatus = 'active' | 'pending' | 'suspended'
 export type PostType = 'announcement' | 'event' | 'news' | 'result'
 export type PostVisibility = 'all' | 'members' | 'coaches'
