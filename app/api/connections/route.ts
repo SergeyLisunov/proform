@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
     .from('connections')
     .select(`
       *,
-      initiator:users!connections_initiator_id_fkey(id, nickname, first_name, last_name, role, avatar_url, sport, city),
-      recipient:users!connections_recipient_id_fkey(id, nickname, first_name, last_name, role, avatar_url, sport, city)
+      initiator:users!connections_initiator_id_fkey(id, name, nickname, role, avatar_url, sport, city),
+      recipient:users!connections_recipient_id_fkey(id, name, nickname, role, avatar_url, sport, city)
     `)
     .or(`initiator_id.eq.${me.id},recipient_id.eq.${me.id}`)
     .order('initiated_at', { ascending: false })

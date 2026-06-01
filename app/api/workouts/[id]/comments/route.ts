@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .from('workout_comments')
     .select(`
       id, workout_id, author_id, body, created_at, updated_at,
-      author:users!workout_comments_author_id_fkey(id, name, first_name, last_name, nickname, avatar_url, role)
+      author:users!workout_comments_author_id_fkey(id, name, nickname, avatar_url, role)
     `)
     .eq('workout_id', workoutId)
     .order('created_at', { ascending: true })
@@ -53,7 +53,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .insert({ workout_id: workoutId, author_id: meRow.id, body: body.body })
     .select(`
       id, workout_id, author_id, body, created_at, updated_at,
-      author:users!workout_comments_author_id_fkey(id, name, first_name, last_name, nickname, avatar_url, role)
+      author:users!workout_comments_author_id_fkey(id, name, nickname, avatar_url, role)
     `)
     .single()
 
@@ -63,18 +63,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { data: workout } = await sb
       .from('workouts')
-      .select('athlete_id, activity_type, date')
+      .select('athlete_id')
       .eq('id', workoutId)
       .maybeSingle()
     const ownerId = (workout as { athlete_id?: string } | null)?.athlete_id
     if (ownerId && ownerId !== meRow.id) {
       const { data: author } = await sb
-        .from('users').select('name, first_name, last_name').eq('id', meRow.id).maybeSingle()
-      const a = author as { name?: string; first_name?: string; last_name?: string } | null
-      const authorName =
-        a?.name ||
-        [a?.first_name, a?.last_name].filter(Boolean).join(' ') ||
-        'Пользователь'
+        .from('users').select('name').eq('id', meRow.id).maybeSingle()
+      const a = author as { name?: string } | null
+      const authorName = a?.name || 'Пользователь'
       const preview = body.body.length > 140 ? body.body.slice(0, 140) + '…' : body.body
       await sb.from('notifications').insert({
         user_id: ownerId,

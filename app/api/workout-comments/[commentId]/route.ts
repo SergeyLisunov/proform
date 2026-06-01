@@ -56,7 +56,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ commen
     .eq('id', commentId)
     .select(`
       id, workout_id, author_id, body, created_at, updated_at,
-      author:users!workout_comments_author_id_fkey(id, name, first_name, last_name, nickname, avatar_url, role)
+      author:users!workout_comments_author_id_fkey(id, name, nickname, avatar_url, role)
     `)
     .single()
 
