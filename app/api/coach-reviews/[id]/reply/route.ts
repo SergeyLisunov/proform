@@ -196,7 +196,7 @@ export async function POST(
       body:        trimmed.slice(0, 140),
       entity_type: 'coach_review',
       entity_id:   reviewId,
-      action_url:  `${APP_URL}/profile/${review.coach_id}#review-${review.athlete_id}`,
+      action_url:  `/profile/${review.coach_id}#review-${review.athlete_id}`,
     })
   } catch (e) {
     console.warn('[coach-reviews/reply] in-app notify failed:', e instanceof Error ? e.message : e)
