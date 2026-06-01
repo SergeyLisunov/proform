@@ -13,6 +13,12 @@ import { createDiaryEntry } from '@/services/coach-diary.service'
 
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 
+// QA C4: the athlete-detail trend chart had hardcoded demo series shown under a
+// "Реальные данные" badge. Gated behind NEXT_PUBLIC_DEMO_MODE (same flag as
+// analytics/calendar); prod shows an honest placeholder until real per-athlete
+// trend aggregation is wired. Badges removed (overclaimed "real data").
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 function sb() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -327,9 +333,6 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">
                 Выбранный атлет
               </span>
-              <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Реальные данные
-              </span>
             </div>
             <div className="mt-3 flex items-center gap-4">
               <div
@@ -513,15 +516,21 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 subtitle="Линейный график остается, но живет в более собранной рабочей зоне."
               />
               <div className="mt-4">
-                <ApexChart
-                  type="line"
-                  series={[
-                    { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
-                    { name: 'ВСР (мс)', data: [44, 47, 45, 41, 48, 50, 47] },
-                  ]}
-                  options={lineOpts}
-                  height={180}
-                />
+                {DEMO_MODE ? (
+                  <ApexChart
+                    type="line"
+                    series={[
+                      { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
+                      { name: 'ВСР (мс)', data: [44, 47, 45, 41, 48, 50, 47] },
+                    ]}
+                    options={lineOpts}
+                    height={180}
+                  />
+                ) : (
+                  <div className="flex h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-border text-center">
+                    <p className="text-xs text-muted-foreground">График появится при накоплении данных тренировок</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -659,10 +668,12 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   </div>
                   <button
                     type="button"
-                    className="rounded-xl border px-3 py-1.5 text-2xs font-semibold transition-all hover:opacity-80"
+                    disabled
+                    title="Скоро — применение меток в разработке"
+                    className="rounded-xl border px-3 py-1.5 text-2xs font-semibold opacity-50 cursor-not-allowed"
                     style={{ background: mark.bg, color: mark.text, borderColor: `${mark.text}40` }}
                   >
-                    Применить
+                    Скоро
                   </button>
                 </div>
               ))}
@@ -889,9 +900,6 @@ export default function AthletesPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">
               Контур тренера
-            </span>
-            <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Реальные данные
             </span>
           </div>
 
