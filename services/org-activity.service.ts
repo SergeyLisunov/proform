@@ -158,7 +158,7 @@ async function adminFetchMemberJoins(admin: any, orgId: string, sinceIso: string
     target_id:   r.user_id,
     target_name: null,
     entity_id:   r.id,
-    summary:     `Новый ${r.member_role === 'coach' ? 'тренер' : r.member_role === 'admin' ? 'администратор' : 'атлет'} в организации`,
+    summary:     `Новый ${r.member_role === 'org_owner' ? 'владелец' : r.member_role === 'org_admin' ? 'администратор' : r.member_role === 'coach' ? 'тренер' : r.member_role === 'doctor' ? 'врач' : r.member_role === 'specialist' ? 'специалист' : 'атлет'} в организации`,
     tone:        'success',
   }))
 }
@@ -323,7 +323,7 @@ async function fetchMemberJoins(orgId: string, sinceIso: string): Promise<OrgEve
     target_id:   r.user_id,
     target_name: null,
     entity_id:   r.id,
-    summary:     `Новый ${r.member_role === 'coach' ? 'тренер' : r.member_role === 'admin' ? 'администратор' : 'атлет'} в организации`,
+    summary:     `Новый ${r.member_role === 'org_owner' ? 'владелец' : r.member_role === 'org_admin' ? 'администратор' : r.member_role === 'coach' ? 'тренер' : r.member_role === 'doctor' ? 'врач' : r.member_role === 'specialist' ? 'специалист' : 'атлет'} в организации`,
     tone:        'success',
   }))
 }
