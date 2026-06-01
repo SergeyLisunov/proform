@@ -36,6 +36,13 @@ const config = [
     rules: {
       'no-redeclare': 'off',
       '@typescript-eslint/no-redeclare': 'error',
+      // QA M6: eslint-config-next/typescript enables no-explicit-any as an ERROR,
+      // but the legacy `next/core-web-vitals` setup never enforced it — the project
+      // intentionally uses `any` for Supabase query casts (the generated Database
+      // types don't cover every embed/RPC shape). 324 of these aren't real defects;
+      // erroring on them makes `npm run lint` noise devs ignore. Downgrade to a
+      // warning so the genuine debt (rules-of-hooks, unescaped entities) stays visible.
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
 ]
