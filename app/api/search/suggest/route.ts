@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeFilterTerm } from '@/lib/utils/search'
 
 /**
  * Lightweight autocomplete for the global search bar / command palette.
@@ -28,7 +29,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ people: [], coaches: [], doctors: [], organizations: [] })
   }
 
-  const q = raw.startsWith('@') ? raw.slice(1) : raw
+  // Sanitize for PostgREST .or() ilike filters below (M1); FTS tsquery path
+  // re-strips non-alphanumerics anyway.
+  const q = sanitizeFilterTerm(raw.startsWith('@') ? raw.slice(1) : raw)
   const useFts = q.length >= 3
 
   // Build a safe prefix tsquery: "alex" → "alex:*", supports multi-word "alex smi" → "alex:* & smi:*"

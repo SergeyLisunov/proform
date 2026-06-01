@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeFilterTerm } from '@/lib/utils/search'
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient()
@@ -16,8 +17,8 @@ export async function GET(req: NextRequest) {
 
   if (q.length < 1) return NextResponse.json({ users: [], total: 0 })
 
-  // Strip @ prefix for nickname search
-  const search = q.startsWith('@') ? q.slice(1).toLowerCase() : q.toLowerCase()
+  // Strip @ prefix for nickname search + sanitize for PostgREST .or() filter (M1)
+  const search = sanitizeFilterTerm(q.startsWith('@') ? q.slice(1).toLowerCase() : q.toLowerCase())
 
   let query = supabase
     .from('users')
