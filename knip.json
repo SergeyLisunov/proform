@@ -17,7 +17,7 @@
     "entry": [
       "app/**/{page,layout,loading,error,not-found,default,template,route}.{ts,tsx}",
       "app/**/route.{ts,tsx}",
-      "middleware.ts",
+      "proxy.ts",
       "instrumentation.ts",
       "sentry.{client,server,edge}.config.ts"
     ]

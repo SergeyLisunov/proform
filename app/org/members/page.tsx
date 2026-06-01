@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { BulkImportDrawer } from './BulkImportDrawer'
+import { getErrorMessage } from '@/lib/utils/errors'
 
 type MemberRole = 'athlete' | 'coach'
 type MemberStatus = 'active' | 'pending' | 'suspended' | 'removed'
@@ -82,8 +83,8 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
       if (insertErr) throw insertErr
       onInvited({ id: member.id, user_id: member.user_id, member_role: member.member_role, status: member.status, joined_at: member.joined_at, created_at: member.created_at, user_name: userRow.name ?? email, user_email: userRow.email })
       handleClose()
-    } catch (e: any) {
-      setErr(e?.message ?? 'Ошибка при добавлении')
+    } catch (e: unknown) {
+      setErr(getErrorMessage(e, 'Ошибка при добавлении'))
     } finally { setSaving(false) }
   }
 

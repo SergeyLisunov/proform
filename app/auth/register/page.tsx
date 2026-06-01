@@ -3,6 +3,7 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { getErrorMessage } from '@/lib/utils/errors'
 
 // ── UTM attribution (Sprint W5 Day 23 / PR #39) ───────────────────────
 // Reads UTM params from URL on mount and passes them to signUp() options.data.
@@ -384,8 +385,8 @@ export default function RegisterPage() {
       if (upsertErr) throw upsertErr
 
       setStep('plan')
-    } catch (err: any) {
-      setAthleteError(err?.message ?? 'Не удалось сохранить профиль')
+    } catch (err: unknown) {
+      setAthleteError(getErrorMessage(err, 'Не удалось сохранить профиль'))
     } finally {
       setAthleteSaving(false)
     }
@@ -420,9 +421,9 @@ export default function RegisterPage() {
             { onConflict: 'user_id' }
           )
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Не блокируем регистрацию, если таблицы нет — просто логируем
-      console.warn('subscription save skipped:', err?.message)
+      console.warn('subscription save skipped:', getErrorMessage(err))
     } finally {
       setPlanSaving(false)
       setStep('done')
