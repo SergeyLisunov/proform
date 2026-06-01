@@ -52,7 +52,7 @@ export interface Offering {
   service_type: ServiceType
   title: string
   description: string | null
-  price_cents: number                  // normalized: pass.price_cents OR service.price_amount
+  price_cents: number                  // always cents (pass.price_cents; service.price_amount ×100)
   currency: string
   /** For pass plans */
   total_sessions?: number | null
@@ -122,7 +122,7 @@ function serviceToOffering(r: CoachServiceRow): Offering {
     service_type:     (r.service_type as ServiceType) ?? 'general',
     title:            r.title,
     description:      r.description,
-    price_cents:      r.price_amount,    // schema uses price_amount on services
+    price_cents:      r.price_amount * 100,  // QA C2: price_amount is whole RUB → ×100 to normalize to cents (UI/sort/filter all assume cents)
     currency:         r.currency,
     duration_days:    r.duration_days,
     format:           r.format,
@@ -224,13 +224,12 @@ export async function listOfferings(filter: ListOfferingsFilter = {}): Promise<O
     ...((services ?? []) as CoachServiceRow[]).map(serviceToOffering),
   ]
 
-  // W8 Day 42: post-merge price filter with kind-aware semantics.
-  // pass_plans.price_cents stores cents → /100 = RUB
-  // coach_services.price_amount stores whole RUB (normalized into Offering.price_cents)
+  // W8 Day 42; QA C2: price_cents is now uniformly cents for BOTH kinds
+  // (services normalized ×100 in serviceToOffering) → /100 = RUB everywhere.
   if (typeof filter.priceMaxRub === 'number' && filter.priceMaxRub >= 0) {
     const cap = filter.priceMaxRub
     all = all.filter(o => {
-      const rub = o.kind === 'pass_plan' ? Math.round(o.price_cents / 100) : o.price_cents
+      const rub = Math.round(o.price_cents / 100)
       return rub <= cap
     })
   }
