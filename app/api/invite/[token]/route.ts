@@ -27,7 +27,7 @@ export async function GET(_req: Request, props: { params: Promise<{ token: strin
 
   const { data: inviter } = await admin
     .from('users')
-    .select('id, name, first_name, last_name, nickname, role, avatar_url')
+    .select('id, name, nickname, role, avatar_url')
     .eq('id', (invite as any).inviter_id)
     .single()
 

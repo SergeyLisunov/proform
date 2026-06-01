@@ -6,8 +6,6 @@ import { createPortal } from 'react-dom'
 type Author = {
   id: string
   name: string | null
-  first_name: string | null
-  last_name: string | null
   nickname: string | null
   avatar_url: string | null
   role: string | null
@@ -25,8 +23,7 @@ type Comment = {
 
 function displayAuthor(a: Author | null): string {
   if (!a) return 'Автор'
-  const full = [a.first_name, a.last_name].filter(Boolean).join(' ').trim()
-  return full || a.nickname || a.name || 'Автор'
+  return a.name || a.nickname || 'Автор'
 }
 
 function roleBadge(role: string | null): { label: string; cls: string } | null {

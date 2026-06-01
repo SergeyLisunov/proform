@@ -11,8 +11,7 @@ type FindType = 'people' | 'coach' | 'doctor' | 'organization'
 type SearchUser = {
   id: string
   nickname: string | null
-  first_name: string | null
-  last_name: string | null
+  name: string | null
   role: string
   avatar_url: string | null
   sport: string | null
@@ -63,8 +62,8 @@ type Connection = {
   connection_type: string
   initiated_at: string
   message: string | null
-  initiator: { id: string; first_name: string | null; last_name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null }
-  recipient: { id: string; first_name: string | null; last_name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null }
+  initiator: { id: string; name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null }
+  recipient: { id: string; name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null }
 }
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -75,8 +74,8 @@ const ROLE_META: Record<string, { label: string; color: string; bg: string }> = 
   admin:        { label: 'Админ',    color: '#7C3AED', bg: '#FAF5FF' },
 }
 
-function displayName(u: { first_name?: string | null; last_name?: string | null; nickname?: string | null }) {
-  return [u.first_name, u.last_name].filter(Boolean).join(' ') || (u.nickname ? `@${u.nickname}` : 'Пользователь')
+function displayName(u: { name?: string | null; first_name?: string | null; last_name?: string | null; nickname?: string | null }) {
+  return u.name || [u.first_name, u.last_name].filter(Boolean).join(' ') || (u.nickname ? `@${u.nickname}` : 'Пользователь')
 }
 
 function useDebounce<T>(value: T, delay: number): T {
