@@ -237,6 +237,8 @@ export default function RegisterPage() {
   const [pwdError, setPwdError] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Set when signUp reports an already-registered email (see handler below).
+  const [existingEmail, setExistingEmail] = useState(false)
 
   // UTM capture — read once on mount, persist в state до signUp
   const [utm, setUtm] = useState<UtmCapture>({
@@ -297,9 +299,10 @@ export default function RegisterPage() {
     setPwdError('')
     setLoading(true)
     setError('')
+    setExistingEmail(false)
 
     const supabase = createClient()
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -321,6 +324,18 @@ export default function RegisterPage() {
 
     if (signUpError) {
       setError(signUpError.message)
+      setLoading(false)
+      return
+    }
+
+    // Supabase anti-enumeration: signing up an email that ALREADY exists
+    // returns no error but a user object with an empty `identities` array —
+    // and sends NO confirmation email (there's nothing to confirm). Detect
+    // that and route the user to login / reset instead of showing the
+    // misleading "проверьте почту" success screen for a mail that never comes.
+    const identities = signUpData?.user?.identities
+    if (Array.isArray(identities) && identities.length === 0) {
+      setExistingEmail(true)
       setLoading(false)
       return
     }
@@ -632,6 +647,36 @@ export default function RegisterPage() {
                   <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
                     <span>{error}</span>
+                  </div>
+                )}
+
+                {existingEmail && (
+                  <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <div className="flex items-start gap-2.5">
+                      <i className="ki-filled ki-information-4 mt-0.5 text-amber-500" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-amber-900">Этот email уже зарегистрирован</p>
+                        <p className="mt-1 text-2sm leading-relaxed text-amber-800">
+                          Аккаунт с адресом <span className="font-semibold">{email}</span> уже существует.
+                          Войдите или сбросьте пароль — нового письма с подтверждением не будет.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Link
+                            href="/auth/login"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-3 py-2 text-2sm font-semibold text-white no-underline transition-colors hover:bg-orange-600"
+                          >
+                            Войти
+                            <i className="ki-filled ki-right text-[10px]" />
+                          </Link>
+                          <Link
+                            href="/auth/forgot"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-white px-3 py-2 text-2sm font-semibold text-amber-800 no-underline transition-colors hover:bg-amber-100"
+                          >
+                            Сбросить пароль
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 

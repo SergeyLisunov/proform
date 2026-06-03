@@ -60,6 +60,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
   const isAuthRoute = pathname.startsWith('/auth')
+  // /auth/reset processes the password-recovery token client-side. A user can
+  // reach it while already authenticated (or once the recovery session is
+  // established), so it must NOT be bounced away like other auth routes —
+  // otherwise the reset form never renders.
+  const isPasswordResetRoute = pathname.startsWith('/auth/reset')
   const isPublic = pathname === '/'
 
   // API routes manage their own auth and должны возвращать 401/404 в JSON.
@@ -135,7 +140,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if (user && isAuthRoute) {
+  if (user && isAuthRoute && !isPasswordResetRoute) {
     // After login/register, if onboarding isn't complete, route there
     // directly instead of bouncing through /dashboard.
     try {

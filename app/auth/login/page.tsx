@@ -257,9 +257,17 @@ export default function LoginPage() {
                   <label className="block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Пароль
                   </label>
-                  {DEMO_ENABLED && (
-                    <span className="text-2xs text-muted-foreground">Демо пароль: {DEMO_PASSWORD}</span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {DEMO_ENABLED && (
+                      <span className="text-2xs text-muted-foreground">Демо пароль: {DEMO_PASSWORD}</span>
+                    )}
+                    <Link
+                      href="/auth/forgot"
+                      className="text-2xs font-semibold text-orange-600 no-underline transition-colors hover:text-orange-700"
+                    >
+                      Забыли пароль?
+                    </Link>
+                  </div>
                 </div>
                 <div className="relative">
                   <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
