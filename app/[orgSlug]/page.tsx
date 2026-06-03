@@ -61,7 +61,7 @@ export default function OrgPublicPage() {
           <h1 className="pf-num text-3xl text-foreground mb-2">Организация не найдена</h1>
           <p className="text-muted-foreground text-sm">Страница <code className="font-mono text-orange-600">/{orgSlug}</code> не существует.</p>
         </div>
-        <Link href="/auth/login" className="kt-btn kt-btn-primary">Перейти в ProForm</Link>
+        <Link href="/auth/login" className="kt-btn kt-btn-primary">Перейти в Sporteo</Link>
       </div>
     )
   }
@@ -144,7 +144,7 @@ export default function OrgPublicPage() {
       {/* Footer */}
       <div className="border-t border-border mt-10">
         <div className="max-w-3xl mx-auto px-5 py-6 flex items-center justify-between text-2xs text-muted-foreground">
-          <span>На базе <Link href="/" className="text-orange-600 font-semibold hover:underline">ProForm</Link></span>
+          <span>На базе <Link href="/" className="text-orange-600 font-semibold hover:underline">Sporteo</Link></span>
           <Link href="/auth/login" className="text-orange-600 font-semibold hover:underline">Войти →</Link>
         </div>
       </div>

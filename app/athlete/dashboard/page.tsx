@@ -146,7 +146,7 @@ export default function AthleteDashboardPage() {
 
       {/* Quick links — W8 Day 39 added /athlete/passes (5th tile) */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <QuickLink href="/athlete/goals"      icon="ki-flag"          color="#EA580C" bg="#FFF7ED" border="#FED7AA" label="Цели" />
+        <QuickLink href="/athlete/goals"      icon="ki-flag"          color="#D44A02" bg="#FFF7ED" border="#FED7AA" label="Цели" />
         <QuickLink href="/athlete/progress"   icon="ki-chart-line-up" color="#2563EB" bg="#EFF6FF" border="#BFDBFE" label="Прогресс" />
         <QuickLink href="/calendar"           icon="ki-calendar-2"    color="#15803D" bg="#F0FDF4" border="#BBF7D0" label="Календарь" />
         <QuickLink

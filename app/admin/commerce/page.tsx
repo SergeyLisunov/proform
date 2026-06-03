@@ -152,7 +152,7 @@ export default async function AdminCommercePage() {
   ]
 
   const TONE: Record<string, { bg: string; color: string; border: string }> = {
-    orange: { bg: '#FFF7ED', color: '#F97316', border: '#FED7AA' },
+    orange: { bg: '#FFF7ED', color: '#F35703', border: '#FED7AA' },
     violet: { bg: '#FAF5FF', color: '#9333EA', border: '#E9D5FF' },
     red:    { bg: '#FEF2F2', color: '#DC2626', border: '#FECACA' },
     green:  { bg: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' },
@@ -191,7 +191,7 @@ export default async function AdminCommercePage() {
             <Link
               href="https://yookassa.ru/my"
               target="_blank"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F97316] to-[#EA580C] px-3.5 py-2 text-xs font-semibold text-white shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F35703] to-[#D44A02] px-3.5 py-2 text-xs font-semibold text-white shadow-sm"
             >
               ЮKassa Dashboard →
             </Link>
@@ -283,7 +283,7 @@ export default async function AdminCommercePage() {
             series={[byPlan.free, byPlan.pro, byPlan.team]}
             options={{
               labels: ['Free', 'Pro', 'Team'],
-              colors: ['#2563EB', '#F97316', '#9333EA'],
+              colors: ['#2563EB', '#F35703', '#9333EA'],
               chart: { toolbar: { show: false }, animations: { enabled: true, speed: 600 } },
               dataLabels: { enabled: false },
               legend: { position: 'bottom' as const, fontSize: '11px', offsetY: 4 },

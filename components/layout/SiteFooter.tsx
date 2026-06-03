@@ -12,6 +12,7 @@
  * link cluster right. Mobile: stack vertical.
  */
 import Link from 'next/link'
+import { SporteoLogo } from "@/components/ui/SporteoLogo"
 
 interface FooterLink {
   href:  string
@@ -58,7 +59,7 @@ export default function SiteFooter() {
     <footer className="border-t border-border bg-slate-900 px-4 py-10 text-slate-400 sm:px-6 lg:px-10">
       <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div>
-          <div className="pf-num text-xl text-white">ProForm</div>
+          <SporteoLogo size="md" onDark />
           <div className="mt-1 text-xs">
             Спортивная платформа для клубов, академий и команд
           </div>
@@ -76,7 +77,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="mx-auto mt-6 max-w-7xl border-t border-white/10 pt-4 text-2xs text-slate-500">
-        © {new Date().getFullYear()} ProForm · Хостинг данных в Supabase
+        © {new Date().getFullYear()} Sporteo · Хостинг данных в Supabase
         EU-Central · RLS-политики на каждой таблице
       </div>
     </footer>

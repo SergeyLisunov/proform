@@ -1,5 +1,5 @@
 /**
- * Minimal HTML email templates for ProForm digests.
+ * Minimal HTML email templates for Sporteo digests.
  * Inline styles only (most email clients ignore <style> tags).
  */
 
@@ -16,7 +16,7 @@ function wrap(title: string, preheader: string, inner: string): string {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06)">
           <tr><td style="padding:28px 32px 16px 32px;border-bottom:1px solid #F1F5F9">
             <table role="presentation" width="100%"><tr>
-              <td style="font-size:12px;font-weight:700;color:#EA580C;letter-spacing:2px;text-transform:uppercase">ProForm</td>
+              <td style="font-size:12px;font-weight:700;color:#D44A02;letter-spacing:2px;text-transform:uppercase">Sporteo</td>
               <td align="right" style="font-size:11px;color:#94A3B8">${new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</td>
             </tr></table>
           </td></tr>
@@ -24,7 +24,7 @@ function wrap(title: string, preheader: string, inner: string): string {
             ${inner}
           </td></tr>
           <tr><td style="padding:20px 32px;border-top:1px solid #F1F5F9;background:#F8FAFC;font-size:11px;color:#64748B;text-align:center">
-            <a href="${BASE_URL}" style="color:#EA580C;text-decoration:none;font-weight:600">Открыть ProForm</a>
+            <a href="${BASE_URL}" style="color:#D44A02;text-decoration:none;font-weight:600">Открыть Sporteo</a>
             &nbsp;·&nbsp;
             <a href="${BASE_URL}/settings/notifications?ref=email" style="color:#64748B;text-decoration:underline">Настройки уведомлений</a>
             &nbsp;·&nbsp;
@@ -58,12 +58,12 @@ export function renderAthleteDailyDigest(params: {
   const { name, events } = params
   const dateStr = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
   const subject = events.length === 0
-    ? 'ProForm: сегодня свободный день'
-    : `ProForm: ${events.length} ${events.length === 1 ? 'событие' : events.length < 5 ? 'события' : 'событий'} сегодня`
+    ? 'Sporteo: сегодня свободный день'
+    : `Sporteo: ${events.length} ${events.length === 1 ? 'событие' : events.length < 5 ? 'события' : 'событий'} сегодня`
 
   const rows = events.map(e => {
     const color =
-      e.kind === 'coach_session' ? '#EA580C' :
+      e.kind === 'coach_session' ? '#D44A02' :
       e.kind === 'group_session' ? '#7C3AED' : '#DC2626'
     const label =
       e.kind === 'coach_session' ? 'Тренировка' :
@@ -87,12 +87,12 @@ export function renderAthleteDailyDigest(params: {
   const inner = events.length === 0 ? `
     <h1 style="margin:0 0 8px 0;font-size:24px;color:#0F172A">Свободный день, ${escape(name)}!</h1>
     <p style="margin:0;color:#64748B;font-size:14px;line-height:1.5">На сегодня ничего не запланировано. Отличный момент для восстановления или собственной тренировки.</p>
-    <div style="margin-top:20px"><a href="${BASE_URL}/calendar" style="display:inline-block;padding:10px 20px;background:#F97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть календарь</a></div>
+    <div style="margin-top:20px"><a href="${BASE_URL}/calendar" style="display:inline-block;padding:10px 20px;background:#F35703;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть календарь</a></div>
   ` : `
     <h1 style="margin:0 0 4px 0;font-size:22px;color:#0F172A">Привет, ${escape(name)}!</h1>
     <p style="margin:0 0 18px 0;color:#64748B;font-size:13px;text-transform:capitalize">${escape(dateStr)}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>
-    <div style="margin-top:20px"><a href="${BASE_URL}/calendar" style="display:inline-block;padding:10px 20px;background:#F97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть календарь →</a></div>
+    <div style="margin-top:20px"><a href="${BASE_URL}/calendar" style="display:inline-block;padding:10px 20px;background:#F35703;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть календарь →</a></div>
   `
   return { subject, html: wrap(subject, `${events.length} событий сегодня`, inner) }
 }
@@ -113,8 +113,8 @@ export function renderCoachWeeklyDigest(params: {
   const { name, athletes_count, stats } = params
   const attention = stats.filter(s => s.missed_sessions > 0 || s.expiring_passes > 0)
   const subject = attention.length > 0
-    ? `ProForm: ${attention.length} ${attention.length === 1 ? 'атлет требует' : 'атлетов требуют'} внимания`
-    : 'ProForm: еженедельная сводка'
+    ? `Sporteo: ${attention.length} ${attention.length === 1 ? 'атлет требует' : 'атлетов требуют'} внимания`
+    : 'Sporteo: еженедельная сводка'
 
   const rows = attention.map(s => `
     <tr><td style="padding:12px 0;border-bottom:1px solid #F1F5F9">
@@ -122,7 +122,7 @@ export function renderCoachWeeklyDigest(params: {
       <div style="font-size:12px;color:#64748B;margin-top:4px">
         ${s.missed_sessions > 0 ? `<span style="color:#DC2626">⚠ ${s.missed_sessions} пропуск${s.missed_sessions === 1 ? '' : 'ов'}</span>` : ''}
         ${s.missed_sessions > 0 && s.expiring_passes > 0 ? ' · ' : ''}
-        ${s.expiring_passes > 0 ? `<span style="color:#F97316">⏱ ${s.expiring_passes} абонемент${s.expiring_passes === 1 ? '' : 'а'} истекает</span>` : ''}
+        ${s.expiring_passes > 0 ? `<span style="color:#F35703">⏱ ${s.expiring_passes} абонемент${s.expiring_passes === 1 ? '' : 'а'} истекает</span>` : ''}
         ${s.avg_recovery !== null ? ` · восстановление ${s.avg_recovery}%` : ''}
       </div>
     </td></tr>
@@ -141,7 +141,7 @@ export function renderCoachWeeklyDigest(params: {
         ✅ Всё идёт по плану — никто не требует срочного внимания.
       </div>
     `}
-    <div style="margin-top:20px"><a href="${BASE_URL}/athletes" style="display:inline-block;padding:10px 20px;background:#F97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть &laquo;Мои атлеты&raquo; →</a></div>
+    <div style="margin-top:20px"><a href="${BASE_URL}/athletes" style="display:inline-block;padding:10px 20px;background:#F35703;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Открыть &laquo;Мои атлеты&raquo; →</a></div>
   `
   return { subject, html: wrap(subject, `${attention.length} атлетов требуют внимания`, inner) }
 }
@@ -166,19 +166,19 @@ export function renderInviteEmail(input: {
   expires_at: string
 }): { subject: string; html: string } {
   const roleLabel = INVITE_ROLE_LABELS[input.connection_type] ?? 'пользователя'
-  const subject = `${input.inviter_name} приглашает вас в ProForm`
+  const subject = `${input.inviter_name} приглашает вас в Sporteo`
   const expiresHuman = new Date(input.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
   const inner = `
-    <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A">Вас приглашают в ProForm</h1>
+    <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A">Вас приглашают в Sporteo</h1>
     <p style="margin:0 0 16px 0;color:#334155;font-size:14px;line-height:1.55">
-      <strong>${escape(input.inviter_name)}</strong> приглашает вас подключиться в качестве ${escape(roleLabel)} на платформе ProForm —
+      <strong>${escape(input.inviter_name)}</strong> приглашает вас подключиться в качестве ${escape(roleLabel)} на платформе Sporteo —
       тренировки, медицинские осмотры и командные события в одном месте.
     </p>
     ${input.message ? `
-      <div style="padding:14px 16px;background:#FFF7ED;border-left:3px solid #F97316;border-radius:8px;margin-bottom:20px;color:#9A3412;font-size:13px;line-height:1.5;white-space:pre-wrap">${escape(input.message)}</div>
+      <div style="padding:14px 16px;background:#FFF7ED;border-left:3px solid #F35703;border-radius:8px;margin-bottom:20px;color:#9A3412;font-size:13px;line-height:1.5;white-space:pre-wrap">${escape(input.message)}</div>
     ` : ''}
     <div style="margin:20px 0">
-      <a href="${input.claim_url}" style="display:inline-block;padding:14px 28px;background:#F97316;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Принять приглашение →</a>
+      <a href="${input.claim_url}" style="display:inline-block;padding:14px 28px;background:#F35703;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Принять приглашение →</a>
     </div>
     <p style="margin:12px 0 0 0;color:#64748B;font-size:12px;line-height:1.5">
       Ссылка действует до <strong>${escape(expiresHuman)}</strong>. Если у вас ещё нет аккаунта — вы сможете зарегистрироваться по той же ссылке, и связь установится автоматически.
@@ -187,7 +187,7 @@ export function renderInviteEmail(input: {
       Или скопируйте ссылку: ${escape(input.claim_url)}
     </p>
   `
-  return { subject, html: wrap(subject, `${input.inviter_name} зовёт вас в ProForm`, inner) }
+  return { subject, html: wrap(subject, `${input.inviter_name} зовёт вас в Sporteo`, inner) }
 }
 
 // ── Sprint W3 Day 14 — subscription lifecycle emails ───────────────────────
@@ -225,12 +225,12 @@ export function renderSubscriptionActivated(input: SubscriptionActivatedInput): 
       ${periodLine}
     </div>
     <p style="margin:24px 0 0 0">
-      <a href="${BASE_URL}/dashboard" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+      <a href="${BASE_URL}/dashboard" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F35703,#D44A02);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
         Открыть платформу →
       </a>
     </p>
     <p style="margin:24px 0 0 0;color:#64748B;font-size:12px;line-height:1.5">
-      Управление подпиской: <a href="${BASE_URL}/settings/billing" style="color:#EA580C;text-decoration:none">/settings/billing</a>
+      Управление подпиской: <a href="${BASE_URL}/settings/billing" style="color:#D44A02;text-decoration:none">/settings/billing</a>
     </p>
   `
   return { subject, html: wrap(subject, 'Подписка активирована, доступ открыт', inner) }
@@ -255,7 +255,7 @@ export function renderSubscriptionPaymentFailed(input: SubscriptionPaymentFailed
       Списание не прошло. Подписка пока активна — у вас есть несколько дней, чтобы обновить способ оплаты, прежде чем доступ ограничится.
     </p>
     <p style="margin:24px 0 0 0">
-      <a href="${escape(input.retry_url)}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+      <a href="${escape(input.retry_url)}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F35703,#D44A02);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
         Повторить оплату
       </a>
     </p>
@@ -292,7 +292,7 @@ export function renderSubscriptionCancelled(input: SubscriptionCancelledInput): 
       </a>
     </p>
     <p style="margin:16px 0 0 0;color:#94A3B8;font-size:12px">
-      Возобновить можно через <a href="${BASE_URL}/settings/billing" style="color:#EA580C;text-decoration:none">/settings/billing</a>.
+      Возобновить можно через <a href="${BASE_URL}/settings/billing" style="color:#D44A02;text-decoration:none">/settings/billing</a>.
     </p>
   `
   return { subject, html: wrap(subject, 'Подписка отменена', inner) }
@@ -406,12 +406,12 @@ export function renderTeamRiskSnapshot(input: TeamRiskSnapshotEmailInput): { sub
       Хотите видеть snapshot автоматически по всем тренировкам команды?
     </p>
     <p style="margin:0">
-      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=team-risk&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+      <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=team-risk&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F35703,#D44A02);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
-      ProForm — платформа для атлетов, тренеров и спортивных врачей. Подключите Garmin / Whoop / ручной ввод —
+      Sporteo — платформа для атлетов, тренеров и спортивных врачей. Подключите Garmin / Whoop / ручной ввод —
       и risk-светофор обновляется в реальном времени.
     </p>
   `
@@ -511,7 +511,7 @@ export function renderAdaptivePlanPreview(input: AdaptivePlanPreviewEmailInput):
     </p>
     <p style="margin:0">
       <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=adaptive-plan&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
@@ -644,11 +644,11 @@ export function renderClubAuditReport(input: ClubAuditEmailInput): { subject: st
     </p>
     <p style="margin:0">
       <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=club-audit&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#10B981,#0F766E);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
-      ProForm для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спорт.врачей,
+      Sporteo для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спорт.врачей,
       автоматизированный биллинг. Подключение — 30 минут с CSV-импорта.
     </p>
   `
@@ -806,11 +806,11 @@ export function renderMedicalSummaryDemo(input: MedicalSummaryEmailInput): { sub
     </p>
     <p style="margin:0">
       <a href="${BASE_URL}/auth/register?utm_source=tools&utm_medium=medical-summary&utm_campaign=email" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#8B5CF6,#A21CAF);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
-      ProForm для врачей: structured recommendations с visibility levels (athlete only / coach + athlete / org_full),
+      Sporteo для врачей: structured recommendations с visibility levels (athlete only / coach + athlete / org_full),
       integration с тренировочными данными, автоматический dispatch уведомлений.
     </p>
   `
@@ -890,7 +890,7 @@ export function renderDoctorInquiryEmail(input: DoctorInquiryEmailInput): { subj
 
     <p style="margin:0 0 12px 0">
       <a href="${input.inquiry_url}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Ответить в ProForm →
+        Ответить в Sporteo →
       </a>
     </p>
 

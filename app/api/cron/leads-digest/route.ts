@@ -32,7 +32,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 /** Sprint W7 Day 35: throttle bumped from 50 → 80 to absorb 3-touch
  *  cadence load while staying under Resend free tier 100/day limit. */
 const BATCH_LIMIT = 80

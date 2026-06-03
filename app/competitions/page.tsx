@@ -147,7 +147,7 @@ function CompetitionDrawer({
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: '#FFF7ED', border: '1px solid #FED7AA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ki-filled ki-medal-star" style={{ color: '#F97316', fontSize: 16 }} />
+              <i className="ki-filled ki-medal-star" style={{ color: '#F35703', fontSize: 16 }} />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>Соревнование</p>
@@ -173,7 +173,7 @@ function CompetitionDrawer({
           {mode === 'view' && competition && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ padding: 16, borderRadius: 14, background: '#FFF7ED', border: '1px solid #FED7AA' }}>
-                <div className="pf-num" style={{ fontSize: 28, color: '#F97316', lineHeight: 1 }}>🏆</div>
+                <div className="pf-num" style={{ fontSize: 28, color: '#F35703', lineHeight: 1 }}>🏆</div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 700, color: 'var(--foreground)' }}>{competition.title}</div>
                 <div style={{ marginTop: 4, fontSize: 13, color: 'var(--muted-foreground)' }}>{fmtDate(competition.event_date)}</div>
               </div>
@@ -213,33 +213,33 @@ function CompetitionDrawer({
                 <div>
                   <label style={labelStyle}>Название *</label>
                   <input ref={titleRef} type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="Весенний марафон…" style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                    onFocus={e => (e.target.style.borderColor = '#F35703')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                 </div>
                 <div>
                   <label style={labelStyle}>Дата</label>
                   <input type="date" value={form.event_date} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} required style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                    onFocus={e => (e.target.style.borderColor = '#F35703')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
                     <label style={labelStyle}>Старт</label>
                     <input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} style={inputStyle}
-                      onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                      onFocus={e => (e.target.style.borderColor = '#F35703')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                   </div>
                   <div>
                     <label style={labelStyle}>Финиш</label>
                     <input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))} style={inputStyle}
-                      onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                      onFocus={e => (e.target.style.borderColor = '#F35703')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                   </div>
                 </div>
                 <div>
                   <label style={labelStyle}>Заметки</label>
                   <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={4} placeholder="Дистанция, место, результат…"
                     style={{ ...inputStyle, resize: 'none', fontFamily: 'inherit' }}
-                    onFocus={e => (e.target.style.borderColor = '#F97316')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                    onFocus={e => (e.target.style.borderColor = '#F35703')} onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button type="submit" disabled={saving} style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? '#FDA96A' : '#F97316', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
+                  <button type="submit" disabled={saving} style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? '#FDA96A' : '#F35703', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
                     {saving ? 'Сохранение…' : mode === 'edit' ? 'Сохранить' : 'Добавить соревнование'}
                   </button>
                   <button type="button" onClick={() => mode === 'edit' && competition ? setMode('view') : handleClose()} style={{ padding: '11px 14px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>

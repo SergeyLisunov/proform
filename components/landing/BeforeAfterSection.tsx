@@ -2,7 +2,7 @@
  * <BeforeAfterSection /> — W16 Day 80 NEW.
  *
  * Visual transformation: 2-column «До / После» table с 6 rows, each
- * сравнивает chaos state (с 5 разными tools) vs ProForm state.
+ * сравнивает chaos state (с 5 разными tools) vs Sporteo state.
  *
  * Placement: после Workflow + Roles, до LeadMagnets — visitor видит
  * concrete transformation prior to trying tools.
@@ -28,7 +28,7 @@ const ROWS: ComparisonRow[] = [
   {
     topic:  'Инструменты',
     before: 'Excel + Telegram-чаты + бумажные карточки + 5 разных программ',
-    after:  '1 система — ProForm',
+    after:  '1 система — Sporteo',
   },
   {
     topic:  'Еженедельная сводка',
@@ -101,7 +101,7 @@ export default function BeforeAfterSection() {
             id="before-after-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Что меняется после внедрения ProForm
+            Что меняется после внедрения Sporteo
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             6 конкретных переходов, которые видит руководитель клуба
@@ -112,8 +112,8 @@ export default function BeforeAfterSection() {
         {/* Comparison header (desktop) */}
         <div className="mt-12 hidden grid-cols-[2fr_1fr_1fr] gap-4 px-2 text-2xs font-bold uppercase tracking-wider lg:grid">
           <div className="text-muted-foreground">Тема</div>
-          <div className="text-slate-500">До ProForm</div>
-          <div className="text-emerald-700">После ProForm</div>
+          <div className="text-slate-500">До Sporteo</div>
+          <div className="text-emerald-700">После Sporteo</div>
         </div>
 
         {/* Rows */}

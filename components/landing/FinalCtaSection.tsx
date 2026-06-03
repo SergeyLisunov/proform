@@ -18,7 +18,7 @@ export default function FinalCtaSection() {
           Готовы попробовать?
         </p>
         <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          ProForm в вашем клубе — через 10 минут
+          Sporteo в вашем клубе — через 10 минут
         </h2>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
           10 минут на регистрацию организации. 5 минут на первого тренера. Дальше —

@@ -32,7 +32,7 @@ const ACTIONS: QuickAction[] = [
     icon: 'ki-shield-cross',
     label: 'Травмы',
     hint: 'Журнал команды',
-    bg: '#FFF7ED', color: '#EA580C', border: '#FED7AA',
+    bg: '#FFF7ED', color: '#D44A02', border: '#FED7AA',
   },
   {
     href: '/network?tab=find',

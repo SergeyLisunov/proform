@@ -32,7 +32,7 @@ type AverageMetricKey = 'hrv' | 'resting_heart_rate' | 'sleep_hours' | 'calories
 
 const TYPE_COLOR: Record<string, string> = {
   Running: '#2563EB', Cycling: '#16A34A', Swimming: '#7C3AED', HIIT: '#DC2626',
-  'Weight Training': '#F97316', CrossFit: '#D97706', Yoga: '#0D9488', Walking: '#64748B',
+  'Weight Training': '#F35703', CrossFit: '#D97706', Yoga: '#0D9488', Walking: '#64748B',
 }
 const TYPE_ICON: Record<string, string> = {
   Running: 'ki-abstract-26', Cycling: 'ki-car', Swimming: 'ki-drop', HIIT: 'ki-abstract-40',
@@ -148,7 +148,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
         <StatCard label="Ср. ВСР"   value={avg('hrv') ?? '—'}                                                                                    unit="мс"        icon="ki-graph-up"    iconColor="#2563EB" sub="WHOOP метрика" />
         <StatCard label="ЧСС покоя" value={avg('resting_heart_rate') ?? '—'}                                                                     unit="bpm"       icon="ki-heart"       iconColor="#DC2626" />
         <StatCard label="Ср. сон"   value={avg('sleep_hours') ?? '—'}                                                                            unit="ч"         icon="ki-moon"        iconColor="#7C3AED" />
-        <StatCard label="Калории"   value={avg('calories_burned') ? Math.round(avg('calories_burned')!).toLocaleString() : '—'}                  unit="ккал/день" icon="ki-abstract-26" iconColor="#F97316" />
+        <StatCard label="Калории"   value={avg('calories_burned') ? Math.round(avg('calories_burned')!).toLocaleString() : '—'}                  unit="ккал/день" icon="ki-abstract-26" iconColor="#F35703" />
       </div>
 
       {/* 8. CHARTS — нагрузка и пульсовые зоны */}
@@ -164,7 +164,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             const totals = [1, 2, 3, 4, 5].map(z => workouts.reduce((s, w) => s + ((w as unknown as Record<string, number>)[`hr_zone_${z}_min`] ?? 0), 0))
             const grand = totals.reduce((a, b) => a + b, 0) || 1
             const pcts = totals.map(t => Math.round(t / grand * 100))
-            const COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F97316', '#EF4444']
+            const COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F35703', '#EF4444']
             const LABELS = ['Z1 Восстановление', 'Z2 Аэробная', 'Z3 Темп', 'Z4 Порог', 'Z5 VO₂max']
             return (
               <div className="flex flex-col gap-3">
@@ -247,7 +247,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
           <p className="pf-num text-lg text-slate-900 mb-4">Заметки тренера</p>
           <div className="flex flex-col gap-3">
             {comments.map((c, i) => (
-              <div key={i} className="p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed" style={{ background: '#F8FAFC', borderLeft: '3px solid #F97316' }}>
+              <div key={i} className="p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed" style={{ background: '#F8FAFC', borderLeft: '3px solid #F35703' }}>
                 {c.body}
                 <div className="text-[10px] text-slate-400 mt-1">{fmtDate(c.created_at ?? '')}</div>
               </div>

@@ -195,7 +195,7 @@ function AssistantChat() {
           <i className="ki-filled ki-message-question text-sm" style={{ color: '#7C3AED' }} />
         </div>
         <div>
-          <div className="text-sm font-semibold text-foreground">ProForm AI Ассистент</div>
+          <div className="text-sm font-semibold text-foreground">Sporteo AI Ассистент</div>
           <div className="text-[11px] text-muted-foreground">Задайте вопрос по тренировкам, сну, восстановлению</div>
         </div>
       </div>
@@ -287,7 +287,7 @@ function AssistantChat() {
 function CoachToolsPanel({ role }: { role: string | undefined }) {
   const tools = [
     { title: 'Брифинг по атлету', subtitle: 'Краткое резюме состояния выбранного атлета', href: '/athletes', icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
-    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-lamp-on', color: '#F97316', bg: '#FFF7ED' },
+    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-lamp-on', color: '#F35703', bg: '#FFF7ED' },
     { title: 'Детектор аномалий', subtitle: 'Автоматический поиск просадок HRV / сна / нагрузки', href: '/analytics', icon: 'ki-shield-tick', color: '#DC2626', bg: '#FEF2F2' },
     { title: 'Медицинское резюме', subtitle: 'Сводка для врача / консилиума по атлету', href: '/athletes', icon: 'ki-note-2', color: '#0D9488', bg: '#F0FDFA' },
   ]
@@ -345,7 +345,7 @@ export default function AiHubPage() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E9D5FF] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7C3AED]">
               <i className="ki-filled ki-sparkle text-[11px]" />
-              ProForm AI
+              Sporteo AI
             </span>
             <span className="inline-flex items-center rounded-full border border-[#BAE6FD] bg-[#F0F9FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0EA5E9]">
               Beta

@@ -49,7 +49,7 @@ const LEVELS: Array<{ key: 'beginner' | 'intermediate' | 'advanced'; label: stri
   { key: 'advanced',     label: 'Продвинутый', hint: 'Регулярно, со структурой, участвую в стартах' },
 ]
 
-const ACCENT = '#F97316'
+const ACCENT = '#F35703'
 
 export default function AthleteOnboardingPage() {
   const router = useRouter()

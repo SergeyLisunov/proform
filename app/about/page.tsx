@@ -13,21 +13,21 @@ import StaticPageShell from '@/components/layout/StaticPageShell'
 export const metadata: Metadata = {
   title: 'О платформе',
   description:
-    'ProForm — единая система для тренера, спортсмена, врача и клуба. Замена Excel, чатов и бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
+    'Sporteo — единая система для тренера, спортсмена, врача и клуба. Замена Excel, чатов и бумажных карточек одной системой. Для клубов и академий в России и СНГ.',
   alternates: { canonical: '/about' },
   openGraph: {
-    title: 'О ProForm — единая система спортивной подготовки',
+    title: 'О Sporteo — единая система спортивной подготовки',
     description:
-      'Почему мы строим ProForm и для кого. Closed-beta status, технологическая основа, что обещаем и что не обещаем.',
+      'Почему мы строим Sporteo и для кого. Closed-beta status, технологическая основа, что обещаем и что не обещаем.',
     url: '/about',
   },
 }
 
 export default function AboutPage() {
   return (
-    <StaticPageShell eyebrow="О платформе" title="ProForm — единая система спортивной подготовки">
+    <StaticPageShell eyebrow="О платформе" title="Sporteo — единая система спортивной подготовки">
       <section>
-        <h2 className="text-xl font-bold text-foreground">Зачем мы строим ProForm</h2>
+        <h2 className="text-xl font-bold text-foreground">Зачем мы строим Sporteo</h2>
         <p className="mt-3 text-muted-foreground">
           Спортивная подготовка в клубах и академиях фрагментирована. Тренер ведёт
           планы в Excel, общается с родителями в Telegram, переписывается с врачом
@@ -35,14 +35,14 @@ export default function AboutPage() {
           уходит на пересылку данных — не на тренерскую работу.
         </p>
         <p className="mt-3 text-muted-foreground">
-          ProForm — это одна система, в которой все участники процесса видят
+          Sporteo — это одна система, в которой все участники процесса видят
           одинаковую картину прогресса спортсмена. Каждый видит только то, что ему
           нужно, и только тех данных, к которым у него есть доступ.
         </p>
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Для кого ProForm</h2>
+        <h2 className="text-xl font-bold text-foreground">Для кого Sporteo</h2>
         <ul className="mt-3 space-y-2 text-muted-foreground">
           <li>
             <strong className="text-foreground">Спортивные клубы</strong> — единое
@@ -62,7 +62,7 @@ export default function AboutPage() {
           </li>
         </ul>
         <p className="mt-3 text-xs text-muted-foreground">
-          ProForm не предназначен для разовых клиентов «фитнес на час» — это
+          Sporteo не предназначен для разовых клиентов «фитнес на час» — это
           инфраструктурный инструмент для долгосрочной подготовки.
         </p>
       </section>
@@ -105,7 +105,7 @@ export default function AboutPage() {
       <section>
         <h2 className="text-xl font-bold text-foreground">Технологическая основа</h2>
         <p className="mt-3 text-muted-foreground">
-          ProForm построен на современном стеке: Next.js (React), Supabase
+          Sporteo построен на современном стеке: Next.js (React), Supabase
           (PostgreSQL), хостинг — Vercel и Supabase EU-Central-1 (Франкфурт).
           Каждая таблица в базе защищена RLS-политиками — каждый запрос проверяется
           на уровне базы данных, не только в коде приложения.

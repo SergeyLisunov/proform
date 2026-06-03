@@ -15,7 +15,7 @@ type Notification = {
 }
 
 const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
-  invitation_received:     { icon: 'ki-user-plus',       color: '#F97316', bg: '#FFF7ED' },
+  invitation_received:     { icon: 'ki-user-plus',       color: '#F35703', bg: '#FFF7ED' },
   invitation_accepted:     { icon: 'ki-check-circle',    color: '#16A34A', bg: '#F0FDF4' },
   invitation_declined:     { icon: 'ki-cross-circle',    color: '#DC2626', bg: '#FEF2F2' },
   invitation_cancelled:    { icon: 'ki-information-5',   color: '#64748B', bg: '#F8FAFC' },
@@ -25,7 +25,7 @@ const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
   // W12 Day 60: review-system + pass-system events
   coach_replied_to_review: { icon: 'ki-message-text',    color: '#16A34A', bg: '#F0FDF4' },
   new_review_for_coach:    { icon: 'ki-star',            color: '#F59E0B', bg: '#FFFBEB' },
-  pass_session_used:       { icon: 'ki-minus-squared',   color: '#F97316', bg: '#FFF7ED' },
+  pass_session_used:       { icon: 'ki-minus-squared',   color: '#F35703', bg: '#FFF7ED' },
 }
 
 function getTypeMeta(type: string) {
@@ -118,7 +118,7 @@ export default function NotificationsPage() {
               <span style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 minWidth: 24, height: 24, borderRadius: 99, padding: '0 8px',
-                background: 'linear-gradient(135deg, #F97316, #EA580C)',
+                background: 'linear-gradient(135deg, #F35703, #D44A02)',
                 color: 'white', fontSize: 12, fontWeight: 800,
                 boxShadow: '0 2px 8px rgba(249,115,22,0.4)',
               }}>
@@ -216,12 +216,12 @@ export default function NotificationsPage() {
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
                     {n.action_url && (
-                      <Link href={n.action_url} style={{ fontSize: 11, color: '#F97316', fontWeight: 600, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>
+                      <Link href={n.action_url} style={{ fontSize: 11, color: '#F35703', fontWeight: 600, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>
                         Перейти →
                       </Link>
                     )}
                     {!n.is_read && (
-                      <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#F97316', flexShrink: 0 }} />
+                      <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#F35703', flexShrink: 0 }} />
                     )}
                   </div>
                 </div>

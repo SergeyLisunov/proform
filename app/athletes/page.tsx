@@ -301,7 +301,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
   const lineOpts = {
     chart: { type: 'line' as const, toolbar: { show: false }, animations: { enabled: false } },
     stroke: { curve: 'smooth' as const, width: [2, 2], dashArray: [0, 4] },
-    colors: ['#F97316', '#2563EB'],
+    colors: ['#F35703', '#2563EB'],
     xaxis: {
       categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },

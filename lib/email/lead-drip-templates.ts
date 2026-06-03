@@ -13,7 +13,7 @@
  * Каждый drip template:
  *   - Source-specific subject + hero
  *   - Light personalization из payload meta (sport name / team name etc.)
- *   - Конкретный USP про продукт (что в ProForm даёт бóльшую ценность чем
+ *   - Конкретный USP про продукт (что в Sporteo даёт бóльшую ценность чем
  *     standalone tool)
  *   - Strong CTA "Открыть бесплатно"
  *   - 1 disclaimer block для medical-summary source (regulatory)
@@ -27,7 +27,7 @@ function escape(s: string): string {
   ))
 }
 
-function wrap(title: string, preheader: string, inner: string, accentColor = '#EA580C'): string {
+function wrap(title: string, preheader: string, inner: string, accentColor = '#D44A02'): string {
   return `<!DOCTYPE html>
 <html lang="ru">
   <head><meta charset="utf-8"/><title>${escape(title)}</title></head>
@@ -38,13 +38,13 @@ function wrap(title: string, preheader: string, inner: string, accentColor = '#E
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06)">
           <tr><td style="padding:28px 32px 16px 32px;border-bottom:1px solid #F1F5F9">
             <table role="presentation" width="100%"><tr>
-              <td style="font-size:12px;font-weight:700;color:${accentColor};letter-spacing:2px;text-transform:uppercase">ProForm</td>
+              <td style="font-size:12px;font-weight:700;color:${accentColor};letter-spacing:2px;text-transform:uppercase">Sporteo</td>
               <td align="right" style="font-size:11px;color:#94A3B8">Lead drip · ${new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</td>
             </tr></table>
           </td></tr>
           <tr><td style="padding:24px 32px 28px 32px">${inner}</td></tr>
           <tr><td style="padding:20px 32px;border-top:1px solid #F1F5F9;background:#F8FAFC;font-size:11px;color:#64748B;text-align:center">
-            <a href="${BASE_URL}" style="color:${accentColor};text-decoration:none;font-weight:600">Открыть ProForm</a>
+            <a href="${BASE_URL}" style="color:${accentColor};text-decoration:none;font-weight:600">Открыть Sporteo</a>
             &nbsp;·&nbsp;
             <a href="${BASE_URL}/legal/unsubscribe" style="color:#64748B;text-decoration:underline">Отписаться</a>
           </td></tr>
@@ -79,7 +79,7 @@ export function renderTeamRiskDrip(payload: TeamRiskDripPayload | null | undefin
       ${p.risk_count ? `${p.risk_count} в красной зоне риска${p.watch_count ? `, ${p.watch_count} требуют наблюдения.` : '.'}` : ''}
     </p>
 
-    <p style="margin:0 0 16px 0;color:#0F172A;font-size:14px;line-height:1.6">Что даёт ProForm над standalone snapshot:</p>
+    <p style="margin:0 0 16px 0;color:#0F172A;font-size:14px;line-height:1.6">Что даёт Sporteo над standalone snapshot:</p>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px 0">
       <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED;margin-bottom:8px">
@@ -116,15 +116,15 @@ export function renderTeamRiskDrip(payload: TeamRiskDripPayload | null | undefin
       Хотите такой workflow для своей команды?
     </p>
     <p style="margin:0">
-      <a href="${BASE_URL}/auth/register?utm_source=drip&utm_medium=email&utm_campaign=team-risk" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+      <a href="${BASE_URL}/auth/register?utm_source=drip&utm_medium=email&utm_campaign=team-risk" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F35703,#D44A02);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
       Free forever для до 5 атлетов. Pro tier с recurring billing — когда команда растёт.
     </p>
   `
-  return { subject, html: wrap(subject, `Team Risk follow-up · ${teamLabel}`, inner, '#EA580C') }
+  return { subject, html: wrap(subject, `Team Risk follow-up · ${teamLabel}`, inner, '#D44A02') }
 }
 
 // ── Source: adaptive-plan ──────────────────────────────────────────────
@@ -156,7 +156,7 @@ export function renderAdaptivePlanDrip(payload: AdaptivePlanDripPayload | null |
       </p>
     </div>
 
-    <p style="margin:0 0 8px 0;color:#0F172A;font-size:14px;line-height:1.6;font-weight:600">Что даёт ProForm:</p>
+    <p style="margin:0 0 8px 0;color:#0F172A;font-size:14px;line-height:1.6;font-weight:600">Что даёт Sporteo:</p>
 
     <ul style="margin:0 0 18px 0;padding-left:20px;color:#475569;font-size:13px;line-height:1.7">
       <li><strong>Garmin / Whoop / Apple Health integration</strong> — фактическая нагрузка логируется автоматически</li>
@@ -196,7 +196,7 @@ export function renderClubAuditDrip(payload: ClubAuditDripPayload | null | undef
   const p = payload ?? {}
   const subject = p.health_score !== undefined
     ? `Audit ${p.health_score}/100 — что делать дальше с клубом`
-    : `От аудита к действию — как клубы используют ProForm`
+    : `От аудита к действию — как клубы используют Sporteo`
   const sport = p.primary_sport ?? 'клуба'
   const inner = `
     <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A;line-height:1.3">
@@ -212,7 +212,7 @@ export function renderClubAuditDrip(payload: ClubAuditDripPayload | null | undef
     </p>
 
     <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px;margin:0 0 18px 0">
-      <strong style="color:#15803D;font-size:13px">📊 ProForm Org Dashboard:</strong>
+      <strong style="color:#15803D;font-size:13px">📊 Sporteo Org Dashboard:</strong>
       <ul style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.7">
         <li>KPI tiles в реальном времени — retention, активные athletes, coach load</li>
         <li>Roster matrix с цветовым highlighting перегрузки тренеров</li>
@@ -233,7 +233,7 @@ export function renderClubAuditDrip(payload: ClubAuditDripPayload | null | undef
     </p>
     <p style="margin:0">
       <a href="${BASE_URL}/auth/register?utm_source=drip&utm_medium=email&utm_campaign=club-audit" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#10B981,#0F766E);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
@@ -276,7 +276,7 @@ export function renderMedicalSummaryDrip(payload: MedicalSummaryDripPayload | nu
     </p>
 
     <p style="margin:0 0 8px 0;color:#0F172A;font-size:14px;line-height:1.6;font-weight:600">
-      ProForm для спортивных врачей — больше чем разовый AI-draft:
+      Sporteo для спортивных врачей — больше чем разовый AI-draft:
     </p>
 
     <ul style="margin:0 0 18px 0;padding-left:20px;color:#475569;font-size:13px;line-height:1.7">
@@ -293,7 +293,7 @@ export function renderMedicalSummaryDrip(payload: MedicalSummaryDripPayload | nu
     </p>
     <p style="margin:0">
       <a href="${BASE_URL}/auth/register?utm_source=drip&utm_medium=email&utm_campaign=medical-summary" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#8B5CF6,#A21CAF);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
-        Открыть ProForm бесплатно →
+        Открыть Sporteo бесплатно →
       </a>
     </p>
     <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">

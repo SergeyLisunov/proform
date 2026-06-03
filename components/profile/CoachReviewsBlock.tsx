@@ -205,9 +205,9 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
             onClick={() => setShowForm(true)}
             style={{
               padding: '8px 14px', borderRadius: 12,
-              background: myReview ? 'var(--accent)' : '#F97316',
+              background: myReview ? 'var(--accent)' : '#F35703',
               color: myReview ? 'var(--foreground)' : '#fff',
-              fontSize: 13, fontWeight: 700, border: '1px solid ' + (myReview ? 'var(--border)' : '#EA580C'),
+              fontSize: 13, fontWeight: 700, border: '1px solid ' + (myReview ? 'var(--border)' : '#D44A02'),
               display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
             }}
           >
@@ -256,8 +256,8 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
               disabled={saving}
               style={{
                 padding: '9px 16px', borderRadius: 12,
-                background: '#F97316', color: '#fff', fontSize: 13, fontWeight: 700,
-                border: '1px solid #EA580C', cursor: saving ? 'wait' : 'pointer',
+                background: '#F35703', color: '#fff', fontSize: 13, fontWeight: 700,
+                border: '1px solid #D44A02', cursor: saving ? 'wait' : 'pointer',
                 opacity: saving ? 0.7 : 1, display: 'inline-flex', alignItems: 'center', gap: 6,
               }}
             >

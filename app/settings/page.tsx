@@ -74,7 +74,7 @@ const EMPTY_FORM: FormData = {
 
 // ── Конфиги ───────────────────────────────────────────────────────────────────
 const TABS: { id: Tab; label: string; icon: string; color: string }[] = [
-  { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle', color: '#F35703' },
   { id: 'sport',    label: 'Спорт',         icon: 'ki-abstract-26',    color: '#2563EB' },
   { id: 'physio',   label: 'Физиология',    icon: 'ki-heart',          color: '#E11D48' },
   { id: 'devices',  label: 'Устройства',    icon: 'ki-watch',          color: '#7C3AED' },
@@ -197,7 +197,7 @@ function Input({ value, onChange, type = 'text', placeholder, min, max }: {
   return (
     <input type={type} value={value} onChange={e => onChange(e.target.value)}
       placeholder={placeholder} min={min} max={max} style={iStyle}
-      onFocus={e => (e.target.style.borderColor = '#F97316')}
+      onFocus={e => (e.target.style.borderColor = '#F35703')}
       onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
   )
 }
@@ -209,7 +209,7 @@ function Select({ value, onChange, options }: {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
       style={{ ...iStyle, cursor: 'pointer' }}
-      onFocus={e => (e.target.style.borderColor = '#F97316')}
+      onFocus={e => (e.target.style.borderColor = '#F35703')}
       onBlur={e => (e.target.style.borderColor = 'var(--border)')}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -255,7 +255,7 @@ function Toggle({ value, onChange, label, hint }: { value: boolean; onChange: (v
         onClick={() => onChange(!value)}
         style={{
           width: 48, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer',
-          background: value ? '#F97316' : 'var(--border)',
+          background: value ? '#F35703' : 'var(--border)',
           position: 'relative', flexShrink: 0, transition: 'background 0.2s',
         }}>
         <span style={{
@@ -291,7 +291,7 @@ function PasswordCard() {
     return s
   })()
   const strengthLabel = ['', 'Слабый', 'Средний', 'Хороший', 'Отличный'][strength]
-  const strengthColor = ['', '#DC2626', '#F97316', '#EAB308', '#16A34A'][strength]
+  const strengthColor = ['', '#DC2626', '#F35703', '#EAB308', '#16A34A'][strength]
 
   async function handleChange() {
     if (!newPw || newPw.length < 8) { setMsg({ type:'err', text:'Минимум 8 символов' }); return }
@@ -650,8 +650,8 @@ export default function SettingsPage() {
             marginBottom: 14, transition: 'all 0.15s',
           }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F97316'
-              ;(e.currentTarget as HTMLAnchorElement).style.color = '#F97316'
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F35703'
+              ;(e.currentTarget as HTMLAnchorElement).style.color = '#F35703'
               ;(e.currentTarget as HTMLAnchorElement).style.background = '#FFF7ED'
             }}
             onMouseLeave={e => {
@@ -678,7 +678,7 @@ export default function SettingsPage() {
             <div style={{ width: 100, height: 6, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
               <div style={{
                 height: '100%', borderRadius: 999,
-                background: completion >= 80 ? '#16A34A' : completion >= 40 ? '#F97316' : '#E11D48',
+                background: completion >= 80 ? '#16A34A' : completion >= 40 ? '#F35703' : '#E11D48',
                 width: `${completion}%`, transition: 'width 0.4s ease',
               }} />
             </div>
@@ -716,12 +716,12 @@ export default function SettingsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Avatar upload */}
           <Card>
-            <SectionHeader icon="ki-picture" color="#F97316" title="Фото профиля" />
+            <SectionHeader icon="ki-picture" color="#F35703" title="Фото профиля" />
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 4 }}>
               <div style={{ position: 'relative', flexShrink: 0 }}>
                 <div style={{
                   width: 80, height: 80, borderRadius: 20,
-                  background: avatarUrl ? 'transparent' : 'linear-gradient(135deg,#F97316,#EA580C)',
+                  background: avatarUrl ? 'transparent' : 'linear-gradient(135deg,#F35703,#D44A02)',
                   border: '2px solid var(--border)', overflow: 'hidden',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -755,7 +755,7 @@ export default function SettingsPage() {
                     style={{
                       padding: '7px 16px', borderRadius: 10,
                       border: '1.5px solid #FED7AA', background: '#FFF7ED',
-                      color: '#F97316', fontSize: 12, fontWeight: 600,
+                      color: '#F35703', fontSize: 12, fontWeight: 600,
                       cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
                       display: 'flex', alignItems: 'center', gap: 6,
                     }}
@@ -792,7 +792,7 @@ export default function SettingsPage() {
           </Card>
 
           <Card>
-            <SectionHeader icon="ki-profile-circle" color="#F97316" title="Личные данные" />
+            <SectionHeader icon="ki-profile-circle" color="#F35703" title="Личные данные" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Имя">
                 <Input value={form.first_name} onChange={set('first_name')} placeholder="Иван" />
@@ -821,7 +821,7 @@ export default function SettingsPage() {
                       ...iStyle, paddingLeft: 28,
                       borderColor: nicknameStatus === 'available' ? '#16A34A' : nicknameStatus === 'taken' || nicknameStatus === 'invalid' ? '#DC2626' : undefined,
                     }}
-                    onFocus={e => { if (nicknameStatus === 'idle') e.target.style.borderColor = '#F97316' }}
+                    onFocus={e => { if (nicknameStatus === 'idle') e.target.style.borderColor = '#F35703' }}
                     onBlur={e => { if (nicknameStatus === 'idle') e.target.style.borderColor = 'var(--border)' }}
                   />
                   {nicknameStatus === 'checking' && (
@@ -857,7 +857,7 @@ export default function SettingsPage() {
                 value={form.bio} onChange={e => set('bio')(e.target.value)}
                 rows={4} placeholder="Расскажите о себе, опыте, целях…"
                 style={{ ...iStyle, resize: 'none', fontFamily: 'inherit' }}
-                onFocus={e => (e.target.style.borderColor = '#F97316')}
+                onFocus={e => (e.target.style.borderColor = '#F35703')}
                 onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
             </Field>
           </Card>
@@ -991,7 +991,7 @@ export default function SettingsPage() {
             </Field>
             <div style={{ marginTop: 16 }}>
               <Alert variant="info">
-                Если ваша организация зарегистрирована в ProForm, вы можете получить приглашение и автоматически
+                Если ваша организация зарегистрирована в Sporteo, вы можете получить приглашение и автоматически
                 привязаться к ней. Обратитесь к администратору организации.
               </Alert>
             </div>
@@ -1130,7 +1130,7 @@ export default function SettingsPage() {
               ? 'linear-gradient(135deg, #16A34A, #15803D)'
               : saveError
               ? 'linear-gradient(135deg, #DC2626, #B91C1C)'
-              : 'linear-gradient(135deg, #F97316, #EA580C)',
+              : 'linear-gradient(135deg, #F35703, #D44A02)',
             color: 'white', fontSize: 14, fontWeight: 700,
             boxShadow: saved
               ? '0 3px 12px rgba(22,163,74,0.35)'

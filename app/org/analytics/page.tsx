@@ -51,7 +51,7 @@ export default async function OrgAnalyticsPage() {
 
   const kpis = [
     { label: 'Активных участников', value: activeMembers ?? 0, icon: 'ki-people',        color: '#2563EB' },
-    { label: 'Атлетов',              value: athleteMembers ?? 0, icon: 'ki-abstract-26',  color: '#F97316' },
+    { label: 'Атлетов',              value: athleteMembers ?? 0, icon: 'ki-abstract-26',  color: '#F35703' },
     { label: 'Тренеров',             value: coachMembers ?? 0, icon: 'ki-teacher',       color: '#16A34A' },
     { label: 'Ожидают подтвержд.',   value: pendingMembers ?? 0, icon: 'ki-time',         color: '#CA8A04' },
   ]
@@ -85,7 +85,7 @@ export default async function OrgAnalyticsPage() {
           type="bar"
           options={{
             chart: { toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
-            colors: ['#2563EB', '#F97316', '#16A34A', '#CA8A04'],
+            colors: ['#2563EB', '#F35703', '#16A34A', '#CA8A04'],
             plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', distributed: true } },
             dataLabels: { enabled: false },
             legend: { show: false },
@@ -119,10 +119,10 @@ export default async function OrgAnalyticsPage() {
           </Card>
         </Link>
         <Link href="/org/members?role=athlete" className="no-underline">
-          <Card className="p-5 rounded-2xl hover:border-[#F97316] hover:shadow-md transition">
+          <Card className="p-5 rounded-2xl hover:border-[#F35703] hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED]">
-                <i className="ki-filled ki-abstract-26 text-[16px] text-[#F97316]" />
+                <i className="ki-filled ki-abstract-26 text-[16px] text-[#F35703]" />
               </div>
               <div>
                 <div className="text-sm font-bold text-foreground">Список атлетов</div>

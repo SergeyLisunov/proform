@@ -26,7 +26,7 @@ const PERIOD_OPTS = [
   { label: 'Сезон', value: 'season' },
 ]
 
-const ZC = ['#60A5FA', '#34D399', '#FBBF24', '#F97316', '#EF4444']
+const ZC = ['#60A5FA', '#34D399', '#FBBF24', '#F35703', '#EF4444']
 
 function Surface({
   children,
@@ -161,7 +161,7 @@ function CoachAnalytics() {
 
   const loadCompare = {
     chart: { type: 'radar' as const, toolbar: { show: false }, animations: { enabled: false } },
-    colors: ['#2563EB', '#F97316', '#16A34A', '#7C3AED'],
+    colors: ['#2563EB', '#F35703', '#16A34A', '#7C3AED'],
     xaxis: { categories: ['Нагрузка', 'ВСР', 'Восстановление', 'Тренировки', 'Сон', 'Серия'] },
     yaxis: { show: false },
     grid: { padding: { top: 10, bottom: 10 } },
@@ -173,7 +173,7 @@ function CoachAnalytics() {
   const groupBar = {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 5 } },
-    colors: ['#2563EB', '#F97316', '#16A34A', '#7C3AED'],
+    colors: ['#2563EB', '#F35703', '#16A34A', '#7C3AED'],
     xaxis: {
       categories: DEMO_WEEKLY.map((w) => w.w),
       labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },
@@ -409,7 +409,7 @@ function AthleteAnalytics() {
   const areaOpts = {
     chart: { type: 'area' as const, toolbar: { show: false }, animations: { enabled: false } },
     stroke: { curve: 'smooth' as const, width: 2.5 },
-    colors: ['#F97316', '#16A34A'],
+    colors: ['#F35703', '#16A34A'],
     fill: { type: 'gradient', gradient: { opacityFrom: 0.12, opacityTo: 0.0 } },
     xaxis: {
       categories: DEMO_DAILY.map((day) => day.day),

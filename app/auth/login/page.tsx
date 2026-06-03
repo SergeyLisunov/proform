@@ -186,7 +186,7 @@ export default function LoginPage() {
               <i className="ki-filled ki-abstract-26 text-sm text-white" />
             </div>
             <div className="text-right">
-              <div className="pf-num text-lg text-foreground">ProForm</div>
+              <div className="pf-num text-lg text-foreground">Sporteo</div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground -mt-0.5">Спортивная платформа</div>
             </div>
           </Link>

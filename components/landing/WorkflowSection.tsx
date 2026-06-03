@@ -153,7 +153,7 @@ export default function WorkflowSection() {
             Подключение → работа → контроль
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Три фазы внедрения ProForm в клуб. От первого инвайта до
+            Три фазы внедрения Sporteo в клуб. От первого инвайта до
             ежедневного контроля состояния организации — за 10 минут.
           </p>
         </div>
@@ -169,7 +169,7 @@ export default function WorkflowSection() {
         <p className="mt-10 text-center text-sm text-muted-foreground">
           Каждая роль работает в своём интерфейсе, а данные сходятся в одну картину.{' '}
           <a href="#tools" className="font-semibold text-orange-600 hover:underline">
-            Попробовать AI-инструменты ProForm →
+            Попробовать AI-инструменты Sporteo →
           </a>
         </p>
       </div>

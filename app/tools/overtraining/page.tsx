@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import OvertrainingQuiz from './OvertrainingQuiz'
 
 export const metadata: Metadata = {
-  title: 'Тест на перетренированность — 10 вопросов | ProForm',
+  title: 'Тест на перетренированность — 10 вопросов | Sporteo',
   description:
     'Бесплатный научный тест на признаки перетренированности. 10 вопросов, результат с рекомендациями за 2 минуты. Чек-лист на основе критериев Overtraining Syndrome.',
   openGraph: {
     title: 'Тест на перетренированность — 10 вопросов',
     description: 'Узнайте за 2 минуты, не перегружаете ли вы себя тренировками. Бесплатно.',
     url: 'https://proform-delta.vercel.app/tools/overtraining',
-    siteName: 'ProForm',
+    siteName: 'Sporteo',
     type: 'website',
   },
   alternates: { canonical: 'https://proform-delta.vercel.app/tools/overtraining' },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'Quiz',
-  name: 'Тест на перетренированность (ProForm)',
+  name: 'Тест на перетренированность (Sporteo)',
   about: 'Overtraining Syndrome self-assessment',
   educationalUse: 'Self-assessment',
 }

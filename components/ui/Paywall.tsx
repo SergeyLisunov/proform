@@ -69,7 +69,7 @@ export const PLANS = [
     price: 599,
     period: '/мес',
     description: 'Для серьёзных атлетов',
-    color: '#F97316',
+    color: '#F35703',
     bg: '#FFF7ED',
     popular: true,
     features: [
@@ -228,7 +228,7 @@ export function PricingModal({
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '6px 14px', borderRadius: 20,
                 background: '#FFF7ED', border: '1px solid #FED7AA',
-                color: '#EA580C', fontSize: 12, fontWeight: 700,
+                color: '#D44A02', fontSize: 12, fontWeight: 700,
                 marginBottom: 12,
               }}>
                 {TRIGGER_MESSAGES[trigger]}
@@ -238,7 +238,7 @@ export function PricingModal({
               Выберите план
             </h2>
             <p style={{ fontSize: 14, color: 'var(--muted-foreground)', margin: '6px 0 0' }}>
-              Разблокируйте полный потенциал ProForm
+              Разблокируйте полный потенциал Sporteo
             </p>
           </div>
 
@@ -435,7 +435,7 @@ export function WorkoutLimitBadge() {
         padding: '8px 14px', borderRadius: 12,
         background: isEmpty ? '#FEF2F2' : '#FFF7ED',
         border: `1px solid ${isEmpty ? '#FECACA' : '#FED7AA'}`,
-        color: isEmpty ? '#DC2626' : '#EA580C',
+        color: isEmpty ? '#DC2626' : '#D44A02',
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'all 0.15s',
       }} className="hover:opacity-80">

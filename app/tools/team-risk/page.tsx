@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import TeamRiskCalculator from './TeamRiskCalculator'
 
 export const metadata: Metadata = {
-  title: 'Team Risk Snapshot — определите атлетов в зоне риска за 60 секунд · ProForm',
+  title: 'Team Risk Snapshot — определите атлетов в зоне риска за 60 секунд · Sporteo',
   description:
     'Бесплатный AI-инструмент для тренеров и клубов. Введите данные команды (3-12 атлетов) — получите цветовой светофор риска по каждому, причины и конкретные действия на ближайшие 7-14 дней.',
   openGraph: {

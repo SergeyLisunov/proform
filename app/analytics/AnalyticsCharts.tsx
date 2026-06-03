@@ -9,7 +9,7 @@ interface Props {
   zonePcts: number[]
 }
 
-const ZONE_COLORS = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
+const ZONE_COLORS = ['#60A5FA','#34D399','#FBBF24','#F35703','#EF4444']
 const ZONE_LABELS = ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO₂max']
 
 export default function AnalyticsCharts({ dailyData, weeklyStrain, zonePcts }: Props) {
@@ -32,11 +32,11 @@ export default function AnalyticsCharts({ dailyData, weeklyStrain, zonePcts }: P
   const strainOpts = {
     ...baseOpts,
     chart: { ...baseOpts.chart, type:'area' as const, id:'str' },
-    colors: ['#F97316'],
+    colors: ['#F35703'],
     fill: { type:'gradient', gradient: { opacityFrom:0.15, opacityTo:0 } },
     stroke: { curve:'smooth' as const, width:2.5 },
     xaxis: { ...baseOpts.xaxis, categories: weeklyStrain.map(d=>d.w) },
-    markers: { size:4, colors:['#F97316'], strokeWidth:0 },
+    markers: { size:4, colors:['#F35703'], strokeWidth:0 },
   }
 
   const donutOpts = {

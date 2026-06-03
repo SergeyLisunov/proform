@@ -33,7 +33,7 @@ export const maxDuration = 60
  *   3. UPDATE payment_events.processed_at
  */
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 
 interface YooKassaObject {
   id: string

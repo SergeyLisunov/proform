@@ -16,10 +16,10 @@ import StaticPageShell from '@/components/layout/StaticPageShell'
 export const metadata: Metadata = {
   title: 'Контакты',
   description:
-    'Связаться с командой ProForm: поддержка пользователей, подключение клуба, юридические и security вопросы. Email + рабочие часы.',
+    'Связаться с командой Sporteo: поддержка пользователей, подключение клуба, юридические и security вопросы. Email + рабочие часы.',
   alternates: { canonical: '/contacts' },
   openGraph: {
-    title: 'Контакты ProForm',
+    title: 'Контакты Sporteo',
     description:
       'Email и рабочие часы поддержки. Подключение клуба, юридические и security вопросы.',
     url: '/contacts',
@@ -67,7 +67,7 @@ export default function ContactsPage() {
     >
       <section>
         <p className="text-muted-foreground">
-          Команда ProForm работает удалённо. Самый быстрый способ связаться — email.
+          Команда Sporteo работает удалённо. Самый быстрый способ связаться — email.
           Все письма читаем в течение рабочего дня. Для срочных вопросов о работе
           существующего клуба пишите на основной адрес поддержки.
         </p>

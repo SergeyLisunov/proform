@@ -47,7 +47,7 @@ export default function DoctorHeroBar({ firstName, stats }: { firstName: string;
 
         <div className="w-full lg:w-auto grid grid-cols-2 sm:grid-cols-4 gap-2">
           <Stat label="Пациенты"          value={String(stats.patientsCount)}  color="#DC2626" />
-          <Stat label="Осмотры сегодня"    value={String(stats.todayCheckups)}  color="#EA580C" highlight={stats.todayCheckups > 0} />
+          <Stat label="Осмотры сегодня"    value={String(stats.todayCheckups)}  color="#D44A02" highlight={stats.todayCheckups > 0} />
           <Stat label="Активные травмы"    value={String(stats.activeInjuries)} color="#B91C1C" highlight={stats.activeInjuries > 0} />
           <Stat label="Уведомления"        value={String(stats.unreadNotif)}    color="#2563EB" highlight={stats.unreadNotif > 0} />
         </div>

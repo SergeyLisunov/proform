@@ -72,7 +72,7 @@ export default function PricingTeaserSection() {
             Сейчас бесплатно. Без сюрпризов потом.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            ProForm в закрытой бете — все функции бесплатно. После выхода —
+            Sporteo в закрытой бете — все функции бесплатно. После выхода —
             прозрачные планы с публичной таблицей тарифов.
           </p>
         </div>

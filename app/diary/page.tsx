@@ -19,7 +19,7 @@ const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
 const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C' },
+  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#D44A02' },
   'Плавание':  { icon: 'ki-abstract-14',  bg: '#E0F2FE', border: '#7DD3FC', text: '#0284C7' },
   'Силовые':   { icon: 'ki-abstract-45',  bg: '#FAF5FF', border: '#E9D5FF', text: '#9333EA' },
   'Ходьба':    { icon: 'ki-map',          bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
@@ -86,7 +86,7 @@ function strainColor(v: number): string {
   if (v < 3) return '#22c55e'
   if (v < 8) return '#84cc16'
   if (v < 14) return '#eab308'
-  if (v < 18) return '#f97316'
+  if (v < 18) return '#F35703'
   return '#ef4444'
 }
 
@@ -284,7 +284,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
   const chartOpts = {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
     grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
-    colors: ['#F97316'],
+    colors: ['#F35703'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '55%', distributed: true } },
     dataLabels: { enabled: false },
     stroke: { show: false },
@@ -324,7 +324,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
               ? stats.totalH.toFixed(1) + ' ч'
               : stats.totalMin + ' мин',
             icon: 'ki-time',
-            color: '#F97316',
+            color: '#F35703',
             bg: '#FFF7ED',
           },
           {
@@ -521,7 +521,7 @@ function ViewEditDrawer({
   const inputClass = 'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
   const quickFacts = [
     workout.activity_duration_min != null
-      ? { label: 'Длительность', value: fmtDuration(workout.activity_duration_min), tone: '#F97316' }
+      ? { label: 'Длительность', value: fmtDuration(workout.activity_duration_min), tone: '#F35703' }
       : null,
     workout.activity_strain != null
       ? { label: 'Нагрузка', value: Number(workout.activity_strain).toFixed(1), tone: strainColor(Number(workout.activity_strain)) }
@@ -1300,7 +1300,7 @@ function AthleteDiary() {
               </div>
             </div>
             <div className="flex flex-col gap-2.5">
-              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F97316,#EA580C)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)] transition-transform hover:translate-y-[-1px]">
+              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)] transition-transform hover:translate-y-[-1px]">
                 <i className="ki-filled ki-plus text-sm" />
                 Новая тренировка
               </button>
@@ -1404,7 +1404,7 @@ function AthleteDiary() {
               : 'Смените фильтр активности или создайте новую запись, чтобы история оставалась полной.'}
           </p>
           <div className="mt-5 flex justify-center">
-            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F97316,#EA580C)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)]">
+            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)]">
               <i className="ki-filled ki-plus text-sm" />
               Добавить тренировку
             </button>

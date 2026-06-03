@@ -612,7 +612,7 @@ export default function MedicalSummaryForm() {
                 <p className="text-sm font-bold text-green-800">✅ Полный assessment template открыт выше.</p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите вести медицинскую документацию атлетов в одной системе?
-                  ProForm для врачей: structured recommendations с visibility levels (athlete only / coach only / org_full),
+                  Sporteo для врачей: structured recommendations с visibility levels (athlete only / coach only / org_full),
                   автоматический notification dispatch, история восстановления через wearables.
                 </p>
                 <Link href="/auth/register?utm_source=tools&utm_medium=medical-summary"
@@ -652,7 +652,7 @@ export default function MedicalSummaryForm() {
         <div className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Документируйте medical findings правильно</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
-            ProForm для врачей: structured recommendations с privacy levels (athlete only / coach + athlete / org_full),
+            Sporteo для врачей: structured recommendations с privacy levels (athlete only / coach + athlete / org_full),
             integration с тренировочными данными атлета, автоматический dispatch уведомлений тренеру и атлету.
           </p>
           <Link href="/auth/register?utm_source=tools&utm_medium=medical-summary&utm_campaign=cta"

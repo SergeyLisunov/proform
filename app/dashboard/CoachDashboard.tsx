@@ -108,7 +108,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
   const reviewCount = (reviewSummary as { review_count: number | null } | null)?.review_count ?? 0
 
   const firstName = name.split(' ')[0] || name
-  const AT_COLORS = ['#2563EB', '#F97316', '#16A34A', '#7C3AED', '#D97706', '#DC2626']
+  const AT_COLORS = ['#2563EB', '#F35703', '#16A34A', '#7C3AED', '#D97706', '#DC2626']
 
   const athletesForActions = athletes.map(a => ({ id: a.id, name: a.name ?? '—' }))
 
@@ -165,7 +165,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                 <Link key={p.id} href="/connections"
                   className="flex items-center gap-2.5 rounded-xl bg-white/80 px-2.5 py-2 hover:bg-white border border-transparent hover:border-orange-200">
                   <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-                    style={{ background: '#F97316' }}>
+                    style={{ background: '#F35703' }}>
                     {p.user?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.user.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -228,7 +228,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                         { v: m.hrv.toFixed(1),    u: 'ВСР мс',     c: '#2563EB' },
                         { v: m.rhr.toFixed(0),    u: 'ЧСС покоя',  c: '#DC2626' },
                         { v: m.sleep.toFixed(1),  u: 'Сон ч',      c: '#7C3AED' },
-                        { v: m.strain.toFixed(1), u: 'Strain',     c: '#F97316' },
+                        { v: m.strain.toFixed(1), u: 'Strain',     c: '#F35703' },
                       ].map(({ v, u, c }) => (
                         <div key={u} className="text-center py-1.5 px-1 rounded-lg" style={{ background: '#F8FAFC' }}>
                           <div className="pf-num text-base leading-none" style={{ color: c }}>{v}</div>
@@ -265,10 +265,10 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
             {diary.map(d => {
               const ath = athletes.find(a => a.id === d.athlete_id)
               return (
-                <div key={d.id} className="p-3.5 rounded-xl" style={{ background: '#F8FAFC', borderLeft: '3px solid #F97316' }}>
+                <div key={d.id} className="p-3.5 rounded-xl" style={{ background: '#F8FAFC', borderLeft: '3px solid #F35703' }}>
                   <div className="flex items-start justify-between gap-3 mb-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      {ath && <span className="text-xs font-bold text-[#F97316]">{ath.name}</span>}
+                      {ath && <span className="text-xs font-bold text-[#F35703]">{ath.name}</span>}
                       {d.tags && d.tags.length > 0 && d.tags.map((t: string) => (
                         <Badge key={t} variant="primary" size="sm">{t}</Badge>
                       ))}

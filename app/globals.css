@@ -49,12 +49,33 @@
   --pf-font-display: var(--font-pf-display), "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
 }
 
-/* ── Brand tokens ─────────────────────────────────────────────────────────── */
+/* ── Brand tokens (Sporteo) ───────────────────────────────────────────────────
+   Palette sampled from the Sporteo deck: orange #F35703 + navy #1D4672 + cream.
+   --pf-brand kept as the token name (used app-wide) but now carries the Sporteo
+   orange. Metronic's --primary is overridden so all kt-*-primary components
+   render on-brand. */
 :root {
-  --pf-brand:       #F97316;
-  --pf-brand-hover: #EA580C;
-  --pf-brand-muted: #FFF7ED;
-  --pf-brand-border: #FED7AA;
+  --pf-brand:        #F35703;
+  --pf-brand-hover:  #D44A02;
+  --pf-brand-muted:  #FEF0E7;
+  --pf-brand-border: #FBD0B5;
+
+  /* Sporteo navy — secondary / headings / panels */
+  --sporteo-navy:        #1D4672;
+  --sporteo-navy-hover:  #163A5E;
+  --sporteo-navy-muted:  #EAF0F6;
+  --sporteo-cream:       #FBF3EC;
+}
+
+/* Override Metronic theme primary → Sporteo orange so kt-btn-primary,
+   kt-badge-primary, kt-alert-primary, etc. are on-brand. */
+:root,
+[data-kt-theme="true"],
+.demo1 {
+  --primary: #F35703;
+  --primary-active: #D44A02;
+  --primary-foreground: #ffffff;
+  --primary-clarity: rgba(243, 87, 3, 0.15);
 }
 
 /* ── Typography ───────────────────────────────────────────────────────────── */

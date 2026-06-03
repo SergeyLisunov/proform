@@ -1,7 +1,7 @@
 /**
  * <RoleSection /> — Sprint W14 Day 69; mobile carousel W17 Day 87.
  *
- * Самая важная новая landing-секция. ProForm — мульти-ролевая платформа,
+ * Самая важная новая landing-секция. Sporteo — мульти-ролевая платформа,
  * и это её главная differentiation. Этот блок отвечает на «для кого
  * это» в визуальном формате.
  *
@@ -71,7 +71,7 @@ const ROLES: RoleEntry[] = [
       'Сообщения от тренера и врача',
     ],
     demoEmail:    'athlete@proform.test',
-    accent:       '#F97316',
+    accent:       '#F35703',
     accentBg:     '#FFF7ED',
     accentBorder: '#FED7AA',
   },
@@ -108,7 +108,7 @@ export default function RoleSection() {
             Каждый видит только то, что нужно ему
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            ProForm построен на идее, что разные люди вокруг спортсмена решают разные задачи.
+            Sporteo построен на идее, что разные люди вокруг спортсмена решают разные задачи.
             Платформа даёт каждому свой инструмент — но соединяет их вокруг общей карточки спортсмена.
           </p>
         </div>

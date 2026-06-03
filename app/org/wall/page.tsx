@@ -21,7 +21,7 @@ const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: str
     label: 'Событие',
     badge: 'bg-orange-50 text-orange-600 border border-orange-200',
     icon: 'ki-calendar-tick',
-    accent: '#F97316',
+    accent: '#F35703',
     panel: '#FFF7ED',
   },
   news: {
@@ -157,7 +157,7 @@ export default function OrgWallPage() {
   const latestPost = posts[0]
   const summary = [
     { label: 'Всего публикаций', value: posts.length, hint: 'Все записи на стене', icon: 'ki-abstract-26', color: '#2563EB', bg: '#EFF6FF' },
-    { label: 'Закреплено', value: pinned.length, hint: 'Верх ленты и важные анонсы', icon: 'ki-pin', color: '#F97316', bg: '#FFF7ED' },
+    { label: 'Закреплено', value: pinned.length, hint: 'Верх ленты и важные анонсы', icon: 'ki-pin', color: '#F35703', bg: '#FFF7ED' },
     { label: 'События', value: eventPosts, hint: 'Посты с датой события', icon: 'ki-calendar-tick', color: '#9333EA', bg: '#FAF5FF' },
     { label: 'Публичные', value: publicPosts, hint: 'Открыты всем посетителям', icon: 'ki-eye', color: '#16A34A', bg: '#F0FDF4' },
   ]
@@ -189,7 +189,7 @@ export default function OrgWallPage() {
               <div className="mt-5 flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F97316,#EA580C)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] transition-transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] transition-transform hover:-translate-y-0.5"
                 >
                   <i className="ki-filled ki-plus text-sm" />
                   Новая публикация
@@ -393,7 +393,7 @@ export default function OrgWallPage() {
                 </Alert>
 
                 <div className="flex gap-2 pt-1">
-                  <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F97316,#EA580C)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] disabled:opacity-60">
+                  <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] disabled:opacity-60">
                     {saving ? 'Сохранение…' : 'Опубликовать'}
                   </button>
                   <button type="button" onClick={() => setShowCreate(false)} className="kt-btn kt-btn-outline">

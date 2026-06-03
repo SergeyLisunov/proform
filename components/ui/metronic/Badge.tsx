@@ -13,7 +13,7 @@ interface BadgeProps {
 }
 
 const VARIANT_TW: Record<BadgeVariant, string> = {
-  primary:     'bg-[#FFF7ED] text-[#EA580C]',
+  primary:     'bg-[#FFF7ED] text-[#D44A02]',
   secondary:   'bg-slate-100 text-slate-600',
   success:     'bg-green-50 text-green-700',
   warning:     'bg-amber-50 text-amber-700',
@@ -22,7 +22,7 @@ const VARIANT_TW: Record<BadgeVariant, string> = {
 }
 
 const DOT_TW: Record<BadgeVariant, string> = {
-  primary: 'bg-[#F97316]', secondary: 'bg-slate-400', success: 'bg-green-500',
+  primary: 'bg-[#F35703]', secondary: 'bg-slate-400', success: 'bg-green-500',
   warning: 'bg-amber-500', destructive: 'bg-red-500', info: 'bg-blue-500',
 }
 

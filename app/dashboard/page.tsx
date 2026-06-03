@@ -36,7 +36,7 @@ function sb() {
 
 const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C' },
+  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#D44A02' },
   'Плавание':  { icon: 'ki-abstract-14',  bg: '#E0F2FE', border: '#7DD3FC', text: '#0284C7' },
   'Силовые':   { icon: 'ki-abstract-45',  bg: '#FAF5FF', border: '#E9D5FF', text: '#9333EA' },
   'Ходьба':    { icon: 'ki-map',          bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
@@ -93,7 +93,7 @@ function HeroAvatar({ avatarUrl, name, userId, onAvatarUpdate }: {
       ) : (
         <div
           className="w-[72px] h-[72px] rounded-full flex items-center justify-center text-white text-2xl font-black pf-num"
-          style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)', border: '3px solid var(--card)' }}
+          style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)', border: '3px solid var(--card)' }}
         >
           {initials}
         </div>
@@ -219,7 +219,7 @@ function SocialIcons({ data, onEdit }: { data: SocialData; onEdit: () => void })
         }}
         onMouseEnter={e => {
           const b = e.currentTarget
-          b.style.borderColor = '#F97316'; b.style.color = '#F97316'; b.style.background = '#FFF7ED'
+          b.style.borderColor = '#F35703'; b.style.color = '#F35703'; b.style.background = '#FFF7ED'
         }}
         onMouseLeave={e => {
           const b = e.currentTarget
@@ -271,7 +271,7 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Профиль</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#F35703', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Профиль</p>
             <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>Социальные сети</h3>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
@@ -529,7 +529,7 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
       <div className="relative flex items-center gap-3 px-4 py-3.5">
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
-          style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
+          style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)' }}
         >
           <i className="ki-filled ki-plus text-white text-lg" />
         </div>
@@ -703,7 +703,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
   const actualHours = weeklyMinutes / 60
 
   const weekPct = targetHours > 0 ? Math.min(100, Math.round((actualHours / targetHours) * 100)) : 0
-  const weekRingColor = weekPct === 0 ? '#9CA3AF' : weekPct < 50 ? '#DC2626' : weekPct < 80 ? '#F97316' : weekPct < 100 ? '#2563EB' : '#16A34A'
+  const weekRingColor = weekPct === 0 ? '#9CA3AF' : weekPct < 50 ? '#DC2626' : weekPct < 80 ? '#F35703' : weekPct < 100 ? '#2563EB' : '#16A34A'
   const weekRingBg = weekPct === 0 ? '#F9FAFB' : weekPct < 50 ? '#FFF1F2' : weekPct < 80 ? '#FFF7ED' : weekPct < 100 ? '#EFF6FF' : '#F0FDF4'
 
   return (
@@ -728,7 +728,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                 onAvatarUpdate={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
               />
               <div>
-                <p style={{ fontSize:10, fontWeight:800, color:'#F97316', textTransform:'uppercase', letterSpacing:'0.22em', marginBottom:4 }}>
+                <p style={{ fontSize:10, fontWeight:800, color:'#F35703', textTransform:'uppercase', letterSpacing:'0.22em', marginBottom:4 }}>
                   Профиль атлета
                 </p>
                 <h2 className="text-2xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
@@ -747,7 +747,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                   label: 'Тренировок\nза неделю',
                   value: String(weeklyCount),
                   icon: 'ki-abstract-26',
-                  color: '#F97316',
+                  color: '#F35703',
                   bg: '#FFF7ED',
                 },
                 {
@@ -947,7 +947,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
   const barOpts = {
     chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: false } },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 6 } },
-    colors: ['#F97316'],
+    colors: ['#F35703'],
     xaxis: {
       categories: athletes.map(a => a.name.split(' ')[0]),
       labels: { style: { fontSize: '11px', colors: '#A1A1AA' } },

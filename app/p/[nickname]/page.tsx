@@ -13,7 +13,7 @@ export async function generateMetadata(
   const p = await getAthletePassport(nickname)
   if (!p) {
     return {
-      title: 'Атлет не найден — ProForm',
+      title: 'Атлет не найден — Sporteo',
       description: 'Этот профиль закрыт или не существует.',
     }
   }
@@ -22,14 +22,14 @@ export async function generateMetadata(
     p.sport ? `Спорт: ${p.sport}` : null,
     p.city  ? p.city : null,
     p.stats ? `${p.stats.total_workouts_90d} тренировок за 90 дней` : null,
-  ].filter(Boolean).join(' · ') || 'Публичный профиль на ProForm'
+  ].filter(Boolean).join(' · ') || 'Публичный профиль на Sporteo'
   const url = `https://proform-delta.vercel.app/p/${p.nickname}`
   return {
     title,
     description: desc,
     alternates: { canonical: url },
     openGraph: {
-      title, description: desc, url, siteName: 'ProForm',
+      title, description: desc, url, siteName: 'Sporteo',
       type: 'profile',
       images: p.avatar_url ? [{ url: p.avatar_url, width: 512, height: 512 }] : undefined,
     },
@@ -90,7 +90,7 @@ export default async function AthletePassportPage(
         className="relative overflow-hidden"
         style={p.background_url
           ? { backgroundImage: `linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.8)), url(${p.background_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-          : { background: 'linear-gradient(135deg, #F97316 0%, #EA580C 60%, #9A3412 100%)' }}>
+          : { background: 'linear-gradient(135deg, #F35703 0%, #D44A02 60%, #9A3412 100%)' }}>
         <div className="mx-auto max-w-5xl px-5 py-12 md:py-16 text-white">
           <div className="flex items-start gap-5 flex-wrap">
             <div className="shrink-0">
@@ -140,7 +140,7 @@ export default async function AthletePassportPage(
             За последние 90 дней
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <StatTile label="Тренировок" value={String(p.stats.total_workouts_90d)} accent="#F97316" />
+            <StatTile label="Тренировок" value={String(p.stats.total_workouts_90d)} accent="#F35703" />
             <StatTile label="Всего времени" value={fmtMinutes(p.stats.total_minutes_90d)} accent="#2563EB" />
             <StatTile label="Текущая серия" value={`${p.stats.current_streak_days} дн`} accent="#16A34A" />
             <StatTile label="Ср. восстановление"

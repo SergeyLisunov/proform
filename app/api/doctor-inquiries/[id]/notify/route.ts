@@ -26,7 +26,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
-const FROM    = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM    = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 const MAX_OPEN_QUEUE_FANOUT = 20
 
 const QUESTION_TYPE_LABELS: Record<string, { label: string; emoji: string }> = {

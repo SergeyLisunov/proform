@@ -79,7 +79,7 @@ export const ENTRY_TYPE_META: Record<DiaryEntryType, {
   },
   session_summary: {
     label: 'Итог тренировки', icon: 'ki-flash-circle',
-    color: '#EA580C', bg: '#FFF7ED', border: '#FED7AA',
+    color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA',
   },
   competition_report: {
     label: 'Соревнование',    icon: 'ki-medal-star',

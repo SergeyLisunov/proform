@@ -25,7 +25,7 @@ import { Accordion } from '@/components/ui/metronic'
 type MemberRole = 'athlete' | 'coach'
 
 const ROLE_CFG = {
-  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F97316', bg: '#FFF7ED', border: '#FED7AA' },
+  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
   coach:   { label: 'Тренер', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
 }
 
@@ -222,7 +222,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
                       Пример
                     </button>
                     <button type="button" onClick={() => fileInputRef.current?.click()}
-                      style={{ fontSize: 11, fontWeight: 600, color: '#F97316', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                      style={{ fontSize: 11, fontWeight: 600, color: '#F35703', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                       Загрузить .csv
                     </button>
                     <input ref={fileInputRef} type="file" accept=".csv,.txt,text/csv,text/plain" hidden

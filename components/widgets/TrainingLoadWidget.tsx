@@ -136,7 +136,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
                         className="w-full rounded-t-md transition-all"
                         style={{
                           height: h,
-                          background: isCurrent ? '#F97316' : '#E2E8F0',
+                          background: isCurrent ? '#F35703' : '#E2E8F0',
                         }}
                       />
                       <div className="text-[9px] text-muted-foreground font-bold">

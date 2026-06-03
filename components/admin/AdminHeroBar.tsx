@@ -40,7 +40,7 @@ export default function AdminHeroBar({ stats }: { stats: AdminHeroStats }) {
 
         <div className="w-full lg:w-auto grid grid-cols-2 sm:grid-cols-4 gap-2">
           <Stat label="Всего"     value={String(stats.totalUsers)} sub={newUsersDelta} color="#7C3AED" highlight={stats.newUsersWeek > 0} />
-          <Stat label="Атлетов"   value={String(stats.athletes)}   sub="ядро базы"    color="#F97316" />
+          <Stat label="Атлетов"   value={String(stats.athletes)}   sub="ядро базы"    color="#F35703" />
           <Stat label="Тренеров"  value={String(stats.coaches)}    sub="специалистов" color="#16A34A" />
           <Stat label="Тренировок" value={String(stats.workouts)} sub={newWorkoutsDelta} color="#2563EB" />
         </div>

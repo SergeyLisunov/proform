@@ -182,7 +182,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
               >
                 <i
                   className={`ki-filled ${r.i_commented ? 'ki-check-circle' : 'ki-abstract-26'} text-sm`}
-                  style={{ color: r.i_commented ? '#16A34A' : '#EA580C' }}
+                  style={{ color: r.i_commented ? '#16A34A' : '#D44A02' }}
                 />
               </div>
               <div className="min-w-0 flex-1">

@@ -18,7 +18,7 @@ const ACTIONS: QuickAction[] = [
     icon: 'ki-plus-squared',
     label: 'Тренировка',
     hint: 'Записать сессию',
-    bg: '#FFF7ED', color: '#EA580C', border: '#FED7AA',
+    bg: '#FFF7ED', color: '#D44A02', border: '#FED7AA',
   },
   {
     href: '/calendar',

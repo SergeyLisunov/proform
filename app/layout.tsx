@@ -48,18 +48,18 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
   'https://proform-delta.vercel.app'
 
-const SITE_TITLE = 'ProForm — спортивная платформа для клубов, академий и команд'
+const SITE_TITLE = 'Sporteo — спортивная платформа для клубов, академий и команд'
 const SITE_DESCRIPTION =
-  'Тренер, спортсмен, врач и клуб — в одной системе. Спортивная подготовка без чатов, таблиц и потерянных данных. Прогресс спортсмена видят все, кому это нужно — и только они.'
+  'Sporteo — цифровая платформа управления спортивной подготовкой. Тренер, спортсмен, врач и руководитель клуба вокруг единой карточки спортсмена: дневник тренировок, импорт с носимых устройств, предиктивная аналитика нагрузки (ACWR) и риска травм.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: '%s · ProForm',
+    template: '%s · Sporteo',
   },
   description: SITE_DESCRIPTION,
-  applicationName: 'ProForm',
+  applicationName: 'Sporteo',
   generator: 'Next.js',
   keywords: [
     'спортивная платформа',
@@ -71,8 +71,8 @@ export const metadata: Metadata = {
     'клуб ватерполо',
     'club management',
   ],
-  authors: [{ name: 'ProForm' }],
-  creator: 'ProForm',
+  authors: [{ name: 'Sporteo' }],
+  creator: 'Sporteo',
   referrer: 'origin-when-cross-origin',
   robots: {
     index: true,
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ru_RU',
     url: SITE_URL,
-    siteName: 'ProForm',
+    siteName: 'Sporteo',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
@@ -109,7 +109,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F97316',
+  themeColor: '#F35703',
   colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,

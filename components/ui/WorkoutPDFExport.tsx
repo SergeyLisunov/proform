@@ -71,7 +71,7 @@ function strainColor(v: number): string {
   if (v < 3) return '#22c55e'
   if (v < 8) return '#84cc16'
   if (v < 14) return '#eab308'
-  if (v < 18) return '#f97316'
+  if (v < 18) return '#F35703'
   return '#ef4444'
 }
 
@@ -79,7 +79,7 @@ const MOODS = ['😴', '😕', '😐', '🙂', '🔥']
 const MOOD_LABELS = ['Очень плохо', 'Плохо', 'Нейтрально', 'Хорошо', 'Отлично']
 
 const ACTIVITY_COLORS: Record<string, string> = {
-  'Бег': '#2563EB', 'Велоспорт': '#EA580C', 'Плавание': '#0284C7',
+  'Бег': '#2563EB', 'Велоспорт': '#D44A02', 'Плавание': '#0284C7',
   'Силовые': '#9333EA', 'Ходьба': '#16A34A',
 }
 
@@ -98,22 +98,22 @@ function generatePDF(workouts: Workout[], fromDate: string, toDate: string, athl
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>ProForm — Отчёт по тренировкам</title>
+<title>Sporteo — Отчёт по тренировкам</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Inter', -apple-system, sans-serif; color: #0f172a; background: #fff; font-size: 11px; line-height: 1.5; }
   
   /* Header */
-  .header { display: flex; justify-content: space-between; align-items: flex-start; padding: 32px 40px 24px; border-bottom: 3px solid #f97316; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; padding: 32px 40px 24px; border-bottom: 3px solid #F35703; }
   .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-logo { width: 36px; height: 36px; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 16px; }
+  .brand-logo { width: 36px; height: 36px; background: linear-gradient(135deg, #F35703, #D44A02); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 16px; }
   .brand-name { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.03em; }
   .brand-sub { font-size: 10px; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
   .header-meta { text-align: right; }
   .header-title { font-size: 22px; font-weight: 900; color: #0f172a; letter-spacing: -0.03em; }
   .header-sub { font-size: 10px; color: #94a3b8; margin-top: 3px; }
-  .header-period { font-size: 13px; font-weight: 700; color: #f97316; margin-top: 2px; }
+  .header-period { font-size: 13px; font-weight: 700; color: #F35703; margin-top: 2px; }
   
   /* Summary KPI */
   .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 20px 40px; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
@@ -171,7 +171,7 @@ function generatePDF(workouts: Workout[], fromDate: string, toDate: string, athl
   <div class="brand">
     <div class="brand-logo">P</div>
     <div>
-      <div class="brand-name">ProForm</div>
+      <div class="brand-name">Sporteo</div>
       <div class="brand-sub">Дневник тренировок</div>
     </div>
   </div>
@@ -276,7 +276,7 @@ ${Object.keys(byType).length > 1 ? `
 </div>
 
 <div class="footer">
-  <div class="footer-left">Сгенерировано ProForm · ${new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+  <div class="footer-left">Сгенерировано Sporteo · ${new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
   <div class="footer-right">proform-delta.vercel.app</div>
 </div>
 
@@ -431,7 +431,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0 }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
-            <div style={{ width:38,height:38,borderRadius:10,background:'linear-gradient(135deg,#f97316,#ea580c)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+            <div style={{ width:38,height:38,borderRadius:10,background:'linear-gradient(135deg,#F35703,#D44A02)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
               <i className="ki-filled ki-file-down text-white text-base" />
             </div>
             <div>
@@ -482,7 +482,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                       style={{ padding:'7px 14px',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer',transition:'all 0.15s',
                         background:preset===p.id?'#FFF7ED':'var(--card)',
                         border:`1.5px solid ${preset===p.id?'#FED7AA':'var(--border)'}`,
-                        color:preset===p.id?'#EA580C':'var(--muted-foreground)' }}>
+                        color:preset===p.id?'#D44A02':'var(--muted-foreground)' }}>
                       {p.label}
                     </button>
                   ))}
@@ -495,14 +495,14 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   <input type="date" value={fromDate} max={toDate}
                     onChange={e => { setFromDate(e.target.value); setPreset('custom') }}
                     style={{ width:'100%',borderRadius:12,border:'1.5px solid var(--border)',padding:'10px 14px',fontSize:14,outline:'none',background:'var(--background)',color:'var(--foreground)',boxSizing:'border-box' }}
-                    onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                    onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
                 </div>
                 <div>
                   <label style={{ fontSize:10,fontWeight:600,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',display:'block',marginBottom:6 }}>До</label>
                   <input type="date" value={toDate} min={fromDate}
                     onChange={e => { setToDate(e.target.value); setPreset('custom') }}
                     style={{ width:'100%',borderRadius:12,border:'1.5px solid var(--border)',padding:'10px 14px',fontSize:14,outline:'none',background:'var(--background)',color:'var(--foreground)',boxSizing:'border-box' }}
-                    onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
+                    onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')} />
                 </div>
               </div>
             </div>
@@ -557,9 +557,9 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                     return (
                       <button key={iso} onClick={() => toggleManualDate(iso)}
                         style={{ aspectRatio:'1',borderRadius:8,fontSize:12,fontWeight:selected?700:500,
-                          border:`2px solid ${selected?'#F97316':isToday?'#FDA96A':'transparent'}`,
-                          background:selected?'#F97316':isToday?'#FFF7ED':'var(--background)',
-                          color:selected?'white':isToday?'#EA580C':'var(--foreground)',
+                          border:`2px solid ${selected?'#F35703':isToday?'#FDA96A':'transparent'}`,
+                          background:selected?'#F35703':isToday?'#FFF7ED':'var(--background)',
+                          color:selected?'white':isToday?'#D44A02':'var(--foreground)',
                           cursor:'pointer',transition:'all 0.12s',display:'flex',alignItems:'center',justifyContent:'center' }}>
                         {day}
                       </button>
@@ -570,10 +570,10 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
 
               {manualDates.length > 0 && (
                 <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',borderRadius:10,background:'#FFF7ED',border:'1px solid #FED7AA' }}>
-                  <span style={{ fontSize:12,fontWeight:600,color:'#EA580C' }}>
+                  <span style={{ fontSize:12,fontWeight:600,color:'#D44A02' }}>
                     Выбрано дней: {manualDates.length}
                   </span>
-                  <button onClick={() => setManualDates([])} style={{ fontSize:11,color:'#EA580C',background:'none',border:'none',cursor:'pointer',fontWeight:600 }}>
+                  <button onClick={() => setManualDates([])} style={{ fontSize:11,color:'#D44A02',background:'none',border:'none',cursor:'pointer',fontWeight:600 }}>
                     Очистить всё
                   </button>
                 </div>
@@ -668,7 +668,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
               onClick={handleGenerate}
               disabled={generating || loading || workouts.length === 0}
               style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',cursor:workouts.length===0?'not-allowed':'pointer',
-                background:workouts.length===0?'var(--border)':'linear-gradient(135deg,#f97316,#ea580c)',
+                background:workouts.length===0?'var(--border)':'linear-gradient(135deg,#F35703,#D44A02)',
                 color:workouts.length===0?'var(--muted-foreground)':'white',fontSize:14,fontWeight:700,
                 display:'flex',alignItems:'center',justifyContent:'center',gap:8,
                 opacity:generating?0.7:1,transition:'all 0.15s' }}>

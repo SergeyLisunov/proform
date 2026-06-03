@@ -132,7 +132,7 @@ export default async function LandingAbPage() {
               rel="noreferrer"
               className="text-orange-600 hover:underline"
             >
-              Vercel Dashboard → ProForm → Analytics
+              Vercel Dashboard → Sporteo → Analytics
             </a>
           </li>
           <li>

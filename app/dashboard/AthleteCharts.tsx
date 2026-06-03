@@ -14,12 +14,12 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
   const strainOptions: ApexCharts.ApexOptions = {
     chart: { type: 'area', toolbar: { show: false }, sparkline: { enabled: false }, background: 'transparent' },
     dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2.5, colors: ['#F97316'] },
-    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.15, opacityTo: 0.0, stops: [0, 90, 100], colorStops: [{ offset: 0, color: '#F97316', opacity: 0.15 }, { offset: 100, color: '#F97316', opacity: 0 }] } },
+    stroke: { curve: 'smooth', width: 2.5, colors: ['#F35703'] },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.15, opacityTo: 0.0, stops: [0, 90, 100], colorStops: [{ offset: 0, color: '#F35703', opacity: 0.15 }, { offset: 100, color: '#F35703', opacity: 0 }] } },
     xaxis: { categories: weeklyData.map(d => d.w), labels: { style: { fontSize: '10px', colors: '#94A3B8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
     yaxis: { labels: { style: { fontSize: '10px', colors: '#94A3B8' } } },
     grid: { borderColor: '#F1F5F9', strokeDashArray: 4, xaxis: { lines: { show: false } } },
-    markers: { size: 4, colors: ['#F97316'], strokeColors: '#fff', strokeWidth: 2 },
+    markers: { size: 4, colors: ['#F35703'], strokeColors: '#fff', strokeWidth: 2 },
     tooltip: { theme: 'light', style: { fontSize: '11px' } },
   }
 

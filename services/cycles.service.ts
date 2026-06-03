@@ -152,7 +152,7 @@ export async function deleteCycleDay(cycleId: string, dayDate: string): Promise<
 
 export const CYCLE_TYPE_CFG: Record<CycleType, { label: string; bg: string; text: string; border: string; desc: string }> = {
   macro: { label: 'Макроцикл', bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE', desc: 'Большой период: сезон, год' },
-  meso:  { label: 'Мезоцикл', bg: '#FFF7ED', text: '#EA580C', border: '#FED7AA', desc: 'Средний период: 3–6 недель' },
+  meso:  { label: 'Мезоцикл', bg: '#FFF7ED', text: '#D44A02', border: '#FED7AA', desc: 'Средний период: 3–6 недель' },
   micro: { label: 'Микроцикл', bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0', desc: 'Малый период: 1–2 недели' },
 }
 

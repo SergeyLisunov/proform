@@ -76,7 +76,7 @@ async function getWorkoutsForMonth(athleteId: string, from: string, to: string):
 
 const ACTIVITY_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  color: '#2563EB', bg: '#EFF6FF' },
-  'Велоспорт': { icon: 'ki-technology-4', color: '#EA580C', bg: '#FFF7ED' },
+  'Велоспорт': { icon: 'ki-technology-4', color: '#D44A02', bg: '#FFF7ED' },
   'Плавание':  { icon: 'ki-abstract-14',  color: '#0284C7', bg: '#E0F2FE' },
   'Силовые':   { icon: 'ki-abstract-45',  color: '#9333EA', bg: '#FAF5FF' },
   'Ходьба':    { icon: 'ki-map',          color: '#16A34A', bg: '#F0FDF4' },
@@ -830,7 +830,7 @@ function YearView({ year, onSelect, cycles, selected }: { year: number; onSelect
                     <div key={di} onClick={() => onSelect(ds)}
                       className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
                       title={ds}
-                      style={{ background: isSel ? '#FFF7ED' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F97316' : (cc ? `1px solid ${cc.border}` : 'none') }}>
+                      style={{ background: isSel ? '#FFF7ED' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F35703' : (cc ? `1px solid ${cc.border}` : 'none') }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
                       {isToday && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
                       <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
@@ -871,7 +871,7 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
                   const h=HEATMAP[ds]; const inC=cycles.find(c=>ds>=c.start_date&&ds<=c.end_date); const cc=inC?CYCLE_TYPE_CFG[inC.type]:null
                   const isSel = ds === selected; const isToday = ds === today
                   return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5"
-                    style={{ background: isSel ? '#FFF7ED' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F97316' : (isToday ? '#FB923C' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
+                    style={{ background: isSel ? '#FFF7ED' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F35703' : (isToday ? '#FB923C' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
                     <span className={`text-[9px] font-medium ${isSel ? 'text-orange-600' : isToday ? 'text-orange-500' : 'text-foreground/60'}`}>{day}</span>
                     {isToday && <span className="w-1 h-1 rounded-full bg-orange-400"/>}
                     {h?.hasComp&&<span className="w-1.5 h-1.5 rounded-full bg-orange-500"/>}
@@ -1497,7 +1497,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 </div>
               ):(
                 <div style={{display:'flex',gap:8,paddingTop:4}}>
-                  <button onClick={()=>setDrawerMode('edit')} style={{flex:1,padding:'11px 0',borderRadius:12,background:'#F97316',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:'pointer'}}><i className="ki-filled ki-pencil" style={{marginRight:6,fontSize:12}}/>Изменить</button>
+                  <button onClick={()=>setDrawerMode('edit')} style={{flex:1,padding:'11px 0',borderRadius:12,background:'#F35703',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:'pointer'}}><i className="ki-filled ki-pencil" style={{marginRight:6,fontSize:12}}/>Изменить</button>
                   <button onClick={()=>setConfirmDelete(true)} style={{padding:'11px 14px',borderRadius:12,background:'#FEF2F2',color:'#DC2626',fontSize:14,fontWeight:600,border:'1.5px solid #FECACA',cursor:'pointer'}}><i className="ki-filled ki-trash" style={{fontSize:14}}/></button>
                 </div>
               )}
@@ -1511,15 +1511,15 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
                   {EVENT_TYPES.map(t=>{const a=form.event_type===t.value;return(<button key={t.value} type="button" onClick={()=>setForm(f=>({...f,event_type:t.value}))} style={{display:'flex',alignItems:'center',gap:6,padding:'8px 10px',borderRadius:10,border:a?`2px solid ${t.color}`:'1.5px solid var(--border)',background:a?t.color+'12':'var(--background)',color:a?t.color:'var(--muted-foreground)',fontSize:11,fontWeight:600,cursor:'pointer'}}><i className={`ki-filled ${t.icon}`} style={{fontSize:12,color:a?t.color:'var(--muted-foreground)',flexShrink:0}}/>{t.label}</button>)})}
                 </div></div>
-                <div><label style={labelStyle}>Название *</label><input ref={titleRef} type="text" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required placeholder="Утренняя пробежка…" style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
-                <div><label style={labelStyle}>Дата</label><input type="date" value={form.event_date} onChange={e=>setForm(f=>({...f,event_date:e.target.value}))} required style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
+                <div><label style={labelStyle}>Название *</label><input ref={titleRef} type="text" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required placeholder="Утренняя пробежка…" style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
+                <div><label style={labelStyle}>Дата</label><input type="date" value={form.event_date} onChange={e=>setForm(f=>({...f,event_date:e.target.value}))} required style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                  <div><label style={labelStyle}>Начало</label><input type="time" value={form.start_time} onChange={e=>setForm(f=>({...f,start_time:e.target.value}))} style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
-                  <div><label style={labelStyle}>Конец</label><input type="time" value={form.end_time} onChange={e=>setForm(f=>({...f,end_time:e.target.value}))} style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
+                  <div><label style={labelStyle}>Начало</label><input type="time" value={form.start_time} onChange={e=>setForm(f=>({...f,start_time:e.target.value}))} style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
+                  <div><label style={labelStyle}>Конец</label><input type="time" value={form.end_time} onChange={e=>setForm(f=>({...f,end_time:e.target.value}))} style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
                 </div>
-                <div><label style={labelStyle}>Заметки</label><textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} rows={3} placeholder="Заметки…" style={{...inputStyle,resize:'none',fontFamily:'inherit'}} onFocus={e=>(e.target.style.borderColor='#F97316')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
+                <div><label style={labelStyle}>Заметки</label><textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} rows={3} placeholder="Заметки…" style={{...inputStyle,resize:'none',fontFamily:'inherit'}} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
                 <div style={{display:'flex',gap:8}}>
-                  <button type="submit" disabled={saving} style={{flex:1,padding:'11px 0',borderRadius:12,background:saving?'#FDA96A':'#F97316',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:saving?'not-allowed':'pointer'}}>{saving?'Сохранение…':drawerMode==='edit'?'Сохранить':'Сохранить событие'}</button>
+                  <button type="submit" disabled={saving} style={{flex:1,padding:'11px 0',borderRadius:12,background:saving?'#FDA96A':'#F35703',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:saving?'not-allowed':'pointer'}}>{saving?'Сохранение…':drawerMode==='edit'?'Сохранить':'Сохранить событие'}</button>
                   <button type="button" onClick={()=>drawerMode==='edit'&&initialEvent?setDrawerMode('view'):handleClose()} style={{padding:'11px 14px',borderRadius:12,border:'1.5px solid var(--border)',background:'transparent',color:'var(--muted-foreground)',fontSize:14,fontWeight:600,cursor:'pointer'}}>Отмена</button>
                 </div>
               </form>
@@ -2323,7 +2323,7 @@ export default function CalendarPage() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Легенда</span>
           {[
             { label: 'Тренировка', color: '#3B82F6', type: 'square' },
-            { label: 'Соревнование', color: '#EA580C', type: 'circle' },
+            { label: 'Соревнование', color: '#D44A02', type: 'circle' },
             ...(['macro', 'meso', 'micro'] as CycleType[]).map(t => ({ label: CYCLE_TYPE_CFG[t].label, color: CYCLE_TYPE_CFG[t].text, type: 'bar' })),
           ].map(l => (
             <div key={l.label} className="flex items-center gap-1.5">

@@ -114,7 +114,7 @@ export const MED_TYPE_META: Record<MedicalEntryType, {
   border: string
 }> = {
   consultation:    { label: 'Консультация',   icon: 'ki-people',         color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  rehab_progress:  { label: 'Реабилитация',   icon: 'ki-heart-circle',   color: '#EA580C', bg: '#FFF7ED', border: '#FED7AA' },
+  rehab_progress:  { label: 'Реабилитация',   icon: 'ki-heart-circle',   color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA' },
   prescription:    { label: 'Назначения',     icon: 'ki-pill',           color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
   lab_results:     { label: 'Анализы',        icon: 'ki-dropper',        color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC' },
   nutrition_plan:  { label: 'Питание',        icon: 'ki-cup',            color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },

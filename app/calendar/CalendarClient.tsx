@@ -12,12 +12,12 @@ interface Props { userId: string; workouts: Workout[]; cycleBlocks: CycleBlock[]
 
 const CYCLE_STYLES: Record<string, { bg: string; border: string; text: string }> = {
   micro: { bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  meso:  { bg: '#FFF7ED', border: '#FED7AA', text: '#F97316' },
+  meso:  { bg: '#FFF7ED', border: '#FED7AA', text: '#F35703' },
   macro: { bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
 }
 const TYPE_COLOR: Record<string, string> = {
   Running:'#2563EB', Cycling:'#16A34A', Swimming:'#7C3AED', HIIT:'#DC2626',
-  'Weight Training':'#F97316', CrossFit:'#D97706', Yoga:'#0D9488', Walking:'#64748B',
+  'Weight Training':'#F35703', CrossFit:'#D97706', Yoga:'#0D9488', Walking:'#64748B',
 }
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const WDAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']
@@ -85,7 +85,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
       {/* Legend */}
       <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background:'#2563EB' }} />Тренировка</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background:'#F97316' }} />Соревнование</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background:'#F35703' }} />Соревнование</span>
         {layer !== 'none' && <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm" style={{ background: CYCLE_STYLES[layer].bg, border: `1.5px solid ${CYCLE_STYLES[layer].border}` }} />
           Блок {layer}цикла
@@ -115,13 +115,13 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
                 {cs && <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: cs.border }} />}
                 {/* Day number */}
                 <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm mb-1.5 font-medium ${isToday(day) ? 'text-white' : 'text-slate-700'}`}
-                  style={{ background: isToday(day) ? '#F97316' : 'transparent' }}>
+                  style={{ background: isToday(day) ? '#F35703' : 'transparent' }}>
                   {day}
                 </div>
                 {/* Workout pills */}
                 {ws.slice(0,2).map(w => {
                   const isComp = w.event_type === 'competition'
-                  const col = isComp ? '#F97316' : (TYPE_COLOR[w.activity_type??''] ?? '#64748B')
+                  const col = isComp ? '#F35703' : (TYPE_COLOR[w.activity_type??''] ?? '#64748B')
                   return (
                     <div key={w.id} className="mb-0.5 flex items-center gap-1">
                       <div className="flex-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white truncate" style={{ background: col }}>

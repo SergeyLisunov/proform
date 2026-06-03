@@ -12,7 +12,7 @@
  *
  * Layout:
  *   1. SkipToContent (sr-only, focus pill)
- *   2. Top bar — back-to-home button + ProForm mini-logo
+ *   2. Top bar — back-to-home button + Sporteo mini-logo
  *   3. Article — max-w-3xl card с consistent typography
  *   4. SiteFooter — shared с landing
  */
@@ -20,6 +20,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import SkipToContent from './SkipToContent'
 import SiteFooter from './SiteFooter'
+import { SporteoLogo } from "@/components/ui/SporteoLogo"
 
 interface StaticPageShellProps {
   /** Small uppercase eyebrow above title. Example: "О платформе". */
@@ -57,16 +58,10 @@ export default function StaticPageShell({
             </Link>
             <Link
               href="/"
-              aria-label="ProForm — на главную"
+              aria-label="Sporteo — на главную"
               className="flex items-center gap-2 no-underline"
             >
-              <div
-                aria-hidden="true"
-                className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-500 shadow-sm"
-              >
-                <i className="ki-filled ki-abstract-26 text-xs text-white" />
-              </div>
-              <span className="pf-num text-base text-foreground">ProForm</span>
+              <SporteoLogo size="sm" />
             </Link>
           </div>
         </header>

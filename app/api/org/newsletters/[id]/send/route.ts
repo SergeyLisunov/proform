@@ -37,7 +37,7 @@ export const maxDuration = 60
  * BEFORE switching to admin client.
  */
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 
 interface MemberWithEmail {
   user_id: string
@@ -57,14 +57,14 @@ function buildHtml(opts: { subject: string; bodyHtml: string; orgName: string | 
     <div style="background:white;border-radius:16px;border:1px solid #E2E8F0;padding:32px;">
       <div style="border-bottom:1px solid #E2E8F0;padding-bottom:20px;margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#9333EA;">
-          ${opts.orgName ? escape(opts.orgName) : 'ProForm'}
+          ${opts.orgName ? escape(opts.orgName) : 'Sporteo'}
         </div>
         <h1 style="margin:8px 0 0;font-size:22px;color:#0F172A;">${escape(opts.subject)}</h1>
       </div>
       <div style="color:#334155;line-height:1.6;font-size:15px;">${opts.bodyHtml}</div>
     </div>
     <div style="margin-top:16px;text-align:center;font-size:11px;color:#94A3B8;">
-      ProForm · Платформа спортивного клуба<br/>
+      Sporteo · Платформа спортивного клуба<br/>
       <a href="https://proform-delta.vercel.app" style="color:#9333EA;text-decoration:none;">proform-delta.vercel.app</a>
     </div>
   </div>

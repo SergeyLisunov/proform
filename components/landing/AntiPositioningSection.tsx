@@ -1,7 +1,7 @@
 /**
  * <AntiPositioningSection /> — W18 Day 89 REBUILD (RU-compliance).
  *
- * «ProForm — это НЕ...» — explicit anti-positioning vs RU-safe alternatives
+ * «Sporteo — это НЕ...» — explicit anti-positioning vs RU-safe alternatives
  * only. Replaced Notion/Coda (US, restricted) and WhatsApp (Meta, banned
  * in RU) with compliant reference points: Bitrix24/AmoCRM, Excel,
  * Telegram-чат, бумажный журнал.
@@ -79,7 +79,7 @@ function NotTile({ card }: { card: NotCard }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-2xs font-bold uppercase tracking-wider text-red-600">
-            ProForm — это НЕ
+            Sporteo — это НЕ
           </p>
           <h3 className="text-base font-bold leading-tight text-foreground sm:text-lg">
             {alternative}
@@ -93,7 +93,7 @@ function NotTile({ card }: { card: NotCard }) {
           {whyNotFit}
         </p>
         <p className="rounded-2xl border border-orange-100 bg-orange-50/60 p-3 text-foreground">
-          <span className="font-semibold text-orange-700">ProForm вместо:</span>{' '}
+          <span className="font-semibold text-orange-700">Sporteo вместо:</span>{' '}
           {proformDoes}
         </p>
       </div>
@@ -111,7 +111,7 @@ export default function AntiPositioningSection() {
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            Чем ProForm отличается
+            Чем Sporteo отличается
           </p>
           <h2
             id="anti-positioning-heading"
@@ -120,7 +120,7 @@ export default function AntiPositioningSection() {
             Это не&nbsp;CRM, не&nbsp;таблица, не&nbsp;чат и&nbsp;не&nbsp;журнал
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            ProForm — операционная система спортивной организации.
+            Sporteo — операционная система спортивной организации.
             Pre-built роли, защита данных на уровне БД, workflow рассчитан
             под спорт — не generic team management.
           </p>

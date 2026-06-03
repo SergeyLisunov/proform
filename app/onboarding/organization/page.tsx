@@ -266,7 +266,7 @@ export default function OrgOnboardingPage() {
               Название организации *
             </label>
             <input type="text" value={orgName} onChange={e => setOrgName(e.target.value)}
-              placeholder="ProForm Triathlon Club"
+              placeholder="Sporteo Triathlon Club"
               maxLength={80}
               className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400" />
           </div>

@@ -27,7 +27,7 @@ const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon
     label: 'Запланирована',
     badge: 'bg-orange-50 text-orange-600 border border-orange-200',
     icon: 'ki-calendar-8',
-    accent: '#F97316',
+    accent: '#F35703',
     bg: '#FFF7ED',
   },
 }
@@ -135,7 +135,7 @@ export default function OrgNewslettersPage() {
   const summary = [
     { label: 'Всего рассылок', value: newsletters.length, hint: 'Общий архив коммуникаций', icon: 'ki-sms', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Черновики', value: drafts.length, hint: 'Готовятся к публикации', icon: 'ki-note-2', color: '#64748B', bg: '#F8FAFC' },
-    { label: 'Запланированные', value: scheduled.length, hint: 'Уже стоят в очереди', icon: 'ki-calendar-8', color: '#F97316', bg: '#FFF7ED' },
+    { label: 'Запланированные', value: scheduled.length, hint: 'Уже стоят в очереди', icon: 'ki-calendar-8', color: '#F35703', bg: '#FFF7ED' },
     { label: 'Отправленные', value: sent.length, hint: 'Ушли в коммуникацию', icon: 'ki-send', color: '#16A34A', bg: '#F0FDF4' },
   ]
 

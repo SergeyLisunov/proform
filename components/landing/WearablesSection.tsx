@@ -38,7 +38,7 @@ const ROADMAP: RoadmapItem[] = [
 
 const STATUS_META: Record<RoadmapItem['status'], { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
   now:     { label: 'Доступно',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle2 },
-  soon:    { label: 'Готовится', color: '#EA580C', bg: '#FFF7ED', icon: Clock },
+  soon:    { label: 'Готовится', color: '#D44A02', bg: '#FFF7ED', icon: Clock },
   roadmap: { label: 'В roadmap', color: '#64748B', bg: '#F1F5F9', icon: Clock },
 }
 
@@ -55,7 +55,7 @@ export default function WearablesSection() {
             Работает с данными носимых устройств
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            ProForm может учитывать данные подключённых трекеров, браслетов и устройств
+            Sporteo может учитывать данные подключённых трекеров, браслетов и устройств
             мониторинга активности, поддерживаемых вашей конфигурацией.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">

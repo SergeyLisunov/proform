@@ -104,7 +104,7 @@ export default function AthleteProgressPage() {
           subtitle="prescribed workouts" />
         <StatTile label="Avg weekly volume" value={`${s.avg_weekly_minutes}`} color="#2563EB"
           subtitle="минут / неделя" />
-        <StatTile label="Активные цели" value={String(s.total_goals_active)} color="#EA580C"
+        <StatTile label="Активные цели" value={String(s.total_goals_active)} color="#D44A02"
           subtitle="в работе" />
         <StatTile label="Достигнуто целей" value={String(s.total_goals_done)} color="#7C3AED"
           subtitle="за всё время" />

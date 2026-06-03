@@ -117,7 +117,7 @@ export default function InvitePage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-10">
       <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-600 mb-3">ProForm · Приглашение</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-600 mb-3">Sporteo · Приглашение</p>
         <h1 className="text-2xl font-bold text-foreground mb-1">Вас приглашают</h1>
         <p className="text-sm text-muted-foreground mb-6">
           <strong className="text-foreground">{name}</strong> хочет подключиться с вами в роли <span className="text-foreground font-semibold">{type.toLowerCase()}</span>.

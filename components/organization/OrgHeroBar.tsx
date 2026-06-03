@@ -27,7 +27,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
   const today = new Date().toLocaleDateString('ru-RU', {
     weekday: 'long', day: 'numeric', month: 'long',
   })
-  const description = [meta.type, meta.sport, meta.city].filter(Boolean).join(' · ') || 'Команда на базе ProForm'
+  const description = [meta.type, meta.sport, meta.city].filter(Boolean).join(' · ') || 'Команда на базе Sporteo'
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-[#BFDBFE] bg-gradient-to-br from-[#EFF6FF] via-white to-[#FAF5FF] p-5 md:p-7">
@@ -47,7 +47,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
         <div className="w-full lg:w-auto grid grid-cols-2 sm:grid-cols-4 gap-2">
           <Stat label="Состав"      value={String(stats.membersCount)}    color="#2563EB" />
           <Stat label="Тренеров"    value={String(stats.coachesCount)}    color="#16A34A" />
-          <Stat label="Атлетов"     value={String(stats.athletesCount)}   color="#F97316" />
+          <Stat label="Атлетов"     value={String(stats.athletesCount)}   color="#F35703" />
           <Stat label="Заявки"      value={String(stats.pendingRequests)} color="#9333EA"
             highlight={stats.pendingRequests > 0} />
         </div>

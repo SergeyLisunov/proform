@@ -8,13 +8,13 @@ interface BaseProps {
 /**
  * Metronic `kt-card` surface. Carries the Metronic component identity
  * (`kt-card*` classes) while colours come from the app's design tokens so the
- * brand (orange #F97316) and good looks are guaranteed regardless of theme.
+ * brand (orange #F35703) and good looks are guaranteed regardless of theme.
  */
 export function Card({ children, className = '', accent = false }: BaseProps & { accent?: boolean }) {
   return (
     <div
       className={`kt-card bg-card border border-border rounded-xl shadow-sm ${
-        accent ? 'kt-card-accent border-t-2 border-t-[#F97316]' : ''
+        accent ? 'kt-card-accent border-t-2 border-t-[#F35703]' : ''
       } ${className}`}
     >
       {children}

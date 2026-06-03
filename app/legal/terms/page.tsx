@@ -14,12 +14,12 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Условия использования',
   description:
-    'Правила использования платформы ProForm — обработка данных (152-ФЗ), права пользователей, ограничение ответственности.',
+    'Правила использования платформы Sporteo — обработка данных (152-ФЗ), права пользователей, ограничение ответственности.',
   alternates: { canonical: '/legal/terms' },
   openGraph: {
-    title: 'Условия использования · ProForm',
+    title: 'Условия использования · Sporteo',
     description:
-      'Holding-страница TOS платформы ProForm. Полный документ проходит правовую экспертизу.',
+      'Holding-страница TOS платформы Sporteo. Полный документ проходит правовую экспертизу.',
     url: '/legal/terms',
   },
   robots: {
@@ -63,7 +63,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-xl font-bold mb-3">1. Принятие условий</h2>
             <p className="text-muted-foreground">
-              Регистрируясь в ProForm, вы соглашаетесь с правилами обработки персональных данных
+              Регистрируясь в Sporteo, вы соглашаетесь с правилами обработки персональных данных
               (152-ФЗ), политикой конфиденциальности и условиями использования сервиса. Если вы не
               согласны — не используйте платформу.
             </p>
@@ -72,7 +72,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-xl font-bold mb-3">2. Роли и данные</h2>
             <p className="text-muted-foreground">
-              ProForm — платформа для спортивных организаций. Поддерживаются роли:{' '}
+              Sporteo — платформа для спортивных организаций. Поддерживаются роли:{' '}
               <strong className="text-foreground">athlete</strong>,{' '}
               <strong className="text-foreground">coach</strong>,{' '}
               <strong className="text-foreground">doctor</strong>,{' '}
@@ -115,7 +115,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-xl font-bold mb-3">5. Ограничение ответственности</h2>
             <p className="text-muted-foreground">
-              ProForm предоставляет инструменты для тренировочного процесса, но не несёт
+              Sporteo предоставляет инструменты для тренировочного процесса, но не несёт
               ответственности за травмы, медицинские состояния или результаты тренировок.
               Пользователи действуют под собственную ответственность и под наблюдением
               квалифицированных тренеров и врачей.

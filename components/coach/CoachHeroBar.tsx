@@ -57,7 +57,7 @@ export default function CoachHeroBar({ firstName, stats }: { firstName: string; 
           <Stat label="Атлеты"     value={String(stats.athletesCount)}  color="#2563EB" />
           <Stat label="Ср. recovery" value={`${stats.avgRecovery}%`}     color={recColor} />
           <Stat label="Записей за нед." value={String(stats.weekDiaryEntries)} color="#7C3AED" />
-          <Stat label="Заявки"     value={String(stats.pendingRequests)} color="#F97316"
+          <Stat label="Заявки"     value={String(stats.pendingRequests)} color="#F35703"
             highlight={stats.pendingRequests > 0} />
         </div>
       </div>

@@ -145,7 +145,7 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
                   <div className="h-full rounded-full transition-all"
                     style={{
                       width: `${pct}%`,
-                      background: overloaded ? '#E11D48' : idle ? '#94A3B8' : '#F97316',
+                      background: overloaded ? '#E11D48' : idle ? '#94A3B8' : '#F35703',
                     }} />
                 </div>
               </div>

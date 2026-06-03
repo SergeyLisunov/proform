@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import ClubAuditForm from './ClubAuditForm'
 
 export const metadata: Metadata = {
-  title: 'Free Club Audit — где теряете управляемость · ProForm',
+  title: 'Free Club Audit — где теряете управляемость · Sporteo',
   description:
     'Бесплатный AI-аудит спортивного клуба. Опишите структуру + текущие процессы — получите health score, top-3 области риска и конкретный план действий на 30 дней.',
   openGraph: {

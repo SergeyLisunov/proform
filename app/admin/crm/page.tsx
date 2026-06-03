@@ -65,13 +65,13 @@ const SEGMENT_CFG = {
   new:     { label: 'Новый',     bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
   active:  { label: 'Активный',  bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   churned: { label: 'Отток',     bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
-  paying:  { label: 'Платящий',  bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  paying:  { label: 'Платящий',  bg: '#FFF7ED', text: '#F35703', border: '#FED7AA' },
   trial:   { label: 'Триал',     bg: '#FAF5FF', text: '#9333EA', border: '#E9D5FF' },
 }
 
 const PLAN_CFG = {
   free: { label: 'Free',  bg: '#F1F5F9', text: '#64748B' },
-  pro:  { label: 'Pro',   bg: '#FFF7ED', text: '#F97316' },
+  pro:  { label: 'Pro',   bg: '#FFF7ED', text: '#F35703' },
   team: { label: 'Team',  bg: '#F0FDF4', text: '#16A34A' },
 }
 
@@ -79,7 +79,7 @@ const ROLE_CFG = {
   athlete:      { label: 'Атлет',    color: '#2563EB' },
   coach:        { label: 'Тренер',   color: '#16A34A' },
   admin:        { label: 'Админ',    color: '#9333EA' },
-  organization: { label: 'Орг.',     color: '#F97316' },
+  organization: { label: 'Орг.',     color: '#F35703' },
 }
 
 // ── User Detail Drawer ─────────────────────────────────────────────────────────
@@ -205,7 +205,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           {([['overview', 'Обзор'], ['events', 'События'], ['notes', 'Заметки']] as const).map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}
-              style={{ flex: 1, padding: '12px 8px', fontSize: 12, fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer', color: tab === id ? '#f97316' : 'var(--muted-foreground)', borderBottom: `2px solid ${tab === id ? '#f97316' : 'transparent'}`, transition: 'all 0.15s' }}>
+              style={{ flex: 1, padding: '12px 8px', fontSize: 12, fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer', color: tab === id ? '#F35703' : 'var(--muted-foreground)', borderBottom: `2px solid ${tab === id ? '#F35703' : 'transparent'}`, transition: 'all 0.15s' }}>
               {label}
             </button>
           ))}
@@ -225,7 +225,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                   { label: 'Тренировок', value: data.workout_count, icon: 'ki-abstract-26', color: '#2563EB', bg: '#EFF6FF' },
                   { label: 'Последняя активность', value: fmtDate(data.last_active), icon: 'ki-calendar', color: '#16A34A', bg: '#F0FDF4' },
                   { label: 'Дата регистрации', value: fmtDate(data.created_at), icon: 'ki-time', color: '#9333EA', bg: '#FAF5FF' },
-                  { label: 'Статус подписки', value: data.plan_status, icon: 'ki-verify', color: '#F97316', bg: '#FFF7ED' },
+                  { label: 'Статус подписки', value: data.plan_status, icon: 'ki-verify', color: '#F35703', bg: '#FFF7ED' },
                 ].map(s => (
                   <div key={s.label} style={{ background: 'var(--accent)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -246,9 +246,9 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                   {(['free', 'pro', 'team'] as const).map(p => (
                     <button key={p} onClick={() => changePlan(p)} disabled={savingPlan || data.plan === p}
                       style={{
-                        flex: 1, padding: '8px 4px', borderRadius: 10, border: `1.5px solid ${data.plan === p ? '#f97316' : 'var(--border)'}`,
+                        flex: 1, padding: '8px 4px', borderRadius: 10, border: `1.5px solid ${data.plan === p ? '#F35703' : 'var(--border)'}`,
                         background: data.plan === p ? '#fff7ed' : 'var(--card)',
-                        color: data.plan === p ? '#f97316' : 'var(--muted-foreground)',
+                        color: data.plan === p ? '#F35703' : 'var(--muted-foreground)',
                         fontSize: 12, fontWeight: 700, cursor: data.plan === p ? 'default' : 'pointer',
                         transition: 'all 0.15s',
                       }}>
@@ -270,7 +270,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                           <div style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>{fmtDate(w.event_date)}</div>
                         </div>
                         {w.activity_strain != null && (
-                          <span style={{ fontSize: 14, fontWeight: 800, color: '#f97316' }}>{Number(w.activity_strain).toFixed(1)}</span>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: '#F35703' }}>{Number(w.activity_strain).toFixed(1)}</span>
                         )}
                       </div>
                     ))}
@@ -284,7 +284,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                 <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted-foreground)', fontSize: 13 }}>Нет событий</div>
               ) : data.events.map((e, i) => (
                 <div key={i} style={{ padding: '10px 14px', background: 'var(--accent)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f97316', flexShrink: 0 }} />
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F35703', flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)' }}>{e.event_type}</div>
                     {Object.keys(e.metadata).length > 0 && (
@@ -310,7 +310,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
               {data.notes.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--muted-foreground)', fontSize: 13 }}>Нет заметок</div>
               ) : data.notes.map(n => (
-                <div key={n.id} style={{ padding: '12px 14px', background: 'var(--accent)', borderRadius: 12, borderLeft: '3px solid #f97316' }}>
+                <div key={n.id} style={{ padding: '12px 14px', background: 'var(--accent)', borderRadius: 12, borderLeft: '3px solid #F35703' }}>
                   <p style={{ fontSize: 13, color: 'var(--foreground)', margin: '0 0 6px', lineHeight: 1.55 }}>{n.body}</p>
                   <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{n.author_name} · {fmtDateTime(n.created_at)}</div>
                 </div>
@@ -424,10 +424,10 @@ export default function AdminCRMPage() {
         {[
           { label: 'Всего', value: stats.total, icon: 'ki-people', color: '#64748B', bg: '#F8FAFC' },
           { label: 'Активных', value: stats.active, icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Платящих', value: stats.paying, icon: 'ki-dollar', color: '#F97316', bg: '#FFF7ED' },
+          { label: 'Платящих', value: stats.paying, icon: 'ki-dollar', color: '#F35703', bg: '#FFF7ED' },
           { label: 'За неделю', value: `+${stats.new_this_week}`, icon: 'ki-arrow-up', color: '#2563EB', bg: '#EFF6FF' },
           { label: 'Free', value: stats.free, icon: 'ki-abstract-26', color: '#64748B', bg: '#F1F5F9' },
-          { label: 'Pro', value: stats.pro, icon: 'ki-star', color: '#F97316', bg: '#FFF7ED' },
+          { label: 'Pro', value: stats.pro, icon: 'ki-star', color: '#F35703', bg: '#FFF7ED' },
           { label: 'Team', value: stats.team, icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
         ].map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-3">
@@ -514,7 +514,7 @@ export default function AdminCRMPage() {
 
                   {/* User */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#f97316,#ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: 'white', flexShrink: 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#F35703,#D44A02)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: 'white', flexShrink: 0 }}>
                       {initials}
                     </div>
                     <div style={{ minWidth: 0 }}>
