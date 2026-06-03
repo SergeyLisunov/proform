@@ -1131,8 +1131,8 @@ function EntryDrawer({
 
           {/* Rehab */}
           {type === 'rehab_progress' && (
-            <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/60 p-3 space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#C2410C]">Реабилитация</p>
+            <div className="rounded-xl border border-[#FBC1A0] bg-[#FEF0E7]/60 p-3 space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B03D04]">Реабилитация</p>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-[10px] text-muted-foreground">Мобильность %</label>

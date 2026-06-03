@@ -46,7 +46,7 @@ interface Summary {
 
 const TRIAGE_META: Record<Triage, { label: string; color: string; bg: string; border: string; emoji: string; tone: string }> = {
   red_flag:            { label: 'Red Flag — immediate evaluation', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA', emoji: '🚨', tone: 'Direct emergency referral' },
-  urgent_referral:     { label: 'Urgent Referral 24-72h',          color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA', emoji: '⚠️', tone: 'Specialist within 24-72h' },
+  urgent_referral:     { label: 'Urgent Referral 24-72h',          color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0', emoji: '⚠️', tone: 'Specialist within 24-72h' },
   restricted_activity: { label: 'Restricted Activity',              color: '#A16207', bg: '#FEFCE8', border: '#FDE68A', emoji: '🟠', tone: 'Modified training, follow-up 1-2w' },
   monitor:             { label: 'Monitor / Reassess',               color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC', emoji: '🟡', tone: 'Watch + reassess 2-4w' },
   return_to_play:      { label: 'Return to Play (with monitoring)', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', emoji: '🟢', tone: 'Cleared with caveats' },
@@ -55,7 +55,7 @@ const TRIAGE_META: Record<Triage, { label: string; color: string; bg: string; bo
 const LIKELIHOOD_META: Record<'low' | 'medium' | 'high', { color: string; bg: string }> = {
   low:    { color: '#64748B', bg: '#F8FAFC' },
   medium: { color: '#0E7490', bg: '#ECFEFF' },
-  high:   { color: '#7C2D12', bg: '#FFF7ED' },
+  high:   { color: '#702A0C', bg: '#FEF0E7' },
 }
 
 const SPORT_OPTIONS = [

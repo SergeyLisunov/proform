@@ -150,7 +150,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
         </div>
 
         {pending.length > 0 ? (
-          <div className="rounded-2xl border border-[#FED7AA] bg-gradient-to-br from-[#FFF7ED] to-white p-5">
+          <div className="rounded-2xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] to-white p-5">
             <div className="flex items-center justify-between gap-2 mb-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Заявки</p>

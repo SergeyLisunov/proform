@@ -35,7 +35,7 @@ const REASON_LABEL: Record<PlanData['reason'], string> = {
 
 const ACTION_LABEL: Record<Suggestion['proposed_action'], { label: string; color: string; bg: string; border: string }> = {
   reduce_volume:   { label: 'Сократить объём',        color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
-  lower_intensity: { label: 'Снизить интенсивность',  color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  lower_intensity: { label: 'Снизить интенсивность',  color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0' },
   make_recovery:   { label: 'Восстановительная',      color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   reschedule:      { label: 'Перенести',              color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
   delete:          { label: 'Отменить',               color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
@@ -149,7 +149,7 @@ export default function AdaptivePlanModal({
               {ctx && (
                 <div className="grid grid-cols-3 gap-2">
                   <Stat label="ACWR" value={ctx.acwr != null ? ctx.acwr.toFixed(2) : '—'}
-                    accent={ctx.zone === 'danger' ? '#B91C1C' : ctx.zone === 'monitor' ? '#C2410C' : '#15803D'} />
+                    accent={ctx.zone === 'danger' ? '#B91C1C' : ctx.zone === 'monitor' ? '#B03D04' : '#15803D'} />
                   <Stat label="Ср. recovery (7д)" value={ctx.avgRecovery != null ? `${ctx.avgRecovery}%` : '—'} accent="#2563EB" />
                   <Stat label="Скипы подряд" value={String(ctx.skipStreak)} accent="#64748B" />
                 </div>

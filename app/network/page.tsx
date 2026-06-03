@@ -68,7 +68,7 @@ type Connection = {
 }
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
-  athlete:      { label: 'Атлет',    color: '#F35703', bg: '#FFF7ED' },
+  athlete:      { label: 'Атлет',    color: '#F35703', bg: '#FEF0E7' },
   coach:        { label: 'Тренер',   color: '#16A34A', bg: '#F0FDF4' },
   organization: { label: 'Орг.',     color: '#2563EB', bg: '#EFF6FF' },
   doctor:       { label: 'Доктор',   color: '#DC2626', bg: '#FEF2F2' },
@@ -501,10 +501,10 @@ function NetworkPageInner() {
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
-      <div className="relative overflow-hidden rounded-3xl border border-[#FED7AA] bg-gradient-to-br from-[#FFF7ED] via-white to-[#EFF6FF] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
             <i className="ki-filled ki-people text-[11px]" />
             Сеть
           </span>
@@ -525,7 +525,7 @@ function NetworkPageInner() {
         {user.role !== 'athlete' && (
           <button
             onClick={() => setInviteOpen(true)}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FFF7ED]"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
           >
             <i className="ki-filled ki-sms text-xs"/>
             Пригласить по email

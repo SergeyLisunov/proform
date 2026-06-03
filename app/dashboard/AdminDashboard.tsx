@@ -12,7 +12,7 @@ type UserRow = Database['public']['Tables']['users']['Row']
 
 const ROLE_STYLE: Record<string, { background: string; color: string }> = {
   athlete:      { background: '#DBEAFE', color: '#2563EB' },
-  coach:        { background: '#FFEDD5', color: '#F35703' },
+  coach:        { background: '#FDDDCB', color: '#F35703' },
   doctor:       { background: '#FEE2E2', color: '#DC2626' },
   organization: { background: '#FAF5FF', color: '#9333EA' },
   admin:        { background: '#EDE9FE', color: '#7C3AED' },

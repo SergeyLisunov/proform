@@ -125,7 +125,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
         border: '1px solid var(--border)',
         boxShadow: '0 40px 100px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05)',
       }}>
-        <div style={{ padding: '22px 24px 16px', background: 'linear-gradient(135deg, rgba(249,115,22,0.05), transparent)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ padding: '22px 24px 16px', background: 'linear-gradient(135deg, rgba(243,87,3,0.05), transparent)', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: '#F35703', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новый диалог</p>
@@ -168,7 +168,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
               </div>
               {creating === u.id
                 ? <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                : <div style={{ width: 28, height: 28, borderRadius: 8, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                : <div style={{ width: 28, height: 28, borderRadius: 8, background: '#fef0e7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <i className="ki-filled ki-arrow-right text-orange-500 text-xs" />
                   </div>
               }
@@ -333,7 +333,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
                             background: isMe ? 'linear-gradient(135deg, #F35703 0%, #D44A02 100%)' : 'var(--accent)',
                             color: isMe ? 'white' : 'var(--foreground)',
                             fontSize: 13.5, lineHeight: 1.55, wordBreak: 'break-word',
-                            boxShadow: isMe ? '0 4px 16px rgba(249,115,22,0.3)' : '0 1px 4px rgba(0,0,0,0.05)',
+                            boxShadow: isMe ? '0 4px 16px rgba(243,87,3,0.3)' : '0 1px 4px rgba(0,0,0,0.05)',
                           }}>
                             {m.body}
                           </div>
@@ -375,7 +375,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
               cursor: text.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.15s',
-              boxShadow: text.trim() ? '0 4px 16px rgba(249,115,22,0.4)' : 'none',
+              boxShadow: text.trim() ? '0 4px 16px rgba(243,87,3,0.4)' : 'none',
               transform: text.trim() ? 'scale(1)' : 'scale(0.95)',
             }}>
             {sending
@@ -650,7 +650,7 @@ export default function MessengerPage() {
                     Сообщения
                   </h2>
                   {hasUnread && (
-                    <span style={{ padding: '4px 10px', borderRadius: 999, background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 6px 18px rgba(249,115,22,0.28)' }}>
+                    <span style={{ padding: '4px 10px', borderRadius: 999, background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 6px 18px rgba(243,87,3,0.28)' }}>
                       {totalUnread}
                     </span>
                   )}
@@ -806,7 +806,7 @@ export default function MessengerPage() {
                           color: 'white', fontSize: 10, fontWeight: 800,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           padding: '0 5px', border: '2px solid var(--card)',
-                          boxShadow: '0 2px 8px rgba(249,115,22,0.5)',
+                          boxShadow: '0 2px 8px rgba(243,87,3,0.5)',
                         }}>
                           {c.unread_count > 99 ? '99+' : c.unread_count}
                         </span>
@@ -873,7 +873,7 @@ export default function MessengerPage() {
                               display: 'inline-flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              boxShadow: '0 4px 12px rgba(249,115,22,0.28)',
+                              boxShadow: '0 4px 12px rgba(243,87,3,0.28)',
                             }}>
                               {c.unread_count > 99 ? '99+' : c.unread_count}
                             </span>

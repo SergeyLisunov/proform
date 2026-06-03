@@ -23,14 +23,14 @@ function getSB() {
 }
 
 const ROLE_CFG = {
-  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
+  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
   coach:   { label: 'Тренер', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
 }
 
 const STATUS_CFG: Record<MemberStatus, { label: string; color: string; bg: string; border: string }> = {
   active:    { label: 'Активен',    color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   pending:   { label: 'Ожидает',    color: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A' },
-  suspended: { label: 'Заморожен',  color: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
+  suspended: { label: 'Заморожен',  color: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
   removed:   { label: 'Удалён',     color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
 }
 
@@ -177,7 +177,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
             padding: '12px 0', borderRadius: 12, border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
             background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white',
             fontSize: 14, fontWeight: 700, opacity: saving ? 0.7 : 1, transition: 'all 0.15s',
-            boxShadow: '0 2px 8px rgba(249,115,22,0.35)',
+            boxShadow: '0 2px 8px rgba(243,87,3,0.35)',
           }}>
             {saving
               ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Добавление…</>
@@ -270,7 +270,7 @@ export default function OrgMembersPage() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.15),_transparent_28%),radial-gradient(circle_at_88%_12%,_rgba(59,130,246,0.08),_transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_20px_55px_rgba(15,23,42,0.06)] sm:p-7">
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.15),_transparent_28%),radial-gradient(circle_at_88%_12%,_rgba(59,130,246,0.08),_transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_20px_55px_rgba(15,23,42,0.06)] sm:p-7">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -302,7 +302,7 @@ export default function OrgMembersPage() {
             </div>
             <button
               onClick={() => setShowInvite(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(243,87,3,0.28)] transition-all hover:-translate-y-0.5"
             >
               <i className="ki-filled ki-plus text-sm" />
               Добавить участника
@@ -320,7 +320,7 @@ export default function OrgMembersPage() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
             { label: 'Всего участников', value: total, color: '#2563EB', bg: '#EFF6FF', icon: 'ki-people' },
-            { label: 'Спортсменов', value: athletes, color: '#F35703', bg: '#FFF7ED', icon: 'ki-abstract-26' },
+            { label: 'Спортсменов', value: athletes, color: '#F35703', bg: '#FEF0E7', icon: 'ki-abstract-26' },
             { label: 'Тренеров', value: coaches, color: '#16A34A', bg: '#F0FDF4', icon: 'ki-notepad-edit' },
             { label: 'Ожидают', value: pending, color: '#CA8A04', bg: '#FEFCE8', icon: 'ki-time' },
           ].map((s) => (
@@ -429,7 +429,7 @@ export default function OrgMembersPage() {
 
       {filtered.length === 0 ? (
         <Card className="rounded-[28px] px-6 py-16 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FFF7ED)] text-orange-400 shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FEF0E7)] text-orange-400 shadow-sm">
             <i className="ki-filled ki-people text-3xl" />
           </div>
           <p className="mt-5 text-lg font-semibold text-foreground">
@@ -443,7 +443,7 @@ export default function OrgMembersPage() {
           {members.length === 0 && (
             <button
               onClick={() => setShowInvite(true)}
-              className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all hover:-translate-y-0.5"
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(243,87,3,0.28)] transition-all hover:-translate-y-0.5"
             >
               <i className="ki-filled ki-plus text-sm" />
               Добавить участника
@@ -503,7 +503,7 @@ export default function OrgMembersPage() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start' }} className="lg:justify-end">
                     {m.status === 'active' && (
-                      <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FED7AA', background: '#FFF7ED', color: '#F35703', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                      <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FBC1A0', background: '#FEF0E7', color: '#F35703', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-pause text-xs" />
                       </button>
                     )}

@@ -25,7 +25,7 @@ const ACTIONS: QuickAction[] = [
     icon: 'ki-abstract-45',
     label: 'Пост',
     hint: 'Новость на стене',
-    bg: '#FFF7ED', color: '#F35703', border: '#FED7AA',
+    bg: '#FEF0E7', color: '#F35703', border: '#FBC1A0',
   },
   {
     href: '/org/newsletters',

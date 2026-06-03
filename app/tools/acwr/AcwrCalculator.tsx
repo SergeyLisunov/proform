@@ -34,7 +34,7 @@ function AcwrGauge({ acwr, zone }: { acwr: number | null; zone: AcwrZone }) {
   const segments: Array<{ from: number; to: number; color: string }> = [
     { from: 0,   to: 0.8, color: '#FDE68A' }, // жёлтый (detraining)
     { from: 0.8, to: 1.3, color: '#BBF7D0' }, // зелёный (optimal)
-    { from: 1.3, to: 1.5, color: '#FED7AA' }, // оранжевый (monitor)
+    { from: 1.3, to: 1.5, color: '#FBC1A0' }, // оранжевый (monitor)
     { from: 1.5, to: 2.0, color: '#FECACA' }, // красный (danger)
   ]
   const ratio = (v: number) => Math.max(0, Math.min(1, v / 2))

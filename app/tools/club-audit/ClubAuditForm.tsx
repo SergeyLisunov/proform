@@ -39,14 +39,14 @@ interface AuditReport {
 
 const HEALTH_META: Record<AuditReport['health_label'], { label: string; color: string; bg: string; border: string; emoji: string }> = {
   critical: { label: 'Критическое',  color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA', emoji: '🚨' },
-  'at-risk':{ label: 'В зоне риска',  color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA', emoji: '⚠️' },
+  'at-risk':{ label: 'В зоне риска',  color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0', emoji: '⚠️' },
   stable:   { label: 'Стабильное',    color: '#A16207', bg: '#FEFCE8', border: '#FDE68A', emoji: '🟡' },
   healthy:  { label: 'Здоровое',      color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', emoji: '🟢' },
 }
 
 const SEVERITY_META: Record<'low' | 'medium' | 'high', { color: string; bg: string; border: string; emoji: string }> = {
   low:    { color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', emoji: '🟢' },
-  medium: { color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA', emoji: '🟡' },
+  medium: { color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0', emoji: '🟡' },
   high:   { color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA', emoji: '🔴' },
 }
 

@@ -65,13 +65,13 @@ const SEGMENT_CFG = {
   new:     { label: 'Новый',     bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
   active:  { label: 'Активный',  bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   churned: { label: 'Отток',     bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
-  paying:  { label: 'Платящий',  bg: '#FFF7ED', text: '#F35703', border: '#FED7AA' },
+  paying:  { label: 'Платящий',  bg: '#FEF0E7', text: '#F35703', border: '#FBC1A0' },
   trial:   { label: 'Триал',     bg: '#FAF5FF', text: '#9333EA', border: '#E9D5FF' },
 }
 
 const PLAN_CFG = {
   free: { label: 'Free',  bg: '#F1F5F9', text: '#64748B' },
-  pro:  { label: 'Pro',   bg: '#FFF7ED', text: '#F35703' },
+  pro:  { label: 'Pro',   bg: '#FEF0E7', text: '#F35703' },
   team: { label: 'Team',  bg: '#F0FDF4', text: '#16A34A' },
 }
 
@@ -225,7 +225,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                   { label: 'Тренировок', value: data.workout_count, icon: 'ki-abstract-26', color: '#2563EB', bg: '#EFF6FF' },
                   { label: 'Последняя активность', value: fmtDate(data.last_active), icon: 'ki-calendar', color: '#16A34A', bg: '#F0FDF4' },
                   { label: 'Дата регистрации', value: fmtDate(data.created_at), icon: 'ki-time', color: '#9333EA', bg: '#FAF5FF' },
-                  { label: 'Статус подписки', value: data.plan_status, icon: 'ki-verify', color: '#F35703', bg: '#FFF7ED' },
+                  { label: 'Статус подписки', value: data.plan_status, icon: 'ki-verify', color: '#F35703', bg: '#FEF0E7' },
                 ].map(s => (
                   <div key={s.label} style={{ background: 'var(--accent)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -247,7 +247,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                     <button key={p} onClick={() => changePlan(p)} disabled={savingPlan || data.plan === p}
                       style={{
                         flex: 1, padding: '8px 4px', borderRadius: 10, border: `1.5px solid ${data.plan === p ? '#F35703' : 'var(--border)'}`,
-                        background: data.plan === p ? '#fff7ed' : 'var(--card)',
+                        background: data.plan === p ? '#fef0e7' : 'var(--card)',
                         color: data.plan === p ? '#F35703' : 'var(--muted-foreground)',
                         fontSize: 12, fontWeight: 700, cursor: data.plan === p ? 'default' : 'pointer',
                         transition: 'all 0.15s',
@@ -424,10 +424,10 @@ export default function AdminCRMPage() {
         {[
           { label: 'Всего', value: stats.total, icon: 'ki-people', color: '#64748B', bg: '#F8FAFC' },
           { label: 'Активных', value: stats.active, icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Платящих', value: stats.paying, icon: 'ki-dollar', color: '#F35703', bg: '#FFF7ED' },
+          { label: 'Платящих', value: stats.paying, icon: 'ki-dollar', color: '#F35703', bg: '#FEF0E7' },
           { label: 'За неделю', value: `+${stats.new_this_week}`, icon: 'ki-arrow-up', color: '#2563EB', bg: '#EFF6FF' },
           { label: 'Free', value: stats.free, icon: 'ki-abstract-26', color: '#64748B', bg: '#F1F5F9' },
-          { label: 'Pro', value: stats.pro, icon: 'ki-star', color: '#F35703', bg: '#FFF7ED' },
+          { label: 'Pro', value: stats.pro, icon: 'ki-star', color: '#F35703', bg: '#FEF0E7' },
           { label: 'Team', value: stats.team, icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
         ].map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-3">

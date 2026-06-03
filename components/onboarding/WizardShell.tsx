@@ -49,7 +49,7 @@ export default function WizardShell({
   const progressPct = Math.round(((currentIndex + 1) / totalSteps) * 100)
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.10),_transparent_28%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_55%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.10),_transparent_28%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_55%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto w-full max-w-2xl">
         {/* Hero */}
         <div className="rounded-3xl border border-orange-100/80 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.06)] p-6 md:p-8 mb-4">

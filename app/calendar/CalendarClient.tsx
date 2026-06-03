@@ -12,7 +12,7 @@ interface Props { userId: string; workouts: Workout[]; cycleBlocks: CycleBlock[]
 
 const CYCLE_STYLES: Record<string, { bg: string; border: string; text: string }> = {
   micro: { bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  meso:  { bg: '#FFF7ED', border: '#FED7AA', text: '#F35703' },
+  meso:  { bg: '#FEF0E7', border: '#FBC1A0', text: '#F35703' },
   macro: { bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
 }
 const TYPE_COLOR: Record<string, string> = {

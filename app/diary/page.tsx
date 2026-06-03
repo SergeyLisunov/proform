@@ -19,7 +19,7 @@ const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'
 const FILTER_OPTIONS = ['Все', 'Бег', 'Велоспорт', 'Плавание', 'Силовые', 'Ходьба']
 const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#D44A02' },
+  'Велоспорт': { icon: 'ki-technology-4', bg: '#FEF0E7', border: '#FBC1A0', text: '#D44A02' },
   'Плавание':  { icon: 'ki-abstract-14',  bg: '#E0F2FE', border: '#7DD3FC', text: '#0284C7' },
   'Силовые':   { icon: 'ki-abstract-45',  bg: '#FAF5FF', border: '#E9D5FF', text: '#9333EA' },
   'Ходьба':    { icon: 'ki-map',          bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
@@ -325,7 +325,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
               : stats.totalMin + ' мин',
             icon: 'ki-time',
             color: '#F35703',
-            bg: '#FFF7ED',
+            bg: '#FEF0E7',
           },
           {
             label: 'Тренировок',
@@ -732,7 +732,7 @@ function ViewEditDrawer({
                   <div className="flex gap-2">
                     {MOODS.map(m => (
                       <button key={m} type="button" onClick={() => setForm(f=>({...f,mood:f.mood===m?'':m}))}
-                        style={{ width:44,height:44,borderRadius:14,fontSize:20,border:`1.5px solid ${form.mood===m?'#fb923c':'var(--border)'}`,background:form.mood===m?'rgba(251,146,60,0.08)':'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s' }}>
+                        style={{ width:44,height:44,borderRadius:14,fontSize:20,border:`1.5px solid ${form.mood===m?'#f5733a':'var(--border)'}`,background:form.mood===m?'rgba(251,146,60,0.08)':'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s' }}>
                         {m}
                       </button>
                     ))}
@@ -1093,7 +1093,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                       onClick={() => setForm(f => ({ ...f, mood: f.mood === m ? '' : m }))}
                       className="flex h-11 w-11 items-center justify-center rounded-xl border text-[20px] transition-all"
                       style={{
-                        borderColor: form.mood === m ? '#fb923c' : 'var(--border)',
+                        borderColor: form.mood === m ? '#f5733a' : 'var(--border)',
                         background: form.mood === m ? 'rgba(251,146,60,0.08)' : 'transparent',
                       }}
                     >
@@ -1254,7 +1254,7 @@ function AthleteDiary() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.14),_transparent_36%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_56%,#FFF4EC_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-7">
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.14),_transparent_36%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_56%,#FFF4EC_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-7">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -1300,7 +1300,7 @@ function AthleteDiary() {
               </div>
             </div>
             <div className="flex flex-col gap-2.5">
-              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)] transition-transform hover:translate-y-[-1px]">
+              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)] transition-transform hover:translate-y-[-1px]">
                 <i className="ki-filled ki-plus text-sm" />
                 Новая тренировка
               </button>
@@ -1404,7 +1404,7 @@ function AthleteDiary() {
               : 'Смените фильтр активности или создайте новую запись, чтобы история оставалась полной.'}
           </p>
           <div className="mt-5 flex justify-center">
-            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.28)]">
+            <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)]">
               <i className="ki-filled ki-plus text-sm" />
               Добавить тренировку
             </button>

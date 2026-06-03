@@ -15,7 +15,7 @@ type Notification = {
 }
 
 const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
-  invitation_received:     { icon: 'ki-user-plus',       color: '#F35703', bg: '#FFF7ED' },
+  invitation_received:     { icon: 'ki-user-plus',       color: '#F35703', bg: '#FEF0E7' },
   invitation_accepted:     { icon: 'ki-check-circle',    color: '#16A34A', bg: '#F0FDF4' },
   invitation_declined:     { icon: 'ki-cross-circle',    color: '#DC2626', bg: '#FEF2F2' },
   invitation_cancelled:    { icon: 'ki-information-5',   color: '#64748B', bg: '#F8FAFC' },
@@ -25,7 +25,7 @@ const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
   // W12 Day 60: review-system + pass-system events
   coach_replied_to_review: { icon: 'ki-message-text',    color: '#16A34A', bg: '#F0FDF4' },
   new_review_for_coach:    { icon: 'ki-star',            color: '#F59E0B', bg: '#FFFBEB' },
-  pass_session_used:       { icon: 'ki-minus-squared',   color: '#F35703', bg: '#FFF7ED' },
+  pass_session_used:       { icon: 'ki-minus-squared',   color: '#F35703', bg: '#FEF0E7' },
 }
 
 function getTypeMeta(type: string) {
@@ -120,7 +120,7 @@ export default function NotificationsPage() {
                 minWidth: 24, height: 24, borderRadius: 99, padding: '0 8px',
                 background: 'linear-gradient(135deg, #F35703, #D44A02)',
                 color: 'white', fontSize: 12, fontWeight: 800,
-                boxShadow: '0 2px 8px rgba(249,115,22,0.4)',
+                boxShadow: '0 2px 8px rgba(243,87,3,0.4)',
               }}>
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
@@ -184,7 +184,7 @@ export default function NotificationsPage() {
                 onClick={() => { if (!n.is_read) markRead(n.id) }}
                 style={{
                   background: n.is_read ? 'var(--card)' : 'var(--accent)',
-                  border: `1px solid ${n.is_read ? 'var(--border)' : '#FED7AA'}`,
+                  border: `1px solid ${n.is_read ? 'var(--border)' : '#FBC1A0'}`,
                   borderRadius: 16, padding: '14px 16px',
                   display: 'flex', alignItems: 'flex-start', gap: 12,
                   cursor: n.is_read ? 'default' : 'pointer',

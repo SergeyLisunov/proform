@@ -75,7 +75,7 @@ export default async function OrgActivityPage() {
     <div className="mx-auto flex w-full max-w-[920px] flex-col gap-6 pf-enter">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.10),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.10),_transparent_28%)]" />
         <div className="relative flex flex-col gap-3 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Организация · Лента событий</p>

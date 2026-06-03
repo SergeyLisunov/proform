@@ -310,14 +310,14 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
             return (
               <div key={r.id} style={{
                 padding: 14, borderRadius: 14,
-                background: isMine ? '#FFF7ED' : 'var(--accent)',
-                border: '1px solid ' + (isMine ? '#FED7AA' : 'var(--border)'),
+                background: isMine ? '#FEF0E7' : 'var(--accent)',
+                border: '1px solid ' + (isMine ? '#FBC1A0' : 'var(--border)'),
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 99,
-                      background: '#FFEDD5', color: '#C2410C', fontSize: 13, fontWeight: 700,
+                      background: '#FDDDCB', color: '#B03D04', fontSize: 13, fontWeight: 700,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
                     }}>
                       {r.athlete_avatar_url

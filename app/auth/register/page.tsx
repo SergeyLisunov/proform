@@ -54,9 +54,9 @@ const ROLES: { value: Role; label: string; desc: string; icon: string; bg: strin
     label: 'Атлет',
     desc: 'Веду дневник тренировок, отслеживаю прогресс и восстановление',
     icon: 'ki-abstract-26',
-    bg: '#FFF7ED',
+    bg: '#FEF0E7',
     text: '#F35703',
-    border: '#FED7AA',
+    border: '#FBC1A0',
   },
   {
     value: 'coach',
@@ -105,8 +105,8 @@ const PLANS: { value: Plan; label: string; price: string; desc: string; features
     desc: 'Для активных атлетов и тренеров',
     features: ['Безлимит тренировок', 'Аналитика и экспорт', 'Циклы и соревнования', 'Мессенджер'],
     accent: '#F35703',
-    bg: '#FFF7ED',
-    border: '#FED7AA',
+    bg: '#FEF0E7',
+    border: '#FBC1A0',
   },
   {
     value: 'team',
@@ -433,7 +433,7 @@ export default function RegisterPage() {
   const selectedRoleMeta = ROLES.find((role) => role.value === selectedRole)
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.16),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-6 sm:px-6 lg:px-10">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.16),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-6 sm:px-6 lg:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[1180px] overflow-hidden rounded-[30px] border border-orange-100/80 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.10)]">
         <div className="relative hidden w-[430px] shrink-0 overflow-hidden bg-zinc-950 lg:flex lg:flex-col">
           <div
@@ -558,7 +558,7 @@ export default function RegisterPage() {
                         className={[
                           'group flex items-start gap-4 rounded-[24px] border p-4 text-left transition-all',
                           isActive
-                            ? 'border-orange-200 bg-orange-50/80 shadow-[0_10px_30px_rgba(249,115,22,0.08)]'
+                            ? 'border-orange-200 bg-orange-50/80 shadow-[0_10px_30px_rgba(243,87,3,0.08)]'
                             : 'border-border bg-background hover:border-orange-200 hover:bg-orange-50/40',
                         ].join(' ')}
                       >

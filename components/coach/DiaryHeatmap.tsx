@@ -29,10 +29,10 @@ const MONTH_LABELS = ['янв','фев','мар','апр','май','июн','и�
 
 function colorFor(count: number): { bg: string; border: string } {
   if (count <= 0) return { bg: '#F1F5F9', border: '#E2E8F0' }
-  if (count === 1) return { bg: '#FED7AA', border: '#FDBA74' }
-  if (count <= 3) return { bg: '#FDBA74', border: '#FB923C' }
-  if (count <= 6) return { bg: '#FB923C', border: '#F35703' }
-  return { bg: '#D44A02', border: '#C2410C' }
+  if (count === 1) return { bg: '#FBC1A0', border: '#F89B6A' }
+  if (count <= 3) return { bg: '#F89B6A', border: '#F5733A' }
+  if (count <= 6) return { bg: '#F5733A', border: '#F35703' }
+  return { bg: '#D44A02', border: '#B03D04' }
 }
 
 export function DiaryHeatmap({

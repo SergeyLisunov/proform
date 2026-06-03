@@ -152,7 +152,7 @@ export default async function AdminCommercePage() {
   ]
 
   const TONE: Record<string, { bg: string; color: string; border: string }> = {
-    orange: { bg: '#FFF7ED', color: '#F35703', border: '#FED7AA' },
+    orange: { bg: '#FEF0E7', color: '#F35703', border: '#FBC1A0' },
     violet: { bg: '#FAF5FF', color: '#9333EA', border: '#E9D5FF' },
     red:    { bg: '#FEF2F2', color: '#DC2626', border: '#FECACA' },
     green:  { bg: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' },
@@ -163,7 +163,7 @@ export default async function AdminCommercePage() {
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(22,163,74,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.10),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(22,163,74,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.10),_transparent_28%)]" />
         <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div className="max-w-2xl">
             <div className="mb-3 flex flex-wrap gap-2">

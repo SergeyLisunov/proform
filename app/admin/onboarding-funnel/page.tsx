@@ -35,7 +35,7 @@ const STEP_ORDER: Record<WizardRole, string[]> = {
 }
 
 const ROLE_META: Record<WizardRole, { label: string; accent: string; bg: string; border: string }> = {
-  athlete:      { label: 'Атлет',         accent: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
+  athlete:      { label: 'Атлет',         accent: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
   coach:        { label: 'Тренер',        accent: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   organization: { label: 'Организация',   accent: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   doctor:       { label: 'Врач',          accent: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
@@ -77,7 +77,7 @@ const STATUS_META: Record<FilterStatus, { label: string; color: string; bg: stri
   all:           { label: 'Все',          color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
   completed:     { label: 'Завершили',    color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   in_progress:   { label: 'В процессе',   color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  paused:        { label: 'Пауза >24ч',   color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA' },
+  paused:        { label: 'Пауза >24ч',   color: '#D44A02', bg: '#FEF0E7', border: '#FBC1A0' },
   not_started:   { label: 'Не начали',    color: '#64748B', bg: '#F1F5F9', border: '#CBD5E1' },
   backfilled:    { label: 'Legacy',       color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
 }
@@ -240,7 +240,7 @@ export default async function OnboardingFunnelPage({
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(124,58,237,0.10),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(124,58,237,0.10),_transparent_28%)]" />
         <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div className="max-w-2xl">
             <div className="mb-3 flex flex-wrap gap-2">

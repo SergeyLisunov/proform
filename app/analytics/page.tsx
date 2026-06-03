@@ -199,7 +199,7 @@ function CoachAnalytics() {
     >
       <div className="flex flex-col gap-6 pf-enter">
         <Surface className="relative bg-gradient-to-br from-orange-50 via-card to-background p-5 md:p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_36%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_36%)]" />
           <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
@@ -478,7 +478,7 @@ function AthleteAnalytics() {
     >
       <div className="flex flex-col gap-6 pf-enter">
         <Surface className="relative bg-gradient-to-br from-orange-50 via-card to-background p-5 md:p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(124,58,237,0.08),transparent_36%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(124,58,237,0.08),transparent_36%)]" />
           <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">

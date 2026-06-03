@@ -125,7 +125,7 @@ export default function AthleteDashboardPage() {
   return (
     <div className="pf-enter max-w-5xl mx-auto px-4 py-8 flex flex-col gap-5">
       {/* Greeting hero */}
-      <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.08),_transparent_30%),linear-gradient(135deg,#FFF7ED_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
+      <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.08),_transparent_30%),linear-gradient(135deg,#FEF0E7_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
         <p className="text-2xs font-bold uppercase tracking-[0.22em] text-orange-700 mb-1">{todayStr}</p>
         <h1 className="text-3xl md:text-4xl font-bold text-navy-500 tracking-tight">
           Привет, {name ?? 'атлет'} 👋
@@ -146,7 +146,7 @@ export default function AthleteDashboardPage() {
 
       {/* Quick links — W8 Day 39 added /athlete/passes (5th tile) */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <QuickLink href="/athlete/goals"      icon="ki-flag"          color="#D44A02" bg="#FFF7ED" border="#FED7AA" label="Цели" />
+        <QuickLink href="/athlete/goals"      icon="ki-flag"          color="#D44A02" bg="#FEF0E7" border="#FBC1A0" label="Цели" />
         <QuickLink href="/athlete/progress"   icon="ki-chart-line-up" color="#2563EB" bg="#EFF6FF" border="#BFDBFE" label="Прогресс" />
         <QuickLink href="/calendar"           icon="ki-calendar-2"    color="#15803D" bg="#F0FDF4" border="#BBF7D0" label="Календарь" />
         <QuickLink

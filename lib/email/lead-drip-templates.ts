@@ -82,32 +82,32 @@ export function renderTeamRiskDrip(payload: TeamRiskDripPayload | null | undefin
     <p style="margin:0 0 16px 0;color:#0F172A;font-size:14px;line-height:1.6">Что даёт Sporteo над standalone snapshot:</p>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px 0">
-      <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED;margin-bottom:8px">
-        <strong style="color:#C2410C;font-size:13px">🔄 Auto-update</strong>
+      <tr><td style="padding:10px 12px;border:1px solid #FBC1A0;border-radius:10px;background:#FEF0E7;margin-bottom:8px">
+        <strong style="color:#B03D04;font-size:13px">🔄 Auto-update</strong>
         <div style="font-size:12px;color:#475569;margin-top:4px">Atlete подключает Garmin/Whoop — ACWR обновляется ежедневно автоматически</div>
       </td></tr>
     </table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px 0">
-      <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED">
-        <strong style="color:#C2410C;font-size:13px">🚨 Early warning</strong>
+      <tr><td style="padding:10px 12px;border:1px solid #FBC1A0;border-radius:10px;background:#FEF0E7">
+        <strong style="color:#B03D04;font-size:13px">🚨 Early warning</strong>
         <div style="font-size:12px;color:#475569;margin-top:4px">Cron уведомляет когда athlete в зоне риска — до травмы, не после</div>
       </td></tr>
     </table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px 0">
-      <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED">
-        <strong style="color:#C2410C;font-size:13px">📊 Roster matrix</strong>
+      <tr><td style="padding:10px 12px;border:1px solid #FBC1A0;border-radius:10px;background:#FEF0E7">
+        <strong style="color:#B03D04;font-size:13px">📊 Roster matrix</strong>
         <div style="font-size:12px;color:#475569;margin-top:4px">Все атлеты в одной таблице со статусами — coach видит overload в одном scan'е</div>
       </td></tr>
     </table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 8px 0">
-      <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED">
-        <strong style="color:#C2410C;font-size:13px">🩺 Doctor recommendations</strong>
+      <tr><td style="padding:10px 12px;border:1px solid #FBC1A0;border-radius:10px;background:#FEF0E7">
+        <strong style="color:#B03D04;font-size:13px">🩺 Doctor recommendations</strong>
         <div style="font-size:12px;color:#475569;margin-top:4px">Спортивный врач может оставить рекомендацию — coach + athlete видят одно и то же</div>
       </td></tr>
     </table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 18px 0">
-      <tr><td style="padding:10px 12px;border:1px solid #FED7AA;border-radius:10px;background:#FFF7ED">
-        <strong style="color:#C2410C;font-size:13px">📅 Bulk planning</strong>
+      <tr><td style="padding:10px 12px;border:1px solid #FBC1A0;border-radius:10px;background:#FEF0E7">
+        <strong style="color:#B03D04;font-size:13px">📅 Bulk planning</strong>
         <div style="font-size:12px;color:#475569;margin-top:4px">CSV-импорт всей команды + bulk-invite за 2 минуты вместо ручного добавления</div>
       </td></tr>
     </table>

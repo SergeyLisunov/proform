@@ -18,7 +18,7 @@ function pickGreeting(hour: number): string {
 
 function recoveryColor(v: number): string {
   if (v >= 67) return '#15803D'
-  if (v >= 34) return '#C2410C'
+  if (v >= 34) return '#B03D04'
   return '#B91C1C'
 }
 
@@ -35,7 +35,7 @@ export default function CoachHeroBar({ firstName, stats }: { firstName: string; 
   const recColor = recoveryColor(stats.avgRecovery)
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[#FED7AA] bg-gradient-to-br from-[#FFF7ED] via-white to-[#EFF6FF] p-5 md:p-7">
+    <section className="relative overflow-hidden rounded-3xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-5 md:p-7">
       <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-orange-200/40 blur-3xl pointer-events-none" />
 
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">

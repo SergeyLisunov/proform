@@ -34,7 +34,7 @@ export const ACWR_ZONE_META: Record<AcwrZone, {
   monitor: {
     label: 'Следить внимательнее',
     tagline: 'Рост нагрузки слишком быстрый — снизьте темп',
-    color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA',
+    color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0',
   },
   danger: {
     label: 'Зона травмы',

@@ -57,7 +57,7 @@ function fmtPct(n: number): string {
 
 function tone(cvr: number): { bg: string; color: string } {
   if (cvr >= 0.15) return { bg: '#F0FDF4', color: '#15803D' }
-  if (cvr >= 0.05) return { bg: '#FFF7ED', color: '#C2410C' }
+  if (cvr >= 0.05) return { bg: '#FEF0E7', color: '#B03D04' }
   return { bg: '#FEF2F2', color: '#B91C1C' }
 }
 
@@ -145,7 +145,7 @@ export default async function AbTestsPage() {
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(124,58,237,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.10),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(124,58,237,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.10),_transparent_28%)]" />
         <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div className="max-w-2xl">
             <div className="mb-3 flex flex-wrap gap-2">

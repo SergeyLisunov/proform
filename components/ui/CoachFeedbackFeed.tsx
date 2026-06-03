@@ -178,7 +178,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
             <div key={r.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50/70 transition-colors">
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: r.i_commented ? '#F0FDF4' : '#FFF7ED' }}
+                style={{ background: r.i_commented ? '#F0FDF4' : '#FEF0E7' }}
               >
                 <i
                   className={`ki-filled ${r.i_commented ? 'ki-check-circle' : 'ki-abstract-26'} text-sm`}

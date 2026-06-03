@@ -11,7 +11,7 @@ import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
-  athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FFF7ED' },
+  athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FEF0E7' },
   coach:        { label: 'Тренер',     color: '#16A34A', bg: '#F0FDF4' },
   organization: { label: 'Организация', color: '#2563EB', bg: '#EFF6FF' },
   admin:        { label: 'Админ',      color: '#7C3AED', bg: '#F5F3FF' },
@@ -322,7 +322,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                 <button onClick={handleCancel} disabled={acting} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: '#FFF7ED', color: '#F35703', border: '1.5px solid #FED7AA',
+                  background: '#FEF0E7', color: '#F35703', border: '1.5px solid #FBC1A0',
                   cursor: 'pointer',
                 }}>
                   <i className="ki-filled ki-time text-sm" />Ожидает · Отозвать
@@ -333,7 +333,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                   padding: '9px 18px', borderRadius: 12, fontSize: 13, fontWeight: 700,
                   background: acting ? 'var(--muted)' : 'linear-gradient(135deg,#F35703,#D44A02)',
                   color: 'white', border: 'none', cursor: acting ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 3px 12px rgba(249,115,22,0.3)',
+                  boxShadow: '0 3px 12px rgba(243,87,3,0.3)',
                 }}>
                   {acting ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправка…</>
                     : <><i className="ki-filled ki-user-plus text-sm" />Пригласить</>}
@@ -649,7 +649,7 @@ function OrgProfile({ profile }: { profile: Profile }) {
       )}
 
       {services.length > 0 && (
-        <SectionCard title="Услуги" color="#F35703" bg="#FFF7ED"><ChipRow items={services} /></SectionCard>
+        <SectionCard title="Услуги" color="#F35703" bg="#FEF0E7"><ChipRow items={services} /></SectionCard>
       )}
 
       {memberships.length > 0 && (

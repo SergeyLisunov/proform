@@ -287,7 +287,7 @@ function AssistantChat() {
 function CoachToolsPanel({ role }: { role: string | undefined }) {
   const tools = [
     { title: 'Брифинг по атлету', subtitle: 'Краткое резюме состояния выбранного атлета', href: '/athletes', icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
-    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-lamp-on', color: '#F35703', bg: '#FFF7ED' },
+    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-lamp-on', color: '#F35703', bg: '#FEF0E7' },
     { title: 'Детектор аномалий', subtitle: 'Автоматический поиск просадок HRV / сна / нагрузки', href: '/analytics', icon: 'ki-shield-tick', color: '#DC2626', bg: '#FEF2F2' },
     { title: 'Медицинское резюме', subtitle: 'Сводка для врача / консилиума по атлету', href: '/athletes', icon: 'ki-note-2', color: '#0D9488', bg: '#F0FDFA' },
   ]

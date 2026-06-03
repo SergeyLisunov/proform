@@ -890,7 +890,7 @@ export default function AthletesPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(circle at top left, rgba(249,115,22,0.14), transparent 30%), radial-gradient(circle at right center, rgba(59,130,246,0.08), transparent 28%), linear-gradient(180deg, rgba(255,248,241,0.86), rgba(255,255,255,0.96))',
+              'radial-gradient(circle at top left, rgba(243,87,3,0.14), transparent 30%), radial-gradient(circle at right center, rgba(59,130,246,0.08), transparent 28%), linear-gradient(180deg, rgba(255,248,241,0.86), rgba(255,255,255,0.96))',
           }}
         />
         <div className="relative p-6 md:p-7">

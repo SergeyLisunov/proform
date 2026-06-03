@@ -53,7 +53,7 @@ export default function AthleteLoadPage() {
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
-      <div className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FFF7ED] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FEF0E7] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-red-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FECACA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">

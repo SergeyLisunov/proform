@@ -561,7 +561,7 @@ function FilterChip({ label, active, onClick, color, bg }: {
       style={active && color && bg
         ? { background: bg, color, borderColor: color + '60' }
         : active
-          ? { background: '#FFF7ED', color: '#D44A02', borderColor: '#FED7AA' }
+          ? { background: '#FEF0E7', color: '#D44A02', borderColor: '#FBC1A0' }
           : undefined}>
       {label}
     </button>

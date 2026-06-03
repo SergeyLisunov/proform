@@ -44,7 +44,7 @@ export default function StaticPageShell({
       <SkipToContent />
       <main
         id="main-content"
-        className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.10),_transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FFF7ED_100%)]"
+        className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.10),_transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FEF0E7_100%)]"
       >
         {/* Top bar — back + mini-logo */}
         <header className="border-b border-orange-100/60 bg-white/70 backdrop-blur-sm">

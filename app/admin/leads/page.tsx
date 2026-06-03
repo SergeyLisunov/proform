@@ -28,15 +28,15 @@ export const dynamic = 'force-dynamic'
 
 const SOURCE_META: Record<LeadSource, { label: string; emoji: string; color: string; bg: string; border: string }> = {
   acwr:              { label: 'ACWR',           emoji: '📊', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
-  overtraining:      { label: 'Overtraining',   emoji: '🥵', color: '#9A3412', bg: '#FFF7ED', border: '#FED7AA' },
+  overtraining:      { label: 'Overtraining',   emoji: '🥵', color: '#8A300A', bg: '#FEF0E7', border: '#FBC1A0' },
   templates:         { label: 'Templates',      emoji: '📋', color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
-  'team-risk':       { label: 'Team Risk',      emoji: '🟠', color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA' },
+  'team-risk':       { label: 'Team Risk',      emoji: '🟠', color: '#D44A02', bg: '#FEF0E7', border: '#FBC1A0' },
   'adaptive-plan':   { label: '7-day Plan',     emoji: '🔵', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   'club-audit':      { label: 'Club Audit',     emoji: '🟢', color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4' },
   'medical-summary': { label: 'Medical Summary', emoji: '🟣', color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
   // W16 Day 79 — high-trust landing form (HeroAuditModal + LeadCaptureForm).
   // Distinct brand-orange color separates visually from tool-calculator leads.
-  'landing-audit-form': { label: 'Landing Audit', emoji: '🎯', color: '#C2410C', bg: '#FFEDD5', border: '#FDBA74' },
+  'landing-audit-form': { label: 'Landing Audit', emoji: '🎯', color: '#B03D04', bg: '#FDDDCB', border: '#F89B6A' },
   other:             { label: 'Other',          emoji: '⭐', color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
 }
 

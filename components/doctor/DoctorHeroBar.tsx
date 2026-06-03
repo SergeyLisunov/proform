@@ -31,7 +31,7 @@ export default function DoctorHeroBar({ firstName, stats }: { firstName: string;
     : `Под наблюдением — ${stats.patientsCount} пациентов`
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FFF7ED] p-5 md:p-7">
+    <section className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FEF0E7] p-5 md:p-7">
       <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-red-200/40 blur-3xl pointer-events-none" />
 
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">

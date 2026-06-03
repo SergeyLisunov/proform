@@ -114,8 +114,8 @@ export default function Calculator() {
     if (!result.isSignificant) {
       return {
         chip:   'Внутри шума',
-        color:  '#C2410C',
-        bg:     '#FFF7ED',
+        color:  '#B03D04',
+        bg:     '#FEF0E7',
         text:   `p-value = ${result.pValue.toFixed(3)} ≥ 0.05. Разница может быть случайной — продолжай собирать данные.`,
       }
     }

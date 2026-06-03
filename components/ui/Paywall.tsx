@@ -70,7 +70,7 @@ export const PLANS = [
     period: '/мес',
     description: 'Для серьёзных атлетов',
     color: '#F35703',
-    bg: '#FFF7ED',
+    bg: '#FEF0E7',
     popular: true,
     features: [
       'Безлимитные тренировки',
@@ -210,7 +210,7 @@ export function PricingModal({
           {/* Header */}
           <div style={{
             padding: '28px 32px 24px',
-            background: 'linear-gradient(135deg, rgba(249,115,22,0.06) 0%, transparent 60%)',
+            background: 'linear-gradient(135deg, rgba(243,87,3,0.06) 0%, transparent 60%)',
             borderBottom: '1px solid var(--border)',
             position: 'relative',
           }}>
@@ -227,7 +227,7 @@ export function PricingModal({
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '6px 14px', borderRadius: 20,
-                background: '#FFF7ED', border: '1px solid #FED7AA',
+                background: '#FEF0E7', border: '1px solid #FBC1A0',
                 color: '#D44A02', fontSize: 12, fontWeight: 700,
                 marginBottom: 12,
               }}>
@@ -433,8 +433,8 @@ export function WorkoutLimitBadge() {
       <div onClick={() => setShowPricing(true)} style={{
         display: 'inline-flex', alignItems: 'center', gap: 8,
         padding: '8px 14px', borderRadius: 12,
-        background: isEmpty ? '#FEF2F2' : '#FFF7ED',
-        border: `1px solid ${isEmpty ? '#FECACA' : '#FED7AA'}`,
+        background: isEmpty ? '#FEF2F2' : '#FEF0E7',
+        border: `1px solid ${isEmpty ? '#FECACA' : '#FBC1A0'}`,
         color: isEmpty ? '#DC2626' : '#D44A02',
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'all 0.15s',

@@ -21,7 +21,7 @@ type Plan = {
 
 const ACT_STYLE: Record<string, { bg: string; color: string; icon: string }> = {
   'Бег':       { bg: '#EFF6FF', color: '#2563EB', icon: 'ki-abstract-26' },
-  'Велоспорт': { bg: '#FFF7ED', color: '#D44A02', icon: 'ki-technology-4' },
+  'Велоспорт': { bg: '#FEF0E7', color: '#D44A02', icon: 'ki-technology-4' },
   'Плавание':  { bg: '#E0F2FE', color: '#0284C7', icon: 'ki-abstract-14' },
   'Силовые':   { bg: '#FAF5FF', color: '#9333EA', icon: 'ki-abstract-45' },
   'Ходьба':    { bg: '#F0FDF4', color: '#16A34A', icon: 'ki-map' },
