@@ -189,7 +189,7 @@ export default function LeadMagnetSection() {
             id="lead-magnets-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           >
-            Попробуйте подход ProForm за 60 секунд
+            Попробуйте подход Sporteo за 60 секунд
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             Без регистрации, без email-форм, без листов ожидания.

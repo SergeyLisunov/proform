@@ -31,28 +31,28 @@ export default function CommandPalette() {
 
   const commands: Cmd[] = useMemo(() => [
     // Navigation
-    { id: 'nav-dashboard',     title: 'Главная',          subtitle: 'Дашборд',                icon: 'ki-home-2',          iconColor: '#F97316', run: go('/dashboard') },
-    { id: 'nav-ai',            title: 'ProForm AI',       subtitle: 'Ассистент, видеоразбор, голос, insights', icon: 'ki-sparkle',   iconColor: '#7C3AED', run: go('/ai') },
+    { id: 'nav-dashboard',     title: 'Главная',          subtitle: 'Дашборд',                icon: 'ki-home-2',          iconColor: '#F35703', run: go('/dashboard') },
+    { id: 'nav-ai',            title: 'Sporteo AI',       subtitle: 'Ассистент, видеоразбор, голос, insights', icon: 'ki-sparkle',   iconColor: '#7C3AED', run: go('/ai') },
     { id: 'nav-ai-assistant',  title: 'AI ассистент',     subtitle: 'Задать вопрос по тренировкам', icon: 'ki-message-question', iconColor: '#7C3AED', run: go('/ai?tab=assistant') },
-    { id: 'nav-network',       title: 'Сеть и контакты',  subtitle: 'Связи + поиск людей/специалистов', icon: 'ki-people', iconColor: '#F97316', run: go('/network') },
+    { id: 'nav-network',       title: 'Сеть и контакты',  subtitle: 'Связи + поиск людей/специалистов', icon: 'ki-people', iconColor: '#F35703', run: go('/network') },
     { id: 'nav-network-find',  title: 'Найти специалиста', subtitle: 'Тренер, врач, организация', icon: 'ki-magnifier', iconColor: '#2563EB', run: go('/network?tab=find') },
     { id: 'nav-diary',         title: 'Дневник',          subtitle: 'Все тренировки',         icon: 'ki-book',            iconColor: '#2563EB', run: go('/diary') },
     { id: 'nav-diary-search',  title: 'Семантический поиск', subtitle: 'Поиск по смыслу в заметках и тренировках', icon: 'ki-magnifier', iconColor: '#6366F1', run: go('/diary/search') },
     { id: 'nav-calendar',      title: 'Календарь',        subtitle: 'Планирование',           icon: 'ki-calendar',        iconColor: '#16A34A', run: go('/calendar') },
-    { id: 'nav-templates',     title: 'Шаблоны',          subtitle: 'Библиотека тренировок',  icon: 'ki-notepad-edit',    iconColor: '#F97316', run: go('/templates') },
+    { id: 'nav-templates',     title: 'Шаблоны',          subtitle: 'Библиотека тренировок',  icon: 'ki-notepad-edit',    iconColor: '#F35703', run: go('/templates') },
     { id: 'nav-challenges',    title: 'Челленджи',        subtitle: 'Лидерборды и вызовы',    icon: 'ki-crown',           iconColor: '#10B981', run: go('/challenges') },
     { id: 'nav-cycles',        title: 'Циклы',            subtitle: 'Макроциклы и периодизация', icon: 'ki-chart-simple', iconColor: '#0D9488', run: go('/cycles') },
     { id: 'nav-athletes',      title: 'Атлеты',           subtitle: 'Моя команда',            icon: 'ki-abstract-26',     iconColor: '#9333EA', run: go('/athletes') },
-    { id: 'nav-competitions',  title: 'Соревнования',     subtitle: 'Старты сезона',          icon: 'ki-crown',           iconColor: '#EA580C', run: go('/competitions') },
+    { id: 'nav-competitions',  title: 'Соревнования',     subtitle: 'Старты сезона',          icon: 'ki-crown',           iconColor: '#D44A02', run: go('/competitions') },
     { id: 'nav-messages',      title: 'Сообщения',        subtitle: 'Чаты',                   icon: 'ki-messages',        iconColor: '#7C3AED', run: go('/messages') },
     { id: 'nav-notes',         title: 'Заметки',          subtitle: 'Быстрые записи',         icon: 'ki-notepad-edit',    iconColor: '#D97706', run: go('/notes') },
     { id: 'nav-records',       title: 'Рекорды',           subtitle: 'Личные максимумы и прогресс', icon: 'ki-medal',      iconColor: '#F59E0B', run: go('/records') },
     { id: 'nav-load',          title: 'Нагрузка · ACWR',    subtitle: 'Светофор острой и хрон. нагрузки', icon: 'ki-pulse', iconColor: '#10B981', run: go('/load') },
-    { id: 'nav-streaks',       title: 'Серия и бейджи',   subtitle: 'Стрик, бейджи, карта активности', icon: 'ki-flash',         iconColor: '#F97316', run: go('/streaks') },
+    { id: 'nav-streaks',       title: 'Серия и бейджи',   subtitle: 'Стрик, бейджи, карта активности', icon: 'ki-flash',         iconColor: '#F35703', run: go('/streaks') },
     { id: 'nav-notifications', title: 'Уведомления',                                         icon: 'ki-notification',    iconColor: '#DC2626', run: go('/notifications') },
     { id: 'nav-settings',      title: 'Настройки',                                           icon: 'ki-setting-2',       iconColor: '#475569', run: go('/settings') },
     // Quick actions
-    { id: 'act-add-workout',   title: 'Добавить тренировку', subtitle: 'Быстрый ввод',         icon: 'ki-plus',            iconColor: '#F97316', kbd: ['N'], run: fire('proform:open-add-workout') },
+    { id: 'act-add-workout',   title: 'Добавить тренировку', subtitle: 'Быстрый ввод',         icon: 'ki-plus',            iconColor: '#F35703', kbd: ['N'], run: fire('proform:open-add-workout') },
     { id: 'act-add-note',      title: 'Новая заметка',    subtitle: 'Голос или текст',        icon: 'ki-microphone-2',    iconColor: '#2563EB', run: go('/notes') },
   ], [go, fire])
 

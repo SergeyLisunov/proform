@@ -198,7 +198,7 @@ export default function DoctorReportPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
                   <i className="ki-filled ki-heart text-red-600 text-sm" />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-red-700">ProForm · Медицинский отчёт</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-red-700">Sporteo · Медицинский отчёт</span>
               </div>
               <h1 className="mt-2 text-2xl font-extrabold text-foreground">{patientLabel}</h1>
               <div className="mt-1 text-sm text-muted-foreground">
@@ -355,7 +355,7 @@ export default function DoctorReportPage() {
                   <div className="mt-1 text-xs text-foreground">{doctorName}</div>
                 </div>
                 <div className="text-right text-2xs text-muted-foreground max-w-[320px]">
-                  Отчёт сгенерирован автоматически на основе данных платформы ProForm. AI-резюме носит информационный характер и не заменяет клиническую оценку.
+                  Отчёт сгенерирован автоматически на основе данных платформы Sporteo. AI-резюме носит информационный характер и не заменяет клиническую оценку.
                 </div>
               </div>
             </section>

@@ -17,7 +17,7 @@ const VALID_COMBOS: Record<string, [string, string]> = {
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
-const FROM    = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM    = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 
 function displayName(u: { name?: string | null; nickname?: string | null; email?: string | null }): string {
   // Schema only has `name` (no first_name/last_name) — the previous

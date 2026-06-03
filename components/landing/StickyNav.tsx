@@ -10,6 +10,7 @@
  */
 import Link from 'next/link'
 import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
+import { SporteoLogo } from "@/components/ui/SporteoLogo"
 
 export default function StickyNav() {
   return (
@@ -21,21 +22,11 @@ export default function StickyNav() {
         {/* Logo — на mobile только icon, нужен accessible name */}
         <Link
           href="/"
-          aria-label="ProForm — на главную"
+          aria-label="Sporteo — на главную"
           className="flex items-center gap-2.5 no-underline"
         >
-          <div
-            aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20"
-          >
-            <i className="ki-filled ki-abstract-26 text-sm text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <div className="pf-num text-xl text-foreground">ProForm</div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground -mt-0.5">
-              Спортивная платформа
-            </div>
-          </div>
+          <SporteoLogo size="md" iconOnly className="sm:hidden" />
+          <SporteoLogo size="md" className="hidden sm:inline-flex" />
         </Link>
 
         {/* CTAs — tracked via TrackedCtaLink for conversion analytics */}

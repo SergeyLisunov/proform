@@ -72,7 +72,7 @@ export const CHANNELS: ChannelMeta[] = [
   },
   {
     key:         'drip_marketing_email',
-    label:       'Drip кампании ProForm',
+    label:       'Drip кампании Sporteo',
     description: 'Еженедельные подсказки: как использовать platform features. Можно отписаться без affect на core.',
     icon:        'ki-rocket',
     category:    'marketing',

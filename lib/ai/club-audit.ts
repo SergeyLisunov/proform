@@ -71,7 +71,7 @@ const RiskAreaSchema = z.object({
   severity:            z.enum(['low', 'medium', 'high']),
   current_state:       z.string().max(220).describe('Что сейчас происходит (с цифрами если возможно)'),
   recommended_action:  z.string().max(220).describe('Что конкретно сделать (1-2 предложения)'),
-  proform_helps_with:  z.string().max(180).optional().describe('Как ProForm может помочь (опц., soft-sell)'),
+  proform_helps_with:  z.string().max(180).optional().describe('Как Sporteo может помочь (опц., soft-sell)'),
 })
 
 export const ClubAuditReportSchema = z.object({
@@ -227,7 +227,7 @@ function ruleBased(input: ClubAuditInput): ClubAuditReport {
       severity:           m.churn_rate_90d > 0.20 ? 'high' : 'medium',
       current_state:      `${Math.round(m.churn_rate_90d * 100)}% атлетов ушло за последние 90 дней (${input.departed_90d} из ${input.total_athletes}).`,
       recommended_action: 'Запустить early-warning систему: атлет не пришёл 2 недели подряд → автоматическое уведомление администратору + триггер для разговора.',
-      proform_helps_with: 'ProForm Org Dashboard показывает at-risk атлетов через recovery + missed sessions trends.',
+      proform_helps_with: 'Sporteo Org Dashboard показывает at-risk атлетов через recovery + missed sessions trends.',
     })
   }
 
@@ -243,7 +243,7 @@ function ruleBased(input: ClubAuditInput): ClubAuditReport {
       recommended_action: heavy
         ? 'Нанять помощников или рассмотреть group-tier подход для базовой работы; senior coaches фокусируются на топ-атлетах.'
         : 'Запустить acquisition campaign для заполнения capacity; либо снизить число тренеров.',
-      proform_helps_with: 'ProForm roster matrix показывает athletes-per-coach ratio в реальном времени.',
+      proform_helps_with: 'Sporteo roster matrix показывает athletes-per-coach ratio в реальном времени.',
     })
   }
 
@@ -254,7 +254,7 @@ function ruleBased(input: ClubAuditInput): ClubAuditReport {
       severity:           m.session_compliance < 0.65 ? 'high' : 'medium',
       current_state:      `Выполнение плана тренировок: ${Math.round(m.session_compliance * 100)}% от целевого. Атлеты пропускают 1-2 сессии в неделю.`,
       recommended_action: 'Внедрить трекинг посещаемости и автоматические follow-up уведомления при пропуске; еженедельный отчёт админу.',
-      proform_helps_with: 'ProForm logs все sessions с completion_status; cron уведомляет о тренде пропусков.',
+      proform_helps_with: 'Sporteo logs все sessions с completion_status; cron уведомляет о тренде пропусков.',
     })
   }
 
@@ -270,7 +270,7 @@ function ruleBased(input: ClubAuditInput): ClubAuditReport {
       severity:           m.tracking_risk_score > 6 ? 'high' : 'medium',
       current_state:      `Текущий учёт: ${methods}. Данные распылены, риск потери информации, audit невозможен.`,
       recommended_action: 'Перейти на единую платформу: один источник истины для тренировок + биллинга + мед.допусков. Это снимает 70% операционного хаоса.',
-      proform_helps_with: 'ProForm объединяет тренировки, оплаты, и медданные в одной БД с RLS-политиками для приватности.',
+      proform_helps_with: 'Sporteo объединяет тренировки, оплаты, и медданные в одной БД с RLS-политиками для приватности.',
     })
   }
 
@@ -301,7 +301,7 @@ function ruleBased(input: ClubAuditInput): ClubAuditReport {
     priorities.push('Сфокусироваться на data-driven решениях: проверять каждое решение через метрики')
     priorities.push('Документировать SOP-процессы (запись на тренировку, биллинг, мед.допуск)')
   }
-  while (priorities.length < 3) priorities.push('Использовать ProForm для централизованного управления операциями клуба')
+  while (priorities.length < 3) priorities.push('Использовать Sporteo для централизованного управления операциями клуба')
 
   const summary = label === 'critical'
     ? `${club}: критическое состояние (score ${score}/100). ${risk_areas.length} области требуют немедленного внимания.`

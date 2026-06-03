@@ -97,7 +97,7 @@ export default function DiaryClient({ role, userId }: Props) {
     <>
       <button onClick={() => setOpen(true)}
         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
-        style={{ background: '#F97316' }}>
+        style={{ background: '#F35703' }}>
         <i className="ki-filled ki-plus text-base" />
         {role === 'coach' ? 'Новое наблюдение' : 'Добавить тренировку'}
       </button>
@@ -134,7 +134,7 @@ export default function DiaryClient({ role, userId }: Props) {
                   {ACTIVITY_TYPES.map(t => (
                     <button key={t} type="button" onClick={() => setForm(f => ({ ...f, activity_type: t }))}
                       className="px-3 py-1.5 rounded-xl text-xs font-semibold transition"
-                      style={{ background: form.activity_type === t ? '#F97316' : '#F1F5F9', color: form.activity_type === t ? '#fff' : '#64748B' }}>
+                      style={{ background: form.activity_type === t ? '#F35703' : '#F1F5F9', color: form.activity_type === t ? '#fff' : '#64748B' }}>
                       {t}
                     </button>
                   ))}
@@ -170,7 +170,7 @@ export default function DiaryClient({ role, userId }: Props) {
                 Отмена
               </button>
               <button onClick={save} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
-                style={{ background: saving ? '#FDA96A' : '#F97316' }}>
+                style={{ background: saving ? '#FDA96A' : '#F35703' }}>
                 {saving ? 'Сохранение…' : 'Сохранить'}
               </button>
             </div>

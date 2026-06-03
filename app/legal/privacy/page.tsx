@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     'Какие данные мы собираем, как обрабатываем, кому передаём. 152-ФЗ-aligned. Holding-документ до финальной правовой экспертизы.',
   alternates: { canonical: '/legal/privacy' },
   openGraph: {
-    title: 'Политика конфиденциальности · ProForm',
+    title: 'Политика конфиденциальности · Sporteo',
     description:
-      'Обработка персональных данных в ProForm. 152-ФЗ. Holding-документ.',
+      'Обработка персональных данных в Sporteo. 152-ФЗ. Holding-документ.',
     url: '/legal/privacy',
   },
   robots: {
@@ -45,13 +45,13 @@ export default function PrivacyPage() {
         <strong>⚠ Holding-страница.</strong> Полный документ Политики
         конфиденциальности проходит правовую экспертизу. Базовые принципы
         обработки данных изложены ниже; финальная редакция будет опубликована до
-        выхода ProForm из закрытого бета-тестирования.
+        выхода Sporteo из закрытого бета-тестирования.
       </div>
 
       <section>
         <h2 className="text-xl font-bold text-foreground">1. Какие данные мы собираем</h2>
         <p className="mt-3 text-muted-foreground">
-          ProForm собирает только те данные, которые необходимы для работы
+          Sporteo собирает только те данные, которые необходимы для работы
           платформы:
         </p>
         <ul className="mt-3 list-disc space-y-1.5 pl-6 text-muted-foreground">

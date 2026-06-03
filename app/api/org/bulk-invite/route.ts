@@ -53,7 +53,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
-const FROM     = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM     = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 const MAX_ROWS = 500
 const MAX_BODY = 256 * 1024
 const SEND_BATCH_SIZE = 10  // parallel Resend calls per batch

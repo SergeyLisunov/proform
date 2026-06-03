@@ -103,7 +103,7 @@ export default function PainSection() {
 
         {/* Bridge to solution */}
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          ProForm заменяет все три картинки одной системой —{' '}
+          Sporteo заменяет все три картинки одной системой —{' '}
           <a href="#how-it-works" className="font-semibold text-orange-600 hover:underline">
             смотреть как →
           </a>

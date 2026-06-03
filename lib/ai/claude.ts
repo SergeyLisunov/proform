@@ -1,5 +1,5 @@
 /**
- * Claude (Anthropic) helpers for ProForm AI features.
+ * Claude (Anthropic) helpers for Sporteo AI features.
  * Gracefully degrades when ANTHROPIC_API_KEY is not configured.
  */
 import { anthropic } from '@ai-sdk/anthropic'

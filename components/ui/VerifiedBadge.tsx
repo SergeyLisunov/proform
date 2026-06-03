@@ -20,7 +20,7 @@ interface VerifiedBadgeProps {
   style?:    CSSProperties
 }
 
-const DEFAULT_TOOLTIP = 'Verified — личность и квалификация подтверждены администратором ProForm'
+const DEFAULT_TOOLTIP = 'Verified — личность и квалификация подтверждены администратором Sporteo'
 
 export default function VerifiedBadge({ size = 'sm', tooltip, className, style }: VerifiedBadgeProps) {
   const title = tooltip ?? DEFAULT_TOOLTIP

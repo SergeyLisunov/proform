@@ -566,7 +566,7 @@ export default function ClubAuditForm() {
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите видеть эти метрики автоматически в реальном времени?
-                  ProForm Org Dashboard показывает at-risk атлетов, coach load, retention trends — всё одной таблицей.
+                  Sporteo Org Dashboard показывает at-risk атлетов, coach load, retention trends — всё одной таблицей.
                 </p>
                 <Link href="/auth/register?utm_source=tools&utm_medium=club-audit"
                   className="mt-3 inline-block rounded-lg bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm font-bold">
@@ -604,7 +604,7 @@ export default function ClubAuditForm() {
         <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Все эти метрики автоматически в Org Dashboard</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
-            ProForm для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спортивных врачей,
+            Sporteo для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спортивных врачей,
             автоматизированный биллинг, единая база медданных. Подключение — 30 минут с CSV-импорта.
           </p>
           <Link href="/auth/register?utm_source=tools&utm_medium=club-audit&utm_campaign=cta"

@@ -30,7 +30,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
 
 interface CronResult {
@@ -60,7 +60,7 @@ function renderEmail(c: NudgeCandidate): { subject: string; html: string } {
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06)">
         <tr><td style="padding:28px 32px 16px 32px;border-bottom:1px solid #F1F5F9">
-          <span style="font-size:12px;font-weight:700;color:#F97316;letter-spacing:2px;text-transform:uppercase">ProForm</span>
+          <span style="font-size:12px;font-weight:700;color:#F35703;letter-spacing:2px;text-transform:uppercase">Sporteo</span>
         </td></tr>
         <tr><td style="padding:24px 32px 28px 32px">
           <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A;line-height:1.3">${escape(greet)}, как тренировки?</h1>
@@ -78,7 +78,7 @@ function renderEmail(c: NudgeCandidate): { subject: string; html: string } {
             </ol>
           </div>
           <p style="margin:0 0 12px 0">
-            <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">Открыть мой dashboard →</a>
+            <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#F35703,#D44A02);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">Открыть мой dashboard →</a>
           </p>
           <p style="margin:18px 0 0 0;color:#94A3B8;font-size:11px;line-height:1.5">
             Это автоматическое напоминание. Отправляется максимум раз в 7 дней.
@@ -105,7 +105,7 @@ function renderEmail(c: NudgeCandidate): { subject: string; html: string } {
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06)">
         <tr><td style="padding:28px 32px 16px 32px;border-bottom:1px solid #F1F5F9">
-          <span style="font-size:12px;font-weight:700;color:#D97706;letter-spacing:2px;text-transform:uppercase">ProForm</span>
+          <span style="font-size:12px;font-weight:700;color:#D97706;letter-spacing:2px;text-transform:uppercase">Sporteo</span>
         </td></tr>
         <tr><td style="padding:24px 32px 28px 32px">
           <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A;line-height:1.3">${escape(greet)}, абонемент скоро закончится</h1>

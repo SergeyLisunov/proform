@@ -10,11 +10,11 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Войти',
   description:
-    'Войдите в ProForm — спортивную платформу для тренеров, спортсменов, врачей и клубов.',
+    'Войдите в Sporteo — спортивную платформу для тренеров, спортсменов, врачей и клубов.',
   alternates: { canonical: '/auth/login' },
   openGraph: {
-    title: 'Войти · ProForm',
-    description: 'Войдите в ProForm — рабочее пространство тренера, спортсмена и клуба.',
+    title: 'Войти · Sporteo',
+    description: 'Войдите в Sporteo — рабочее пространство тренера, спортсмена и клуба.',
     url: '/auth/login',
   },
 }

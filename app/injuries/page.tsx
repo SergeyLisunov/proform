@@ -21,7 +21,7 @@ const SEVERITY_COLOR: Record<InjurySeverity, { text: string; bg: string; border:
 
 const STATUS_COLOR: Record<InjuryStatus, string> = {
   active:     '#DC2626',
-  recovering: '#EA580C',
+  recovering: '#D44A02',
   recovered:  '#15803D',
 }
 

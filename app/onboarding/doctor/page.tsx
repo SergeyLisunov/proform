@@ -261,7 +261,7 @@ export default function DoctorOnboardingPage() {
               <div className="text-sm font-semibold text-foreground">Согласие на обработку медданных (152-ФЗ)</div>
               <div className="text-xs text-muted-foreground mt-0.5">
                 Я понимаю, что медицинская переписка с атлетами и тренерами в системе — это обработка
-                персональных данных. Соблюдаю требования 152-ФЗ. ProForm хранит данные в Supabase
+                персональных данных. Соблюдаю требования 152-ФЗ. Sporteo хранит данные в Supabase
                 EU-Central, доступ RLS-ограничен.
               </div>
             </div>

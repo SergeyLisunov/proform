@@ -34,7 +34,7 @@ type Newsletter = {
 
 const POST_TYPE_BADGE: Record<string, { label: string; style: React.CSSProperties }> = {
   announcement: { label: 'Объявление', style: { background: '#EFF6FF', color: '#2563EB', border: '1px solid #BFDBFE' } },
-  event:        { label: 'Событие',    style: { background: '#FFF7ED', color: '#F97316', border: '1px solid #FED7AA' } },
+  event:        { label: 'Событие',    style: { background: '#FFF7ED', color: '#F35703', border: '1px solid #FED7AA' } },
   news:         { label: 'Новость',    style: { background: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' } },
   result:       { label: 'Результат',  style: { background: '#FAF5FF', color: '#9333EA', border: '1px solid #E9D5FF' } },
 }
@@ -42,7 +42,7 @@ const POST_TYPE_BADGE: Record<string, { label: string; style: React.CSSPropertie
 const NL_STATUS: Record<string, { label: string; style: React.CSSProperties }> = {
   sent:      { label: 'Отправлена',  style: { background: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' } },
   draft:     { label: 'Черновик',    style: { background: '#F8FAFC', color: '#64748B', border: '1px solid #E2E8F0' } },
-  scheduled: { label: 'Запланирована', style: { background: '#FFF7ED', color: '#F97316', border: '1px solid #FED7AA' } },
+  scheduled: { label: 'Запланирована', style: { background: '#FFF7ED', color: '#F35703', border: '1px solid #FED7AA' } },
   cancelled: { label: 'Отменена',    style: { background: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA' } },
 }
 
@@ -131,13 +131,13 @@ export default function OrgDashboard() {
   const kpis = [
     { label: 'Участники', value: stats.total, hint: 'Активный состав', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Тренеры', value: stats.coaches, hint: 'Роль с доступом', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4' },
-    { label: 'Атлеты', value: stats.athletes, hint: 'Основная команда', icon: 'ki-abstract-26', color: '#F97316', bg: '#FFF7ED' },
+    { label: 'Атлеты', value: stats.athletes, hint: 'Основная команда', icon: 'ki-abstract-26', color: '#F35703', bg: '#FFF7ED' },
     { label: 'Контент', value: posts.length + newsletters.length, hint: 'Публикации и рассылки', icon: 'ki-calendar-tick', color: '#9333EA', bg: '#FAF5FF' },
   ]
 
   const actions = [
     { href: '/org/members', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF', label: 'Участники', meta: 'Состав и статусы' },
-    { href: '/org/wall', icon: 'ki-abstract-45', color: '#F97316', bg: '#FFF7ED', label: 'Стена', meta: 'Публикации и анонсы' },
+    { href: '/org/wall', icon: 'ki-abstract-45', color: '#F35703', bg: '#FFF7ED', label: 'Стена', meta: 'Публикации и анонсы' },
     { href: '/org/newsletters', icon: 'ki-sms', color: '#9333EA', bg: '#FAF5FF', label: 'Рассылки', meta: 'Сообщения и охват' },
     { href: '/org/settings', icon: 'ki-setting-2', color: '#64748B', bg: '#F8FAFC', label: 'Настройки', meta: 'Профиль и права' },
   ]
@@ -185,7 +185,7 @@ export default function OrgDashboard() {
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '10px 16px', borderRadius: 14, textDecoration: 'none',
                   border: '1px solid #FED7AA',
-                  background: 'linear-gradient(135deg, #F97316, #EA580C)',
+                  background: 'linear-gradient(135deg, #F35703, #D44A02)',
                   color: 'white', fontSize: 13, fontWeight: 700,
                   boxShadow: '0 10px 24px rgba(249,115,22,0.26)',
                 }}>
@@ -297,7 +297,7 @@ export default function OrgDashboard() {
               </div>
               <p className="text-2xs text-muted-foreground mt-1">Что сейчас видно команде на стене</p>
             </div>
-            <Link href="/org/wall" style={{ fontSize: 11, fontWeight: 700, color: '#F97316', textDecoration: 'none' }}>
+            <Link href="/org/wall" style={{ fontSize: 11, fontWeight: 700, color: '#F35703', textDecoration: 'none' }}>
               Все →
             </Link>
           </div>
@@ -305,11 +305,11 @@ export default function OrgDashboard() {
             {posts.length === 0 ? (
               <div className="px-5 py-12 text-center">
                 <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                  <i className="ki-filled ki-abstract-45 text-2xl" style={{ color: '#F97316' }} />
+                  <i className="ki-filled ki-abstract-45 text-2xl" style={{ color: '#F35703' }} />
                 </div>
                 <p className="text-sm font-semibold text-foreground">Публикаций пока нет</p>
                 <p className="text-2xs text-muted-foreground mt-1">Добавьте первую новость, чтобы наполнить ленту организации.</p>
-                <Link href="/org/wall" style={{ fontSize: 12, color: '#F97316', fontWeight: 700, textDecoration: 'none', marginTop: 10, display: 'inline-block' }}>
+                <Link href="/org/wall" style={{ fontSize: 12, color: '#F35703', fontWeight: 700, textDecoration: 'none', marginTop: 10, display: 'inline-block' }}>
                   Создать первую →
                 </Link>
               </div>
@@ -352,7 +352,7 @@ export default function OrgDashboard() {
               </div>
               <p className="text-2xs text-muted-foreground mt-1">Статус отправок и охват аудитории</p>
             </div>
-            <Link href="/org/newsletters" style={{ fontSize: 11, fontWeight: 700, color: '#F97316', textDecoration: 'none' }}>
+            <Link href="/org/newsletters" style={{ fontSize: 11, fontWeight: 700, color: '#F35703', textDecoration: 'none' }}>
               Все →
             </Link>
           </div>
@@ -363,7 +363,7 @@ export default function OrgDashboard() {
               </div>
               <p className="text-sm font-semibold text-foreground">Рассылок пока нет</p>
               <p className="text-2xs text-muted-foreground mt-1">Запустите первое сообщение, чтобы держать участников в курсе.</p>
-              <Link href="/org/newsletters" style={{ fontSize: 12, color: '#F97316', fontWeight: 700, textDecoration: 'none', marginTop: 10, display: 'inline-block' }}>
+              <Link href="/org/newsletters" style={{ fontSize: 12, color: '#F35703', fontWeight: 700, textDecoration: 'none', marginTop: 10, display: 'inline-block' }}>
                 Создать рассылку →
               </Link>
             </div>

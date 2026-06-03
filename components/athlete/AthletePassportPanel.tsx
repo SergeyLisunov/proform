@@ -60,7 +60,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
   const share = async () => {
     if (!url) return
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      try { await (navigator as any).share({ title: 'Мой паспорт атлета · ProForm', url }) } catch {}
+      try { await (navigator as any).share({ title: 'Мой паспорт атлета · Sporteo', url }) } catch {}
     } else { copy() }
   }
 

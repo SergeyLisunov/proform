@@ -68,7 +68,7 @@ type Connection = {
 }
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
-  athlete:      { label: 'Атлет',    color: '#F97316', bg: '#FFF7ED' },
+  athlete:      { label: 'Атлет',    color: '#F35703', bg: '#FFF7ED' },
   coach:        { label: 'Тренер',   color: '#16A34A', bg: '#F0FDF4' },
   organization: { label: 'Орг.',     color: '#2563EB', bg: '#EFF6FF' },
   doctor:       { label: 'Доктор',   color: '#DC2626', bg: '#FEF2F2' },
@@ -114,7 +114,7 @@ function RoleChip({ role }: { role: string }) {
 }
 
 function PillButton({ active, onClick, children, icon, accent }: { active: boolean; onClick: () => void; children: React.ReactNode; icon?: string; accent?: string }) {
-  const color = accent ?? '#F97316'
+  const color = accent ?? '#F35703'
   return (
     <button
       type="button"
@@ -196,7 +196,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
 
       <div className="flex flex-wrap gap-2">
         {['', 'athlete', 'coach', 'doctor', 'organization'].map(r => (
-          <PillButton key={r || 'all'} active={roleFilter === r} onClick={() => setRoleFilter(r)} accent="#F97316">
+          <PillButton key={r || 'all'} active={roleFilter === r} onClick={() => setRoleFilter(r)} accent="#F35703">
             {r === '' ? 'Все роли' : ROLE_META[r]?.label ?? r}
           </PillButton>
         ))}
@@ -227,14 +227,14 @@ function PeopleSearch({ myRole }: { myRole: string }) {
                 {status === 'active' ? (
                   <span className="text-[11px] font-semibold text-[#16A34A]">✓ в связях</span>
                 ) : status === 'pending' || status === 'pending_outgoing' ? (
-                  <span className="text-[11px] font-semibold text-[#F97316]">Ожидает</span>
+                  <span className="text-[11px] font-semibold text-[#F35703]">Ожидает</span>
                 ) : status === 'pending_incoming' ? (
-                  <Link href="/network?tab=contacts" className="text-[11px] font-semibold text-[#F97316]">Ответить →</Link>
+                  <Link href="/network?tab=contacts" className="text-[11px] font-semibold text-[#F35703]">Ответить →</Link>
                 ) : (
                   <button
                     onClick={() => invite(u)}
                     disabled={busy === u.id}
-                    className="rounded-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                    className="rounded-lg bg-gradient-to-r from-[#F35703] to-[#D44A02] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
                   >
                     {busy === u.id ? '…' : 'Пригласить'}
                   </button>
@@ -390,7 +390,7 @@ function ContactsPanel() {
         <PillButton active={tab === 'active'} onClick={() => setTab('active')} icon="ki-check-circle" accent="#16A34A">
           Активные {counts.active > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.active}</span>}
         </PillButton>
-        <PillButton active={tab === 'incoming'} onClick={() => setTab('incoming')} icon="ki-inbox-in" accent="#F97316">
+        <PillButton active={tab === 'incoming'} onClick={() => setTab('incoming')} icon="ki-inbox-in" accent="#F35703">
           Входящие {counts.incoming > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.incoming}</span>}
         </PillButton>
         <PillButton active={tab === 'outgoing'} onClick={() => setTab('outgoing')} icon="ki-inbox-out" accent="#7C3AED">
@@ -504,7 +504,7 @@ function NetworkPageInner() {
       <div className="relative overflow-hidden rounded-3xl border border-[#FED7AA] bg-gradient-to-br from-[#FFF7ED] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F97316]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
             <i className="ki-filled ki-people text-[11px]" />
             Сеть
           </span>
@@ -516,7 +516,7 @@ function NetworkPageInner() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <PillButton active={mode === 'contacts'} onClick={() => selectMode('contacts')} icon="ki-people" accent="#F97316">
+        <PillButton active={mode === 'contacts'} onClick={() => selectMode('contacts')} icon="ki-people" accent="#F35703">
           Мои контакты
         </PillButton>
         <PillButton active={mode === 'find'} onClick={() => selectMode('find')} icon="ki-magnifier" accent="#2563EB">
@@ -525,7 +525,7 @@ function NetworkPageInner() {
         {user.role !== 'athlete' && (
           <button
             onClick={() => setInviteOpen(true)}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F97316] hover:bg-[#FFF7ED]"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FFF7ED]"
           >
             <i className="ki-filled ki-sms text-xs"/>
             Пригласить по email

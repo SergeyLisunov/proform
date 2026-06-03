@@ -55,7 +55,7 @@ const ROLES: { value: Role; label: string; desc: string; icon: string; bg: strin
     desc: 'Веду дневник тренировок, отслеживаю прогресс и восстановление',
     icon: 'ki-abstract-26',
     bg: '#FFF7ED',
-    text: '#F97316',
+    text: '#F35703',
     border: '#FED7AA',
   },
   {
@@ -104,7 +104,7 @@ const PLANS: { value: Plan; label: string; price: string; desc: string; features
     price: '599 ₽/мес',
     desc: 'Для активных атлетов и тренеров',
     features: ['Безлимит тренировок', 'Аналитика и экспорт', 'Циклы и соревнования', 'Мессенджер'],
-    accent: '#F97316',
+    accent: '#F35703',
     bg: '#FFF7ED',
     border: '#FED7AA',
   },
@@ -453,7 +453,7 @@ export default function RegisterPage() {
               <i className="ki-filled ki-abstract-26 text-[16px] text-white" />
             </div>
             <div>
-              <div className="pf-num text-[24px] tracking-wide text-white">ProForm</div>
+              <div className="pf-num text-[24px] tracking-wide text-white">Sporteo</div>
               <div className="text-2xs uppercase tracking-[0.34em] text-zinc-500">Платформа атлета</div>
             </div>
           </div>
@@ -518,7 +518,7 @@ export default function RegisterPage() {
                 <i className="ki-filled ki-abstract-26 text-sm text-white" />
               </div>
               <div>
-                <div className="pf-num text-2xl text-foreground">ProForm</div>
+                <div className="pf-num text-2xl text-foreground">Sporteo</div>
                 <div className="text-2xs uppercase tracking-[0.28em] text-muted-foreground">Платформа атлета</div>
               </div>
             </div>
@@ -1118,7 +1118,7 @@ export default function RegisterPage() {
                     href="/auth/login"
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white no-underline transition-all hover:bg-orange-600"
                   >
-                    Войти в ProForm
+                    Войти в Sporteo
                     <i className="ki-filled ki-right text-xs" />
                   </Link>
                 </div>

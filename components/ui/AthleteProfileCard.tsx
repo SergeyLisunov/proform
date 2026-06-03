@@ -100,7 +100,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
     ctx.restore()
     // Orange border
     ctx.beginPath(); ctx.arc(cx + cs / 2, cy + cs / 2, cs / 2, 0, Math.PI * 2)
-    ctx.strokeStyle = '#F97316'; ctx.lineWidth = 3; ctx.stroke()
+    ctx.strokeStyle = '#F35703'; ctx.lineWidth = 3; ctx.stroke()
   }
 
   function clamp() {
@@ -168,7 +168,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
         {/* Header */}
         <div style={{ padding:'18px 22px 14px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between' }}>
           <div style={{ display:'flex',alignItems:'center',gap:10 }}>
-            <div style={{ width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,#F97316,#EA580C)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+            <div style={{ width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,#F35703,#D44A02)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
               <i className="ki-filled ki-picture text-white text-sm" />
             </div>
             <div>
@@ -187,7 +187,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
           <i className="ki-filled ki-minus text-xs text-muted-foreground" />
           <input type="range" min={1} max={4} step={0.05} value={zoom}
             onChange={e => applyZoom(Number(e.target.value))}
-            style={{ flex:1,accentColor:'#F97316',cursor:'pointer' }} />
+            style={{ flex:1,accentColor:'#F35703',cursor:'pointer' }} />
           <i className="ki-filled ki-plus text-xs text-muted-foreground" />
           <span style={{ fontSize:11,fontWeight:700,color:'var(--muted-foreground)',minWidth:32,textAlign:'right' }}>{zoom.toFixed(1)}×</span>
         </div>
@@ -198,7 +198,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
         </div>
         {/* Footer */}
         <div style={{ padding:'12px 22px 20px',display:'flex',gap:10 }}>
-          <button onClick={handleApply} disabled={saving} style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',background:'linear-gradient(135deg,#F97316,#EA580C)',color:'white',fontSize:14,fontWeight:700,cursor:saving?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 2px 8px rgba(249,115,22,0.35)',opacity:saving?0.7:1,transition:'all 0.15s' }}>
+          <button onClick={handleApply} disabled={saving} style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',background:'linear-gradient(135deg,#F35703,#D44A02)',color:'white',fontSize:14,fontWeight:700,cursor:saving?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 2px 8px rgba(249,115,22,0.35)',opacity:saving?0.7:1,transition:'all 0.15s' }}>
             {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-check text-sm" />Применить</>}
           </button>
           <button onClick={handleClose} style={{ padding:'12px 18px',borderRadius:12,border:'1.5px solid var(--border)',background:'transparent',color:'var(--muted-foreground)',fontSize:14,fontWeight:600,cursor:'pointer' }}>Отмена</button>
@@ -248,7 +248,7 @@ function SocialEditModal({ profile, onClose, onSaved }: {
       <div style={{ position:'relative',background:'var(--card)',border:'1px solid var(--border)',borderRadius:20,width:420,maxWidth:'95vw',zIndex:1,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.18)' }}>
         <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between' }}>
           <div>
-            <p style={{ fontSize:10,fontWeight:700,color:'#f97316',textTransform:'uppercase',letterSpacing:'0.12em',margin:0 }}>Профиль</p>
+            <p style={{ fontSize:10,fontWeight:700,color:'#F35703',textTransform:'uppercase',letterSpacing:'0.12em',margin:0 }}>Профиль</p>
             <h3 style={{ fontSize:17,fontWeight:800,color:'var(--foreground)',margin:'3px 0 0' }}>Социальные сети</h3>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
@@ -413,7 +413,7 @@ export default function AthleteProfileCard() {
             position:'absolute', inset:0,
             background: profile.background_url
               ? `url(${profile.background_url}) center/cover no-repeat`
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f97316 100%)',
+              : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #F35703 100%)',
           }} />
           <div style={{ position:'absolute',inset:0,background:'rgba(0,0,0,0.08)' }} />
 
@@ -469,7 +469,7 @@ export default function AthleteProfileCard() {
                   <div style={{
                     width:80, height:80, borderRadius:'50%',
                     border:'4px solid var(--card)',
-                    background:'linear-gradient(135deg,#f97316,#ea580c)',
+                    background:'linear-gradient(135deg,#F35703,#D44A02)',
                     display:'flex', alignItems:'center', justifyContent:'center',
                     fontSize:26, fontWeight:900, color:'white', letterSpacing:'-0.02em',
                   }}>
@@ -497,7 +497,7 @@ export default function AthleteProfileCard() {
                   <div style={{
                     position:'absolute', bottom:-2, right:-2,
                     width:22, height:22, borderRadius:'50%',
-                    background:'#F97316', border:'2px solid var(--card)',
+                    background:'#F35703', border:'2px solid var(--card)',
                     display:'flex', alignItems:'center', justifyContent:'center',
                   }}>
                     <i className="ki-filled ki-picture text-white" style={{ fontSize:9 }} />
@@ -515,7 +515,7 @@ export default function AthleteProfileCard() {
             <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
               <h2 className="pf-heading-sm" style={{ color:'var(--foreground)', margin:0 }}>{profile.name}</h2>
               {profile.sport_type && (
-                <span className="pf-label" style={{ padding:'3px 10px', borderRadius:20, background:'#fff7ed', color:'#ea580c', border:'1px solid #fed7aa', fontSize:11, letterSpacing:'0.1em' }}>
+                <span className="pf-label" style={{ padding:'3px 10px', borderRadius:20, background:'#fff7ed', color:'#D44A02', border:'1px solid #fed7aa', fontSize:11, letterSpacing:'0.1em' }}>
                   {profile.sport_type}
                 </span>
               )}
@@ -599,7 +599,7 @@ export default function AthleteProfileCard() {
                     style={{ width:26, height:26, borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center',
                       background:'transparent', border:'1px dashed #CBD5E1', cursor:'pointer', flexShrink:0,
                       transition:'all 0.15s', color:'#CBD5E1', marginLeft:2 }}
-                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#F97316'; b.style.color='#F97316'; b.style.background='#FFF7ED' }}
+                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#F35703'; b.style.color='#F35703'; b.style.background='#FFF7ED' }}
                     onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#CBD5E1'; b.style.color='#CBD5E1'; b.style.background='transparent' }}>
                     <i className="ki-filled ki-pencil" style={{ fontSize:9 }} />
                   </button>
@@ -612,7 +612,7 @@ export default function AthleteProfileCard() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:1, marginTop:20, background:'var(--border)', borderRadius:16, overflow:'hidden', border:'1px solid var(--border)' }}>
             {[
               { label:'Тренировок', value:stats.total, icon:'ki-abstract-26', color:'#2563EB', bg:'#EFF6FF', href:'/diary' },
-              { label:'Часов', value:fmtHours(stats.totalMinutes), icon:'ki-time', color:'#F97316', bg:'#FFF7ED', href:'/diary' },
+              { label:'Часов', value:fmtHours(stats.totalMinutes), icon:'ki-time', color:'#F35703', bg:'#FFF7ED', href:'/diary' },
               { label:'Ср. нагрузка', value:stats.avgStrain || '—', icon:'ki-chart-line-up', color:'#DC2626', bg:'#FEF2F2', href:'/calendar' },
               { label:'На неделе', value:stats.thisWeek, icon:'ki-calendar', color:'#16A34A', bg:'#F0FDF4', href:'/diary' },
             ].map((s,i) => (
@@ -632,7 +632,7 @@ export default function AthleteProfileCard() {
             <Link href="/diary/new" style={{
               flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:7, padding:'11px 0',
               borderRadius:12, textDecoration:'none',
-              background:'linear-gradient(135deg,#F97316,#EA580C)', color:'white',
+              background:'linear-gradient(135deg,#F35703,#D44A02)', color:'white',
               fontSize:13, fontWeight:700, boxShadow:'0 2px 8px rgba(249,115,22,0.3)',
             }}>
               <i className="ki-filled ki-plus text-sm" />Новая тренировка
@@ -643,7 +643,7 @@ export default function AthleteProfileCard() {
               background:'var(--card)', color:'var(--muted-foreground)',
               fontSize:13, fontWeight:600, transition:'all 0.15s',
             }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='#F97316';(e.currentTarget as HTMLAnchorElement).style.color='#F97316'}}
+              onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='#F35703';(e.currentTarget as HTMLAnchorElement).style.color='#F35703'}}
               onMouseLeave={e=>{(e.currentTarget as HTMLAnchorElement).style.borderColor='var(--border)';(e.currentTarget as HTMLAnchorElement).style.color='var(--muted-foreground)'}}>
               <i className="ki-filled ki-setting-2 text-sm" />Профиль
             </Link>

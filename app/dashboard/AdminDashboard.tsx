@@ -12,7 +12,7 @@ type UserRow = Database['public']['Tables']['users']['Row']
 
 const ROLE_STYLE: Record<string, { background: string; color: string }> = {
   athlete:      { background: '#DBEAFE', color: '#2563EB' },
-  coach:        { background: '#FFEDD5', color: '#F97316' },
+  coach:        { background: '#FFEDD5', color: '#F35703' },
   doctor:       { background: '#FEE2E2', color: '#DC2626' },
   organization: { background: '#FAF5FF', color: '#9333EA' },
   admin:        { background: '#EDE9FE', color: '#7C3AED' },
@@ -86,7 +86,7 @@ export default async function AdminDashboard() {
           {(() => {
             const total = (athletes ?? 0) + (coaches ?? 0) + (doctors ?? 0) + (orgs ?? 0) || 1
             const items = [
-              { label: 'Атлеты',       count: athletes ?? 0, color: '#F97316' },
+              { label: 'Атлеты',       count: athletes ?? 0, color: '#F35703' },
               { label: 'Тренеры',      count: coaches ?? 0,  color: '#16A34A' },
               { label: 'Врачи',        count: doctors ?? 0,  color: '#DC2626' },
               { label: 'Организации',  count: orgs ?? 0,     color: '#7C3AED' },
@@ -132,7 +132,7 @@ export default async function AdminDashboard() {
               label="Назначено осмотров"
               value={scheduledCheckups ?? 0}
               icon="ki-heart-circle"
-              color="#EA580C"
+              color="#D44A02"
               hint="в работе у докторов"
             />
             <Signal
@@ -159,12 +159,12 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {[
             { grp: 'Идентификация',  cols: ['users', 'athletes', 'trainer_athletes', 'connections'], c: '#2563EB' },
-            { grp: 'Тренировки',     cols: ['workouts', 'cycle_blocks', 'competitions', 'workout_templates'], c: '#F97316' },
+            { grp: 'Тренировки',     cols: ['workouts', 'cycle_blocks', 'competitions', 'workout_templates'], c: '#F35703' },
             { grp: 'Биометрика',     cols: ['daily_metrics', 'user_device_connections'], c: '#16A34A' },
             { grp: 'Медицина',       cols: ['injuries', 'medical_checkups', 'medical_diary'], c: '#DC2626' },
             { grp: 'Дневники',       cols: ['observation_diary', 'workout_comments', 'notes'], c: '#7C3AED' },
             { grp: 'Биллинг',        cols: ['subscriptions', 'athlete_passes', 'payments', 'referral_credits'], c: '#9333EA' },
-            { grp: 'Маркетинг',      cols: ['tool_leads', 'email_invites', 'newsletters'], c: '#EA580C' },
+            { grp: 'Маркетинг',      cols: ['tool_leads', 'email_invites', 'newsletters'], c: '#D44A02' },
             { grp: 'Организации',    cols: ['organizations', 'org_group_sessions', 'org_session_participants', 'wall_posts'], c: '#0891B2' },
             { grp: 'Безопасность',   cols: ['RLS on all tables', 'auth trigger', 'role functions', 'audit_logs'], c: '#475569' },
           ].map(({ grp, cols, c }) => (

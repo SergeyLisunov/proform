@@ -30,7 +30,7 @@ const SOURCE_META: Record<LeadSource, { label: string; emoji: string; color: str
   acwr:              { label: 'ACWR',           emoji: '📊', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
   overtraining:      { label: 'Overtraining',   emoji: '🥵', color: '#9A3412', bg: '#FFF7ED', border: '#FED7AA' },
   templates:         { label: 'Templates',      emoji: '📋', color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
-  'team-risk':       { label: 'Team Risk',      emoji: '🟠', color: '#EA580C', bg: '#FFF7ED', border: '#FED7AA' },
+  'team-risk':       { label: 'Team Risk',      emoji: '🟠', color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA' },
   'adaptive-plan':   { label: '7-day Plan',     emoji: '🔵', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   'club-audit':      { label: 'Club Audit',     emoji: '🟢', color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4' },
   'medical-summary': { label: 'Medical Summary', emoji: '🟣', color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
@@ -127,7 +127,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
         <CounterTile label="Pending"                 value={totalPending}    color="#0891B2" />
         <CounterTile label="Failed (3+ attempts)"    value={totalFailed}     color="#B91C1C" />
         <CounterTile label="Converted → users"       value={totalConverted}  color="#7C3AED" subtitle={`${overallConvPct}% conv. rate`} />
-        <CounterTile label="Converted → paid"        value={totalPaid}       color="#EA580C" />
+        <CounterTile label="Converted → paid"        value={totalPaid}       color="#D44A02" />
       </div>
 
       {/* Funnel by source */}

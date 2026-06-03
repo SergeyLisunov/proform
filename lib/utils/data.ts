@@ -49,7 +49,7 @@ export const TYPE_COLORS: Record<string, { bg: string; text: string; icon: strin
   Cycling:           { bg: '#F0FDF4', text: '#16A34A', icon: 'ki-abstract-14',  border: '#BBF7D0' },
   Swimming:          { bg: '#F5F3FF', text: '#7C3AED', icon: 'ki-abstract-18',  border: '#DDD6FE' },
   HIIT:              { bg: '#FEF2F2', text: '#DC2626', icon: 'ki-abstract-17',  border: '#FECACA' },
-  'Weight Training': { bg: '#FFF7ED', text: '#F97316', icon: 'ki-abstract-31',  border: '#FED7AA' },
+  'Weight Training': { bg: '#FFF7ED', text: '#F35703', icon: 'ki-abstract-31',  border: '#FED7AA' },
   CrossFit:          { bg: '#FFFBEB', text: '#D97706', icon: 'ki-abstract-28',  border: '#FDE68A' },
   Yoga:              { bg: '#F0FDF4', text: '#0D9488', icon: 'ki-heart',         border: '#99F6E4' },
   Walking:           { bg: '#F8FAFC', text: '#64748B', icon: 'ki-map',           border: '#CBD5E1' },
@@ -64,7 +64,7 @@ export const CYCLE_COLORS: Record<string, { bg: string; text: string; border: st
 
 export const EVENT_COLORS: Record<string, { bg: string; text: string }> = {
   workout:     { bg: '#EFF6FF', text: '#2563EB' },
-  competition: { bg: '#FFF7ED', text: '#EA580C' },
+  competition: { bg: '#FFF7ED', text: '#D44A02' },
   rest:        { bg: '#F1F5F9', text: '#64748B' },
   medical:     { bg: '#FDF4FF', text: '#9333EA' },
   camp:        { bg: '#F0FDFA', text: '#0F766E' },
@@ -83,7 +83,7 @@ export const RISK_COLORS: Record<string, { bg: string; text: string; border: str
 // ── Coach marks ────────────────────────────────────────────────────────────────
 export const COACH_MARKS: Record<string, { label: string; bg: string; text: string }> = {
   overload:       { label: 'Overload',       bg: '#FEF2F2', text: '#DC2626' },
-  under_recovery: { label: 'Under-Recovery', bg: '#FFF7ED', text: '#EA580C' },
+  under_recovery: { label: 'Under-Recovery', bg: '#FFF7ED', text: '#D44A02' },
   unstable:       { label: 'Unstable',       bg: '#FEFCE8', text: '#A16207' },
   on_track:       { label: 'On Track',       bg: '#F0FDF4', text: '#16A34A' },
   peak:           { label: 'Peak',           bg: '#EFF6FF', text: '#2563EB' },
@@ -129,5 +129,5 @@ export const DEMO_DIARY = [
 ]
 
 export function recoveryColor(v: number) {
-  return v >= 67 ? '#16A34A' : v >= 34 ? '#F97316' : '#DC2626'
+  return v >= 67 ? '#16A34A' : v >= 34 ? '#F35703' : '#DC2626'
 }

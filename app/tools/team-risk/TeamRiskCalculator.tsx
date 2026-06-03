@@ -8,7 +8,7 @@
  *   result    → показ snapshot, email gate (показываем только первые 2
  *               athletes полностью, остальные blur'ятся)
  *   submitted → email captured через /api/tools/lead → full reveal +
- *               CTA «Открыть в ProForm»
+ *               CTA «Открыть в Sporteo»
  *
  * Mirror стиля /tools/acwr (orange accent, 2-column hero, science section,
  * CTA, cross-link).
@@ -574,7 +574,7 @@ export default function TeamRiskCalculator() {
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите автоматический snapshot по всем тренировкам команды?
-                  В ProForm атлеты подключают Garmin / Whoop / ручной ввод —
+                  В Sporteo атлеты подключают Garmin / Whoop / ручной ввод —
                   риск-светофор обновляется в реальном времени.
                 </p>
                 <Link href="/auth/register?utm_source=tools&utm_medium=team-risk"
@@ -616,7 +616,7 @@ export default function TeamRiskCalculator() {
         <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-rose-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Хотите snapshot автоматически по всей команде?</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
-            ProForm подключает Garmin, Whoop и ручной ввод. Тренер видит ACWR + recovery + mood
+            Sporteo подключает Garmin, Whoop и ручной ввод. Тренер видит ACWR + recovery + mood
             по каждому атлету одной таблицей. Risk-светофор обновляется в реальном времени.
           </p>
           <Link href="/auth/register?utm_source=tools&utm_medium=team-risk&utm_campaign=cta"

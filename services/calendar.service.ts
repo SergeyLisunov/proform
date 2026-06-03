@@ -6,7 +6,7 @@ export type EventType = CalendarEvent['event_type']
 
 export const EVENT_TYPES: { value: EventType; label: string; icon: string; color: string }[] = [
   { value: 'workout',     label: 'Тренировка',  icon: 'ki-abstract-26',  color: '#2563EB' },
-  { value: 'competition', label: 'Соревнование', icon: 'ki-crown',        color: '#F97316' },
+  { value: 'competition', label: 'Соревнование', icon: 'ki-crown',        color: '#F35703' },
   { value: 'rest',        label: 'Отдых',       icon: 'ki-moon',         color: '#16A34A' },
   { value: 'note',        label: 'Заметка',     icon: 'ki-notepad-edit', color: '#64748B' },
   { value: 'travel',      label: 'Поездка',     icon: 'ki-airplane',     color: '#7C3AED' },

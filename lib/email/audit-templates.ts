@@ -63,7 +63,7 @@ function wrap(title: string, preheader: string, inner: string): string {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06)">
           <tr><td style="padding:28px 32px 16px 32px;border-bottom:1px solid #F1F5F9">
             <table role="presentation" width="100%"><tr>
-              <td style="font-size:12px;font-weight:700;color:#EA580C;letter-spacing:2px;text-transform:uppercase">ProForm</td>
+              <td style="font-size:12px;font-weight:700;color:#D44A02;letter-spacing:2px;text-transform:uppercase">Sporteo</td>
               <td align="right" style="font-size:11px;color:#94A3B8">Аудит клуба</td>
             </tr></table>
           </td></tr>
@@ -71,7 +71,7 @@ function wrap(title: string, preheader: string, inner: string): string {
             ${inner}
           </td></tr>
           <tr><td style="padding:20px 32px;border-top:1px solid #F1F5F9;background:#F8FAFC;font-size:11px;color:#64748B;text-align:center">
-            <a href="${APP_URL}" style="color:#EA580C;text-decoration:none;font-weight:600">Открыть ProForm</a>
+            <a href="${APP_URL}" style="color:#D44A02;text-decoration:none;font-weight:600">Открыть Sporteo</a>
             &nbsp;·&nbsp;
             <a href="${APP_URL}/legal/privacy" style="color:#64748B;text-decoration:underline">Конфиденциальность</a>
           </td></tr>
@@ -121,14 +121,14 @@ export function buildUserConfirmationEmail(ctx: AuditEmailContext): {
     </p>
     <p style="margin:0 0 4px 0">
       <a href="${APP_URL}/auth/login?demo=coach"
-         style="display:inline-block;padding:10px 18px;background:#F97316;color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:10px">
+         style="display:inline-block;padding:10px 18px;background:#F35703;color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:10px">
         Открыть демо как тренер →
       </a>
     </p>
 
     <p style="margin:24px 0 0 0;font-size:12px;color:#64748B;line-height:1.5">
       Не получили аудит за 24 часа? Напишите на
-      <a href="mailto:support@proform-delta.vercel.app" style="color:#EA580C">support@proform-delta.vercel.app</a>
+      <a href="mailto:support@proform-delta.vercel.app" style="color:#D44A02">support@proform-delta.vercel.app</a>
       ${ctx.telegram ? `или в Telegram — мы связались бы с вами по ${escape(ctx.telegram)}` : ''}.
     </p>
   `
@@ -164,7 +164,7 @@ export function buildAdminNotificationEmail(ctx: AuditEmailContext): {
       </tr>
       <tr style="border-top:1px solid #F1F5F9">
         <td style="padding:8px 0;color:#64748B">Email</td>
-        <td style="padding:8px 0;color:#0F172A"><a href="mailto:${escape(ctx.email)}" style="color:#EA580C;text-decoration:none">${escape(ctx.email)}</a></td>
+        <td style="padding:8px 0;color:#0F172A"><a href="mailto:${escape(ctx.email)}" style="color:#D44A02;text-decoration:none">${escape(ctx.email)}</a></td>
       </tr>
       ${ctx.telegram ? `
       <tr style="border-top:1px solid #F1F5F9">
@@ -200,7 +200,7 @@ export function buildAdminNotificationEmail(ctx: AuditEmailContext): {
       Действия:
     </p>
     <p style="margin:0">
-      <a href="mailto:${escape(ctx.email)}?subject=ProForm%20—%20аудит%20клуба%20${encodeURIComponent(ctx.organization)}"
+      <a href="mailto:${escape(ctx.email)}?subject=Sporteo%20—%20аудит%20клуба%20${encodeURIComponent(ctx.organization)}"
          style="display:inline-block;margin-right:8px;padding:8px 14px;background:#0F172A;color:#fff;text-decoration:none;font-weight:600;font-size:13px;border-radius:8px">
         Ответить
       </a>

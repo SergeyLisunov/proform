@@ -36,7 +36,7 @@ const ATHLETE_COUNTS = new Set(['<20', '20-50', '50-200', '200+'])
 const MAX_PAYLOAD_BYTES = 8_000
 const MAX_PER_IP_PER_HOUR = 5
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 const ADMIN_EMAIL =
   process.env.ADMIN_NOTIFICATIONS_EMAIL ?? 'support@proform-delta.vercel.app'
 

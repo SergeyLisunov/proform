@@ -417,7 +417,7 @@ function MarketplaceInner() {
                 width="100%"
                 options={{
                   chart: { toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
-                  colors: ['#F97316'],
+                  colors: ['#F35703'],
                   plotOptions: { bar: { horizontal: true, borderRadius: 4, columnWidth: '60%' } },
                   dataLabels: { enabled: false },
                   grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
@@ -561,7 +561,7 @@ function FilterChip({ label, active, onClick, color, bg }: {
       style={active && color && bg
         ? { background: bg, color, borderColor: color + '60' }
         : active
-          ? { background: '#FFF7ED', color: '#EA580C', borderColor: '#FED7AA' }
+          ? { background: '#FFF7ED', color: '#D44A02', borderColor: '#FED7AA' }
           : undefined}>
       {label}
     </button>

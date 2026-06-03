@@ -565,7 +565,7 @@ export default function AdaptivePlanForm() {
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите чтобы план обновлялся каждую неделю автоматически?
-                  В ProForm ваши тренировки логируются + Garmin / Whoop —
+                  В Sporteo ваши тренировки логируются + Garmin / Whoop —
                   AI-план каждую неделю с учётом фактической нагрузки и recovery.
                 </p>
                 <Link href="/auth/register?utm_source=tools&utm_medium=adaptive-plan"
@@ -607,7 +607,7 @@ export default function AdaptivePlanForm() {
         <div className="rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Хотите свежий план каждую неделю автоматически?</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
-            ProForm логирует ваши тренировки + Garmin / Whoop / Apple Health.
+            Sporteo логирует ваши тренировки + Garmin / Whoop / Apple Health.
             Каждую неделю AI обновляет план на основе фактической нагрузки и recovery.
           </p>
           <Link href="/auth/register?utm_source=tools&utm_medium=adaptive-plan&utm_campaign=cta"

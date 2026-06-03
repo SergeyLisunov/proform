@@ -96,7 +96,7 @@ export default async function SharedWorkoutPage({
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 text-white">
               <i className="ki-filled ki-abstract-26 text-[13px]" />
             </span>
-            ProForm
+            Sporteo
           </Link>
           <div className="text-2xs font-semibold uppercase tracking-[0.22em] text-slate-500">
             Публичная ссылка
@@ -187,7 +187,7 @@ export default async function SharedWorkoutPage({
 }
 
 export const metadata = {
-  title: 'Тренировка · ProForm',
+  title: 'Тренировка · Sporteo',
   description: 'Публичная ссылка на тренировку',
   robots: { index: false, follow: false },
 }

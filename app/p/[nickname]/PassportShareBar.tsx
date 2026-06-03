@@ -19,7 +19,7 @@ export default function PassportShareBar({
 
   const nativeShare = async () => {
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      try { await (navigator as any).share({ title: `${displayName} · ProForm`, url }) } catch {}
+      try { await (navigator as any).share({ title: `${displayName} · Sporteo`, url }) } catch {}
     } else {
       copy()
     }

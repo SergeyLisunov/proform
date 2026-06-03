@@ -24,7 +24,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'nodejs'
-export const alt = 'ProForm — спортивная платформа для клубов, академий и команд'
+export const alt = 'Sporteo — спортивная платформа для клубов, академий и команд'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -40,7 +40,7 @@ export default async function OgImage() {
           justifyContent: 'space-between',
           padding: '72px 80px',
           background:
-            'radial-gradient(circle at 90% 10%, rgba(249,115,22,0.20) 0%, transparent 45%), linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 100%)',
+            'radial-gradient(circle at 90% 10%, rgba(243,87,3,0.18) 0%, transparent 45%), linear-gradient(180deg, #FFFFFF 0%, #FBF3EC 100%)',
           fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
         }}
       >
@@ -51,21 +51,21 @@ export default async function OgImage() {
               width: 56,
               height: 56,
               borderRadius: 18,
-              background: '#F97316',
+              background: '#F35703',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 24px rgba(249,115,22,0.30)',
-              color: 'white',
-              fontSize: 28,
+              boxShadow: '0 8px 24px rgba(243,87,3,0.30)',
+              color: '#FBF3EC',
+              fontSize: 30,
               fontWeight: 800,
             }}
           >
-            P
+            S
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: 32, fontWeight: 800, color: '#0F172A', letterSpacing: -0.5 }}>
-              ProForm
+              Sporteo
             </span>
             <span
               style={{
@@ -93,7 +93,7 @@ export default async function OgImage() {
             }}
           >
             Тренер, спортсмен, врач{' '}
-            <span style={{ color: '#F97316' }}>и клуб</span> —
+            <span style={{ color: '#F35703' }}>и клуб</span> —
             <br />работают в одной системе
           </span>
           <span style={{ fontSize: 24, color: '#475569', lineHeight: 1.35, maxWidth: 880 }}>
@@ -115,8 +115,7 @@ export default async function OgImage() {
               { label: 'Тренер',     bg: '#DCFCE7', fg: '#166534' },
               { label: 'Спортсмен',  bg: '#FFEDD5', fg: '#9A3412' },
               { label: 'Врач',       bg: '#FEE2E2', fg: '#991B1B' },
-              { label: 'Клуб',       bg: '#DBEAFE', fg: '#1E40AF' },
-              { label: 'Родитель',   bg: '#EDE9FE', fg: '#5B21B6' },
+              { label: 'Клуб',       bg: '#EAF0F6', fg: '#1D4672' },
             ].map((chip) => (
               <div
                 key={chip.label}

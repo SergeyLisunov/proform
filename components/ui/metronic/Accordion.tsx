@@ -44,7 +44,7 @@ export function Accordion({ items, defaultOpenIds = [], allowMultiple = false, c
             key={item.id}
             data-kt-accordion-item={item.id}
             className={`kt-accordion-item bg-card border rounded-xl overflow-hidden transition-colors ${
-              isOpen ? 'active border-[#F97316]/40' : 'border-border'
+              isOpen ? 'active border-[#F35703]/40' : 'border-border'
             }`}
           >
             <button
@@ -53,7 +53,7 @@ export function Accordion({ items, defaultOpenIds = [], allowMultiple = false, c
               aria-expanded={isOpen}
               className="kt-accordion-toggle flex w-full items-center gap-3 px-5 py-4 text-start hover:bg-muted/40 transition-colors"
             >
-              {item.icon && <i className={`ki-filled ${item.icon} text-base text-[#F97316]`} aria-hidden />}
+              {item.icon && <i className={`ki-filled ${item.icon} text-base text-[#F35703]`} aria-hidden />}
               <span className="kt-accordion-title flex-1 text-sm font-semibold text-foreground">{item.title}</span>
               <i
                 className={`ki-filled ki-down kt-accordion-indicator text-xs text-muted-foreground transition-transform duration-200 ${

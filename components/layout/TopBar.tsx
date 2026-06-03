@@ -37,7 +37,7 @@ const TITLES: Record<string, { title: string; sub: string }> = {
 }
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  athlete:      { bg: '#FFF7ED', text: '#F97316', border: '#FED7AA' },
+  athlete:      { bg: '#FFF7ED', text: '#F35703', border: '#FED7AA' },
   coach:        { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   admin:        { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
   organization: { bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
@@ -71,7 +71,7 @@ const NOTIF_ICONS: Record<string, string> = {
 }
 
 const NOTIF_COLORS: Record<string, string> = {
-  invitation_received:     '#F97316',
+  invitation_received:     '#F35703',
   invitation_accepted:     '#16A34A',
   invitation_declined:     '#DC2626',
   invitation_cancelled:    '#64748B',
@@ -79,7 +79,7 @@ const NOTIF_COLORS: Record<string, string> = {
   broadcast:               '#2563EB',
   system:                  '#7C3AED',
   comment:                 '#2563EB',
-  announcement:            '#F97316',
+  announcement:            '#F35703',
   coach_mark:              '#16A34A',
   org_post:                '#7C3AED',
   // W13 Day 65: extend для W12 Day 60 + older types — palette matches
@@ -90,11 +90,11 @@ const NOTIF_COLORS: Record<string, string> = {
   checkup_cancelled:       '#94A3B8',
   invited_to_event:        '#7C3AED',
   event_cancelled:         '#94A3B8',
-  pass_issued:             '#F97316',
+  pass_issued:             '#F35703',
   rsvp_received:           '#16A34A',
   coach_replied_to_review: '#16A34A',
   new_review_for_coach:    '#F59E0B',
-  pass_session_used:       '#F97316',
+  pass_session_used:       '#F35703',
 }
 
 // ── mobile menu toggle ────────────────────────────────────────────────────────
@@ -437,7 +437,7 @@ export default function TopBar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   const meta  = Object.entries(TITLES).find(([k]) => pathname === k || pathname.startsWith(k + '/'))?.[1]
-  const title = meta?.title ?? 'ProForm'
+  const title = meta?.title ?? 'Sporteo'
   const sub   = meta?.sub   ?? ''
   const date  = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   const rc    = user ? ROLE_COLORS[user.role] : null

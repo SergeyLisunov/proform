@@ -53,7 +53,7 @@ function fmtTime(iso: string) {
   return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 }
 
-const AVATAR_COLORS = ['#f97316','#2563eb','#16a34a','#9333ea','#0284c7','#dc2626','#d97706']
+const AVATAR_COLORS = ['#F35703','#2563eb','#16a34a','#9333ea','#0284c7','#dc2626','#d97706']
 
 function getColor(name: string) {
   return AVATAR_COLORS[(name.charCodeAt(0) + name.charCodeAt(1 % name.length)) % AVATAR_COLORS.length]
@@ -128,7 +128,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
         <div style={{ padding: '22px 24px 16px', background: 'linear-gradient(135deg, rgba(249,115,22,0.05), transparent)', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <div>
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новый диалог</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#F35703', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новый диалог</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>
                 Выбери собеседника
               </h3>
@@ -141,7 +141,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
             <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..."
               style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
-              onFocus={e => e.currentTarget.style.borderColor = '#f97316'}
+              onFocus={e => e.currentTarget.style.borderColor = '#F35703'}
               onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
             />
           </div>
@@ -330,7 +330,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
                           <div style={{
                             padding: '10px 14px',
                             borderRadius: isMe ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
-                            background: isMe ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' : 'var(--accent)',
+                            background: isMe ? 'linear-gradient(135deg, #F35703 0%, #D44A02 100%)' : 'var(--accent)',
                             color: isMe ? 'white' : 'var(--foreground)',
                             fontSize: 13.5, lineHeight: 1.55, wordBreak: 'break-word',
                             boxShadow: isMe ? '0 4px 16px rgba(249,115,22,0.3)' : '0 1px 4px rgba(0,0,0,0.05)',
@@ -364,14 +364,14 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
               lineHeight: 1.5, maxHeight: 120, transition: 'border-color 0.15s',
               fontFamily: 'inherit',
             }}
-            onFocus={e => e.currentTarget.style.borderColor = '#f97316'}
+            onFocus={e => e.currentTarget.style.borderColor = '#F35703'}
             onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
             onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }}
           />
           <button onClick={send} disabled={!text.trim() || sending}
             style={{
               width: 44, height: 44, borderRadius: 14, border: 'none', flexShrink: 0,
-              background: text.trim() ? 'linear-gradient(135deg, #f97316, #ea580c)' : 'var(--accent)',
+              background: text.trim() ? 'linear-gradient(135deg, #F35703, #D44A02)' : 'var(--accent)',
               cursor: text.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.15s',
@@ -650,7 +650,7 @@ export default function MessengerPage() {
                     Сообщения
                   </h2>
                   {hasUnread && (
-                    <span style={{ padding: '4px 10px', borderRadius: 999, background: 'linear-gradient(135deg,#f97316,#ea580c)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 6px 18px rgba(249,115,22,0.28)' }}>
+                    <span style={{ padding: '4px 10px', borderRadius: 999, background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', fontSize: 13, fontWeight: 800, boxShadow: '0 6px 18px rgba(249,115,22,0.28)' }}>
                       {totalUnread}
                     </span>
                   )}
@@ -736,7 +736,7 @@ export default function MessengerPage() {
           placeholder="Поиск по имени…"
           className="w-full rounded-2xl border border-input bg-card text-sm outline-none"
           style={{ padding: '11px 14px 11px 38px', transition: 'border-color 0.15s' }}
-          onFocus={e => e.currentTarget.style.borderColor = '#f97316'}
+          onFocus={e => e.currentTarget.style.borderColor = '#F35703'}
           onBlur={e => e.currentTarget.style.borderColor = ''}
         />
       </div>
@@ -802,7 +802,7 @@ export default function MessengerPage() {
                         <span style={{
                           position: 'absolute', top: -4, right: -4,
                           minWidth: 20, height: 20, borderRadius: 10,
-                          background: 'linear-gradient(135deg,#f97316,#ea580c)',
+                          background: 'linear-gradient(135deg,#F35703,#D44A02)',
                           color: 'white', fontSize: 10, fontWeight: 800,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           padding: '0 5px', border: '2px solid var(--card)',
@@ -866,7 +866,7 @@ export default function MessengerPage() {
                               height: 20,
                               borderRadius: 999,
                               padding: '0 6px',
-                              background: 'linear-gradient(135deg,#f97316,#ea580c)',
+                              background: 'linear-gradient(135deg,#F35703,#D44A02)',
                               color: 'white',
                               fontSize: 10,
                               fontWeight: 800,
@@ -878,7 +878,7 @@ export default function MessengerPage() {
                               {c.unread_count > 99 ? '99+' : c.unread_count}
                             </span>
                           )}
-                          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#f97316,#ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transform: 'translateX(-4px)', transition: 'all 0.2s' }} className="group-hover:opacity-100 group-hover:translate-x-0">
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#F35703,#D44A02)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transform: 'translateX(-4px)', transition: 'all 0.2s' }} className="group-hover:opacity-100 group-hover:translate-x-0">
                             <i className="ki-filled ki-arrow-right text-white text-xs" />
                           </div>
                         </div>

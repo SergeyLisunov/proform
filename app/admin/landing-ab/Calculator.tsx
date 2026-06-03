@@ -146,7 +146,7 @@ export default function Calculator() {
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <VariantInput label="A" color="#2563EB" value={a} onChange={setA} />
-        <VariantInput label="B" color="#EA580C" value={b} onChange={setB} />
+        <VariantInput label="B" color="#D44A02" value={b} onChange={setB} />
       </div>
 
       {/* Verdict */}

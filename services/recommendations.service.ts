@@ -108,7 +108,7 @@ function rowToRec(r: RecommendationRow): Recommendation {
 export const CATEGORY_META: Record<RecommendationCategory, { label: string; icon: string; color: string }> = {
   load_restriction:     { label: 'Ограничение нагрузки',  icon: 'ki-flash',          color: '#B91C1C' },
   activity_restriction: { label: 'Ограничение активности', icon: 'ki-shield-cross',   color: '#B91C1C' },
-  recovery:             { label: 'Восстановление',         icon: 'ki-heart-circle',   color: '#EA580C' },
+  recovery:             { label: 'Восстановление',         icon: 'ki-heart-circle',   color: '#D44A02' },
   observation:          { label: 'Наблюдение',             icon: 'ki-eye',            color: '#64748B' },
   consultation_request: { label: 'Запрос консультации',    icon: 'ki-message-question', color: '#2563EB' },
   clearance:            { label: 'Допуск',                 icon: 'ki-check-circle',   color: '#15803D' },

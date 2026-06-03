@@ -58,7 +58,7 @@ export function sorenessColor(level: number | null): string {
   if (level == null) return '#94A3B8'
   if (level <= 2) return '#10B981'
   if (level <= 5) return '#F59E0B'
-  if (level <= 7) return '#F97316'
+  if (level <= 7) return '#F35703'
   return '#EF4444'
 }
 

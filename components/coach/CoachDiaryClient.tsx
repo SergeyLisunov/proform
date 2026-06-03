@@ -149,7 +149,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#EA580C]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
               <i className="ki-filled ki-notepad-edit text-[11px]" />
               Рабочий журнал
             </span>

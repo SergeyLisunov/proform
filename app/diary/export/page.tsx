@@ -77,7 +77,7 @@ function ExportInner() {
       {/* Print controls — hidden on print */}
       <div className="mb-8 flex items-center justify-between print:hidden">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-600">ProForm · Дневник тренера</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-600">Sporteo · Дневник тренера</p>
           <h1 className="text-2xl font-bold mt-1">Отчёт {fmt(from)} — {fmt(to)}</h1>
         </div>
         <button onClick={() => window.print()}
@@ -89,7 +89,7 @@ function ExportInner() {
 
       {/* Print header */}
       <div className="hidden print:block mb-6">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-orange-600">ProForm</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-orange-600">Sporteo</p>
         <h1 className="text-xl font-bold">Дневник тренера — {user.name ?? 'без имени'}</h1>
         <p className="text-xs text-slate-500">
           Период: {fmt(from)} — {fmt(to)}
@@ -159,7 +159,7 @@ function ExportInner() {
       )}
 
       <div className="hidden print:block mt-10 pt-4 border-t border-slate-200 text-[10px] text-slate-400 text-center">
-        Сгенерировано ProForm · {new Date().toLocaleDateString('ru-RU')}
+        Сгенерировано Sporteo · {new Date().toLocaleDateString('ru-RU')}
       </div>
 
       <style jsx global>{`

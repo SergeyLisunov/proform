@@ -71,7 +71,7 @@ export default function NewsletterStatsPage() {
   const STAT_CARDS = [
     { label: 'Отправлено',  value: stats?.sent ?? 0,      icon: 'ki-send',         color: '#2563EB', bg: '#EFF6FF', hint: 'Все отправленные письма' },
     { label: 'Доставлено',  value: stats?.delivered ?? 0, icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4', hint: 'Успешно дошли до адресатов' },
-    { label: 'Открыто',     value: stats?.opened ?? 0,    icon: 'ki-eye',          color: '#F97316', bg: '#FFF7ED', hint: 'Получатели открыли письмо' },
+    { label: 'Открыто',     value: stats?.opened ?? 0,    icon: 'ki-eye',          color: '#F35703', bg: '#FFF7ED', hint: 'Получатели открыли письмо' },
     { label: 'Ошибки',      value: stats?.failed ?? 0,    icon: 'ki-shield-cross', color: '#DC2626', bg: '#FEF2F2', hint: 'Неуспешные доставки' },
   ]
 

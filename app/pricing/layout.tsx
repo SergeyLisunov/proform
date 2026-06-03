@@ -9,9 +9,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Тарифы — простые и честные цены',
   description:
-    'Тарифы ProForm: бесплатный старт, trial-период на платных планах, отмена в любой момент. Планы для атлетов, тренеров, специалистов и клубов.',
+    'Тарифы Sporteo: бесплатный старт, trial-период на платных планах, отмена в любой момент. Планы для атлетов, тренеров, специалистов и клубов.',
   keywords: [
-    'тарифы ProForm',
+    'тарифы Sporteo',
     'цены спортивная платформа',
     'подписка тренеров',
     'тариф клуб',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: '/pricing' },
   openGraph: {
-    title: 'Тарифы ProForm — простые и честные цены',
+    title: 'Тарифы Sporteo — простые и честные цены',
     description:
       'Free start. Trial period на платных тарифах. Планы для 4 ролей: athlete, coach, specialist, organization.',
     url: '/pricing',

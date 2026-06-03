@@ -39,7 +39,7 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
       icon: 'ki-plus-squared',
       label: 'Назначить',
       hint: 'Тренировка атлету',
-      bg: '#FFF7ED', color: '#EA580C', border: '#FED7AA',
+      bg: '#FFF7ED', color: '#D44A02', border: '#FED7AA',
     },
     {
       href: '/diary',

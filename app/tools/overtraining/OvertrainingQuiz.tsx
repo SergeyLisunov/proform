@@ -210,7 +210,7 @@ export default function OvertrainingQuiz() {
             <div className="rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white p-6">
               <h3 className="text-xl font-bold">Хотите отслеживать состояние автоматически?</h3>
               <p className="mt-1 text-sm opacity-90">
-                В ProForm ваш тренер и спортивный врач видят ваши ответы каждую неделю и
+                В Sporteo ваш тренер и спортивный врач видят ваши ответы каждую неделю и
                 замечают изменения до того, как они превратятся в травму.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">

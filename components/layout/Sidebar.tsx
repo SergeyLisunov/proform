@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 import { createBrowserClient } from '@supabase/ssr'
+import { SporteoLogo } from "@/components/ui/SporteoLogo"
 
 const NAV_SECTIONS = [
   {
@@ -44,7 +45,7 @@ const NAV_SECTIONS = [
   {
     title: 'Умные инструменты',
     items: [
-      { href: '/ai', icon: 'ki-sparkle', label: 'ProForm AI', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
+      { href: '/ai', icon: 'ki-sparkle', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
     ],
   },
   {
@@ -58,7 +59,7 @@ const NAV_SECTIONS = [
 ] as const
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-  athlete:      { label: 'Атлет',         bg: '#FFF7ED', text: '#F97316' },
+  athlete:      { label: 'Атлет',         bg: '#FFF7ED', text: '#F35703' },
   coach:        { label: 'Тренер',        bg: '#F0FDF4', text: '#16A34A' },
   admin:        { label: 'Администратор', bg: '#F5F3FF', text: '#7C3AED' },
   organization: { label: 'Организация',   bg: '#EFF6FF', text: '#2563EB' },
@@ -232,14 +233,9 @@ export default function Sidebar() {
         style={{ height: 'auto' }}
       >
         <Link href="/dashboard" className="flex items-center gap-3 no-underline group rounded-2xl border border-border/70 bg-background/80 px-3 py-3 shadow-sm transition-all hover:border-orange-200 hover:bg-orange-50/70">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 shadow-md shadow-orange-500/20 ring-1 ring-orange-200/60 shrink-0 transition-transform group-hover:scale-[1.02]">
-            <i className="ki-filled ki-abstract-26 text-white text-base" />
-          </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="pf-num text-[20px] leading-none text-foreground tracking-wide">ProForm</span>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">Панель атлета и тренера</p>
+            <SporteoLogo size="md" />
+            <p className="mt-1.5 text-xs text-muted-foreground">Панель атлета и тренера</p>
           </div>
         </Link>
 

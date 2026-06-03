@@ -25,7 +25,7 @@ import {
 const RISK_META: Record<RiskBucket, { label: string; color: string; bg: string }> = {
   low:      { label: 'В норме',  color: '#16A34A', bg: '#F0FDF4' },
   moderate: { label: 'Умеренный', color: '#D97706', bg: '#FFFBEB' },
-  high:     { label: 'Высокий',  color: '#EA580C', bg: '#FFF7ED' },
+  high:     { label: 'Высокий',  color: '#D44A02', bg: '#FFF7ED' },
   critical: { label: 'Критич.',  color: '#DC2626', bg: '#FEF2F2' },
 }
 
@@ -133,7 +133,7 @@ export default function OrgHealthPage() {
       {/* W12 Day 59: print-only watermark banner (hidden on screen) */}
       <div className="print-only" style={{ marginBottom: 14, paddingBottom: 10, borderBottom: '2px solid #1D4ED8' }}>
         <p style={{ fontSize: 10, fontWeight: 700, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.18em', margin: 0 }}>
-          ProForm · Health Snapshot
+          Sporteo · Health Snapshot
         </p>
         <p style={{ fontSize: 11, color: '#475569', margin: '4px 0 0' }}>
           Сгенерировано для «{snapshot.org_name}» · {new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} · Данные защищены RLS
@@ -359,7 +359,7 @@ export default function OrgHealthPage() {
       {/* W12 Day 59: print-only footer */}
       <div className="print-only" style={{ marginTop: 16, paddingTop: 8, borderTop: '1px solid #e5e7eb' }}>
         <p style={{ fontSize: 9, color: '#94a3b8', margin: 0, textAlign: 'center' }}>
-          Этот отчёт сгенерирован платформой ProForm. Полные данные доступны на proform-delta.vercel.app для авторизованных членов организации.
+          Этот отчёт сгенерирован платформой Sporteo. Полные данные доступны на proform-delta.vercel.app для авторизованных членов организации.
         </p>
       </div>
 

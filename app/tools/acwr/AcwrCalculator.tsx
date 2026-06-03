@@ -306,7 +306,7 @@ export default function AcwrCalculator() {
         <div className="mt-10 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Хотите, чтобы ACWR считался сам по каждой тренировке?</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
-            В ProForm подключается Garmin, Whoop и ручной ввод. Тренер видит ACWR по всем атлетам одной таблицей.
+            В Sporteo подключается Garmin, Whoop и ручной ввод. Тренер видит ACWR по всем атлетам одной таблицей.
           </p>
           <Link href="/auth/register?utm_source=tools&utm_medium=acwr&utm_campaign=cta"
             className="mt-4 inline-block rounded-xl bg-white text-orange-600 px-5 py-2.5 text-sm font-bold hover:bg-orange-50">

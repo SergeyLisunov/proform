@@ -35,7 +35,7 @@ const STEP_ORDER: Record<WizardRole, string[]> = {
 }
 
 const ROLE_META: Record<WizardRole, { label: string; accent: string; bg: string; border: string }> = {
-  athlete:      { label: 'Атлет',         accent: '#F97316', bg: '#FFF7ED', border: '#FED7AA' },
+  athlete:      { label: 'Атлет',         accent: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
   coach:        { label: 'Тренер',        accent: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   organization: { label: 'Организация',   accent: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
   doctor:       { label: 'Врач',          accent: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
@@ -77,7 +77,7 @@ const STATUS_META: Record<FilterStatus, { label: string; color: string; bg: stri
   all:           { label: 'Все',          color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
   completed:     { label: 'Завершили',    color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   in_progress:   { label: 'В процессе',   color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  paused:        { label: 'Пауза >24ч',   color: '#EA580C', bg: '#FFF7ED', border: '#FED7AA' },
+  paused:        { label: 'Пауза >24ч',   color: '#D44A02', bg: '#FFF7ED', border: '#FED7AA' },
   not_started:   { label: 'Не начали',    color: '#64748B', bg: '#F1F5F9', border: '#CBD5E1' },
   backfilled:    { label: 'Legacy',       color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
 }

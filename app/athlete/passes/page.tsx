@@ -180,7 +180,7 @@ export default function AthletePassesPage() {
                 <div className="mb-3">
                   <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                     <div className="h-full rounded-full transition-all"
-                      style={{ width: `${progress}%`, background: progress >= 80 ? '#F97316' : '#10B981' }} />
+                      style={{ width: `${progress}%`, background: progress >= 80 ? '#F35703' : '#10B981' }} />
                   </div>
                   <div className="flex items-center justify-between mt-1.5 text-[11px] text-muted-foreground">
                     <span>{p.used_sessions} использовано</span>

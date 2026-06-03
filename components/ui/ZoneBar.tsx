@@ -1,4 +1,4 @@
-const ZC = ['#60A5FA','#34D399','#FBBF24','#F97316','#EF4444']
+const ZC = ['#60A5FA','#34D399','#FBBF24','#F35703','#EF4444']
 
 export function ZoneBar({ zones, height = 6, showLabels = false }: { zones: (number|null)[], height?: number, showLabels?: boolean }) {
   const vals = zones.map(v => v ?? 0)

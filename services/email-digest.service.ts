@@ -6,7 +6,7 @@ import {
 } from '@/lib/email/templates'
 import { isChannelAllowed, type PrefsBag } from './notification-prefs-server'
 
-const FROM = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY

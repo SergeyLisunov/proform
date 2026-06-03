@@ -324,7 +324,7 @@ function textFromJsonbLines(v: unknown): string {
 type TabDef = { id: string; label: string; icon: string; color: string }
 
 const COACH_TABS: TabDef[] = [
-  { id: 'personal',     label: 'Личные данные', icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'personal',     label: 'Личные данные', icon: 'ki-profile-circle', color: '#F35703' },
   { id: 'professional', label: 'Профессия',     icon: 'ki-abstract-26',    color: '#2563EB' },
   { id: 'methodology',  label: 'Методика',      icon: 'ki-flash',          color: '#8B5CF6' },
   { id: 'experience',   label: 'Опыт и ставка', icon: 'ki-medal-star',     color: '#0D9488' },
@@ -333,7 +333,7 @@ const COACH_TABS: TabDef[] = [
 ]
 
 const DOCTOR_TABS: TabDef[] = [
-  { id: 'personal',    label: 'Личные данные',   icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'personal',    label: 'Личные данные',   icon: 'ki-profile-circle', color: '#F35703' },
   { id: 'medical',     label: 'Специализация',   icon: 'ki-heart',          color: '#E11D48' },
   { id: 'education',   label: 'Образование',     icon: 'ki-book',           color: '#2563EB' },
   { id: 'services',    label: 'Услуги и формат', icon: 'ki-abstract-26',    color: '#0EA5E9' },
@@ -342,7 +342,7 @@ const DOCTOR_TABS: TabDef[] = [
 ]
 
 const ORG_TABS: TabDef[] = [
-  { id: 'main',         label: 'Основное',         icon: 'ki-home-2',         color: '#F97316' },
+  { id: 'main',         label: 'Основное',         icon: 'ki-home-2',         color: '#F35703' },
   { id: 'structure',    label: 'Структура',        icon: 'ki-abstract-26',    color: '#0D9488' },
   { id: 'membership',   label: 'Услуги и членство', icon: 'ki-crown',         color: '#8B5CF6' },
   { id: 'contacts',     label: 'Контакты',         icon: 'ki-sms',            color: '#2563EB' },
@@ -351,7 +351,7 @@ const ORG_TABS: TabDef[] = [
 ]
 
 const ADMIN_TABS: TabDef[] = [
-  { id: 'personal',        label: 'Личные данные',  icon: 'ki-profile-circle', color: '#F97316' },
+  { id: 'personal',        label: 'Личные данные',  icon: 'ki-profile-circle', color: '#F35703' },
   { id: 'role',            label: 'Права доступа',  icon: 'ki-shield-tick',    color: '#16A34A' },
   { id: 'responsibilities',label: 'Зоны ответственности', icon: 'ki-abstract-26', color: '#8B5CF6' },
   { id: 'contacts',        label: 'Контакты',       icon: 'ki-sms',            color: '#2563EB' },
@@ -774,7 +774,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F97316">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Дата рождения"><TextInput type="date" value={form.birth_date} onChange={u('birth_date') as (v: string) => void} /></Field>
@@ -877,7 +877,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F97316">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Дата рождения"><TextInput type="date" value={form.birth_date} onChange={u('birth_date') as (v: string) => void} /></Field>
@@ -988,7 +988,7 @@ function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Di
 
   if (tab === 'main') {
     return (
-      <FormSection title="Основная информация" icon="ki-home-2" iconBg="#FFF7ED" iconColor="#F97316">
+      <FormSection title="Основная информация" icon="ki-home-2" iconBg="#FFF7ED" iconColor="#F35703">
         <Field label="Название организации"><TextInput value={form.org_name} onChange={u('org_name') as (v: string) => void} /></Field>
         <Field label="Короткий URL (slug)" hint="например: skyrun"><TextInput value={form.org_slug} onChange={u('org_slug') as (v: string) => void} /></Field>
         <Field label="Тип организации"><Select value={form.org_type} onChange={u('org_type') as (v: string) => void} options={ORG_TYPES} /></Field>
@@ -1071,7 +1071,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F97316">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>

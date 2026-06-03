@@ -1,4 +1,4 @@
-const rc = (v: number) => v >= 67 ? '#16A34A' : v >= 34 ? '#F97316' : '#DC2626'
+const rc = (v: number) => v >= 67 ? '#16A34A' : v >= 34 ? '#F35703' : '#DC2626'
 const rl = (v: number) => v >= 67 ? 'Готов' : v >= 34 ? 'Умеренно' : 'Низко'
 
 export function RecoveryRing({

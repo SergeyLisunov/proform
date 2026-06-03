@@ -33,7 +33,7 @@ export function ProfileShell(props: {
   const pctColor =
     pct == null ? null
       : pct < 40 ? '#DC2626'
-      : pct < 80 ? '#F97316'
+      : pct < 80 ? '#F35703'
       : '#16A34A'
 
   return (

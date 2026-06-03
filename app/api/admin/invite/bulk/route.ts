@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic'
 
 const ALLOWED_ROLES = new Set(['athlete', 'coach', 'doctor', 'organization'])
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
-const FROM    = process.env.RESEND_FROM ?? 'ProForm <notifications@proform-delta.vercel.app>'
+const FROM    = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
 const MAX_BATCH = 50
 
 const ROLE_LABEL_RU: Record<string, string> = {
@@ -46,22 +46,22 @@ function renderAdminInviteEmail(input: {
   expires_at:   string
 }): { subject: string; html: string } {
   const roleRu = ROLE_LABEL_RU[input.target_role] ?? input.target_role
-  const subject = `Приглашение в ProForm как ${roleRu}`
+  const subject = `Приглашение в Sporteo как ${roleRu}`
   const html = `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"></head>
 <body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#fafafa;padding:24px;color:#0f172a">
   <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:28px">
-    <p style="font-size:11px;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:0.18em;margin:0 0 6px">ProForm</p>
+    <p style="font-size:11px;font-weight:700;color:#D44A02;text-transform:uppercase;letter-spacing:0.18em;margin:0 0 6px">Sporteo</p>
     <h1 style="font-size:22px;font-weight:800;margin:0 0 12px">Приглашение от администратора</h1>
     <p style="font-size:14px;line-height:1.55;margin:0 0 16px">
-      ${input.inviter_name} приглашает вас присоединиться к платформе ProForm
+      ${input.inviter_name} приглашает вас присоединиться к платформе Sporteo
       как <strong>${roleRu}</strong>.
     </p>
     <p style="font-size:14px;line-height:1.55;margin:0 0 20px">
       Перейдите по ссылке, чтобы зарегистрироваться:
     </p>
     <p style="margin:0 0 20px">
-      <a href="${input.claim_url}" style="display:inline-block;padding:12px 22px;background:#f97316;color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
+      <a href="${input.claim_url}" style="display:inline-block;padding:12px 22px;background:#F35703;color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:14px">
         Принять приглашение →
       </a>
     </p>
@@ -111,7 +111,7 @@ export async function POST(req: Request) {
   const inviterName =
     ((me as { name?: string | null }).name)
     ?? ((me as { nickname?: string | null }).nickname)
-    ?? 'Администратор ProForm'
+    ?? 'Администратор Sporteo'
 
   const RESEND_API_KEY = process.env.RESEND_API_KEY
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
