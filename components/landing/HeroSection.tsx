@@ -54,21 +54,21 @@ export default function HeroSection() {
         {/* Eyebrow chip — shorter copy fits one line на narrow mobile (375px) */}
         <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
           <Building2 aria-hidden="true" size={13} />
-          Спортивная платформа для клубов
+          Платформа управления подготовкой
         </span>
 
         {/* H1 — short punchy copy wraps к 2 lines max на mobile (was 4 lines) */}
         <h1 className="pf-num mt-7 text-balance text-[clamp(2rem,7vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-navy-500 sm:mt-8">
-          Управляйте клубом,
+          Весь спортсмен —
           <br className="sm:hidden" />{' '}
-          <span className="text-orange-500">а не чатами.</span>
+          <span className="text-orange-500">в одной карточке.</span>
         </h1>
 
         {/* Subhead — outcome triad: control / transparency / safety */}
         <p className="mt-6 max-w-xl text-base leading-[1.65] text-muted-foreground sm:mt-7 sm:max-w-2xl sm:text-lg lg:text-xl">
-          Тренеры, врачи и атлеты — в одной системе.
-          Руководитель видит всё. Каждый видит то, что положено.
-          Медданные защищены по&nbsp;152-ФЗ.
+          Тренер, врач, атлет и руководитель — в одной системе вокруг
+          единой карточки спортсмена. Предиктивная аналитика нагрузки
+          предупреждает о&nbsp;травме до&nbsp;того, как атлет «сломается».
         </p>
 
         {/* CTAs — primary register + secondary demo. min-h-11 = 44px touch target */}
@@ -108,11 +108,12 @@ export default function HeroSection() {
             </div>
             <div className="flex-1 text-center sm:text-left">
               <p className="text-sm font-bold text-foreground">
-                Не готовы регистрироваться?
+                Хотите сначала оценить свой клуб?
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                Получите 5-минутный аудит вашего клуба — пришлём health-score,
-                top-3 риска и план на 30 дней на email.
+                Получите бесплатный аудит за 5 минут — пришлём оценку
+                подготовки, топ-3 риска для ваших атлетов и план роста
+                на 30 дней.
               </p>
             </div>
             <HeroAuditModal
@@ -124,9 +125,9 @@ export default function HeroSection() {
 
         {/* Value chips — single horizontal row, shorter copy fits на mobile */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-          <ValueChip icon={CheckCircle2} label="Контроль" />
-          <ValueChip icon={CheckCircle2} label="Прозрачность" />
-          <ValueChip icon={ShieldCheck} label="152-ФЗ · RLS" />
+          <ValueChip icon={CheckCircle2} label="Единая карточка" />
+          <ValueChip icon={CheckCircle2} label="Прогноз травм" />
+          <ValueChip icon={ShieldCheck} label="Защита медданных" />
         </div>
       </div>
     </section>

@@ -26,34 +26,34 @@ interface ComparisonRow {
 
 const ROWS: ComparisonRow[] = [
   {
-    topic:  'Инструменты',
-    before: 'Excel + Telegram-чаты + бумажные карточки + 5 разных программ',
-    after:  '1 система — Sporteo',
+    topic:  'Где живут данные',
+    before: 'Excel, чаты в мессенджерах, бумажные медкарты — в пяти разных местах',
+    after:  'Единая карточка спортсмена: история, медкарта, нагрузки и план — в одном окне',
+  },
+  {
+    topic:  'История спортсмена',
+    before: 'Теряется на следующий день — никто не видит полной картины',
+    after:  'Вся история под рукой годами: ничего не пропадает при смене тренера',
+  },
+  {
+    topic:  'Контроль нагрузки',
+    before: 'На глаз. Перетренированность замечают, когда уже поздно',
+    after:  'Авторасчёт нагрузки (ACWR) и циклов — система сама подсвечивает перебор',
+  },
+  {
+    topic:  'Травмы',
+    before: 'Случаются внезапно — выбивают спортсмена и срывают сезон',
+    after:  'ML-модель заранее предупреждает о риске — успеваете снизить нагрузку',
+  },
+  {
+    topic:  'Медицинские данные',
+    before: 'В чате или бумажной папке — кто угодно может увидеть',
+    after:  'Защита уровня СУБД: Row-Level Security и шифрование данных',
   },
   {
     topic:  'Еженедельная сводка',
-    before: '30+ минут собрать данные из 5 источников',
-    after:  '30 секунд через единый dashboard',
-  },
-  {
-    topic:  'Медданные',
-    before: 'В Telegram-чате или бумажной папке у врача',
-    after:  'RLS-изоляция + хостинг EU-Central + 152-ФЗ',
-  },
-  {
-    topic:  'Onboarding тренера',
-    before: '2 недели на освоение 5 разных tool’ов',
-    after:  '10 минут — единый интерфейс с pre-built ролями',
-  },
-  {
-    topic:  '«Кто кому что писал»',
-    before: 'Теряется в чатах через 100 сообщений',
-    after:  'Activity feed по контексту атлета — навсегда',
-  },
-  {
-    topic:  'Excel-конфликты',
-    before: '«Кто перезаписал данные?» каждую неделю',
-    after:  'Single source of truth с версионностью',
+    before: '30+ минут вручную собирать данные из пяти источников',
+    after:  '30 секунд: готовые отчёты и кабинеты для клуба, тренера и врача',
   },
 ]
 
@@ -101,17 +101,17 @@ export default function BeforeAfterSection() {
             id="before-after-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            Что меняется после внедрения Sporteo
+            Было хаотично — стало под контролем
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            6 конкретных переходов, которые видит руководитель клуба
-            в первые 30 дней использования.
+            Мессенджеры, Excel и бумага против единой карточки спортсмена.
+            Шесть переходов, которые руководитель клуба чувствует уже в первый месяц.
           </p>
         </div>
 
         {/* Comparison header (desktop) */}
         <div className="mt-12 hidden grid-cols-[2fr_1fr_1fr] gap-4 px-2 text-2xs font-bold uppercase tracking-wider lg:grid">
-          <div className="text-muted-foreground">Тема</div>
+          <div className="text-muted-foreground">Что меняется</div>
           <div className="text-slate-500">До Sporteo</div>
           <div className="text-emerald-700">После Sporteo</div>
         </div>
@@ -151,12 +151,12 @@ export default function BeforeAfterSection() {
 
         {/* Bridge */}
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Подключение клуба занимает 10 минут.{' '}
+          Перенести клуб в Sporteo — дело нескольких минут.{' '}
           <a
             href="/auth/register"
             className="font-semibold text-orange-600 hover:underline"
           >
-            Подключить бесплатно →
+            Подключить клуб →
           </a>
         </p>
       </div>

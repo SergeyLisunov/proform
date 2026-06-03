@@ -1,55 +1,42 @@
 /**
- * <PricingTeaserSection /> — W16 Day 81 NEW.
+ * <PricingTeaserSection /> — convert-stage pricing surface.
  *
- * Inline pricing surface — addresses «сколько стоит?» objection до того
- * как visitor попадёт в FAQ или уйдёт. Closed-beta status: free now,
- * paid plans after launch.
+ * Inline pricing block — closes «сколько стоит?» objection до того, как
+ * клиент уйдёт. Чёткий якорь цены (от 3900 ₽/мес) + ценность за деньги:
+ * одна система вместо пяти, защита медданных, предиктивная аналитика.
  *
- * Placement: после Wearables, до Security. Visitor видит:
- *   1. Что было раньше / что меняется (BeforeAfter)
- *   2. Try free tools (LeadMagnets)
- *   3. Honest trust (SocialProof)
- *   4. Benefits + UseCases (stories с outcome)
- *   5. Wearables (что подключается)
- *   6. **Pricing teaser** (сколько стоит) ← HERE
- *   7. Security (final trust)
- *   8. FAQ + FinalCTA
- *
- * Honest framing: НЕ показываем конкретные числа здесь (тарифы DB-driven,
- * могут меняться). Показываем beta status + указатель к `/pricing` для
- * полной таблицы тарифов.
+ * Структура компонента, экспорт и CTA-ссылка на /pricing сохранены.
  */
 import Link from 'next/link'
-import { ArrowRight, Gift, Sparkles, Wallet } from 'lucide-react'
+import { ArrowRight, Layers, ShieldCheck, Sparkles } from 'lucide-react'
 
 interface PricingPoint {
-  icon:        typeof Gift
+  icon:        typeof Layers
   title:       string
   description: string
 }
 
 const POINTS: PricingPoint[] = [
   {
-    icon:        Gift,
-    title:       'Сейчас — бесплатно',
+    icon:        Layers,
+    title:       'Одна система вместо пяти',
     description:
-      'Закрытая бета. Подключайте клуб без банковской карты и без email-форм. ' +
-      'Все 6 ролей, AI-инструменты, RLS-защита, EU-Central хостинг — без ограничений по фичам.',
+      'Excel, мессенджеры, бумажные медкарты и заметки тренера — в одной карточке атлета. ' +
+      'Платите за один инструмент, а закрываете расписание, дневник, медкарту и отчётность клуба.',
   },
   {
-    icon:        Wallet,
-    title:       'После выхода из беты',
+    icon:        ShieldCheck,
+    title:       'Защита и аналитика — в каждом тарифе',
     description:
-      'Платные планы — от small clubs (до 30 атлетов) до enterprise (сеть клубов). ' +
-      'Все цены рублёвые, оплата через ЮKassa с автофискализацией по 54-ФЗ. ' +
-      'Никаких скрытых fees, никаких per-seat сюрпризов.',
+      'Все 4 роли, защита медданных уровня СУБД (Row-Level Security), шифрование данных ' +
+      'и предиктивная аналитика нагрузки уже включены. Без скрытых доплат и сюрпризов за место.',
   },
   {
     icon:        Sparkles,
-    title:       'White-glove для первых 20 клубов',
+    title:       'Окупается на первой травме',
     description:
-      'Подключаемые в закрытой бете получают приоритетную поддержку первые 30 дней + ' +
-      'миграцию первичных данных бесплатно. После launch эти клубы остаются на специальных условиях.',
+      'Раннее предупреждение о риске травмы экономит недели восстановления одного атлета — ' +
+      'это дороже годовой подписки. Сопровождаем запуск и переносим первичные данные клуба.',
   },
 ]
 
@@ -69,11 +56,12 @@ export default function PricingTeaserSection() {
             id="pricing-teaser-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            Сейчас бесплатно. Без сюрпризов потом.
+            Вся подготовка клуба — от 3900&nbsp;₽ в месяц
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Sporteo в закрытой бете — все функции бесплатно. После выхода —
-            прозрачные планы с публичной таблицей тарифов.
+            Меньше стоимости одного абонемента — а вы получаете единую карточку
+            атлета, контроль нагрузок и защиту медданных для всего клуба. Цены
+            рублёвые, прозрачные, без скрытых доплат.
           </p>
         </div>
 
@@ -105,11 +93,12 @@ export default function PricingTeaserSection() {
         <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-orange-200 bg-white p-6 text-center sm:flex-row sm:justify-between sm:gap-6 sm:text-left">
           <div className="flex-1">
             <p className="text-base font-bold text-foreground">
-              Хочется увидеть конкретные числа?
+              Сколько это для вашего клуба?
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               Полная таблица тарифов — для атлета, тренера, специалиста и
               организации. Цены, лимиты, что входит — всё на одной странице.
+              Подберите план под размер клуба за минуту.
             </p>
           </div>
           <Link

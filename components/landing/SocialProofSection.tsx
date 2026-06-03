@@ -1,45 +1,47 @@
 /**
- * <SocialProofSection /> — W16 Day 80 NEW.
+ * <SocialProofSection /> — proof-пойнты для клиента (спортшкола / клуб / академия).
  *
- * Trust + social proof. Закрытая бета status — нет реальных testimonials
- * пока. Honest framing: closed-beta chip + 3 credibility blocks
- * (data sovereignty / security / white-glove onboarding) + honesty note
- * о том что real testimonials появятся когда бета масштабируется.
+ * Назначение: убедить лицо, принимающее решение, что Sporteo — рабочая,
+ * проверенная платформа, а не идея на бумаге. Опора на фактические
+ * proof-пойнты: работающий MVP, ML-модель риска травм (AUC ≈ 0,75),
+ * отзывы спортивных федераций, протестированная интеграция с носимыми
+ * устройствами, патентный поиск без аналогов и руководство —
+ * олимпийский призёр и кандидат экономических наук.
  *
- * Complements <SecuritySection /> (W14 — compliance-tech focus) с
- * decision-maker-oriented framing (white-glove service, beta status,
- * data residency).
- *
- * Avoids: fake testimonials, fabricated client logos, made-up «X клубов»
- * count. Follows W14 «honest roadmap framing» convention extended к trust
- * surface.
+ * Structure: header chip + 4 proof-блока + closing note с CTA.
  */
-import { Globe2, Handshake, ShieldCheck, Sparkles } from 'lucide-react'
+import { Activity, Award, BadgeCheck, MessageSquareQuote, Search, Sparkles } from 'lucide-react'
 
 interface TrustBlock {
-  icon:        typeof ShieldCheck
+  icon:        typeof BadgeCheck
   title:       string
   description: string
 }
 
 const BLOCKS: TrustBlock[] = [
   {
-    icon:        Handshake,
-    title:       'White-glove onboarding',
+    icon:        BadgeCheck,
+    title:       'Платформа уже работает',
     description:
-      'Каждый подключаемый клуб получает персональный звонок с командой Sporteo + миграцию первичных данных + приоритетную поддержку первые 30 дней.',
+      'Это не презентация и не обещание. Рабочая платформа создана и доступна: единая карточка спортсмена, дневник тренировок и кабинеты для клуба, тренера и врача — можно пользоваться сегодня.',
   },
   {
-    icon:        Globe2,
-    title:       'Данные в EU-Central',
+    icon:        Activity,
+    title:       'Прогноз травм с точностью AUC ≈ 0,75',
     description:
-      'Хостинг базы данных в Supabase EU-Central-1 (Франкфурт). Соответствие 152-ФЗ через ЦОД на территории EU. Реквизиты обработки доступны по запросу.',
+      'ML-модель риска травм проверена на валидации и показывает AUC ≈ 0,75. Система предупреждает о риске заранее — у тренера есть время снизить нагрузку, а не констатировать травму постфактум.',
   },
   {
-    icon:        ShieldCheck,
-    title:       'RLS на каждой таблице',
+    icon:        MessageSquareQuote,
+    title:       'Одобрение спортивных федераций',
     description:
-      'Защита данных не только в приложении, но и на уровне базы. Каждый запрос проходит проверку прав доступа в PostgreSQL — даже compromised app сервер не даст доступ к чужим данным.',
+      'Подход Sporteo уже получил отзывы от спортивных федераций. А интеграция с «умными» часами и трекерами протестирована — данные спортсмена попадают в систему автоматически.',
+  },
+  {
+    icon:        Award,
+    title:       'Команда, которой доверяют',
+    description:
+      'Во главе проекта — призёр Олимпийских игр и кандидат экономических наук со 100+ научными публикациями. Спорт высоких достижений и научный подход к данным — в одной команде.',
   },
 ]
 
@@ -66,48 +68,54 @@ export default function SocialProofSection() {
       aria-labelledby="social-proof-heading"
     >
       <div className="mx-auto max-w-6xl">
-        {/* Header с beta status chip */}
+        {/* Header с proof status chip */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-2xs font-bold uppercase tracking-[0.22em] text-orange-700">
             <Sparkles aria-hidden="true" size={13} />
-            Закрытая бета · По приглашению
+            Проверено на практике
           </span>
           <h2
             id="social-proof-heading"
             className="mt-4 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            На что опираться, когда отзывов ещё нет
+            Почему Sporteo можно доверять
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Sporteo в закрытой бете — реальные отзывы клубов появятся,
-            когда первая когорта расскажет о результатах публично.
-            До того — оцените инфраструктуру, процесс и обещания.
+            Рабочая платформа, проверенная ML-модель, одобрение федераций
+            и команда уровня спорта высоких достижений. Не слова — факты,
+            на которые можно опереться при выборе.
           </p>
         </div>
 
-        {/* 3 trust blocks */}
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        {/* 4 proof blocks */}
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {BLOCKS.map((b) => (
             <TrustTile key={b.title} block={b} />
           ))}
         </div>
 
-        {/* Honest framing note */}
+        {/* Proof closer note */}
         <div className="mx-auto mt-10 max-w-3xl rounded-3xl border-2 border-dashed border-orange-200 bg-orange-50/40 p-6 text-center">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            <strong className="text-orange-700">Честно:</strong>{' '}
-            Мы не публикуем «у нас 100+ клубов» баннеры, пока это не правда.
-            Когда первые 10 клубов выйдут из закрытой беты с конкретными
-            результатами — добавим сюда их истории с реальными именами
-            и метриками. До того — попробуйте платформу через{' '}
-            <a href="#tools" className="font-semibold text-orange-600 hover:underline">
-              бесплатные AI-инструменты
-            </a>{' '}
-            или{' '}
-            <a href="/contacts" className="font-semibold text-orange-600 hover:underline">
-              напишите нам напрямую
-            </a>
-            .
+          <p className="flex flex-col items-center gap-3 text-sm leading-relaxed text-muted-foreground sm:flex-row sm:items-start sm:text-left">
+            <Search
+              aria-hidden="true"
+              size={20}
+              className="shrink-0 text-orange-600 sm:mt-0.5"
+            />
+            <span>
+              <strong className="text-orange-700">Решение уникально:</strong>{' '}
+              патентный поиск не выявил прямых аналогов на рынке —
+              вы получаете то, чего нет у конкурентов. Лучший способ убедиться —
+              попробовать самим: оцените{' '}
+              <a href="#tools" className="font-semibold text-orange-600 hover:underline">
+                бесплатные AI-инструменты
+              </a>{' '}
+              или{' '}
+              <a href="/contacts" className="font-semibold text-orange-600 hover:underline">
+                запросите демонстрацию для клуба
+              </a>
+              .
+            </span>
           </p>
         </div>
       </div>

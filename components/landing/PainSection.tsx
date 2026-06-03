@@ -12,7 +12,13 @@
  * Visual: light bg-slate-50, persona-coded pain icons, no emojis (avoid
  * playful tone). Footer hint pre-bridges к solution.
  */
-import { FileSpreadsheet, FileText, MessagesSquare } from 'lucide-react'
+import {
+  Activity,
+  FileSpreadsheet,
+  FileText,
+  MessagesSquare,
+  ShieldAlert,
+} from 'lucide-react'
 
 interface PainCard {
   /** Lucide icon component. */
@@ -36,19 +42,38 @@ const PAINS: PainCard[] = [
   },
   {
     icon:        FileSpreadsheet,
-    title:       '«Excel с цветными ячейками»',
+    title:       '«Расписание живёт в Excel»',
     description:
       'Расписание в одной таблице, нагрузка — в другой, ' +
-      'посещаемость — в третьей. Кто-то случайно удалил столбец, ' +
-      'а кто-то перезаписал чужие данные.',
+      'посещаемость — в третьей. Кто-то удалил столбец, ' +
+      'кто-то перезаписал чужие данные — и картина рассыпалась.',
     hue:         { bg: '#EFF6FF', text: '#1D4ED8' },
   },
   {
     icon:        FileText,
-    title:       '«Медицинские карточки в бумаге»',
+    title:       '«Медкарты — на бумаге»',
     description:
       'Доктор пишет рекомендации тренеру на бумажке. ' +
-      'Тренер забыл — атлет на тренировке с не до конца зажившей травмой.',
+      'Тренер забыл — и атлет выходит на тренировку ' +
+      'с не до конца зажившей травмой.',
+    hue:         { bg: '#FEF2F2', text: '#B91C1C' },
+  },
+  {
+    icon:        Activity,
+    title:       '«Нагрузку никто не считает»',
+    description:
+      'Перегруз замечают, когда спортсмен уже сломался. ' +
+      'Нет объективного контроля нагрузок — значит, ' +
+      'перетренированность и травмы бьют по результату и составу.',
+    hue:         { bg: '#FEFCE8', text: '#A16207' },
+  },
+  {
+    icon:        ShieldAlert,
+    title:       '«Медданные не защищены»',
+    description:
+      'Диагнозы и справки лежат в чатах, на телефонах и флешках. ' +
+      'Одна утечка персональных медданных — и это уже ' +
+      'нарушение 152-ФЗ и удар по репутации клуба.',
     hue:         { bg: '#FEF2F2', text: '#B91C1C' },
   },
 ]
@@ -88,10 +113,14 @@ export default function PainSection() {
           </p>
           <h2
             id="pain-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
+            className="mt-3 text-balance text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            Спортивный клуб не должен работать как 5 разных программ
+            Подготовку нельзя вести в чатах, таблицах и на бумаге
           </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Данные разбросаны по пяти местам, история спортсмена теряется
+            на следующий день, а перегруз замечают, когда уже поздно.
+          </p>
         </div>
 
         {/* Grid — 1 col mobile → 3 col desktop */}
@@ -103,7 +132,7 @@ export default function PainSection() {
 
         {/* Bridge to solution */}
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Sporteo заменяет все три картинки одной системой —{' '}
+          Sporteo заменяет все эти разрозненные инструменты одной системой —{' '}
           <a href="#how-it-works" className="font-semibold text-orange-600 hover:underline">
             смотреть как →
           </a>
