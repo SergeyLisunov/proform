@@ -187,7 +187,7 @@ function MarketplaceInner() {
 
       <div className="mb-8">
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-2">Marketplace</p>
-        <h1 className="pf-num text-[clamp(2rem,5vw,3.5rem)] text-foreground leading-[0.95] tracking-tight mb-3">
+        <h1 className="pf-num text-[clamp(2rem,5vw,3.5rem)] text-navy-500 leading-[0.95] tracking-tight mb-3">
           Услуги и абонементы
         </h1>
         <p className="text-muted-foreground text-sm md:text-base max-w-xl">
@@ -318,7 +318,7 @@ function MarketplaceInner() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">⭐</span>
-            <h2 className="text-lg font-bold text-foreground">Рекомендуем</h2>
+            <h2 className="text-lg font-bold text-navy-500">Рекомендуем</h2>
             <Badge variant="warning" size="sm" className="uppercase tracking-[0.18em]">
               Featured
             </Badge>
@@ -332,7 +332,7 @@ function MarketplaceInner() {
                   href={`/marketplace/${o.kind}/${o.id}`}
                   className="rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col gap-3 no-underline">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-base font-bold text-foreground line-clamp-2">{o.title}</h3>
+                    <h3 className="text-base font-bold text-navy-500 line-clamp-2">{o.title}</h3>
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
                       style={{ background: roleMeta.bg, color: roleMeta.color }}>
                       {roleMeta.emoji} {roleMeta.label}
@@ -376,7 +376,7 @@ function MarketplaceInner() {
           {verifiedOnly ? (
             <>
               <i className="ki-filled ki-verify text-4xl text-blue-500 mb-3 block" />
-              <h3 className="text-lg font-semibold text-foreground">Verified-тренеров пока нет</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Verified-тренеров пока нет</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                 Программа верификации только запускается. Снимите фильтр, чтобы увидеть всех доступных тренеров.
               </p>
@@ -390,7 +390,7 @@ function MarketplaceInner() {
           ) : (
             <>
               <i className="ki-filled ki-shop text-4xl text-muted-foreground mb-3 block" />
-              <h3 className="text-lg font-semibold text-foreground">Услуг по вашему запросу пока нет</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Услуг по вашему запросу пока нет</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                 Попробуйте сбросить фильтры или вернуться позже — каталог обновляется регулярно.
               </p>
@@ -439,7 +439,7 @@ function MarketplaceInner() {
               <section key={t}>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-2xl">{meta.emoji}</span>
-                  <h2 className="text-lg font-bold text-foreground">{meta.label}</h2>
+                  <h2 className="text-lg font-bold text-navy-500">{meta.label}</h2>
                   <span className="text-xs text-muted-foreground">({offs.length})</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -454,7 +454,7 @@ function MarketplaceInner() {
                         href={`/marketplace/${o.kind}/${o.id}`}
                         className="rounded-2xl border border-border bg-card p-5 hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col gap-3 no-underline">
                         <div className="flex items-start justify-between gap-3">
-                          <h3 className="text-base font-bold text-foreground line-clamp-2">{o.title}</h3>
+                          <h3 className="text-base font-bold text-navy-500 line-clamp-2">{o.title}</h3>
                           <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
                             style={{ background: roleMeta.bg, color: roleMeta.color }}>
                             {roleMeta.emoji} {roleMeta.label}

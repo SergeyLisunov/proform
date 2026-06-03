@@ -27,7 +27,7 @@ export default function AboutPage() {
   return (
     <StaticPageShell eyebrow="О платформе" title="Sporteo — единая система спортивной подготовки">
       <section>
-        <h2 className="text-xl font-bold text-foreground">Зачем мы строим Sporteo</h2>
+        <h2 className="text-xl font-bold text-navy-500">Зачем мы строим Sporteo</h2>
         <p className="mt-3 text-muted-foreground">
           Спортивная подготовка в клубах и академиях фрагментирована. Тренер ведёт
           планы в Excel, общается с родителями в Telegram, переписывается с врачом
@@ -42,7 +42,7 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Для кого Sporteo</h2>
+        <h2 className="text-xl font-bold text-navy-500">Для кого Sporteo</h2>
         <ul className="mt-3 space-y-2 text-muted-foreground">
           <li>
             <strong className="text-foreground">Спортивные клубы</strong> — единое
@@ -68,7 +68,7 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Что мы делаем</h2>
+        <h2 className="text-xl font-bold text-navy-500">Что мы делаем</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-6 text-muted-foreground">
           <li>Карточки атлетов — тренировки, самочувствие, медицинские заметки</li>
           <li>Планы тренировок и шаблоны для повторяющихся циклов</li>
@@ -81,7 +81,7 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Что мы не обещаем</h2>
+        <h2 className="text-xl font-bold text-navy-500">Что мы не обещаем</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-6 text-muted-foreground">
           <li>
             <strong className="text-foreground">Не «AI-тренер»</strong> — мы не заменяем
@@ -103,7 +103,7 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Технологическая основа</h2>
+        <h2 className="text-xl font-bold text-navy-500">Технологическая основа</h2>
         <p className="mt-3 text-muted-foreground">
           Sporteo построен на современном стеке: Next.js (React), Supabase
           (PostgreSQL), хостинг — Vercel и Supabase EU-Central-1 (Франкфурт).
@@ -126,7 +126,7 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Текущий статус</h2>
+        <h2 className="text-xl font-bold text-navy-500">Текущий статус</h2>
         <div className="mt-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-sm">
           <strong className="text-orange-900">Закрытая бета.</strong>
           <p className="mt-1 text-orange-900/80">

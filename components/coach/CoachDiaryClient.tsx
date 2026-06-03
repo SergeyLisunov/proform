@@ -153,7 +153,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
               <i className="ki-filled ki-notepad-edit text-[11px]" />
               Рабочий журнал
             </span>
-            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground mt-2">Дневник тренера</h1>
+            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500 mt-2">Дневник тренера</h1>
             <p className="max-w-2xl text-sm md:text-base text-muted-foreground mt-1">
               Наблюдения, разборы, соревнования и планирование. Голосовой ввод, шаблоны,
               автосинк с календарём и AI-обзор недели.
@@ -368,7 +368,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 p-12 text-center">
       <i className="ki-filled ki-notepad-edit text-5xl text-muted-foreground/40 block mb-3" />
-      <h3 className="text-base font-semibold text-foreground">Пока нет записей</h3>
+      <h3 className="text-base font-semibold text-navy-500">Пока нет записей</h3>
       <p className="text-sm text-muted-foreground mt-1 mb-5">
         Начните вести журнал — наблюдения, разборы, планы.
       </p>
@@ -591,7 +591,7 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-purple-700">AI · Claude</p>
-            <h3 className="text-lg font-semibold text-foreground">Обзор за {days} дней</h3>
+            <h3 className="text-lg font-semibold text-navy-500">Обзор за {days} дней</h3>
           </div>
           <div className="flex items-center gap-2">
             <select value={days} onChange={e => setDays(Number(e.target.value))}
@@ -852,7 +852,7 @@ function EntryDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: meta.color }}>
               {meta.label}
             </p>
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-navy-500">
               {initial ? 'Редактировать запись' : 'Новая запись в дневник'}
             </h3>
           </div>

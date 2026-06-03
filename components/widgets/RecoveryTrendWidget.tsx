@@ -80,7 +80,7 @@ export default function RecoveryTrendWidget({ userId }: { userId: string }) {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-emerald-100">
             <i className="ki-filled ki-heart text-[14px] text-emerald-600" />
           </div>
-          <h3 className="text-sm font-bold text-foreground">Готовность · 14 дней</h3>
+          <h3 className="text-sm font-bold text-navy-500">Готовность · 14 дней</h3>
         </div>
         {last != null && (
           <div className="flex items-baseline gap-1.5">

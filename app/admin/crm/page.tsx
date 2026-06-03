@@ -412,7 +412,7 @@ export default function AdminCRMPage() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Администрирование</p>
-          <h2 className="pf-num text-[34px] text-foreground leading-none">CRM</h2>
+          <h2 className="pf-num text-[34px] text-navy-500 leading-none">CRM</h2>
         </div>
         <button onClick={() => load()} className="kt-btn kt-btn-outline gap-2">
           <i className="ki-filled ki-arrows-circle text-sm" />Обновить

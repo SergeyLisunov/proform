@@ -43,7 +43,7 @@ export default function WeeklyInsightsCard() {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-indigo-100">
             <i className="ki-filled ki-chart-line-up text-[14px] text-indigo-600" />
           </div>
-          <h3 className="text-sm font-bold text-foreground">Неделя в цифрах</h3>
+          <h3 className="text-sm font-bold text-navy-500">Неделя в цифрах</h3>
         </div>
         <button
           onClick={load}

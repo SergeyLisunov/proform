@@ -56,7 +56,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Календарь</p>
-          <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{MONTHS[month]} {year}</h2>
+          <h2 className="pf-num text-3xl text-navy-500 mt-0.5">{MONTHS[month]} {year}</h2>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {/* Cycle layer filter */}

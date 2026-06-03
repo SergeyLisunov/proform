@@ -39,7 +39,7 @@ export default function DoctorHeroBar({ firstName, stats }: { firstName: string;
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-600 mb-1">
             🩺 {today}
           </p>
-          <h1 className="pf-num text-3xl md:text-4xl text-foreground leading-tight">
+          <h1 className="pf-num text-3xl md:text-4xl text-navy-500 leading-tight">
             {greeting}, <span className="text-red-600">{firstName}</span>!
           </h1>
           <p className="mt-2 text-sm md:text-base text-muted-foreground">{summary}</p>

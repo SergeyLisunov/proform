@@ -53,7 +53,7 @@ function TrustTile({ block }: { block: TrustBlock }) {
       >
         <Icon size={22} strokeWidth={2} />
       </div>
-      <h3 className="text-base font-bold text-foreground">{title}</h3>
+      <h3 className="text-base font-bold text-navy-500">{title}</h3>
       <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
     </article>
   )
@@ -74,7 +74,7 @@ export default function SocialProofSection() {
           </span>
           <h2
             id="social-proof-heading"
-            className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-4 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             На что опираться, когда отзывов ещё нет
           </h2>

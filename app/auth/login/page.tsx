@@ -200,7 +200,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <h1 className="pf-num text-[40px] leading-none text-foreground sm:text-[46px]">Войти</h1>
+            <h1 className="pf-num text-[40px] leading-none text-navy-500 sm:text-[46px]">Войти</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
               Прогресс спортсмена в одной системе для всех, кто рядом.
               {DEMO_ENABLED ? ' Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.' : ' Войдите в свой профиль.'}

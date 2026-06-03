@@ -184,7 +184,7 @@ export function MedicalCheckupDrawer({
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Медосмотр</p>
-            <h3 className="text-lg font-semibold text-foreground">{initial ? 'Редактировать' : 'Новый осмотр'}</h3>
+            <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новый осмотр'}</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs"/>

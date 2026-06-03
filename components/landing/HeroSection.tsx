@@ -58,7 +58,7 @@ export default function HeroSection() {
         </span>
 
         {/* H1 — short punchy copy wraps к 2 lines max на mobile (was 4 lines) */}
-        <h1 className="pf-num mt-7 text-balance text-[clamp(2rem,7vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-8">
+        <h1 className="pf-num mt-7 text-balance text-[clamp(2rem,7vw,4.25rem)] font-bold leading-[1.04] tracking-tight text-navy-500 sm:mt-8">
           Управляйте клубом,
           <br className="sm:hidden" />{' '}
           <span className="text-orange-500">а не чатами.</span>

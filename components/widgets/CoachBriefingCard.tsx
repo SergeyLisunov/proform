@@ -70,7 +70,7 @@ export default function CoachBriefingCard() {
             <i className="ki-filled ki-rocket text-[14px] text-orange-500" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">Утренний брифинг</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">Утренний брифинг</h3>
             <div className="text-[10px] text-muted-foreground mt-0.5">AI-сводка по команде</div>
           </div>
         </div>

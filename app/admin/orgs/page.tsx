@@ -65,7 +65,7 @@ export default function AdminOrgsPage() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Администратор · Организации</p>
-          <h2 className="pf-num text-[36px] text-foreground leading-none">Организации</h2>
+          <h2 className="pf-num text-[36px] text-navy-500 leading-none">Организации</h2>
         </div>
         <div className="flex gap-3">
           <div className="bg-card border border-border rounded-xl px-4 py-2 text-center">

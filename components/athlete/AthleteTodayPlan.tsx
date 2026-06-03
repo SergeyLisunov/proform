@@ -74,7 +74,7 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">План тренировок</p>
-            <h3 className="text-base font-bold text-foreground mt-1">Тренер не назначил тренировок на сегодня</h3>
+            <h3 className="text-base font-bold text-navy-500 mt-1">Тренер не назначил тренировок на сегодня</h3>
             <p className="text-xs text-muted-foreground mt-0.5">Можно записать сессию самостоятельно, она попадёт в дневник.</p>
           </div>
           <Link href="/diary"
@@ -91,7 +91,7 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">План тренировок</p>
-          <h3 className="text-base font-bold text-foreground">Сегодня и завтра</h3>
+          <h3 className="text-base font-bold text-navy-500">Сегодня и завтра</h3>
         </div>
         <Link href="/diary" className="text-[11px] font-semibold text-orange-600 hover:underline">
           Все тренировки →

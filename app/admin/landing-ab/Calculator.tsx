@@ -130,7 +130,7 @@ export default function Calculator() {
 
   return (
     <Card className="p-6">
-      <h2 className="text-xl font-bold text-foreground">Z-test калькулятор</h2>
+      <h2 className="text-xl font-bold text-navy-500">Z-test калькулятор</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Введите visitors и conversions для каждого варианта из{' '}
         <a

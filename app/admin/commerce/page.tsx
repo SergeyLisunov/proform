@@ -174,7 +174,7 @@ export default async function AdminCommercePage() {
                 Подписки · ЮKassa
               </span>
             </div>
-            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-foreground">
+            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-navy-500">
               Коммерческая панель
             </h1>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
@@ -232,7 +232,7 @@ export default async function AdminCommercePage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Подписки</div>
-            <h2 className="mt-1 text-lg font-semibold text-foreground">Распределение по тарифам</h2>
+            <h2 className="mt-1 text-lg font-semibold text-navy-500">Распределение по тарифам</h2>
           </div>
           {upcomingCancel > 0 && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
@@ -300,7 +300,7 @@ export default async function AdminCommercePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Платежи</div>
-              <h2 className="mt-1 text-lg font-semibold text-foreground">Последние транзакции</h2>
+              <h2 className="mt-1 text-lg font-semibold text-navy-500">Последние транзакции</h2>
             </div>
             <span className="text-2xs text-muted-foreground">{payments.length}</span>
           </div>
@@ -337,7 +337,7 @@ export default async function AdminCommercePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Счета</div>
-              <h2 className="mt-1 text-lg font-semibold text-foreground">Последние инвойсы</h2>
+              <h2 className="mt-1 text-lg font-semibold text-navy-500">Последние инвойсы</h2>
             </div>
             <span className="text-2xs text-muted-foreground">{invoices.length}</span>
           </div>

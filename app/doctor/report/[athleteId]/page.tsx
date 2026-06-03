@@ -143,7 +143,7 @@ export default function DoctorReportPage() {
       <main className="flex min-h-screen items-center justify-center p-6">
         <div className="max-w-sm rounded-2xl border border-border bg-card p-6 text-center">
           <i className="ki-filled ki-shield-cross text-3xl text-red-500" />
-          <h1 className="mt-3 text-lg font-bold text-foreground">Доступ ограничен</h1>
+          <h1 className="mt-3 text-lg font-bold text-navy-500">Доступ ограничен</h1>
           <p className="mt-1 text-sm text-muted-foreground">Отчёт доступен только для роли doctor или admin.</p>
           <button onClick={() => router.back()} className="mt-4 rounded-xl border border-border px-4 py-2 text-sm font-semibold">Назад</button>
         </div>
@@ -200,7 +200,7 @@ export default function DoctorReportPage() {
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-red-700">Sporteo · Медицинский отчёт</span>
               </div>
-              <h1 className="mt-2 text-2xl font-extrabold text-foreground">{patientLabel}</h1>
+              <h1 className="mt-2 text-2xl font-extrabold text-navy-500">{patientLabel}</h1>
               <div className="mt-1 text-sm text-muted-foreground">
                 {patientSport}{profile?.city ? ` · ${profile.city}` : ''}
               </div>

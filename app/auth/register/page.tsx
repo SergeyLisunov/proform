@@ -529,7 +529,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="max-w-[580px]">
-            <h1 className="pf-num text-[42px] leading-none text-foreground sm:text-[48px]">Регистрация</h1>
+            <h1 className="pf-num text-[42px] leading-none text-navy-500 sm:text-[48px]">Регистрация</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
               Настройте аккаунт под свою роль, а затем, если вы атлет, добавьте профиль для более точной персонализации.
             </p>
@@ -540,7 +540,7 @@ export default function RegisterPage() {
               <div className="pf-enter">
                 <div className="mb-5">
                   <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Шаг 1</div>
-                  <h2 className="pf-num mt-1 text-[28px] leading-none text-foreground sm:text-[32px]">Кто вы?</h2>
+                  <h2 className="pf-num mt-1 text-[28px] leading-none text-navy-500 sm:text-[32px]">Кто вы?</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Выберите сценарий, и мы покажем только нужные поля и следующий шаг.
                   </p>
@@ -620,7 +620,7 @@ export default function RegisterPage() {
 
                 <div className="mb-5">
                   <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Шаг 2</div>
-                  <h2 className="pf-num mt-1 text-[28px] leading-none text-foreground sm:text-[32px]">Создать аккаунт</h2>
+                  <h2 className="pf-num mt-1 text-[28px] leading-none text-navy-500 sm:text-[32px]">Создать аккаунт</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Регистрация как{' '}
                     <span className="font-semibold text-foreground">{selectedRoleMeta?.label ?? 'пользователь'}</span>.
@@ -732,7 +732,7 @@ export default function RegisterPage() {
               <div className="pf-enter">
                 <div className="mb-5">
                   <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Шаг 3</div>
-                  <h2 className="pf-num mt-1 text-[28px] leading-none text-foreground sm:text-[32px]">Профиль атлета</h2>
+                  <h2 className="pf-num mt-1 text-[28px] leading-none text-navy-500 sm:text-[32px]">Профиль атлета</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Эти данные помогут персонализировать аналитику и рекомендации. Все поля необязательны, можно пропустить этот шаг.
                   </p>
@@ -1009,7 +1009,7 @@ export default function RegisterPage() {
               <div className="pf-enter">
                 <div className="mb-5">
                   <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Последний шаг</div>
-                  <h2 className="pf-num mt-1 text-[28px] leading-none text-foreground sm:text-[32px]">Выберите тариф</h2>
+                  <h2 className="pf-num mt-1 text-[28px] leading-none text-navy-500 sm:text-[32px]">Выберите тариф</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Можно начать с Free и обновиться позже в настройках аккаунта.
                   </p>
@@ -1103,7 +1103,7 @@ export default function RegisterPage() {
                   <div className="mb-2 inline-flex items-center rounded-full border border-green-200 bg-green-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-green-700">
                     Готово
                   </div>
-                  <h2 className="pf-num text-[28px] leading-none text-foreground">Аккаунт создан!</h2>
+                  <h2 className="pf-num text-[28px] leading-none text-navy-500">Аккаунт создан!</h2>
                   <p className="mt-2 text-2sm text-muted-foreground">
                     Проверьте почту <span className="font-semibold text-foreground">{email}</span> и подтвердите адрес,
                     затем войдите в приложение.

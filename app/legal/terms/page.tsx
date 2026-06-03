@@ -46,7 +46,7 @@ export default function TermsPage() {
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-2">
           Правовая информация
         </p>
-        <h1 className="pf-num text-3xl md:text-4xl font-bold text-foreground leading-tight">
+        <h1 className="pf-num text-3xl md:text-4xl font-bold text-navy-500 leading-tight">
           Условия использования
         </h1>
         <p className="mt-2 text-xs text-muted-foreground">

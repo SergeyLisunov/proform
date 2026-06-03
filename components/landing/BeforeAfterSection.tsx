@@ -99,7 +99,7 @@ export default function BeforeAfterSection() {
           </p>
           <h2
             id="before-after-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Что меняется после внедрения Sporteo
           </h2>
@@ -125,7 +125,7 @@ export default function BeforeAfterSection() {
             >
               {/* Topic */}
               <div className="flex items-center">
-                <h3 className="text-base font-bold text-foreground lg:text-sm">
+                <h3 className="text-base font-bold text-navy-500 lg:text-sm">
                   {row.topic}
                 </h3>
               </div>

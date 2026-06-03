@@ -91,7 +91,7 @@ export default function NotificationSettingsPage() {
     <div className="pf-enter max-w-3xl mx-auto px-4 py-8 flex flex-col gap-5">
       <div>
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Настройки</p>
-        <h1 className="text-3xl font-bold text-foreground">Уведомления</h1>
+        <h1 className="text-3xl font-bold text-navy-500">Уведомления</h1>
         <p className="mt-1 text-sm text-muted-foreground max-w-xl">
           Выберите какие emails получать. Изменения применяются мгновенно. Отписка не влияет на функциональность —
           вы можете вернуть любой канал когда нужно.
@@ -108,7 +108,7 @@ export default function NotificationSettingsPage() {
         return (
           <Card key={cat} className="p-5">
             <div className="mb-3">
-              <h2 className="text-base font-bold text-foreground">{meta.label}</h2>
+              <h2 className="text-base font-bold text-navy-500">{meta.label}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{meta.description}</p>
             </div>
             <div className="flex flex-col gap-2">

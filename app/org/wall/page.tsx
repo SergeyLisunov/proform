@@ -180,7 +180,7 @@ export default function OrgWallPage() {
                   {org?.org_name}
                 </span>
               </div>
-              <h2 className="pf-num text-[clamp(2.15rem,4vw,3.75rem)] leading-[0.95] tracking-tight text-foreground">
+              <h2 className="pf-num text-[clamp(2.15rem,4vw,3.75rem)] leading-[0.95] tracking-tight text-navy-500">
                 Стена
               </h2>
               <p className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground">
@@ -315,7 +315,7 @@ export default function OrgWallPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Контент организации</div>
-                  <h3 className="pf-num mt-2 text-[28px] leading-none text-foreground">Новая публикация</h3>
+                  <h3 className="pf-num mt-2 text-[28px] leading-none text-navy-500">Новая публикация</h3>
                   <p className="mt-2 text-2sm text-muted-foreground">Подготовьте анонс, новость, событие или результат для участников клуба.</p>
                 </div>
                 <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">

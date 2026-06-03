@@ -131,7 +131,7 @@ export default function CoachPassesPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Тренер · Абонементы</p>
-            <h1 className="text-3xl font-bold text-foreground">Активные абонементы атлетов</h1>
+            <h1 className="text-3xl font-bold text-navy-500">Активные абонементы атлетов</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               {passes.length === 0
                 ? 'Пока нет ни одного выпущенного абонемента с остатком сессий.'
@@ -154,7 +154,7 @@ export default function CoachPassesPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
             <i className="ki-filled ki-cup text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Нет активных абонементов</h3>
+          <h3 className="text-lg font-semibold text-navy-500">Нет активных абонементов</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
             Создайте пакет на странице <Link href="/coach/pass-plans" className="text-orange-600 hover:underline">«Пакеты»</Link>
             {' '}или выдайте абонемент атлету напрямую — пока marketplace + Split Payments в работе.
@@ -239,7 +239,7 @@ export default function CoachPassesPage() {
       {confirming && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-xl">
-            <h3 className="text-lg font-bold text-foreground mb-2">Списать сессию?</h3>
+            <h3 className="text-lg font-bold text-navy-500 mb-2">Списать сессию?</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Это уменьшит остаток на 1 у атлета{' '}
               <strong className="text-foreground">{confirming.athlete_name ?? confirming.athlete_nickname ?? '—'}</strong>

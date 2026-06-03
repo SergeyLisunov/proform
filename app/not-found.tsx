@@ -8,7 +8,7 @@ export default function NotFound() {
       </div>
       <div className="text-center">
         <p className="text-2xs font-bold text-muted-foreground uppercase tracking-widest mb-2">404</p>
-        <h1 className="pf-num text-4xl text-foreground mb-3">Страница не найдена</h1>
+        <h1 className="pf-num text-4xl text-navy-500 mb-3">Страница не найдена</h1>
         <p className="text-sm text-muted-foreground max-w-xs">
           Такой страницы не существует или она была перемещена.
         </p>

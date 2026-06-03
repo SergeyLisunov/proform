@@ -155,7 +155,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Обратная связь</p>
-            <h3 className="text-base font-semibold text-slate-900 mt-0.5">Последние тренировки атлетов</h3>
+            <h3 className="text-base font-semibold text-navy-500 mt-0.5">Последние тренировки атлетов</h3>
           </div>
           <div className="flex items-center gap-2">
             {uncommentedCount > 0 && (

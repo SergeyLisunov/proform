@@ -64,7 +64,7 @@ function PainTile({ pain }: { pain: PainCard }) {
       >
         <Icon size={24} strokeWidth={2} />
       </div>
-      <h3 className="text-base font-bold leading-snug text-foreground sm:text-lg">
+      <h3 className="text-base font-bold leading-snug text-navy-500 sm:text-lg">
         {title}
       </h3>
       <p className="text-sm leading-relaxed text-muted-foreground">
@@ -88,7 +88,7 @@ export default function PainSection() {
           </p>
           <h2
             id="pain-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Спортивный клуб не должен работать как 5 разных программ
           </h2>

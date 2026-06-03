@@ -646,7 +646,7 @@ export default function MessengerPage() {
               </Link>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 className="text-[clamp(2.15rem,4.4vw,3.4rem)] font-semibold tracking-tight text-foreground leading-none">
+                  <h2 className="text-[clamp(2.15rem,4.4vw,3.4rem)] font-semibold tracking-tight text-navy-500 leading-none">
                     Сообщения
                   </h2>
                   {hasUnread && (

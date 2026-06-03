@@ -130,7 +130,7 @@ export default function BillingPage() {
     <div className="pf-enter max-w-3xl mx-auto px-4 py-8 flex flex-col gap-5">
       <div>
         <p className="text-2xs font-bold uppercase tracking-[0.22em] text-muted-foreground mb-1">Настройки → Биллинг</p>
-        <h1 className="text-2xl font-bold text-foreground">Подписка</h1>
+        <h1 className="text-2xl font-bold text-navy-500">Подписка</h1>
       </div>
 
       {msg && (
@@ -146,7 +146,7 @@ export default function BillingPage() {
           <div>
             <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Текущий тариф</div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold text-foreground">{tariff?.name ?? 'Free'}</h2>
+              <h2 className="text-xl font-bold text-navy-500">{tariff?.name ?? 'Free'}</h2>
               <Badge variant={statusMeta.variant} size="sm" className="uppercase tracking-wider">
                 {statusMeta.label}
               </Badge>
@@ -205,7 +205,7 @@ export default function BillingPage() {
               <div className="flex items-start gap-3 mb-3">
                 <i className="ki-filled ki-information-2 text-base text-amber-600 mt-0.5" />
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold text-foreground">Подписка будет отменена</h3>
+                  <h3 className="text-sm font-bold text-navy-500">Подписка будет отменена</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-snug">
                     Доступ сохраняется до {fmtDate(sub.current_period_end)}.
                     После — переход на Free тариф. Возобновите сейчас, чтобы избежать паузы.
@@ -219,7 +219,7 @@ export default function BillingPage() {
             </>
           ) : (
             <>
-              <h3 className="text-sm font-bold text-foreground mb-1">Отменить подписку</h3>
+              <h3 className="text-sm font-bold text-navy-500 mb-1">Отменить подписку</h3>
               <p className="text-xs text-muted-foreground mb-4 leading-snug">
                 Доступ сохранится до конца оплаченного периода. После окончания периода — переход на Free тариф.
                 Можно возобновить в любой момент до этой даты без потери истории.
@@ -237,7 +237,7 @@ export default function BillingPage() {
       {(!sub || (tariff?.price_cents === 0)) && (
         <section className="rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/30 p-6 text-center">
           <i className="ki-filled ki-rocket text-3xl text-orange-500 mb-2 block" />
-          <h3 className="text-base font-bold text-foreground">Хотите больше?</h3>
+          <h3 className="text-base font-bold text-navy-500">Хотите больше?</h3>
           <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
             Pro-тарифы открывают AI-coach, безлимитные тренировки, мессенджер с тренером и продвинутую аналитику.
           </p>

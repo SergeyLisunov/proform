@@ -242,7 +242,7 @@ export default function TeamDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
-          <h2 className="text-lg font-semibold text-foreground">Команда не найдена</h2>
+          <h2 className="text-lg font-semibold text-navy-500">Команда не найдена</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Возможно, команда была архивирована или у вас нет доступа.
           </p>
@@ -279,7 +279,7 @@ export default function TeamDetailPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-700 mb-2">
               Организация {org ? '· ' + org.org_name : ''}
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-navy-500 tracking-tight">
               {group.name}
             </h1>
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -325,7 +325,7 @@ export default function TeamDetailPage() {
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Состав</p>
-            <h2 className="text-xl font-bold text-foreground mt-1">Атлеты команды</h2>
+            <h2 className="text-xl font-bold text-navy-500 mt-1">Атлеты команды</h2>
           </div>
           <span className="text-xs text-muted-foreground">{members.length} в команде</span>
         </div>
@@ -373,7 +373,7 @@ export default function TeamDetailPage() {
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Доступно</p>
-            <h2 className="text-xl font-bold text-foreground mt-1">Добавить в команду</h2>
+            <h2 className="text-xl font-bold text-navy-500 mt-1">Добавить в команду</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Атлеты организации, ещё не входящие в эту команду
             </p>
@@ -437,7 +437,7 @@ export default function TeamDetailPage() {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">Редактирование команды</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Редактирование команды</h3>
               <button onClick={() => setShowEdit(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-xs" />
               </button>

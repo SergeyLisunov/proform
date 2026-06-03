@@ -196,7 +196,7 @@ export default function AthleteGoalsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Атлет · Цели</p>
-          <h1 className="text-3xl font-bold text-foreground">Goals</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Goals</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Ставьте измеримые цели — личный рекорд 5к, weekly volume, целевой вес. Отмечайте достижения и видите прогресс.
           </p>
@@ -242,7 +242,7 @@ export default function AthleteGoalsPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
             <i className="ki-filled ki-flag text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'active'
               ? 'Нет активных целей'
               : filter === 'achieved'
@@ -270,7 +270,7 @@ export default function AthleteGoalsPage() {
               <Card key={g.id} className="p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold text-foreground line-clamp-2">{g.metric_label}</h3>
+                    <h3 className="text-base font-bold text-navy-500 line-clamp-2">{g.metric_label}</h3>
                     <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{g.metric}</p>
                   </div>
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
@@ -364,7 +364,7 @@ export default function AthleteGoalsPage() {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-navy-500">
                 {editingId ? 'Редактировать цель' : 'Новая цель'}
               </h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">

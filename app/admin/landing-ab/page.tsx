@@ -54,7 +54,7 @@ export default async function LandingAbPage() {
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
           Landing analytics · A/B harness
         </p>
-        <h1 className="pf-num mt-2 text-3xl text-foreground md:text-4xl">
+        <h1 className="pf-num mt-2 text-3xl text-navy-500 md:text-4xl">
           Hero copy A/B
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -75,7 +75,7 @@ export default async function LandingAbPage() {
 
       {/* Methodology */}
       <Card className="mb-8 p-6">
-        <h2 className="text-xl font-bold text-foreground">Методология</h2>
+        <h2 className="text-xl font-bold text-navy-500">Методология</h2>
         <ul className="mt-3 list-disc space-y-2 pl-6 text-sm text-muted-foreground">
           <li>
             <strong className="text-foreground">Аудитория:</strong> все visitors

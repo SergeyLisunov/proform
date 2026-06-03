@@ -89,7 +89,7 @@ export default function DoctorTodayCheckups({ doctorId }: { doctorId: string }) 
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Приёмы</p>
-            <h3 className="text-base font-bold text-foreground mt-1">На сегодня приёмов нет</h3>
+            <h3 className="text-base font-bold text-navy-500 mt-1">На сегодня приёмов нет</h3>
             <p className="text-xs text-muted-foreground mt-0.5">Назначьте через календарь — пациенты получат уведомление.</p>
           </div>
           <Link href="/calendar"
@@ -110,7 +110,7 @@ export default function DoctorTodayCheckups({ doctorId }: { doctorId: string }) 
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-700">Расписание</p>
-          <h3 className="text-base font-bold text-foreground">Сегодня и завтра — {rows.length}</h3>
+          <h3 className="text-base font-bold text-navy-500">Сегодня и завтра — {rows.length}</h3>
         </div>
         <Link href="/calendar" className="text-[11px] font-semibold text-red-600 hover:underline">
           Календарь →

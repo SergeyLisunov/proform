@@ -108,7 +108,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Admin · Leads</p>
-          <h1 className="text-3xl font-bold text-foreground">Lead capture analytics</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Lead capture analytics</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Все captured leads из W1+W4 lead-magnets. Drip emails отправляются еженедельно cron'ом /api/cron/leads-digest.
           </p>
@@ -132,7 +132,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
 
       {/* Funnel by source */}
       <Card className="p-5">
-        <h2 className="text-base font-bold text-foreground mb-3">Funnel по source</h2>
+        <h2 className="text-base font-bold text-navy-500 mb-3">Funnel по source</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -188,7 +188,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
 
       {/* Filters */}
       <Card className="p-5">
-        <h2 className="text-base font-bold text-foreground mb-3">Список leads</h2>
+        <h2 className="text-base font-bold text-navy-500 mb-3">Список leads</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           <FilterChip href="/admin/leads"           label="Все sources"       active={!filterSource} />
           {(['team-risk','adaptive-plan','club-audit','medical-summary'] as LeadSource[]).map(s => (

@@ -511,7 +511,7 @@ export default function TopBar() {
           <div className="flex items-center gap-3">
             <MobileMenuToggle />
             <div>
-              <h1 className="pf-num text-xl text-foreground leading-none">{title}</h1>
+              <h1 className="pf-num text-xl text-navy-500 leading-none">{title}</h1>
               {sub && <p className="text-2xs text-muted-foreground mt-0.5 hidden sm:block">{sub}</p>}
             </div>
           </div>

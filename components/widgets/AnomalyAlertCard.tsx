@@ -73,7 +73,7 @@ export default function AnomalyAlertCard() {
             <i className="ki-filled ki-shield-tick text-[14px] text-rose-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">Аномалии</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">Аномалии</h3>
             <div className="text-[10px] text-muted-foreground mt-0.5">AI-мониторинг здоровья</div>
           </div>
         </div>

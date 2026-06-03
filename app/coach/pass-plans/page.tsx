@@ -226,7 +226,7 @@ export default function CoachPassPlansPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Абонементы</p>
-          <h1 className="text-3xl font-bold text-foreground">Coach Pass Plans</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Coach Pass Plans</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Создавайте абонементы для marketplace: пакеты тренировок, безлимит на месяц, групповые блоки.
             Также см. одноразовые услуги в <Link href="/coach/services" className="text-orange-600 font-semibold hover:underline">/coach/services</Link>.
@@ -263,7 +263,7 @@ export default function CoachPassPlansPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
             <i className="ki-filled ki-cup text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'archived' ? 'В архиве пусто' : 'Абонементов пока нет'}
           </h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -302,7 +302,7 @@ export default function CoachPassPlansPage() {
                         </Badge>
                       )}
                     </div>
-                    <h3 className="text-base font-bold text-foreground truncate">{p.title}</h3>
+                    <h3 className="text-base font-bold text-navy-500 truncate">{p.title}</h3>
                     {p.description && (
                       <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.description}</p>
                     )}
@@ -351,7 +351,7 @@ export default function CoachPassPlansPage() {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-lg rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-navy-500">
                 {editor.mode === 'create' ? 'Новый абонемент' : 'Редактировать абонемент'}
               </h3>
               <button onClick={closeEditor} className="rounded-lg p-1.5 hover:bg-muted text-muted-foreground" aria-label="Закрыть">

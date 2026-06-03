@@ -96,7 +96,7 @@ function StepCard({ step, isLast }: { step: Step; isLast: boolean }) {
         <p className="text-2xs font-bold uppercase tracking-wider" style={{ color: hue.text }}>
           Шаг {num}
         </p>
-        <h3 className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        <h3 className="mt-1 text-xl font-bold tracking-tight text-navy-500 sm:text-2xl">
           {title}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -148,7 +148,7 @@ export default function WorkflowSection() {
           </p>
           <h2
             id="workflow-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Подключение → работа → контроль
           </h2>

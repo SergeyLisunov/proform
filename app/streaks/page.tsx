@@ -214,7 +214,7 @@ export default function StreaksPage() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-600">
             Стрик & достижения
           </div>
-          <h1 className="pf-num text-[28px] leading-tight text-foreground">
+          <h1 className="pf-num text-[28px] leading-tight text-navy-500">
             {stats ? (
               <>🔥 Серия {stats.currentStreak} {stats.currentStreak === 1 ? 'день' :
                 stats.currentStreak < 5 ? 'дня' : 'дней'}</>

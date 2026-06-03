@@ -68,7 +68,7 @@ export default async function SharedWorkoutPage({
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
             <i className="ki-filled ki-lock-2 text-[22px]" />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-slate-900">Ссылка недействительна</h1>
+          <h1 className="mt-4 text-xl font-bold text-navy-500">Ссылка недействительна</h1>
           <p className="mt-2 text-sm text-slate-600">
             Возможно, ссылка отозвана автором или срок её действия истёк.
           </p>
@@ -128,7 +128,7 @@ export default async function SharedWorkoutPage({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Тренировка</div>
-              <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-900">
+              <h1 className="mt-1 text-2xl font-bold leading-tight text-navy-500">
                 {data.name || data.activity_type || 'Тренировка'}
               </h1>
               {data.activity_type && data.name && (

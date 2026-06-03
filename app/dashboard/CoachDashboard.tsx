@@ -154,7 +154,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
             <div className="flex items-center justify-between gap-2 mb-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Заявки</p>
-                <h3 className="text-base font-bold text-foreground">Новые — {pending.length}</h3>
+                <h3 className="text-base font-bold text-navy-500">Новые — {pending.length}</h3>
               </div>
               <Link href="/connections" className="text-[11px] font-semibold text-orange-600 hover:underline">
                 Все →
