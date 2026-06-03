@@ -31,7 +31,7 @@ export function CardHeader({ children, className = '' }: BaseProps) {
 }
 
 export function CardTitle({ children, className = '' }: BaseProps) {
-  return <h3 className={`kt-card-title text-sm font-semibold text-foreground ${className}`}>{children}</h3>
+  return <h3 className={`kt-card-title text-sm font-semibold text-navy-500 ${className}`}>{children}</h3>
 }
 
 export function CardToolbar({ children, className = '' }: BaseProps) {

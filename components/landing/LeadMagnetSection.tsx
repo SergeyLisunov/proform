@@ -112,7 +112,7 @@ function FeaturedCard() {
 
       {/* Right: content */}
       <div className="flex-1">
-        <h3 className="text-xl font-bold text-foreground sm:text-2xl">{title}</h3>
+        <h3 className="text-xl font-bold text-navy-500 sm:text-2xl">{title}</h3>
         <p className="mt-1 text-2xs font-semibold uppercase tracking-wider" style={{ color: hue.text }}>
           {persona}
         </p>
@@ -155,7 +155,7 @@ function SecondaryCard({ magnet }: { magnet: LeadMagnet }) {
         </span>
       </div>
       <div>
-        <h3 className="text-lg font-bold leading-snug text-foreground">{title}</h3>
+        <h3 className="text-lg font-bold leading-snug text-navy-500">{title}</h3>
         <p className="mt-1 text-2xs font-semibold uppercase tracking-wider" style={{ color: hue.text }}>
           {persona}
         </p>
@@ -187,7 +187,7 @@ export default function LeadMagnetSection() {
           </p>
           <h2
             id="lead-magnets-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Попробуйте подход Sporteo за 60 секунд
           </h2>

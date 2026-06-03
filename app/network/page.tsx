@@ -508,7 +508,7 @@ function NetworkPageInner() {
             <i className="ki-filled ki-people text-[11px]" />
             Сеть
           </span>
-          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground">Контакты и поиск</h1>
+          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">Контакты и поиск</h1>
           <p className="max-w-2xl text-sm md:text-base text-muted-foreground">
             Одно место для ваших связей и поиска новых специалистов. Переключайте режимы и ищите удобно — по имени, роли или каталогу.
           </p>

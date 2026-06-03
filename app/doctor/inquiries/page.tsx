@@ -137,7 +137,7 @@ export default function DoctorInquiriesPage() {
     <div className="pf-enter max-w-5xl mx-auto px-4 py-8 flex flex-col gap-5">
       <div>
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Врач · Запросы</p>
-        <h1 className="text-3xl font-bold text-foreground">Doctor Inquiries</h1>
+        <h1 className="text-3xl font-bold text-navy-500">Doctor Inquiries</h1>
         <p className="mt-1 text-sm text-muted-foreground max-w-xl">
           Запросы от тренеров на медицинское заключение. Ответ структурирован и сохраняется в системе —
           coach + athlete видят результат.
@@ -169,7 +169,7 @@ export default function DoctorInquiriesPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
             <i className="ki-filled ki-message-question text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'pending' ? 'Нет ожидающих запросов' : filter === 'answered' ? 'История ответов пуста' : 'Запросов нет'}
           </h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">

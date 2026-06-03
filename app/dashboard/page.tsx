@@ -380,7 +380,7 @@ function TrainingWidget({
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-orange-100">
             <i className="ki-filled ki-abstract-26 text-[14px] text-orange-500" />
           </div>
-          <h3 className="text-sm font-bold text-foreground">Тренировки</h3>
+          <h3 className="text-sm font-bold text-navy-500">Тренировки</h3>
         </div>
       </div>
 
@@ -731,7 +731,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                 <p style={{ fontSize:10, fontWeight:800, color:'#F35703', textTransform:'uppercase', letterSpacing:'0.22em', marginBottom:4 }}>
                   Профиль атлета
                 </p>
-                <h2 className="text-2xl font-extrabold text-foreground leading-tight tracking-tight">{name}</h2>
+                <h2 className="text-2xl font-extrabold text-navy-500 leading-tight tracking-tight">{name}</h2>
                 {profile?.nickname
                   ? <p className="text-sm text-muted-foreground mt-0.5">@{profile.nickname}</p>
                   : <p className="text-xs text-muted-foreground/40 mt-0.5 italic">никнейм не задан</p>
@@ -963,7 +963,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
     <div className="flex flex-col gap-6 pf-enter">
       <div>
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Тренер</p>
-        <h2 className="pf-num text-[36px] text-foreground leading-none">
+        <h2 className="pf-num text-[36px] text-navy-500 leading-none">
           Привет, {name.split(' ')[0]} 👋
         </h2>
       </div>
@@ -993,7 +993,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2 overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">Статус атлетов</h3>
+            <h3 className="text-sm font-semibold text-navy-500">Статус атлетов</h3>
             <Link href="/athletes" className="text-2xs font-semibold text-orange-500 hover:text-orange-600">Управление →</Link>
           </div>
           {loading ? (
@@ -1094,7 +1094,7 @@ function AdminDash({ name }: { name: string }) {
     <div className="flex flex-col gap-6 pf-enter">
       <div>
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
-        <h2 className="pf-num text-[36px] text-foreground leading-none">System Overview</h2>
+        <h2 className="pf-num text-[36px] text-navy-500 leading-none">System Overview</h2>
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
@@ -1118,7 +1118,7 @@ function AdminDash({ name }: { name: string }) {
 
       <Card className="overflow-hidden">
         <div className="px-5 py-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-foreground">System Health</h3>
+          <h3 className="text-sm font-semibold text-navy-500">System Health</h3>
         </div>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[

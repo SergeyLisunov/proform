@@ -104,7 +104,7 @@ export default function RoleSection() {
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
             4 ключевые роли — одна карта спортсмена
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
             Каждый видит только то, что нужно ему
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">

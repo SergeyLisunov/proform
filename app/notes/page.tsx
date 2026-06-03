@@ -278,7 +278,7 @@ export default function NotesPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Заметки</h1>
+          <h1 className="text-xl font-semibold text-navy-500">Заметки</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {notes.length} {notes.length === 1 ? 'заметка' : notes.length < 5 ? 'заметки' : 'заметок'}
           </p>
@@ -560,7 +560,7 @@ export default function NotesPage() {
               <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mb-4">
                 <i className="ki-filled ki-notepad-edit text-3xl text-orange-400" />
               </div>
-              <h3 className="text-base font-semibold text-foreground mb-1">Выберите заметку</h3>
+              <h3 className="text-base font-semibold text-navy-500 mb-1">Выберите заметку</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Выберите заметку из списка или создайте новую
               </p>

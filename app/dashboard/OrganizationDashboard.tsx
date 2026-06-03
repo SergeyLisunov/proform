@@ -84,7 +84,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
       <div className="flex flex-col gap-5 pf-page-enter">
         <div>
           <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Панель организации</p>
-          <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{name}</h2>
+          <h2 className="pf-num text-3xl text-navy-500 mt-0.5">{name}</h2>
         </div>
         <Card className="p-10 text-center">
           <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
@@ -132,7 +132,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Стена</p>
-              <h3 className="text-base font-bold text-foreground">Последние публикации</h3>
+              <h3 className="text-base font-bold text-navy-500">Последние публикации</h3>
             </div>
             <Link href="/org/wall" className="text-[11px] font-semibold text-orange-600 hover:underline">Все →</Link>
           </div>
@@ -169,7 +169,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Email</p>
-              <h3 className="text-base font-bold text-foreground">Рассылки</h3>
+              <h3 className="text-base font-bold text-navy-500">Рассылки</h3>
             </div>
             <Link href="/org/newsletters" className="text-[11px] font-semibold text-purple-600 hover:underline">Все →</Link>
           </div>

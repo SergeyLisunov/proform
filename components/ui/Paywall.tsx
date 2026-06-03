@@ -540,7 +540,7 @@ export function PricingPage() {
       </div>
       <div className="text-center">
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Тарифы</p>
-        <h1 className="pf-num text-[40px] text-foreground leading-none mb-3" style={{ letterSpacing: '-0.03em' }}>
+        <h1 className="pf-num text-[40px] text-navy-500 leading-none mb-3" style={{ letterSpacing: '-0.03em' }}>
           Простые и честные цены
         </h1>
         <p className="text-muted-foreground text-sm max-w-md mx-auto">

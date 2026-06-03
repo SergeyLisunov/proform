@@ -58,7 +58,7 @@ export default function OrgPublicPage() {
           <i className="ki-filled ki-office-bag text-2xl text-slate-400" />
         </div>
         <div className="text-center">
-          <h1 className="pf-num text-3xl text-foreground mb-2">Организация не найдена</h1>
+          <h1 className="pf-num text-3xl text-navy-500 mb-2">Организация не найдена</h1>
           <p className="text-muted-foreground text-sm">Страница <code className="font-mono text-orange-600">/{orgSlug}</code> не существует.</p>
         </div>
         <Link href="/auth/login" className="kt-btn kt-btn-primary">Перейти в Sporteo</Link>
@@ -82,7 +82,7 @@ export default function OrgPublicPage() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h1 className="pf-num text-3xl text-foreground leading-tight">{org!.org_name}</h1>
+                <h1 className="pf-num text-3xl text-navy-500 leading-tight">{org!.org_name}</h1>
                 {org!.is_verified && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
                     <i className="ki-filled ki-verify text-xs" />
@@ -116,7 +116,7 @@ export default function OrgPublicPage() {
           <section>
             <div className="flex items-center gap-2 mb-4">
               <span>📌</span>
-              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Закреплено</h2>
+              <h2 className="text-sm font-semibold text-navy-500 uppercase tracking-wider">Закреплено</h2>
             </div>
             <div className="flex flex-col gap-3">
               {pinned.map(p => <PublicPostCard key={p.id} post={p} />)}
@@ -127,7 +127,7 @@ export default function OrgPublicPage() {
         {/* Feed */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Последние публикации</h2>
+            <h2 className="text-sm font-semibold text-navy-500 uppercase tracking-wider">Последние публикации</h2>
           </div>
           {feed.length === 0 && pinned.length === 0 ? (
             <div className="bg-card border border-border rounded-xl px-5 py-12 text-center text-muted-foreground text-2sm">
@@ -168,7 +168,7 @@ function PublicPostCard({ post }: { post: WallPost }) {
               </span>
             )}
           </div>
-          <h3 className="text-sm font-semibold text-foreground mb-1">{post.title}</h3>
+          <h3 className="text-sm font-semibold text-navy-500 mb-1">{post.title}</h3>
           <p className="text-2sm text-muted-foreground leading-relaxed">{post.body}</p>
         </div>
       </div>

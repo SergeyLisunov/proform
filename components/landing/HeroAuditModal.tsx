@@ -115,7 +115,7 @@ export default function HeroAuditModal({
             </p>
             <h2
               id="audit-modal-title"
-              className="text-lg font-bold leading-tight text-foreground sm:text-xl"
+              className="text-lg font-bold leading-tight text-navy-500 sm:text-xl"
             >
               Health-score клуба + top-3 риска + план на 30 дней
             </h2>

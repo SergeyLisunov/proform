@@ -81,7 +81,7 @@ function NotTile({ card }: { card: NotCard }) {
           <p className="text-2xs font-bold uppercase tracking-wider text-red-600">
             Sporteo — это НЕ
           </p>
-          <h3 className="text-base font-bold leading-tight text-foreground sm:text-lg">
+          <h3 className="text-base font-bold leading-tight text-navy-500 sm:text-lg">
             {alternative}
           </h3>
         </div>
@@ -115,7 +115,7 @@ export default function AntiPositioningSection() {
           </p>
           <h2
             id="anti-positioning-heading"
-            className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-balance text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Это не&nbsp;CRM, не&nbsp;таблица, не&nbsp;чат и&nbsp;не&nbsp;журнал
           </h2>

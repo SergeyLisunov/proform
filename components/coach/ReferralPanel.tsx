@@ -30,7 +30,7 @@ export default function ReferralPanel({
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
             🎁 Реферальная программа
           </span>
-          <h3 className="pf-num text-xl font-bold text-foreground mt-2">
+          <h3 className="pf-num text-xl font-bold text-navy-500 mt-2">
             Приглашай атлетов — получай Pro бесплатно
           </h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl">

@@ -78,7 +78,7 @@ export default async function AdminDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Состав</p>
-              <h3 className="text-base font-bold text-foreground">Распределение по ролям</h3>
+              <h3 className="text-base font-bold text-navy-500">Распределение по ролям</h3>
             </div>
             <span className="text-[11px] text-muted-foreground">{totalUsers ?? 0} всего</span>
           </div>
@@ -117,7 +117,7 @@ export default async function AdminDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Сигналы</p>
-              <h3 className="text-base font-bold text-foreground">Активность платформы</h3>
+              <h3 className="text-base font-bold text-navy-500">Активность платформы</h3>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -181,7 +181,7 @@ export default async function AdminDashboard() {
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">CRM</p>
-            <h3 className="text-base font-bold text-foreground">Последние регистрации</h3>
+            <h3 className="text-base font-bold text-navy-500">Последние регистрации</h3>
           </div>
           <Link href="/admin/crm" className="text-[11px] font-semibold text-purple-600 hover:underline">
             Все пользователи →

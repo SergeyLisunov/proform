@@ -61,7 +61,7 @@ export default async function DoctorReportsPage() {
     <div className="flex flex-col gap-6 max-w-[1040px] mx-auto w-full">
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-muted-foreground">Врач</p>
-        <h1 className="pf-num text-[32px] leading-tight text-foreground">Отчёты по атлетам</h1>
+        <h1 className="pf-num text-[32px] leading-tight text-navy-500">Отчёты по атлетам</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Мои пациенты — {athletes.length}. Откройте отчёт, чтобы увидеть медицинскую сводку и историю.
         </p>

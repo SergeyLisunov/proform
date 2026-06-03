@@ -206,7 +206,7 @@ export default function RecordsPage() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-600">
             Персональные рекорды
           </div>
-          <h1 className="pf-num text-[28px] leading-tight text-foreground">
+          <h1 className="pf-num text-[28px] leading-tight text-navy-500">
             Ваш лог достижений
           </h1>
           <p className="max-w-[640px] text-sm text-muted-foreground">

@@ -79,7 +79,7 @@ export default async function OrgActivityPage() {
         <div className="relative flex flex-col gap-3 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Организация · Лента событий</p>
-            <h1 className="pf-num text-[clamp(1.75rem,3vw,2.5rem)] leading-[0.95] tracking-tight text-foreground">
+            <h1 className="pf-num text-[clamp(1.75rem,3vw,2.5rem)] leading-[0.95] tracking-tight text-navy-500">
               Activity feed
             </h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
@@ -136,7 +136,7 @@ export default async function OrgActivityPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-4">
             <i className="ki-filled ki-people text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Пока тихо</h3>
+          <h3 className="text-lg font-semibold text-navy-500">Пока тихо</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
             События появятся когда атлет присоединится, тренер задаст вопрос врачу или врач выпустит рекомендацию.
             Пригласите первых атлетов на <Link href="/org/members" className="text-blue-600 font-semibold hover:underline">/org/members</Link>.

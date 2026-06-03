@@ -127,7 +127,7 @@ export default function AthleteDashboardPage() {
       {/* Greeting hero */}
       <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.08),_transparent_30%),linear-gradient(135deg,#FFF7ED_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
         <p className="text-2xs font-bold uppercase tracking-[0.22em] text-orange-700 mb-1">{todayStr}</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-bold text-navy-500 tracking-tight">
           Привет, {name ?? 'атлет'} 👋
         </h1>
         {todayWorkout ? (
@@ -165,7 +165,7 @@ export default function AthleteDashboardPage() {
         <Card className="lg:col-span-2 p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-base font-bold text-foreground">Эта неделя</h2>
+              <h2 className="text-base font-bold text-navy-500">Эта неделя</h2>
               <p className="text-[11px] text-muted-foreground mt-0.5">Назначенные тренером тренировки</p>
             </div>
             <Link href="/calendar" className="text-xs text-orange-600 font-semibold hover:underline no-underline">
@@ -234,7 +234,7 @@ export default function AthleteDashboardPage() {
         <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-base font-bold text-foreground">Цели</h2>
+              <h2 className="text-base font-bold text-navy-500">Цели</h2>
               <p className="text-[11px] text-muted-foreground mt-0.5">Top 3 активных</p>
             </div>
             <Link href="/athlete/goals" className="text-xs text-orange-600 font-semibold hover:underline no-underline">
@@ -258,7 +258,7 @@ export default function AthleteDashboardPage() {
                 return (
                   <li key={g.id} className="rounded-xl border border-border bg-background p-3">
                     <div className="flex items-start justify-between gap-2 mb-1.5">
-                      <h3 className="text-sm font-bold text-foreground line-clamp-2">{g.metric_label}</h3>
+                      <h3 className="text-sm font-bold text-navy-500 line-clamp-2">{g.metric_label}</h3>
                       <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5"
                         style={{ background: GOAL_STATUS_META.active.bg, color: GOAL_STATUS_META.active.color }}>
                         🎯
@@ -287,7 +287,7 @@ export default function AthleteDashboardPage() {
       {recs.length > 0 && (
         <Card className="p-5">
           <div className="mb-3">
-            <h2 className="text-base font-bold text-foreground">Недавние рекомендации</h2>
+            <h2 className="text-base font-bold text-navy-500">Недавние рекомендации</h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">Сообщения от тренера и врача</p>
           </div>
           <ul className="space-y-2">

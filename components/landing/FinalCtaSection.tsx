@@ -17,7 +17,7 @@ export default function FinalCtaSection() {
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
           Готовы попробовать?
         </p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
           Sporteo в вашем клубе — через 10 минут
         </h2>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">

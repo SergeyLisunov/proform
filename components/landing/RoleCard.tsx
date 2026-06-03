@@ -58,7 +58,7 @@ export default function RoleCard({
         >
           <Icon size={20} strokeWidth={2} />
         </div>
-        <h3 className="text-lg font-bold tracking-tight text-foreground">{title}</h3>
+        <h3 className="text-lg font-bold tracking-tight text-navy-500">{title}</h3>
       </div>
 
       {/* Tagline */}

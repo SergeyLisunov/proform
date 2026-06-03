@@ -97,7 +97,7 @@ export default function NewsletterStatsPage() {
                   {formatAudience(newsletter.target_roles)}
                 </span>
               </div>
-              <h2 className="pf-num text-[clamp(2rem,4vw,3.3rem)] leading-[0.95] tracking-tight text-foreground">
+              <h2 className="pf-num text-[clamp(2rem,4vw,3.3rem)] leading-[0.95] tracking-tight text-navy-500">
                 {newsletter.subject}
               </h2>
               <p className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground">
@@ -210,7 +210,7 @@ export default function NewsletterStatsPage() {
             {formatAudience(newsletter.target_roles)}
           </span>
         </div>
-        <h3 className="text-base font-semibold text-foreground">Содержание рассылки</h3>
+        <h3 className="text-base font-semibold text-navy-500">Содержание рассылки</h3>
         <p className="mt-3 whitespace-pre-wrap text-2sm leading-relaxed text-muted-foreground">{newsletter.body}</p>
       </Card>
     </div>

@@ -112,7 +112,7 @@ export default function AthletePassesPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Атлет · Абонементы</p>
-            <h1 className="text-3xl font-bold text-foreground">My Passes</h1>
+            <h1 className="text-3xl font-bold text-navy-500">My Passes</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               {active.length === 0
                 ? 'У вас пока нет активных абонементов. Найдите тренера и купите пакет тренировок.'
@@ -133,7 +133,7 @@ export default function AthletePassesPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
             <i className="ki-filled ki-cup text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Нет активных абонементов</h3>
+          <h3 className="text-lg font-semibold text-navy-500">Нет активных абонементов</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
             Браузите marketplace и купите пакет от тренера — например, «10 тренировок за месяц».
             Сессии списываются тренером после каждой встречи.
@@ -155,7 +155,7 @@ export default function AthletePassesPage() {
               <Card key={p.id} className="p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-foreground truncate">{p.title}</h3>
+                    <h3 className="text-base font-bold text-navy-500 truncate">{p.title}</h3>
                     {p.coach_id && (
                       <div className="mt-1 flex items-center gap-1.5">
                         <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700 overflow-hidden shrink-0">

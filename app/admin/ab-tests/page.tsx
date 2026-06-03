@@ -156,7 +156,7 @@ export default async function AbTestsPage() {
                 Drip subject A vs B
               </span>
             </div>
-            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-foreground">
+            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-navy-500">
               Drip template A/B test
             </h1>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
@@ -182,7 +182,7 @@ export default async function AbTestsPage() {
       <Card className="p-6">
         <div className="mb-4">
           <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Per-source</div>
-          <h2 className="mt-1 text-lg font-semibold text-foreground">Conversion: variant A vs B</h2>
+          <h2 className="mt-1 text-lg font-semibold text-navy-500">Conversion: variant A vs B</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Lift = (B.cvr − A.cvr) / A.cvr. Sample size {'<'}30 на вариант — результат пока статистически слабый.
           </p>
@@ -250,7 +250,7 @@ export default async function AbTestsPage() {
       <Card className="p-6">
         <div className="mb-4">
           <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">3-touch drip funnel</div>
-          <h2 className="mt-1 text-lg font-semibold text-foreground">Где конвертируются — после какого touch</h2>
+          <h2 className="mt-1 text-lg font-semibold text-navy-500">Где конвертируются — после какого touch</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Funnel показывает сколько leads застряли на каждом touch level. Touch 0 = ещё не отправляли (fresh); 1/2/3 = после первого/второго/третьего email. Big drop с touch 1 → touch 2 значит cadence работает (или leads разрешились).
           </p>

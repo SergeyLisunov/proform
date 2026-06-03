@@ -251,7 +251,7 @@ export default async function OnboardingFunnelPage({
                 4 wizards · derived from onboarding_state
               </span>
             </div>
-            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-foreground">
+            <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-navy-500">
               Onboarding funnel
             </h1>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
@@ -289,7 +289,7 @@ export default async function OnboardingFunnelPage({
                   <div className="text-2xs font-bold uppercase tracking-[0.2em]" style={{ color: meta.accent }}>
                     {meta.label}
                   </div>
-                  <h2 className="mt-1 text-xl font-bold text-foreground">
+                  <h2 className="mt-1 text-xl font-bold text-navy-500">
                     {f.started} started · {f.completed} completed
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -354,7 +354,7 @@ export default async function OnboardingFunnelPage({
         <div className="flex items-end justify-between gap-3 flex-wrap mb-4">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Drill-down</p>
-            <h2 className="mt-1 text-lg font-bold text-foreground">
+            <h2 className="mt-1 text-lg font-bold text-navy-500">
               Список пользователей
               <span className="ml-2 pf-num text-sm font-normal text-muted-foreground">
                 ({totalFiltered.toLocaleString('ru-RU')})

@@ -93,7 +93,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
             <i className="ki-filled ki-chart-line-up text-[14px] text-sky-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">Тренировочная нагрузка</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">Тренировочная нагрузка</h3>
             <div className="text-[10px] text-muted-foreground mt-0.5">ACWR · монотонность · 4 недели</div>
           </div>
         </div>

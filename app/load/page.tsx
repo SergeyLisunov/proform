@@ -197,7 +197,7 @@ export default function LoadPage() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-600">
             Нагрузка · ACWR
           </div>
-          <h1 className="pf-num text-[28px] leading-tight text-foreground">
+          <h1 className="pf-num text-[28px] leading-tight text-navy-500">
             Светофор тренировочной нагрузки
           </h1>
           <p className="max-w-[680px] text-sm text-muted-foreground">

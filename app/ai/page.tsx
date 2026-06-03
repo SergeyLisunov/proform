@@ -351,7 +351,7 @@ export default function AiHubPage() {
               Beta
             </span>
           </div>
-          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground">Умные инструменты</h1>
+          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">Умные инструменты</h1>
           <p className="max-w-2xl text-sm md:text-base text-muted-foreground">
             Всё, что связано с AI — в одном месте: ассистент, недельные разборы, видеоанализ, голосовой ввод и инструменты для тренера / врача.
           </p>

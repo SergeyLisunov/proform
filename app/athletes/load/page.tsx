@@ -40,7 +40,7 @@ export default function AthleteLoadPage() {
     return (
       <Card className="max-w-xl mx-auto mt-12 p-8 text-center">
         <i className="ki-filled ki-lock text-3xl text-muted-foreground block mb-3" />
-        <h1 className="text-lg font-bold text-foreground mb-1">Доступно только тренерам</h1>
+        <h1 className="text-lg font-bold text-navy-500 mb-1">Доступно только тренерам</h1>
         <p className="text-sm text-muted-foreground">Раздел показывает ACWR для атлетов, подключённых к вам.</p>
       </Card>
     )
@@ -60,7 +60,7 @@ export default function AthleteLoadPage() {
             <i className="ki-filled ki-shield-cross text-[11px]" />
             Нагрузка
           </span>
-          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground">ACWR — риск травмы</h1>
+          <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">ACWR — риск травмы</h1>
           <p className="max-w-2xl text-sm md:text-base text-muted-foreground">
             Отношение острой (7 дн) к хронической (28 дн) нагрузке. &laquo;Сладкая зона&raquo; — 0.8–1.3.
             Значение &gt; 1.5 связано с повышенным риском травмы в спортивной науке.

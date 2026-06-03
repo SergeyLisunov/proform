@@ -140,7 +140,7 @@ export default function CoachAtRiskAthletes({ coachId }: { coachId: string }) {
       <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-700">⚠ Внимание</p>
-          <h3 className="text-base font-bold text-foreground">Требуют вмешательства — {rows.length}</h3>
+          <h3 className="text-base font-bold text-navy-500">Требуют вмешательства — {rows.length}</h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {summary.danger > 0 && <span>ACWR {summary.danger} · </span>}
             {summary.monitor > 0 && <span>зона monitor {summary.monitor} · </span>}

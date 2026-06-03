@@ -38,7 +38,7 @@ export default function CoachReputationCard({
       <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Репутация</p>
-          <h2 className="text-lg font-bold text-foreground">Ваш профиль глазами атлетов</h2>
+          <h2 className="text-lg font-bold text-navy-500">Ваш профиль глазами атлетов</h2>
         </div>
         <Link
           href="/coach/passes"

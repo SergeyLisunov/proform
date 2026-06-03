@@ -57,7 +57,7 @@ function SectionTitle({
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{eyebrow}</p>
-        <h3 className="mt-1 text-base font-semibold text-foreground">{title}</h3>
+        <h3 className="mt-1 text-base font-semibold text-navy-500">{title}</h3>
         {subtitle && <p className="mt-1 text-xs leading-5 text-muted-foreground">{subtitle}</p>}
       </div>
       {action}
@@ -213,7 +213,7 @@ function CoachAnalytics() {
                   Обновлено недавно
                 </span>
               </div>
-              <h2 className="mt-4 text-[clamp(2.1rem,4vw,3.4rem)] font-semibold tracking-tight text-foreground">
+              <h2 className="mt-4 text-[clamp(2.1rem,4vw,3.4rem)] font-semibold tracking-tight text-navy-500">
                 Аналитика тренера в одном рабочем поле
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -492,7 +492,7 @@ function AthleteAnalytics() {
                   WHOOP в реальном времени
                 </span>
               </div>
-              <h2 className="mt-4 text-[clamp(2.1rem,4vw,3.4rem)] font-semibold tracking-tight text-foreground">
+              <h2 className="mt-4 text-[clamp(2.1rem,4vw,3.4rem)] font-semibold tracking-tight text-navy-500">
                 Аналитика без перегруза интерфейса
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -756,7 +756,7 @@ function AnalyticsComingSoon() {
         <i className="ki-filled ki-chart-line-up text-3xl text-orange-400" />
       </div>
       <div>
-        <h1 className="pf-num text-2xl text-foreground">Аналитика готовится</h1>
+        <h1 className="pf-num text-2xl text-navy-500">Аналитика готовится</h1>
         <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
           Графики восстановления, нагрузки и пульсовых зон появятся здесь по мере
           накопления данных тренировок и самочувствия. Начните вести дневник —

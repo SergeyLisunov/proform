@@ -85,7 +85,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
             🪪 Паспорт атлета
           </span>
-          <h3 className="pf-num text-xl font-bold text-foreground mt-2">
+          <h3 className="pf-num text-xl font-bold text-navy-500 mt-2">
             {profilePublic ? 'Ваш профиль открыт для всех' : 'Сделай профиль публичным'}
           </h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl">

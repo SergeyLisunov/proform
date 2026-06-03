@@ -52,7 +52,7 @@ export function ProfileShell(props: {
             <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
               Настройки
             </div>
-            <h1 className="pf-num mt-2 flex flex-wrap items-center gap-3 text-[clamp(1.7rem,5vw,2rem)] leading-tight text-foreground">
+            <h1 className="pf-num mt-2 flex flex-wrap items-center gap-3 text-[clamp(1.7rem,5vw,2rem)] leading-tight text-navy-500">
               {props.title}
               {props.roleBadge && (
                 <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">

@@ -117,7 +117,7 @@ export default function DiarySearchPage() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-indigo-600">
             Семантический поиск
           </div>
-          <h1 className="pf-num text-[28px] leading-tight text-foreground">
+          <h1 className="pf-num text-[28px] leading-tight text-navy-500">
             Найди, что думал или тренировал — по смыслу
           </h1>
           <p className="max-w-[640px] text-sm text-muted-foreground">

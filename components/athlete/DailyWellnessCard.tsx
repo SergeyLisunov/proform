@@ -164,7 +164,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
             <i className="ki-filled ki-heart text-base text-emerald-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">Самочувствие сегодня</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">Самочувствие сегодня</h3>
             <div className="text-[10px] text-muted-foreground mt-1">Заполняй то, что хочешь — все поля опциональные</div>
           </div>
         </div>

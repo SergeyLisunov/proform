@@ -44,7 +44,7 @@ function ContactBlock({ icon: Icon, title, email, description }: ContactBlockPro
           <Icon size={18} strokeWidth={2} />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-bold text-foreground">{title}</h2>
+          <h2 className="text-base font-bold text-navy-500">{title}</h2>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{description}</p>
           <a
             href={`mailto:${email}`}
@@ -101,7 +101,7 @@ export default function ContactsPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Рабочие часы</h2>
+        <h2 className="text-xl font-bold text-navy-500">Рабочие часы</h2>
         <div className="mt-3 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
           <Clock
             aria-hidden="true"
@@ -121,7 +121,7 @@ export default function ContactsPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">Что прислать в письме</h2>
+        <h2 className="text-xl font-bold text-navy-500">Что прислать в письме</h2>
         <p className="mt-3 text-muted-foreground">
           Чтобы мы могли помочь быстрее, укажите в письме:
         </p>

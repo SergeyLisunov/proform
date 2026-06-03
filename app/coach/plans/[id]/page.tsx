@@ -61,7 +61,7 @@ export default function EditPlanPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
-          <h2 className="text-lg font-semibold text-foreground">План не найден</h2>
+          <h2 className="text-lg font-semibold text-navy-500">План не найден</h2>
           <p className="mt-2 text-sm text-muted-foreground">Возможно, он был архивирован или у вас нет доступа.</p>
           <Link href="/coach/plans"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold no-underline">

@@ -145,7 +145,7 @@ export default function OrgHealthPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Health Snapshot</p>
-            <h1 className="text-3xl font-bold text-foreground truncate">{snapshot.org_name}</h1>
+            <h1 className="text-3xl font-bold text-navy-500 truncate">{snapshot.org_name}</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               Краткий портрет состояния организации на сегодня. Используйте для еженедельных
               обзоров и для переговоров со спонсорами / руководством.
@@ -202,7 +202,7 @@ export default function OrgHealthPage() {
         <div className="flex items-end justify-between gap-3 mb-3 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Распределение риска</p>
-            <h2 className="mt-1 text-lg font-bold text-foreground">
+            <h2 className="mt-1 text-lg font-bold text-navy-500">
               Готовность атлетов
               {snapshot.avg_recovery !== null && (
                 <span className="ml-2 pf-num text-base font-normal text-emerald-700">{snapshot.avg_recovery}% средний</span>
@@ -288,7 +288,7 @@ export default function OrgHealthPage() {
         <div className="flex items-end justify-between gap-3 mb-3 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Активность</p>
-            <h2 className="mt-1 text-lg font-bold text-foreground">Атлеты с тренировкой за 7 дней</h2>
+            <h2 className="mt-1 text-lg font-bold text-navy-500">Атлеты с тренировкой за 7 дней</h2>
           </div>
           <div className="text-right">
             <div className="pf-num text-4xl font-bold text-foreground leading-none">{snapshot.adherence_pct}%</div>
@@ -322,7 +322,7 @@ export default function OrgHealthPage() {
         <Card className="rounded-3xl p-5 md:p-6">
           <div className="mb-3">
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Загрузка тренеров</p>
-            <h2 className="mt-1 text-lg font-bold text-foreground">Кто сколько ведёт</h2>
+            <h2 className="mt-1 text-lg font-bold text-navy-500">Кто сколько ведёт</h2>
           </div>
           <div className="space-y-2">
             {snapshot.coach_utilization.slice(0, 8).map(c => (

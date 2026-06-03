@@ -161,7 +161,7 @@ export default function ChallengeDetailPage() {
                 {new Date(challenge.starts_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} — {new Date(challenge.ends_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
-            <h1 className="pf-num text-[30px] leading-tight text-foreground">{challenge.title}</h1>
+            <h1 className="pf-num text-[30px] leading-tight text-navy-500">{challenge.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="rounded-full bg-muted px-2 py-0.5 font-semibold">{METRIC_LABEL[challenge.metric]}</span>
               {challenge.activity_type && (
@@ -208,7 +208,7 @@ export default function ChallengeDetailPage() {
         <div className="mb-3 flex items-center justify-between">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Лидерборд</div>
-            <h3 className="pf-num mt-1 text-[20px] leading-none text-foreground">{METRIC_LABEL[challenge.metric]}</h3>
+            <h3 className="pf-num mt-1 text-[20px] leading-none text-navy-500">{METRIC_LABEL[challenge.metric]}</h3>
           </div>
         </div>
 

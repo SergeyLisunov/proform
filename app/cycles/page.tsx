@@ -535,7 +535,7 @@ function CyclesContent() {
               <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
                 Тренировочные циклы
               </span>
-              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-foreground leading-tight">
+              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-navy-500 leading-tight">
                 Периодизация
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">{periodLabel}</p>

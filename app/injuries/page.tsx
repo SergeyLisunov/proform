@@ -101,7 +101,7 @@ export default function InjuriesPage() {
               <i className="ki-filled ki-heart-circle text-[11px]" />
               Травмы
             </span>
-            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground mt-2">Журнал травм</h1>
+            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500 mt-2">Журнал травм</h1>
             <p className="max-w-2xl text-sm md:text-base text-muted-foreground mt-1">
               Запись, мониторинг и статус восстановления. Видно вашему тренеру и врачу.
             </p>

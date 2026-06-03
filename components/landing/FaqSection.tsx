@@ -70,7 +70,7 @@ export default function FaqSection() {
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
             Часто задают
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
             Вопросы перед подключением клуба
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
@@ -87,7 +87,7 @@ export default function FaqSection() {
               className="group rounded-2xl border border-border bg-white p-5 shadow-sm transition-all open:shadow-md"
             >
               <summary className="flex cursor-pointer items-start justify-between gap-3 list-none">
-                <h3 className="text-base font-bold leading-tight text-foreground">
+                <h3 className="text-base font-bold leading-tight text-navy-500">
                   <span className="mr-2 text-orange-600 font-normal">{String(idx + 1).padStart(2, '0')}.</span>
                   {item.q}
                 </h3>

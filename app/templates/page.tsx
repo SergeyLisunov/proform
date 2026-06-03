@@ -181,7 +181,7 @@ export default function TemplatesPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
               Шаблоны
             </div>
-            <h1 className="pf-num text-[32px] leading-none text-foreground">Библиотека тренировок</h1>
+            <h1 className="pf-num text-[32px] leading-none text-navy-500">Библиотека тренировок</h1>
             <p className="mt-2 max-w-[560px] text-sm text-muted-foreground">
               Сохраняйте любимые сессии, делитесь ими с публичной лентой или применяйте к календарю одной кнопкой.
             </p>
@@ -387,7 +387,7 @@ export default function TemplatesPage() {
             <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Применить шаблон
             </div>
-            <h3 className="mt-1 text-lg font-bold text-foreground">{applyFor.name}</h3>
+            <h3 className="mt-1 text-lg font-bold text-navy-500">{applyFor.name}</h3>
             {applyFor.duration_min && (
               <p className="text-xs text-muted-foreground">{applyFor.duration_min} мин</p>
             )}

@@ -434,7 +434,7 @@ export default function AdminPage() {
                   Системный контроль
                 </span>
               </div>
-              <h1 className="pf-num text-[clamp(2.2rem,4vw,3.9rem)] leading-[0.95] tracking-tight text-foreground">
+              <h1 className="pf-num text-[clamp(2.2rem,4vw,3.9rem)] leading-[0.95] tracking-tight text-navy-500">
                 Панель администратора
               </h1>
               <p className="mt-4 max-w-xl text-sm text-muted-foreground md:text-base">
@@ -505,7 +505,7 @@ export default function AdminPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Операционный центр</div>
-              <h2 className="mt-2 text-xl font-semibold text-foreground">Контроль ролей, журналов и системных контуров</h2>
+              <h2 className="mt-2 text-xl font-semibold text-navy-500">Контроль ролей, журналов и системных контуров</h2>
               <p className="mt-1 text-2sm text-muted-foreground">Переключайтесь между разделами без потери текущего admin-сценария.</p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2 lg:w-[420px]">
@@ -564,7 +564,7 @@ export default function AdminPage() {
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Управление пользователями</div>
-                      <h3 className="mt-2 text-lg font-semibold text-foreground">Роли, статусы и последние входы</h3>
+                      <h3 className="mt-2 text-lg font-semibold text-navy-500">Роли, статусы и последние входы</h3>
                     </div>
                     <button
                       onClick={() => setShowInviteModal(true)}
@@ -630,7 +630,7 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
                     <div>
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Приглашения</div>
-                      <h3 className="mt-2 text-lg font-semibold text-foreground">
+                      <h3 className="mt-2 text-lg font-semibold text-navy-500">
                         Отправленные приглашения
                         {invites.filter(i => i.status === 'pending').length > 0 && (
                           <span className="ml-2 pf-num text-sm text-orange-700">
@@ -704,7 +704,7 @@ export default function AdminPage() {
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
                   <div>
                     <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Верификация тренеров</div>
-                    <h3 className="mt-2 text-lg font-semibold text-foreground">Подтверждение личности и квалификации</h3>
+                    <h3 className="mt-2 text-lg font-semibold text-navy-500">Подтверждение личности и квалификации</h3>
                     <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
                       Включите бейдж только после проверки документов и опыта тренера.
                       Verified-бейдж отображается на профиле, в marketplace и других местах как сигнал доверия.
@@ -784,7 +784,7 @@ export default function AdminPage() {
               <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,2fr)]">
                 <div className="rounded-[26px] border border-border bg-background p-5">
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Контур приватности</div>
-                  <h3 className="mt-2 text-lg font-semibold text-foreground">Матрица доступа для athlete-профилей</h3>
+                  <h3 className="mt-2 text-lg font-semibold text-navy-500">Матрица доступа для athlete-профилей</h3>
                   <p className="mt-2 text-2sm text-muted-foreground">
                     Администратор видит и корректирует видимость профиля, дневника, тренировок и метрик без перехода в отдельные сервисы.
                   </p>
@@ -844,7 +844,7 @@ export default function AdminPage() {
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Журнал действий</div>
-                  <h3 className="mt-2 text-lg font-semibold text-foreground">Входы, изменения и чувствительные операции</h3>
+                  <h3 className="mt-2 text-lg font-semibold text-navy-500">Входы, изменения и чувствительные операции</h3>
                 </div>
                 <button
                   disabled
@@ -909,7 +909,7 @@ export default function AdminPage() {
             <div className="space-y-5">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Система</div>
-                <h3 className="mt-2 text-lg font-semibold text-foreground">Сервисы, политики и инфраструктурные контуры</h3>
+                <h3 className="mt-2 text-lg font-semibold text-navy-500">Сервисы, политики и инфраструктурные контуры</h3>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {SYSTEM_SERVICES.map(service => {
@@ -948,7 +948,7 @@ export default function AdminPage() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Приглашения</div>
-                <h3 className="pf-num mt-2 text-xl text-foreground">
+                <h3 className="pf-num mt-2 text-xl text-navy-500">
                   {inviteMode === 'bulk' ? 'Массовое приглашение' : 'Новый пользователь'}
                 </h3>
               </div>
@@ -1136,7 +1136,7 @@ export default function AdminPage() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Операции доступа</div>
-                <h3 className="pf-num mt-2 text-xl text-foreground">Назначить атлета тренеру</h3>
+                <h3 className="pf-num mt-2 text-xl text-navy-500">Назначить атлета тренеру</h3>
               </div>
               <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-sm" />

@@ -67,7 +67,7 @@ export default function PricingTeaserSection() {
           </p>
           <h2
             id="pricing-teaser-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Сейчас бесплатно. Без сюрпризов потом.
           </h2>
@@ -92,7 +92,7 @@ export default function PricingTeaserSection() {
                 >
                   <Icon size={22} strokeWidth={2} />
                 </div>
-                <h3 className="text-base font-bold text-foreground">{p.title}</h3>
+                <h3 className="text-base font-bold text-navy-500">{p.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {p.description}
                 </p>

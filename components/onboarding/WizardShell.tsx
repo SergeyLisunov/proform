@@ -70,7 +70,7 @@ export default function WizardShell({
               style={{ width: `${progressPct}%`, background: accentColor }} />
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-navy-500 leading-tight">
             {step.title}
           </h1>
           {step.description && (

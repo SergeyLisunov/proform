@@ -49,7 +49,7 @@ export default function PrivacyPage() {
       </div>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">1. Какие данные мы собираем</h2>
+        <h2 className="text-xl font-bold text-navy-500">1. Какие данные мы собираем</h2>
         <p className="mt-3 text-muted-foreground">
           Sporteo собирает только те данные, которые необходимы для работы
           платформы:
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">2. Цели обработки</h2>
+        <h2 className="text-xl font-bold text-navy-500">2. Цели обработки</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-6 text-muted-foreground">
           <li>Предоставление функциональности платформы (основная цель)</li>
           <li>Уведомления о действиях других пользователей в вашей организации</li>
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">3. Передача третьим сторонам</h2>
+        <h2 className="text-xl font-bold text-navy-500">3. Передача третьим сторонам</h2>
         <p className="mt-3 text-muted-foreground">
           Часть данных передаётся процессорам, без которых платформа не может
           работать:
@@ -143,7 +143,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">4. Срок хранения</h2>
+        <h2 className="text-xl font-bold text-navy-500">4. Срок хранения</h2>
         <p className="mt-3 text-muted-foreground">
           Данные хранятся в течение всего срока активности аккаунта. После запроса
           на удаление аккаунта данные удаляются в течение 30 календарных дней. Часть
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">5. Права пользователя (152-ФЗ)</h2>
+        <h2 className="text-xl font-bold text-navy-500">5. Права пользователя (152-ФЗ)</h2>
         <p className="mt-3 text-muted-foreground">
           В соответствии с Федеральным законом «О персональных данных» вы имеете
           право:
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">6. Безопасность данных</h2>
+        <h2 className="text-xl font-bold text-navy-500">6. Безопасность данных</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-6 text-muted-foreground">
           <li>Шифрование данных при передаче (TLS 1.2+) и хранении (at-rest)</li>
           <li>
@@ -198,7 +198,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">7. Cookies и хранение в браузере</h2>
+        <h2 className="text-xl font-bold text-navy-500">7. Cookies и хранение в браузере</h2>
         <p className="mt-3 text-muted-foreground">
           Платформа использует только необходимые и функциональные хранилища:
         </p>
@@ -219,7 +219,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">8. Изменения в политике</h2>
+        <h2 className="text-xl font-bold text-navy-500">8. Изменения в политике</h2>
         <p className="mt-3 text-muted-foreground">
           Существенные изменения в Политике публикуются на этой странице. Вы
           получите email-уведомление за 14 дней до вступления изменений в силу. До
@@ -229,7 +229,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-foreground">9. Контакты по вопросам обработки данных</h2>
+        <h2 className="text-xl font-bold text-navy-500">9. Контакты по вопросам обработки данных</h2>
         <p className="mt-3 text-muted-foreground">
           По любым вопросам, связанным с обработкой ваших персональных данных,
           пишите на{' '}

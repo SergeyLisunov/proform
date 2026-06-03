@@ -466,7 +466,7 @@ export function WorkoutAddDrawer({
             <Badge variant="primary" size="sm" className="font-bold uppercase tracking-[0.18em]">
               Быстрая тренировка
             </Badge>
-            <h3 className="mt-2 pf-num text-[26px] leading-none text-foreground">Добавить тренировку</h3>
+            <h3 className="mt-2 pf-num text-[26px] leading-none text-navy-500">Добавить тренировку</h3>
             <p className="mt-1.5 text-xs text-muted-foreground">
               Запись попадёт в дневник и календарь.
             </p>

@@ -282,7 +282,7 @@ export default function OrgMembersPage() {
               </span>
             </div>
             <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Участники</p>
-            <h2 className="mt-2 text-[clamp(2rem,4vw,3.35rem)] font-semibold tracking-[-0.04em] text-foreground">
+            <h2 className="mt-2 text-[clamp(2rem,4vw,3.35rem)] font-semibold tracking-[-0.04em] text-navy-500">
               Управляйте составом организации без лишнего шума
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
