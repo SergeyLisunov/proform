@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { Card, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 export const dynamic = 'force-dynamic'
 
@@ -226,7 +228,7 @@ export default async function AdminCommercePage() {
       </section>
 
       {/* Plan distribution */}
-      <section className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+      <Card className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Подписки</div>
@@ -269,11 +271,32 @@ export default async function AdminCommercePage() {
             )
           })}
         </div>
-      </section>
+      </Card>
+
+      {/* Plan distribution chart — derived from byPlan counts already in scope */}
+      {(byPlan.free + byPlan.pro + byPlan.team) > 0 && (
+        <ChartCard title="Доли тарифов" subtitle="Free / Pro / Team — активные подписки">
+          <ApexChart
+            type="donut"
+            height={260}
+            width="100%"
+            series={[byPlan.free, byPlan.pro, byPlan.team]}
+            options={{
+              labels: ['Free', 'Pro', 'Team'],
+              colors: ['#2563EB', '#F97316', '#9333EA'],
+              chart: { toolbar: { show: false }, animations: { enabled: true, speed: 600 } },
+              dataLabels: { enabled: false },
+              legend: { position: 'bottom' as const, fontSize: '11px', offsetY: 4 },
+              plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Подписки', fontSize: '11px', color: '#64748B' } } } } },
+              tooltip: { theme: 'light' },
+            }}
+          />
+        </ChartCard>
+      )}
 
       {/* Recent payments + invoices */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+        <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Платежи</div>
@@ -308,9 +331,9 @@ export default async function AdminCommercePage() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+        <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Счета</div>
@@ -344,7 +367,7 @@ export default async function AdminCommercePage() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       </section>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">

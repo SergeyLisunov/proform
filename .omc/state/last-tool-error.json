@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"git status --short | grep -v \\\"^??\\\" ; echo \\\"=== tsbuildinfo regenerated & gitignored? ===\\\" ; ls tsconfig.tsbuildinfo 2>/dev/null && git check-ignore tsconfig.tsbuildinfo && echo \\\"tscon...",
+  "error": "Exit code 1\n M app/admin/ab-tests/page.tsx\n M app/admin/commerce/page.tsx\n M app/admin/crm/page.tsx\n M app/admin/landing-ab/Calculator.tsx\n M app/admin/landing-ab/page.tsx\n M app/admin/leads/page.tsx\n M app/admin/onboarding-funnel/page.tsx\n M app/admin/orgs/page.tsx\n M app/admin/page.tsx\n M app/athlete/dashboard/page.tsx\n M app/athlete/goals/page.tsx\n M app/athlete/passes/page.tsx\n M app/athlete/progress/page.tsx\n M app/athletes/load/page.tsx\n M app/athletes/page.tsx\n M app/calendar/CalendarClie...",
+  "timestamp": "2026-06-03T13:23:53.965Z",
+  "retry_count": 1
+}

@@ -22,6 +22,7 @@ import {
   ACTIVITY_TYPE_PRESETS, ACTIVITY_LABELS, INTENSITY_META,
   type Intensity, type WorkoutPlanFull, type AthleteOption,
 } from '@/services/workout-plans.service'
+import { Card, Alert } from '@/components/ui/metronic'
 
 type Mode = 'create' | 'edit'
 
@@ -230,7 +231,7 @@ export default function PlanEditor({ mode, initial }: Props) {
       </div>
 
       {/* Header */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           <div className="md:col-span-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Название *</label>
@@ -267,10 +268,10 @@ export default function PlanEditor({ mode, initial }: Props) {
             </label>
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* Days grid */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
             <h2 className="text-lg font-bold text-foreground">Тренировки по дням</h2>
@@ -358,12 +359,10 @@ export default function PlanEditor({ mode, initial }: Props) {
             )
           })}
         </div>
-      </section>
+      </Card>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <Alert variant="destructive">{error}</Alert>
       )}
 
       {/* Actions */}
@@ -396,12 +395,9 @@ export default function PlanEditor({ mode, initial }: Props) {
             </div>
             <div className="px-5 py-5 space-y-4">
               {assignResult ? (
-                <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm">
-                  <p className="font-bold text-green-800">✅ План назначен</p>
-                  <p className="mt-1 text-green-700">
-                    Создано {assignResult.created} тренировок в календаре атлета.
-                  </p>
-                </div>
+                <Alert variant="success" title="План назначен">
+                  Создано {assignResult.created} тренировок в календаре атлета.
+                </Alert>
               ) : assignAthletes.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   У вас пока нет атлетов с принятой связью. Добавьте атлетов через /athletes или организацию.
@@ -420,11 +416,11 @@ export default function PlanEditor({ mode, initial }: Props) {
                     <input type="date" value={assignStartDate} onChange={e => setAssignStartDate(e.target.value)}
                       className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
                   </div>
-                  <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-blue-800">
+                  <Alert variant="info">
                     Будет создано <strong>{items.length}</strong> тренировок в календаре атлета, начиная с {new Date(assignStartDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}.
-                  </div>
+                  </Alert>
                   {assignError && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{assignError}</div>
+                    <Alert variant="destructive">{assignError}</Alert>
                   )}
                 </>
               )}

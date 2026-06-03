@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { getNewsletter, getNewsletterStats } from '@/services/newsletter.service'
 import type { Newsletter, NewsletterStats } from '@/types/org.types'
+import { Card, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 function formatDate(value: string | null, options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }) {
   if (!value) return '—'
@@ -121,7 +123,7 @@ export default function NewsletterStatsPage() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {STAT_CARDS.map(c => (
-          <div key={c.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <Card key={c.label} className="p-5 rounded-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{c.label}</div>
@@ -135,12 +137,36 @@ export default function NewsletterStatsPage() {
                 <i className={`ki-filled ${c.icon} text-base`} style={{ color: c.color }} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
+      <ChartCard title="Воронка доставки" subtitle="Отправлено → доставлено → открыто → ошибки" accent>
+        <ApexChart
+          type="bar"
+          options={{
+            chart: { toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
+            colors: STAT_CARDS.map(c => c.color),
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', distributed: true } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
+            xaxis: {
+              categories: STAT_CARDS.map(c => c.label),
+              labels: { style: { fontSize: '11px', colors: '#94A3B8' } },
+              axisBorder: { show: false }, axisTicks: { show: false },
+            },
+            yaxis: { labels: { style: { fontSize: '10px', colors: '#94A3B8' } } },
+            tooltip: { theme: 'light' },
+          }}
+          series={[{ name: 'Письма', data: STAT_CARDS.map(c => c.value) }]}
+          height={240}
+          width="100%"
+        />
+      </ChartCard>
+
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+        <Card className="rounded-3xl p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Доставляемость</div>
@@ -155,9 +181,9 @@ export default function NewsletterStatsPage() {
             />
           </div>
           <p className="mt-3 text-2sm text-muted-foreground">{stats?.delivered} из {stats?.sent} получателей получили письмо успешно.</p>
-        </div>
+        </Card>
 
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+        <Card className="rounded-3xl p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Открываемость</div>
@@ -172,10 +198,10 @@ export default function NewsletterStatsPage() {
             />
           </div>
           <p className="mt-3 text-2sm text-muted-foreground">{stats?.opened} из {stats?.delivered} доставленных писем были открыты.</p>
-        </div>
+        </Card>
       </section>
 
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+      <Card className="rounded-3xl p-5">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-700">
             Контент
@@ -186,7 +212,7 @@ export default function NewsletterStatsPage() {
         </div>
         <h3 className="text-base font-semibold text-foreground">Содержание рассылки</h3>
         <p className="mt-3 whitespace-pre-wrap text-2sm leading-relaxed text-muted-foreground">{newsletter.body}</p>
-      </section>
+      </Card>
     </div>
   )
 }

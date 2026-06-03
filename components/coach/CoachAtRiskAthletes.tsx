@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { computeCoachAthletesAcwr, ACWR_ZONE_META, type AthleteAcwr } from '@/services/acwr.service'
+import { Alert } from '@/components/ui/metronic'
 
 interface RiskRow {
   athleteId: string
@@ -128,15 +129,9 @@ export default function CoachAtRiskAthletes({ coachId }: { coachId: string }) {
   if (loading) return null
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50/40 p-4">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">✅</span>
-          <div>
-            <p className="text-sm font-bold text-foreground">Команда в норме</p>
-            <p className="text-[11px] text-muted-foreground">Никто не требует срочного внимания.</p>
-          </div>
-        </div>
-      </div>
+      <Alert variant="success" title="Команда в норме">
+        Никто не требует срочного внимания.
+      </Alert>
     )
   }
 

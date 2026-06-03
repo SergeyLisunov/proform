@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Card, Badge } from '@/components/ui/metronic'
 
 interface RosterRow {
   coach_id: string
@@ -75,14 +76,14 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5 rounded-2xl">
         <p className="text-sm font-bold mb-3">Загрузка тренеров…</p>
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-10 bg-muted rounded animate-pulse" />
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
@@ -103,7 +104,7 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
   const max = Math.max(...rows.map(r => r.athletes_count), 1)
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
           <h3 className="text-sm font-bold text-foreground">Загрузка тренеров</h3>
@@ -130,14 +131,14 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-semibold text-foreground truncate">{r.coach_name}</span>
                   {overloaded && (
-                    <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                    <Badge variant="destructive" size="sm" className="!rounded-full uppercase tracking-wider">
                       Перегружен
-                    </span>
+                    </Badge>
                   )}
                   {idle && (
-                    <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border border-slate-200">
+                    <Badge variant="secondary" size="sm" className="!rounded-full uppercase tracking-wider">
                       Без атлетов
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 <div className="mt-1 h-1.5 bg-muted rounded-full overflow-hidden">
@@ -156,6 +157,6 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }

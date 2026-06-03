@@ -13,6 +13,8 @@ import {
 } from '@/services/coach-diary.service'
 import { DIARY_TEMPLATES, type DiaryTemplate } from '@/lib/coach-diary/templates'
 import { DiaryHeatmap } from '@/components/coach/DiaryHeatmap'
+import { Card, Badge, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 type AthleteOpt = { id: string; name: string }
 
@@ -213,14 +215,42 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
             </button>
           )
         })}
-        <div className="rounded-xl border border-border bg-card p-3">
+        <Card className="p-3">
           <div className="flex items-center gap-2">
             <i className="ki-filled ki-calendar-tick text-lg text-muted-foreground" />
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Впереди</span>
           </div>
           <div className="pf-num text-2xl mt-1 text-foreground">{counts.upcoming}</div>
-        </div>
+        </Card>
       </div>
+
+      {/* Entry-type distribution — derived from counts already in scope */}
+      {counts.total > 0 && (
+        <ChartCard title="Записи по типам" subtitle={`Всего ${counts.total} за текущий фильтр`}>
+          <ApexChart
+            type="bar"
+            options={{
+              chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
+              colors: ENTRY_TYPES.map(t => ENTRY_TYPE_META[t].color),
+              plotOptions: { bar: { borderRadius: 4, columnWidth: '55%', distributed: true } },
+              grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
+              dataLabels: { enabled: false },
+              legend: { show: false },
+              stroke: { show: false },
+              xaxis: {
+                categories: ENTRY_TYPES.map(t => ENTRY_TYPE_META[t].label),
+                labels: { style: { fontSize: '10px', colors: '#94A3B8' } },
+                axisBorder: { show: false }, axisTicks: { show: false },
+              },
+              yaxis: { labels: { style: { fontSize: '10px', colors: '#94A3B8' } } },
+              tooltip: { theme: 'light' },
+            }}
+            series={[{ name: 'Записей', data: ENTRY_TYPES.map(t => counts.byType[t]) }]}
+            height={200}
+            width="100%"
+          />
+        </ChartCard>
+      )}
 
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap rounded-xl bg-muted/20 border border-border p-3">
@@ -389,9 +419,9 @@ function EntryCard({
               </span>
             )}
             {entry.category && (
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-border/60 text-muted-foreground">
+              <Badge variant="secondary" size="sm">
                 {CATEGORY_LABELS[entry.category]}
-              </span>
+              </Badge>
             )}
             {entry.calendar_event_id && (
               <Link href="/calendar"
@@ -401,10 +431,10 @@ function EntryCard({
               </Link>
             )}
             {entry.is_shared_with_athlete && (
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 inline-flex items-center gap-1">
+              <Badge variant="info" size="sm">
                 <i className="ki-filled ki-eye text-[10px]" />
                 Видит атлет
-              </span>
+              </Badge>
             )}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5">
@@ -485,9 +515,9 @@ function EntryCard({
       {entry.tags && entry.tags.length > 0 && (
         <div className="mt-3 flex items-center gap-1.5 flex-wrap">
           {entry.tags.map(t => (
-            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-accent border border-border text-muted-foreground">
+            <Badge key={t} variant="secondary" size="sm" className="font-medium">
               #{t}
-            </span>
+            </Badge>
           ))}
         </div>
       )}

@@ -7,6 +7,7 @@ import {
   setPrescribedCompletion,
   type PrescribedWorkout,
 } from '@/services/prescribed-workouts.service'
+import { Card, Badge } from '@/components/ui/metronic'
 
 function todayISO(): string { return new Date().toISOString().slice(0, 10) }
 function tomorrowISO(): string {
@@ -60,10 +61,10 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
 
   if (loading && rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <Card className="p-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground mb-2">План на ближайшие дни</p>
         <div className="h-12 flex items-center justify-center text-xs text-muted-foreground">Загрузка…</div>
-      </div>
+      </Card>
     )
   }
 
@@ -138,11 +139,9 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
                   </div>
                 ) : (
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                      status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'
-                    }`}>
+                    <Badge variant={status === 'completed' ? 'success' : 'secondary'} size="sm" className="uppercase tracking-wider">
                       {status === 'completed' ? '✓ Сделано' : 'Пропуск'}
-                    </span>
+                    </Badge>
                     {celebrateId === w.id && (
                       <Link href="/diary"
                         className="inline-flex items-center gap-1 rounded-md bg-green-500/10 text-green-700 px-2 py-0.5 text-[10px] font-semibold border border-green-200 hover:bg-green-500/20 animate-pulse"

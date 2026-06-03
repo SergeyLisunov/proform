@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { Card } from '@/components/ui/metronic'
 
 /**
  * Compact 12-week heatmap (à la GitHub contributions).
@@ -76,7 +77,7 @@ export function DiaryHeatmap({
   const total = Object.values(data).reduce((s, n) => s + n, 0)
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <Card className="p-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           Активность журнала · {weeks} нед
@@ -132,6 +133,6 @@ export function DiaryHeatmap({
         })}
         <span>больше</span>
       </div>
-    </div>
+    </Card>
   )
 }

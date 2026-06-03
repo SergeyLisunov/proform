@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { listOrgRecommendations, CATEGORY_META, SEVERITY_META, type OrgRecommendationView } from '@/services/recommendations.service'
 import { createClient } from '@/lib/supabase/client'
+import { Card, Badge } from '@/components/ui/metronic'
 
 export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
   const [recs, setRecs]       = useState<OrgRecommendationView[]>([])
@@ -45,14 +46,14 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5 rounded-2xl">
         <p className="text-sm font-bold mb-3">Загрузка рекомендаций…</p>
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-12 bg-muted rounded animate-pulse" />
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
@@ -104,17 +105,17 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
                     style={{ background: sev.bg, color: sev.color, border: `1px solid ${sev.border}` }}>
                     {sev.label}
                   </span>
-                  <span className="rounded-full px-1.5 py-[1px] text-[9px] font-semibold bg-slate-100 text-slate-600">
+                  <Badge variant="secondary" size="sm" className="!rounded-full !font-semibold">
                     {cat.label}
-                  </span>
+                  </Badge>
                   {r.acknowledged_by_coach_at ? (
-                    <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <Badge variant="success" size="sm" className="!rounded-full uppercase tracking-wider">
                       Тренер ack
-                    </span>
+                    </Badge>
                   ) : (
-                    <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                    <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
                       Не ack
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 {r.title ? (

@@ -20,6 +20,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { Card } from '@/components/ui/metronic'
 
 export const dynamic = 'force-dynamic'
 
@@ -349,7 +350,7 @@ export default async function OnboardingFunnelPage({
       </section>
 
       {/* W12 Day 61: drill-down table — filter by role + status, paginated */}
-      <section className="rounded-[26px] border border-border bg-card p-5 md:p-6 shadow-sm">
+      <Card className="p-5 md:p-6">
         <div className="flex items-end justify-between gap-3 flex-wrap mb-4">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Drill-down</p>
@@ -507,7 +508,7 @@ export default async function OnboardingFunnelPage({
             </div>
           </div>
         )}
-      </section>
+      </Card>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
         Funnel выведен из <code className="rounded bg-muted px-1 py-0.5">users.onboarding_state</code> JSONB
@@ -521,11 +522,11 @@ export default async function OnboardingFunnelPage({
 
 function KpiTile({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+    <Card className="p-5">
       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <div className="pf-num mt-2 text-3xl leading-tight text-foreground">{value}</div>
       <div className="mt-2 text-2xs text-muted-foreground">{hint}</div>
-    </div>
+    </Card>
   )
 }
 

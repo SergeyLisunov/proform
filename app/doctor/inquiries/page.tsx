@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { Alert } from '@/components/ui/metronic'
 import {
   listMyDoctorInquiries, respondToInquiry,
   QUESTION_TYPE_META, URGENCY_META, STATUS_META,
@@ -269,7 +270,7 @@ export default function DoctorInquiriesPage() {
                             className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400" />
                         </label>
                         {convertError && (
-                          <div className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs text-red-700">{convertError}</div>
+                          <Alert variant="destructive">{convertError}</Alert>
                         )}
                         <div className="flex items-center gap-2 pt-1">
                           <button onClick={() => handleConvert(i.id)} disabled={convertBusy}

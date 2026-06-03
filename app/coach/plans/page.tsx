@@ -12,6 +12,7 @@ import {
   listMyPlans, archivePlan, ACTIVITY_LABELS,
   type WorkoutPlan,
 } from '@/services/workout-plans.service'
+import { Card, Badge } from '@/components/ui/metronic'
 
 export default function CoachPlansPage() {
   const { user, loading: userLoading } = useUser()
@@ -98,28 +99,28 @@ export default function CoachPlansPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map(p => (
-            <div key={p.id} className="rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-orange-200 relative group">
+            <Card key={p.id} className="p-5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-orange-200 relative group">
               <Link href={`/coach/plans/${p.id}`} className="block no-underline">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h3 className="text-base font-bold text-foreground line-clamp-2 group-hover:text-orange-700 transition-colors">{p.name}</h3>
                   {p.is_public && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 shrink-0">
+                    <Badge variant="info" size="sm" className="uppercase tracking-wider shrink-0">
                       Public
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 {p.description && (
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{p.description}</p>
                 )}
-                <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {p.sport && (
-                    <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5">
+                    <Badge variant="warning" size="sm" className="uppercase tracking-wider">
                       {ACTIVITY_LABELS[p.sport] ?? p.sport}
-                    </span>
+                    </Badge>
                   )}
-                  <span className="rounded-full bg-violet-50 text-violet-700 border border-violet-200 px-2 py-0.5">
+                  <Badge variant="secondary" size="sm" className="uppercase tracking-wider bg-violet-50 text-violet-700">
                     {p.duration_weeks} {p.duration_weeks === 1 ? 'неделя' : p.duration_weeks < 5 ? 'недели' : 'недель'}
-                  </span>
+                  </Badge>
                 </div>
                 <div className="mt-3 pt-3 border-t border-border text-[11px] text-muted-foreground">
                   Обновлено {new Date(p.updated_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
@@ -132,7 +133,7 @@ export default function CoachPlansPage() {
                 title="Архивировать">
                 <i className="ki-filled ki-archive text-xs" />
               </button>
-            </div>
+            </Card>
           ))}
         </div>
       )}

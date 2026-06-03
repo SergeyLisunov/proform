@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Card } from '@/components/ui/metronic'
 
 type Session = {
   id: string
@@ -65,10 +66,10 @@ export default function CoachTodaySchedule({ coachId }: { coachId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <Card className="p-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground mb-2">Сегодня и завтра</p>
         <div className="h-12 flex items-center justify-center text-xs text-muted-foreground">Загрузка…</div>
-      </div>
+      </Card>
     )
   }
 

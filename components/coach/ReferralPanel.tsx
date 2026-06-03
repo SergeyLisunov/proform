@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getMyReferralStats, type ReferralStats } from '@/services/referrals.service'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
+import { Card } from '@/components/ui/metronic'
 
 /**
  * Панель «Приглашай и получай Pro» для дашборда тренера.
@@ -45,18 +46,18 @@ export default function ReferralPanel({
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl border border-border bg-white p-3">
+        <Card className="p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Получено месяцев Pro</div>
           <div className="pf-num text-2xl mt-1 text-orange-600">{stats?.total_months ?? 0}</div>
-        </div>
-        <div className="rounded-xl border border-border bg-white p-3">
+        </Card>
+        <Card className="p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Приняли приглашение</div>
           <div className="pf-num text-2xl mt-1 text-green-600">{stats?.claimed_count ?? 0}</div>
-        </div>
-        <div className="rounded-xl border border-border bg-white p-3">
+        </Card>
+        <Card className="p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ожидают ответа</div>
           <div className="pf-num text-2xl mt-1 text-slate-600">{stats?.pending_count ?? 0}</div>
-        </div>
+        </Card>
       </div>
 
       {stats && stats.credits.length > 0 && (

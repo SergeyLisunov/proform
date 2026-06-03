@@ -17,20 +17,21 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
+import { Card, Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
 import type { Database } from '@/types/database'
 
 type SubRow = Database['public']['Tables']['subscriptions']['Row']
 type TariffRow = Database['public']['Tables']['tariffs']['Row']
 
-const STATUS_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  trialing:      { label: 'Trial-период',     color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC' },
-  trial:         { label: 'Trial-период',     color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC' },
-  active:        { label: 'Активна',          color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-  past_due:      { label: 'Просрочена',       color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
-  cancelled:     { label: 'Отменена',         color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
-  expired:       { label: 'Истекла',          color: '#94A3B8', bg: '#F8FAFC', border: '#E2E8F0' },
-  blocked:       { label: 'Заблокирована',    color: '#7F1D1D', bg: '#FEE2E2', border: '#FCA5A5' },
-  manual_review: { label: 'Ручная проверка',  color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+const STATUS_META: Record<string, { label: string; variant: BadgeVariant }> = {
+  trialing:      { label: 'Trial-период',     variant: 'info' },
+  trial:         { label: 'Trial-период',     variant: 'info' },
+  active:        { label: 'Активна',          variant: 'success' },
+  past_due:      { label: 'Просрочена',       variant: 'destructive' },
+  cancelled:     { label: 'Отменена',         variant: 'secondary' },
+  expired:       { label: 'Истекла',          variant: 'secondary' },
+  blocked:       { label: 'Заблокирована',    variant: 'destructive' },
+  manual_review: { label: 'Ручная проверка',  variant: 'primary' },
 }
 
 function getSb() {
@@ -133,29 +134,26 @@ export default function BillingPage() {
       </div>
 
       {msg && (
-        <div className={`rounded-xl border px-4 py-3 text-sm ${
-          msg.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'
-        }`}>
-          <i className={`ki-filled ${msg.ok ? 'ki-check-circle' : 'ki-shield-cross'} mr-2`} />
+        <Alert variant={msg.ok ? 'success' : 'destructive'}
+          icon={msg.ok ? 'ki-check-circle' : 'ki-shield-cross'}>
           {msg.text}
-        </div>
+        </Alert>
       )}
 
       {/* Current plan card */}
-      <section className="rounded-2xl border border-border bg-card p-6">
+      <Card className="p-6">
         <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
           <div>
             <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Текущий тариф</div>
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-xl font-bold text-foreground">{tariff?.name ?? 'Free'}</h2>
-              <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                style={{ background: statusMeta.bg, color: statusMeta.color, border: `1px solid ${statusMeta.border}` }}>
+              <Badge variant={statusMeta.variant} size="sm" className="uppercase tracking-wider">
                 {statusMeta.label}
-              </span>
+              </Badge>
               {sub?.cancel_at_period_end && (
-                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                <Badge variant="warning" size="sm" className="uppercase tracking-wider">
                   Будет отменена
-                </span>
+                </Badge>
               )}
             </div>
           </div>
@@ -197,11 +195,11 @@ export default function BillingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Card>
 
       {/* Cancel / Reactivate */}
       {sub && tariff && tariff.price_cents > 0 && (
-        <section className="rounded-2xl border border-border bg-card p-6">
+        <Card className="p-6">
           {sub.cancel_at_period_end ? (
             <>
               <div className="flex items-start gap-3 mb-3">
@@ -232,7 +230,7 @@ export default function BillingPage() {
               </button>
             </>
           )}
-        </section>
+        </Card>
       )}
 
       {/* Free tier upgrade prompt */}

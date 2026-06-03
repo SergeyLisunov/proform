@@ -5,6 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import RoleProfile from '@/components/settings/RoleProfile'
 import DevicesSection from '@/components/settings/DevicesSection'
+import { Alert } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
@@ -988,16 +989,11 @@ export default function SettingsPage() {
                   onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
               </div>
             </Field>
-            <div style={{
-              marginTop: 16, padding: '14px 16px', borderRadius: 14,
-              background: '#EFF6FF', border: '1px solid #BFDBFE',
-              display: 'flex', alignItems: 'flex-start', gap: 10,
-            }}>
-              <i className="ki-filled ki-information-5" style={{ color: '#2563EB', flexShrink: 0, marginTop: 1 }} />
-              <div style={{ fontSize: 12, color: '#1D4ED8', lineHeight: 1.5 }}>
+            <div style={{ marginTop: 16 }}>
+              <Alert variant="info">
                 Если ваша организация зарегистрирована в ProForm, вы можете получить приглашение и автоматически
                 привязаться к ней. Обратитесь к администратору организации.
-              </div>
+              </Alert>
             </div>
           </Card>
         </div>
@@ -1093,16 +1089,10 @@ export default function SettingsPage() {
 
           <Card>
             <SectionHeader icon="ki-eye" color="#0284C7" title="Доступ тренера" />
-            <div style={{ padding: '14px 16px', borderRadius: 14, background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <i className="ki-filled ki-verify text-sm" style={{ color: '#16A34A' }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>Тренер имеет доступ</span>
-              </div>
-              <p style={{ fontSize: 12, color: '#166534', margin: 0, lineHeight: 1.5 }}>
-                Если вы добавлены в программу тренера, он видит ваши тренировки и может оставлять комментарии.
-                Вы можете отозвать доступ в настройках тренера.
-              </p>
-            </div>
+            <Alert variant="success" icon="ki-verify" title="Тренер имеет доступ">
+              Если вы добавлены в программу тренера, он видит ваши тренировки и может оставлять комментарии.
+              Вы можете отозвать доступ в настройках тренера.
+            </Alert>
           </Card>
 
           <Card style={{ background: 'var(--accent)' }}>

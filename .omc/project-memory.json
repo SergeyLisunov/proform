@@ -1,0 +1,551 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780422781931,
+  "projectRoot": "/Users/sergeylisunov/proform",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.6",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "@playwright/test",
+        "version": "1.59.1",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev --webpack",
+      "build": "next build --webpack",
+      "start": "next start",
+      "lint": "eslint .",
+      "lint:dead": "knip --no-progress",
+      "test:e2e": "playwright test",
+      "test:e2e:install": "playwright install --with-deps chromium",
+      "test:e2e:ui": "playwright test --ui",
+      "lint:duplicates": "bash scripts/audit-duplicate-exports.sh",
+      "analyze": "ANALYZE=true next build --webpack",
+      "check:bundle": "node scripts/bundle-budget-check.mjs",
+      "audit:screenshots": "node scripts/audit-landing.mjs",
+      "prepare": "husky"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "docs",
+      "lib",
+      "public",
+      "scripts",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [
+    {
+      "timestamp": 1779963244029,
+      "source": "manual",
+      "category": "build",
+      "content": "W19 TS-debt fix recipe (deferred from W18 Day 99). GitHub Actions \"TypeScript & Security Review\" check fails on every PR (non-blocking — Vercel deploy is real gate, next.config.mjs:19 ignoreBuildErrors:true masks it in build). Root cause: types/database.types.ts is stale — missing tables/columns from migrations 071 (coach_reviews), 072 (users.is_verified), 074 (admin_user_invites). Concrete failing files: services/admin-invites.service.ts (L36-41 deep instantiation + status not assignable), app/api/users/[id]/route.ts (L41 is_verified missing, L61 spread), services/admin-verifications.service.ts, services/coach-reviews.service.ts. Fix in one session: (1) npx supabase gen types typescript --project-id hhyjihbctidtucvpgjzv --schema public > types/database.types.ts, (2) tsc --noEmit to see remainder, (3) flip next.config.mjs ignoreBuildErrors:true → false. Closes W19 candidate \"TypeScript build errors enabled\"."
+    },
+    {
+      "timestamp": 1779968467823,
+      "source": "manual",
+      "category": "deploy",
+      "content": "W20 headline — Next.js upgrade (deferred from W19 Day 4). CRITICAL: 14.2.35 is the LAST 14.x release (line is EOL for security). 14 runtime Next.js advisories unpatched on 14.x — DoS via Image Optimizer remotePatterns (app uses it), HTTP request smuggling in rewrites (app uses redirects()), middleware cache-poisoning (app has middleware), XSS in App Router CSP nonces, SSRF via WebSocket upgrades, RSC cache poisoning. Fixes only in 15.x/16.x. Breaking surface assessed: (1) React 18.3.1→19 required; (2) async params/searchParams — only 5 SERVER components need migration: app/athletes/[id]/page.tsx, app/admin/onboarding-funnel/page.tsx, app/admin/leads/page.tsx, app/share/workout/[token]/page.tsx, app/p/[nickname]/page.tsx (other 14 are client components using useParams() — unaffected); (3) cookies() — 1 call site, already awaited; (4) @supabase/ssr 0.10.0 — verify Next 15 compat. Recommended path: Next 15 first (1 major, 15.3.9 or backport 15.5.18), codemod `npx @next/codemod upgrade`, then 16 separately if needed. npm audit recommends 16.2.6 to clear ALL 14 advisories but 15.x clears the bulk. Now next.config has ignoreBuildErrors:false so upgrade build errors will surface immediately."
+    }
+  ],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 8,
+      "lastAccessed": 1780422781880,
+      "keyFiles": [
+        "error.tsx",
+        "globals.css",
+        "layout.tsx",
+        "not-found.tsx",
+        "opengraph-image.tsx"
+      ]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1780422781883,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 9,
+      "lastAccessed": 1780422781884,
+      "keyFiles": [
+        "DB_SCHEMA_REALITY.md",
+        "bundle-budget.md",
+        "conversion-events.md",
+        "husky-setup.md",
+        "landing-audit-procedure.md"
+      ]
+    },
+    "hooks": {
+      "path": "hooks",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1780422781884,
+      "keyFiles": [
+        "useDictation.ts"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 0,
+      "lastAccessed": 1780422781884,
+      "keyFiles": []
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 0,
+      "lastAccessed": 1780422781884,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 5,
+      "lastAccessed": 1780422781884,
+      "keyFiles": [
+        "audit-duplicate-exports.sh",
+        "audit-landing.mjs",
+        "bundle-budget-check.mjs",
+        "setup-stripe-env.sh",
+        "sprint-wrap-check.sh"
+      ]
+    },
+    "services": {
+      "path": "services",
+      "purpose": "Business logic services",
+      "fileCount": 43,
+      "lastAccessed": 1780422781885,
+      "keyFiles": [
+        "acwr.service.ts",
+        "adherence-nudge.service.ts",
+        "admin-invites.service.ts",
+        "admin-leads.service.ts",
+        "admin-verifications.service.ts"
+      ]
+    },
+    "supabase": {
+      "path": "supabase",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1780422781885,
+      "keyFiles": []
+    },
+    "test-results": {
+      "path": "test-results",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1780422781886,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1780422781886,
+      "keyFiles": []
+    },
+    "types": {
+      "path": "types",
+      "purpose": "Type definitions",
+      "fileCount": 3,
+      "lastAccessed": 1780422781886,
+      "keyFiles": [
+        "database.ts",
+        "org.types.ts",
+        "users.ts"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1780422781886,
+      "keyFiles": []
+    },
+    "public/assets": {
+      "path": "public/assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1780422781887,
+      "keyFiles": []
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 70,
+      "lastAccessed": 1780422781888,
+      "keyFiles": [
+        "009_cycle_blocks.sql",
+        "010_workout_comments.sql",
+        "011_workout_shares.sql"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "app/analytics/AnalyticsCharts.tsx",
+      "accessCount": 14,
+      "lastAccessed": 1780491412175,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/Card.tsx",
+      "accessCount": 14,
+      "lastAccessed": 1780492925570,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/Badge.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1780492926982,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/Alert.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1780492927453,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/ChartCard.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1780492927682,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/Accordion.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1780492926489,
+      "type": "file"
+    },
+    {
+      "path": "components/settings/DevicesSection.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1780491100613,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/metronic/index.ts",
+      "accessCount": 8,
+      "lastAccessed": 1780492925097,
+      "type": "file"
+    },
+    {
+      "path": "app/athlete/progress/page.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780491121777,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/plans/PlanEditor.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780491293692,
+      "type": "file"
+    },
+    {
+      "path": "components/charts/ApexChart.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780491294608,
+      "type": "file"
+    },
+    {
+      "path": "app/athlete/dashboard/page.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780491067246,
+      "type": "file"
+    },
+    {
+      "path": "app/athlete/passes/page.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780491211258,
+      "type": "file"
+    },
+    {
+      "path": "components/doctor/DoctorActiveInjuries.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491032180,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/services/page.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491150438,
+      "type": "file"
+    },
+    {
+      "path": "app/athlete/goals/page.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491157606,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/pass-plans/page.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491185475,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/inquiries/page.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491218049,
+      "type": "file"
+    },
+    {
+      "path": "components/profile/AthleteMedicalDossier.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491335114,
+      "type": "file"
+    },
+    {
+      "path": "components/profile/CoachReviewsBlock.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1780491368329,
+      "type": "file"
+    },
+    {
+      "path": "app/doctor/report/[athleteId]/page.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780491078554,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/passes/page.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780491242392,
+      "type": "file"
+    },
+    {
+      "path": "app/coach/plans/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780491034720,
+      "type": "file"
+    },
+    {
+      "path": "components/doctor/DoctorTodayCheckups.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780491049562,
+      "type": "file"
+    },
+    {
+      "path": "app/doctor/inquiries/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780491099199,
+      "type": "file"
+    },
+    {
+      "path": "components/doctor/RecommendationForm.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780491116571,
+      "type": "file"
+    },
+    {
+      "path": "components/medical/AskDoctorButton.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780491131250,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/083_fix_connection_notify_phantom_name.sql",
+      "accessCount": 1,
+      "lastAccessed": 1780429285158,
+      "type": "file"
+    },
+    {
+      "path": "services/notifications.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780429420562,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/084_drop_stale_notifications_type_check.sql",
+      "accessCount": 1,
+      "lastAccessed": 1780429617446,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/085_sync_trainer_athletes_from_connections.sql",
+      "accessCount": 1,
+      "lastAccessed": 1780472883393,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/081_can_notify_function.sql",
+      "accessCount": 1,
+      "lastAccessed": 1780474534451,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/086_can_notify_care_team_predicate.sql",
+      "accessCount": 1,
+      "lastAccessed": 1780474629271,
+      "type": "file"
+    },
+    {
+      "path": "app/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780489746472,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/StatCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490016775,
+      "type": "file"
+    },
+    {
+      "path": "app/globals.css",
+      "accessCount": 1,
+      "lastAccessed": 1780490132332,
+      "type": "file"
+    },
+    {
+      "path": "app/cycles/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490966007,
+      "type": "file"
+    },
+    {
+      "path": "app/diary/DiaryClient.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490966195,
+      "type": "file"
+    },
+    {
+      "path": "app/doctor/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490966251,
+      "type": "file"
+    },
+    {
+      "path": "app/notes/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490966829,
+      "type": "file"
+    },
+    {
+      "path": "app/doctor/reports/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490967289,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/AiCoachCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490967425,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/AnomalyAlertCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490967912,
+      "type": "file"
+    },
+    {
+      "path": "components/doctor/DoctorHeroBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490968790,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/CoachBriefingCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490969032,
+      "type": "file"
+    },
+    {
+      "path": "components/doctor/DoctorQuickActions.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490969490,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/RecoveryTrendWidget.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490969711,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/TrainingLoadWidget.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490970057,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/WeeklyInsightsCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490970813,
+      "type": "file"
+    },
+    {
+      "path": "components/widgets/WeeklyPlannerCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780490970916,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

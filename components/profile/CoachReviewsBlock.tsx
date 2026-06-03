@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { Card, Badge } from '@/components/ui/metronic'
 import {
   listReviewsForCoach, getMyReviewForCoach, upsertReview, deleteMyReview,
   replyToReview,
@@ -178,12 +179,14 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
   const count = summary?.review_count ?? computedCount
 
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
+    <Card className="p-5">
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
         <div>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8, display: 'inline-block', background: '#FEF3C7', padding: '3px 10px', borderRadius: 99 }}>
-            Отзывы атлетов
-          </p>
+          <div style={{ marginBottom: 8 }}>
+            <Badge variant="warning" size="sm" className="uppercase tracking-wider">
+              Отзывы атлетов
+            </Badge>
+          </div>
           {avg !== null && count > 0 ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span className="pf-num" style={{ fontSize: 32, fontWeight: 800, color: 'var(--foreground)', lineHeight: 1 }}>{avg.toFixed(1)}</span>
@@ -449,7 +452,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
           {toast.msg}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 

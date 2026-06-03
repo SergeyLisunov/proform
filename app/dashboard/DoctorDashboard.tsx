@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
+import { Card } from '@/components/ui/metronic'
 
 const DoctorHeroBar         = dynamic(() => import('@/components/doctor/DoctorHeroBar'),         { ssr: false })
 const DoctorQuickActions    = dynamic(() => import('@/components/doctor/DoctorQuickActions'),    { ssr: false })
@@ -167,7 +168,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
           <DoctorTodayCheckups doctorId={userId} />
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Лента</p>
@@ -207,11 +208,11 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* 5. PATIENTS */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Подопечные</p>
@@ -283,7 +284,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
             ))}
           </div>
         )}
-      </section>
+      </Card>
     </div>
   )
 }

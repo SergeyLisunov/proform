@@ -6,6 +6,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { getMyOrg } from '@/services/org.service'
 import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewsletter } from '@/services/newsletter.service'
 import type { Organization, Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
+import { Card, Badge, Alert } from '@/components/ui/metronic'
 
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
   draft: {
@@ -221,7 +222,7 @@ export default function OrgNewslettersPage() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summary.map((item) => (
-          <div key={item.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <Card key={item.label} className="p-5 rounded-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{item.label}</div>
@@ -232,7 +233,7 @@ export default function OrgNewslettersPage() {
                 <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
@@ -256,7 +257,7 @@ export default function OrgNewslettersPage() {
           emptyMsg: 'Отправленных рассылок пока нет',
         },
       ].map(section => (
-        <section key={section.title} className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-sm">
+        <Card key={section.title} className="rounded-3xl p-4 md:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{section.title}</div>
@@ -285,7 +286,7 @@ export default function OrgNewslettersPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {section.items.map(nl => (
-                <div key={nl.id} className="rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm">
+                <Card key={nl.id} className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-sm">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="mb-2 flex items-center gap-2 flex-wrap">
@@ -323,14 +324,13 @@ export default function OrgNewslettersPage() {
                     </div>
                   </div>
                   {sendResult?.id === nl.id && (
-                    <div className={`mt-3 rounded-xl border px-3 py-2 text-xs font-semibold ${
-                      sendResult.ok
-                        ? 'border-green-200 bg-green-50 text-green-700'
-                        : 'border-red-200 bg-red-50 text-red-700'
-                    }`}>
-                      <i className={`ki-filled ${sendResult.ok ? 'ki-check-circle' : 'ki-shield-cross'} text-sm mr-1.5`} />
+                    <Alert
+                      variant={sendResult.ok ? 'success' : 'destructive'}
+                      icon={sendResult.ok ? 'ki-check-circle' : 'ki-shield-cross'}
+                      className="mt-3"
+                    >
                       {sendResult.message}
-                    </div>
+                    </Alert>
                   )}
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
                     <span className="text-2xs text-muted-foreground">
@@ -347,11 +347,11 @@ export default function OrgNewslettersPage() {
                       <i className={`ki-filled ${STATUS_META[nl.status].icon} text-xs`} style={{ color: STATUS_META[nl.status].accent }} />
                     </span>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}
-        </section>
+        </Card>
       ))}
 
       {showCreate && (
@@ -426,9 +426,9 @@ export default function OrgNewslettersPage() {
                 />
                 <p className="mt-1 text-2xs text-muted-foreground">Если дата не задана, рассылку можно сохранить черновиком или отправить сразу.</p>
               </div>
-              <div className="rounded-2xl border border-violet-100 bg-violet-50/70 px-4 py-3 text-2sm text-muted-foreground">
+              <Alert variant="info">
                 Отправленная рассылка появится в разделе завершенных коммуникаций, а для нее станет доступна статистика доставляемости и открытий.
-              </div>
+              </Alert>
               <div className="flex flex-wrap gap-2 pt-1">
                 <button
                   onClick={() => handleSave('draft')}

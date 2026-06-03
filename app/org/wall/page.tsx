@@ -7,6 +7,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import { getMyOrg } from '@/services/org.service'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
 import type { Organization, WallPost, PostType, PostVisibility } from '@/types/org.types'
+import { Card, Alert } from '@/components/ui/metronic'
 
 const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: string; accent: string; panel: string }> = {
   announcement: {
@@ -225,7 +226,7 @@ export default function OrgWallPage() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summary.map((item) => (
-          <div key={item.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <Card key={item.label} className="p-5 rounded-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{item.label}</div>
@@ -236,7 +237,7 @@ export default function OrgWallPage() {
                 <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
@@ -270,7 +271,7 @@ export default function OrgWallPage() {
         </section>
       )}
 
-      <section className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-sm">
+      <Card className="rounded-3xl p-4 md:p-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Все публикации</div>
@@ -302,7 +303,7 @@ export default function OrgWallPage() {
             {feed.map(p => <PostCard key={p.id} post={p} onPin={() => handleTogglePin(p)} onDelete={() => handleDelete(p.id)} />)}
           </div>
         )}
-      </section>
+      </Card>
 
       {showCreate && (
         <div
@@ -387,9 +388,9 @@ export default function OrgWallPage() {
                   </div>
                 )}
 
-                <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-2sm text-muted-foreground">
+                <Alert variant="primary">
                   Публикация появится на стене сразу после сохранения. Закрепить ее при необходимости можно уже из списка публикаций.
-                </div>
+                </Alert>
 
                 <div className="flex gap-2 pt-1">
                   <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F97316,#EA580C)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] disabled:opacity-60">
@@ -413,10 +414,10 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
   const visibilityMeta = VISIBILITY_META[post.visible_to]
 
   return (
-    <div className={`rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm ${
+    <Card className={`p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-sm ${
       pinnedStyle
-        ? 'border-orange-100 bg-white shadow-[0_12px_28px_rgba(249,115,22,0.08)]'
-        : 'border-border bg-card'
+        ? '!border-orange-100 !bg-white shadow-[0_12px_28px_rgba(249,115,22,0.08)]'
+        : ''
     }`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
@@ -470,6 +471,6 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
           <i className={`ki-filled ${typeMeta.icon} text-xs`} style={{ color: typeMeta.accent }} />
         </span>
       </div>
-    </div>
+    </Card>
   )
 }

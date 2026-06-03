@@ -15,6 +15,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Card, Alert } from '@/components/ui/metronic'
 import {
   listLeadsWithUserInfo,
   getFunnelStats,
@@ -61,15 +62,13 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
   if (!meRow || meRow.role !== 'admin') {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="rounded-3xl border-2 border-red-200 bg-red-50 px-6 py-12 text-center">
-          <i className="ki-filled ki-shield-cross text-4xl text-red-500 mb-3 block" />
-          <h2 className="text-lg font-semibold text-red-900">Access denied</h2>
-          <p className="mt-2 text-sm text-red-700">Только пользователи с ролью <code>admin</code> могут видеть эту страницу.</p>
+        <Alert variant="destructive" icon="ki-shield-cross" title="Access denied">
+          <p>Только пользователи с ролью <code>admin</code> могут видеть эту страницу.</p>
           <Link href="/dashboard"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 text-sm font-bold no-underline">
             ← На главную
           </Link>
-        </div>
+        </Alert>
       </div>
     )
   }
@@ -132,7 +131,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       </div>
 
       {/* Funnel by source */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <h2 className="text-base font-bold text-foreground mb-3">Funnel по source</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -185,10 +184,10 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
 
       {/* Filters */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <h2 className="text-base font-bold text-foreground mb-3">Список leads</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           <FilterChip href="/admin/leads"           label="Все sources"       active={!filterSource} />
@@ -294,20 +293,19 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
             )}
           </>
         )}
-      </section>
+      </Card>
 
       {/* Cron info */}
-      <section className="rounded-2xl border border-blue-200 bg-blue-50/40 p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-blue-800 mb-2">⚙️ Auto-drip cron</h3>
-        <p className="text-sm text-slate-700 leading-relaxed">
+      <Alert variant="info" title="⚙️ Auto-drip cron">
+        <p className="leading-relaxed">
           <code>GET /api/cron/leads-digest</code> запускается еженедельно (Monday 8am UTC) через Vercel cron.
           Обрабатывает до {50} pending leads за раз, отправляет drip emails по 4 W4 sources (team-risk / adaptive-plan / club-audit / medical-summary),
           marks email_dispatched_at. Failed leads retry до 3 раз. После 3 attempts помечаются как Failed и больше не отправляются.
         </p>
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="mt-2">
           Manual trigger требует <code>CRON_SECRET</code> в Bearer header (только admin доступа).
         </p>
-      </section>
+      </Alert>
     </div>
   )
 }
@@ -316,13 +314,13 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
 
 function CounterTile({ label, value, color, subtitle }: { label: string; value: number; color: string; subtitle?: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <Card className="p-4">
       <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="pf-num text-2xl font-bold mt-1" style={{ color }}>{value}</div>
       {subtitle && (
         <div className="text-[10px] font-semibold mt-0.5" style={{ color }}>{subtitle}</div>
       )}
-    </div>
+    </Card>
   )
 }
 

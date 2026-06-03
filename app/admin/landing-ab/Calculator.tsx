@@ -16,6 +16,7 @@
 
 import { useMemo, useState } from 'react'
 import { pooledZTest } from '@/lib/stats/ztest'
+import { Card } from '@/components/ui/metronic'
 
 interface VariantInputs {
   visitors:    number
@@ -128,7 +129,7 @@ export default function Calculator() {
   }, [a, b, result])
 
   return (
-    <section className="rounded-3xl border border-border bg-card p-6">
+    <Card className="p-6">
       <h2 className="text-xl font-bold text-foreground">Z-test калькулятор</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Введите visitors и conversions для каждого варианта из{' '}
@@ -191,6 +192,6 @@ export default function Calculator() {
           </div>
         </div>
       )}
-    </section>
+    </Card>
   )
 }

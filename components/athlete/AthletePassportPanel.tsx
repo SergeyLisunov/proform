@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Alert } from '@/components/ui/metronic'
 
 /**
  * Виджет на дашборде атлета: управление публичностью «Паспорта атлета»
@@ -65,16 +66,15 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
 
   if (!nickname) {
     return (
-      <div className="rounded-2xl border border-orange-200 bg-orange-50/50 p-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-700">Паспорт атлета</p>
-        <p className="text-sm text-foreground mt-1">
+      <Alert variant="primary" title="Паспорт атлета" icon="ki-information-2">
+        <p>
           Чтобы получить публичную ссылку <code className="font-mono bg-white px-1 rounded">/p/nickname</code>,
           задайте никнейм в настройках.
         </p>
         <Link href="/settings" className="mt-3 inline-block text-sm font-semibold text-orange-600 hover:underline">
           Настроить никнейм →
         </Link>
-      </div>
+      </Alert>
     )
   }
 

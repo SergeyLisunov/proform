@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
+import { Card, Alert } from '@/components/ui/metronic'
 
 const OrgHeroBar       = dynamic(() => import('@/components/organization/OrgHeroBar'),       { ssr: false })
 const OrgQuickActions  = dynamic(() => import('@/components/organization/OrgQuickActions'),  { ssr: false })
@@ -85,7 +86,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
           <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Панель организации</p>
           <h2 className="pf-num text-3xl text-slate-900 mt-0.5">{name}</h2>
         </div>
-        <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center">
+        <Card className="p-10 text-center">
           <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
             <i className="ki-filled ki-office-bag text-2xl" style={{ color: '#2563EB' }} />
           </div>
@@ -95,7 +96,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
             <i className="ki-filled ki-setting-2" />
             Перейти в настройки
           </Link>
-        </div>
+        </Card>
       </div>
     )
   }
@@ -127,7 +128,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
 
       {/* 4. RECENT POSTS + NEWSLETTERS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden">
+        <Card className="overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Стена</p>
@@ -162,9 +163,9 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden">
+        <Card className="overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Email</p>
@@ -197,27 +198,21 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* 5. ORG ADMIN BANNER */}
-      <div className="rounded-2xl border border-[#BFDBFE] bg-gradient-to-r from-[#EFF6FF] to-white p-5">
-        <div className="flex items-start gap-3 flex-wrap">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-            <i className="ki-filled ki-office-bag text-lg" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-bold text-foreground">Полное управление организацией</div>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Структура команды, тренировочная база, профиль организации, публичная страница и история всех событий — в разделе /org.
-            </p>
-          </div>
+      <Alert variant="info" icon="ki-office-bag" title="Полное управление организацией">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <p className="min-w-0 flex-1">
+            Структура команды, тренировочная база, профиль организации, публичная страница и история всех событий — в разделе /org.
+          </p>
           <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm">
             Открыть /org
             <i className="ki-filled ki-right text-xs" />
           </Link>
         </div>
-      </div>
+      </Alert>
     </div>
   )
 }

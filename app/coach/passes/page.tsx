@@ -23,6 +23,7 @@ import {
   listMyIssuedPasses, useSession,
   type AthletePassWithAthlete,
 } from '@/services/athlete-passes.service'
+import { Card } from '@/components/ui/metronic'
 
 function fmtDate(iso: string): string {
   try {
@@ -169,7 +170,7 @@ export default function CoachPassesPage() {
             const urgentDays = days <= 7
             const busy = busyId === p.id
             return (
-              <div key={p.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <Card key={p.id} className="p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center text-sm font-bold text-orange-700 overflow-hidden shrink-0">
@@ -223,16 +224,16 @@ export default function CoachPassesPage() {
                       : <><i className="ki-filled ki-minus-squared text-xs" /> Списать сессию</>}
                   </button>
                 </div>
-              </div>
+              </Card>
             )
           })}
         </section>
       )}
 
-      <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
+      <Card className="border-dashed bg-background/70 p-4 text-[11px] text-muted-foreground">
         Списание уменьшает <code className="font-mono">used_sessions</code> на 1 атомарно. Когда счётчик достигает лимита,
         абонемент автоматически переходит в статус <em>used_up</em> и исчезает из этого списка.
-      </div>
+      </Card>
 
       {/* Confirm dialog */}
       {confirming && (

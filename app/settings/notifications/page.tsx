@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { Card, Alert } from '@/components/ui/metronic'
 import {
   loadMyPrefs, updateMyPrefs, effective,
   CHANNELS, type NotificationChannel, type NotificationPrefs,
@@ -98,16 +99,14 @@ export default function NotificationSettingsPage() {
       </div>
 
       {savedAt && Date.now() - savedAt < 3000 && (
-        <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 inline-flex items-center gap-2">
-          ✅ Настройки сохранены
-        </div>
+        <Alert variant="success">Настройки сохранены</Alert>
       )}
 
       {(['core', 'collaboration', 'marketing'] as Array<keyof typeof CATEGORY_META>).map(cat => {
         const channels = grouped[cat] ?? []
         const meta = CATEGORY_META[cat]
         return (
-          <section key={cat} className="rounded-2xl border border-border bg-card p-5">
+          <Card key={cat} className="p-5">
             <div className="mb-3">
               <h2 className="text-base font-bold text-foreground">{meta.label}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{meta.description}</p>
@@ -138,22 +137,21 @@ export default function NotificationSettingsPage() {
                 )
               })}
             </div>
-          </section>
+          </Card>
         )
       })}
 
-      <section className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-1">⚠ Что не отключается</h3>
-        <ul className="text-xs text-slate-700 space-y-1">
+      <Alert variant="warning" title="Что не отключается">
+        <ul className="space-y-1">
           <li>• Подтверждения подписки и платежей (требование 152-ФЗ)</li>
           <li>• Email подтверждение регистрации</li>
           <li>• Сброс пароля и security-events</li>
           <li>• Уведомления о приёме в команду/организацию</li>
         </ul>
-        <p className="mt-2 text-[11px] text-amber-700">
+        <p className="mt-2">
           Эти emails необходимы для функционирования аккаунта и не отключаются.
         </p>
-      </section>
+      </Alert>
     </div>
   )
 }

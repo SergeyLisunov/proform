@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { listOrgGroups, LEVEL_META, type OrgGroupWithCounts } from '@/services/org-groups.service'
+import { Card, Badge } from '@/components/ui/metronic'
 
 export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
   const [groups, setGroups]   = useState<OrgGroupWithCounts[]>([])
@@ -27,14 +28,14 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5 rounded-2xl">
         <p className="text-sm font-bold mb-3">Загрузка команд…</p>
         <div className="grid grid-cols-2 gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-20 bg-muted rounded animate-pulse" />
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
@@ -53,7 +54,7 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
           <h3 className="text-sm font-bold text-foreground">Команды</h3>
@@ -83,9 +84,9 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {ageRange && (
-                  <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                  <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
                     {ageRange}
-                  </span>
+                  </Badge>
                 )}
                 {lvl && (
                   <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
@@ -103,6 +104,6 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }

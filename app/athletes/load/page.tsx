@@ -10,6 +10,7 @@ import {
   type AcwrZone,
 } from '@/services/acwr.service'
 import AdaptivePlanModal from '@/components/coach/AdaptivePlanModal'
+import { Card } from '@/components/ui/metronic'
 
 const ZONE_ORDER: AcwrZone[] = ['danger', 'monitor', 'optimal', 'detraining', 'no_data']
 
@@ -37,11 +38,11 @@ export default function AthleteLoadPage() {
   }
   if (user.role !== 'coach') {
     return (
-      <div className="max-w-xl mx-auto mt-12 rounded-2xl border border-border bg-card p-8 text-center">
+      <Card className="max-w-xl mx-auto mt-12 p-8 text-center">
         <i className="ki-filled ki-lock text-3xl text-muted-foreground block mb-3" />
         <h1 className="text-lg font-bold text-foreground mb-1">Доступно только тренерам</h1>
         <p className="text-sm text-muted-foreground">Раздел показывает ACWR для атлетов, подключённых к вам.</p>
-      </div>
+      </Card>
     )
   }
 
@@ -79,7 +80,7 @@ export default function AthleteLoadPage() {
         })}
       </div>
 
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Атлеты · {rows.length}</p>
           <button onClick={load} className="text-[11px] font-semibold text-orange-600 hover:text-orange-700">
@@ -134,9 +135,9 @@ export default function AthleteLoadPage() {
             })}
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-border bg-card p-5 text-xs text-muted-foreground space-y-2">
+      <Card className="p-5 text-xs text-muted-foreground space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground">Как читать</p>
         <p><strong style={{ color: ACWR_ZONE_META.optimal.color }}>0.8–1.3</strong> — баланс: организм адаптируется, риск низкий.</p>
         <p><strong style={{ color: ACWR_ZONE_META.monitor.color }}>1.3–1.5</strong> — сигнал внимания: снизьте темп роста нагрузки.</p>
@@ -145,7 +146,7 @@ export default function AthleteLoadPage() {
         <p className="pt-2 text-[10px]">
           Нагрузка = Whoop strain (если есть), иначе длительность × 0.1. Минимум 3 тренировки за 28 дн для расчёта.
         </p>
-      </div>
+      </Card>
 
       {adaptive && (
         <AdaptivePlanModal

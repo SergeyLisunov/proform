@@ -13,6 +13,7 @@
  * → New inquiry → pick athlete) down to 1 click on the athlete card.
  */
 import { useState } from 'react'
+import { Alert } from '@/components/ui/metronic'
 import {
   createInquiry,
   QUESTION_TYPE_META,
@@ -188,13 +189,13 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
               </div>
 
               {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+                <Alert variant="destructive">{error}</Alert>
               )}
 
-              <div className="rounded-lg border border-dashed border-border bg-accent/30 p-3 text-[11px] text-muted-foreground">
+              <Alert variant="info">
                 Запрос будет направлен врачам (если назначен конкретный — только ему, иначе в открытую очередь).
                 Email будет отправлен сразу после создания.
-              </div>
+              </Alert>
             </div>
 
             <div className="border-t border-border px-5 py-3 flex items-center gap-2">

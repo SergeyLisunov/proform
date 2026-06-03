@@ -1,6 +1,7 @@
 'use client'
 
 import ApexChart from '@/components/charts/ApexChart'
+import { ChartCard } from '@/components/ui/metronic'
 
 interface Props {
   dailyData: { date: string; recovery: number; hrv: number; rhr: number; strain: number; sleep: number }[]
@@ -60,43 +61,31 @@ export default function AnalyticsCharts({ dailyData, weeklyStrain, zonePcts }: P
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      {/* Recovery & HRV */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-        <p className="pf-num text-lg text-slate-900 mb-0.5">Recovery & HRV — 30 Days</p>
-        <p className="text-xs text-slate-400 mb-3">Daily WHOOP biometrics</p>
+      <ChartCard title="Recovery & HRV — 30 Days" subtitle="Daily WHOOP biometrics" accent>
         <ApexChart type="line" options={recoveryHRVOpts}
           series={[{ name:'Recovery %', data: dailyData.map(d=>d.recovery) }, { name:'HRV ms', data: dailyData.map(d=>d.hrv) }]}
           height={200} width="100%" />
-      </div>
+      </ChartCard>
 
-      {/* Weekly strain */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-        <p className="pf-num text-lg text-slate-900 mb-0.5">Weekly Day Strain</p>
-        <p className="text-xs text-slate-400 mb-3">WHOOP day_strain cumulative</p>
+      <ChartCard title="Weekly Day Strain" subtitle="WHOOP day_strain cumulative">
         <ApexChart type="area" options={strainOpts}
           series={[{ name:'Day Strain', data: weeklyStrain.map(d=>d.strain) }]}
           height={200} width="100%" />
-      </div>
+      </ChartCard>
 
-      {/* HR Zone donut */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-        <p className="pf-num text-lg text-slate-900 mb-0.5">HR Zone Distribution</p>
-        <p className="text-xs text-slate-400 mb-3">Aggregated across all sessions</p>
+      <ChartCard title="HR Zone Distribution" subtitle="Aggregated across all sessions">
         {zonePcts.some(p=>p>0) ? (
           <ApexChart type="donut" options={donutOpts} series={zonePcts} height={260} width="100%" />
         ) : (
           <div className="h-[260px] flex items-center justify-center text-slate-400 text-sm">No zone data available</div>
         )}
-      </div>
+      </ChartCard>
 
-      {/* RHR & Sleep */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-        <p className="pf-num text-lg text-slate-900 mb-0.5">RHR & Sleep — 14 Days</p>
-        <p className="text-xs text-slate-400 mb-3">Resting heart rate & sleep hours</p>
+      <ChartCard title="RHR & Sleep — 14 Days" subtitle="Resting heart rate & sleep hours">
         <ApexChart type="bar" options={rhrSleepOpts}
           series={[{ name:'RHR bpm', data: dailyData.slice(0,14).map(d=>d.rhr) }, { name:'Sleep hrs', data: dailyData.slice(0,14).map(d=>d.sleep) }]}
           height={200} width="100%" />
-      </div>
+      </ChartCard>
     </div>
   )
 }

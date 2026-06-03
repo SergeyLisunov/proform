@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
+import { Card } from '@/components/ui/metronic'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type CRMUser = {
@@ -429,7 +430,7 @@ export default function AdminCRMPage() {
           { label: 'Pro', value: stats.pro, icon: 'ki-star', color: '#F97316', bg: '#FFF7ED' },
           { label: 'Team', value: stats.team, icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
         ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+          <Card key={s.label} className="p-4 flex items-center gap-3">
             <div style={{ width: 34, height: 34, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
             </div>
@@ -437,7 +438,7 @@ export default function AdminCRMPage() {
               <div className="pf-num" style={{ fontSize: 22, fontWeight: 800, color: 'var(--foreground)', lineHeight: 1 }}>{s.value}</div>
               <div style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 2 }}>{s.label}</div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -486,7 +487,7 @@ export default function AdminCRMPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="overflow-hidden">
         {/* Table header */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 80px', gap: 0, padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--accent)' }}>
           {['Пользователь', 'Роль', 'Сегмент', 'План', 'Тренировок', 'Дата'].map(h => (
@@ -557,7 +558,7 @@ export default function AdminCRMPage() {
             })}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* User drawer */}
       {selectedUser && user && (

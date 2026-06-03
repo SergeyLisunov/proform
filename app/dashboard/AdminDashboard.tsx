@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { fmtDate } from '@/lib/utils/recovery'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { Card } from '@/components/ui/metronic'
 import type { Database } from '@/types/database'
 
 const AdminHeroBar      = dynamic(() => import('@/components/admin/AdminHeroBar'),      { ssr: false })
@@ -73,7 +74,7 @@ export default async function AdminDashboard() {
       {/* 3. PLATFORM HEALTH */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* User mix */}
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Состав</p>
@@ -109,10 +110,10 @@ export default async function AdminDashboard() {
               </div>
             )
           })()}
-        </div>
+        </Card>
 
         {/* Live signals */}
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Сигналы</p>
@@ -149,11 +150,11 @@ export default async function AdminDashboard() {
               hint="за последние 7 дней"
             />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* 4. SCHEMA MAP */}
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <p className="pf-num text-base font-bold text-slate-900 mb-3">Схема базы данных</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {[
@@ -173,10 +174,10 @@ export default async function AdminDashboard() {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* 5. RECENT USERS */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">CRM</p>
@@ -212,7 +213,7 @@ export default async function AdminDashboard() {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

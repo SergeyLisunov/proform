@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Card } from '@/components/ui/metronic'
 
 interface Workout { id: string; event_date: string; activity_type: string | null; event_type: string; activity_strain: number | null; is_public: boolean }
 interface CycleBlock { id: string; start_date: string; end_date: string; cycle_type: string; label: string | null; color: string }
@@ -92,7 +93,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
       </div>
 
       {/* Calendar grid */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
+      <Card className="overflow-hidden">
         {/* Day headers */}
         <div className="grid grid-cols-7 bg-[#F8FAFC] border-b border-[#E2E8F0]">
           {WDAYS.map(d => (
@@ -143,7 +144,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
             )
           })}
         </div>
-      </div>
+      </Card>
 
       {/* Cycle blocks summary */}
       {layer !== 'none' && (

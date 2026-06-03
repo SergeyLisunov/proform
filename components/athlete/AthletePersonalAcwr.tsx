@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { computeAcwr, ACWR_ZONE_META, type AcwrZone } from '@/lib/acwr/calc'
+import { Card } from '@/components/ui/metronic'
 
 interface WeekBucket { label: string; load: number; date: string }
 
@@ -103,10 +104,10 @@ export default function AthletePersonalAcwr({ athleteId }: { athleteId: string }
 
   if (loading || !snap) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground mb-2">Ваша нагрузка</p>
         <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">Считаем ACWR…</div>
-      </div>
+      </Card>
     )
   }
 

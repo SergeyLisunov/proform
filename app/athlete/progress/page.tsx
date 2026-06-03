@@ -17,6 +17,7 @@ import {
   getProgressStats, listMyGoals,
   STATUS_META, type ProgressStats, type AthleteGoal,
 } from '@/services/athlete-goals.service'
+import { Card, ChartCard, Alert } from '@/components/ui/metronic'
 
 export default function AthleteProgressPage() {
   const { user, loading: userLoading } = useUser()
@@ -110,24 +111,14 @@ export default function AthleteProgressPage() {
       </div>
 
       {/* Chart */}
-      <section className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">8-week volume</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Бары — total_minutes; цвет = доля completed (зелёная) vs pending/skipped (серая).
-            </p>
-          </div>
-        </div>
-
+      <ChartCard
+        title="8-week volume"
+        subtitle="Бары — total_minutes; цвет = доля completed (зелёная) vs pending/skipped (серая)."
+      >
         {!hasData ? (
-          <div className="rounded-xl border-2 border-dashed border-border bg-accent/30 px-4 py-12 text-center">
-            <i className="ki-filled ki-chart-line-up text-3xl text-muted-foreground mb-2 block" />
-            <p className="text-sm text-foreground font-semibold">Нет данных за 8 недель</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Логируйте тренировки на /calendar или подключите wearable — данные появятся здесь.
-            </p>
-          </div>
+          <Alert variant="info" title="Нет данных за 8 недель" icon="ki-chart-line-up">
+            Логируйте тренировки на /calendar или подключите wearable — данные появятся здесь.
+          </Alert>
         ) : (
           <div className="overflow-x-auto">
             <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full max-w-3xl mx-auto" style={{ maxHeight: 280 }}>
@@ -192,11 +183,11 @@ export default function AthleteProgressPage() {
             </svg>
           </div>
         )}
-      </section>
+      </ChartCard>
 
       {/* Recovery trend */}
       {hasData && s.weeks.some(w => w.avg_recovery !== null) && (
-        <section className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <h2 className="text-lg font-bold text-foreground mb-2">Recovery trend</h2>
           <p className="text-xs text-muted-foreground mb-3">Средний recovery score (если есть данные от wearable / ручного ввода)</p>
           <div className="grid grid-cols-4 lg:grid-cols-8 gap-2">
@@ -216,11 +207,11 @@ export default function AthleteProgressPage() {
               )
             })}
           </div>
-        </section>
+        </Card>
       )}
 
       {/* Active goals summary */}
-      <section className="rounded-2xl border border-border bg-card p-5">
+      <Card className="p-5">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
           <div>
             <h2 className="text-lg font-bold text-foreground">Активные цели</h2>
@@ -278,7 +269,7 @@ export default function AthleteProgressPage() {
             })}
           </div>
         )}
-      </section>
+      </Card>
     </div>
   )
 }
@@ -287,11 +278,11 @@ export default function AthleteProgressPage() {
 
 function StatTile({ label, value, color, subtitle }: { label: string; value: string; color: string; subtitle?: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <Card className="p-4">
       <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="pf-num text-2xl font-bold mt-1" style={{ color }}>{value}</div>
       {subtitle && <div className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</div>}
-    </div>
+    </Card>
   )
 }
 

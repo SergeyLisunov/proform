@@ -1,6 +1,7 @@
 'use client'
 
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
+import { Card } from '@/components/ui/metronic'
 import { strainColor, strainLabel } from '@/lib/utils/recovery'
 
 interface HeroMetrics {
@@ -76,7 +77,7 @@ export default function AthleteHeroBar({ firstName, metrics }: AthleteHeroBarPro
 
         {/* Metrics card */}
         {hasData && metrics ? (
-          <div className="w-full lg:w-auto rounded-2xl border border-border bg-white shadow-sm px-5 py-4 flex items-center gap-5">
+          <Card className="w-full lg:w-auto px-5 py-4 flex items-center gap-5">
             {recovery != null && <RecoveryRing score={Math.round(recovery)} size={88} />}
             <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 text-sm flex-1 min-w-0">
               {metrics.hrv != null && (
@@ -97,7 +98,7 @@ export default function AthleteHeroBar({ firstName, metrics }: AthleteHeroBarPro
                 <Metric label="Сон" value={`${metrics.sleep_hours.toFixed(1)} ч`} />
               )}
             </div>
-          </div>
+          </Card>
         ) : null}
       </div>
     </section>

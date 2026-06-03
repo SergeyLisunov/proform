@@ -14,6 +14,7 @@
  * On success — closes modal + calls onSaved callback.
  */
 import { useState } from 'react'
+import { Alert } from '@/components/ui/metronic'
 import {
   CATEGORY_META, SEVERITY_META, VISIBILITY_META,
   type RecommendationCategory, type RecommendationSeverity,
@@ -222,10 +223,7 @@ export default function RecommendationForm({
           </label>
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              <i className="ki-filled ki-shield-cross mr-1.5" />
-              {error}
-            </div>
+            <Alert variant="destructive" icon="ki-shield-cross">{error}</Alert>
           )}
         </div>
 

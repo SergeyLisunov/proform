@@ -1,5 +1,7 @@
 'use client'
 
+import { Card } from '@/components/ui/metronic'
+
 interface HeroStats {
   athletesCount: number
   avgRecovery: number
@@ -65,9 +67,9 @@ export default function CoachHeroBar({ firstName, stats }: { firstName: string; 
 
 function Stat({ label, value, color, highlight }: { label: string; value: string; color: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-xl border bg-white px-3 py-2.5 ${highlight ? 'animate-pulse border-orange-300' : 'border-border'}`}>
+    <Card className={`px-3 py-2.5 ${highlight ? 'animate-pulse border-orange-300' : ''}`}>
       <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="pf-num text-xl font-bold mt-0.5" style={{ color }}>{value}</div>
-    </div>
+    </Card>
   )
 }

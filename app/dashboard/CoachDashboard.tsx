@@ -3,6 +3,7 @@ import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { initials, fmtDate } from '@/lib/utils/recovery'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { Card, Badge } from '@/components/ui/metronic'
 import CoachFeedbackFeed from '@/components/ui/CoachFeedbackFeed'
 import ReferralPanel from '@/components/coach/ReferralPanel'
 import type { Database } from '@/types/database'
@@ -195,14 +196,14 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
           </Link>
         </div>
         {!athletes.length ? (
-          <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center text-slate-400">
+          <Card className="p-10 text-center text-slate-400">
             <i className="ki-filled ki-people text-4xl block mb-3" />
             <p className="text-sm">Атлеты ещё не назначены.</p>
             <p className="text-xs mt-1">Пригласите атлета через раздел «Сеть».</p>
             <Link href="/network" className="mt-4 inline-block rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-semibold">
               Найти атлетов
             </Link>
-          </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {athletes.map((a, i) => {
@@ -249,7 +250,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
       <CoachFeedbackFeed coachId={userId} />
 
       {/* 7. RECENT DIARY ENTRIES */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
+      <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <p className="pf-num text-xl text-slate-900">Дневник наблюдений</p>
           <Link href="/diary" className="text-xs text-[#2563EB] hover:underline font-medium">Все записи →</Link>
@@ -269,7 +270,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
                     <div className="flex items-center gap-2 flex-wrap">
                       {ath && <span className="text-xs font-bold text-[#F97316]">{ath.name}</span>}
                       {d.tags && d.tags.length > 0 && d.tags.map((t: string) => (
-                        <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: '#FFEDD5', color: '#F97316' }}>{t}</span>
+                        <Badge key={t} variant="primary" size="sm">{t}</Badge>
                       ))}
                     </div>
                     <span className="text-[10px] text-slate-400 shrink-0">{fmtDate(d.date)}</span>
@@ -280,7 +281,7 @@ export default async function CoachDashboard({ userId, name }: { userId: string;
             })}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* 8. REFERRAL — bottom когда заявки уже отрисованы выше */}
       {pending.length > 0 && <ReferralPanel myRole="coach" />}

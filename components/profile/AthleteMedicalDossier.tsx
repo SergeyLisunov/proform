@@ -18,6 +18,7 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Card, Badge } from '@/components/ui/metronic'
 import {
   CATEGORY_META,
   SEVERITY_META,
@@ -31,7 +32,6 @@ interface Props {
 type LoadState = 'loading' | 'ready' | 'error'
 
 const SECTION_COLOR = '#DC2626'
-const SECTION_BG = '#FEF2F2'
 
 export default function AthleteMedicalDossier({ athleteId }: Props) {
   const [recs, setRecs] = useState<Recommendation[]>([])
@@ -63,11 +63,11 @@ export default function AthleteMedicalDossier({ athleteId }: Props) {
   useEffect(() => { load() }, [load])
 
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
+    <Card className="p-5">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, color: SECTION_COLOR, textTransform: 'uppercase', letterSpacing: '0.14em', display: 'inline-block', background: SECTION_BG, padding: '3px 10px', borderRadius: 99, margin: 0 }}>
+        <Badge variant="destructive" size="sm" className="uppercase tracking-wider">
           Медицинские рекомендации и ограничения
-        </p>
+        </Badge>
         <Link href="/diary" style={{ fontSize: 11, fontWeight: 700, color: SECTION_COLOR, textDecoration: 'none', whiteSpace: 'nowrap' }}>
           Открыть дневник →
         </Link>
@@ -125,6 +125,6 @@ export default function AthleteMedicalDossier({ athleteId }: Props) {
           })}
         </div>
       )}
-    </div>
+    </Card>
   )
 }

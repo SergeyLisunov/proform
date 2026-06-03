@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Card, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 export default async function OrgAnalyticsPage() {
   const supabase = await createClient()
@@ -66,7 +68,7 @@ export default async function OrgAnalyticsPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpis.map(k => (
-          <div key={k.label} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <Card key={k.label} className="p-4 rounded-2xl">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: `${k.color}18` }}>
                 <i className={`ki-filled ${k.icon} text-[14px]`} style={{ color: k.color }} />
@@ -74,43 +76,73 @@ export default async function OrgAnalyticsPage() {
               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{k.label}</div>
             </div>
             <div className="pf-num mt-2 text-2xl font-bold text-foreground">{k.value}</div>
-          </div>
+          </Card>
         ))}
       </div>
 
+      <ChartCard title="Состав организации" subtitle="Активные участники, атлеты, тренеры и заявки" accent>
+        <ApexChart
+          type="bar"
+          options={{
+            chart: { toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
+            colors: ['#2563EB', '#F97316', '#16A34A', '#CA8A04'],
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', distributed: true } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
+            xaxis: {
+              categories: ['Участники', 'Атлеты', 'Тренеры', 'Заявки'],
+              labels: { style: { fontSize: '11px', colors: '#94A3B8' } },
+              axisBorder: { show: false }, axisTicks: { show: false },
+            },
+            yaxis: { labels: { style: { fontSize: '10px', colors: '#94A3B8' } } },
+            tooltip: { theme: 'light' },
+          }}
+          series={[{ name: 'Кол-во', data: kpis.map(k => k.value) }]}
+          height={240}
+          width="100%"
+        />
+      </ChartCard>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/org/members?role=coach" className="rounded-2xl border border-border bg-card p-5 hover:border-[#16A34A] hover:shadow-md transition no-underline">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0FDF4]">
-              <i className="ki-filled ki-teacher text-[16px] text-[#16A34A]" />
+        <Link href="/org/members?role=coach" className="no-underline">
+          <Card className="p-5 rounded-2xl hover:border-[#16A34A] hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0FDF4]">
+                <i className="ki-filled ki-teacher text-[16px] text-[#16A34A]" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-foreground">Список тренеров</div>
+                <div className="text-xs text-muted-foreground">Управление и права</div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm font-bold text-foreground">Список тренеров</div>
-              <div className="text-xs text-muted-foreground">Управление и права</div>
-            </div>
-          </div>
+          </Card>
         </Link>
-        <Link href="/org/members?role=athlete" className="rounded-2xl border border-border bg-card p-5 hover:border-[#F97316] hover:shadow-md transition no-underline">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED]">
-              <i className="ki-filled ki-abstract-26 text-[16px] text-[#F97316]" />
+        <Link href="/org/members?role=athlete" className="no-underline">
+          <Card className="p-5 rounded-2xl hover:border-[#F97316] hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED]">
+                <i className="ki-filled ki-abstract-26 text-[16px] text-[#F97316]" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-foreground">Список атлетов</div>
+                <div className="text-xs text-muted-foreground">Участники команды</div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm font-bold text-foreground">Список атлетов</div>
-              <div className="text-xs text-muted-foreground">Участники команды</div>
-            </div>
-          </div>
+          </Card>
         </Link>
-        <Link href="/org/wall" className="rounded-2xl border border-border bg-card p-5 hover:border-[#7C3AED] hover:shadow-md transition no-underline">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F3FF]">
-              <i className="ki-filled ki-message-text-2 text-[16px] text-[#7C3AED]" />
+        <Link href="/org/wall" className="no-underline">
+          <Card className="p-5 rounded-2xl hover:border-[#7C3AED] hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F3FF]">
+                <i className="ki-filled ki-message-text-2 text-[16px] text-[#7C3AED]" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-foreground">Стена и анонсы</div>
+                <div className="text-xs text-muted-foreground">Обращения к команде</div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm font-bold text-foreground">Стена и анонсы</div>
-              <div className="text-xs text-muted-foreground">Обращения к команде</div>
-            </div>
-          </div>
+          </Card>
         </Link>
       </div>
     </div>

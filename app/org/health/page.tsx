@@ -15,6 +15,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { Card, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 import {
   getOrgHealthSnapshot,
   type OrgHealthSnapshot, type RiskBucket,
@@ -181,7 +183,7 @@ export default function OrgHealthPage() {
           { label: 'Тренеры',          value: snapshot.coaches_total,  icon: 'ki-cup',           bg: 'bg-emerald-50 text-emerald-600' },
           { label: 'Врачи',            value: snapshot.doctors_total,  icon: 'ki-medical-clinic', bg: 'bg-red-50 text-red-600' },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl border border-border bg-card p-4">
+          <Card key={s.label} className="p-4 rounded-2xl">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <div className="pf-num text-2xl font-bold text-foreground">{s.value}</div>
@@ -191,12 +193,12 @@ export default function OrgHealthPage() {
                 <i className={`ki-filled ${s.icon} text-base`} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
       {/* Risk distribution */}
-      <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+      <Card className="rounded-3xl p-5 md:p-6">
         <div className="flex items-end justify-between gap-3 mb-3 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Распределение риска</p>
@@ -258,10 +260,31 @@ export default function OrgHealthPage() {
             </div>
           </>
         )}
-      </section>
+      </Card>
+
+      {/* Risk distribution chart */}
+      {riskTotal > 0 && (
+        <ChartCard title="Готовность атлетов" subtitle="Доли по уровням риска" className="print-hide">
+          <ApexChart
+            type="donut"
+            options={{
+              chart: { toolbar: { show: false }, animations: { enabled: true, speed: 600 } },
+              colors: segments.map(s => RISK_META[s.bucket].color),
+              labels: segments.map(s => RISK_META[s.bucket].label),
+              plotOptions: { pie: { donut: { size: '65%' } } },
+              dataLabels: { enabled: false },
+              legend: { position: 'bottom', fontSize: '11px', offsetY: 4 },
+              tooltip: { theme: 'light' },
+            }}
+            series={segments.map(s => s.count)}
+            height={260}
+            width="100%"
+          />
+        </ChartCard>
+      )}
 
       {/* Adherence */}
-      <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+      <Card className="rounded-3xl p-5 md:p-6">
         <div className="flex items-end justify-between gap-3 mb-3 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Активность</p>
@@ -292,11 +315,11 @@ export default function OrgHealthPage() {
               ? 'Половина состава активна. Поставьте напоминание тренерам прозвонить остальных.'
               : 'Большинство атлетов выпадают — план реактивации обязателен.'}
         </p>
-      </section>
+      </Card>
 
       {/* Coach utilization */}
       {snapshot.coach_utilization.length > 0 && (
-        <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+        <Card className="rounded-3xl p-5 md:p-6">
           <div className="mb-3">
             <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Загрузка тренеров</p>
             <h2 className="mt-1 text-lg font-bold text-foreground">Кто сколько ведёт</h2>
@@ -322,7 +345,7 @@ export default function OrgHealthPage() {
               </div>
             ))}
           </div>
-        </section>
+        </Card>
       )}
 
       {/* Footer CTA */}

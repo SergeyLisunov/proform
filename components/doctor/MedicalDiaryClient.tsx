@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Card } from '@/components/ui/metronic'
 import { useDictation } from '@/hooks/useDictation'
 import {
   listMedicalEntries, createMedicalEntry, updateMedicalEntry, deleteMedicalEntry,
@@ -217,9 +218,9 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
       {/* Entries list */}
       <div className="flex flex-col gap-3">
         {loading && entries.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-10 text-center text-xs text-muted-foreground">
+          <Card className="p-10 text-center text-xs text-muted-foreground">
             Загрузка журнала…
-          </div>
+          </Card>
         ) : entries.length === 0 ? (
           <EmptyState onCreate={() => { setCreating(true); setEditing(null) }} />
         ) : (
@@ -445,7 +446,7 @@ function EntryCard({
   const sev = entry.severity ? SEVERITY_LABELS[entry.severity] : null
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 hover:border-red-200 hover:shadow-sm transition-all">
+    <Card className="p-5 hover:border-red-200 transition-all">
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
           style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
@@ -627,7 +628,7 @@ function EntryCard({
           ))}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { getAllOrgs, verifyOrg } from '@/services/org.service'
 import type { Organization } from '@/types/org.types'
+import { Card, Badge } from '@/components/ui/metronic'
 
 const SPORT_LABELS: Record<string, string> = {
   athletics: 'Лёгкая атлетика', swimming: 'Плавание', cycling: 'Велоспорт',
@@ -89,7 +90,7 @@ export default function AdminOrgsPage() {
             <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest">Ожидают проверки</span>
             <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 text-2xs font-bold">{unverified.length}</span>
           </div>
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <Card className="overflow-hidden">
             <div className="divide-y divide-border">
               {unverified.map(org => (
                 <OrgRow
@@ -100,7 +101,7 @@ export default function AdminOrgsPage() {
                 />
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -111,17 +112,17 @@ export default function AdminOrgsPage() {
           <span className="px-1.5 py-0.5 rounded-full bg-green-100 text-green-600 text-2xs font-bold">{verified.length}</span>
         </div>
         {verified.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl px-5 py-8 text-center text-muted-foreground text-2sm">
+          <Card className="px-5 py-8 text-center text-muted-foreground text-2sm">
             Проверенных организаций пока нет
-          </div>
+          </Card>
         ) : (
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <Card className="overflow-hidden">
             <div className="divide-y divide-border">
               {verified.map(org => (
                 <OrgRow key={org.id} org={org} verifying={false} onVerify={() => {}} />
               ))}
             </div>
-          </div>
+          </Card>
         )}
       </div>
     </div>
@@ -140,10 +141,10 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-sm font-semibold text-foreground truncate">{org.org_name}</span>
           {org.is_verified && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
+            <Badge variant="info" size="sm">
               <i className="ki-filled ki-verify text-xs" />
               Проверено
-            </span>
+            </Badge>
           )}
         </div>
         <div className="flex items-center gap-3 flex-wrap">

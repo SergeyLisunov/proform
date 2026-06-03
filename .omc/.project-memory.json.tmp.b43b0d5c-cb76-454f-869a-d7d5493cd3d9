@@ -1,0 +1,551 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780320550650,
+  "projectRoot": "/Users/sergeylisunov/proform",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.6",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.6",
+        "category": "frontend"
+      },
+      {
+        "name": "@playwright/test",
+        "version": "1.59.1",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev --webpack",
+      "build": "next build --webpack",
+      "start": "next start",
+      "lint": "eslint .",
+      "lint:dead": "knip --no-progress",
+      "test:e2e": "playwright test",
+      "test:e2e:install": "playwright install --with-deps chromium",
+      "test:e2e:ui": "playwright test --ui",
+      "lint:duplicates": "bash scripts/audit-duplicate-exports.sh",
+      "analyze": "ANALYZE=true next build --webpack",
+      "check:bundle": "node scripts/bundle-budget-check.mjs",
+      "audit:screenshots": "node scripts/audit-landing.mjs",
+      "prepare": "husky"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "docs",
+      "lib",
+      "public",
+      "scripts",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [
+    {
+      "timestamp": 1779963244029,
+      "source": "manual",
+      "category": "build",
+      "content": "W19 TS-debt fix recipe (deferred from W18 Day 99). GitHub Actions \"TypeScript & Security Review\" check fails on every PR (non-blocking — Vercel deploy is real gate, next.config.mjs:19 ignoreBuildErrors:true masks it in build). Root cause: types/database.types.ts is stale — missing tables/columns from migrations 071 (coach_reviews), 072 (users.is_verified), 074 (admin_user_invites). Concrete failing files: services/admin-invites.service.ts (L36-41 deep instantiation + status not assignable), app/api/users/[id]/route.ts (L41 is_verified missing, L61 spread), services/admin-verifications.service.ts, services/coach-reviews.service.ts. Fix in one session: (1) npx supabase gen types typescript --project-id hhyjihbctidtucvpgjzv --schema public > types/database.types.ts, (2) tsc --noEmit to see remainder, (3) flip next.config.mjs ignoreBuildErrors:true → false. Closes W19 candidate \"TypeScript build errors enabled\"."
+    },
+    {
+      "timestamp": 1779968467823,
+      "source": "manual",
+      "category": "deploy",
+      "content": "W20 headline — Next.js upgrade (deferred from W19 Day 4). CRITICAL: 14.2.35 is the LAST 14.x release (line is EOL for security). 14 runtime Next.js advisories unpatched on 14.x — DoS via Image Optimizer remotePatterns (app uses it), HTTP request smuggling in rewrites (app uses redirects()), middleware cache-poisoning (app has middleware), XSS in App Router CSP nonces, SSRF via WebSocket upgrades, RSC cache poisoning. Fixes only in 15.x/16.x. Breaking surface assessed: (1) React 18.3.1→19 required; (2) async params/searchParams — only 5 SERVER components need migration: app/athletes/[id]/page.tsx, app/admin/onboarding-funnel/page.tsx, app/admin/leads/page.tsx, app/share/workout/[token]/page.tsx, app/p/[nickname]/page.tsx (other 14 are client components using useParams() — unaffected); (3) cookies() — 1 call site, already awaited; (4) @supabase/ssr 0.10.0 — verify Next 15 compat. Recommended path: Next 15 first (1 major, 15.3.9 or backport 15.5.18), codemod `npx @next/codemod upgrade`, then 16 separately if needed. npm audit recommends 16.2.6 to clear ALL 14 advisories but 15.x clears the bulk. Now next.config has ignoreBuildErrors:false so upgrade build errors will surface immediately."
+    }
+  ],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 8,
+      "lastAccessed": 1780320550595,
+      "keyFiles": [
+        "error.tsx",
+        "globals.css",
+        "layout.tsx",
+        "not-found.tsx",
+        "opengraph-image.tsx"
+      ]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1780320550599,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 9,
+      "lastAccessed": 1780320550599,
+      "keyFiles": [
+        "DB_SCHEMA_REALITY.md",
+        "bundle-budget.md",
+        "conversion-events.md",
+        "husky-setup.md",
+        "landing-audit-procedure.md"
+      ]
+    },
+    "hooks": {
+      "path": "hooks",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1780320550599,
+      "keyFiles": [
+        "useDictation.ts"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 0,
+      "lastAccessed": 1780320550600,
+      "keyFiles": []
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 0,
+      "lastAccessed": 1780320550600,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 5,
+      "lastAccessed": 1780320550600,
+      "keyFiles": [
+        "audit-duplicate-exports.sh",
+        "audit-landing.mjs",
+        "bundle-budget-check.mjs",
+        "setup-stripe-env.sh",
+        "sprint-wrap-check.sh"
+      ]
+    },
+    "services": {
+      "path": "services",
+      "purpose": "Business logic services",
+      "fileCount": 43,
+      "lastAccessed": 1780320550600,
+      "keyFiles": [
+        "acwr.service.ts",
+        "adherence-nudge.service.ts",
+        "admin-invites.service.ts",
+        "admin-leads.service.ts",
+        "admin-verifications.service.ts"
+      ]
+    },
+    "supabase": {
+      "path": "supabase",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1780320550600,
+      "keyFiles": []
+    },
+    "test-results": {
+      "path": "test-results",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1780320550600,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1780320550601,
+      "keyFiles": []
+    },
+    "types": {
+      "path": "types",
+      "purpose": "Type definitions",
+      "fileCount": 3,
+      "lastAccessed": 1780320550601,
+      "keyFiles": [
+        "database.ts",
+        "org.types.ts",
+        "users.ts"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1780320550601,
+      "keyFiles": []
+    },
+    "public/assets": {
+      "path": "public/assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1780320550602,
+      "keyFiles": []
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 66,
+      "lastAccessed": 1780320550602,
+      "keyFiles": [
+        "009_cycle_blocks.sql",
+        "010_workout_comments.sql",
+        "011_workout_shares.sql"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "next.config.mjs",
+      "accessCount": 15,
+      "lastAccessed": 1780321203724,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 14,
+      "lastAccessed": 1780046127286,
+      "type": "file"
+    },
+    {
+      "path": "app/layout.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1779971142840,
+      "type": "file"
+    },
+    {
+      "path": "scripts/bundle-budget-check.mjs",
+      "accessCount": 10,
+      "lastAccessed": 1779999986716,
+      "type": "file"
+    },
+    {
+      "path": "docs/bundle-budget.md",
+      "accessCount": 10,
+      "lastAccessed": 1780000038947,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/HeroSection.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1779909622555,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/RoleSection.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1780042742979,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/BenefitsSection.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1779916441428,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/PainSection.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1779906921422,
+      "type": "file"
+    },
+    {
+      "path": "app/page.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1779885171400,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/BeforeAfterSection.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1779906947854,
+      "type": "file"
+    },
+    {
+      "path": "app/api/doctor-inquiries/[id]/convert-to-recommendation/route.ts",
+      "accessCount": 6,
+      "lastAccessed": 1780048389398,
+      "type": "file"
+    },
+    {
+      "path": "services/recommendations.service.ts",
+      "accessCount": 6,
+      "lastAccessed": 1780325082052,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/HeroAuditModal.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1779901932851,
+      "type": "file"
+    },
+    {
+      "path": "docs/landing-perf.md",
+      "accessCount": 5,
+      "lastAccessed": 1779905019239,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/AntiPositioningSection.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1779909622762,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/FaqSection.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1779916447711,
+      "type": "file"
+    },
+    {
+      "path": "app/about/page.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1779916450291,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/052_recommendations.sql",
+      "accessCount": 4,
+      "lastAccessed": 1780042641006,
+      "type": "file"
+    },
+    {
+      "path": "lib/supabase/client.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780042675059,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/064_doctor_inquiries.sql",
+      "accessCount": 4,
+      "lastAccessed": 1780042722813,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/WorkflowSection.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1780042787064,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/LeadMagnetSection.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1779884376442,
+      "type": "file"
+    },
+    {
+      "path": "app/globals.css",
+      "accessCount": 3,
+      "lastAccessed": 1779901647322,
+      "type": "file"
+    },
+    {
+      "path": "docs/landing-mobile-qa.md",
+      "accessCount": 3,
+      "lastAccessed": 1779904971524,
+      "type": "file"
+    },
+    {
+      "path": "app/api/leads/audit/route.ts",
+      "accessCount": 3,
+      "lastAccessed": 1779914013871,
+      "type": "file"
+    },
+    {
+      "path": "middleware.ts",
+      "accessCount": 3,
+      "lastAccessed": 1780000225325,
+      "type": "file"
+    },
+    {
+      "path": "lib/supabase/middleware.ts",
+      "accessCount": 3,
+      "lastAccessed": 1780042615811,
+      "type": "file"
+    },
+    {
+      "path": "lib/supabase/server.ts",
+      "accessCount": 3,
+      "lastAccessed": 1780042616335,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/042_security_definer_hardening.sql",
+      "accessCount": 3,
+      "lastAccessed": 1780042639989,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/UseCasesSection.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1779885140450,
+      "type": "file"
+    },
+    {
+      "path": "services/admin-leads.service.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779885535468,
+      "type": "file"
+    },
+    {
+      "path": "app/admin/leads/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1779885653659,
+      "type": "file"
+    },
+    {
+      "path": ".husky/pre-commit",
+      "accessCount": 2,
+      "lastAccessed": 1779903568858,
+      "type": "file"
+    },
+    {
+      "path": "lib/email/audit-templates.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779914280606,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/051_yookassa_billing_foundation.sql",
+      "accessCount": 2,
+      "lastAccessed": 1780042686911,
+      "type": "file"
+    },
+    {
+      "path": "services/billing.service.ts",
+      "accessCount": 2,
+      "lastAccessed": 1780042695784,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/LeadCaptureForm.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1779883801236,
+      "type": "file"
+    },
+    {
+      "path": "lib/analytics/track.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779883854506,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/SocialProofSection.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1779884429561,
+      "type": "file"
+    },
+    {
+      "path": "components/landing/PricingTeaserSection.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1779885167130,
+      "type": "file"
+    },
+    {
+      "path": "docs/sprints/W16-wrap.md",
+      "accessCount": 1,
+      "lastAccessed": 1779886004705,
+      "type": "file"
+    },
+    {
+      "path": "scripts/audit-duplicate-exports.sh",
+      "accessCount": 1,
+      "lastAccessed": 1779902332344,
+      "type": "file"
+    },
+    {
+      "path": "docs/husky-setup.md",
+      "accessCount": 1,
+      "lastAccessed": 1779903579137,
+      "type": "file"
+    },
+    {
+      "path": "docs/sprints/W17-wrap.md",
+      "accessCount": 1,
+      "lastAccessed": 1779904954871,
+      "type": "file"
+    },
+    {
+      "path": "scripts/audit-landing.mjs",
+      "accessCount": 1,
+      "lastAccessed": 1779908521443,
+      "type": "file"
+    },
+    {
+      "path": "docs/landing-audit-procedure.md",
+      "accessCount": 1,
+      "lastAccessed": 1779908622442,
+      "type": "file"
+    },
+    {
+      "path": "services/doctor-inquiries.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779914002656,
+      "type": "file"
+    },
+    {
+      "path": "services/email-invites.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1779914003608,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/029_function_search_path_hardening.sql",
+      "accessCount": 1,
+      "lastAccessed": 1779914011027,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

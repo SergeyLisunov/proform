@@ -15,6 +15,7 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Card } from '@/components/ui/metronic'
 
 interface Tile {
   label: string
@@ -100,10 +101,10 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-2xl border border-border bg-card p-5 animate-pulse">
+          <Card key={i} className="p-5 animate-pulse rounded-2xl">
             <div className="h-3 w-2/3 bg-muted rounded mb-3" />
             <div className="h-8 w-1/2 bg-muted rounded" />
-          </div>
+          </Card>
         ))}
       </div>
     )
@@ -162,14 +163,15 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
           </div>
         )
         return t.href ? (
-          <a key={t.label} href={t.href}
-            className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md no-underline">
-            {inner}
+          <a key={t.label} href={t.href} className="no-underline">
+            <Card className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-md">
+              {inner}
+            </Card>
           </a>
         ) : (
-          <div key={t.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <Card key={t.label} className="p-5 rounded-2xl">
             {inner}
-          </div>
+          </Card>
         )
       })}
     </div>

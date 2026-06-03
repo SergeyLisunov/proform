@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { allProviders, type DeviceProvider } from '@/lib/integrations/providers'
+import { Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
 import {
   listMyDeviceConnections, setPrimaryDevice, disconnectDevice, triggerSync,
   type DeviceConnection,
@@ -14,17 +15,17 @@ import {
  */
 
 function Status({ s }: { s: DeviceConnection['status'] }) {
-  const map = {
-    connected: { label: 'Подключено',  color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-    pending:   { label: 'Ожидает',     color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
-    failed:    { label: 'Ошибка',      color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
-    revoked:   { label: 'Отключено',   color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
-  }[s]
+  const map: Record<DeviceConnection['status'], { label: string; variant: BadgeVariant }> = {
+    connected: { label: 'Подключено',  variant: 'success' },
+    pending:   { label: 'Ожидает',     variant: 'primary' },
+    failed:    { label: 'Ошибка',      variant: 'destructive' },
+    revoked:   { label: 'Отключено',   variant: 'secondary' },
+  }
+  const m = map[s]
   return (
-    <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 border"
-      style={{ background: map.bg, color: map.color, borderColor: map.border }}>
-      {map.label}
-    </span>
+    <Badge variant={m.variant} size="sm" className="uppercase tracking-wider">
+      {m.label}
+    </Badge>
   )
 }
 
@@ -93,14 +94,11 @@ export default function DevicesSection() {
       </div>
 
       {msg && (
-        <div className={`rounded-xl border px-3 py-2 text-sm ${
-          msg.level === 'ok' ? 'border-green-200 bg-green-50 text-green-800'
-                             : 'border-red-200 bg-red-50 text-red-800'
-        }`}>
+        <Alert variant={msg.level === 'ok' ? 'success' : 'destructive'}>
           {msg.text}
           <button onClick={() => setMsg(null)}
             className="float-right text-xs opacity-60 hover:opacity-100">×</button>
-        </div>
+        </Alert>
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -110,7 +108,7 @@ export default function DevicesSection() {
           const isPrimary   = !!conn?.is_primary && isConnected
           return (
             <div key={meta.id}
-              className="rounded-2xl border bg-card p-4 flex flex-col gap-3 transition-all hover:shadow-sm"
+              className="kt-card rounded-2xl border bg-card p-4 flex flex-col gap-3 transition-all hover:shadow-sm"
               style={{ borderColor: isPrimary ? meta.brandColor : meta.border }}>
               <div className="flex items-start gap-3">
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
@@ -122,7 +120,7 @@ export default function DevicesSection() {
                     <span className="text-sm font-bold text-foreground">{meta.name}</span>
                     {conn && <Status s={conn.status} />}
                     {isPrimary && (
-                      <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                      <span className="kt-badge rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
                         основное
                       </span>
                     )}
@@ -214,12 +212,11 @@ export default function DevicesSection() {
         })}
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-4 text-[11px] text-muted-foreground">
-        <strong className="text-foreground">Приватность:</strong>{' '}
+      <Alert variant="info" icon="ki-shield-tick" title="Приватность">
         Мы храним только OAuth-токены и агрегированные метрики
         (recovery, HRV, сон, strain). Исходные данные остаются у провайдера.
         Отключение в любой момент удаляет токены.
-      </div>
+      </Alert>
     </div>
   )
 }
