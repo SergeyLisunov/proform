@@ -21,7 +21,7 @@ export function ChartCard({ title, subtitle, toolbar, children, className = '', 
     <Card accent={accent} className={className}>
       <div className="kt-card-header flex items-start justify-between gap-3 px-5 pt-5">
         <div className="min-w-0">
-          <p className="kt-card-title pf-num text-base leading-tight text-foreground">{title}</p>
+          <p className="kt-card-title pf-num text-base leading-tight text-navy-500">{title}</p>
           {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
         {toolbar && <div className="kt-card-toolbar flex shrink-0 items-center gap-2">{toolbar}</div>}

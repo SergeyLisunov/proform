@@ -12,6 +12,10 @@ const config: Config = {
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
         display: ['"Bebas Neue"', 'sans-serif'],
       },
+      fontSize: {
+        // Used widely for micro eyebrow/stat labels — was undefined (no-op) before.
+        '2xs': ['0.625rem', { lineHeight: '0.9rem' }],
+      },
       colors: {
         // Sporteo brand — orange #F35703 + navy #1D4672 (sampled from the deck).
         // Override the default `orange` scale so every *-orange-* utility across
