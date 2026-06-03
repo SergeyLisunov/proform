@@ -38,12 +38,12 @@ const HUE = {
 }
 
 const FEATURED: LeadMagnet = {
-  title:       'Free Club Audit',
+  title:       'Бесплатный аудит клуба',
   persona:     'Руководитель / собственник',
   description:
-    'Health-score клуба, top-3 области риска и план действий на 30 дней. ' +
-    'AI анализирует структуру вашей организации и подсвечивает, ' +
-    'где теряете управляемость прямо сейчас.',
+    'Health-score клуба, топ-3 зоны риска и план действий на 30 дней. ' +
+    'AI анализирует структуру вашей организации и показывает, ' +
+    'где вы теряете управляемость и деньги прямо сейчас — до покупки платформы.',
   href:        '/tools/club-audit',
   hue:         HUE.org,
   icon:        Building2,
@@ -52,18 +52,18 @@ const FEATURED: LeadMagnet = {
 
 const SECONDARY: LeadMagnet[] = [
   {
-    title:       'Team Risk Snapshot',
+    title:       'Снимок риска команды',
     persona:     'Тренер · Клуб',
-    description: 'Светофор риска по команде + причины + план на 7-14 дней.',
+    description: 'Светофор риска травм по команде + причины + план на 7-14 дней.',
     href:        '/tools/team-risk',
     hue:         HUE.coach,
     icon:        ShieldAlert,
     ttv:         '60 сек',
   },
   {
-    title:       'Adaptive Plan',
+    title:       'Адаптивный план',
     persona:     'Атлет',
-    description: 'AI-план тренировок на 7 дней по вашей цели + 4 неделям нагрузки.',
+    description: 'AI-план тренировок на 7 дней под вашу цель и 4 недели нагрузки.',
     href:        '/tools/adaptive-plan',
     hue:         HUE.athlete,
     icon:        TrendingUp,
@@ -189,11 +189,12 @@ export default function LeadMagnetSection() {
             id="lead-magnets-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            Попробуйте подход Sporteo за 60 секунд
+            Убедитесь в пользе за 60 секунд — до покупки
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Без регистрации, без email-форм, без листов ожидания.
-            Используйте прямо сейчас и решите, нужна ли вам полная платформа.
+            Без регистрации, без email-форм, без листов ожидания. Прогоните свой
+            клуб через AI прямо сейчас, увидьте результат — и решайте по фактам,
+            а не по обещаниям.
           </p>
         </div>
 
@@ -231,8 +232,8 @@ export default function LeadMagnetSection() {
 
         {/* Footer hint */}
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          Все инструменты работают на тех же AI-моделях, что и платная платформа.
-          Понравится — перенесите данные в свой клуб за 10 минут.
+          Это та же предиктивная аналитика, что работает в полной платформе.
+          Понравится результат — подключите клуб за 10 минут, от 3900&nbsp;₽ в месяц.
         </p>
       </div>
     </section>

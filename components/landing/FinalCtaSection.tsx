@@ -15,14 +15,15 @@ export default function FinalCtaSection() {
     <section className="w-full bg-gradient-to-br from-orange-50 via-white to-orange-50/50 py-20 px-4 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-          Готовы попробовать?
+          Пора навести порядок
         </p>
         <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
-          Sporteo в вашем клубе — через 10 минут
+          Соберите подготовку клуба в одной системе
         </h2>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-          10 минут на регистрацию организации. 5 минут на первого тренера. Дальше —
-          обычный рабочий день, только с одной системой вместо пяти.
+          10 минут на регистрацию организации, 5 минут на первого тренера — и единая
+          карточка атлета, контроль нагрузок и защита медданных работают на ваш клуб.
+          От 3900&nbsp;₽ в месяц, без оплаты за каждое место.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -44,8 +45,9 @@ export default function FinalCtaSection() {
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
-          Доступ для тренеров, спортсменов и врачей создаётся внутри организации.
-          Никаких отдельных регистраций для каждой роли.
+          Доступ для тренеров, спортсменов и врачей создаётся внутри организации —
+          никаких отдельных регистраций. Нужно обсудить тариф под ваш клуб? Напишите нам,
+          поможем с запуском и переносом данных.
         </p>
       </div>
     </section>

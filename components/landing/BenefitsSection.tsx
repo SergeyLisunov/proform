@@ -1,31 +1,22 @@
 /**
- * <BenefitsSection /> — Sprint W14 Day 70; trimmed W17 Day 87.
+ * <BenefitsSection /> — solution-stage value block for Sporteo.
  *
- * Was: 9 benefits в 3×3 grid (W16 mobile QA flagged as wall-of-text).
- * Now: 6 high-impact benefits в 2×3 grid с larger icons + tighter copy.
+ * 6 benefits в 2×3 grid. Лид-четвёрка = ядро УТП:
+ *   ✅ Предиктивная аналитика (ACWR + ML-риск травм — главная ценность)
+ *   ✅ Мультиролевая координация (тренер/атлет/врач/руководитель)
+ *   ✅ Единая карточка спортсмена (вся история в одном месте)
+ *   ✅ Защита данных уровня СУБД (Row-Level Security, шифрование)
+ * + поддержка: дневник с обратной связью тренера и отчёты/Health Snapshot.
  *
- * Trim rationale — kept 6 most B2B-impactful, dropped 3 generic:
- *   ✅ Единая карточка спортсмена (replaces 5 tools — primary value prop)
- *   ✅ Координация ролей (multi-role differentiator vs CRM/Notion)
- *   ✅ Медицинские ограничения (safety + 152-ФЗ trust)
- *   ✅ Дневник и отзывы тренера (history preserved — addresses pain)
- *   ✅ Отчёты и экспорт (decision-maker value — Health Snapshot PDF)
- *   ✅ Безопасность по роли (RLS + 152-ФЗ — compliance trust)
- *
- *   ❌ Быстрый ввод тренировок (operational, weak B2B signal)
- *   ❌ Прогресс и аналитика (vague — overlap с UseCases concrete metrics)
- *   ❌ Группы и команды (overlap с RoleSection)
- *
- * Visual: card icons bumped к 12×12 (was 10×10), tighter card padding,
- * still mobile-stack à 1-col, sm:2-col, lg:3-col.
+ * Visual: 12×12 icons, mobile-stack 1-col, sm:2-col, lg:3-col.
  */
 import {
   ClipboardList,
   FileSpreadsheet,
   IdCard,
-  MessageSquare,
   Network,
   ShieldCheck,
+  TrendingUp,
 } from 'lucide-react'
 
 interface Benefit {
@@ -36,34 +27,34 @@ interface Benefit {
 
 const BENEFITS: Benefit[] = [
   {
-    icon:  IdCard,
-    title: 'Единая карточка спортсмена',
-    body:  'Все данные в одном месте — тренировки, медицина, прогресс. Заменяет Excel, Telegram-чаты и бумажные карточки.',
+    icon:  TrendingUp,
+    title: 'Предиктивная аналитика нагрузки',
+    body:  'Автоматический расчёт нагрузки (ACWR) и ML-модель риска травм предупреждают о перетренированности заранее — до того, как спортсмен «сломается».',
   },
   {
     icon:  Network,
-    title: 'Координация ключевых ролей',
-    body:  'Тренер, врач, организация, спортсмен — каждый видит своё, без хаоса параллельных чатов. Родители получают PDF-снимки и email-рассылки.',
+    title: 'Мультиролевая координация',
+    body:  'Тренер, спортсмен, врач и руководитель работают в одной системе — каждый видит ровно то, что нужно ему. Конец хаосу из чатов, Excel и бумажных карточек.',
+  },
+  {
+    icon:  IdCard,
+    title: 'Единая карточка спортсмена',
+    body:  'Вся история, медкарта, нагрузки и план тренировок — в одном месте. Картина спортсмена не теряется на следующий день и копится годами.',
+  },
+  {
+    icon:  ShieldCheck,
+    title: 'Защита данных уровня СУБД',
+    body:  'Доступ к медицинским данным проверяется на уровне базы (Row-Level Security) и шифруются при хранении и передаче. Каждый получает только свой срез информации.',
   },
   {
     icon:  ClipboardList,
-    title: 'Дневник + отзывы тренера',
-    body:  'Двусторонняя обратная связь с историей. Спортсмен видит, тренер фиксирует — ничего не теряется через 100 сообщений.',
-  },
-  {
-    icon:  MessageSquare,
-    title: 'Медицинские ограничения',
-    body:  'Травмы, противопоказания, период восстановления — изолированный медицинский контур с правильным доступом.',
+    title: 'Дневник и обратная связь',
+    body:  'Дневник тренировок и самочувствия плюс отзывы тренера — двусторонняя связь с полной историей. Ничего не теряется среди сотни сообщений.',
   },
   {
     icon:  FileSpreadsheet,
     title: 'Отчёты и Health Snapshot',
-    body:  'PDF для руководства, спонсоров, родителей — в один клик из любой роли. Forward-friendly, no login needed.',
-  },
-  {
-    icon:  ShieldCheck,
-    title: 'RLS на уровне БД',
-    body:  '152-ФЗ + EU-Central хостинг. Доступ проверяется в PostgreSQL — даже compromised app сервер не даст чужие данные.',
+    body:  'Готовые отчёты и PDF-снимки для руководства, спонсоров и родителей — в один клик из любой роли, без отдельного входа в систему.',
   },
 ]
 
@@ -74,14 +65,14 @@ export default function BenefitsSection() {
         {/* Header */}
         <div className="max-w-3xl">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            Возможности платформы
+            Что даёт Sporteo
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
-            Всё нужное для управления спортивной подготовкой
+            Управляйте подготовкой осознанно — и берегите спортсменов
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            От карточки спортсмена до командной аналитики — без переключений между Excel,
-            чатами и заметками.
+            Предиктивная аналитика нагрузки, единая карточка спортсмена и защита медданных —
+            всё в одной системе, без Excel, бумажных медкарт и десятка чатов.
           </p>
         </div>
 

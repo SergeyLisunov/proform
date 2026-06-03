@@ -1,26 +1,21 @@
 /**
- * <WorkflowSection /> — Sprint W14 Day 70; refactored W16 Day 81.
+ * <WorkflowSection /> — solution-stage «как это работает» for Sporteo.
  *
- * Previous: 6 flat cards в 3-col grid — каждая роль = отдельный шаг.
- * Feedback: «cramped, нет "aha"», читается как fragmented list.
+ * 3-step numbered timeline по дата-продукт arc:
+ *   1. Сбор — дневник тренировок + импорт с носимых устройств
+ *   2. Анализ — авторасчёт нагрузки (ACWR), циклы, ML-прогноз риска травм
+ *   3. Действие — рекомендации, адаптивный план, отчёты по ролям
  *
- * Day 81 rebuild: 3-step numbered timeline с narrative arc:
- *   1. Подключение — клуб строит структуру (онбоардинг)
- *   2. Работа — все роли действуют в своих контурах (operational)
- *   3. Контроль — руководитель видит общую картину (oversight)
+ * Visual: vertical timeline mobile, horizontal flow на lg+ с numbered
+ * cards + ArrowRight между ними. Each step — 2-3 role-tagged bullets.
  *
- * Visual: vertical timeline mobile с connector lines, horizontal flow
- * на lg+ с numbered cards + ArrowRight между ними. Each step richer
- * чем micro-card — includes 2-3 role-tagged bullets «что происходит
- * на этом шаге».
- *
- * Anchor #how-it-works — Day 79 PainSection bridges hint к этой секции.
+ * Anchor #how-it-works — PainSection bridges hint к этой секции.
  */
-import { ArrowRight, Building2, ChartLine, Workflow } from 'lucide-react'
+import { Activity, ArrowRight, ClipboardList, Sparkles } from 'lucide-react'
 
 interface Step {
   num:   number
-  icon:  typeof Building2
+  icon:  typeof ClipboardList
   title: string
   body:  string
   /** What happens at this step — short role-tagged bullets. */
@@ -31,39 +26,37 @@ interface Step {
 const STEPS: Step[] = [
   {
     num:   1,
-    icon:  Building2,
-    title: 'Подключение',
-    body:  'Руководитель создаёт организацию, приглашает тренеров и врачей одним инвайтом. Pre-built роли — никакого DIY access control.',
+    icon:  ClipboardList,
+    title: 'Сбор данных',
+    body:  'Спортсмен и тренер ведут дневник тренировок и самочувствия, а данные с умных часов и трекеров подтягиваются автоматически. Ничего не вносится дважды.',
     bullets: [
-      { role: 'Руководитель',    action: 'Создаёт клуб, добавляет команды' },
-      { role: 'Тренер',          action: 'Принимает инвайт, видит свою группу' },
-      { role: 'Врач',            action: 'Принимает инвайт в медицинский слой' },
+      { role: 'Спортсмен',       action: 'Дневник тренировок и самочувствия' },
+      { role: 'Носимые',         action: 'Импорт с умных часов и трекеров' },
+      { role: 'Тренер',          action: 'Фиксирует планы и обратную связь' },
     ],
     hue: { bg: '#EFF6FF', ring: '#BFDBFE', text: '#1D4ED8' },
   },
   {
     num:   2,
-    icon:  Workflow,
-    title: 'Работа в своих контурах',
-    body:  'Каждая роль действует в своём интерфейсе. Данные сходятся в общую картину автоматически — без копи-пасты между tool’ами.',
+    icon:  Activity,
+    title: 'Анализ нагрузки и риска',
+    body:  'Платформа сама считает нагрузку (ACWR) и циклы тренировок, а ML-модель прогнозирует риск травм — и предупреждает раньше, чем спортсмен «сломается».',
     bullets: [
-      { role: 'Тренер',          action: 'Ведёт планы, отзывы, контроль готовности' },
-      { role: 'Атлет',           action: 'Видит план, рекомендации, прогресс' },
-      { role: 'Врач',            action: 'Пишет рекомендации привязанные к атлету' },
-      // W18 Day 96 — Parent role removed (audit C2). Communication к
-      // parents preserved через PDF/email digest channels, not as role.
+      { role: 'Аналитика',       action: 'Авторасчёт нагрузки (ACWR) и циклов' },
+      { role: 'ML-модель',       action: 'Прогноз риска травм, раннее предупреждение' },
+      { role: 'Тренер',          action: 'Видит готовность и зоны риска по группе' },
     ],
     hue: { bg: '#FFF7ED', ring: '#FED7AA', text: '#C2410C' },
   },
   {
     num:   3,
-    icon:  ChartLine,
-    title: 'Контроль и видимость',
-    body:  'Руководитель открывает один дашборд — видит загрузку всех команд, риски по атлетам, activity feed по событиям. Без 30-минутных еженедельных сводок из 5 файлов.',
+    icon:  Sparkles,
+    title: 'Рекомендации и отчёты',
+    body:  'На основе аналитики Sporteo формирует рекомендации и адаптирует план тренировок, а руководитель и врач получают готовые отчёты по своим ролям.',
     bullets: [
-      { role: 'Руководитель',    action: 'Health-score клуба + риск-картина' },
-      { role: 'Admin',           action: 'Audit trail всех решений и событий' },
-      { role: 'Все',             action: 'Activity feed по атлету — навсегда' },
+      { role: 'Спортсмен',       action: 'Адаптивный план и рекомендации' },
+      { role: 'Врач',            action: 'Корректирует ограничения и нагрузку' },
+      { role: 'Руководитель',    action: 'Отчёты и риск-картина по всему клубу' },
     ],
     hue: { bg: '#F0FDF4', ring: '#BBF7D0', text: '#15803D' },
   },
@@ -144,17 +137,17 @@ export default function WorkflowSection() {
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
-            Как работает
+            Как это работает
           </p>
           <h2
             id="workflow-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
-            Подключение → работа → контроль
+            Сбор данных → анализ → рекомендации
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Три фазы внедрения Sporteo в клуб. От первого инвайта до
-            ежедневного контроля состояния организации — за 10 минут.
+            Дневник и носимые устройства, авторасчёт нагрузки и ML-прогноз риска травм,
+            адаптивный план и отчёты — три шага от сырых данных к решениям, которые берегут спортсменов.
           </p>
         </div>
 
@@ -167,7 +160,7 @@ export default function WorkflowSection() {
 
         {/* Bridge */}
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Каждая роль работает в своём интерфейсе, а данные сходятся в одну картину.{' '}
+          Сырые данные превращаются в прогноз и готовый план автоматически.{' '}
           <a href="#tools" className="font-semibold text-orange-600 hover:underline">
             Попробовать AI-инструменты Sporteo →
           </a>
