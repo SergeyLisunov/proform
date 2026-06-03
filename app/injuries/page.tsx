@@ -15,7 +15,7 @@ type AthleteOption = { id: string; name: string }
 
 const SEVERITY_COLOR: Record<InjurySeverity, { text: string; bg: string; border: string }> = {
   minor:    { text: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-  moderate: { text: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  moderate: { text: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0' },
   severe:   { text: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
 }
 
@@ -93,7 +93,7 @@ export default function InjuriesPage() {
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
-      <div className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FFF7ED] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-gradient-to-br from-[#FEF2F2] via-white to-[#FEF0E7] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-red-200/40 blur-3xl" />
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -119,9 +119,9 @@ export default function InjuriesPage() {
           <div className="text-[10px] font-semibold uppercase tracking-wider text-[#B91C1C]">Активные</div>
           <div className="pf-num text-2xl mt-1 text-[#B91C1C]">{counts.active}</div>
         </div>
-        <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] p-3">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-[#C2410C]">Восстановление</div>
-          <div className="pf-num text-2xl mt-1 text-[#C2410C]">{counts.recovering}</div>
+        <div className="rounded-xl border border-[#FBC1A0] bg-[#FEF0E7] p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-[#B03D04]">Восстановление</div>
+          <div className="pf-num text-2xl mt-1 text-[#B03D04]">{counts.recovering}</div>
         </div>
         <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] p-3">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-[#15803D]">Восстановлены</div>

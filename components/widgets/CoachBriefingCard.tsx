@@ -66,7 +66,7 @@ export default function CoachBriefingCard() {
     <div className="rounded-[20px] border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#FFF7ED' }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#FEF0E7' }}>
             <i className="ki-filled ki-rocket text-[14px] text-orange-500" />
           </div>
           <div>

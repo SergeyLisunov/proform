@@ -22,7 +22,7 @@ const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: str
     badge: 'bg-orange-50 text-orange-600 border border-orange-200',
     icon: 'ki-calendar-tick',
     accent: '#F35703',
-    panel: '#FFF7ED',
+    panel: '#FEF0E7',
   },
   news: {
     label: 'Новость',
@@ -157,7 +157,7 @@ export default function OrgWallPage() {
   const latestPost = posts[0]
   const summary = [
     { label: 'Всего публикаций', value: posts.length, hint: 'Все записи на стене', icon: 'ki-abstract-26', color: '#2563EB', bg: '#EFF6FF' },
-    { label: 'Закреплено', value: pinned.length, hint: 'Верх ленты и важные анонсы', icon: 'ki-pin', color: '#F35703', bg: '#FFF7ED' },
+    { label: 'Закреплено', value: pinned.length, hint: 'Верх ленты и важные анонсы', icon: 'ki-pin', color: '#F35703', bg: '#FEF0E7' },
     { label: 'События', value: eventPosts, hint: 'Посты с датой события', icon: 'ki-calendar-tick', color: '#9333EA', bg: '#FAF5FF' },
     { label: 'Публичные', value: publicPosts, hint: 'Открыты всем посетителям', icon: 'ki-eye', color: '#16A34A', bg: '#F0FDF4' },
   ]
@@ -165,7 +165,7 @@ export default function OrgWallPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.15),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.15),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -189,7 +189,7 @@ export default function OrgWallPage() {
               <div className="mt-5 flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] transition-transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] transition-transform hover:-translate-y-0.5"
                 >
                   <i className="ki-filled ki-plus text-sm" />
                   Новая публикация
@@ -311,7 +311,7 @@ export default function OrgWallPage() {
           onClick={e => { if (e.target === e.currentTarget) setShowCreate(false) }}
         >
           <div className="w-full max-w-xl overflow-hidden rounded-[28px] border border-border bg-card shadow-[0_30px_90px_rgba(15,23,42,0.2)]">
-            <div className="border-b border-border bg-[linear-gradient(135deg,rgba(249,115,22,0.08),transparent)] px-6 py-5">
+            <div className="border-b border-border bg-[linear-gradient(135deg,rgba(243,87,3,0.08),transparent)] px-6 py-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Контент организации</div>
@@ -393,7 +393,7 @@ export default function OrgWallPage() {
                 </Alert>
 
                 <div className="flex gap-2 pt-1">
-                  <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] disabled:opacity-60">
+                  <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] disabled:opacity-60">
                     {saving ? 'Сохранение…' : 'Опубликовать'}
                   </button>
                   <button type="button" onClick={() => setShowCreate(false)} className="kt-btn kt-btn-outline">
@@ -416,7 +416,7 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
   return (
     <Card className={`p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-sm ${
       pinnedStyle
-        ? '!border-orange-100 !bg-white shadow-[0_12px_28px_rgba(249,115,22,0.08)]'
+        ? '!border-orange-100 !bg-white shadow-[0_12px_28px_rgba(243,87,3,0.08)]'
         : ''
     }`}>
       <div className="flex items-start justify-between gap-4">

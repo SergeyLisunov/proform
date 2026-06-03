@@ -187,7 +187,7 @@ export default function DoctorInquiriesPage() {
             return (
               <div key={i.id} className="rounded-2xl border-2 p-4"
                 style={isPending && i.urgency === 'red_flag' ? { borderColor: '#FECACA', background: '#FEF2F2' }
-                  : isPending && i.urgency === 'urgent' ? { borderColor: '#FED7AA', background: '#FFF7ED' }
+                  : isPending && i.urgency === 'urgent' ? { borderColor: '#FBC1A0', background: '#FEF0E7' }
                   : { borderColor: 'var(--border)' }}>
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
                   <div className="flex items-center gap-2 flex-wrap">

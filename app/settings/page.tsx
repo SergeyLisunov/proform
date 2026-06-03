@@ -652,7 +652,7 @@ export default function SettingsPage() {
             onMouseEnter={e => {
               (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F35703'
               ;(e.currentTarget as HTMLAnchorElement).style.color = '#F35703'
-              ;(e.currentTarget as HTMLAnchorElement).style.background = '#FFF7ED'
+              ;(e.currentTarget as HTMLAnchorElement).style.background = '#FEF0E7'
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'
@@ -754,7 +754,7 @@ export default function SettingsPage() {
                     disabled={uploadingAvatar}
                     style={{
                       padding: '7px 16px', borderRadius: 10,
-                      border: '1.5px solid #FED7AA', background: '#FFF7ED',
+                      border: '1.5px solid #FBC1A0', background: '#FEF0E7',
                       color: '#F35703', fontSize: 12, fontWeight: 600,
                       cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
                       display: 'flex', alignItems: 'center', gap: 6,
@@ -1136,7 +1136,7 @@ export default function SettingsPage() {
               ? '0 3px 12px rgba(22,163,74,0.35)'
               : saveError
               ? '0 3px 12px rgba(220,38,38,0.35)'
-              : '0 3px 12px rgba(249,115,22,0.35)',
+              : '0 3px 12px rgba(243,87,3,0.35)',
             opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
           }}>
           {saving ? (

@@ -28,7 +28,7 @@ const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon
     badge: 'bg-orange-50 text-orange-600 border border-orange-200',
     icon: 'ki-calendar-8',
     accent: '#F35703',
-    bg: '#FFF7ED',
+    bg: '#FEF0E7',
   },
 }
 
@@ -135,7 +135,7 @@ export default function OrgNewslettersPage() {
   const summary = [
     { label: 'Всего рассылок', value: newsletters.length, hint: 'Общий архив коммуникаций', icon: 'ki-sms', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Черновики', value: drafts.length, hint: 'Готовятся к публикации', icon: 'ki-note-2', color: '#64748B', bg: '#F8FAFC' },
-    { label: 'Запланированные', value: scheduled.length, hint: 'Уже стоят в очереди', icon: 'ki-calendar-8', color: '#F35703', bg: '#FFF7ED' },
+    { label: 'Запланированные', value: scheduled.length, hint: 'Уже стоят в очереди', icon: 'ki-calendar-8', color: '#F35703', bg: '#FEF0E7' },
     { label: 'Отправленные', value: sent.length, hint: 'Ушли в коммуникацию', icon: 'ki-send', color: '#16A34A', bg: '#F0FDF4' },
   ]
 
@@ -159,7 +159,7 @@ export default function OrgNewslettersPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.1),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.1),_transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">

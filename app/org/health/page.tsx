@@ -25,7 +25,7 @@ import {
 const RISK_META: Record<RiskBucket, { label: string; color: string; bg: string }> = {
   low:      { label: 'В норме',  color: '#16A34A', bg: '#F0FDF4' },
   moderate: { label: 'Умеренный', color: '#D97706', bg: '#FFFBEB' },
-  high:     { label: 'Высокий',  color: '#D44A02', bg: '#FFF7ED' },
+  high:     { label: 'Высокий',  color: '#D44A02', bg: '#FEF0E7' },
   critical: { label: 'Критич.',  color: '#DC2626', bg: '#FEF2F2' },
 }
 

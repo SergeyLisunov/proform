@@ -415,14 +415,14 @@ export default function AdminPage() {
   const summary = [
     { label: 'Пользователи', value: USERS.length, hint: 'Все тестовые аккаунты контура', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Активны сегодня', value: todayActiveCount, hint: 'Свежие входы и действия за день', icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4' },
-    { label: 'Сущности данных', value: '13', hint: 'Базовые системные таблицы и политики', icon: 'ki-data', color: '#F35703', bg: '#FFF7ED' },
+    { label: 'Сущности данных', value: '13', hint: 'Базовые системные таблицы и политики', icon: 'ki-data', color: '#F35703', bg: '#FEF0E7' },
     { label: 'Журналы и sync', value: '100K', hint: 'События аудита и интеграций', icon: 'ki-chart-line-up', color: '#9333EA', bg: '#FAF5FF' },
   ]
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.12),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.12),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.08),_transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -443,7 +443,7 @@ export default function AdminPage() {
               <div className="mt-5 flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={() => setShowAssign(true)}
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(249,115,22,0.26)] transition-transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] transition-transform hover:-translate-y-0.5"
                 >
                   <i className="ki-filled ki-people text-sm" />
                   Назначить атлета

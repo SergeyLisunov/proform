@@ -175,7 +175,7 @@ export function renderInviteEmail(input: {
       тренировки, медицинские осмотры и командные события в одном месте.
     </p>
     ${input.message ? `
-      <div style="padding:14px 16px;background:#FFF7ED;border-left:3px solid #F35703;border-radius:8px;margin-bottom:20px;color:#9A3412;font-size:13px;line-height:1.5;white-space:pre-wrap">${escape(input.message)}</div>
+      <div style="padding:14px 16px;background:#FEF0E7;border-left:3px solid #F35703;border-radius:8px;margin-bottom:20px;color:#8A300A;font-size:13px;line-height:1.5;white-space:pre-wrap">${escape(input.message)}</div>
     ` : ''}
     <div style="margin:20px 0">
       <a href="${input.claim_url}" style="display:inline-block;padding:14px 28px;background:#F35703;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Принять приглашение →</a>
@@ -474,8 +474,8 @@ export function renderAdaptivePlanPreview(input: AdaptivePlanPreviewEmailInput):
   }).join('')
 
   const redFlagsBlock = input.red_flags.length > 0
-    ? `<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:14px;margin:0 0 18px 0">
-         <div style="font-size:11px;font-weight:700;color:#9A3412;text-transform:uppercase;letter-spacing:1px">⚠️ На что обратить внимание</div>
+    ? `<div style="background:#FEF0E7;border:1px solid #FBC1A0;border-radius:12px;padding:14px;margin:0 0 18px 0">
+         <div style="font-size:11px;font-weight:700;color:#8A300A;text-transform:uppercase;letter-spacing:1px">⚠️ На что обратить внимание</div>
          <ul style="margin:8px 0 0 0;padding-left:20px;color:#0F172A;font-size:13px;line-height:1.6">
            ${input.red_flags.map(rf => `<li>${escape(rf)}</li>`).join('')}
          </ul>
@@ -526,14 +526,14 @@ export function renderAdaptivePlanPreview(input: AdaptivePlanPreviewEmailInput):
 
 const HEALTH_BADGE: Record<'critical' | 'at-risk' | 'stable' | 'healthy', { label: string; color: string; bg: string; emoji: string }> = {
   critical: { label: 'CRITICAL', color: '#B91C1C', bg: '#FEF2F2', emoji: '🚨' },
-  'at-risk':{ label: 'AT RISK',  color: '#C2410C', bg: '#FFF7ED', emoji: '⚠️' },
+  'at-risk':{ label: 'AT RISK',  color: '#B03D04', bg: '#FEF0E7', emoji: '⚠️' },
   stable:   { label: 'STABLE',   color: '#A16207', bg: '#FEFCE8', emoji: '🟡' },
   healthy:  { label: 'HEALTHY',  color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
 }
 
 const SEVERITY_BADGE_EMAIL: Record<'low' | 'medium' | 'high', { color: string; bg: string }> = {
   low:    { color: '#15803D', bg: '#F0FDF4' },
-  medium: { color: '#C2410C', bg: '#FFF7ED' },
+  medium: { color: '#B03D04', bg: '#FEF0E7' },
   high:   { color: '#B91C1C', bg: '#FEF2F2' },
 }
 
@@ -614,7 +614,7 @@ export function renderClubAuditReport(input: ClubAuditEmailInput): { subject: st
         <td style="padding-left:16px;vertical-align:top">
           <p style="margin:0 0 8px 0;color:#475569;font-size:14px;line-height:1.6">${escape(input.summary)}</p>
           ${input.estimated_revenue_at_risk ? `
-            <div style="display:inline-block;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:6px 10px;font-size:12px;color:#9A3412;font-weight:600">
+            <div style="display:inline-block;background:#FEF0E7;border:1px solid #FBC1A0;border-radius:8px;padding:6px 10px;font-size:12px;color:#8A300A;font-weight:600">
               💸 ${escape(input.estimated_revenue_at_risk)}
             </div>
           ` : ''}
@@ -659,7 +659,7 @@ export function renderClubAuditReport(input: ClubAuditEmailInput): { subject: st
 
 const TRIAGE_BADGE: Record<'red_flag' | 'urgent_referral' | 'restricted_activity' | 'monitor' | 'return_to_play', { label: string; color: string; bg: string; emoji: string }> = {
   red_flag:            { label: 'RED FLAG',            color: '#B91C1C', bg: '#FEF2F2', emoji: '🚨' },
-  urgent_referral:     { label: 'URGENT REFERRAL',     color: '#C2410C', bg: '#FFF7ED', emoji: '⚠️' },
+  urgent_referral:     { label: 'URGENT REFERRAL',     color: '#B03D04', bg: '#FEF0E7', emoji: '⚠️' },
   restricted_activity: { label: 'RESTRICTED ACTIVITY', color: '#A16207', bg: '#FEFCE8', emoji: '🟠' },
   monitor:             { label: 'MONITOR',             color: '#0E7490', bg: '#ECFEFF', emoji: '🟡' },
   return_to_play:      { label: 'RETURN TO PLAY',      color: '#15803D', bg: '#F0FDF4', emoji: '🟢' },
@@ -844,11 +844,11 @@ export function renderDoctorInquiryEmail(input: DoctorInquiryEmailInput): { subj
   const subject = `${urgencyPrefix}Запрос врачу: ${input.athlete_name} (${input.question_type})`
 
   const urgencyBg = input.urgency === 'red_flag' ? '#FEF2F2'
-    : input.urgency === 'urgent' ? '#FFF7ED' : '#F8FAFC'
+    : input.urgency === 'urgent' ? '#FEF0E7' : '#F8FAFC'
   const urgencyColor = input.urgency === 'red_flag' ? '#B91C1C'
-    : input.urgency === 'urgent' ? '#C2410C' : '#475569'
+    : input.urgency === 'urgent' ? '#B03D04' : '#475569'
   const urgencyBorder = input.urgency === 'red_flag' ? '#FECACA'
-    : input.urgency === 'urgent' ? '#FED7AA' : '#E2E8F0'
+    : input.urgency === 'urgent' ? '#FBC1A0' : '#E2E8F0'
 
   const expiresFmt = (() => {
     try {

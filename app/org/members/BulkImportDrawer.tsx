@@ -25,7 +25,7 @@ import { Accordion } from '@/components/ui/metronic'
 type MemberRole = 'athlete' | 'coach'
 
 const ROLE_CFG = {
-  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FFF7ED', border: '#FED7AA' },
+  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
   coach:   { label: 'Тренер', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
 }
 

@@ -34,7 +34,7 @@ type Newsletter = {
 
 const POST_TYPE_BADGE: Record<string, { label: string; style: React.CSSProperties }> = {
   announcement: { label: 'Объявление', style: { background: '#EFF6FF', color: '#2563EB', border: '1px solid #BFDBFE' } },
-  event:        { label: 'Событие',    style: { background: '#FFF7ED', color: '#F35703', border: '1px solid #FED7AA' } },
+  event:        { label: 'Событие',    style: { background: '#FEF0E7', color: '#F35703', border: '1px solid #FBC1A0' } },
   news:         { label: 'Новость',    style: { background: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' } },
   result:       { label: 'Результат',  style: { background: '#FAF5FF', color: '#9333EA', border: '1px solid #E9D5FF' } },
 }
@@ -42,7 +42,7 @@ const POST_TYPE_BADGE: Record<string, { label: string; style: React.CSSPropertie
 const NL_STATUS: Record<string, { label: string; style: React.CSSProperties }> = {
   sent:      { label: 'Отправлена',  style: { background: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' } },
   draft:     { label: 'Черновик',    style: { background: '#F8FAFC', color: '#64748B', border: '1px solid #E2E8F0' } },
-  scheduled: { label: 'Запланирована', style: { background: '#FFF7ED', color: '#F35703', border: '1px solid #FED7AA' } },
+  scheduled: { label: 'Запланирована', style: { background: '#FEF0E7', color: '#F35703', border: '1px solid #FBC1A0' } },
   cancelled: { label: 'Отменена',    style: { background: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA' } },
 }
 
@@ -131,13 +131,13 @@ export default function OrgDashboard() {
   const kpis = [
     { label: 'Участники', value: stats.total, hint: 'Активный состав', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Тренеры', value: stats.coaches, hint: 'Роль с доступом', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4' },
-    { label: 'Атлеты', value: stats.athletes, hint: 'Основная команда', icon: 'ki-abstract-26', color: '#F35703', bg: '#FFF7ED' },
+    { label: 'Атлеты', value: stats.athletes, hint: 'Основная команда', icon: 'ki-abstract-26', color: '#F35703', bg: '#FEF0E7' },
     { label: 'Контент', value: posts.length + newsletters.length, hint: 'Публикации и рассылки', icon: 'ki-calendar-tick', color: '#9333EA', bg: '#FAF5FF' },
   ]
 
   const actions = [
     { href: '/org/members', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF', label: 'Участники', meta: 'Состав и статусы' },
-    { href: '/org/wall', icon: 'ki-abstract-45', color: '#F35703', bg: '#FFF7ED', label: 'Стена', meta: 'Публикации и анонсы' },
+    { href: '/org/wall', icon: 'ki-abstract-45', color: '#F35703', bg: '#FEF0E7', label: 'Стена', meta: 'Публикации и анонсы' },
     { href: '/org/newsletters', icon: 'ki-sms', color: '#9333EA', bg: '#FAF5FF', label: 'Рассылки', meta: 'Сообщения и охват' },
     { href: '/org/settings', icon: 'ki-setting-2', color: '#64748B', bg: '#F8FAFC', label: 'Настройки', meta: 'Профиль и права' },
   ]
@@ -145,7 +145,7 @@ export default function OrgDashboard() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.13),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.13),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div className="max-w-2xl">
@@ -184,10 +184,10 @@ export default function OrgDashboard() {
                 <Link href="/org/wall" style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '10px 16px', borderRadius: 14, textDecoration: 'none',
-                  border: '1px solid #FED7AA',
+                  border: '1px solid #FBC1A0',
                   background: 'linear-gradient(135deg, #F35703, #D44A02)',
                   color: 'white', fontSize: 13, fontWeight: 700,
-                  boxShadow: '0 10px 24px rgba(249,115,22,0.26)',
+                  boxShadow: '0 10px 24px rgba(243,87,3,0.26)',
                 }}>
                   <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
                   Новая публикация
@@ -304,7 +304,7 @@ export default function OrgDashboard() {
           <div className="divide-y divide-border">
             {posts.length === 0 ? (
               <div className="px-5 py-12 text-center">
-                <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FEF0E7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                   <i className="ki-filled ki-abstract-45 text-2xl" style={{ color: '#F35703' }} />
                 </div>
                 <p className="text-sm font-semibold text-foreground">Публикаций пока нет</p>

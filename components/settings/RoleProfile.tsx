@@ -774,7 +774,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FEF0E7" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Дата рождения"><TextInput type="date" value={form.birth_date} onChange={u('birth_date') as (v: string) => void} /></Field>
@@ -877,7 +877,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FEF0E7" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Дата рождения"><TextInput type="date" value={form.birth_date} onChange={u('birth_date') as (v: string) => void} /></Field>
@@ -988,7 +988,7 @@ function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Di
 
   if (tab === 'main') {
     return (
-      <FormSection title="Основная информация" icon="ki-home-2" iconBg="#FFF7ED" iconColor="#F35703">
+      <FormSection title="Основная информация" icon="ki-home-2" iconBg="#FEF0E7" iconColor="#F35703">
         <Field label="Название организации"><TextInput value={form.org_name} onChange={u('org_name') as (v: string) => void} /></Field>
         <Field label="Короткий URL (slug)" hint="например: skyrun"><TextInput value={form.org_slug} onChange={u('org_slug') as (v: string) => void} /></Field>
         <Field label="Тип организации"><Select value={form.org_type} onChange={u('org_type') as (v: string) => void} options={ORG_TYPES} /></Field>
@@ -1071,7 +1071,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
 
   if (tab === 'personal') {
     return (
-      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FFF7ED" iconColor="#F35703">
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FEF0E7" iconColor="#F35703">
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>

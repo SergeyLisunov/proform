@@ -90,7 +90,7 @@ export default async function AthletePassportPage(
         className="relative overflow-hidden"
         style={p.background_url
           ? { backgroundImage: `linear-gradient(rgba(15,23,42,0.4), rgba(15,23,42,0.8)), url(${p.background_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-          : { background: 'linear-gradient(135deg, #F35703 0%, #D44A02 60%, #9A3412 100%)' }}>
+          : { background: 'linear-gradient(135deg, #F35703 0%, #D44A02 60%, #8A300A 100%)' }}>
         <div className="mx-auto max-w-5xl px-5 py-12 md:py-16 text-white">
           <div className="flex items-start gap-5 flex-wrap">
             <div className="shrink-0">

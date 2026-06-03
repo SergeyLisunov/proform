@@ -38,7 +38,7 @@ const PAINS: PainCard[] = [
     description:
       'Тренеры пишут одно, родители — другое, врач — в третьем. ' +
       'Кто кому ответил и где — теряется на следующий день.',
-    hue:         { bg: '#FFF7ED', text: '#C2410C' },
+    hue:         { bg: '#FEF0E7', text: '#B03D04' },
   },
   {
     icon:        FileSpreadsheet,

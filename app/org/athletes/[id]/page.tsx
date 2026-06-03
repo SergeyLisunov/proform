@@ -252,7 +252,7 @@ export default function OrgAthletePage() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Tile label="Активных рекомендаций" value={counts.active_recommendations} icon="ki-clipboard-check" color="#7C3AED" bg="#FAF5FF" />
         <Tile label="Активных травм" value={counts.active_injuries} icon="ki-shield-cross" color="#B91C1C" bg="#FEF2F2" />
-        <Tile label="Тренировок за 30д" value={counts.workouts_last_30d} icon="ki-flash" color="#F35703" bg="#FFF7ED" />
+        <Tile label="Тренировок за 30д" value={counts.workouts_last_30d} icon="ki-flash" color="#F35703" bg="#FEF0E7" />
         <Tile label="Команд" value={counts.team_names.length} icon="ki-people" color="#2563EB" bg="#EFF6FF" />
       </section>
 

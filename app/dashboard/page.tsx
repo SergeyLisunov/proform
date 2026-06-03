@@ -36,7 +36,7 @@ function sb() {
 
 const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  bg: '#EFF6FF', border: '#BFDBFE', text: '#2563EB' },
-  'Велоспорт': { icon: 'ki-technology-4', bg: '#FFF7ED', border: '#FED7AA', text: '#D44A02' },
+  'Велоспорт': { icon: 'ki-technology-4', bg: '#FEF0E7', border: '#FBC1A0', text: '#D44A02' },
   'Плавание':  { icon: 'ki-abstract-14',  bg: '#E0F2FE', border: '#7DD3FC', text: '#0284C7' },
   'Силовые':   { icon: 'ki-abstract-45',  bg: '#FAF5FF', border: '#E9D5FF', text: '#9333EA' },
   'Ходьба':    { icon: 'ki-map',          bg: '#F0FDF4', border: '#BBF7D0', text: '#16A34A' },
@@ -219,7 +219,7 @@ function SocialIcons({ data, onEdit }: { data: SocialData; onEdit: () => void })
         }}
         onMouseEnter={e => {
           const b = e.currentTarget
-          b.style.borderColor = '#F35703'; b.style.color = '#F35703'; b.style.background = '#FFF7ED'
+          b.style.borderColor = '#F35703'; b.style.color = '#F35703'; b.style.background = '#FEF0E7'
         }}
         onMouseLeave={e => {
           const b = e.currentTarget
@@ -372,7 +372,7 @@ function TrainingWidget({
   return (
     <div
       className="border border-orange-100 rounded-[20px] overflow-hidden h-full flex flex-col"
-      style={{ background: 'linear-gradient(160deg,#FFF7ED 0%,#FFFBF5 50%,#FFFFFF 100%)' }}
+      style={{ background: 'linear-gradient(160deg,#FEF0E7 0%,#FFFBF5 50%,#FFFFFF 100%)' }}
     >
       {/* Header — без ссылок и кнопки */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-orange-100/80 shrink-0">
@@ -513,8 +513,8 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="group relative w-full overflow-hidden rounded-[20px] border text-left transition-all hover:shadow-lg"
       style={{
-        background: 'linear-gradient(135deg,#FFEDD5 0%,#FFF7ED 55%,#FFFBEB 100%)',
-        borderColor: '#FED7AA',
+        background: 'linear-gradient(135deg,#FDDDCB 0%,#FEF0E7 55%,#FFFBEB 100%)',
+        borderColor: '#FBC1A0',
       }}
     >
       {/* Both decorative blobs removed: top-right blob's blur-2xl bled
@@ -704,7 +704,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
 
   const weekPct = targetHours > 0 ? Math.min(100, Math.round((actualHours / targetHours) * 100)) : 0
   const weekRingColor = weekPct === 0 ? '#9CA3AF' : weekPct < 50 ? '#DC2626' : weekPct < 80 ? '#F35703' : weekPct < 100 ? '#2563EB' : '#16A34A'
-  const weekRingBg = weekPct === 0 ? '#F9FAFB' : weekPct < 50 ? '#FFF1F2' : weekPct < 80 ? '#FFF7ED' : weekPct < 100 ? '#EFF6FF' : '#F0FDF4'
+  const weekRingBg = weekPct === 0 ? '#F9FAFB' : weekPct < 50 ? '#FFF1F2' : weekPct < 80 ? '#FEF0E7' : weekPct < 100 ? '#EFF6FF' : '#F0FDF4'
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
@@ -713,7 +713,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
       <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
         {/* Gradient banner */}
         <div style={{
-          background: 'linear-gradient(135deg,#FFF7ED 0%,#FFFBF5 60%,#F0F9FF 100%)',
+          background: 'linear-gradient(135deg,#FEF0E7 0%,#FFFBF5 60%,#F0F9FF 100%)',
           padding: '28px 32px',
           borderBottom: '1px solid var(--border)',
         }}>
@@ -748,7 +748,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                   value: String(weeklyCount),
                   icon: 'ki-abstract-26',
                   color: '#F35703',
-                  bg: '#FFF7ED',
+                  bg: '#FEF0E7',
                 },
                 {
                   label: 'Часов\nза неделю',

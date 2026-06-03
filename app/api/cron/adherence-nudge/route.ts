@@ -69,9 +69,9 @@ function renderEmail(c: NudgeCandidate): { subject: string; html: string } {
             а отмечено выполнено — <strong style="color:#0F172A">${prescribed - missed}</strong>.
             Это не упрёк — просто хотим помочь вернуться в ритм.
           </p>
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:14px 16px;margin:0 0 18px 0">
-            <p style="margin:0 0 6px 0;color:#9A3412;font-size:13px;font-weight:700">3 шага чтобы вернуться:</p>
-            <ol style="margin:0;padding-left:20px;color:#7C2D12;font-size:13px;line-height:1.6">
+          <div style="background:#FEF0E7;border:1px solid #FBC1A0;border-radius:12px;padding:14px 16px;margin:0 0 18px 0">
+            <p style="margin:0 0 6px 0;color:#8A300A;font-size:13px;font-weight:700">3 шага чтобы вернуться:</p>
+            <ol style="margin:0;padding-left:20px;color:#702A0C;font-size:13px;line-height:1.6">
               <li>Зайдите в календарь — что планировалось на эту неделю?</li>
               <li>Отметьте 1-2 тренировки на ближайшие дни как «сделано» или «перенесено».</li>
               <li>Если план не реалистичен — напишите тренеру, пересмотрите вместе.</li>

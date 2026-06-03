@@ -44,7 +44,7 @@ interface Tariff {
 }
 
 const ROLE_GROUPS: Array<{ key: string; label: string; emoji: string; bg: string; color: string }> = [
-  { key: 'athlete',      label: 'Атлет',           emoji: '🏃', bg: '#FFF7ED', color: '#D44A02' },
+  { key: 'athlete',      label: 'Атлет',           emoji: '🏃', bg: '#FEF0E7', color: '#D44A02' },
   { key: 'coach',        label: 'Тренер',          emoji: '🥇', bg: '#EFF6FF', color: '#2563EB' },
   { key: 'specialist',   label: 'Врач / Специалист', emoji: '⚕️', bg: '#FEF2F2', color: '#E11D48' },
   { key: 'organization', label: 'Организация',     emoji: '🏢', bg: '#FAF5FF', color: '#9333EA' },
@@ -215,7 +215,7 @@ export default function PricingPage() {
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                         <span className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
-                          style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', boxShadow: '0 4px 12px rgba(234,88,12,0.4)' }}>
+                          style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', boxShadow: '0 4px 12px rgba(212,74,2,0.4)' }}>
                           ⭐ Популярный
                         </span>
                       </div>
@@ -244,7 +244,7 @@ export default function PricingPage() {
 
                     {t.trial_days > 0 && !isFree && (
                       <div className="mb-3 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider self-start"
-                        style={{ background: '#FFF7ED', color: '#D44A02', border: '1px solid #FED7AA' }}>
+                        style={{ background: '#FEF0E7', color: '#D44A02', border: '1px solid #FBC1A0' }}>
                         🎁 Trial {t.trial_days} дней
                       </div>
                     )}

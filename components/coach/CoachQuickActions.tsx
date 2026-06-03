@@ -39,7 +39,7 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
       icon: 'ki-plus-squared',
       label: 'Назначить',
       hint: 'Тренировка атлету',
-      bg: '#FFF7ED', color: '#D44A02', border: '#FED7AA',
+      bg: '#FEF0E7', color: '#D44A02', border: '#FBC1A0',
     },
     {
       href: '/diary',
@@ -74,7 +74,7 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
       icon: 'ki-minus-squared',
       label: 'Списать сессию',
       hint: 'Абонементы атлетов',
-      bg: '#FFF7ED', color: '#C2410C', border: '#FED7AA',
+      bg: '#FEF0E7', color: '#B03D04', border: '#FBC1A0',
     },
   ]
 

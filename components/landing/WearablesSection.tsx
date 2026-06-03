@@ -40,7 +40,7 @@ const ROADMAP: RoadmapItem[] = [
 
 const STATUS_META: Record<RoadmapItem['status'], { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
   now:     { label: 'Доступно',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle2 },
-  soon:    { label: 'Готовится', color: '#D44A02', bg: '#FFF7ED', icon: Clock },
+  soon:    { label: 'Готовится', color: '#D44A02', bg: '#FEF0E7', icon: Clock },
   roadmap: { label: 'В roadmap', color: '#64748B', bg: '#F1F5F9', icon: Clock },
 }
 

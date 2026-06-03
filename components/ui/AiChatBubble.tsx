@@ -77,7 +77,7 @@ export default function AiChatBubble() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-[9997] flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(249,115,22,0.45)] transition hover:scale-105"
+          className="fixed bottom-6 right-6 z-[9997] flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F35703 0%,#D44A02 60%,#7C3AED 130%)' }}
           title="AI-ассистент"
         >

@@ -46,7 +46,7 @@ const STEPS: Step[] = [
       { role: 'ML-модель',       action: 'Прогноз риска травм, раннее предупреждение' },
       { role: 'Тренер',          action: 'Видит готовность и зоны риска по группе' },
     ],
-    hue: { bg: '#FFF7ED', ring: '#FED7AA', text: '#C2410C' },
+    hue: { bg: '#FEF0E7', ring: '#FBC1A0', text: '#B03D04' },
   },
   {
     num:   3,

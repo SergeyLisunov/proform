@@ -71,7 +71,7 @@ export default async function OgImage() {
               style={{
                 fontSize: 13,
                 fontWeight: 700,
-                color: '#C2410C',
+                color: '#B03D04',
                 letterSpacing: 4,
                 textTransform: 'uppercase',
               }}
@@ -113,7 +113,7 @@ export default async function OgImage() {
           <div style={{ display: 'flex', gap: 12 }}>
             {[
               { label: 'Тренер',     bg: '#DCFCE7', fg: '#166534' },
-              { label: 'Спортсмен',  bg: '#FFEDD5', fg: '#9A3412' },
+              { label: 'Спортсмен',  bg: '#FDDDCB', fg: '#8A300A' },
               { label: 'Врач',       bg: '#FEE2E2', fg: '#991B1B' },
               { label: 'Клуб',       bg: '#EAF0F6', fg: '#1D4672' },
             ].map((chip) => (

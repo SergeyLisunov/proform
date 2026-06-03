@@ -37,7 +37,7 @@ const TITLES: Record<string, { title: string; sub: string }> = {
 }
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  athlete:      { bg: '#FFF7ED', text: '#F35703', border: '#FED7AA' },
+  athlete:      { bg: '#FEF0E7', text: '#F35703', border: '#FBC1A0' },
   coach:        { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
   admin:        { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
   organization: { bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },

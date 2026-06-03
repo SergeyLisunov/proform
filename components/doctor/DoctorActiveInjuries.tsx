@@ -10,7 +10,7 @@ interface InjuryRow extends Injury { athlete_name: string }
 
 const STATUS_META: Record<Injury['status'], { label: string; color: string; bg: string; border: string }> = {
   active:     { label: 'Активная',        color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
-  recovering: { label: 'Восстановление',  color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  recovering: { label: 'Восстановление',  color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0' },
   recovered:  { label: 'Восстановлена',   color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
 }
 

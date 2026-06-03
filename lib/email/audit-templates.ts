@@ -105,8 +105,8 @@ export function buildUserConfirmationEmail(ctx: AuditEmailContext): {
       (в рабочие дни обычно за 2-4 часа).
     </p>
 
-    <div style="margin:20px 0;padding:14px 16px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px">
-      <div style="font-size:11px;font-weight:700;color:#C2410C;letter-spacing:1px;text-transform:uppercase">Что в аудите</div>
+    <div style="margin:20px 0;padding:14px 16px;background:#FEF0E7;border:1px solid #FBC1A0;border-radius:12px">
+      <div style="font-size:11px;font-weight:700;color:#B03D04;letter-spacing:1px;text-transform:uppercase">Что в аудите</div>
       <ul style="margin:8px 0 0 0;padding:0 0 0 18px;font-size:14px;line-height:1.6;color:#334155">
         <li><strong style="color:#0F172A">Health-score клуба</strong> — общая оценка управляемости 0-100</li>
         <li><strong style="color:#0F172A">Top-3 области риска</strong> — где теряете контроль прямо сейчас</li>

@@ -47,7 +47,7 @@ const ACTIONS: QuickAction[] = [
     icon: 'ki-rocket',
     label: 'Funnel',
     hint: 'Wizard dropoff per persona',
-    bg: '#FFF7ED', color: '#F35703', border: '#FED7AA',
+    bg: '#FEF0E7', color: '#F35703', border: '#FBC1A0',
   },
   {
     href: 'https://supabase.com/dashboard/project/hhyjihbctidtucvpgjzv',
@@ -55,7 +55,7 @@ const ACTIONS: QuickAction[] = [
     icon: 'ki-data',
     label: 'Supabase',
     hint: 'Логи и таблицы',
-    bg: '#FFF7ED', color: '#D44A02', border: '#FED7AA',
+    bg: '#FEF0E7', color: '#D44A02', border: '#FBC1A0',
   },
   {
     href: 'https://vercel.com/sergeylisunovs-projects/proform',

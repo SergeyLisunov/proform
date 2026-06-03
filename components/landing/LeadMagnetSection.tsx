@@ -33,7 +33,7 @@ interface LeadMagnet {
 
 const HUE = {
   org:     { bg: '#EFF6FF', ring: '#BFDBFE', text: '#1D4ED8' },
-  coach:   { bg: '#FFF7ED', ring: '#FED7AA', text: '#C2410C' },
+  coach:   { bg: '#FEF0E7', ring: '#FBC1A0', text: '#B03D04' },
   athlete: { bg: '#F0FDF4', ring: '#BBF7D0', text: '#15803D' },
 }
 

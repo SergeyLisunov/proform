@@ -145,7 +145,7 @@ export const OT_LEVEL_META: Record<OvertrainingLevel, {
 }> = {
   green:  { label: 'Всё в норме',            tagline: 'Признаков перетренированности нет',     color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
   yellow: { label: 'Лёгкая усталость',       tagline: 'Нужна разгрузочная неделя в ближайшее время', color: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A' },
-  orange: { label: 'Высокое напряжение',     tagline: 'Риск перетренированности — снизьте объём на 30–40%', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  orange: { label: 'Высокое напряжение',     tagline: 'Риск перетренированности — снизьте объём на 30–40%', color: '#B03D04', bg: '#FEF0E7', border: '#FBC1A0' },
   red:    { label: 'Перетренированность',    tagline: 'Обязательна разгрузка 7+ дней и очная консультация', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
 }
 

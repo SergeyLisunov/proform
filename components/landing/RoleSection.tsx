@@ -72,8 +72,8 @@ const ROLES: RoleEntry[] = [
     ],
     demoEmail:    'athlete@proform.test',
     accent:       '#F35703',
-    accentBg:     '#FFF7ED',
-    accentBorder: '#FED7AA',
+    accentBg:     '#FEF0E7',
+    accentBorder: '#FBC1A0',
   },
   {
     role:    'doctor',

@@ -76,7 +76,7 @@ async function getWorkoutsForMonth(athleteId: string, from: string, to: string):
 
 const ACTIVITY_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
   'Бег':       { icon: 'ki-abstract-26',  color: '#2563EB', bg: '#EFF6FF' },
-  'Велоспорт': { icon: 'ki-technology-4', color: '#D44A02', bg: '#FFF7ED' },
+  'Велоспорт': { icon: 'ki-technology-4', color: '#D44A02', bg: '#FEF0E7' },
   'Плавание':  { icon: 'ki-abstract-14',  color: '#0284C7', bg: '#E0F2FE' },
   'Силовые':   { icon: 'ki-abstract-45',  color: '#9333EA', bg: '#FAF5FF' },
   'Ходьба':    { icon: 'ki-map',          color: '#16A34A', bg: '#F0FDF4' },
@@ -830,7 +830,7 @@ function YearView({ year, onSelect, cycles, selected }: { year: number; onSelect
                     <div key={di} onClick={() => onSelect(ds)}
                       className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
                       title={ds}
-                      style={{ background: isSel ? '#FFF7ED' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F35703' : (cc ? `1px solid ${cc.border}` : 'none') }}>
+                      style={{ background: isSel ? '#FEF0E7' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F35703' : (cc ? `1px solid ${cc.border}` : 'none') }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
                       {isToday && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
                       <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
@@ -871,7 +871,7 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
                   const h=HEATMAP[ds]; const inC=cycles.find(c=>ds>=c.start_date&&ds<=c.end_date); const cc=inC?CYCLE_TYPE_CFG[inC.type]:null
                   const isSel = ds === selected; const isToday = ds === today
                   return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5"
-                    style={{ background: isSel ? '#FFF7ED' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F35703' : (isToday ? '#FB923C' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
+                    style={{ background: isSel ? '#FEF0E7' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F35703' : (isToday ? '#F5733A' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
                     <span className={`text-[9px] font-medium ${isSel ? 'text-orange-600' : isToday ? 'text-orange-500' : 'text-foreground/60'}`}>{day}</span>
                     {isToday && <span className="w-1 h-1 rounded-full bg-orange-400"/>}
                     {h?.hasComp&&<span className="w-1.5 h-1.5 rounded-full bg-orange-500"/>}

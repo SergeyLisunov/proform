@@ -480,8 +480,8 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   ].map(p => (
                     <button key={p.id} onClick={() => p.id === 'custom' ? setPreset('custom') : applyPreset(p.id as PeriodPreset)}
                       style={{ padding:'7px 14px',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer',transition:'all 0.15s',
-                        background:preset===p.id?'#FFF7ED':'var(--card)',
-                        border:`1.5px solid ${preset===p.id?'#FED7AA':'var(--border)'}`,
+                        background:preset===p.id?'#FEF0E7':'var(--card)',
+                        border:`1.5px solid ${preset===p.id?'#FBC1A0':'var(--border)'}`,
                         color:preset===p.id?'#D44A02':'var(--muted-foreground)' }}>
                       {p.label}
                     </button>
@@ -558,7 +558,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                       <button key={iso} onClick={() => toggleManualDate(iso)}
                         style={{ aspectRatio:'1',borderRadius:8,fontSize:12,fontWeight:selected?700:500,
                           border:`2px solid ${selected?'#F35703':isToday?'#FDA96A':'transparent'}`,
-                          background:selected?'#F35703':isToday?'#FFF7ED':'var(--background)',
+                          background:selected?'#F35703':isToday?'#FEF0E7':'var(--background)',
                           color:selected?'white':isToday?'#D44A02':'var(--foreground)',
                           cursor:'pointer',transition:'all 0.12s',display:'flex',alignItems:'center',justifyContent:'center' }}>
                         {day}
@@ -569,7 +569,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
               </div>
 
               {manualDates.length > 0 && (
-                <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',borderRadius:10,background:'#FFF7ED',border:'1px solid #FED7AA' }}>
+                <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',borderRadius:10,background:'#FEF0E7',border:'1px solid #FBC1A0' }}>
                   <span style={{ fontSize:12,fontWeight:600,color:'#D44A02' }}>
                     Выбрано дней: {manualDates.length}
                   </span>

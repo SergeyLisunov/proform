@@ -71,14 +71,14 @@ export default function NewsletterStatsPage() {
   const STAT_CARDS = [
     { label: 'Отправлено',  value: stats?.sent ?? 0,      icon: 'ki-send',         color: '#2563EB', bg: '#EFF6FF', hint: 'Все отправленные письма' },
     { label: 'Доставлено',  value: stats?.delivered ?? 0, icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4', hint: 'Успешно дошли до адресатов' },
-    { label: 'Открыто',     value: stats?.opened ?? 0,    icon: 'ki-eye',          color: '#F35703', bg: '#FFF7ED', hint: 'Получатели открыли письмо' },
+    { label: 'Открыто',     value: stats?.opened ?? 0,    icon: 'ki-eye',          color: '#F35703', bg: '#FEF0E7', hint: 'Получатели открыли письмо' },
     { label: 'Ошибки',      value: stats?.failed ?? 0,    icon: 'ki-shield-cross', color: '#DC2626', bg: '#FEF2F2', hint: 'Неуспешные доставки' },
   ]
 
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(249,115,22,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.08),_transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">

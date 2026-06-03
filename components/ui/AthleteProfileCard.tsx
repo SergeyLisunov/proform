@@ -198,7 +198,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
         </div>
         {/* Footer */}
         <div style={{ padding:'12px 22px 20px',display:'flex',gap:10 }}>
-          <button onClick={handleApply} disabled={saving} style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',background:'linear-gradient(135deg,#F35703,#D44A02)',color:'white',fontSize:14,fontWeight:700,cursor:saving?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 2px 8px rgba(249,115,22,0.35)',opacity:saving?0.7:1,transition:'all 0.15s' }}>
+          <button onClick={handleApply} disabled={saving} style={{ flex:1,padding:'12px 0',borderRadius:12,border:'none',background:'linear-gradient(135deg,#F35703,#D44A02)',color:'white',fontSize:14,fontWeight:700,cursor:saving?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 2px 8px rgba(243,87,3,0.35)',opacity:saving?0.7:1,transition:'all 0.15s' }}>
             {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-check text-sm" />Применить</>}
           </button>
           <button onClick={handleClose} style={{ padding:'12px 18px',borderRadius:12,border:'1.5px solid var(--border)',background:'transparent',color:'var(--muted-foreground)',fontSize:14,fontWeight:600,cursor:'pointer' }}>Отмена</button>
@@ -515,7 +515,7 @@ export default function AthleteProfileCard() {
             <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
               <h2 className="pf-heading-sm" style={{ color:'var(--foreground)', margin:0 }}>{profile.name}</h2>
               {profile.sport_type && (
-                <span className="pf-label" style={{ padding:'3px 10px', borderRadius:20, background:'#fff7ed', color:'#D44A02', border:'1px solid #fed7aa', fontSize:11, letterSpacing:'0.1em' }}>
+                <span className="pf-label" style={{ padding:'3px 10px', borderRadius:20, background:'#fef0e7', color:'#D44A02', border:'1px solid #fbc1a0', fontSize:11, letterSpacing:'0.1em' }}>
                   {profile.sport_type}
                 </span>
               )}
@@ -599,7 +599,7 @@ export default function AthleteProfileCard() {
                     style={{ width:26, height:26, borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center',
                       background:'transparent', border:'1px dashed #CBD5E1', cursor:'pointer', flexShrink:0,
                       transition:'all 0.15s', color:'#CBD5E1', marginLeft:2 }}
-                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#F35703'; b.style.color='#F35703'; b.style.background='#FFF7ED' }}
+                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#F35703'; b.style.color='#F35703'; b.style.background='#FEF0E7' }}
                     onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor='#CBD5E1'; b.style.color='#CBD5E1'; b.style.background='transparent' }}>
                     <i className="ki-filled ki-pencil" style={{ fontSize:9 }} />
                   </button>
@@ -612,7 +612,7 @@ export default function AthleteProfileCard() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:1, marginTop:20, background:'var(--border)', borderRadius:16, overflow:'hidden', border:'1px solid var(--border)' }}>
             {[
               { label:'Тренировок', value:stats.total, icon:'ki-abstract-26', color:'#2563EB', bg:'#EFF6FF', href:'/diary' },
-              { label:'Часов', value:fmtHours(stats.totalMinutes), icon:'ki-time', color:'#F35703', bg:'#FFF7ED', href:'/diary' },
+              { label:'Часов', value:fmtHours(stats.totalMinutes), icon:'ki-time', color:'#F35703', bg:'#FEF0E7', href:'/diary' },
               { label:'Ср. нагрузка', value:stats.avgStrain || '—', icon:'ki-chart-line-up', color:'#DC2626', bg:'#FEF2F2', href:'/calendar' },
               { label:'На неделе', value:stats.thisWeek, icon:'ki-calendar', color:'#16A34A', bg:'#F0FDF4', href:'/diary' },
             ].map((s,i) => (
@@ -633,7 +633,7 @@ export default function AthleteProfileCard() {
               flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:7, padding:'11px 0',
               borderRadius:12, textDecoration:'none',
               background:'linear-gradient(135deg,#F35703,#D44A02)', color:'white',
-              fontSize:13, fontWeight:700, boxShadow:'0 2px 8px rgba(249,115,22,0.3)',
+              fontSize:13, fontWeight:700, boxShadow:'0 2px 8px rgba(243,87,3,0.3)',
             }}>
               <i className="ki-filled ki-plus text-sm" />Новая тренировка
             </Link>

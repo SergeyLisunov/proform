@@ -209,7 +209,7 @@ export default function StreaksPage() {
     <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-6">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(249,115,22,0.16),_transparent_42%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.16),_transparent_42%)]" />
         <div className="relative flex flex-col gap-2">
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-600">
             Стрик & достижения

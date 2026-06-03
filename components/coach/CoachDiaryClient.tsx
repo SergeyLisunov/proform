@@ -145,11 +145,11 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
   return (
     <div className="flex flex-col gap-5 pf-enter">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl border border-[#FED7AA] bg-gradient-to-br from-[#FFF7ED] via-white to-[#EFF6FF] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
               <i className="ki-filled ki-notepad-edit text-[11px]" />
               Рабочий журнал
             </span>
@@ -1010,8 +1010,8 @@ function EntryDrawer({
 
           {/* Session data */}
           {type === 'session_summary' && (
-            <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/60 p-3 space-y-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#C2410C]">Детали тренировки</p>
+            <div className="rounded-xl border border-[#FBC1A0] bg-[#FEF0E7]/60 p-3 space-y-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B03D04]">Детали тренировки</p>
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="text-[10px] text-muted-foreground">Длительность, мин</label>

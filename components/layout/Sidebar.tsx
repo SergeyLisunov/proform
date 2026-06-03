@@ -59,7 +59,7 @@ const NAV_SECTIONS = [
 ] as const
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-  athlete:      { label: 'Атлет',         bg: '#FFF7ED', text: '#F35703' },
+  athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
   coach:        { label: 'Тренер',        bg: '#F0FDF4', text: '#16A34A' },
   admin:        { label: 'Администратор', bg: '#F5F3FF', text: '#7C3AED' },
   organization: { label: 'Организация',   bg: '#EFF6FF', text: '#2563EB' },

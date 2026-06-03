@@ -121,7 +121,7 @@ export default async function OrgAnalyticsPage() {
         <Link href="/org/members?role=athlete" className="no-underline">
           <Card className="p-5 rounded-2xl hover:border-[#F35703] hover:shadow-md transition">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FEF0E7]">
                 <i className="ki-filled ki-abstract-26 text-[16px] text-[#F35703]" />
               </div>
               <div>

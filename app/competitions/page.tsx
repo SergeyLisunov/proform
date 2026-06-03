@@ -146,7 +146,7 @@ function CompetitionDrawer({
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#FFF7ED', border: '1px solid #FED7AA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#FEF0E7', border: '1px solid #FBC1A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="ki-filled ki-medal-star" style={{ color: '#F35703', fontSize: 16 }} />
             </div>
             <div>
@@ -172,7 +172,7 @@ function CompetitionDrawer({
           {/* VIEW mode */}
           {mode === 'view' && competition && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ padding: 16, borderRadius: 14, background: '#FFF7ED', border: '1px solid #FED7AA' }}>
+              <div style={{ padding: 16, borderRadius: 14, background: '#FEF0E7', border: '1px solid #FBC1A0' }}>
                 <div className="pf-num" style={{ fontSize: 28, color: '#F35703', lineHeight: 1 }}>🏆</div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 700, color: 'var(--foreground)' }}>{competition.title}</div>
                 <div style={{ marginTop: 4, fontSize: 13, color: 'var(--muted-foreground)' }}>{fmtDate(competition.event_date)}</div>

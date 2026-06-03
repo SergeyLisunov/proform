@@ -34,7 +34,7 @@ const ENTRY_TYPE_LABEL: Record<string, string> = {
 
 const SEVERITY_COLOR: Record<string, { bg: string; fg: string; border: string }> = {
   low:      { bg: '#F0FDF4', fg: '#15803D', border: '#BBF7D0' },
-  moderate: { bg: '#FFF7ED', fg: '#C2410C', border: '#FED7AA' },
+  moderate: { bg: '#FEF0E7', fg: '#B03D04', border: '#FBC1A0' },
   high:     { bg: '#FEF2F2', fg: '#B91C1C', border: '#FECACA' },
   critical: { bg: '#FEE2E2', fg: '#7F1D1D', border: '#FCA5A5' },
 }
