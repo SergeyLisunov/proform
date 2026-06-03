@@ -243,7 +243,7 @@ export function CoachSessionDrawer({
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тренерское занятие</p>
-            <h3 className="text-lg font-semibold text-foreground">{initial ? 'Редактировать' : 'Новое занятие'}</h3>
+            <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новое занятие'}</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs"/>
@@ -415,7 +415,7 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тарифы</p>
-            <h3 className="text-lg font-semibold text-foreground">Абонементы (шаблоны)</h3>
+            <h3 className="text-lg font-semibold text-navy-500">Абонементы (шаблоны)</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs"/>
@@ -613,7 +613,7 @@ export function IssuePassDrawer({
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Абонемент</p>
-            <h3 className="text-lg font-semibold text-foreground">Выдать атлету</h3>
+            <h3 className="text-lg font-semibold text-navy-500">Выдать атлету</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs"/>

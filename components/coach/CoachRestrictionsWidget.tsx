@@ -93,7 +93,7 @@ export default async function CoachRestrictionsWidget({
             <i className="ki-filled ki-shield-cross text-base text-rose-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">Медицинские ограничения</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">Медицинские ограничения</h3>
             <div className="text-[10px] text-muted-foreground mt-1">
               От врачей и специалистов · {entries.length}
             </div>

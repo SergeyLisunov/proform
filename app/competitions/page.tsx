@@ -320,7 +320,7 @@ function CompetitionsContent() {
               <Badge variant="primary" className="rounded-full uppercase tracking-[0.18em]">
                 Соревнования
               </Badge>
-              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-foreground leading-tight">
+              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-navy-500 leading-tight">
                 График стартов
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">{periodLabel}</p>

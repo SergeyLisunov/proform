@@ -130,7 +130,7 @@ export default function ChallengesPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Челленджи
             </div>
-            <h1 className="pf-num text-[32px] leading-none text-foreground">Командные вызовы</h1>
+            <h1 className="pf-num text-[32px] leading-none text-navy-500">Командные вызовы</h1>
             <p className="mt-2 max-w-[560px] text-sm text-muted-foreground">
               Создавайте недельные или месячные челленджи на объём, strain или количество тренировок. Лидерборд обновляется автоматически.
             </p>

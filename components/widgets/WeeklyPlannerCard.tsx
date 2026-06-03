@@ -116,7 +116,7 @@ export default function WeeklyPlannerCard() {
             <i className="ki-filled ki-calendar-tick text-[14px] text-purple-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground leading-none">План на неделю</h3>
+            <h3 className="text-sm font-bold text-navy-500 leading-none">План на неделю</h3>
             <div className="text-[10px] text-muted-foreground mt-0.5">AI составит 7 дней</div>
           </div>
         </div>

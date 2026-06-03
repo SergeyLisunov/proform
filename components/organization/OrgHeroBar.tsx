@@ -38,7 +38,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-700 mb-1">
             🏢 {today}
           </p>
-          <h1 className="pf-num text-3xl md:text-4xl text-foreground leading-tight">
+          <h1 className="pf-num text-3xl md:text-4xl text-navy-500 leading-tight">
             {greeting}, <span className="text-blue-700">{orgName}</span>!
           </h1>
           <p className="mt-2 text-sm md:text-base text-muted-foreground">{description}</p>

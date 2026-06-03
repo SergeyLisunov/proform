@@ -89,7 +89,7 @@ export default function InvitePage() {
           <div className="w-14 h-14 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
             <i className="ki-filled ki-information-2 text-2xl"/>
           </div>
-          <h1 className="text-xl font-bold text-foreground mb-2">{msg[state.error] ?? 'Ошибка'}</h1>
+          <h1 className="text-xl font-bold text-navy-500 mb-2">{msg[state.error] ?? 'Ошибка'}</h1>
           <p className="text-sm text-muted-foreground mb-6">Свяжитесь с тем, кто отправил вам это приглашение, чтобы получить новую ссылку.</p>
           <button onClick={() => router.push('/')} className="rounded-xl bg-orange-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-orange-600">На главную</button>
         </div>
@@ -107,7 +107,7 @@ export default function InvitePage() {
           <div className="w-14 h-14 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
             <i className="ki-filled ki-check-circle text-2xl"/>
           </div>
-          <h1 className="text-xl font-bold text-foreground mb-2">Связь установлена</h1>
+          <h1 className="text-xl font-bold text-navy-500 mb-2">Связь установлена</h1>
           <p className="text-sm text-muted-foreground">Переходим к списку подключений…</p>
         </div>
       </main>
@@ -118,7 +118,7 @@ export default function InvitePage() {
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-10">
       <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-600 mb-3">Sporteo · Приглашение</p>
-        <h1 className="text-2xl font-bold text-foreground mb-1">Вас приглашают</h1>
+        <h1 className="text-2xl font-bold text-navy-500 mb-1">Вас приглашают</h1>
         <p className="text-sm text-muted-foreground mb-6">
           <strong className="text-foreground">{name}</strong> хочет подключиться с вами в роли <span className="text-foreground font-semibold">{type.toLowerCase()}</span>.
         </p>

@@ -115,7 +115,7 @@ export default function AdaptivePlanModal({
         <div className="flex items-start justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-purple-700">AI · Адаптация плана</p>
-            <h3 className="text-lg font-semibold text-foreground">{athleteName}</h3>
+            <h3 className="text-lg font-semibold text-navy-500">{athleteName}</h3>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs" />

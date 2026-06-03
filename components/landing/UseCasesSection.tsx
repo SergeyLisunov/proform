@@ -112,7 +112,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-bold leading-tight text-foreground">{name}</h3>
+          <h3 className="text-base font-bold leading-tight text-navy-500">{name}</h3>
           <p className="mt-0.5 text-sm font-semibold" style={{ color: hue.text }}>
             {role}
           </p>
@@ -165,7 +165,7 @@ export default function UseCasesSection() {
           </p>
           <h2
             id="use-cases-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl"
           >
             Три типа клубов — три конкретных результата
           </h2>

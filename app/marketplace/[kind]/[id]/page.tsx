@@ -112,7 +112,7 @@ export default function OfferingDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
-          <h2 className="text-lg font-semibold text-foreground">Услуга не найдена</h2>
+          <h2 className="text-lg font-semibold text-navy-500">Услуга не найдена</h2>
           <p className="mt-2 text-sm text-muted-foreground">Возможно, продавец отключил её или её больше нет в каталоге.</p>
           <Link href="/marketplace"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold no-underline">
@@ -152,7 +152,7 @@ export default function OfferingDetailPage() {
             {typeMeta.emoji} {typeMeta.label}
           </Badge>
         </div>
-        <h1 className="text-3xl font-bold text-foreground">{offering.title}</h1>
+        <h1 className="text-3xl font-bold text-navy-500">{offering.title}</h1>
         {offering.description && (
           <p className="mt-3 text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
             {offering.description}

@@ -69,7 +69,7 @@ export default function CoachPlansPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Планы</p>
-          <h1 className="text-3xl font-bold text-foreground">Workout Plans</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Workout Plans</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Re-usable weekly plans. Создайте один раз → назначайте разным атлетам с разной даты старта.
           </p>
@@ -87,7 +87,7 @@ export default function CoachPlansPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
             <i className="ki-filled ki-calendar-tick text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">У вас пока нет планов</h3>
+          <h3 className="text-lg font-semibold text-navy-500">У вас пока нет планов</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
             Создайте первый weekly plan для атлета — типовая тренировочная неделя с распределением по дням.
           </p>
@@ -102,7 +102,7 @@ export default function CoachPlansPage() {
             <Card key={p.id} className="p-5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-orange-200 relative group">
               <Link href={`/coach/plans/${p.id}`} className="block no-underline">
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-base font-bold text-foreground line-clamp-2 group-hover:text-orange-700 transition-colors">{p.name}</h3>
+                  <h3 className="text-base font-bold text-navy-500 line-clamp-2 group-hover:text-orange-700 transition-colors">{p.name}</h3>
                   {p.is_public && (
                     <Badge variant="info" size="sm" className="uppercase tracking-wider shrink-0">
                       Public

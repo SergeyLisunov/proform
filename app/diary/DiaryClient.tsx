@@ -107,7 +107,7 @@ export default function DiaryClient({ role, userId }: Props) {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-[#F1F5F9]">
               <div>
-                <h3 className="pf-num text-xl text-slate-900">Записать тренировку</h3>
+                <h3 className="pf-num text-xl text-navy-500">Записать тренировку</h3>
                 <p className="text-xs text-slate-400 mt-0.5">Все поля совместимы с WHOOP</p>
               </div>
               <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">

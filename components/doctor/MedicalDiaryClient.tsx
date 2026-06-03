@@ -126,7 +126,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
               <i className="ki-filled ki-heart-circle text-[11px]" />
               Медицинский журнал
             </span>
-            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-foreground mt-2">Дневник врача</h1>
+            <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500 mt-2">Дневник врача</h1>
             <p className="max-w-2xl text-sm md:text-base text-muted-foreground mt-1">
               Консультации, реабилитация, анализы, рецепты и плановые приёмы.
               Под рукой — вся картина по пациенту: тренировки, метрики восстановления,
@@ -310,7 +310,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 p-12 text-center">
       <i className="ki-filled ki-heart-circle text-5xl text-muted-foreground/40 block mb-3" />
-      <h3 className="text-base font-semibold text-foreground">Пока нет записей</h3>
+      <h3 className="text-base font-semibold text-navy-500">Пока нет записей</h3>
       <p className="text-sm text-muted-foreground mt-1 mb-5">
         Записывайте консультации, назначения, прогресс реабилитации — всё в одном месте.
       </p>
@@ -339,7 +339,7 @@ function PatientSnapshotPanel({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-700">Карточка пациента</p>
-          <h3 className="text-lg font-semibold text-foreground">{name}</h3>
+          <h3 className="text-lg font-semibold text-navy-500">{name}</h3>
         </div>
       </div>
 
@@ -868,7 +868,7 @@ function EntryDrawer({
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: meta.color }}>{meta.label}</p>
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-navy-500">
               {initial ? 'Редактировать запись' : 'Новая запись'}
             </h3>
           </div>

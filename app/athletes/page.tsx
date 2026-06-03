@@ -105,7 +105,7 @@ function SectionHeader({
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">{eyebrow}</p>
-        <h3 className="mt-1.5 text-base font-semibold text-foreground">{title}</h3>
+        <h3 className="mt-1.5 text-base font-semibold text-navy-500">{title}</h3>
         {subtitle && <p className="mt-1 text-xs leading-5 text-muted-foreground">{subtitle}</p>}
       </div>
       {action}
@@ -343,7 +343,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 {getInitials(athlete.name)}
               </div>
               <div className="min-w-0">
-                <h3 className="truncate text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-foreground">
+                <h3 className="truncate text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-navy-500">
                   {athlete.name}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -686,7 +686,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <p className="text-2xs font-bold uppercase tracking-[0.18em] text-orange-700">Комментарий</p>
-                <h3 className="mt-1 text-lg font-bold text-foreground">Заметка по атлету «{athlete.name}»</h3>
+                <h3 className="mt-1 text-lg font-bold text-navy-500">Заметка по атлету «{athlete.name}»</h3>
               </div>
               <button
                 onClick={() => { setCommentOpen(false); setCError(null) }}
@@ -903,7 +903,7 @@ export default function AthletesPage() {
           <div className="mt-5 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-2xl">
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Состав атлетов</p>
-              <h2 className="mt-2 text-[clamp(2rem,4vw,3.2rem)] font-semibold tracking-tight text-foreground">
+              <h2 className="mt-2 text-[clamp(2rem,4vw,3.2rem)] font-semibold tracking-tight text-navy-500">
                 Мои атлеты
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">

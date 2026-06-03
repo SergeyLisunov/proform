@@ -274,7 +274,7 @@ export default function PlanEditor({ mode, initial }: Props) {
       <Card className="p-5">
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Тренировки по дням</h2>
+            <h2 className="text-lg font-bold text-navy-500">Тренировки по дням</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               {totalDays} {totalDays === 1 ? 'день' : totalDays < 5 ? 'дня' : 'дней'} · {items.length} тренировок добавлено
             </p>
@@ -388,7 +388,7 @@ export default function PlanEditor({ mode, initial }: Props) {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">Назначить атлету</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Назначить атлету</h3>
               <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-xs" />
               </button>

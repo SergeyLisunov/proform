@@ -579,7 +579,7 @@ function ViewEditDrawer({
                     <div className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
                       Сессия атлета
                     </div>
-                    <h3 className="mt-3 text-[28px] font-semibold leading-none text-foreground">{displayName}</h3>
+                    <h3 className="mt-3 text-[28px] font-semibold leading-none text-navy-500">{displayName}</h3>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
                         {fmtFullDate(workout.event_date)}
@@ -883,7 +883,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
               <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
                 Быстрое добавление
               </div>
-              <h3 className="mt-3 pf-num text-[30px] leading-none text-foreground">Добавить тренировку</h3>
+              <h3 className="mt-3 pf-num text-[30px] leading-none text-navy-500">Добавить тренировку</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
                 Сначала сохраните главное: тип, дату и нагрузку. Остальные метрики можно быстро добавить сразу в этом же потоке.
               </p>
@@ -1266,7 +1266,7 @@ function AthleteDiary() {
               </span>
             </div>
             <p className="mt-4 text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">История тренировок</p>
-            <h2 className="mt-2 pf-num text-[clamp(2.2rem,4vw,3.9rem)] leading-[0.94] text-foreground">Мой дневник</h2>
+            <h2 className="mt-2 pf-num text-[clamp(2.2rem,4vw,3.9rem)] leading-[0.94] text-navy-500">Мой дневник</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
               Добавляйте тренировку сразу после сессии, фиксируйте самочувствие и держите историю нагрузки под рукой в одном рабочем пространстве.
             </p>
@@ -1330,7 +1330,7 @@ function AthleteDiary() {
                 {filtered.length} записей
               </span>
             </div>
-            <h3 className="mt-3 text-[26px] font-semibold leading-none text-foreground">История и разбор тренировок</h3>
+            <h3 className="mt-3 text-[26px] font-semibold leading-none text-navy-500">История и разбор тренировок</h3>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Фильтруйте записи по активности, быстро считывайте нагрузку и открывайте отдельную тренировку для редактирования и заметок.
             </p>

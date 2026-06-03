@@ -173,7 +173,7 @@ export default function PricingPage() {
       {/* Hero */}
       <div className="text-center mb-10">
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-2">Тарифы</p>
-        <h1 className="pf-num text-[clamp(2rem,5vw,3.5rem)] text-foreground leading-[0.95] tracking-tight mb-3">
+        <h1 className="pf-num text-[clamp(2rem,5vw,3.5rem)] text-navy-500 leading-[0.95] tracking-tight mb-3">
           Простые и честные цены
         </h1>
         <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
@@ -199,7 +199,7 @@ export default function PricingPage() {
           <section key={group.key} className="mb-10">
             <div className="flex items-center gap-2.5 mb-4">
               <span className="text-2xl">{group.emoji}</span>
-              <h2 className="text-xl font-bold text-foreground">Для роли: {group.label}</h2>
+              <h2 className="text-xl font-bold text-navy-500">Для роли: {group.label}</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

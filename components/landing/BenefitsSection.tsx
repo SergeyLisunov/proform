@@ -76,7 +76,7 @@ export default function BenefitsSection() {
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
             Возможности платформы
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-navy-500 sm:text-4xl">
             Всё нужное для управления спортивной подготовкой
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
@@ -99,7 +99,7 @@ export default function BenefitsSection() {
                 <Icon size={22} strokeWidth={2} />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-base font-bold tracking-tight text-foreground">{title}</h3>
+                <h3 className="text-base font-bold tracking-tight text-navy-500">{title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
               </div>
             </div>

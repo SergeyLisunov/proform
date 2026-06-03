@@ -74,7 +74,7 @@ export default function StaticPageShell({
                 {eyebrow}
               </p>
             )}
-            <h1 className="pf-num mt-3 text-3xl leading-tight text-foreground md:text-4xl">
+            <h1 className="pf-num mt-3 text-3xl leading-tight text-navy-500 md:text-4xl">
               {title}
             </h1>
             {lastUpdated && (

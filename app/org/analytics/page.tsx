@@ -60,7 +60,7 @@ export default async function OrgAnalyticsPage() {
     <div className="flex flex-col gap-6 max-w-[1100px] mx-auto w-full">
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-muted-foreground">Организация</p>
-        <h1 className="pf-num text-[32px] leading-tight text-foreground">Аналитика {org?.org_name ? `· ${org.org_name}` : ''}</h1>
+        <h1 className="pf-num text-[32px] leading-tight text-navy-500">Аналитика {org?.org_name ? `· ${org.org_name}` : ''}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Сводка по участникам, тренерам и заявкам. Углублённая статистика скоро появится в этом разделе.
         </p>

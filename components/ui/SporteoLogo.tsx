@@ -1,44 +1,54 @@
+/* eslint-disable @next/next/no-img-element */
 interface SporteoLogoProps {
-  /** Visual size preset. */
+  /** Visual size preset (logo height in px: sm 20 · md 28 · lg 40). */
   size?: 'sm' | 'md' | 'lg'
   /** Render just the orange "S" mark, no wordmark. */
   iconOnly?: boolean
-  /** Render the wordmark in white (for dark/navy backgrounds). */
+  /** Dark background: orange mark + white wordmark (the navy PNG wordmark
+   *  wouldn't read on dark). */
   onDark?: boolean
   className?: string
 }
 
-const SIZES = {
-  sm: { box: 'w-6 h-7 rounded-md text-base', word: 'text-base', gap: 'gap-2' },
-  md: { box: 'w-8 h-10 rounded-lg text-xl', word: 'text-xl', gap: 'gap-2.5' },
-  lg: { box: 'w-11 h-14 rounded-xl text-3xl', word: 'text-3xl', gap: 'gap-3' },
-} as const
+const HEIGHT = { sm: 20, md: 28, lg: 40 } as const
+const LOGO_RATIO = 1422 / 472 // full lockup intrinsic w/h
+const MARK_RATIO = 385 / 480  // S-mark intrinsic w/h
 
 /**
- * Sporteo brand logo — orange rounded "S" mark + navy "SPORTEO" wordmark.
- * Brand palette: orange #F35703, navy #1D4672 (sampled from the brand deck).
- * CSS/token-based so it scales crisply and inherits the app fonts. Swap in an
- * exact SVG asset later if desired (drop it into public/ and point here).
+ * Sporteo brand logo — uses the official assets:
+ *   /sporteo-logo.png  full lockup (orange S + navy SPORTEO)
+ *   /sporteo-mark.png  the orange S mark only
+ * Both trimmed PNGs with transparency, so they sit on any background.
  */
 export function SporteoLogo({ size = 'md', iconOnly = false, onDark = false, className = '' }: SporteoLogoProps) {
-  const s = SIZES[size]
-  return (
-    <span className={`inline-flex items-center ${s.gap} ${className}`} aria-label="Sporteo">
-      <span
-        className={`${s.box} grid place-items-center bg-[#F35703] font-extrabold leading-none text-[#FBF3EC] select-none`}
-        style={{ fontFamily: 'var(--pf-font-sans)' }}
-        aria-hidden
-      >
-        S
-      </span>
-      {!iconOnly && (
-        <span
-          className={`${s.word} font-extrabold leading-none tracking-[0.04em] ${onDark ? 'text-white' : 'text-[#1D4672]'}`}
-        >
+  const h = HEIGHT[size]
+  const markW = Math.round(h * MARK_RATIO)
+
+  if (iconOnly) {
+    return (
+      <img src="/sporteo-mark.png" alt="Sporteo" width={markW} height={h} className={`inline-block align-middle ${className}`} />
+    )
+  }
+
+  if (onDark) {
+    return (
+      <span className={`inline-flex items-center gap-2 ${className}`} aria-label="Sporteo">
+        <img src="/sporteo-mark.png" alt="" width={markW} height={h} className="inline-block align-middle" />
+        <span className="font-extrabold leading-none tracking-[0.05em] text-white" style={{ fontSize: Math.round(h * 0.66) }}>
           SPORTEO
         </span>
-      )}
-    </span>
+      </span>
+    )
+  }
+
+  return (
+    <img
+      src="/sporteo-logo.png"
+      alt="Sporteo"
+      width={Math.round(h * LOGO_RATIO)}
+      height={h}
+      className={`inline-block align-middle ${className}`}
+    />
   )
 }
 

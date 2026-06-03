@@ -20,7 +20,7 @@ export default function Error({
       </div>
       <div className="text-center">
         <p className="text-2xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Ошибка</p>
-        <h1 className="pf-num text-4xl text-foreground mb-3">Что-то пошло не так</h1>
+        <h1 className="pf-num text-4xl text-navy-500 mb-3">Что-то пошло не так</h1>
         <p className="text-sm text-muted-foreground max-w-xs">
           Произошла непредвиденная ошибка. Попробуйте обновить страницу.
         </p>

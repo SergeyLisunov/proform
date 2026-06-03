@@ -127,7 +127,7 @@ export default function OrgTeamsPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-700">Организация · {org.org_name}</p>
-            <h1 className="text-3xl font-bold text-foreground mt-1">Команды</h1>
+            <h1 className="text-3xl font-bold text-navy-500 mt-1">Команды</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               Группы атлетов организации с возрастным диапазоном и уровнем подготовки.
               Команды используются для bulk-планирования, командных рассылок и аналитики.
@@ -148,7 +148,7 @@ export default function OrgTeamsPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
             <i className="ki-filled ki-people text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Команд пока нет</h3>
+          <h3 className="text-lg font-semibold text-navy-500">Команд пока нет</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
             Создайте первую команду — например «U-12», «Senior», «Бегуны» — чтобы группировать атлетов
             и управлять ими массово.
@@ -172,7 +172,7 @@ export default function OrgTeamsPage() {
                 <Card className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-violet-200">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold text-foreground truncate group-hover:text-violet-700 transition-colors">{g.name}</h3>
+                    <h3 className="text-base font-bold text-navy-500 truncate group-hover:text-violet-700 transition-colors">{g.name}</h3>
                     {g.description && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{g.description}</p>
                     )}
@@ -227,7 +227,7 @@ export default function OrgTeamsPage() {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">Новая команда</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Новая команда</h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-xs" />
               </button>

@@ -227,7 +227,7 @@ export default function OrgAthletePage() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-foreground">{profile.name ?? '—'}</h1>
+            <h1 className="text-2xl font-bold text-navy-500">{profile.name ?? '—'}</h1>
             {profile.member_role && (
               <Badge variant="primary" size="sm" className="!rounded-full uppercase tracking-wider">
                 {profile.member_role}

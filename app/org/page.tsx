@@ -162,7 +162,7 @@ export default function OrgDashboard() {
                   /{org.org_slug}
                 </span>
               </div>
-              <h2 className="pf-num text-[clamp(2.15rem,4vw,3.75rem)] text-foreground leading-[0.95] tracking-tight">
+              <h2 className="pf-num text-[clamp(2.15rem,4vw,3.75rem)] text-navy-500 leading-[0.95] tracking-tight">
                 {org.org_name}
               </h2>
               <p className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground">
@@ -250,7 +250,7 @@ export default function OrgDashboard() {
       <section className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Быстрые действия</h3>
+            <h3 className="text-sm font-semibold text-navy-500">Быстрые действия</h3>
             <p className="text-2xs text-muted-foreground mt-1">Переходы к ключевым зонам управления</p>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function OrgDashboard() {
           <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-foreground">Последние публикации</h3>
+                <h3 className="text-sm font-semibold text-navy-500">Последние публикации</h3>
                 <span className="text-2xs text-muted-foreground">({posts.length})</span>
               </div>
               <p className="text-2xs text-muted-foreground mt-1">Что сейчас видно команде на стене</p>
@@ -347,7 +347,7 @@ export default function OrgDashboard() {
           <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-foreground">Рассылки</h3>
+                <h3 className="text-sm font-semibold text-navy-500">Рассылки</h3>
                 <span className="text-2xs text-muted-foreground">({newsletters.length})</span>
               </div>
               <p className="text-2xs text-muted-foreground mt-1">Статус отправок и охват аудитории</p>

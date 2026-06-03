@@ -860,7 +860,7 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
         const mc = cycles.filter(c => { const cs=parseLocalDate(c.start_date),ce=parseLocalDate(c.end_date); return cs<=new Date(year,mi+1,0)&&ce>=new Date(year,mi,1) })
         return (
           <div key={mi} className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-border"><h3 className="pf-num text-lg text-foreground">{MONTHS_RU[mi]} {year}</h3></div>
+            <div className="px-4 py-3 border-b border-border"><h3 className="pf-num text-lg text-navy-500">{MONTHS_RU[mi]} {year}</h3></div>
             <div className="p-3">
               <div className="grid grid-cols-7 mb-1">{DAYS_SHORT.map(d => <div key={d} className="text-center text-2xs text-muted-foreground/60 font-medium py-0.5">{d[0]}</div>)}</div>
               {mc.map((c,ci) => { const cc=CYCLE_TYPE_CFG[c.type]; return <div key={ci} className="mb-1 px-2 py-0.5 rounded text-2xs font-medium truncate border" style={{ background:cc.bg, color:cc.text, borderColor:cc.border }}>{c.label}</div> })}
@@ -1082,7 +1082,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Выбрано</p>
-            <h3 className="mt-1 text-[clamp(1.2rem,2vw,1.45rem)] font-semibold tracking-tight text-foreground capitalize">{label}</h3>
+            <h3 className="mt-1 text-[clamp(1.2rem,2vw,1.45rem)] font-semibold tracking-tight text-navy-500 capitalize">{label}</h3>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -1991,7 +1991,7 @@ export default function CalendarPage() {
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex-1 min-w-0">
               <Tag tone="border-orange-200 bg-orange-50 text-orange-700">График тренировок</Tag>
-              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-foreground leading-tight">Календарь</h2>
+              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-navy-500 leading-tight">Календарь</h2>
               <p className="mt-1 text-sm text-muted-foreground">{periodLabel()}</p>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {/* KPI 1 — Тренировки → дневник с диапазоном дат */}
@@ -2280,7 +2280,7 @@ export default function CalendarPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ваши события</p>
-              <h3 className="mt-1 text-base font-semibold text-foreground">Лента событий</h3>
+              <h3 className="mt-1 text-base font-semibold text-navy-500">Лента событий</h3>
             </div>
             <Tag tone="border-border bg-background text-muted-foreground">{savedEvents.length}</Tag>
           </div>

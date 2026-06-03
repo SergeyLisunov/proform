@@ -100,7 +100,7 @@ export default function RecommendationForm({
         <div className="flex items-start justify-between border-b border-border px-5 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-rose-700">Медицинская рекомендация</p>
-            <h3 className="text-lg font-semibold text-foreground">Для пациента: {athleteName}</h3>
+            <h3 className="text-lg font-semibold text-navy-500">Для пациента: {athleteName}</h3>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
             <i className="ki-filled ki-cross text-xs" />

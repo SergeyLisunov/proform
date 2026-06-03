@@ -57,7 +57,7 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
     <Card className="rounded-2xl overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
-          <h3 className="text-sm font-bold text-foreground">Команды</h3>
+          <h3 className="text-sm font-bold text-navy-500">Команды</h3>
           <p className="text-2xs text-muted-foreground mt-0.5">
             {groups.length} активных групп
           </p>

@@ -76,7 +76,7 @@ export default function DevicesSection() {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-purple-700">
               ⌚ Носимые устройства
             </span>
-            <h2 className="text-lg font-bold text-foreground mt-2">Выберите носимое устройство</h2>
+            <h2 className="text-lg font-bold text-navy-500 mt-2">Выберите носимое устройство</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-xl">
               Подключите Garmin, WHOOP или Apple Health — метрики восстановления,
               HRV, сна и тренировок будут автоматически подгружаться в ваш

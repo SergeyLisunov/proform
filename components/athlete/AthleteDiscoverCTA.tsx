@@ -22,7 +22,7 @@ export default function AthleteDiscoverCTA({ hasNoConnections }: AthleteDiscover
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex-1 min-w-0">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Старт</p>
-          <h2 className="text-lg font-bold text-foreground">Найдите тренера для прогресса</h2>
+          <h2 className="text-lg font-bold text-navy-500">Найдите тренера для прогресса</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-xl leading-relaxed">
             У вас пока нет связей с тренерами. Откройте marketplace и выберите специалиста —
             начните с подтверждённых платформой.

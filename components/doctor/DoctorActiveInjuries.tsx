@@ -61,7 +61,7 @@ export default function DoctorActiveInjuries() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-700">Травмы пациентов</p>
-          <h3 className="text-base font-bold text-foreground">Требуют наблюдения — {rows.length}</h3>
+          <h3 className="text-base font-bold text-navy-500">Требуют наблюдения — {rows.length}</h3>
         </div>
         <Link href="/injuries" className="text-[11px] font-semibold text-red-600 hover:underline">
           Журнал травм →

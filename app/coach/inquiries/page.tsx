@@ -128,7 +128,7 @@ export default function CoachInquiriesPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Запросы врачу</p>
-          <h1 className="text-3xl font-bold text-foreground">Doctor Inquiries</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Doctor Inquiries</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Запрашивайте медицинское заключение перед допуском к нагрузке. Документированная цепочка
             решений снижает вашу ответственность.
@@ -167,7 +167,7 @@ export default function CoachInquiriesPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
             <i className="ki-filled ki-message-question text-2xl" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'all' ? 'У вас пока нет запросов' : `Нет запросов в статусе "${STATUS_META[filter as keyof typeof STATUS_META]?.label ?? filter}"`}
           </h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -239,7 +239,7 @@ export default function CoachInquiriesPage() {
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">Новый запрос врачу</h3>
+              <h3 className="text-lg font-semibold text-navy-500">Новый запрос врачу</h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
                 <i className="ki-filled ki-cross text-xs" />
               </button>
