@@ -10,6 +10,8 @@ import type { Workout } from '@/services/workouts.service'
 import { createBrowserClient } from '@supabase/ssr'
 import { WorkoutLimitBadge } from '@/components/ui/Paywall'
 import dynamic from 'next/dynamic'
+import { Card, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'), { ssr: false })
 
@@ -270,8 +272,35 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
     return { totalH, totalMin, count, avgMin, avgStrain, topType, filtered }
   }, [workouts, period])
 
+  const durationByType = useMemo(() => {
+    const byType: Record<string, number> = {}
+    stats.filtered.forEach(w => {
+      const t = w.activity_type ?? 'Другое'
+      byType[t] = (byType[t] ?? 0) + (w.activity_duration_min ?? 0)
+    })
+    return Object.entries(byType).sort((a, b) => b[1] - a[1])
+  }, [stats])
+
+  const chartOpts = {
+    chart: { type: 'bar' as const, toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
+    grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
+    colors: ['#F97316'],
+    plotOptions: { bar: { borderRadius: 4, columnWidth: '55%', distributed: true } },
+    dataLabels: { enabled: false },
+    stroke: { show: false },
+    legend: { show: false },
+    xaxis: {
+      categories: durationByType.map(([type]) => type),
+      labels: { style: { fontSize: '10px', colors: '#94A3B8' } },
+      axisBorder: { show: false }, axisTicks: { show: false },
+    },
+    yaxis: { labels: { style: { fontSize: '10px', colors: '#94A3B8' } } },
+    tooltip: { theme: 'light', y: { formatter: (v: number) => fmtDuration(v) } },
+  }
+
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <>
+    <Card className="overflow-hidden">
       <div className="flex items-center gap-0.5 p-1.5 border-b border-border">
         <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mr-1">Период:</span>
         {PERIODS.map(p => (
@@ -368,7 +397,20 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
           <p className="text-2xs text-muted-foreground">Нет тренировок за выбранный период</p>
         </div>
       )}
-    </div>
+    </Card>
+
+    {durationByType.length > 0 && (
+      <ChartCard title="Объём по активностям" subtitle="Суммарное время за выбранный период">
+        <ApexChart
+          type="bar"
+          options={chartOpts}
+          series={[{ name: 'Время', data: durationByType.map(([, min]) => min) }]}
+          height={220}
+          width="100%"
+        />
+      </ChartCard>
+    )}
+    </>
   )
 }
 

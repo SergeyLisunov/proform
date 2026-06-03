@@ -15,6 +15,7 @@ import {
   METRIC_PRESETS, STATUS_META,
   type AthleteGoal, type GoalStatus,
 } from '@/services/athlete-goals.service'
+import { Card, Alert } from '@/components/ui/metronic'
 
 type FilterTab = 'all' | GoalStatus
 
@@ -266,7 +267,7 @@ export default function AthleteGoalsPage() {
               ? Math.max(0, Math.min(100, Math.round((g.current_value / g.target_value) * 100)))
               : null
             return (
-              <div key={g.id} className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-3">
+              <Card key={g.id} className="p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-bold text-foreground line-clamp-2">{g.metric_label}</h3>
@@ -349,7 +350,7 @@ export default function AthleteGoalsPage() {
                     🗑
                   </button>
                 </div>
-              </div>
+              </Card>
             )
           })}
         </div>
@@ -418,7 +419,7 @@ export default function AthleteGoalsPage() {
                   className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 resize-vertical" />
               </div>
               {formError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</div>
+                <Alert variant="destructive">{formError}</Alert>
               )}
             </div>
             <div className="flex items-center gap-2 border-t border-border px-5 py-3">

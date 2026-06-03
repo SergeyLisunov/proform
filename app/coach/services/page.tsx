@@ -27,6 +27,7 @@ import {
   SERVICE_TYPE_META, FORMAT_META,
   type CoachService, type ServiceType, type ServiceFormat,
 } from '@/services/coach-services.service'
+import { Card, Badge, Alert } from '@/components/ui/metronic'
 
 type FilterTab = 'active' | 'archived' | 'all'
 
@@ -276,28 +277,28 @@ export default function CoachServicesPage() {
             const tm = SERVICE_TYPE_META[s.service_type] ?? SERVICE_TYPE_META.general
             const fm = s.format ? FORMAT_META[s.format] : null
             return (
-              <div key={s.id}
-                className={`rounded-2xl border p-4 ${s.is_active ? 'border-border bg-card' : 'border-dashed border-border bg-accent/30 opacity-75'}`}>
+              <Card key={s.id}
+                className={`p-4 ${s.is_active ? '' : 'border-dashed bg-accent/30 opacity-75'}`}>
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                      <span className="rounded-full bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                      <Badge variant="primary" size="sm" className="uppercase tracking-wider">
                         {tm.emoji} {tm.label}
-                      </span>
+                      </Badge>
                       {fm && (
-                        <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                        <Badge variant="info" size="sm" className="uppercase tracking-wider">
                           {fm.emoji} {fm.label}
-                        </span>
+                        </Badge>
                       )}
                       {s.duration_days && (
-                        <span className="rounded-full bg-violet-50 text-violet-700 border border-violet-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                        <Badge variant="secondary" size="sm" className="uppercase tracking-wider bg-violet-50 text-violet-700">
                           {s.duration_days} дн
-                        </span>
+                        </Badge>
                       )}
                       {!s.is_active && (
-                        <span className="rounded-full bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                        <Badge variant="secondary" size="sm" className="uppercase tracking-wider">
                           Архив
-                        </span>
+                        </Badge>
                       )}
                     </div>
                     <h3 className="text-base font-bold text-foreground truncate">{s.title}</h3>
@@ -335,7 +336,7 @@ export default function CoachServicesPage() {
                     </>
                   )}
                 </div>
-              </div>
+              </Card>
             )
           })}
         </div>
@@ -429,7 +430,7 @@ export default function CoachServicesPage() {
               </div>
 
               {formError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</div>
+                <Alert variant="destructive">{formError}</Alert>
               )}
             </div>
             <div className="flex items-center gap-2 border-t border-border px-5 py-3">

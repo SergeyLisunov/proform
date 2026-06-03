@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Card, Badge } from '@/components/ui/metronic'
 
 type GroupSession = {
   id: string
@@ -78,10 +79,10 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <Card className="p-4 rounded-2xl">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground mb-2">События</p>
         <div className="h-12 flex items-center justify-center text-xs text-muted-foreground">Загрузка…</div>
-      </div>
+      </Card>
     )
   }
 
@@ -142,9 +143,9 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
                     {s.location && (s.start_time && s.end_time ? ' · ' : '') + s.location}
                   </div>
                 </div>
-                <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 text-[10px] font-bold shrink-0">
+                <Badge variant="info" size="sm" className="!rounded-full shrink-0">
                   👥 {s.participantCount}
-                </span>
+                </Badge>
               </div>
             ))}
           </div>

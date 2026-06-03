@@ -5,6 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
+import { Card } from '@/components/ui/metronic'
 
 type MemberRole = 'athlete' | 'coach'
 type MemberStatus = 'active' | 'pending' | 'suspended' | 'removed'
@@ -340,7 +341,7 @@ export default function OrgMembersPage() {
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-border bg-card p-4 shadow-sm sm:p-5">
+      <Card className="rounded-[28px] p-4 sm:p-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
@@ -424,10 +425,10 @@ export default function OrgMembersPage() {
             </div>
           </div>
         </div>
-      </section>
+      </Card>
 
       {filtered.length === 0 ? (
-        <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-sm">
+        <Card className="rounded-[28px] px-6 py-16 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FFF7ED)] text-orange-400 shadow-sm">
             <i className="ki-filled ki-people text-3xl" />
           </div>
@@ -448,9 +449,9 @@ export default function OrgMembersPage() {
               Добавить участника
             </button>
           )}
-        </div>
+        </Card>
       ) : (
-        <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
+        <Card className="overflow-hidden rounded-[28px]">
           <div className="flex flex-col gap-2 border-b border-border bg-background/60 px-5 py-4 sm:px-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Список участников</p>
             <p className="text-sm text-muted-foreground">Все действия по ролям и статусам доступны прямо из этой ленты.</p>
@@ -519,7 +520,7 @@ export default function OrgMembersPage() {
               )
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {showInvite && (

@@ -10,6 +10,7 @@ import {
   type VerifiableCoach,
 } from '@/services/admin-verifications.service'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { Card, Alert } from '@/components/ui/metronic'
 import {
   listMyAdminInvites, revokeAdminInvite,
   type AdminUserInvite, type AdminInviteRole,
@@ -482,7 +483,7 @@ export default function AdminPage() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summary.map(item => (
-          <div key={item.label} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <Card key={item.label} className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{item.label}</div>
@@ -495,7 +496,7 @@ export default function AdminPage() {
                 <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
@@ -1035,11 +1036,11 @@ export default function AdminPage() {
                 </select>
               </div>
 
-              <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-2sm text-muted-foreground">
+              <Alert variant="primary">
                 {inviteMode === 'bulk'
                   ? 'Каждый пользователь получит свою ссылку с предзаполненной ролью. Существующие пользователи будут пропущены. Дубликаты email на pending-инвайт переиспользуются.'
                   : 'Пользователь получит email со ссылкой на регистрацию с предзаполненной ролью. Приглашение активно 30 дней.'}
-              </div>
+              </Alert>
 
               {inviteError && (
                 <p className="text-xs text-red-600">{inviteError}</p>
@@ -1154,9 +1155,9 @@ export default function AdminPage() {
                   <option>Alex Trainer (coach@proform.test)</option>
                 </select>
               </div>
-              <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-2sm text-muted-foreground">
+              <Alert variant="primary">
                 Назначение связывает тестового атлета с тренером в рамках демонстрационного admin-сценария.
-              </div>
+              </Alert>
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => {

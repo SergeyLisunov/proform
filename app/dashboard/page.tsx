@@ -12,6 +12,7 @@ import {
   WorkoutEditDrawer,
   CalendarEventEditDrawer,
 } from '@/components/workout/WorkoutDrawers'
+import { Card, ChartCard, Badge } from '@/components/ui/metronic'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -974,7 +975,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
           { label: 'Тренировок (посл.)',  value: loading ? '…' : athletes.reduce((s, a) => s + a.workouts_count, 0).toString(),                            icon: 'ki-calendar',      bg: 'bg-orange-50 text-orange-500' },
           { label: 'Предупреждения',      value: loading ? '…' : alerts.toString(),                                                                         icon: 'ki-notification',  bg: alerts > 0 ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600' },
         ].map(c => (
-          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
+          <Card key={c.label} className="p-5 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
@@ -982,7 +983,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
               </div>
             </div>
             <span className="pf-num text-4xl text-foreground">{c.value}</span>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -990,7 +991,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
       <CoachBriefingCard />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 bg-card border border-border rounded-xl overflow-hidden">
+        <Card className="xl:col-span-2 overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">Статус атлетов</h3>
             <Link href="/athletes" className="text-2xs font-semibold text-orange-500 hover:text-orange-600">Управление →</Link>
@@ -1047,10 +1048,9 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
               })}
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="bg-card border border-border rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Восстановление команды</h3>
+        <ChartCard title="Восстановление команды">
           {!loading && athletes.length > 0 ? (
             <ApexChart
               type="bar"
@@ -1063,7 +1063,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
               {loading ? 'Загрузка…' : 'Нет данных'}
             </div>
           )}
-        </div>
+        </ChartCard>
       </div>
     </div>
   )
@@ -1104,7 +1104,7 @@ function AdminDash({ name }: { name: string }) {
           { label: 'Тренеры',            value: loading ? '…' : stats.coaches.toString(),   icon: 'ki-notepad-edit', bg: 'bg-green-50 text-green-600' },
           { label: 'Организации',        value: loading ? '…' : stats.orgs.toString(),      icon: 'ki-office-bag',   bg: 'bg-violet-50 text-violet-600' },
         ].map(c => (
-          <div key={c.label} className="bg-card border border-border rounded-xl p-5 flex flex-col gap-2">
+          <Card key={c.label} className="p-5 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
@@ -1112,32 +1112,30 @@ function AdminDash({ name }: { name: string }) {
               </div>
             </div>
             <span className="pf-num text-4xl text-foreground">{c.value}</span>
-          </div>
+          </Card>
         ))}
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="px-5 py-4 border-b border-border">
           <h3 className="text-sm font-semibold text-foreground">System Health</h3>
         </div>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { label: 'Supabase DB',   status: 'Online',  badge: 'bg-green-50 text-green-700 border-green-200' },
-            { label: 'Auth Service',  status: 'Healthy', badge: 'bg-green-50 text-green-700 border-green-200' },
-            { label: 'Vercel Deploy', status: 'Active',  badge: 'bg-green-50 text-green-700 border-green-200' },
+            { label: 'Supabase DB',   status: 'Online'  },
+            { label: 'Auth Service',  status: 'Healthy' },
+            { label: 'Vercel Deploy', status: 'Active'  },
           ].map(s => (
             <div key={s.label} className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
               <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
               <div className="flex-1">
                 <div className="text-sm font-medium text-foreground">{s.label}</div>
               </div>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold border ${s.badge}`}>
-                {s.status}
-              </span>
+              <Badge variant="success" size="sm">{s.status}</Badge>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       <div className="flex justify-center">
         <Link href="/admin" className="kt-btn kt-btn-primary gap-2">

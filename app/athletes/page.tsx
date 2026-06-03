@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
+import { Card, ChartCard } from '@/components/ui/metronic'
 import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
@@ -509,30 +510,26 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
-              <SectionHeader
-                eyebrow="Тренд"
-                title="Недельная нагрузка и ВСР"
-                subtitle="Линейный график остается, но живет в более собранной рабочей зоне."
-              />
-              <div className="mt-4">
-                {DEMO_MODE ? (
-                  <ApexChart
-                    type="line"
-                    series={[
-                      { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
-                      { name: 'ВСР (мс)', data: [44, 47, 45, 41, 48, 50, 47] },
-                    ]}
-                    options={lineOpts}
-                    height={180}
-                  />
-                ) : (
-                  <div className="flex h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-border text-center">
-                    <p className="text-xs text-muted-foreground">График появится при накоплении данных тренировок</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ChartCard
+              title="Недельная нагрузка и ВСР"
+              subtitle="Линейный график остается, но живет в более собранной рабочей зоне."
+            >
+              {DEMO_MODE ? (
+                <ApexChart
+                  type="line"
+                  series={[
+                    { name: 'Нагрузка', data: [8.2, 11.5, 7.1, 14.2, 10.8, 6.3, 12.1] },
+                    { name: 'ВСР (мс)', data: [44, 47, 45, 41, 48, 50, 47] },
+                  ]}
+                  options={lineOpts}
+                  height={180}
+                />
+              ) : (
+                <div className="flex h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-border text-center">
+                  <p className="text-xs text-muted-foreground">График появится при накоплении данных тренировок</p>
+                </div>
+              )}
+            </ChartCard>
           </div>
         )}
 
@@ -828,7 +825,7 @@ export default function AthletesPage() {
 
   if (user?.role !== 'coach' && user?.role !== 'admin') {
     return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 rounded-[28px] border border-border bg-card px-6 py-10 text-center shadow-sm">
+      <Card className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 py-10 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
           <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
         </div>
@@ -836,7 +833,7 @@ export default function AthletesPage() {
           <p className="text-sm font-semibold text-foreground">Доступ ограничен</p>
           <p className="mt-1 text-2sm text-muted-foreground">Этот раздел доступен только тренерам.</p>
         </div>
-      </div>
+      </Card>
     )
   }
 

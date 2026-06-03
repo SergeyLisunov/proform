@@ -9,6 +9,7 @@ import {
   SEVERITY_LABELS, MECHANISM_LABELS, STATUS_LABELS, SIDE_LABELS,
   type Injury, type InjurySide, type InjurySeverity, type InjuryMechanism, type InjuryStatus,
 } from '@/services/injuries.service'
+import { Card } from '@/components/ui/metronic'
 
 type AthleteOption = { id: string; name: string }
 
@@ -137,7 +138,7 @@ export default function InjuriesPage() {
         />
       )}
 
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Записи · {rows.length}
@@ -159,7 +160,7 @@ export default function InjuriesPage() {
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }
@@ -203,9 +204,9 @@ function InjuryForm({
 
   if (athleteOptions.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5 text-center text-xs text-muted-foreground">
+      <Card className="p-5 text-center text-xs text-muted-foreground">
         У вас нет связанных атлетов, чтобы зафиксировать травму.
-      </div>
+      </Card>
     )
   }
 

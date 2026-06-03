@@ -20,6 +20,7 @@ import {
   LEVEL_META, type SkillLevel, type OrgGroupWithCounts,
 } from '@/services/org-groups.service'
 import type { Organization } from '@/types/org.types'
+import { Card, Badge } from '@/components/ui/metronic'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -122,7 +123,7 @@ export default function OrgTeamsPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       {/* Header */}
-      <section className="rounded-3xl border border-border bg-card p-6">
+      <Card className="rounded-3xl p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-700">Организация · {org.org_name}</p>
@@ -139,7 +140,7 @@ export default function OrgTeamsPage() {
             Новая команда
           </button>
         </div>
-      </section>
+      </Card>
 
       {/* List */}
       {groups.length === 0 ? (
@@ -167,8 +168,8 @@ export default function OrgTeamsPage() {
                           : g.age_max ? `до ${g.age_max} лет`
                           : null
             return (
-              <Link key={g.id} href={`/org/teams/${g.id}`}
-                className="rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-violet-200 no-underline block group">
+              <Link key={g.id} href={`/org/teams/${g.id}`} className="no-underline block group">
+                <Card className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-violet-200">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-bold text-foreground truncate group-hover:text-violet-700 transition-colors">{g.name}</h3>
@@ -187,9 +188,9 @@ export default function OrgTeamsPage() {
 
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {ageRange && (
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                    <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
                       {ageRange}
-                    </span>
+                    </Badge>
                   )}
                   {lvl && (
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
@@ -211,6 +212,7 @@ export default function OrgTeamsPage() {
                     </div>
                   )}
                 </div>
+                </Card>
               </Link>
             )
           })}

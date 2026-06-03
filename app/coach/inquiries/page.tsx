@@ -15,6 +15,7 @@ import {
   QUESTION_TYPE_META, URGENCY_META, STATUS_META,
   type InquiryWithUsers, type QuestionType, type Urgency, type AthleteOption,
 } from '@/services/doctor-inquiries.service'
+import { Card, Alert } from '@/components/ui/metronic'
 
 type FilterTab = 'all' | 'pending' | 'answered' | 'expired'
 
@@ -184,7 +185,7 @@ export default function CoachInquiriesPage() {
             const ur = URGENCY_META[i.urgency]
             const st = STATUS_META[i.status]
             return (
-              <div key={i.id} className="rounded-2xl border border-border bg-card p-4">
+              <Card key={i.id} className="p-4">
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
@@ -211,12 +212,10 @@ export default function CoachInquiriesPage() {
                 </div>
                 <p className="text-sm text-foreground whitespace-pre-wrap mb-2">{i.question}</p>
                 {i.response && (
-                  <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 mb-1">
-                      Ответ врача · {i.responded_at ? new Date(i.responded_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}
-                    </div>
-                    <p className="text-sm text-foreground whitespace-pre-wrap">{i.response}</p>
-                  </div>
+                  <Alert variant="success" className="mt-3"
+                    title={`Ответ врача · ${i.responded_at ? new Date(i.responded_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}`}>
+                    <p className="whitespace-pre-wrap">{i.response}</p>
+                  </Alert>
                 )}
                 {i.status === 'pending' && (
                   <div className="flex justify-end mt-2">
@@ -226,7 +225,7 @@ export default function CoachInquiriesPage() {
                     </button>
                   </div>
                 )}
-              </div>
+              </Card>
             )
           })}
         </div>
@@ -294,7 +293,7 @@ export default function CoachInquiriesPage() {
                     <p className="mt-1 text-[10px] text-muted-foreground">{question.length}/2000</p>
                   </div>
                   {formError && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</div>
+                    <Alert variant="destructive">{formError}</Alert>
                   )}
                 </>
               )}

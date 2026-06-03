@@ -13,6 +13,7 @@ import {
 import type { Workout } from '@/services/workouts.service'
 import { getNotes, type Note } from '@/services/notes.service'
 import QuickNoteModal from '@/components/ui/QuickNoteModal'
+import { Badge } from '@/components/ui/metronic'
 import {
   CoachAthletesPanel, CoachSessionDrawer, PassPlansManager, IssuePassDrawer, useCoachAthletes,
 } from '@/components/ui/CoachCalendarAddons'
@@ -1208,9 +1209,9 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="truncate text-sm font-semibold text-foreground">{ev.title}</div>
-                        <span className="inline-flex items-center rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        <Badge variant="secondary" size="sm" className="rounded-full uppercase tracking-[0.14em]">
                           {meta?.label ?? 'Событие'}
-                        </span>
+                        </Badge>
                       </div>
                       {ev.notes && <div className="mt-1 truncate text-[10px] text-muted-foreground">{ev.notes}</div>}
                     </div>
@@ -2298,9 +2299,9 @@ export default function CalendarPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="truncate text-sm font-semibold text-foreground">{ev.title}</span>
-                      <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      <Badge variant="secondary" size="sm" className="rounded-full uppercase tracking-[0.14em]">
                         {meta?.label ?? 'Событие'}
-                      </span>
+                      </Badge>
                     </div>
                     {ev.notes && <span className="mt-1 block truncate text-2xs text-muted-foreground">{ev.notes}</span>}
                   </div>

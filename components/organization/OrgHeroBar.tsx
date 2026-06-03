@@ -1,5 +1,7 @@
 'use client'
 
+import { Card } from '@/components/ui/metronic'
+
 interface OrgHeroStats {
   membersCount: number
   coachesCount: number
@@ -56,9 +58,9 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
 
 function Stat({ label, value, color, highlight }: { label: string; value: string; color: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-xl border bg-white px-3 py-2.5 ${highlight ? 'border-purple-300' : 'border-border'}`}>
+    <Card className={`px-3 py-2.5 ${highlight ? '!border-purple-300' : ''}`}>
       <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="pf-num text-xl font-bold mt-0.5" style={{ color }}>{value}</div>
-    </div>
+    </Card>
   )
 }

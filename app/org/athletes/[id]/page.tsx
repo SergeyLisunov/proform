@@ -25,6 +25,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { getMyOrg } from '@/services/org.service'
 import { createClient } from '@/lib/supabase/client'
 import type { Organization } from '@/types/org.types'
+import { Card, Alert, Badge } from '@/components/ui/metronic'
 
 interface AthleteProfile {
   id: string
@@ -210,17 +211,14 @@ export default function OrgAthletePage() {
   return (
     <div className="flex flex-col gap-5 pf-enter">
       {/* Privacy banner */}
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
-        <i className="ki-filled ki-shield-tick text-base text-amber-700 mt-0.5" />
-        <div className="flex-1 text-xs text-amber-900 leading-snug">
-          <strong>Org-view: упрощённый профиль.</strong> Из этого экрана вы видите только agg-метрики и
-          членство. Полный профиль с тренировочной историей и медицинскими данными
-          доступен только связанному тренеру/врачу (через RLS).
-        </div>
-      </div>
+      <Alert variant="warning" icon="ki-shield-tick" title="Org-view: упрощённый профиль.">
+        Из этого экрана вы видите только agg-метрики и членство. Полный профиль с
+        тренировочной историей и медицинскими данными доступен только связанному
+        тренеру/врачу (через RLS).
+      </Alert>
 
       {/* Hero card */}
-      <section className="rounded-3xl border border-border bg-card p-6 flex items-start gap-5 flex-wrap">
+      <Card className="rounded-3xl p-6 flex items-start gap-5 flex-wrap">
         <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-700 shrink-0 overflow-hidden">
           {profile.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -231,9 +229,9 @@ export default function OrgAthletePage() {
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-bold text-foreground">{profile.name ?? '—'}</h1>
             {profile.member_role && (
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-orange-50 text-orange-700 border border-orange-200">
+              <Badge variant="primary" size="sm" className="!rounded-full uppercase tracking-wider">
                 {profile.member_role}
-              </span>
+              </Badge>
             )}
           </div>
           <div className="mt-1 text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
@@ -248,7 +246,7 @@ export default function OrgAthletePage() {
           <i className="ki-filled ki-arrow-left text-xs" />
           В управление
         </Link>
-      </section>
+      </Card>
 
       {/* Aggregations grid (no raw medical detail) */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -270,7 +268,7 @@ export default function OrgAthletePage() {
 
 function Tile({ label, value, icon, color, bg }: { label: string; value: number; icon: string; color: string; bg: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <Card className="p-4 rounded-2xl">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
@@ -280,13 +278,13 @@ function Tile({ label, value, icon, color, bg }: { label: string; value: number;
           <i className={`ki-filled ${icon}`} style={{ color, fontSize: 16 }} />
         </div>
       </div>
-    </div>
+    </Card>
   )
 }
 
 function ContextCard({ title, items, emptyHint, icon, color }: { title: string; items: string[]; emptyHint: string; icon: string; color: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <Card className="p-4 rounded-2xl">
       <div className="flex items-center gap-2 mb-2">
         <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
@@ -300,6 +298,6 @@ function ContextCard({ title, items, emptyHint, icon, color }: { title: string; 
           ))}
         </ul>
       )}
-    </div>
+    </Card>
   )
 }

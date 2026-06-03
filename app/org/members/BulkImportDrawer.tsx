@@ -20,6 +20,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { parseCsv, isValidEmail } from '@/lib/csv/parse'
+import { Accordion } from '@/components/ui/metronic'
 
 type MemberRole = 'athlete' | 'coach'
 
@@ -395,22 +396,25 @@ function ResultPanel({ result }: { result: ApiResponse }) {
 
       {/* Failed details */}
       {result.details.some(d => d.status === 'failed' || d.status === 'invalid_email') && (
-        <details style={{ borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
-          <summary style={{ padding: '10px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'var(--accent)', color: 'var(--foreground)' }}>
-            Подробности по проблемным строкам
-          </summary>
-          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-            {result.details
-              .filter(d => d.status === 'failed' || d.status === 'invalid_email')
-              .map((d, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8, padding: '6px 14px', fontSize: 11, fontFamily: 'monospace', borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--muted-foreground)', width: 30 }}>#{d.line}</span>
-                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.email}</span>
-                  <span style={{ color: '#DC2626' }}>{d.status === 'invalid_email' ? 'не email' : (d.reason ?? 'ошибка')}</span>
-                </div>
-              ))}
-          </div>
-        </details>
+        <Accordion
+          items={[{
+            id: 'failed-rows',
+            title: 'Подробности по проблемным строкам',
+            content: (
+              <div style={{ maxHeight: 200, overflowY: 'auto', margin: '0 -20px' }}>
+                {result.details
+                  .filter(d => d.status === 'failed' || d.status === 'invalid_email')
+                  .map((d, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, padding: '6px 14px', fontSize: 11, fontFamily: 'monospace', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--muted-foreground)', width: 30 }}>#{d.line}</span>
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.email}</span>
+                      <span style={{ color: '#DC2626' }}>{d.status === 'invalid_email' ? 'не email' : (d.reason ?? 'ошибка')}</span>
+                    </div>
+                  ))}
+              </div>
+            ),
+          }]}
+        />
       )}
     </div>
   )

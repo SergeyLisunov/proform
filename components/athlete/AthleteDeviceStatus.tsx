@@ -6,6 +6,7 @@ import {
   listMyDeviceConnections, triggerSync, type DeviceConnection,
 } from '@/services/devices.service'
 import { providerMeta } from '@/lib/integrations/providers'
+import { Card, Badge } from '@/components/ui/metronic'
 
 function fmtSync(iso: string | null): string {
   if (!iso) return 'ещё не было'
@@ -59,7 +60,7 @@ export default function AthleteDeviceStatus({ athleteId }: { athleteId: string }
   const meta = primary ? providerMeta(primary.provider) : null
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <Card className="p-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           {meta && (
@@ -71,9 +72,9 @@ export default function AthleteDeviceStatus({ athleteId }: { athleteId: string }
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-foreground">{meta?.name ?? 'Устройство'}</span>
-              <span className="rounded-full bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
-                ● онлайн
-              </span>
+              <Badge variant="success" size="sm" dot className="uppercase tracking-wider">
+                онлайн
+              </Badge>
               {connected.length > 1 && (
                 <span className="text-[11px] text-muted-foreground">+{connected.length - 1}</span>
               )}
@@ -107,6 +108,6 @@ export default function AthleteDeviceStatus({ athleteId }: { athleteId: string }
         </div>
       </div>
       {msg && <div className="mt-2 text-[11px] text-muted-foreground">{msg}</div>}
-    </div>
+    </Card>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { ChartCard } from '@/components/ui/metronic'
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -38,11 +39,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       {/* Weekly strain */}
-      <div className="card rounded-2xl border border-[#E2E8F0] bg-white p-6">
-        <div className="mb-3">
-          <h3 className="pf-num text-lg text-slate-900">Нагрузка по дням недели</h3>
-          <p className="text-xs text-slate-400 mt-0.5">WHOOP day_strain score · последние 8 недель</p>
-        </div>
+      <ChartCard title="Нагрузка по дням недели" subtitle="WHOOP day_strain score · последние 8 недель">
         {weeklyData.length > 0 ? (
           <ReactApexChart
             type="area"
@@ -53,20 +50,19 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
         ) : (
           <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
         )}
-      </div>
+      </ChartCard>
 
       {/* Recovery + HRV 7 days */}
-      <div className="card rounded-2xl border border-[#E2E8F0] bg-white p-6">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="pf-num text-lg text-slate-900">Восстановление и ВСР</h3>
-            <p className="text-xs text-slate-400 mt-0.5">7-дневные биометрики WHOOP</p>
-          </div>
+      <ChartCard
+        title="Восстановление и ВСР"
+        subtitle="7-дневные биометрики WHOOP"
+        toolbar={
           <div className="flex gap-3 text-xs text-slate-500">
             <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-green-500" />Восстановление %</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-blue-500 border-dashed border-t border-blue-500" />ВСР мс</span>
           </div>
-        </div>
+        }
+      >
         {daily7.length > 0 ? (
           <ReactApexChart
             type="line"
@@ -80,7 +76,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
         ) : (
           <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
         )}
-      </div>
+      </ChartCard>
     </div>
   )
 }

@@ -8,6 +8,7 @@ import {
   getCalendarEvents, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent,
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
+import { Badge } from '@/components/ui/metronic'
 
 function parseLocalDate(s: string | null | undefined): Date {
   // Calendar events from the DB allow nullable event_date; treat null as
@@ -316,9 +317,9 @@ function CompetitionsContent() {
         <div className="bg-gradient-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex-1 min-w-0">
-              <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-700">
+              <Badge variant="primary" className="rounded-full uppercase tracking-[0.18em]">
                 Соревнования
-              </span>
+              </Badge>
               <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-tight text-foreground leading-tight">
                 График стартов
               </h2>
@@ -390,10 +391,9 @@ function CompetitionsContent() {
       {upcoming.length > 0 && (
         <SurfaceFrame className="p-5">
           <div className="mb-4 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-green-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+            <Badge variant="success" dot className="rounded-full uppercase tracking-[0.18em]">
               Предстоящие
-            </span>
+            </Badge>
             <span className="text-2xs text-muted-foreground">{upcoming.length}</span>
           </div>
           <div className="flex flex-col gap-2">
@@ -423,9 +423,9 @@ function CompetitionsContent() {
       {past.length > 0 && (
         <SurfaceFrame className="p-5">
           <div className="mb-4 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <Badge variant="secondary" className="rounded-full uppercase tracking-[0.18em]">
               Прошедшие
-            </span>
+            </Badge>
             <span className="text-2xs text-muted-foreground">{past.length}</span>
           </div>
           <div className="flex flex-col gap-2">

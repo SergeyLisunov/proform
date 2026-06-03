@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
+import { Card, Alert } from '@/components/ui/metronic'
 
 type Mode = 'contacts' | 'find'
 type FindType = 'people' | 'coach' | 'doctor' | 'organization'
@@ -209,7 +210,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
           const name = displayName(u)
           const status = u.connection_status
           return (
-            <div key={u.id} className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-3">
+            <Card key={u.id} className="flex items-center gap-3 p-3">
               <Link href={`/profile/${u.id}`}><Avatar url={u.avatar_url} name={name} role={u.role} /></Link>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -239,7 +240,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
                   </button>
                 )}
               </div>
-            </div>
+            </Card>
           )
         })}
       </div>
@@ -270,7 +271,6 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
   useEffect(() => { setItems([]); load() }, [load])
 
   const accent = type === 'coach' ? '#16A34A' : type === 'doctor' ? '#DC2626' : '#2563EB'
-  const bg     = type === 'coach' ? '#F0FDF4' : type === 'doctor' ? '#FEF2F2' : '#EFF6FF'
 
   return (
     <div className="flex flex-col gap-4">
@@ -285,9 +285,9 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
         </div>
       </div>
 
-      <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground" style={{ borderColor: `${accent}40`, background: bg }}>
-        💡 Для точного поиска (специализация, формат, цена) откройте <Link href={`/directory?type=${type}`} className="font-bold underline" style={{ color: accent }}>полный каталог</Link>.
-      </div>
+      <Alert variant="info" icon="ki-information-5">
+        Для точного поиска (специализация, формат, цена) откройте <Link href={`/directory?type=${type}`} className="font-bold underline" style={{ color: accent }}>полный каталог</Link>.
+      </Alert>
 
       {loading && <div className="text-sm text-muted-foreground">Загружаю…</div>}
       {!loading && items.length === 0 && <div className="rounded-2xl border border-dashed border-[#E2E8F0] p-10 text-center text-sm text-muted-foreground">Нет подходящих специалистов</div>}
@@ -413,7 +413,7 @@ function ContactsPanel() {
           const other = c.initiator.id === my ? c.recipient : c.initiator
           const name = displayName(other)
           return (
-            <div key={c.id} className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-3">
+            <Card key={c.id} className="flex items-center gap-3 p-3">
               <Link href={`/profile/${other.id}`}><Avatar url={other.avatar_url} name={name} role={other.role} /></Link>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -434,7 +434,7 @@ function ContactsPanel() {
               ) : (
                 <Link href={`/profile/${other.id}`} className="shrink-0 rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground">Профиль →</Link>
               )}
-            </div>
+            </Card>
           )
         })}
       </div>

@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   CATEGORY_META, SEVERITY_META, type Recommendation,
 } from '@/services/recommendations.service'
+import { Badge } from '@/components/ui/metronic'
 
 interface Props {
   athleteId: string
@@ -105,9 +106,9 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
                     {sev.label}
                   </span>
                   {r.valid_until && (
-                    <span className="rounded-full px-1.5 py-[1px] text-[9px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <Badge variant="warning" size="sm">
                       до {new Date(r.valid_until + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 {r.body && (
@@ -128,9 +129,9 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
                   {busyId === r.id ? '…' : '✓ Понятно'}
                 </button>
               ) : (
-                <span className="shrink-0 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
+                <Badge variant="success" size="sm" className="shrink-0 uppercase tracking-wider">
                   Учтено
-                </span>
+                </Badge>
               )}
             </div>
           )

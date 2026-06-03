@@ -18,6 +18,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { listMyGoals, STATUS_META as GOAL_STATUS_META, type AthleteGoal } from '@/services/athlete-goals.service'
 import { countMyActivePasses } from '@/services/athlete-passes.service'
+import { Card } from '@/components/ui/metronic'
 
 interface PrescribedWorkout {
   id:                    string
@@ -161,7 +162,7 @@ export default function AthleteDashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* This week's plan */}
-        <section className="lg:col-span-2 rounded-2xl border border-border bg-card p-5">
+        <Card className="lg:col-span-2 p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-base font-bold text-foreground">Эта неделя</h2>
@@ -227,10 +228,10 @@ export default function AthleteDashboardPage() {
               … ещё {upcomingWorkouts.length - 7} тренировок в календаре
             </p>
           )}
-        </section>
+        </Card>
 
         {/* Active goals */}
-        <section className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-base font-bold text-foreground">Цели</h2>
@@ -279,12 +280,12 @@ export default function AthleteDashboardPage() {
               })}
             </ul>
           )}
-        </section>
+        </Card>
       </div>
 
       {/* Recent recommendations */}
       {recs.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="mb-3">
             <h2 className="text-base font-bold text-foreground">Недавние рекомендации</h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">Сообщения от тренера и врача</p>
@@ -310,7 +311,7 @@ export default function AthleteDashboardPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </Card>
       )}
     </div>
   )

@@ -12,6 +12,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { Card, Alert } from '@/components/ui/metronic'
 import Calculator from './Calculator'
 
 export const dynamic = 'force-dynamic'
@@ -65,20 +66,15 @@ export default async function LandingAbPage() {
       </header>
 
       {/* Test status banner */}
-      <section className="mb-8 rounded-3xl border border-amber-200 bg-amber-50 p-5">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-amber-800">
-          Текущий статус: тест приостановлен
-        </h2>
-        <p className="mt-2 text-sm text-amber-900/90">
-          W15 Day 77 hero copy A/B (variant A persona-driven vs B
-          tool-replacement) — retired W16 Day 78 на основе UX feedback.
-          Landing rebuilt к single voice. Calculator widget + методология
-          сохранены — used для будущих tests.
-        </p>
-      </section>
+      <Alert variant="warning" title="Текущий статус: тест приостановлен" className="mb-8">
+        W15 Day 77 hero copy A/B (variant A persona-driven vs B
+        tool-replacement) — retired W16 Day 78 на основе UX feedback.
+        Landing rebuilt к single voice. Calculator widget + методология
+        сохранены — used для будущих tests.
+      </Alert>
 
       {/* Methodology */}
-      <section className="mb-8 rounded-3xl border border-border bg-card p-6">
+      <Card className="mb-8 p-6">
         <h2 className="text-xl font-bold text-foreground">Методология</h2>
         <ul className="mt-3 list-disc space-y-2 pl-6 text-sm text-muted-foreground">
           <li>
@@ -117,13 +113,13 @@ export default async function LandingAbPage() {
             inconclusive.
           </li>
         </ul>
-      </section>
+      </Card>
 
       {/* Calculator widget */}
       <Calculator />
 
       {/* Vercel link */}
-      <section className="mt-8 rounded-3xl border border-border bg-orange-50/50 p-5">
+      <Card className="mt-8 bg-orange-50/50 p-5">
         <h3 className="text-sm font-bold uppercase tracking-wider text-orange-700">
           Откуда брать данные
         </h3>
@@ -152,7 +148,7 @@ export default async function LandingAbPage() {
             каждом page view event.
           </li>
         </ol>
-      </section>
+      </Card>
     </div>
   )
 }

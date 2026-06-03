@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Alert } from '@/components/ui/metronic'
 
 type Author = {
   id: string
@@ -239,9 +240,9 @@ export default function WorkoutCommentsDrawer({
           )}
 
           {error && (
-            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-2xs text-red-700">
+            <Alert variant="destructive" className="mt-3">
               {error}
-            </div>
+            </Alert>
           )}
         </div>
 

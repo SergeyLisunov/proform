@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Card, Alert } from '@/components/ui/metronic'
 import { listInjuries, BODY_PART_LABELS, SEVERITY_LABELS, type Injury } from '@/services/injuries.service'
 
 interface InjuryRow extends Injury { athlete_name: string }
@@ -49,20 +50,14 @@ export default function DoctorActiveInjuries() {
   if (loading) return null
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50/40 p-4">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">✅</span>
-          <div>
-            <p className="text-sm font-bold text-foreground">Активных травм нет</p>
-            <p className="text-[11px] text-muted-foreground">Все ваши пациенты в норме.</p>
-          </div>
-        </div>
-      </div>
+      <Alert variant="success" title="Активных травм нет">
+        Все ваши пациенты в норме.
+      </Alert>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-red-200 bg-card p-5">
+    <Card className="border-red-200 p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-700">Травмы пациентов</p>
@@ -100,6 +95,6 @@ export default function DoctorActiveInjuries() {
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }

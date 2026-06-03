@@ -18,6 +18,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { Card } from '@/components/ui/metronic'
 import { pooledZTest } from '@/lib/stats/ztest'
 
 export const dynamic = 'force-dynamic'
@@ -178,7 +179,7 @@ export default async function AbTestsPage() {
       </section>
 
       {/* Per-source A vs B table */}
-      <section className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+      <Card className="p-6">
         <div className="mb-4">
           <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Per-source</div>
           <h2 className="mt-1 text-lg font-semibold text-foreground">Conversion: variant A vs B</h2>
@@ -243,10 +244,10 @@ export default async function AbTestsPage() {
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
 
       {/* W13 Day 66: Touch funnel — drip cadence (W7 Day 35) breakdown per variant */}
-      <section className="rounded-[26px] border border-border bg-card p-6 shadow-sm">
+      <Card className="p-6">
         <div className="mb-4">
           <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">3-touch drip funnel</div>
           <h2 className="mt-1 text-lg font-semibold text-foreground">Где конвертируются — после какого touch</h2>
@@ -295,7 +296,7 @@ export default async function AbTestsPage() {
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
         Чтобы пополнить выборку, направляйте трафик на инструменты с UTM-меткой, или ждите естественной конверсии.
@@ -307,10 +308,10 @@ export default async function AbTestsPage() {
 
 function KpiTile({ label, value, hint, tone: t }: { label: string; value: string; hint: string; tone?: { bg: string; color: string } }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+    <Card className="p-5">
       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <div className="pf-num mt-2 text-3xl leading-tight" style={t ? { color: t.color } : { color: 'inherit' }}>{value}</div>
       <div className="mt-2 text-2xs text-muted-foreground">{hint}</div>
-    </div>
+    </Card>
   )
 }

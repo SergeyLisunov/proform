@@ -17,6 +17,7 @@ import {
   getOffering, ROLE_META, SPECIALTY_META, SERVICE_TYPE_META,
   type Offering, type OfferingKind,
 } from '@/services/marketplace.service'
+import { Card, Badge, Alert } from '@/components/ui/metronic'
 
 function fmtPrice(cents: number, currency: string): string {
   if (cents === 0) return 'Бесплатно'
@@ -147,9 +148,9 @@ export default function OfferingDetailPage() {
               {specMeta.emoji} {specMeta.label}
             </span>
           )}
-          <span className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-600">
+          <Badge variant="secondary" size="sm">
             {typeMeta.emoji} {typeMeta.label}
-          </span>
+          </Badge>
         </div>
         <h1 className="text-3xl font-bold text-foreground">{offering.title}</h1>
         {offering.description && (
@@ -160,34 +161,34 @@ export default function OfferingDetailPage() {
       </header>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-border bg-card p-4">
+        <Card className="p-4">
           <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Цена</div>
           <div className="pf-num text-2xl font-bold text-foreground">
             {fmtPrice(offering.price_cents, offering.currency)}
           </div>
-        </div>
+        </Card>
         {offering.kind === 'pass_plan' && offering.total_sessions != null && (
-          <div className="rounded-2xl border border-border bg-card p-4">
+          <Card className="p-4">
             <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Состав</div>
             <div className="text-sm font-bold text-foreground">{offering.total_sessions} сессий</div>
             <div className="text-[11px] text-muted-foreground">
               период {offering.period_days} {offering.period_days === 1 ? 'день' : 'дней'}
             </div>
-          </div>
+          </Card>
         )}
         {offering.kind === 'service' && offering.duration_days != null && (
-          <div className="rounded-2xl border border-border bg-card p-4">
+          <Card className="p-4">
             <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Длительность</div>
             <div className="text-sm font-bold text-foreground">
               {offering.duration_days} {offering.duration_days === 1 ? 'день' : 'дней'}
             </div>
-          </div>
+          </Card>
         )}
       </div>
 
       {/* Seller card */}
       {seller && (
-        <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
+        <Card className="p-4 flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-base font-bold text-orange-700 overflow-hidden shrink-0">
             {seller.avatar_url
               // eslint-disable-next-line @next/next/no-img-element
@@ -198,14 +199,13 @@ export default function OfferingDetailPage() {
             <div className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">Продавец</div>
             <div className="text-base font-semibold text-foreground truncate">{seller.name ?? '—'}</div>
           </div>
-        </div>
+        </Card>
       )}
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <i className="ki-filled ki-shield-cross mr-2" />
+        <Alert variant="destructive" icon="ki-shield-cross">
           {error}
-        </div>
+        </Alert>
       )}
 
       <div>

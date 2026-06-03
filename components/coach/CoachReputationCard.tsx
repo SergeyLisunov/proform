@@ -13,6 +13,7 @@
  */
 import Link from 'next/link'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { Card, Badge } from '@/components/ui/metronic'
 
 interface CoachReputationCardProps {
   isVerified:        boolean
@@ -33,7 +34,7 @@ export default function CoachReputationCard({
   isVerified, avgRating, reviewCount, activePassesCount,
 }: CoachReputationCardProps) {
   return (
-    <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+    <Card className="rounded-3xl p-5 md:p-6">
       <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Репутация</p>
@@ -49,23 +50,23 @@ export default function CoachReputationCard({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Verified */}
-        <div className="rounded-2xl border border-border bg-background/60 p-4">
+        <Card className="rounded-2xl bg-background/60 p-4">
           <div className="flex items-center gap-2 mb-1.5">
             {isVerified
               ? <VerifiedBadge size="md" />
-              : <span className="inline-flex items-center gap-1 rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5 text-[10px] font-bold">
+              : <Badge variant="secondary" size="sm">
                   Не подтверждён
-                </span>}
+                </Badge>}
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {isVerified
               ? 'Бейдж выдан администратором — отображается на профиле и в marketplace.'
               : 'Напишите в поддержку для прохождения верификации.'}
           </p>
-        </div>
+        </Card>
 
         {/* Rating */}
-        <div className="rounded-2xl border border-border bg-background/60 p-4">
+        <Card className="rounded-2xl bg-background/60 p-4">
           <div className="flex items-baseline gap-2 mb-1">
             <span className="pf-num text-2xl font-bold text-foreground">
               {avgRating !== null ? avgRating.toFixed(1) : '—'}
@@ -77,10 +78,10 @@ export default function CoachReputationCard({
               ? `${reviewCount} ${pluralize(reviewCount, ['отзыв', 'отзыва', 'отзывов'])} от атлетов`
               : 'Пока нет отзывов — попросите атлетов поделиться впечатлением.'}
           </p>
-        </div>
+        </Card>
 
         {/* Active passes */}
-        <div className="rounded-2xl border border-border bg-background/60 p-4">
+        <Card className="rounded-2xl bg-background/60 p-4">
           <div className="flex items-baseline gap-2 mb-1">
             <span className="pf-num text-2xl font-bold text-foreground">{activePassesCount}</span>
             <span className="text-xs text-muted-foreground">
@@ -90,8 +91,8 @@ export default function CoachReputationCard({
           <p className="text-[11px] text-muted-foreground">
             Сессии списываются на странице «Списать сессию» после каждой тренировки.
           </p>
-        </div>
+        </Card>
       </div>
-    </section>
+    </Card>
   )
 }

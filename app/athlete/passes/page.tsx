@@ -24,6 +24,7 @@ import {
 } from '@/services/athlete-passes.service'
 import { getMyReviewsByCoachIds } from '@/services/coach-reviews.service'
 import AthleteReviewPrompt from '@/components/athlete/AthleteReviewPrompt'
+import { Card, Alert, Accordion } from '@/components/ui/metronic'
 
 function fmtDate(iso: string): string {
   try {
@@ -49,7 +50,6 @@ export default function AthletePassesPage() {
   const [active, setActive]     = useState<AthletePassWithCoach[]>([])
   const [expired, setExpired]   = useState<AthletePassWithCoach[]>([])
   const [loading, setLoading]   = useState(true)
-  const [showExpired, setShowExpired] = useState(false)
   // W10 Day 49: set of coach_ids athlete has already reviewed (or chose to skip)
   const [reviewedCoachIds, setReviewedCoachIds] = useState<Set<string>>(new Set())
   const [dismissedCoachIds, setDismissedCoachIds] = useState<Set<string>>(new Set())
@@ -152,7 +152,7 @@ export default function AthletePassesPage() {
             const days = daysUntil(p.expires_at)
             const urgentDays = days <= 7
             return (
-              <div key={p.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <Card key={p.id} className="p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base font-bold text-foreground truncate">{p.title}</h3>
@@ -206,7 +206,7 @@ export default function AthletePassesPage() {
                     {fmtMoneyFromCents(p.price_cents, p.currency)}
                   </span>
                 </div>
-              </div>
+              </Card>
             )
           })}
         </section>
@@ -237,47 +237,41 @@ export default function AthletePassesPage() {
 
       {/* Expired section (collapsed) */}
       {expired.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card">
-          <button onClick={() => setShowExpired(s => !s)}
-            className="w-full flex items-center justify-between gap-3 px-5 py-3 text-left hover:bg-muted transition rounded-2xl">
-            <div className="flex items-center gap-2">
-              <i className={`ki-filled ki-${showExpired ? 'down' : 'right'} text-xs text-muted-foreground`} />
-              <h2 className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
-                История · {expired.length} истекших
-              </h2>
-            </div>
-            <span className="text-[11px] text-muted-foreground">{showExpired ? 'Скрыть' : 'Показать'}</span>
-          </button>
-          {showExpired && (
-            <div className="border-t border-border divide-y divide-border">
-              {expired.map(p => {
-                const used = p.used_sessions
-                const total = p.total_sessions
-                const finishedReason = used >= total ? 'использован'
-                  : p.status === 'cancelled' ? 'отменён'
-                  : 'истёк по времени'
-                return (
-                  <div key={p.id} className="px-5 py-3 flex items-center justify-between gap-3 flex-wrap text-sm">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-semibold text-foreground truncate">{p.title}</div>
-                      <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {p.coach_name ?? '—'} · {used} из {total} использовано · {finishedReason}
+        <Accordion
+          items={[{
+            id: 'expired-history',
+            title: `История · ${expired.length} истекших`,
+            content: (
+              <div className="-mx-5 -mb-4 divide-y divide-border border-t border-border">
+                {expired.map(p => {
+                  const used = p.used_sessions
+                  const total = p.total_sessions
+                  const finishedReason = used >= total ? 'использован'
+                    : p.status === 'cancelled' ? 'отменён'
+                    : 'истёк по времени'
+                  return (
+                    <div key={p.id} className="px-5 py-3 flex items-center justify-between gap-3 flex-wrap text-sm">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-foreground truncate">{p.title}</div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">
+                          {p.coach_name ?? '—'} · {used} из {total} использовано · {finishedReason}
+                        </div>
+                      </div>
+                      <div className="text-right text-[11px] text-muted-foreground shrink-0">
+                        {fmtDate(p.starts_at)} → {fmtDate(p.expires_at)}
                       </div>
                     </div>
-                    <div className="text-right text-[11px] text-muted-foreground shrink-0">
-                      {fmtDate(p.starts_at)} → {fmtDate(p.expires_at)}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </section>
+                  )
+                })}
+              </div>
+            ),
+          }]}
+        />
       )}
 
-      <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
+      <Alert variant="info" icon="ki-information-2">
         Сессии списываются тренером после каждой встречи. Если что-то не сошлось — обратитесь к тренеру или поддержке.
-      </div>
+      </Alert>
     </div>
   )
 }

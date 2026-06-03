@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { useToast } from '@/lib/hooks/useToast'
+import { Badge, type BadgeVariant } from '@/components/ui/metronic'
 
 type NoteData = { id: string; title: string | null; content: string; note_date: string }
 type WorkoutData = {
@@ -38,10 +39,10 @@ function pct(sim: number): string {
   return `${Math.round(Math.max(0, Math.min(1, sim)) * 100)}%`
 }
 
-function simTone(sim: number): string {
-  if (sim >= 0.6) return 'bg-emerald-50 text-emerald-700 border-emerald-200'
-  if (sim >= 0.4) return 'bg-amber-50 text-amber-700 border-amber-200'
-  return 'bg-slate-50 text-slate-600 border-slate-200'
+function simVariant(sim: number): BadgeVariant {
+  if (sim >= 0.6) return 'success'
+  if (sim >= 0.4) return 'warning'
+  return 'secondary'
 }
 
 export default function DiarySearchPage() {
@@ -193,18 +194,15 @@ export default function DiarySearchPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <Badge variant="secondary" size="sm" className="uppercase tracking-wider">
                             {isNote ? 'Заметка' : 'Тренировка'}
-                          </span>
+                          </Badge>
                           {dateIso && (
                             <span className="text-[11px] text-muted-foreground">{fmtDate(dateIso)}</span>
                           )}
-                          <span
-                            className={`ml-auto rounded-full border px-2 py-0.5 text-[10px] font-bold ${simTone(h.similarity)}`}
-                            title="Семантическое сходство"
-                          >
+                          <Badge variant={simVariant(h.similarity)} size="sm" className="ml-auto">
                             {pct(h.similarity)}
-                          </span>
+                          </Badge>
                         </div>
                         <div className="mt-1 truncate text-sm font-semibold text-foreground group-hover:text-indigo-700">
                           {title}

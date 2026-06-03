@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { listInjuries, BODY_PART_LABELS, SEVERITY_LABELS, type Injury } from '@/services/injuries.service'
+import { Alert } from '@/components/ui/metronic'
 
 interface PassRow {
   id: string
@@ -50,11 +51,8 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
   if (injuries.length === 0 && passes.length === 0) return null
 
   return (
-    <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700 mb-2">
-        ⚠ Требуют внимания
-      </p>
-      <div className="flex flex-wrap gap-2">
+    <Alert variant="primary" title="Требуют внимания" icon="ki-information-5">
+      <div className="flex flex-wrap gap-2 mt-1">
         {injuries.map(i => {
           const sev = SEVERITY_LABELS[i.severity]
           const part = BODY_PART_LABELS[i.body_part] ?? i.body_part
@@ -91,6 +89,6 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
           )
         })}
       </div>
-    </div>
+    </Alert>
   )
 }

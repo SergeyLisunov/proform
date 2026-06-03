@@ -15,6 +15,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getRecentOrgActivity, type OrgEvent, type OrgEventType } from '@/services/org-activity.service'
+import { ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 export const dynamic = 'force-dynamic'
 
@@ -106,6 +108,27 @@ export default async function OrgActivityPage() {
           )
         })}
       </section>
+
+      {/* Type distribution */}
+      {events.length > 0 && (
+        <ChartCard title="Распределение событий" subtitle="За последние 30 дней по типу">
+          <ApexChart
+            type="donut"
+            options={{
+              chart: { toolbar: { show: false }, animations: { enabled: true, speed: 600 } },
+              colors: (Object.keys(counts) as OrgEventType[]).map(t => TYPE_META[t].color),
+              labels: (Object.keys(counts) as OrgEventType[]).map(t => TYPE_META[t].label),
+              plotOptions: { pie: { donut: { size: '65%' } } },
+              dataLabels: { enabled: false },
+              legend: { position: 'bottom', fontSize: '11px', offsetY: 4 },
+              tooltip: { theme: 'light' },
+            }}
+            series={(Object.keys(counts) as OrgEventType[]).map(t => counts[t])}
+            height={260}
+            width="100%"
+          />
+        </ChartCard>
+      )}
 
       {/* Feed */}
       {events.length === 0 ? (

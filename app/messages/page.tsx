@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { Card } from '@/components/ui/metronic'
 
 type ChatUser = { id: string; name: string; email: string; role: string }
 type ChatType = 'direct' | 'group' | 'org_channel'
@@ -697,7 +698,7 @@ export default function MessengerPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+        <Card className="px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Всего диалогов</div>
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{activeChats}</div>
@@ -705,8 +706,8 @@ export default function MessengerPage() {
               <i className="ki-filled ki-message-text-2 text-sm" />
             </div>
           </div>
-        </div>
-        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+        </Card>
+        <Card className="px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Непрочитанные</div>
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{totalUnread}</div>
@@ -714,8 +715,8 @@ export default function MessengerPage() {
               <i className="ki-filled ki-notification-on text-sm" />
             </div>
           </div>
-        </div>
-        <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+        </Card>
+        <Card className="px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активные чаты</div>
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{visibleChats}</div>
@@ -723,7 +724,7 @@ export default function MessengerPage() {
               <i className="ki-filled ki-abstract-26 text-sm" />
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <div className="relative max-w-md">

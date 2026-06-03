@@ -25,6 +25,7 @@ import {
   LEVEL_META, type SkillLevel, type OrgGroup,
 } from '@/services/org-groups.service'
 import type { Organization } from '@/types/org.types'
+import { Card, Badge } from '@/components/ui/metronic'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -283,9 +284,9 @@ export default function TeamDetailPage() {
             </h1>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {ageRange && (
-                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
                   {ageRange}
-                </span>
+                </Badge>
               )}
               {lvl && (
                 <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
@@ -320,7 +321,7 @@ export default function TeamDetailPage() {
       </section>
 
       {/* Roster */}
-      <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+      <Card className="rounded-3xl p-5 md:p-6">
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Состав</p>
@@ -365,10 +366,10 @@ export default function TeamDetailPage() {
             })}
           </div>
         )}
-      </section>
+      </Card>
 
       {/* Add picker */}
-      <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+      <Card className="rounded-3xl p-5 md:p-6">
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Доступно</p>
@@ -426,7 +427,7 @@ export default function TeamDetailPage() {
             )}
           </div>
         )}
-      </section>
+      </Card>
 
       {/* Edit modal */}
       {showEdit && (

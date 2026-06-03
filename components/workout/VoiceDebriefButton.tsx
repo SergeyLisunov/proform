@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { Badge } from '@/components/ui/metronic'
 
 type Debrief = {
   mood: number
@@ -140,9 +141,9 @@ export default function VoiceDebriefButton({
             </ul>
           )}
           {result.recommended_tag !== 'none' && (
-            <span className="inline-block rounded-full bg-amber-100 px-2 py-0.5 text-2xs font-bold uppercase tracking-wider text-amber-800">
+            <Badge variant="warning" size="sm" className="uppercase tracking-wider">
               метка: {result.recommended_tag}
-            </span>
+            </Badge>
           )}
         </div>
       )}

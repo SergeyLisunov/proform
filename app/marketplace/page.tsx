@@ -30,6 +30,8 @@ import {
 } from '@/services/marketplace.service'
 import { getReviewSummaries } from '@/services/coach-reviews.service'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { Card, Badge, ChartCard } from '@/components/ui/metronic'
+import ApexChart from '@/components/charts/ApexChart'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
 const TYPE_OPTIONS: ServiceType[] = [
@@ -216,7 +218,7 @@ function MarketplaceInner() {
       </form>
 
       {/* Filters */}
-      <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex flex-col gap-3">
+      <Card className="p-4 mb-6 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
             <i className="ki-filled ki-filter text-sm text-muted-foreground" />
@@ -309,7 +311,7 @@ function MarketplaceInner() {
             <FilterChip label="до 50 000 ₽"    active={priceMax === 50000}       onClick={() => setFilter('price_max', '50000')} />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Featured carousel (only without filters/search) — W6 Day 32 */}
       {!loading && featured.length > 0 && (
@@ -317,9 +319,9 @@ function MarketplaceInner() {
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">⭐</span>
             <h2 className="text-lg font-bold text-foreground">Рекомендуем</h2>
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+            <Badge variant="warning" size="sm" className="uppercase tracking-[0.18em]">
               Featured
-            </span>
+            </Badge>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featured.map(o => {
@@ -403,6 +405,34 @@ function MarketplaceInner() {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
+          {grouped.size > 1 && (
+            <ChartCard
+              title="Каталог по типам услуг"
+              subtitle={`Всего ${offerings.length} предложений в ${grouped.size} категориях`}
+              accent
+            >
+              <ApexChart
+                type="bar"
+                height={Math.max(140, grouped.size * 44)}
+                width="100%"
+                options={{
+                  chart: { toolbar: { show: false }, animations: { enabled: true, speed: 500 } },
+                  colors: ['#F97316'],
+                  plotOptions: { bar: { horizontal: true, borderRadius: 4, columnWidth: '60%' } },
+                  dataLabels: { enabled: false },
+                  grid: { borderColor: '#F1F5F9', strokeDashArray: 3 },
+                  xaxis: {
+                    categories: Array.from(grouped.keys()).map(t => SERVICE_TYPE_META[t].label),
+                    labels: { style: { fontSize: '10px', colors: '#94A3B8' } },
+                    axisBorder: { show: false }, axisTicks: { show: false },
+                  },
+                  yaxis: { labels: { style: { fontSize: '11px', colors: '#94A3B8' } } },
+                  tooltip: { theme: 'light' },
+                }}
+                series={[{ name: 'Предложений', data: Array.from(grouped.values()).map(offs => offs.length) }]}
+              />
+            </ChartCard>
+          )}
           {Array.from(grouped.entries()).map(([t, offs]) => {
             const meta = SERVICE_TYPE_META[t]
             return (
@@ -435,14 +465,14 @@ function MarketplaceInner() {
                         {(isFeatured || isNew) && (
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {isFeatured && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                              <Badge variant="warning" size="sm" className="uppercase tracking-wider">
                                 ⭐ Featured
-                              </span>
+                              </Badge>
                             )}
                             {isNew && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                              <Badge variant="success" size="sm" className="uppercase tracking-wider">
                                 🆕 New this month
-                              </span>
+                              </Badge>
                             )}
                           </div>
                         )}

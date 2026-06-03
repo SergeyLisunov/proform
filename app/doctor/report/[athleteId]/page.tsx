@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
+import { Alert } from '@/components/ui/metronic'
 
 function sb() {
   return createBrowserClient(
@@ -239,7 +240,7 @@ export default function DoctorReportPage() {
             <section className="mt-6">
               <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">AI-резюме</h2>
               {summaryError ? (
-                <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">{summaryError}</p>
+                <Alert variant="warning">{summaryError}</Alert>
               ) : summary ? (
                 <div className="space-y-3">
                   <p className="text-sm leading-relaxed text-foreground">{summary.overview}</p>
@@ -308,7 +309,7 @@ export default function DoctorReportPage() {
                 Тренировки в периоде ({workouts.length})
               </h2>
               {workouts.length === 0 ? (
-                <p className="rounded-xl border border-border bg-accent/40 p-3 text-xs text-muted-foreground">Тренировки за указанный период отсутствуют.</p>
+                <Alert variant="info">Тренировки за указанный период отсутствуют.</Alert>
               ) : (
                 <div className="overflow-x-auto rounded-xl border border-border">
                   <table className="w-full text-xs">

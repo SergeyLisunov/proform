@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { PaywallBanner, type Plan as PlanTier } from '@/components/ui/Paywall'
+import { Card, Alert } from '@/components/ui/metronic'
 
 interface Suggestion {
   workout_id: string
@@ -135,13 +136,13 @@ export default function AdaptivePlanModal({
               description={paywall.message}
             />
           ) : err ? (
-            <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
+            <Alert variant="destructive">
               Ошибка: {err === 'AI_NOT_CONFIGURED'
                 ? 'AI не настроен (ANTHROPIC_API_KEY)'
                 : err === 'COACH_ONLY' ? 'Доступно только тренерам'
                 : err === 'NOT_LINKED' ? 'Атлет не связан с вами'
                 : err}
-            </div>
+            </Alert>
           ) : data ? (
             <>
               {/* Context banner */}
@@ -224,9 +225,9 @@ export default function AdaptivePlanModal({
               )}
 
               {result && (
-                <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 px-3 py-2 text-sm">
-                  ✅ Применено {result.applied}. Пропущено {result.skipped}.
-                </div>
+                <Alert variant="success">
+                  Применено {result.applied}. Пропущено {result.skipped}.
+                </Alert>
               )}
             </>
           ) : null}
@@ -256,9 +257,9 @@ export default function AdaptivePlanModal({
 
 function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3">
+    <Card className="p-3">
       <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
       <div className="pf-num text-xl font-bold" style={{ color: accent }}>{value}</div>
-    </div>
+    </Card>
   )
 }

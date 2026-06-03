@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
 import VoiceDebriefButton from '@/components/workout/VoiceDebriefButton'
+import { Badge } from '@/components/ui/metronic'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -462,9 +463,9 @@ export function WorkoutAddDrawer({
       <div className="border-b border-border px-6 py-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-orange-700">
+            <Badge variant="primary" size="sm" className="font-bold uppercase tracking-[0.18em]">
               Быстрая тренировка
-            </div>
+            </Badge>
             <h3 className="mt-2 pf-num text-[26px] leading-none text-foreground">Добавить тренировку</h3>
             <p className="mt-1.5 text-xs text-muted-foreground">
               Запись попадёт в дневник и календарь.

@@ -5,6 +5,7 @@ import { strainColor, strainLabel, fmtDate } from '@/lib/utils/recovery'
 import StrainChart from './StrainChart'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { Card, ChartCard } from '@/components/ui/metronic'
 import type { Database } from '@/types/database'
 
 const AthleteHeroBar          = dynamic(() => import('@/components/athlete/AthleteHeroBar'),       { ssr: false })
@@ -152,13 +153,11 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
 
       {/* 8. CHARTS — нагрузка и пульсовые зоны */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 card bg-white border border-[#E2E8F0] rounded-2xl p-5">
-          <p className="pf-num text-lg text-slate-900 mb-0.5">Недельная нагрузка</p>
-          <p className="text-xs text-slate-400 mb-4">Суммарный day_strain · последние 8 недель</p>
+        <ChartCard className="lg:col-span-2" title="Недельная нагрузка" subtitle="Суммарный day_strain · последние 8 недель">
           <StrainChart data={weeklyData} />
-        </div>
+        </ChartCard>
 
-        <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
+        <Card className="p-5">
           <p className="pf-num text-lg text-slate-900 mb-0.5">Пульсовые зоны</p>
           <p className="text-xs text-slate-400 mb-4">По последним тренировкам</p>
           {workouts.length ? (() => {
@@ -185,11 +184,11 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
               </div>
             )
           })() : <p className="text-sm text-slate-400">Нет данных о тренировках</p>}
-        </div>
+        </Card>
       </div>
 
       {/* 9. RECENT SESSIONS */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
+      <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <p className="pf-num text-lg text-slate-900">Последние тренировки</p>
           <Link href="/diary" className="text-xs text-[#2563EB] hover:underline font-medium flex items-center gap-1">
@@ -237,14 +236,14 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
             })}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* 10. COACH FEEDBACK — последние комментарии тренера к тренировкам */}
       <AthleteFeedbackCard userId={userId} />
 
       {/* 11. COACH NOTES — отдельные текстовые заметки */}
       {comments.length ? (
-        <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-5">
+        <Card className="p-5">
           <p className="pf-num text-lg text-slate-900 mb-4">Заметки тренера</p>
           <div className="flex flex-col gap-3">
             {comments.map((c, i) => (
@@ -254,7 +253,7 @@ export default async function AthleteDashboard({ userId, name }: { userId: strin
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       ) : null}
 
       {/* 12. PASSPORT — utility-блок, в самом низу */}

@@ -7,6 +7,7 @@ import AskDoctorButton from '@/components/medical/AskDoctorButton'
 import AthleteMedicalDossier from '@/components/profile/AthleteMedicalDossier'
 import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -306,13 +307,9 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
               {connectionStatus === 'active' ? (
                 <>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                    background: '#F0FDF4', color: '#16A34A', border: '1.5px solid #BBF7D0',
-                  }}>
+                  <Badge variant="success" size="lg">
                     <i className="ki-filled ki-check-circle text-sm" />Связаны
-                  </span>
+                  </Badge>
                   {/* W6 Day 28: coach → athlete drawer to ask doctor */}
                   {user && user.role === 'coach' && profile.role === 'athlete' && (
                     <AskDoctorButton
@@ -405,7 +402,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Socials */}
       {(profile.telegram_url || profile.instagram_url || profile.youtube_url || profile.website_url || profile.whatsapp_url) && (
-        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
+        <Card className="p-5">
           <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Контакты</p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {profile.telegram_url && <SocialLink href={profile.telegram_url} icon="ki-send" label="Telegram" color="#0284C7" />}
@@ -414,15 +411,15 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             {profile.youtube_url && <SocialLink href={profile.youtube_url} icon="ki-youtube" label="YouTube" color="#DC2626" />}
             {profile.website_url && <SocialLink href={profile.website_url} icon="ki-earth" label="Сайт" color="#0D9488" />}
           </div>
-        </div>
+        </Card>
       )}
 
       {profile.role === 'coach' && (profile.accepts_new_athletes === true || profile.hourly_rate != null) && (
-        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Card className="p-5 flex gap-4 flex-wrap items-center">
           {profile.accepts_new_athletes === true && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: '#F0FDF4', color: '#16A34A', fontSize: 12, fontWeight: 700, border: '1px solid #BBF7D0' }}>
+            <Badge variant="success" size="lg">
               <i className="ki-filled ki-check-circle text-xs" /> Принимает новых атлетов
-            </span>
+            </Badge>
           )}
           {profile.hourly_rate != null && (
             <div>
@@ -430,7 +427,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <p className="pf-num" style={{ fontSize: 22, fontWeight: 800, color: 'var(--foreground)' }}>{profile.hourly_rate}<span style={{ fontSize: 12, color: 'var(--muted-foreground)', marginLeft: 6 }}>{profile.currency ?? 'RUB'}</span></p>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Toast */}
@@ -454,10 +451,10 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
 function SectionCard({ title, color, bg, children }: { title: string; color: string; bg: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '18px 20px' }}>
+    <Card className="p-5">
       <p style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 12, display: 'inline-block', background: bg, padding: '3px 10px', borderRadius: 99 }}>{title}</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>{children}</div>
-    </div>
+    </Card>
   )
 }
 
@@ -587,9 +584,9 @@ function DoctorProfile({ profile }: { profile: Profile }) {
         <FactRow label="Действует до" value={profile.license_expires_at} />
         <FactRow label="Стоимость консультации" value={profile.consultation_fee != null ? `${profile.consultation_fee} ${profile.currency ?? 'RUB'}` : null} />
         {profile.emergency_contact && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 99, background: '#FEE2E2', color: '#B91C1C', fontSize: 11, fontWeight: 700, border: '1px solid #FCA5A5', width: 'fit-content' }}>
+          <Badge variant="destructive" size="md" className="w-fit">
             <i className="ki-filled ki-bandage text-[11px]" /> Принимает экстренные случаи
-          </span>
+          </Badge>
         )}
         {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки приёма</p><ChipRow items={langs} /></div>}
       </SectionCard>

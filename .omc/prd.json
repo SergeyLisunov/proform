@@ -1,0 +1,59 @@
+{
+  "title": "ProForm Dashboard — Visual Consistency + Ring Logic Fixes",
+  "created": "2026-04-16",
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Ring refresh after workout add/update in diary",
+      "description": "When a user adds or edits a workout in /diary while the dashboard is in the same session, the WeeklyPlanCard ring does not update its minutes/percentage because AthleteDash.useEffect only fires once on mount. Fix by dispatching a custom DOM event from diary and listening for it in dashboard to re-fetch weekly data.",
+      "passes": false,
+      "acceptanceCriteria": [
+        "diary/page.tsx handleCreated dispatches window CustomEvent 'proform:workout-added' after onCreated(workout) call",
+        "diary/page.tsx handleUpdated dispatches window CustomEvent 'proform:workout-added' after updating workout (duration change also affects weekly total)",
+        "dashboard/page.tsx AthleteDash has a separate loadWeekly() function that re-fetches only workouts for the current week",
+        "dashboard/page.tsx AthleteDash useEffect adds event listener for 'proform:workout-added' that calls loadWeekly()",
+        "Event listener is cleaned up in useEffect return (removeEventListener)",
+        "TypeScript compiles with no new errors on dashboard/page.tsx and diary/page.tsx"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "Dashboard TrainingWidget sport-specific colors",
+      "description": "TrainingWidget hardcodes orange icons for past workouts and blue icons for upcoming events regardless of sport type. Calendar and Diary use ACTIVITY_CONFIG with sport-specific bg/border/text colors. Dashboard should match this system.",
+      "passes": false,
+      "acceptanceCriteria": [
+        "dashboard/page.tsx defines ACTIVITY_CONFIG matching diary/page.tsx (Бег=blue, Велоспорт=orange, Плавание=cyan, Силовые=purple, Ходьба=green, Другое=slate)",
+        "Past workout rows use ACTIVITY_CONFIG[w.activity_type] colors for icon container bg and icon color",
+        "Upcoming event rows use ACTIVITY_CONFIG[ev.activity_type] colors for icon container bg and icon color",
+        "getActivityIcon() is updated or replaced to use ACTIVITY_CONFIG and return both icon name and colors",
+        "TypeScript compiles with no new errors on dashboard/page.tsx"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "WeeklyPlanCard: handle no-goal state correctly",
+      "description": "When weekly_training_hours is null (new user hasn't set a goal), the fallback is 10h which shows misleading progress. Should show a dedicated 'no goal set' UI with a link to settings.",
+      "passes": false,
+      "acceptanceCriteria": [
+        "When athletes.weekly_training_hours is null/0, WeeklyPlanCard shows a 'goal not set' empty state instead of fake progress",
+        "The empty state includes a link/button to /settings to set the weekly goal",
+        "When weekly_training_hours IS set (> 0), the ring/card works as before",
+        "No hardcoded fallback of 10 when the athlete has no goal set",
+        "TypeScript compiles with no new errors"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "Align dashboard card visual style with Metronic design tokens",
+      "description": "Calendar page uses SurfaceFrame (rounded-[28px], richer shadows). Diary uses rounded-xl with structured headers matching Metronic patterns. Dashboard cards use rounded-xl but with simpler styling. The WeeklyPlanCard, TrainingWidget and profile section should visually align with the overall design language.",
+      "passes": false,
+      "acceptanceCriteria": [
+        "WeeklyPlanCard uses rounded-2xl (or rounded-[20px]) with consistent border/shadow matching diary card style",
+        "TrainingWidget header section label uses the same uppercase tracking text style as calendar/diary section labels",
+        "Compact profile header has subtle visual separation (bg-card, rounded, border) so it doesn't float in empty space",
+        "All metric stat boxes inside WeeklyPlanCard use consistent Metronic-style border/bg tokens (no raw hex colors for backgrounds)",
+        "TypeScript compiles with no new errors"
+      ]
+    }
+  ]
+}
