@@ -59,15 +59,33 @@ export interface OnboardingState {
   doctor?:             DoctorWizardData
 }
 
+/**
+ * Resolve the current auth user id resiliently.
+ *
+ * Prefers the locally-stored session (`getSession`, no network round-trip) and
+ * only falls back to `getUser` (a network call to /auth/v1/user) if the session
+ * isn't cached. `getUser` can transiently return null on a flaky connection,
+ * which previously nulled the user mid-wizard and surfaced as
+ * "Не удалось отметить onboarding как пройденный" on finish — RLS still
+ * enforces real auth on every DB call, so trusting the stored session id here
+ * is safe.
+ */
+async function currentAuthUserId(sb: ReturnType<typeof createClient>): Promise<string | null> {
+  const { data: { session } } = await sb.auth.getSession()
+  if (session?.user?.id) return session.user.id
+  const { data: { user } } = await sb.auth.getUser()
+  return user?.id ?? null
+}
+
 /** Loads current user's onboarding state, or {} if missing. */
 export async function loadMyOnboarding(): Promise<OnboardingState> {
   const sb = createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return {}
+  const authUserId = await currentAuthUserId(sb)
+  if (!authUserId) return {}
   const { data: meRow } = await sb
     .from('users')
     .select('onboarding_state')
-    .eq('auth_id', auth.user.id)
+    .eq('auth_id', authUserId)
     .maybeSingle()
   const me = meRow as { onboarding_state: OnboardingState | null } | null
   return (me?.onboarding_state ?? {}) as OnboardingState
@@ -83,12 +101,12 @@ export async function loadMyOnboarding(): Promise<OnboardingState> {
  */
 export async function patchMyOnboarding(patch: Partial<OnboardingState>): Promise<OnboardingState> {
   const sb = createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return {}
+  const authUserId = await currentAuthUserId(sb)
+  if (!authUserId) return {}
   const { data: meRow } = await sb
     .from('users')
     .select('id, onboarding_state')
-    .eq('auth_id', auth.user.id)
+    .eq('auth_id', authUserId)
     .maybeSingle()
   const me = meRow as { id: string; onboarding_state: OnboardingState | null } | null
   if (!me) return {}
