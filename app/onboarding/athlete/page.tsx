@@ -72,7 +72,9 @@ export default function AthleteOnboardingPage() {
     void (async () => {
       const state = await loadMyOnboarding()
       if (cancelled) return
-      if (state.completed) { router.replace('/athlete/dashboard'); return }
+      // Already onboarded → bounce to the role-correct dashboard (not the
+      // athlete-only one), so e.g. an admin who lands here isn't trapped.
+      if (state.completed) { router.replace('/dashboard'); return }
       const a = (state.athlete ?? {}) as AthleteWizardData
       if (a.sport) setSport(a.sport)
       if (a.goal)  setGoalKey(a.goal)
