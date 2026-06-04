@@ -26,16 +26,23 @@ export function useUser() {
 
   const fetchUser = useCallback(async () => {
     const supabase = createClient()
-    const { data: { user: authUser } } = await supabase.auth.getUser()
-    if (!authUser) { setLoading(false); return }
+    // Prefer the locally-stored session (`getSession`, no network round-trip)
+    // and fall back to `getUser` (a network call to /auth/v1/user) only if it's
+    // not cached. `getUser` transiently returns null on a flaky connection,
+    // which would otherwise bounce an authenticated user to /auth/login. RLS
+    // still enforces real auth on every DB call, so trusting the stored
+    // session id here is safe.
+    const { data: { session } } = await supabase.auth.getSession()
+    const authUserId = session?.user?.id ?? (await supabase.auth.getUser()).data.user?.id ?? null
+    if (!authUserId) { setLoading(false); return }
     const { data } = await supabase
       .from('users')
       .select('id, name, email, role, auth_id')
-      .eq('auth_id', authUser.id)
+      .eq('auth_id', authUserId)
       .single()
     const userRow = data as Pick<UserRow, 'id' | 'name' | 'email' | 'role' | 'auth_id'> | null
     if (userRow) {
-      setUser({ id: userRow.id, authId: authUser.id, name: userRow.name, email: userRow.email, role: userRow.role as UserRole })
+      setUser({ id: userRow.id, authId: authUserId, name: userRow.name, email: userRow.email, role: userRow.role as UserRole })
     }
     setLoading(false)
   }, [])
