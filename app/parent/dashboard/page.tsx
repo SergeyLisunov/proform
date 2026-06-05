@@ -20,6 +20,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Card } from '@/components/ui/metronic'
 import ClaimLinkButton from './ClaimLinkButton'
+import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 
 interface ChildLink {
   child_id: string
@@ -254,6 +255,8 @@ export default async function ParentDashboardPage() {
               <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.22em] text-blue-700">
                 Атлет
               </span>
+              {/* P3 #4 — clearance child (родитель видит через RLS из миграции 092) */}
+              <ClearanceBadge athleteId={child.id} size="sm" />
               <ClaimLinkButton childId={child.id} childName={child.name ?? 'Без имени'} />
             </div>
           </div>

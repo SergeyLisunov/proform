@@ -13,6 +13,7 @@ import {
   CalendarEventEditDrawer,
 } from '@/components/workout/WorkoutDrawers'
 import { Card, ChartCard, Badge } from '@/components/ui/metronic'
+import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -737,6 +738,10 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                   : <p className="text-xs text-muted-foreground/40 mt-0.5 italic">никнейм не задан</p>
                 }
                 {profile && <SocialIcons data={profile} onEdit={() => setShowSocialEdit(true)} />}
+                {/* P3 #4 — мой текущий допуск (если выставлен доктором) */}
+                <div className="mt-2">
+                  <ClearanceBadge athleteId={userId} size="md" showNote />
+                </div>
               </div>
             </div>
 
