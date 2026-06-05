@@ -46,6 +46,7 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> 
 
 const NOTIF_ICONS: Record<string, string> = {
   invitation_received:     'ki-user-plus',
+  claim_request:           'ki-key',
   invitation_accepted:     'ki-check-circle',
   invitation_declined:     'ki-cross-circle',
   invitation_cancelled:    'ki-information-5',
@@ -72,6 +73,7 @@ const NOTIF_ICONS: Record<string, string> = {
 
 const NOTIF_COLORS: Record<string, string> = {
   invitation_received:     '#F35703',
+  claim_request:           '#F35703',
   invitation_accepted:     '#16A34A',
   invitation_declined:     '#DC2626',
   invitation_cancelled:    '#64748B',

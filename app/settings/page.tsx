@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import RoleProfile from '@/components/settings/RoleProfile'
+import ChildClaimSection from '@/components/settings/ChildClaimSection'
 import DevicesSection from '@/components/settings/DevicesSection'
 import { Alert } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
@@ -714,6 +715,9 @@ export default function SettingsPage() {
       {/* ═══════════════ ЛИЧНЫЕ ДАННЫЕ ═══════════════ */}
       {tab === 'personal' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Child claim — visible only if user is linked as a child (parent_links) */}
+          <ChildClaimSection myUserId={user?.id ?? null} />
+
           {/* Avatar upload */}
           <Card>
             <SectionHeader icon="ki-picture" color="#F35703" title="Фото профиля" />
