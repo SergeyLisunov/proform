@@ -522,18 +522,16 @@ function NetworkPageInner() {
         <PillButton active={mode === 'find'} onClick={() => selectMode('find')} icon="ki-magnifier" accent="#2563EB">
           Найти
         </PillButton>
-        {user.role !== 'athlete' && (
-          <button
-            onClick={() => setInviteOpen(true)}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
-          >
-            <i className="ki-filled ki-sms text-xs"/>
-            Пригласить по email
-          </button>
-        )}
+        <button
+          onClick={() => setInviteOpen(true)}
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
+        >
+          <i className="ki-filled ki-sms text-xs"/>
+          Пригласить по email
+        </button>
       </div>
-      {inviteOpen && user.role !== 'athlete' && (
-        <EmailInviteDialog myRole={user.role as 'coach' | 'doctor' | 'organization' | 'admin'} onClose={() => setInviteOpen(false)} />
+      {inviteOpen && (
+        <EmailInviteDialog myRole={user.role as 'athlete' | 'coach' | 'doctor' | 'organization' | 'admin'} onClose={() => setInviteOpen(false)} />
       )}
 
       {mode === 'contacts' && <ContactsPanel />}

@@ -24,7 +24,15 @@ const OPTIONS_BY_ROLE: Record<Role, Array<{ value: InviteConnectionType; label: 
   admin:        [
     { value: 'admin_doctor', label: 'Врача'      },
   ],
-  athlete:      [], // athletes can't invite via this UI
+  athlete:      [
+    // P2 tenant refactor #4a — first-class B2C athlete↔personal-trainer link.
+    // The backend (/api/invite + /api/invite/[token]) already accepts these
+    // combos from the athlete side via the symmetric role check; this just
+    // enables the UI surface so an athlete can invite a personal coach/doctor
+    // without going through an organization.
+    { value: 'coach_athlete',  label: 'Тренера'  },
+    { value: 'doctor_athlete', label: 'Врача'    },
+  ],
 }
 
 export function EmailInviteDialog({
