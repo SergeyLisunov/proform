@@ -8,55 +8,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 import { createBrowserClient } from '@supabase/ssr'
 import { SporteoLogo } from "@/components/ui/SporteoLogo"
-
-const NAV_SECTIONS = [
-  {
-    title: 'Обзор',
-    items: [
-      { href: '/dashboard', icon: 'ki-element-11', label: 'Главная', roles: null },
-    ],
-  },
-  {
-    title: 'Тренировки',
-    items: [
-      { href: '/calendar',     icon: 'ki-calendar',    label: 'Календарь',    roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
-      { href: '/templates',    icon: 'ki-notepad-edit', label: 'Шаблоны',      roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/competitions', icon: 'ki-medal-star',  label: 'Соревнования', roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/challenges',   icon: 'ki-crown',        label: 'Челленджи',    roles: ['athlete', 'coach', 'organization', 'admin'] as string[] },
-      { href: '/cycles',       icon: 'ki-abstract-45', label: 'Циклы',        roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/diary', icon: 'ki-book-open', label: 'Дневник тренировок', roles: ['athlete', 'admin'] as string[] },
-      { href: '/diary', icon: 'ki-notepad-edit', label: 'Дневник тренера',    roles: ['coach'] as string[] },
-      { href: '/diary', icon: 'ki-heart-circle',  label: 'Дневник врача',      roles: ['doctor'] as string[] },
-      { href: '/notes',       icon: 'ki-notepad-edit',   label: 'Заметки',      roles: null },
-      { href: '/records',       icon: 'ki-medal',         label: 'Рекорды',           roles: ['athlete', 'admin'] as string[] },
-      { href: '/load',          icon: 'ki-pulse',         label: 'Нагрузка · ACWR',   roles: ['athlete', 'coach', 'admin'] as string[] },
-      { href: '/streaks',       icon: 'ki-flash',         label: 'Серия и бейджи',    roles: ['athlete', 'admin'] as string[] },
-      { href: '/messages',    icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
-    ],
-  },
-  {
-    title: 'Сеть',
-    items: [
-      { href: '/network', icon: 'ki-people', label: 'Сеть и контакты', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
-      { href: '/athletes', icon: 'ki-abstract-26', label: 'Мои атлеты', roles: ['coach', 'admin', 'doctor'] as string[] },
-      { href: '/analytics', icon: 'ki-chart-line-up', label: 'Аналитика', roles: ['athlete', 'coach', 'admin', 'doctor'] as string[] },
-    ],
-  },
-  {
-    title: 'Умные инструменты',
-    items: [
-      { href: '/ai', icon: 'ki-sparkle', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] as string[] },
-    ],
-  },
-  {
-    title: 'Управление',
-    items: [
-      { href: '/org', icon: 'ki-office-bag', label: 'Организация', roles: ['organization'] as string[] },
-      { href: '/admin', icon: 'ki-setting-2', label: 'Администратор', roles: ['admin'] as string[] },
-      { href: '/admin/crm', icon: 'ki-graph-3', label: 'CRM', roles: ['admin'] as string[] },
-    ],
-  },
-] as const
+import { filterSidebarForRole, type EffectiveRole } from '@/lib/sidebar/config'
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
   athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
@@ -160,31 +112,14 @@ export default function Sidebar() {
     }
   }, [user])
 
-  const visibleSections = NAV_SECTIONS
-    .map(section => ({
-      ...section,
-      items: section.items.filter(item => {
-        if (!item.roles) return true
-        if (!user) return false
-        return item.roles.includes(user.role)
-      }),
-    }))
-    .filter(section => section.items.length > 0) as Array<{
-      title: string
-      items: Array<{ href: string; icon: string; label: string; roles: string[] | null }>
-    }>
-
-  // P2 tenant refactor — "Семья": показываем кабинет родителя, если у юзера
-  // есть активные parent_links. Это relationship, не role — поэтому не сидит
-  // в NAV_SECTIONS, а инжектится здесь.
-  if (user && user.childCount > 0) {
-    visibleSections.push({
-      title: 'Семья',
-      items: [
-        { href: '/parent/dashboard', icon: 'ki-people', label: 'Дети', roles: null },
-      ],
-    })
-  }
+  // Единая чистая функция фильтра — живёт в lib/sidebar/config.ts.
+  // Поведение идентичное предыдущему inline-варианту: пункты без `roles`
+  // видят все авторизованные; «Семья» инжектится при childCount > 0
+  // (parent — relationship, не глобальная роль).
+  const visibleSections = filterSidebarForRole({
+    role:       user?.role as EffectiveRole | undefined,
+    childCount: user?.childCount ?? 0,
+  })
 
   async function signOut() {
     setSigningOut(true)
