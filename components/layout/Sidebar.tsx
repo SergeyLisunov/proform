@@ -364,10 +364,18 @@ export default function Sidebar() {
             </span>
           </div>
 
+          <Link
+            href="/"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground no-underline transition-all hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+          >
+            <i className="ki-filled ki-home-2 text-sm shrink-0" />
+            <span>На главную</span>
+          </Link>
+
           <button
             onClick={signOut}
             disabled={signingOut}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {signingOut ? (
               <>
