@@ -6,6 +6,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
 import VoiceDebriefButton from '@/components/workout/VoiceDebriefButton'
 import { Badge } from '@/components/ui/metronic'
+import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -475,6 +476,12 @@ export function WorkoutAddDrawer({
             <i className="ki-filled ki-cross text-sm" />
           </button>
         </div>
+      </div>
+
+      {/* P3 #3 — clearance banner: показывает текущий допуск к нагрузке если
+          выставлен; если нет — секция не рендерится (ClearanceBadge возвращает null) */}
+      <div className="border-b border-border bg-background/40 px-6 py-3">
+        <ClearanceBadge athleteId={userId} size="md" showNote />
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
