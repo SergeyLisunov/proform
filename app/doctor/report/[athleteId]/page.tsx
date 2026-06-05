@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { Alert } from '@/components/ui/metronic'
+import ClearanceSection from './ClearanceSection'
 
 function sb() {
   return createBrowserClient(
@@ -216,6 +217,11 @@ export default function DoctorReportPage() {
             </div>
           </div>
         </header>
+
+        {/* Светофор допуска (P3 ров #2) — выставляется доктором, читается тренером/атлетом/родителем */}
+        <div className="no-print mt-5">
+          <ClearanceSection athleteId={athleteId} />
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-14">
