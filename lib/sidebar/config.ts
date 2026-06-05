@@ -82,6 +82,18 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       { id: 'global.dashboard', href: '/dashboard', icon: 'ki-element-11', label: 'Главная', roles: null },
     ],
   },
+  // Этап 4 sidebar-rebuild — Coach «Мой кокпит». Главное действие тренера —
+  // «открыть атлета и зафиксировать тренировку». Поднимаем «Мои атлеты» в
+  // первую тройку через отдельную секцию (не под «Сеть»), чтобы coach видел
+  // её ещё ДО общего «Тренировки» меню. Quick Log FAB — отдельный client
+  // компонент в dashboard layout, добавляется отдельным PR.
+  {
+    id:    'coach_focus',
+    title: 'Мой кокпит',
+    items: [
+      { id: 'coach.athletes', href: '/athletes', icon: 'ki-abstract-26', label: 'Мои атлеты', roles: ['coach'] },
+    ],
+  },
   {
     id:    'training',
     title: 'Тренировки',
@@ -118,8 +130,10 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     id:    'network',
     title: 'Сеть',
     items: [
-      { id: 'network.contacts',  href: '/network',   icon: 'ki-people',         label: 'Сеть и контакты', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] },
-      { id: 'network.athletes',  href: '/athletes',  icon: 'ki-abstract-26',    label: 'Мои атлеты',      roles: ['coach', 'admin', 'doctor'] },
+      { id: 'network.contacts',  href: '/network',   icon: 'ki-people',         label: 'Сеть и контакты', roles: ['athlete', 'organization', 'admin', 'doctor'] },
+      // Coach видит «Мои атлеты» через секцию «Мой кокпит» выше, поэтому здесь
+      // dropped из roles чтобы не дублировался. Admin/Doctor по-прежнему видят.
+      { id: 'network.athletes',  href: '/athletes',  icon: 'ki-abstract-26',    label: 'Мои атлеты',      roles: ['admin', 'doctor'] },
       // Analytics — для athlete это consumer surface, но обычно смотрят виджеты
       // в /dashboard; отдельная страница - для coach/doctor view.
       { id: 'network.analytics', href: '/analytics', icon: 'ki-chart-line-up',  label: 'Аналитика',       roles: ['coach', 'admin', 'doctor'] },
