@@ -17,6 +17,10 @@ export interface AppUser {
   name: string
   email: string
   role: UserRole
+  /** Active parent_links rows where this user is the parent. Used to gate
+   *  the "Дети" sidebar nav-entry — there is no global `parent` role; being
+   *  a parent is a relationship (parent_links), not a role. */
+  childCount: number
 }
 
 export function useUser() {
@@ -42,7 +46,19 @@ export function useUser() {
       .single()
     const userRow = data as Pick<UserRow, 'id' | 'name' | 'email' | 'role' | 'auth_id'> | null
     if (userRow) {
-      setUser({ id: userRow.id, authId: authUserId, name: userRow.name, email: userRow.email, role: userRow.role as UserRole })
+      // Count active parent_links — cheap (one indexed lookup) and lets the
+      // sidebar conditionally render "Дети" without an extra round-trip there.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { count: childCount } = await (supabase as any)
+        .from('parent_links')
+        .select('id', { count: 'exact', head: true })
+        .eq('parent_id', userRow.id)
+        .eq('status', 'active')
+      setUser({
+        id: userRow.id, authId: authUserId, name: userRow.name, email: userRow.email,
+        role: userRow.role as UserRole,
+        childCount: childCount ?? 0,
+      })
     }
     setLoading(false)
   }, [])

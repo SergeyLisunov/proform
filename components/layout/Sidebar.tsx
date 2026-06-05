@@ -169,7 +169,22 @@ export default function Sidebar() {
         return item.roles.includes(user.role)
       }),
     }))
-    .filter(section => section.items.length > 0)
+    .filter(section => section.items.length > 0) as Array<{
+      title: string
+      items: Array<{ href: string; icon: string; label: string; roles: string[] | null }>
+    }>
+
+  // P2 tenant refactor — "Семья": показываем кабинет родителя, если у юзера
+  // есть активные parent_links. Это relationship, не role — поэтому не сидит
+  // в NAV_SECTIONS, а инжектится здесь.
+  if (user && user.childCount > 0) {
+    visibleSections.push({
+      title: 'Семья',
+      items: [
+        { href: '/parent/dashboard', icon: 'ki-people', label: 'Дети', roles: null },
+      ],
+    })
+  }
 
   async function signOut() {
     setSigningOut(true)
