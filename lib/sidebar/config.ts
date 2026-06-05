@@ -107,9 +107,15 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     items: [
       { id: 'club.dashboard', href: '/org',           icon: 'ki-office-bag',    label: 'Обзор клуба', roles: ['organization'] },
       { id: 'club.athletes',  href: '/org/athletes',  icon: 'ki-abstract-26',   label: 'Спортсмены',  roles: ['organization'] },
+      // Этап 6b — /org/coaches уже существует как redirect на /org/members?role=coach
+      // (как и /org/athletes); поднимаем в первый ряд section вместе с ростером.
+      { id: 'club.coaches',   href: '/org/coaches',   icon: 'ki-notepad-edit',  label: 'Тренеры',     roles: ['organization'] },
       { id: 'club.members',   href: '/org/members',   icon: 'ki-people',        label: 'Участники',   roles: ['organization'] },
       { id: 'club.teams',     href: '/org/teams',     icon: 'ki-abstract-32',   label: 'Группы',      roles: ['organization'] },
       { id: 'club.analytics', href: '/org/analytics', icon: 'ki-chart-line-up', label: 'Аналитика',   roles: ['organization'] },
+      // Этап 6c — /org/health уже существует (org-wide health snapshot).
+      // Заменяет ранее планировавшийся отдельный /org/medical surface.
+      { id: 'club.health',    href: '/org/health',    icon: 'ki-shield-tick',   label: 'Здоровье клуба', roles: ['organization'] },
       { id: 'club.activity',  href: '/org/activity',  icon: 'ki-pulse',         label: 'Активность',  roles: ['organization'] },
     ],
   },
