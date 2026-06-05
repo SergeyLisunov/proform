@@ -98,7 +98,9 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     id:    'training',
     title: 'Тренировки',
     items: [
-      { id: 'training.calendar',     href: '/calendar',     icon: 'ki-calendar',     label: 'Календарь',           roles: ['athlete', 'coach', 'admin', 'doctor'] },
+      // Doctor не использует календарь тренировок — у него своё расписание
+      // осмотров через doctor_inquiries / medical_checkups. Removed из roles.
+      { id: 'training.calendar',     href: '/calendar',     icon: 'ki-calendar',     label: 'Календарь',           roles: ['athlete', 'coach', 'admin'] },
       // Templates / Cycles — тренерская концепция. Athlete видит план через
       // карточку конкретной тренировки (workout.prescribed_by), отдельный
       // sidebar-пункт для построения шаблонов ему не нужен.
@@ -124,6 +126,17 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // Streaks — motivation; будет в /motivation. Скрыто из athlete sidebar.
       { id: 'training.streaks',       href: '/streaks',   icon: 'ki-flash',          label: 'Серия и бейджи',  roles: ['admin'] },
       { id: 'training.messages',      href: '/messages',  icon: 'ki-message-text-2', label: 'Сообщения', roles: ['athlete', 'coach', 'organization', 'admin', 'doctor'] },
+    ],
+  },
+  // Этап 5 sidebar-rebuild — Doctor «Медицина». Допуски (светофор) — главная
+  // ежедневная задача доктора («кто требует моего внимания сегодня»).
+  // Размещена выше «Сеть»/«Управление» — приоритет действий, не категория.
+  {
+    id:    'medical',
+    title: 'Медицина',
+    items: [
+      { id: 'medical.clearances', href: '/doctor/clearances', icon: 'ki-shield-tick',    label: 'Допуски',  roles: ['doctor', 'admin'] },
+      { id: 'medical.injuries',   href: '/injuries',          icon: 'ki-information-3',  label: 'Травмы',    roles: ['doctor', 'admin'] },
     ],
   },
   {
