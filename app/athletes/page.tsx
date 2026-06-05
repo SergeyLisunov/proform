@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { RecoveryRing } from '@/components/ui/RecoveryRing'
 import { Card, ChartCard } from '@/components/ui/metronic'
+import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 import { RISK_COLORS, COACH_MARKS, recoveryColor } from '@/lib/utils/data'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
@@ -182,6 +183,10 @@ function AthleteCard({
               <div className="truncate text-sm font-semibold text-foreground">{athlete.name}</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">
                 {athlete.sport_type ?? 'Спорт'} · {athlete.age ? `${athlete.age} лет` : ''}
+              </div>
+              {/* P3 #3 — clearance traffic-light (если выставлен; иначе badge скрыт) */}
+              <div className="mt-1.5">
+                <ClearanceBadge athleteId={athlete.id} size="sm" />
               </div>
             </div>
             <span
