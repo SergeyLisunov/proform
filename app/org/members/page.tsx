@@ -7,7 +7,15 @@ import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Card } from '@/components/ui/metronic'
 
-type MemberRole = 'athlete' | 'coach'
+// Этап 7a — расширили локальный MemberRole до DB-полного набора (CHECK
+// 053 разрешает 6 значений). До этого `'athlete' | 'coach'` молча
+// type-cast'ил org_admin/org_owner/doctor/specialist строки и они
+// падали в ROLE_CFG[undefined].
+type MemberRole =
+  | 'athlete' | 'coach' | 'org_admin' | 'org_owner' | 'doctor' | 'specialist'
+// Invite-форма пускает только две роли: athlete/coach. Owner добавляет
+// сам себя при онбординге, остальные scoped роли — через assign-флоу.
+type InvitableRole = 'athlete' | 'coach'
 type MemberStatus = 'active' | 'pending' | 'suspended' | 'removed'
 
 type Member = {
@@ -22,9 +30,13 @@ function getSB() {
   )
 }
 
-const ROLE_CFG = {
-  athlete: { label: 'Атлет',  icon: 'ki-abstract-26',  color: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
-  coach:   { label: 'Тренер', icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+const ROLE_CFG: Record<MemberRole, { label: string; icon: string; color: string; bg: string; border: string }> = {
+  athlete:    { label: 'Атлет',      icon: 'ki-abstract-26',  color: '#F35703', bg: '#FEF0E7', border: '#FBC1A0' },
+  coach:      { label: 'Тренер',     icon: 'ki-notepad-edit', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+  org_owner:  { label: 'Владелец',   icon: 'ki-crown',        color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
+  org_admin:  { label: 'Админ',      icon: 'ki-shield-tick',  color: '#0F766E', bg: '#ECFDF5', border: '#A7F3D0' },
+  doctor:     { label: 'Доктор',     icon: 'ki-pulse',        color: '#0EA5E9', bg: '#F0F9FF', border: '#BAE6FD' },
+  specialist: { label: 'Специалист', icon: 'ki-people',       color: '#64748B', bg: '#F1F5F9', border: '#CBD5E1' },
 }
 
 const STATUS_CFG: Record<MemberStatus, { label: string; color: string; bg: string; border: string }> = {
@@ -40,7 +52,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
 }) {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
-  const [role, setRole] = useState<MemberRole>('athlete')
+  const [role, setRole] = useState<InvitableRole>('athlete')
   const [email, setEmail] = useState('')
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState('')
@@ -121,7 +133,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Роль</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {(['athlete', 'coach'] as MemberRole[]).map(r => {
+              {(['athlete', 'coach'] as InvitableRole[]).map(r => {
                 const cfg = ROLE_CFG[r]; const sel = role === r
                 return (
                   <button key={r} type="button" onClick={() => setRole(r)} style={{
@@ -307,6 +319,26 @@ export default function OrgMembersPage() {
     showToastMsg(newStatus === 'removed' ? 'Участник удалён' : 'Статус обновлён')
   }
 
+  // Этап 7a — назначение/разжалование org_admin. UI спрашивает причину
+  // (хотя бы 4 символа — API enforced); audit_logs пишется на бэке.
+  async function changeMemberRole(memberId: string, newRole: 'org_admin' | 'coach') {
+    const label = newRole === 'org_admin' ? 'сделать админом' : 'снять с админа'
+    const reason = window.prompt(`Кратко укажите причину (${label}):`)?.trim() ?? ''
+    if (reason.length < 4) { alert('Нужно указать причину (минимум 4 символа)'); return }
+    const res = await fetch('/api/org/members/role', {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ member_id: memberId, new_role: newRole, reason }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok || !json.ok) {
+      alert(`Не удалось изменить роль: ${json.error ?? res.status}`)
+      return
+    }
+    setMembers(prev => prev.map(m => m.id === memberId ? { ...m, member_role: newRole } : m))
+    showToastMsg(newRole === 'org_admin' ? 'Назначен админом' : 'Снят с админа')
+  }
+
   function showToastMsg(msg: string) { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
   const filtered = members.filter(m => {
@@ -322,10 +354,14 @@ export default function OrgMembersPage() {
   const pending  = members.filter(m => m.status === 'pending').length
   const hasFilters = roleFilter !== 'all' || statusFilter !== 'all' || Boolean(search.trim())
 
+  // Filter tabs — owner всегда один (без отдельного tab); doctor/specialist
+  // в /org/members не основной surface (приглашаются через другой флоу).
+  const hasAdmins = members.some(m => m.member_role === 'org_admin')
   const roleOptions: { id: 'all' | MemberRole; label: string }[] = [
     { id: 'all', label: 'Все роли' },
     { id: 'athlete', label: 'Спортсмены' },
     { id: 'coach', label: 'Тренеры' },
+    ...(hasAdmins ? [{ id: 'org_admin' as const, label: 'Админы' }] : []),
   ]
 
   const statusOptions: { id: 'all' | MemberStatus; label: string }[] = [
@@ -578,6 +614,16 @@ export default function OrgMembersPage() {
                     {m.member_role === 'athlete' && m.status === 'active' && (
                       <button onClick={() => setAssignAthlete(m)} title="Назначить тренера" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-link text-xs" />
+                      </button>
+                    )}
+                    {m.member_role === 'coach' && m.status === 'active' && m.user_id !== orgId && (
+                      <button onClick={() => changeMemberRole(m.id, 'org_admin')} title="Сделать админом" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #A7F3D0', background: '#ECFDF5', color: '#0F766E', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                        <i className="ki-filled ki-shield-tick text-xs" />
+                      </button>
+                    )}
+                    {m.member_role === 'org_admin' && m.status === 'active' && (
+                      <button onClick={() => changeMemberRole(m.id, 'coach')} title="Снять с админа" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FEF3C7', background: '#FFFBEB', color: '#B45309', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                        <i className="ki-filled ki-shield-cross text-xs" />
                       </button>
                     )}
                     {m.status === 'active' && (
