@@ -94,6 +94,25 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       { id: 'coach.athletes', href: '/athletes', icon: 'ki-abstract-26', label: 'Мои атлеты', roles: ['coach'] },
     ],
   },
+  // Этап 6a sidebar-rebuild — Owner/Org Admin «Клуб». Главные задачи Owner'а
+  // (ростер, тренеры, расписание, аналитика, медконтроль) выводим в первую
+  // секцию сразу после «Главная». Используем roles:['organization'] —
+  // getRoleMatchSet() даёт org_owner и org_admin тот же набор пунктов через
+  // scoped→global mapping. Этапы 6b-d добавят страницы /org/coaches,
+  // /org/medical, /org/schedule. На этапе 7 (org_admin separation) фильтр
+  // станет тоньше — org_admin теряет доступ к биллингу/настройкам клуба.
+  {
+    id:    'club',
+    title: 'Клуб',
+    items: [
+      { id: 'club.dashboard', href: '/org',           icon: 'ki-office-bag',    label: 'Обзор клуба', roles: ['organization'] },
+      { id: 'club.athletes',  href: '/org/athletes',  icon: 'ki-abstract-26',   label: 'Спортсмены',  roles: ['organization'] },
+      { id: 'club.members',   href: '/org/members',   icon: 'ki-people',        label: 'Участники',   roles: ['organization'] },
+      { id: 'club.teams',     href: '/org/teams',     icon: 'ki-abstract-32',   label: 'Группы',      roles: ['organization'] },
+      { id: 'club.analytics', href: '/org/analytics', icon: 'ki-chart-line-up', label: 'Аналитика',   roles: ['organization'] },
+      { id: 'club.activity',  href: '/org/activity',  icon: 'ki-pulse',         label: 'Активность',  roles: ['organization'] },
+    ],
+  },
   {
     id:    'training',
     title: 'Тренировки',
@@ -163,7 +182,9 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     id:    'management',
     title: 'Управление',
     items: [
-      { id: 'management.org',       href: '/org',       icon: 'ki-office-bag', label: 'Организация',  roles: ['organization'] },
+      // management.org удалён — заменён через club.dashboard выше (этап 6a).
+      // Старый href '/org' остался той же страницей, но теперь в новой section
+      // «Клуб» вместе с остальными org-инструментами.
       { id: 'management.admin',     href: '/admin',     icon: 'ki-setting-2',  label: 'Администратор', roles: ['admin'] },
       { id: 'management.admin_crm', href: '/admin/crm', icon: 'ki-graph-3',    label: 'CRM',          roles: ['admin'] },
     ],
