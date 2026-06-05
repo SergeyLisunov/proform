@@ -116,6 +116,11 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // Этап 6c — /org/health уже существует (org-wide health snapshot).
       // Заменяет ранее планировавшийся отдельный /org/medical surface.
       { id: 'club.health',    href: '/org/health',    icon: 'ki-shield-tick',   label: 'Здоровье клуба', roles: ['organization'] },
+      // Этап 6d — /calendar уже знает org-режим (isOrg branch с OrgSessionsPanel,
+      // listGroupSessions, OrgSessionDrawer). Owner до этого не имел entry в нав.
+      // Stable id club.schedule отличается от training.calendar по scope —
+      // analytics учитывает откуда пришёл клик, маршрут общий.
+      { id: 'club.schedule',  href: '/calendar',      icon: 'ki-calendar',      label: 'Расписание клуба', roles: ['organization'] },
       { id: 'club.activity',  href: '/org/activity',  icon: 'ki-pulse',         label: 'Активность',  roles: ['organization'] },
     ],
   },
