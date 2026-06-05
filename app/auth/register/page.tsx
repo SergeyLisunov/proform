@@ -628,6 +628,12 @@ export default function RegisterPage() {
                     Войти
                   </Link>
                 </p>
+                <p className="mt-2 text-center text-2sm text-muted-foreground">
+                  Регистрируете ребёнка-спортсмена?{' '}
+                  <Link href="/auth/register-as-parent" className="font-semibold text-orange-500 no-underline hover:text-orange-600">
+                    Отдельный мастер
+                  </Link>
+                </p>
               </div>
             )}
 
