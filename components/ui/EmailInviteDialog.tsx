@@ -32,6 +32,10 @@ const OPTIONS_BY_ROLE: Record<Role, Array<{ value: InviteConnectionType; label: 
     // without going through an organization.
     { value: 'coach_athlete',  label: 'Тренера'  },
     { value: 'doctor_athlete', label: 'Врача'    },
+    // #4b-iii — athlete invites a parent/guardian. parent_link is NOT a
+    // connection_type pair (parent isn't a role); the claim route creates a
+    // parent_links row instead of a connections row.
+    { value: 'parent_link',    label: 'Родителя / опекуна' },
   ],
 }
 

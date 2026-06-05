@@ -156,6 +156,7 @@ const INVITE_ROLE_LABELS: Record<string, string> = {
   coach_doctor:   'тренера',
   org_doctor:     'организации',
   admin_doctor:   'администратора',
+  parent_link:    'родителя / опекуна',
 }
 
 export function renderInviteEmail(input: {
