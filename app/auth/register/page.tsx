@@ -279,6 +279,9 @@ export default function RegisterPage() {
   const [athleteError, setAthleteError] = useState('')
 
   const [selectedPlan, setSelectedPlan] = useState<Plan>('free')
+  // Paid plan the user picked at signup. Registration has NO payment step, so
+  // we provision `free` and remember the intent here to route them to /pricing.
+  const [pendingPaidPlan, setPendingPaidPlan] = useState<Plan | null>(null)
   const [planSaving, setPlanSaving] = useState(false)
   const [planError, setPlanError] = useState('')
 
@@ -423,18 +426,23 @@ export default function RegisterPage() {
         .single()
 
       if (userRow?.id) {
-        // Сохраняем выбор тарифа в subscriptions (если таблица есть — upsert)
+        // SECURITY/billing: never grant a paid plan here — registration has no
+        // payment step. Always provision the free tier. A paid plan the user
+        // picked is remembered (pendingPaidPlan) and they're routed to /pricing
+        // to actually pay. (Previously this wrote plan='pro'/'team' status='trial'
+        // with no payment, so every signup was a free giveaway.)
         await supabase
           .from('subscriptions')
           .upsert(
             {
               user_id: userRow.id,
-              plan: selectedPlan,
-              status: selectedPlan === 'free' ? 'active' : 'trial',
+              plan: 'free',
+              status: 'active',
               expires_at: null,
             },
             { onConflict: 'user_id' }
           )
+        if (selectedPlan !== 'free') setPendingPaidPlan(selectedPlan)
       }
     } catch (err: unknown) {
       // Не блокируем регистрацию, если таблицы нет — просто логируем
@@ -1158,6 +1166,13 @@ export default function RegisterPage() {
                     После входа — короткая настройка профиля (3-4 минуты).
                   </p>
                 </div>
+                {pendingPaidPlan && (
+                  <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-2sm leading-relaxed text-orange-800">
+                    Вы выбрали тариф <span className="font-semibold uppercase">{pendingPaidPlan}</span>.
+                    Аккаунт создан на бесплатном тарифе — оформить оплату можно на странице тарифов
+                    после входа, когда будете готовы.
+                  </div>
+                )}
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/auth/login"
@@ -1166,6 +1181,14 @@ export default function RegisterPage() {
                     Войти в Sporteo
                     <i className="ki-filled ki-right text-xs" />
                   </Link>
+                  {pendingPaidPlan && (
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-white px-6 py-3 text-sm font-semibold text-orange-700 no-underline transition-all hover:bg-orange-50"
+                    >
+                      Перейти к тарифам
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
