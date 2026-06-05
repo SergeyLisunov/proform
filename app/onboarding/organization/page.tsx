@@ -9,10 +9,11 @@
  *   4. Review       → summary + finish
  *
  * On finish:
- *   - INSERT into organizations { id: me.id, ... }
- *       schema convention: organizations.id == users.id (1:1 for org-role users).
- *       Silent fail on RLS edge cases — onboarding still completes so user
- *       lands on /org dashboard and can finish profile from settings.
+ *   - UPDATE the organizations row (created by the role trigger, migration 088,
+ *       with placeholder name/slug) with the wizard's real name/type/profile +
+ *       a human slug (best-effort; keeps the id-based slug if it's taken).
+ *       Silent fail — onboarding still completes so the user lands on /org and
+ *       can finish the profile from settings.
  *   - Dispatch invite emails (best-effort, count goes to invites_sent).
  *   - markOnboardingComplete → redirect to /org.
  */
@@ -138,27 +139,39 @@ export default function OrgOnboardingPage() {
 
   function prev() { setError(null); setCurrentIndex(i => Math.max(i - 1, 0)) }
 
-  async function tryCreateOrgRow(meId: string): Promise<boolean> {
+  async function persistOrgProfile(meId: string): Promise<boolean> {
     const sb = createClient()
-    const slug = slugify(orgName)
+    // The organizations row already exists — the role trigger (migration 088)
+    // creates it with a placeholder name + id-based slug the moment a user
+    // becomes role='organization'. So we UPDATE it with the wizard's real data;
+    // an INSERT would conflict on the existing id and silently drop the input.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: err } = await (sb as any).from('organizations').insert({
-      id:             meId,
-      org_name:       orgName.trim(),
-      org_slug:       slug,
-      org_type:       orgType,
-      sport_type:     sportType.trim() || null,
-      description:    description.trim() || null,
-      city:           city.trim() || null,
-      profile_public: profilePublic,
-    })
-    if (err) {
-      // Most common reason: organizations row already exists (id collision
-      // when user re-enters wizard). Treat as already-created — silent OK.
-      if (err.message?.toLowerCase().includes('duplicate')) return true
-      console.warn('[org-onboarding] organizations insert:', err.message)
+    const { data: updated, error: err } = await (sb as any)
+      .from('organizations')
+      .update({
+        org_name:       orgName.trim(),
+        org_type:       orgType,
+        sport_type:     sportType.trim() || null,
+        description:    description.trim() || null,
+        city:           city.trim() || null,
+        profile_public: profilePublic,
+      })
+      .eq('id', meId)
+      .select('id')
+      .maybeSingle()
+    if (err || !updated) {
+      console.warn('[org-onboarding] organizations update:', err?.message ?? 'no row updated')
       return false
     }
+    // Best-effort human slug. org_slug is UNIQUE — if this one is already taken
+    // we keep the trigger's id-based slug (the org can rename later in settings).
+    const slug = slugify(orgName)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: slugErr } = await (sb as any)
+      .from('organizations')
+      .update({ org_slug: slug })
+      .eq('id', meId)
+    if (slugErr) console.warn('[org-onboarding] slug not applied (likely taken):', slugErr.message)
     return true
   }
 
@@ -186,7 +199,7 @@ export default function OrgOnboardingPage() {
     }
     setBusy(true)
     try {
-      const orgCreated = await tryCreateOrgRow(user.id)
+      const orgCreated = await persistOrgProfile(user.id)
       const sent       = await dispatchInvites()
 
       await patchMyOnboarding({
