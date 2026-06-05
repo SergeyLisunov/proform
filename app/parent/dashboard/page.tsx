@@ -7,13 +7,17 @@
  *   - calendar_events_parent_select
  *   - athlete_passes_parent_select
  *   - observation_diary_parent_select
- * Никаких мед-данных (workouts/HRV/recovery) — это намеренно (см. 089).
- * Прогресс-сводка без мед-полей вынесена в follow-up (нужен серверный роут
- * с колонко-фильтром).
+ * Никаких мед-данных (HRV / recovery / risk_flag) — это намеренно (см. 089).
+ * Прогресс-сводка за 7 дней — через admin client с строгим column-фильтром
+ * (только event_date / activity_duration_min). Это безопасно потому что
+ * child_id'ы уже отфильтрованы parent_links RLS перед admin-запросом, а
+ * сами sensitive-колонки не SELECT'аются. См. [[RLS row-level не подходит
+ * для column-sensitive surfaces]] в vault.
  */
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { Card } from '@/components/ui/metronic'
 
 interface ChildLink {
@@ -50,6 +54,12 @@ interface CoachNote {
   note: string | null
   category: string | null
   risk_level: string | null
+}
+
+interface ProgressSummary {
+  count:      number
+  totalMin:   number
+  byActivity: Array<{ activity_type: string; count: number; min: number }>
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -140,8 +150,19 @@ export default async function ParentDashboardPage() {
   // codebase, see e.g. app/dashboard/page.tsx).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = supabase as any
+
+  // Admin client purely for the workouts progress summary — STRICT column
+  // filter (no HRV/recovery/risk/strain/trainer_comment/mood). Safe because
+  // childIds come from parent_links above (already RLS-filtered to me=parent).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adminSb = createAdminClient() as any
+
+  const sevenAgo = new Date(today)
+  sevenAgo.setDate(today.getDate() - 6)  // 7 days incl. today
+  const sevenAgoStr = sevenAgo.toISOString().slice(0, 10)
+
   const childData = await Promise.all(children.map(async (c) => {
-    const [{ data: upcomingRaw }, { data: passesRaw }, { data: notesRaw }] = await Promise.all([
+    const [{ data: upcomingRaw }, { data: passesRaw }, { data: notesRaw }, { data: workoutsRaw }] = await Promise.all([
       sb.from('calendar_events')
         .select('id, title, event_date, start_time, activity_type')
         .eq('owner_id', c.id)
@@ -160,12 +181,44 @@ export default async function ParentDashboardPage() {
         .eq('athlete_id', c.id)
         .order('date', { ascending: false })
         .limit(3),
+      adminSb.from('workouts')
+        // Strict column allow-list — no medical/personal fields.
+        .select('event_date, activity_type, activity_duration_min')
+        .eq('athlete_id', c.id)
+        .gte('event_date', sevenAgoStr)
+        .lte('event_date', todayStr)
+        .limit(200),
     ])
+
+    const rows = (workoutsRaw ?? []) as Array<{
+      event_date: string | null
+      activity_type: string | null
+      activity_duration_min: number | null
+    }>
+    const byActivityMap = new Map<string, { count: number; min: number }>()
+    let totalMin = 0
+    for (const w of rows) {
+      const m = Math.max(0, Number(w.activity_duration_min ?? 0) || 0)
+      totalMin += m
+      const k = (w.activity_type ?? 'Другое').trim() || 'Другое'
+      const cur = byActivityMap.get(k) ?? { count: 0, min: 0 }
+      byActivityMap.set(k, { count: cur.count + 1, min: cur.min + m })
+    }
+    const progress: ProgressSummary = {
+      count:    rows.length,
+      totalMin,
+      byActivity: Array.from(byActivityMap.entries())
+        .map(([activity_type, v]) => ({ activity_type, ...v }))
+        .sort((a, b) => b.min - a.min)
+        .slice(0, 3),
+    }
+
     return {
       child:    c,
       upcoming: (upcomingRaw ?? []) as UpcomingEvent[],
       passes:   (passesRaw   ?? []) as Pass[],
       notes:    (notesRaw    ?? []) as CoachNote[],
+      progress,
     }
   }))
 
@@ -182,7 +235,7 @@ export default async function ParentDashboardPage() {
         </p>
       </header>
 
-      {childData.map(({ child, upcoming, passes, notes }) => (
+      {childData.map(({ child, upcoming, passes, notes, progress }) => (
         <Card key={child.id} className="rounded-[28px] overflow-hidden">
           {/* Child header */}
           <div className="flex items-center gap-4 border-b border-border px-6 py-4">
@@ -201,7 +254,7 @@ export default async function ParentDashboardPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 p-6 lg:grid-cols-3">
+          <div className="grid gap-4 p-6 lg:grid-cols-2 xl:grid-cols-4">
             {/* Upcoming schedule */}
             <section>
               <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
@@ -278,6 +331,46 @@ export default async function ParentDashboardPage() {
                     </li>
                   ))}
                 </ul>
+              )}
+            </section>
+
+            {/* Progress (last 7 days) — strict column allow-list (event_date /
+                activity_type / activity_duration_min). NO medical fields. */}
+            <section>
+              <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                Прогресс за 7 дней
+              </h3>
+              {progress.count === 0 ? (
+                <p className="text-2xs text-muted-foreground">Тренировок не было.</p>
+              ) : (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-2xl border border-border bg-background/60 px-3 py-2.5 text-center">
+                      <div className="pf-num text-xl text-foreground">{progress.count}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        тренировок
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-border bg-background/60 px-3 py-2.5 text-center">
+                      <div className="pf-num text-xl text-foreground">
+                        {(progress.totalMin / 60).toFixed(progress.totalMin >= 600 ? 0 : 1)}
+                      </div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        часов
+                      </div>
+                    </div>
+                  </div>
+                  {progress.byActivity.length > 0 && (
+                    <ul className="space-y-1.5">
+                      {progress.byActivity.map((a) => (
+                        <li key={a.activity_type} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background/60 px-3 py-1.5">
+                          <span className="text-2xs font-semibold text-foreground truncate">{a.activity_type}</span>
+                          <span className="text-2xs text-muted-foreground shrink-0">{a.count} · {a.min} мин</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               )}
             </section>
           </div>
