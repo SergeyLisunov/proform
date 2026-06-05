@@ -8,7 +8,8 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 import { createBrowserClient } from '@supabase/ssr'
 import { SporteoLogo } from "@/components/ui/SporteoLogo"
-import { filterSidebarForRole, type EffectiveRole } from '@/lib/sidebar/config'
+import { filterSidebarForRole } from '@/lib/sidebar/config'
+import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
   athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
@@ -112,12 +113,15 @@ export default function Sidebar() {
     }
   }, [user])
 
-  // Единая чистая функция фильтра — живёт в lib/sidebar/config.ts.
-  // Поведение идентичное предыдущему inline-варианту: пункты без `roles`
-  // видят все авторизованные; «Семья» инжектится при childCount > 0
-  // (parent — relationship, не глобальная роль).
+  // Этап 2 sidebar-rebuild: используем effectiveRole (через useEffectiveRole hook),
+  // который маппит org_members.member_role='org_owner'/'org_admin' в scoped
+  // org-роль. На этом этапе SIDEBAR_CONFIG ещё не содержит специфичных пунктов
+  // для scoped ролей — filterSidebarForRole внутри fallback'ит scoped role к
+  // 'organization' для backward-compat. Текущие org-владельцы видят тот же
+  // sidebar что и раньше, но путь резолвинга роли теперь явный.
+  const { effectiveRole } = useEffectiveRole()
   const visibleSections = filterSidebarForRole({
-    role:       user?.role as EffectiveRole | undefined,
+    role:       effectiveRole,
     childCount: user?.childCount ?? 0,
   })
 

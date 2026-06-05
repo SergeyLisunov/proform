@@ -18,15 +18,24 @@
  * config — единый источник правды по пунктам.
  */
 
-/** Глобальная роль из public.users.role. Пока 1:1 — потом расширим. */
+/** Глобальная роль из public.users.role. */
 export type GlobalRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'doctor'
 
+/** Производная org-роль из org_members.member_role для активной организации. */
+export type ScopedOrgRole = 'org_owner' | 'org_admin'
+
 /**
- * Резолвленная роль для целей навигации. На этапе 1 совпадает с GlobalRole;
- * на этапе 7 добавятся 'org_owner' / 'org_admin' (производные от
- * org_members.member_role для активной организации).
+ * Резолвленная роль для целей навигации.
+ *
+ * Этап 2 (этот файл): тип расширен включая ScopedOrgRole. SIDEBAR_CONFIG
+ * ПОКА не содержит пунктов специфичных для 'org_owner' / 'org_admin' —
+ * для backward-compat scoped org-роли отображаются как 'organization' в
+ * filter-функции через getRoleMatchSet(). Когда config'у понадобятся
+ * специфичные пункты (этапы 6/7 — owner rebuild, org admin), они просто
+ * получат `roles: ['org_owner']` / `roles: ['org_admin']` и автоматически
+ * сужат показ.
  */
-export type EffectiveRole = GlobalRole
+export type EffectiveRole = GlobalRole | ScopedOrgRole
 
 export interface MenuItem {
   /**
@@ -147,17 +156,36 @@ export const PARENT_FAMILY_SECTION: SidebarSection = {
  *   - секции без пунктов после фильтра — отбрасываются
  *   - section «Семья» добавляется в конец если childCount > 0
  */
+/**
+ * Список ролей, под которыми «считается» текущий effectiveRole для целей
+ * фильтрации SIDEBAR_CONFIG. Backward-compat: scoped org-роль наследует
+ * видимость глобальной 'organization' пока в конфиге нет специфичных пунктов.
+ *
+ * Пример: пункт с `roles: ['organization']` будет виден org_owner и org_admin.
+ * Когда добавятся пункты с `roles: ['org_owner']` — они будут видны
+ * **только** org_owner, не org_admin (точное соответствие).
+ *
+ * Этап 6/7: когда SIDEBAR_CONFIG получит пункты для org_owner/org_admin,
+ * можно убрать mapping и оставить только `[role]` — фильтр станет строгим.
+ */
+function getRoleMatchSet(role: EffectiveRole | undefined): EffectiveRole[] {
+  if (!role) return []
+  if (role === 'org_owner' || role === 'org_admin') return [role, 'organization']
+  return [role]
+}
+
 export function filterSidebarForRole(opts: {
   role:       EffectiveRole | undefined
   childCount: number
 }): SidebarSection[] {
+  const matchSet = getRoleMatchSet(opts.role)
   const sections = SIDEBAR_CONFIG
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => {
         if (item.roles === null) return true
-        if (!opts.role) return false
-        return item.roles.includes(opts.role)
+        if (matchSet.length === 0) return false
+        return item.roles.some((r) => matchSet.includes(r))
       }),
     }))
     .filter((section) => section.items.length > 0)
