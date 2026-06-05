@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Card } from '@/components/ui/metronic'
+import ClaimLinkButton from './ClaimLinkButton'
 
 interface ChildLink {
   child_id: string
@@ -249,9 +250,12 @@ export default async function ParentDashboardPage() {
               <h2 className="text-base font-semibold text-foreground">{child.name ?? 'Без имени'}</h2>
               <p className="truncate font-mono text-2xs text-muted-foreground">{child.email ?? '—'}</p>
             </div>
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.22em] text-blue-700">
-              Атлет
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.22em] text-blue-700">
+                Атлет
+              </span>
+              <ClaimLinkButton childId={child.id} childName={child.name ?? 'Без имени'} />
+            </div>
           </div>
 
           <div className="grid gap-4 p-6 lg:grid-cols-2 xl:grid-cols-4">
