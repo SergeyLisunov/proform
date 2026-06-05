@@ -89,16 +89,53 @@ export async function POST(_req: Request, props: { params: Promise<{ token: stri
     org_doctor:     ['organization', 'doctor'],
     admin_doctor:   ['admin', 'doctor'],
   }
-  const combo = VALID_COMBOS[inv.connection_type]
-  if (!combo) return NextResponse.json({ ok: false, error: 'invalid_type' }, { status: 400 })
 
-  // Determine which side is the recipient (the one that isn't the inviter's role).
   const { data: inviter } = await admin
     .from('users').select('id, role').eq('id', inv.inviter_id).single()
   if (!inviter) return NextResponse.json({ ok: false, error: 'inviter_missing' }, { status: 410 })
-
-  const myRole = (me as any).role
   const inviterRole = (inviter as any).role
+  const myRole = (me as any).role
+
+  // ── parent_link: special-case. Not a connection — claimer becomes the
+  //    inviter (athlete)'s parent via a parent_links row (migration 089).
+  //    No recipient-role gate since "parent" isn't a global role; inviter must
+  //    be the athlete.
+  if (inv.connection_type === 'parent_link') {
+    if (inviterRole !== 'athlete') {
+      return NextResponse.json({ ok: false, error: 'invalid_inviter_role' }, { status: 422 })
+    }
+    const childId  = inv.inviter_id
+    const parentId = (me as any).id
+    const { error: linkErr } = await (admin as any)
+      .from('parent_links')
+      .upsert(
+        { parent_id: parentId, child_id: childId, status: 'active', created_by: parentId },
+        { onConflict: 'parent_id,child_id' },
+      )
+    if (linkErr) {
+      return NextResponse.json({ ok: false, error: 'link_failed' }, { status: 500 })
+    }
+    // Mark invite claimed (mirrors the connection path below).
+    await admin
+      .from('email_invites')
+      .update({ status: 'claimed', claimed_by_user_id: parentId, claimed_at: new Date().toISOString() })
+      .eq('id', inv.id)
+    // Notify the athlete.
+    await admin.from('notifications').insert({
+      user_id:     childId,
+      type:        'invitation_accepted',
+      title:       'Родитель / опекун подключился',
+      body:        (me as any).email ?? null,
+      entity_type: 'parent_link',
+      entity_id:   null,
+      action_url:  '/network',
+    })
+    return NextResponse.json({ ok: true, parent_link: true })
+  }
+
+  const combo = VALID_COMBOS[inv.connection_type]
+  if (!combo) return NextResponse.json({ ok: false, error: 'invalid_type' }, { status: 400 })
+  // Determine which side is the recipient (the one that isn't the inviter's role).
   const recipientRole = combo[0] === inviterRole ? combo[1] : combo[0]
   if (myRole !== recipientRole) {
     return NextResponse.json({ ok: false, error: 'role_mismatch', required_role: recipientRole }, { status: 422 })

@@ -8,6 +8,7 @@ export type InviteConnectionType =
   | 'coach_doctor'
   | 'org_doctor'
   | 'admin_doctor'
+  | 'parent_link'  // athlete → parent/guardian (creates a parent_links row on claim, not a connection)
 
 export type InviteStatus = 'pending' | 'claimed' | 'expired' | 'revoked'
 
@@ -33,6 +34,7 @@ export const CONNECTION_TYPE_LABELS: Record<InviteConnectionType, string> = {
   coach_doctor:   'тренер ↔ врач',
   org_doctor:     'организация ↔ врач',
   admin_doctor:   'админ ↔ врач',
+  parent_link:    'атлет ↔ родитель / опекун',
 }
 
 /**

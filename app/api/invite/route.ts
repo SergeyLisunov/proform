@@ -52,10 +52,19 @@ export async function POST(req: Request) {
   if (myEmail && myEmail === email) {
     return NextResponse.json({ error: 'self_invite_not_allowed' }, { status: 400 })
   }
-  const combo = VALID_COMBOS[connection_type]
-  if (!combo) return NextResponse.json({ error: 'invalid_connection_type' }, { status: 400 })
-  if (me.role !== combo[0] && me.role !== combo[1]) {
-    return NextResponse.json({ error: 'role_mismatch' }, { status: 422 })
+  // parent_link is special: parent isn't a global role, so we don't use the
+  // role-pair table — we just gate inviter to role='athlete'. The recipient
+  // can be anyone; on claim, a parent_links row is created (not a connection).
+  if (connection_type === 'parent_link') {
+    if ((me as { role: string }).role !== 'athlete') {
+      return NextResponse.json({ error: 'role_mismatch' }, { status: 422 })
+    }
+  } else {
+    const combo = VALID_COMBOS[connection_type]
+    if (!combo) return NextResponse.json({ error: 'invalid_connection_type' }, { status: 400 })
+    if (me.role !== combo[0] && me.role !== combo[1]) {
+      return NextResponse.json({ error: 'role_mismatch' }, { status: 422 })
+    }
   }
 
   // Avoid spamming: one pending invite per (inviter, email, type).
