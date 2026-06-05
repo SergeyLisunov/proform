@@ -143,6 +143,42 @@ export async function POST(_req: Request, props: { params: Promise<{ token: stri
     connectionId = (newConn as any).id
   }
 
+  // Sync org roster: org_* invites grant a connection AND must add an
+  // org_members row — the org roster (app/org/members) reads org_members, so
+  // without this an invite-link member is silently invisible in the roster.
+  // Non-blocking: the connection above is the canonical access grant; a roster
+  // sync failure must not fail the claim.
+  const ORG_MEMBER_ROLE: Record<string, string> = {
+    org_athlete: 'athlete',
+    org_coach:   'coach',
+    org_doctor:  'doctor',
+  }
+  const orgMemberRole = ORG_MEMBER_ROLE[inv.connection_type]
+  if (orgMemberRole) {
+    // The org side is the party whose role is 'organization'
+    // (organizations.id == that user's id); the other party is the member.
+    const orgUserId    = inviterRole === 'organization' ? inv.inviter_id : (me as any).id
+    const memberUserId = inviterRole === 'organization' ? (me as any).id : inv.inviter_id
+    try {
+      const { error: omErr } = await (admin as any)
+        .from('org_members')
+        .upsert(
+          {
+            org_id:      orgUserId,
+            user_id:     memberUserId,
+            member_role: orgMemberRole,
+            status:      'active',
+            joined_at:   new Date().toISOString(),
+            invited_by:  inv.inviter_id,
+          },
+          { onConflict: 'org_id,user_id' }
+        )
+      if (omErr) console.warn('[invite] org_members roster sync skipped:', omErr.message)
+    } catch (e) {
+      console.warn('[invite] org_members roster sync error:', e)
+    }
+  }
+
   // Mark invite claimed.
   await admin
     .from('email_invites')
