@@ -193,6 +193,77 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
   )
 }
 
+// ── AssignCoachModal — link an athlete to one of the org's coaches ──────────────
+function AssignCoachModal({ athlete, coaches, onClose, onLinked }: {
+  athlete: Member; coaches: Member[]; onClose: () => void; onLinked: (coachName: string) => void
+}) {
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [err, setErr] = useState('')
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, [onClose])
+
+  async function link(coach: Member) {
+    setBusyId(coach.user_id); setErr('')
+    try {
+      const res = await fetch('/api/org/connect', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ athlete_id: athlete.user_id, provider_id: coach.user_id, provider_kind: 'coach' }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.ok) throw new Error(json.error ?? 'link_failed')
+      onLinked(coach.user_name)
+      onClose()
+    } catch (e) {
+      setErr(getErrorMessage(e, 'Не удалось связать'))
+    } finally { setBusyId(null) }
+  }
+
+  return ReactDOM.createPortal(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }} />
+      <div style={{ position: 'relative', width: 440, maxWidth: '100vw', maxHeight: '85vh', overflow: 'auto', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+        <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Назначить тренера</p>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>{athlete.user_name}</h3>
+          </div>
+          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+        </div>
+        <div style={{ padding: '14px 22px' }}>
+          {coaches.length === 0 ? (
+            <p style={{ fontSize: 13, color: 'var(--muted-foreground)', margin: 0 }}>В организации нет активных тренеров. Сначала добавьте тренера в состав.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {coaches.map(c => (
+                <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 12 }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.user_name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>{c.user_email}</div>
+                  </div>
+                  <button onClick={() => link(c)} disabled={busyId === c.user_id} style={{ background: '#16A34A', color: 'white', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, border: 'none', cursor: busyId === c.user_id ? 'not-allowed' : 'pointer', opacity: busyId === c.user_id ? 0.7 : 1, flexShrink: 0 }}>
+                    {busyId === c.user_id ? 'Связываю…' : 'Связать'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {err && <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>{err}</div>}
+          <p style={{ fontSize: 11, color: 'var(--muted-foreground)', margin: '12px 0 0', lineHeight: 1.5 }}>
+            Тренер получит доступ к данным спортсмена (тренировки, нагрузка). Связать можно только участников этой организации.
+          </p>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function OrgMembersPage() {
   const { user } = useUser()
@@ -203,9 +274,11 @@ export default function OrgMembersPage() {
   const [search, setSearch] = useState('')
   const [showInvite, setShowInvite] = useState(false)
   const [showBulkImport, setShowBulkImport] = useState(false)
+  const [assignAthlete, setAssignAthlete] = useState<Member | null>(null)
   const [toast, setToast] = useState('')
 
   const orgId = user?.id ?? ''
+  const activeCoaches = members.filter(m => m.member_role === 'coach' && m.status === 'active')
 
   useEffect(() => { if (orgId) loadMembers() }, [orgId]) // eslint-disable-line
 
@@ -502,6 +575,11 @@ export default function OrgMembersPage() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start' }} className="lg:justify-end">
+                    {m.member_role === 'athlete' && m.status === 'active' && (
+                      <button onClick={() => setAssignAthlete(m)} title="Назначить тренера" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                        <i className="ki-filled ki-link text-xs" />
+                      </button>
+                    )}
                     {m.status === 'active' && (
                       <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FBC1A0', background: '#FEF0E7', color: '#F35703', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-pause text-xs" />
@@ -526,6 +604,15 @@ export default function OrgMembersPage() {
       {showInvite && (
         <InviteDrawer orgId={orgId} onClose={() => setShowInvite(false)}
           onInvited={m => { setMembers(prev => [m, ...prev]); showToastMsg('Участник добавлен!') }} />
+      )}
+
+      {assignAthlete && (
+        <AssignCoachModal
+          athlete={assignAthlete}
+          coaches={activeCoaches}
+          onClose={() => setAssignAthlete(null)}
+          onLinked={coachName => showToastMsg(`Тренер ${coachName} назначен`)}
+        />
       )}
 
       {showBulkImport && (
