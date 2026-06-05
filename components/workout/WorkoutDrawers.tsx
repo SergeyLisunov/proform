@@ -386,6 +386,15 @@ export function WorkoutAddDrawer({
     description: '',
   })
 
+  // P3 #5 — clearance gating. На open fetch'аем current_clearances для атлета.
+  // Если status=banned (или review_needed для не-full) — на submit показываем
+  // модалку override_reason, фиксим в audit_logs через /api/clearance/override.
+  const [currentStatus, setCurrentStatus] = useState<'full'|'limited'|'light_only'|'banned'|null>(null)
+  const [currentReviewNeeded, setCurrentReviewNeeded] = useState(false)
+  const [showOverrideModal, setShowOverrideModal] = useState(false)
+  const [overrideReason, setOverrideReason] = useState('')
+  const [overrideError, setOverrideError] = useState<string | null>(null)
+
   useEffect(() => {
     if (open) {
       setForm({
@@ -399,17 +408,29 @@ export function WorkoutAddDrawer({
         description: '',
       })
       setError(null)
+      setShowOverrideModal(false)
+      setOverrideReason('')
+      setOverrideError(null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void (async () => {
+        const { data } = await (sb() as any)
+          .from('current_clearances')
+          .select('status, review_needed')
+          .eq('athlete_id', userId)
+          .maybeSingle()
+        setCurrentStatus((data?.status as 'full'|'limited'|'light_only'|'banned'|null) ?? null)
+        setCurrentReviewNeeded(!!data?.review_needed)
+      })()
     }
-  }, [open])
+  }, [open, userId])
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const name = form.name.trim()
-    if (!name) { setError('Название обязательно'); return }
-    if (!form.event_date) { setError('Дата обязательна'); return }
+  const needsOverride = currentStatus === 'banned'
+    || (currentReviewNeeded && currentStatus !== null && currentStatus !== 'full')
 
+  async function actuallyCreate() {
     setSaving(true)
     setError(null)
+    const name = form.name.trim()
     try {
       const duration = form.activity_duration_min ? Number(form.activity_duration_min) : null
       const payload = {
@@ -459,6 +480,45 @@ export function WorkoutAddDrawer({
     }
   }
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const name = form.name.trim()
+    if (!name) { setError('Название обязательно'); return }
+    if (!form.event_date) { setError('Дата обязательна'); return }
+    if (needsOverride) { setShowOverrideModal(true); return }
+    await actuallyCreate()
+  }
+
+  async function confirmOverrideAndCreate() {
+    setOverrideError(null)
+    const reason = overrideReason.trim()
+    if (reason.length < 10) { setOverrideError('Минимум 10 символов'); return }
+    setSaving(true)
+    try {
+      const res = await fetch('/api/clearance/override', {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          athlete_id: userId,
+          reason,
+          planned: {
+            title:         form.name.trim() || undefined,
+            event_date:    form.event_date || undefined,
+            activity_type: form.activity_type || undefined,
+          },
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.ok) throw new Error(json.error ?? 'audit_failed')
+      setShowOverrideModal(false)
+      await actuallyCreate()
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'audit_failed'
+      setOverrideError(`Не удалось зафиксировать override: ${msg}`)
+      setSaving(false)
+    }
+  }
+
   return (
     <DrawerShell open={open} onClose={onClose}>
       <div className="border-b border-border px-6 py-5">
@@ -494,10 +554,58 @@ export function WorkoutAddDrawer({
         <div className="border-t border-border bg-card px-6 py-4 flex gap-2">
           <button type="button" onClick={onClose} className="kt-btn kt-btn-outline flex-1">Отмена</button>
           <button type="submit" disabled={saving} className="kt-btn kt-btn-primary flex-1 min-w-[160px] justify-center">
-            {saving ? 'Сохранение…' : 'Сохранить'}
+            {saving ? 'Сохранение…' : needsOverride ? 'Сохранить с override…' : 'Сохранить'}
           </button>
         </div>
       </form>
+
+      {/* P3 #5 — override-confirm modal: требуется когда у атлета banned clearance
+          или review_needed для не-full. POST /api/clearance/override фиксит
+          в audit_logs, потом продолжается обычное создание тренировки. */}
+      {showOverrideModal && (
+        <div style={{ position:'absolute', inset:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+          <div onClick={() => !saving && setShowOverrideModal(false)} style={{ position:'absolute', inset:0, background:'rgba(15,23,42,0.6)', backdropFilter:'blur(4px)' }} />
+          <div style={{ position:'relative', width:480, maxWidth:'100%', background:'var(--card)', border:'1px solid var(--border)', borderRadius:20, boxShadow:'0 24px 64px rgba(0,0,0,0.2)' }}>
+            <div style={{ padding:'18px 22px', borderBottom:'1px solid var(--border)' }}>
+              <p style={{ fontSize:10, fontWeight:700, color:'#B91C1C', textTransform:'uppercase', letterSpacing:'0.18em', margin:0 }}>
+                Override медицинского ограничения
+              </p>
+              <h3 style={{ fontSize:17, fontWeight:800, color:'var(--foreground)', margin:'4px 0 0' }}>
+                {currentStatus === 'banned' ? 'Доктор выставил «Запрет тренировок»' : 'Требуется review допуска'}
+              </h3>
+            </div>
+            <div style={{ padding:'16px 22px', display:'flex', flexDirection:'column', gap:12 }}>
+              <p style={{ margin:0, fontSize:13, lineHeight:1.55, color:'var(--muted-foreground)' }}>
+                Чтобы продолжить, укажите медицинскую причину override'а. Текст будет записан
+                в audit-log и доступен для разбора. Минимум 10 символов.
+              </p>
+              <textarea
+                value={overrideReason}
+                onChange={(e) => { setOverrideReason(e.target.value); setOverrideError(null) }}
+                rows={4}
+                maxLength={500}
+                placeholder="Например: согласовано с врачом X 03.06.2026 устно, лёгкая разминка после реабилитации"
+                style={{ width:'100%', borderRadius:12, border:'1.5px solid var(--border)', background:'var(--background)', color:'var(--foreground)', padding:'10px 12px', fontSize:13, outline:'none', resize:'vertical', boxSizing:'border-box' }}
+              />
+              {overrideError && (
+                <div style={{ padding:'9px 12px', borderRadius:10, background:'#FEF2F2', border:'1px solid #FECACA', fontSize:12, color:'#B91C1C' }}>
+                  {overrideError}
+                </div>
+              )}
+              <div style={{ display:'flex', gap:10 }}>
+                <button onClick={confirmOverrideAndCreate} disabled={saving || overrideReason.trim().length < 10}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60">
+                  {saving ? 'Сохраняем…' : 'Подтвердить и создать'}
+                </button>
+                <button onClick={() => !saving && setShowOverrideModal(false)} disabled={saving}
+                  className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted">
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DrawerShell>
   )
 }
