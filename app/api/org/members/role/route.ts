@@ -26,6 +26,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { canAssignOrgAdmin, type GlobalRole } from '@/lib/permissions'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -45,8 +46,11 @@ export async function PATCH(req: Request) {
     .from('users').select('id, role').eq('auth_id', authUser.id).maybeSingle()
   if (!meRow) return NextResponse.json({ ok: false, error: 'no_profile' }, { status: 404 })
   const actorId   = (meRow as { id: string }).id
-  const actorRole = (meRow as { role: string }).role
-  if (actorRole !== 'organization') {
+  const actorRole = (meRow as { role: GlobalRole }).role
+  // Этап 10 — централизованный permission helper. Раньше было прямое
+  // сравнение строки; теперь семантика «может ли делегировать org_admin»
+  // живёт в lib/permissions.ts и тестируема отдельно.
+  if (!canAssignOrgAdmin(actorRole)) {
     return NextResponse.json({ ok: false, error: 'forbidden' }, { status: 403 })
   }
 
