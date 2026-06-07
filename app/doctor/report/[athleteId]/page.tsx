@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { Alert } from '@/components/ui/metronic'
 import ClearanceSection from './ClearanceSection'
+import { canViewMedicalReport, type GlobalRole } from '@/lib/permissions'
 
 function sb() {
   return createBrowserClient(
@@ -79,8 +80,10 @@ export default function DoctorReportPage() {
       const { data: { user: authUser } } = await sb().auth.getUser()
       if (!authUser) { setAuthorized(false); return }
       const { data } = await sb().from('users').select('id, name, first_name, last_name, role').eq('auth_id', authUser.id).maybeSingle()
-      const u = data as { role: string | null; name: string | null; first_name: string | null; last_name: string | null } | null
-      const ok = u?.role === 'doctor' || u?.role === 'admin'
+      const u = data as { role: GlobalRole | null; name: string | null; first_name: string | null; last_name: string | null } | null
+      // Этап 10 — централизованный permission helper. Доктор и
+      // платформенный admin (последний для compliance/audit).
+      const ok = canViewMedicalReport(u?.role ?? undefined)
       setAuthorized(ok)
       const full = [u?.first_name, u?.last_name].filter(Boolean).join(' ').trim()
       setDoctorName(full || u?.name || 'Доктор')

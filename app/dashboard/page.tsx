@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import type { Workout } from '@/services/workouts.service'
 import { recoveryColor } from '@/lib/utils/data'
 import { createBrowserClient } from '@supabase/ssr'
+import { isPlatformAdmin } from '@/lib/permissions'
 import {
   WorkoutAddDrawer,
   WorkoutEditDrawer,
@@ -1172,6 +1173,7 @@ export default function DashboardPage() {
   if (user.role === 'doctor') return <DoctorDash userId={user.id} name={user.name} />
   if (user.role === 'organization') return <OrgDash userId={user.id} name={user.name} />
   if (user.role === 'coach') return <CoachDash userId={user.id} name={user.name} />
-  if (user.role === 'admin') return <AdminDash name={user.name} />
+  // Этап 10 — централизованный helper. Платформенный admin = back-office.
+  if (isPlatformAdmin(user.role)) return <AdminDash name={user.name} />
   return <AthleteDash userId={user.id} name={user.name} />
 }
