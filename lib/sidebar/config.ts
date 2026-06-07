@@ -214,11 +214,15 @@ export const PARENT_FAMILY_SECTION: SidebarSection = {
   id:    'family',
   title: 'Семья',
   items: [
-    { id: 'family.children', href: '/parent/dashboard', icon: 'ki-people',   label: 'Дети',       roles: null },
+    { id: 'family.children', href: '/parent/dashboard', icon: 'ki-people',        label: 'Дети',       roles: null },
     // Этап 8a — кросс-детский календарь. Dashboard показывает события по
     // ребёнку (карточка → 3 ближайших); эта страница — обратный axis,
     // события по дате с меткой ребёнка. 4-недельное окно.
-    { id: 'family.schedule', href: '/parent/schedule',  icon: 'ki-calendar', label: 'Расписание', roles: null },
+    { id: 'family.schedule', href: '/parent/schedule',  icon: 'ki-calendar',      label: 'Расписание', roles: null },
+    // Этап 8b — кросс-детский фид заметок тренера. Те же 3 свежих коммента
+    // что показывает dashboard под каждым ребёнком, но в едином feed: новые
+    // сверху, risk_level / category цветные чипы, лимит 50 записей.
+    { id: 'family.notes',    href: '/parent/notes',     icon: 'ki-notepad-edit',  label: 'Заметки',    roles: null },
   ],
 }
 
