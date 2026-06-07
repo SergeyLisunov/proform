@@ -10,6 +10,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { SporteoLogo } from "@/components/ui/SporteoLogo"
 import { filterSidebarForRole } from '@/lib/sidebar/config'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
+import MobileBottomNav from './MobileBottomNav'
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
   athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
@@ -346,6 +347,10 @@ export default function Sidebar() {
         </div>
       </div>
     </div>
+    {/* Этап 11 sidebar-rebuild — постоянный нижний bar на mobile. Видим
+        только lg:hidden; берёт топ-item каждой filtered section (max 5).
+        Источник правды — filterSidebarForRole, как и desktop sidebar. */}
+    <MobileBottomNav />
     </>
   )
 }
