@@ -206,13 +206,19 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
  * Динамически инжектируемая секция «Семья» для пользователей с активными
  * parent_links (relationship, не глобальная роль). Используется отдельно от
  * SIDEBAR_CONFIG потому что зависит от runtime-данных, а не от роли в JWT.
- * Этап 8 roadmap'а — расширить (расписание/посещаемость/платежи); пока 1 пункт.
+ * Этап 8 roadmap — постепенно добавляем кросс-детские агрегаты: схedule
+ * (8a), notes/passes (later). Каждый item остаётся виден всем — gating
+ * происходит на уровне самой секции (childCount > 0).
  */
 export const PARENT_FAMILY_SECTION: SidebarSection = {
   id:    'family',
   title: 'Семья',
   items: [
-    { id: 'family.children', href: '/parent/dashboard', icon: 'ki-people', label: 'Дети', roles: null },
+    { id: 'family.children', href: '/parent/dashboard', icon: 'ki-people',   label: 'Дети',       roles: null },
+    // Этап 8a — кросс-детский календарь. Dashboard показывает события по
+    // ребёнку (карточка → 3 ближайших); эта страница — обратный axis,
+    // события по дате с меткой ребёнка. 4-недельное окно.
+    { id: 'family.schedule', href: '/parent/schedule',  icon: 'ki-calendar', label: 'Расписание', roles: null },
   ],
 }
 
