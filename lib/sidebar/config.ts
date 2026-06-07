@@ -24,6 +24,11 @@ export type GlobalRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'docto
 /** Производная org-роль из org_members.member_role для активной организации. */
 export type ScopedOrgRole = 'org_owner' | 'org_admin'
 
+// Re-import тип для use в MenuItem.requiredPlan. Локальный import, чтобы
+// круговой зависимости не было — lib/plans.ts не импортирует config.
+import type { Plan, PaidPlan } from '@/lib/plans'
+import { meetsRequiredPlan } from '@/lib/plans'
+
 /**
  * Резолвленная роль для целей навигации.
  *
@@ -52,6 +57,16 @@ export interface MenuItem {
    * аутентифицированным» (например /messages у всех ролей).
    */
   roles: EffectiveRole[] | null
+  /**
+   * Этап 12 — feature gate по тарифному плану. Если задано, пункт виден
+   * только пользователям с эффективным планом >= requiredPlan (см.
+   * `meetsRequiredPlan` в lib/plans.ts). Server-side gating всё равно
+   * остаётся в API routes / RLS — это UX hint, чтобы не показывать пункт,
+   * который сразу же стрельнёт 402.
+   *
+   * Если поле опущено, требование = free (все видят).
+   */
+  requiredPlan?: PaidPlan
 }
 
 export interface SidebarSection {
@@ -199,7 +214,11 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     items: [
       // Этап 9 — admin удалён: Sporteo AI это client-facing tool для конечных
       // пользователей, не backoffice surface.
-      { id: 'smart_tools.ai', href: '/ai', icon: 'ki-sparkle', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'doctor'] },
+      // Этап 12 — requiredPlan: 'pro'. Server-side gate уже стоит в API
+      // (lib/ai/plan-gate.ts → 402); UI hint скрывает пункт у free-tier
+      // чтобы не давать ложного affordance. На /pricing они дойдут через
+      // отдельный CTA в /dashboard, не через sidebar.
+      { id: 'smart_tools.ai', href: '/ai', icon: 'ki-sparkle', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'doctor'], requiredPlan: 'pro' },
     ],
   },
   {
@@ -282,15 +301,30 @@ function getRoleMatchSet(role: EffectiveRole | undefined): EffectiveRole[] {
 export function filterSidebarForRole(opts: {
   role:       EffectiveRole | undefined
   childCount: number
+  /**
+   * Этап 12 — текущий effective plan пользователя. Если undefined (план
+   * ещё не загрузился), пункты с requiredPlan НЕ скрываются — это безопасный
+   * default чтобы избежать flickering на первой отрисовке. Когда план
+   * резолвится, фильтр пересчитывается.
+   */
+  plan?:      Plan
 }): SidebarSection[] {
   const matchSet = getRoleMatchSet(opts.role)
+  const planKnown = opts.plan !== undefined
   const sections = SIDEBAR_CONFIG
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => {
-        if (item.roles === null) return true
-        if (matchSet.length === 0) return false
-        return item.roles.some((r) => matchSet.includes(r))
+        // role gate
+        if (item.roles !== null) {
+          if (matchSet.length === 0) return false
+          if (!item.roles.some((r) => matchSet.includes(r))) return false
+        }
+        // plan gate (только когда план уже известен)
+        if (planKnown && item.requiredPlan) {
+          return meetsRequiredPlan(opts.plan!, item.requiredPlan)
+        }
+        return true
       }),
     }))
     .filter((section) => section.items.length > 0)

@@ -10,6 +10,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { SporteoLogo } from "@/components/ui/SporteoLogo"
 import { filterSidebarForRole } from '@/lib/sidebar/config'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
+import { usePlan } from '@/lib/hooks/usePlan'
 import MobileBottomNav from './MobileBottomNav'
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
@@ -121,9 +122,13 @@ export default function Sidebar() {
   // 'organization' для backward-compat. Текущие org-владельцы видят тот же
   // sidebar что и раньше, но путь резолвинга роли теперь явный.
   const { effectiveRole } = useEffectiveRole()
+  // Этап 12 — plan gate. Пока план не загрузился, pass undefined, чтобы
+  // filterSidebarForRole не скрывал premium-пункты и не было flicker'а.
+  const { plan, loading: planLoading } = usePlan()
   const visibleSections = filterSidebarForRole({
     role:       effectiveRole,
     childCount: user?.childCount ?? 0,
+    plan:       planLoading ? undefined : plan,
   })
 
   async function signOut() {
