@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
+import { usePlan } from '@/lib/hooks/usePlan'
 import { filterSidebarForRole, type MenuItem } from '@/lib/sidebar/config'
 
 const MAX_TABS = 5
@@ -35,6 +36,8 @@ export default function MobileBottomNav() {
   const pathname = usePathname()
   const { user } = useUser()
   const { effectiveRole, loading: roleLoading } = useEffectiveRole()
+  // Этап 12 — plan gate (mobile зеркало sidebar gate'а).
+  const { plan, loading: planLoading } = usePlan()
   const [childCount, setChildCount] = useState(0)
 
   // parent_links count — для решения, инжектится ли section «Семья».
@@ -56,7 +59,11 @@ export default function MobileBottomNav() {
 
   if (roleLoading || !user || !effectiveRole) return null
 
-  const sections = filterSidebarForRole({ role: effectiveRole, childCount })
+  const sections = filterSidebarForRole({
+    role:       effectiveRole,
+    childCount,
+    plan:       planLoading ? undefined : plan,
+  })
 
   // По одному топ-item на section, в порядке config. Если sections >= MAX_TABS,
   // получим ровно 5 разных категорий — caption хорошее покрытие топ-flow.
