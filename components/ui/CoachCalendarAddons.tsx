@@ -12,6 +12,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 type Athlete = { id: string; name: string }
 
@@ -152,6 +153,7 @@ export function CoachSessionDrawer({
   onSaved: (s: CoachSession) => void
   initial?: CoachSession | null
 }) {
+  const { confirm } = useDialog()
   const [athleteId, setAthleteId]   = useState<string>(initial?.athlete_id ?? initialAthleteId ?? athletes[0]?.id ?? '')
   const [sessionDate, setSessionDate] = useState<string>(initial?.session_date ?? initialDate)
   const [startTime, setStartTime]   = useState<string>(initial?.start_time ?? '')
@@ -225,7 +227,7 @@ export function CoachSessionDrawer({
 
   const handleDelete = useCallback(async () => {
     if (!initial) return
-    if (!confirm('Удалить занятие?')) return
+    if (!(await confirm('Удалить занятие?'))) return
     await deleteCoachSession(initial.id)
     onSaved({ ...initial, status: 'cancelled' })
     handleClose()
@@ -361,6 +363,7 @@ export function CoachSessionDrawer({
 // PassPlansManager — тарифы тренера
 // ═══════════════════════════════════════════════════════════════════════
 export function PassPlansManager({ coachId, onClose }: { coachId: string; onClose: () => void }) {
+  const { confirm } = useDialog()
   const [plans, setPlans] = useState<CoachPassPlan[]>([])
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -401,7 +404,7 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
   }, [editing, coachId, load])
 
   const removePlan = useCallback(async (id: string) => {
-    if (!confirm('Удалить тариф?')) return
+    if (!(await confirm('Удалить тариф?'))) return
     await deleteCoachPlan(id); await load()
   }, [load])
 
@@ -516,6 +519,7 @@ export function IssuePassDrawer({
   onClose: () => void
   onIssued: (p: AthletePass) => void
 }) {
+  const { confirm } = useDialog()
   const [athleteId, setAthleteId] = useState<string>(initialAthleteId ?? athletes[0]?.id ?? '')
   const [plans, setPlans] = useState<CoachPassPlan[]>([])
   const [planId, setPlanId] = useState<string | null>(null)
@@ -598,7 +602,7 @@ export function IssuePassDrawer({
   }, [])
 
   const handleRemovePass = useCallback(async (id: string) => {
-    if (!confirm('Удалить абонемент?')) return
+    if (!(await confirm('Удалить абонемент?'))) return
     await deletePass(id)
     setExisting(prev => prev.filter(p => p.id !== id))
   }, [])

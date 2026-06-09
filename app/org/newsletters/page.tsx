@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { getMyOrg } from '@/services/org.service'
 import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewsletter } from '@/services/newsletter.service'
 import type { Organization, Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
@@ -42,6 +43,7 @@ function formatAudience(roles: OrgMemberRole[]) {
 
 export default function OrgNewslettersPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [org, setOrg] = useState<Organization | null>(null)
   const [newsletters, setNewsletters] = useState<Newsletter[]>([])
   const [loading, setLoading] = useState(true)
@@ -109,7 +111,7 @@ export default function OrgNewslettersPage() {
 
   async function handleSend(id: string) {
     if (sending) return
-    if (!confirm('Отправить рассылку всем активным членам с выбранными ролями?')) return
+    if (!(await confirm('Отправить рассылку всем активным членам с выбранными ролями?'))) return
     setSending(id)
     setSendResult(null)
     try {

@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import {
   listMyCoachInquiries, createInquiry, cancelInquiry, listMyAssignedAthletes,
   QUESTION_TYPE_META, URGENCY_META, STATUS_META,
@@ -21,6 +22,7 @@ type FilterTab = 'all' | 'pending' | 'answered' | 'expired'
 
 export default function CoachInquiriesPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [inquiries, setInquiries]       = useState<InquiryWithUsers[]>([])
   const [loading, setLoading]           = useState(true)
   const [filter, setFilter]             = useState<FilterTab>('all')
@@ -86,7 +88,7 @@ export default function CoachInquiriesPage() {
   }
 
   async function handleCancel(id: string) {
-    if (!confirm('Отменить запрос врачу?')) return
+    if (!(await confirm('Отменить запрос врачу?'))) return
     setBusyId(id)
     try {
       if (await cancelInquiry(id)) await load()

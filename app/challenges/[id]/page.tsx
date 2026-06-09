@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 type Challenge = {
   id: string
@@ -54,6 +55,7 @@ export default function ChallengeDetailPage() {
   const id = Array.isArray(params.id) ? params.id[0] : (params.id as string)
   const { user } = useUser()
   const { success, error } = useToast()
+  const { confirm } = useDialog()
 
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [leaderboard, setLeaderboard] = useState<LeaderRow[]>([])
@@ -103,7 +105,7 @@ export default function ChallengeDetailPage() {
   }
 
   async function remove() {
-    if (!id || !confirm('Удалить челлендж?')) return
+    if (!id || !(await confirm('Удалить челлендж?'))) return
     try {
       const res = await fetch(`/api/challenges/${id}`, { method: 'DELETE' })
       const json = await res.json()

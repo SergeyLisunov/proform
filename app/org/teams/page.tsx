@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { getMyOrg } from '@/services/org.service'
 import {
   listOrgGroups, createOrgGroup, archiveOrgGroup,
@@ -26,6 +27,7 @@ const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 're
 
 export default function OrgTeamsPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm }                 = useDialog()
   const [org, setOrg]               = useState<Organization | null>(null)
   const [groups, setGroups]         = useState<OrgGroupWithCounts[]>([])
   const [loading, setLoading]       = useState(true)
@@ -95,7 +97,7 @@ export default function OrgTeamsPage() {
   }
 
   const archive = async (groupId: string) => {
-    if (!confirm('Архивировать команду? Атлеты останутся в системе, команда будет скрыта.')) return
+    if (!(await confirm('Архивировать команду? Атлеты останутся в системе, команда будет скрыта.'))) return
     setBusyId(groupId)
     try {
       const ok = await archiveOrgGroup(groupId)

@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import {
   listMyServices, createService, updateService, archiveService,
   reactivateService, deleteService,
@@ -62,6 +63,7 @@ function fmtMoney(v: number, currency = 'RUB'): string {
 
 export default function CoachServicesPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [services, setServices] = useState<CoachService[]>([])
   const [loading, setLoading]   = useState(true)
   const [filter, setFilter]     = useState<FilterTab>('active')
@@ -156,7 +158,7 @@ export default function CoachServicesPage() {
   }
 
   async function handleArchive(id: string) {
-    if (!confirm('Скрыть услугу из каталога?')) return
+    if (!(await confirm('Скрыть услугу из каталога?'))) return
     setBusyId(id)
     try {
       const ok = await archiveService(id)
@@ -175,7 +177,7 @@ export default function CoachServicesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Удалить услугу навсегда? Это действие нельзя отменить.')) return
+    if (!(await confirm('Удалить услугу навсегда? Это действие нельзя отменить.'))) return
     setBusyId(id)
     try {
       const ok = await deleteService(id)

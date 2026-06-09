@@ -13,6 +13,7 @@ import {
 } from '@/services/org-sessions.service'
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { GroupConflictWarning } from '@/components/ui/ConflictWarning'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 export function useOrgMembers(orgId: string | null) {
   const [members, setMembers] = useState<OrgMember[]>([])
@@ -111,6 +112,7 @@ export function OrgSessionDrawer({
   onSaved: (s: GroupSession) => void
   initial?: GroupSession | null
 }) {
+  const { confirm } = useDialog()
   const [sessionDate, setSessionDate] = useState<string>(initial?.session_date ?? initialDate)
   const [startTime, setStartTime]     = useState<string>(initial?.start_time ?? '')
   const [endTime, setEndTime]         = useState<string>(initial?.end_time ?? '')
@@ -228,7 +230,7 @@ export function OrgSessionDrawer({
 
   const handleDelete = useCallback(async () => {
     if (!initial) return
-    if (!confirm('Удалить событие?')) return
+    if (!(await confirm('Удалить событие?'))) return
     await deleteGroupSession(initial.id)
     onSaved({ ...initial, status: 'cancelled' })
     handleClose()

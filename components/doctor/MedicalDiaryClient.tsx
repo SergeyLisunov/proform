@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
 import { useDictation } from '@/hooks/useDictation'
@@ -43,6 +44,7 @@ function fmtSize(b: number): string {
 // ════════════════════════════════════════════════════════════════════════
 
 export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
+  const { confirm } = useDialog()
   const [entries, setEntries] = useState<MedicalEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [heatmap, setHeatmap] = useState<Record<string, number>>({})
@@ -237,7 +239,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
                 load()
               }}
               onDelete={async () => {
-                if (!confirm('Удалить запись? Связанное событие в календаре тоже удалится.')) return
+                if (!(await confirm('Удалить запись? Связанное событие в календаре тоже удалится.'))) return
                 await deleteMedicalEntry(e.id)
                 load()
               }}

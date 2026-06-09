@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card, Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
+import { useDialog } from '@/lib/hooks/useDialog'
 import type { Database } from '@/types/database'
 
 type SubRow = Database['public']['Tables']['subscriptions']['Row']
@@ -59,6 +60,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy]     = useState(false)
   const [msg, setMsg]       = useState<{ ok: boolean; text: string } | null>(null)
+  const { confirm } = useDialog()
 
   const load = async () => {
     setLoading(true)
@@ -89,7 +91,7 @@ export default function BillingPage() {
 
   const toggleCancel = async (cancel: boolean) => {
     if (!sub) return
-    if (cancel && !confirm('Отменить подписку? Доступ сохранится до конца оплаченного периода.')) return
+    if (cancel && !(await confirm('Отменить подписку? Доступ сохранится до конца оплаченного периода.'))) return
     setBusy(true)
     setMsg(null)
     try {

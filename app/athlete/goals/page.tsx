@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import {
   listMyGoals, createGoal, updateGoal, achieveGoal, abandonGoal,
   reactivateGoal, deleteGoal,
@@ -21,6 +22,7 @@ type FilterTab = 'all' | GoalStatus
 
 export default function AthleteGoalsPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [goals, setGoals]     = useState<AthleteGoal[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter]   = useState<FilterTab>('active')
@@ -142,7 +144,7 @@ export default function AthleteGoalsPage() {
     } finally { setBusyId(null) }
   }
   async function handleAbandon(id: string) {
-    if (!confirm('Снять цель? Можно будет вернуть в активные позже.')) return
+    if (!(await confirm('Снять цель? Можно будет вернуть в активные позже.'))) return
     setBusyId(id)
     try {
       if (await abandonGoal(id)) await load()
@@ -155,7 +157,7 @@ export default function AthleteGoalsPage() {
     } finally { setBusyId(null) }
   }
   async function handleDelete(id: string) {
-    if (!confirm('Удалить цель навсегда? Это действие необратимо.')) return
+    if (!(await confirm('Удалить цель навсегда? Это действие необратимо.'))) return
     setBusyId(id)
     try {
       if (await deleteGoal(id)) await load()

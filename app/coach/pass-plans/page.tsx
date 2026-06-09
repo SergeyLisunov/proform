@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import {
   listMyPassPlans, createPassPlan, updatePassPlan, archivePassPlan,
   reactivatePassPlan, deletePassPlan,
@@ -70,6 +71,7 @@ function fmtPerSession(cents: number, sessions: number, currency = 'RUB'): strin
 
 export default function CoachPassPlansPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [plans, setPlans]       = useState<CoachPassPlan[]>([])
   const [loading, setLoading]   = useState(true)
   const [filter, setFilter]     = useState<FilterTab>('active')
@@ -164,7 +166,7 @@ export default function CoachPassPlansPage() {
   }
 
   async function handleArchive(id: string) {
-    if (!confirm('Скрыть абонемент из каталога?')) return
+    if (!(await confirm('Скрыть абонемент из каталога?'))) return
     setBusyId(id)
     try {
       const ok = await archivePassPlan(id)
@@ -181,7 +183,7 @@ export default function CoachPassPlansPage() {
     } finally { setBusyId(null) }
   }
   async function handleDelete(id: string) {
-    if (!confirm('Удалить абонемент навсегда? Это действие нельзя отменить.')) return
+    if (!(await confirm('Удалить абонемент навсегда? Это действие нельзя отменить.'))) return
     setBusyId(id)
     try {
       const ok = await deletePassPlan(id)

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { getMyOrg } from '@/services/org.service'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
 import type { Organization, WallPost, PostType, PostVisibility } from '@/types/org.types'
@@ -67,6 +68,7 @@ function formatDate(date: string, options: Intl.DateTimeFormatOptions = { day: '
 export default function OrgWallPage() {
   const { user, loading: userLoading } = useUser()
   const { warning } = useToast()
+  const { confirm } = useDialog()
   const [org, setOrg] = useState<Organization | null>(null)
   const [posts, setPosts] = useState<WallPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -128,7 +130,7 @@ export default function OrgWallPage() {
   }
 
   async function handleDelete(postId: string) {
-    if (!confirm('Удалить эту публикацию?')) return
+    if (!(await confirm('Удалить эту публикацию?'))) return
     await softDeletePost(postId)
     setPosts(prev => prev.filter(p => p.id !== postId))
   }

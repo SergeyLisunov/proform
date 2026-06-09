@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useToast } from '@/lib/hooks/useToast'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 type Author = { id: string; name: string | null; nickname: string | null; avatar_url: string | null }
 
@@ -35,6 +36,7 @@ function toLocalISO(d: Date) {
 
 export default function TemplatesPage() {
   const { success, error } = useToast()
+  const { confirm } = useDialog()
   const [templates, setTemplates] = useState<Template[]>([])
   const [meId, setMeId]           = useState<string | null>(null)
   const [loading, setLoading]     = useState(true)
@@ -135,7 +137,7 @@ export default function TemplatesPage() {
   }
 
   async function remove(t: Template) {
-    if (!confirm(`Удалить шаблон «${t.name}»?`)) return
+    if (!(await confirm(`Удалить шаблон «${t.name}»?`))) return
     try {
       const res = await fetch(`/api/workout-templates/${t.id}`, { method: 'DELETE' })
       const json = await res.json()

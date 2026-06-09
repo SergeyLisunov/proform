@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import Link from 'next/link'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -159,6 +160,7 @@ export function PricingModal({
   trigger?: string  // причина показа: 'workout_limit' | 'analytics' | 'messenger' | etc
   highlightPlan?: Plan
 }) {
+  const { alert } = useDialog()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -316,12 +318,12 @@ export function PricingModal({
                         })
                         const data = await res.json().catch(() => ({}))
                         if (!res.ok || !data.url) {
-                          alert(data.error || 'Не удалось открыть оплату. Попробуйте позже.')
+                          await alert(data.error || 'Не удалось открыть оплату. Попробуйте позже.')
                           return
                         }
                         window.location.href = data.url as string
                       } catch {
-                        alert('Сеть недоступна. Проверьте соединение и попробуйте снова.')
+                        await alert('Сеть недоступна. Проверьте соединение и попробуйте снова.')
                       }
                     }}
                     style={{
