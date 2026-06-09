@@ -141,15 +141,15 @@ export default function OfferingDetailPage() {
         <div className="flex items-center gap-2 flex-wrap mb-2">
           <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
             style={{ background: roleMeta.bg, color: roleMeta.color }}>
-            {roleMeta.emoji} {roleMeta.label}
+            {roleMeta.label}
           </span>
           {specMeta && (
             <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-violet-50 text-violet-700 border border-violet-200">
-              {specMeta.emoji} {specMeta.label}
+              {specMeta.label}
             </span>
           )}
           <Badge variant="secondary" size="sm">
-            {typeMeta.emoji} {typeMeta.label}
+            {typeMeta.label}
           </Badge>
         </div>
         <h1 className="text-3xl font-bold text-navy-500">{offering.title}</h1>

@@ -156,7 +156,7 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
                 <select value={questionType} onChange={e => setQuestionType(e.target.value as QuestionType)}
                   className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400">
                   {(Object.entries(QUESTION_TYPE_META) as Array<[QuestionType, typeof QUESTION_TYPE_META[QuestionType]]>).map(([k, v]) =>
-                    <option key={k} value={k}>{v.emoji} {v.label}</option>
+                    <option key={k} value={k}>{v.label}</option>
                   )}
                 </select>
               </div>

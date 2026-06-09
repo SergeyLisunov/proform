@@ -157,7 +157,7 @@ export default function CoachInquiriesPage() {
                   ? 'border-violet-300 bg-violet-50 text-violet-700'
                   : 'border-border bg-background hover:border-violet-200 text-muted-foreground'
               }`}>
-              {meta ? `${meta.emoji} ` : ''}{label} · {count}
+              {meta ? `` : ''}{label} · {count}
             </button>
           )
         })}
@@ -192,7 +192,7 @@ export default function CoachInquiriesPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                       style={{ background: qt.bg, color: qt.color, border: `1px solid ${qt.border}` }}>
-                      {qt.emoji} {qt.label}
+                      {qt.label}
                     </span>
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                       style={{ background: ur.bg, color: ur.color, border: `1px solid ${ur.border}` }}>
@@ -200,7 +200,7 @@ export default function CoachInquiriesPage() {
                     </span>
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                       style={{ background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
-                      {st.emoji} {st.label}
+                      {st.label}
                     </span>
                   </div>
                   <span className="text-[11px] text-muted-foreground">
@@ -265,7 +265,7 @@ export default function CoachInquiriesPage() {
                     <select value={questionType} onChange={e => setQuestionType(e.target.value as QuestionType)}
                       className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400">
                       {(Object.entries(QUESTION_TYPE_META) as Array<[QuestionType, typeof QUESTION_TYPE_META[QuestionType]]>).map(([k, v]) =>
-                        <option key={k} value={k}>{v.emoji} {v.label}</option>
+                        <option key={k} value={k}>{v.label}</option>
                       )}
                     </select>
                   </div>

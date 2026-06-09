@@ -232,7 +232,7 @@ export default function AthleteGoalsPage() {
                   ? 'border-orange-300 bg-orange-50 text-orange-700'
                   : 'border-border bg-background hover:border-orange-200 text-muted-foreground'
               }`}>
-              {meta ? `${meta.emoji} ` : ''}{label} · {count}
+              {meta ? `` : ''}{label} · {count}
             </button>
           )
         })}
@@ -277,7 +277,7 @@ export default function AthleteGoalsPage() {
                   </div>
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
                     style={{ background: status.bg, color: status.color, border: `1px solid ${status.border}` }}>
-                    {status.emoji} {status.label}
+                    {status.label}
                   </span>
                 </div>
 
