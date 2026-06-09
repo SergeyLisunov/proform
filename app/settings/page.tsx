@@ -7,6 +7,7 @@ import RoleProfile from '@/components/settings/RoleProfile'
 import ChildClaimSection from '@/components/settings/ChildClaimSection'
 import DevicesSection from '@/components/settings/DevicesSection'
 import { Alert } from '@/components/ui/metronic'
+import { CountryFlag } from '@/components/ui/CountryFlag'
 import { getErrorMessage } from '@/lib/utils/errors'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
@@ -91,50 +92,50 @@ const GENDERS = [
 
 const COUNTRIES = [
   { value: '', label: '— Выбрать —' },
-  { value: 'RU', label: '🇷🇺 Россия' },
-  { value: 'BY', label: '🇧🇾 Беларусь' },
-  { value: 'KZ', label: '🇰🇿 Казахстан' },
-  { value: 'UA', label: '🇺🇦 Украина' },
-  { value: 'US', label: '🇺🇸 США' },
-  { value: 'DE', label: '🇩🇪 Германия' },
-  { value: 'FR', label: '🇫🇷 Франция' },
-  { value: 'GB', label: '🇬🇧 Великобритания' },
-  { value: 'OTHER', label: '🌍 Другая' },
+  { value: 'RU', label: 'Россия' },
+  { value: 'BY', label: 'Беларусь' },
+  { value: 'KZ', label: 'Казахстан' },
+  { value: 'UA', label: 'Украина' },
+  { value: 'US', label: 'США' },
+  { value: 'DE', label: 'Германия' },
+  { value: 'FR', label: 'Франция' },
+  { value: 'GB', label: 'Великобритания' },
+  { value: 'OTHER', label: 'Другая' },
 ]
 
 const SPORTS = [
   { value: '', label: '— Выбрать —' },
   // Циклические
-  { value: 'Бег', label: '🏃 Бег' },
-  { value: 'Велоспорт', label: '🚴 Велоспорт' },
-  { value: 'Плавание', label: '🏊 Плавание' },
-  { value: 'Триатлон', label: '🏅 Триатлон' },
-  { value: 'Дуатлон', label: '🏅 Дуатлон' },
-  { value: 'Ходьба', label: '🚶 Ходьба / Скандинавская ходьба' },
-  { value: 'Лыжи', label: '⛷️ Лыжи (беговые)' },
-  { value: 'Горные лыжи', label: '🎿 Горные лыжи / Сноуборд' },
-  { value: 'Гребля', label: '🚣 Гребля / Каяк' },
+  { value: 'Бег', label: 'Бег' },
+  { value: 'Велоспорт', label: 'Велоспорт' },
+  { value: 'Плавание', label: 'Плавание' },
+  { value: 'Триатлон', label: 'Триатлон' },
+  { value: 'Дуатлон', label: 'Дуатлон' },
+  { value: 'Ходьба', label: 'Ходьба / Скандинавская ходьба' },
+  { value: 'Лыжи', label: 'Лыжи (беговые)' },
+  { value: 'Горные лыжи', label: 'Горные лыжи / Сноуборд' },
+  { value: 'Гребля', label: 'Гребля / Каяк' },
   // Силовые и единоборства
-  { value: 'Силовые', label: '🏋️ Силовые тренировки' },
-  { value: 'Кроссфит', label: '💪 Кроссфит' },
-  { value: 'Борьба', label: '🥋 Единоборства / Борьба' },
-  { value: 'Бокс', label: '🥊 Бокс / Кикбоксинг' },
+  { value: 'Силовые', label: 'Силовые тренировки' },
+  { value: 'Кроссфит', label: 'Кроссфит' },
+  { value: 'Борьба', label: 'Единоборства / Борьба' },
+  { value: 'Бокс', label: 'Бокс / Кикбоксинг' },
   // Командные
-  { value: 'Футбол', label: '⚽ Футбол' },
-  { value: 'Баскетбол', label: '🏀 Баскетбол' },
-  { value: 'Волейбол', label: '🏐 Волейбол' },
-  { value: 'Хоккей', label: '🏒 Хоккей' },
-  { value: 'Регби', label: '🏉 Регби' },
-  { value: 'Теннис', label: '🎾 Теннис' },
-  { value: 'Настольный теннис', label: '🏓 Настольный теннис' },
-  { value: 'Бадминтон', label: '🏸 Бадминтон' },
+  { value: 'Футбол', label: 'Футбол' },
+  { value: 'Баскетбол', label: 'Баскетбол' },
+  { value: 'Волейбол', label: 'Волейбол' },
+  { value: 'Хоккей', label: 'Хоккей' },
+  { value: 'Регби', label: 'Регби' },
+  { value: 'Теннис', label: 'Теннис' },
+  { value: 'Настольный теннис', label: 'Настольный теннис' },
+  { value: 'Бадминтон', label: 'Бадминтон' },
   // Прочее
-  { value: 'Гимнастика', label: '🤸 Гимнастика / Акробатика' },
-  { value: 'Йога', label: '🧘 Йога / Пилатес' },
-  { value: 'Фитнес', label: '🏃 Фитнес / Аэробика' },
-  { value: 'Скалолазание', label: '🧗 Скалолазание' },
-  { value: 'Верховая езда', label: '🐎 Верховая езда' },
-  { value: 'Другое', label: '✏️ Другое (ввести вручную)' },
+  { value: 'Гимнастика', label: 'Гимнастика / Акробатика' },
+  { value: 'Йога', label: 'Йога / Пилатес' },
+  { value: 'Фитнес', label: 'Фитнес / Аэробика' },
+  { value: 'Скалолазание', label: 'Скалолазание' },
+  { value: 'Верховая езда', label: 'Верховая езда' },
+  { value: 'Другое', label: 'Другое (ввести вручную)' },
 ]
 
 const FITNESS_LEVELS = [
@@ -360,10 +361,10 @@ function PasswordCard() {
                 </div>
                 <div style={{ fontSize:11, fontWeight:600, color:strengthColor }}>{strengthLabel}</div>
                 <div style={{ fontSize:10, color:'var(--muted-foreground)', marginTop:4, display:'flex', gap:10, flexWrap:'wrap' }}>
-                  <span style={{ color: newPw.length>=8 ? '#16A34A':'var(--muted-foreground)' }}>✓ 8+ символов</span>
-                  <span style={{ color: /[A-Z]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Заглавная буква</span>
-                  <span style={{ color: /[0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Цифра</span>
-                  <span style={{ color: /[^A-Za-z0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}>✓ Спецсимвол</span>
+                  <span style={{ color: newPw.length>=8 ? '#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />8+ символов</span>
+                  <span style={{ color: /[A-Z]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Заглавная буква</span>
+                  <span style={{ color: /[0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Цифра</span>
+                  <span style={{ color: /[^A-Za-z0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Спецсимвол</span>
                 </div>
               </div>
             )}
@@ -849,7 +850,12 @@ export default function SettingsPage() {
                 <Input value={form.city} onChange={set('city')} placeholder="Москва" />
               </Field>
               <Field label="Страна">
-                <Select value={form.country} onChange={set('country')} options={COUNTRIES} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <CountryFlag code={form.country} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Select value={form.country} onChange={set('country')} options={COUNTRIES} />
+                  </div>
+                </div>
               </Field>
             </div>
           </Card>
@@ -1146,7 +1152,7 @@ export default function SettingsPage() {
           {saving ? (
             <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</>
           ) : saved ? (
-            <><i className="ki-filled ki-check text-sm" />Сохранено ✓</>
+            <><i className="ki-filled ki-check text-sm" />Сохранено</>
           ) : (
             <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
           )}

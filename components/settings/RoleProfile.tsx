@@ -13,6 +13,7 @@ import {
   Toggle,
   Chips,
 } from './ProfileShell'
+import { CountryFlag } from '@/components/ui/CountryFlag'
 
 function getSB() {
   return createBrowserClient(
@@ -32,15 +33,15 @@ const GENDERS = [
 
 const COUNTRIES = [
   { value: '', label: '— Выбрать —' },
-  { value: 'RU', label: '🇷🇺 Россия' },
-  { value: 'BY', label: '🇧🇾 Беларусь' },
-  { value: 'KZ', label: '🇰🇿 Казахстан' },
-  { value: 'UA', label: '🇺🇦 Украина' },
-  { value: 'US', label: '🇺🇸 США' },
-  { value: 'DE', label: '🇩🇪 Германия' },
-  { value: 'FR', label: '🇫🇷 Франция' },
-  { value: 'GB', label: '🇬🇧 Великобритания' },
-  { value: 'OTHER', label: '🌍 Другая' },
+  { value: 'RU', label: 'Россия' },
+  { value: 'BY', label: 'Беларусь' },
+  { value: 'KZ', label: 'Казахстан' },
+  { value: 'UA', label: 'Украина' },
+  { value: 'US', label: 'США' },
+  { value: 'DE', label: 'Германия' },
+  { value: 'FR', label: 'Франция' },
+  { value: 'GB', label: 'Великобритания' },
+  { value: 'OTHER', label: 'Другая' },
 ]
 
 const COACH_SPECIALIZATIONS = [
@@ -83,16 +84,16 @@ const ACCESS_LEVELS = [
 
 const SPORT_TYPES = [
   { value: '', label: '— Выбрать —' },
-  { value: 'Бег', label: '🏃 Бег' },
-  { value: 'Велоспорт', label: '🚴 Велоспорт' },
-  { value: 'Плавание', label: '🏊 Плавание' },
-  { value: 'Триатлон', label: '🏅 Триатлон' },
-  { value: 'Силовые', label: '🏋️ Силовые' },
-  { value: 'Футбол', label: '⚽ Футбол' },
-  { value: 'Баскетбол', label: '🏀 Баскетбол' },
-  { value: 'Хоккей', label: '🏒 Хоккей' },
-  { value: 'Мультиспорт', label: '🎯 Мультиспорт' },
-  { value: 'Другое', label: '✏️ Другое' },
+  { value: 'Бег', label: 'Бег' },
+  { value: 'Велоспорт', label: 'Велоспорт' },
+  { value: 'Плавание', label: 'Плавание' },
+  { value: 'Триатлон', label: 'Триатлон' },
+  { value: 'Силовые', label: 'Силовые' },
+  { value: 'Футбол', label: 'Футбол' },
+  { value: 'Баскетбол', label: 'Баскетбол' },
+  { value: 'Хоккей', label: 'Хоккей' },
+  { value: 'Мультиспорт', label: 'Мультиспорт' },
+  { value: 'Другое', label: 'Другое' },
 ]
 
 const SESSION_FORMATS = [
@@ -126,13 +127,13 @@ const DOCTOR_SERVICES = [
 
 const ORG_TYPES = [
   { value: '',            label: '— Выбрать —' },
-  { value: 'club',        label: '🏅 Спортивный клуб' },
-  { value: 'federation',  label: '🏛 Федерация' },
-  { value: 'team',        label: '🚴 Команда' },
-  { value: 'school',      label: '🎓 Спортшкола' },
-  { value: 'gym',         label: '💪 Фитнес-центр' },
-  { value: 'academy',     label: '📘 Академия' },
-  { value: 'other',       label: '✏️ Другое' },
+  { value: 'club',        label: 'Спортивный клуб' },
+  { value: 'federation',  label: 'Федерация' },
+  { value: 'team',        label: 'Команда' },
+  { value: 'school',      label: 'Спортшкола' },
+  { value: 'gym',         label: 'Фитнес-центр' },
+  { value: 'academy',     label: 'Академия' },
+  { value: 'other',       label: 'Другое' },
 ]
 
 const ORG_SERVICES = [
@@ -781,7 +782,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
         <Field label="Пол"><Select value={form.gender} onChange={u('gender') as (v: string) => void} options={GENDERS} /></Field>
         <Field label="Телефон"><TextInput value={form.phone} onChange={u('phone') as (v: string) => void} placeholder="+7 900 000 00 00" /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>
-        <Field label="Страна"><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></Field>
+        <Field label="Страна"><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CountryFlag code={form.country} /><div style={{ flex: 1, minWidth: 0 }}><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></div></div></Field>
         <Field label="Коротко о себе" full><TextArea value={form.bio} onChange={u('bio') as (v: string) => void} placeholder="Кто вы, какой подход к тренировкам…" /></Field>
       </FormSection>
     )
@@ -884,7 +885,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
         <Field label="Пол"><Select value={form.gender} onChange={u('gender') as (v: string) => void} options={GENDERS} /></Field>
         <Field label="Телефон"><TextInput value={form.phone} onChange={u('phone') as (v: string) => void} /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>
-        <Field label="Страна"><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></Field>
+        <Field label="Страна"><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CountryFlag code={form.country} /><div style={{ flex: 1, minWidth: 0 }}><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></div></div></Field>
         <Field label="Коротко о себе" full><TextArea value={form.bio} onChange={u('bio') as (v: string) => void} /></Field>
       </FormSection>
     )
@@ -1037,7 +1038,7 @@ function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Di
         <Field label="Языки" hint="Через запятую"><TextInput value={form.languages_text} onChange={u('languages_text') as (v: string) => void} /></Field>
         <Field label="Адрес" full><TextInput value={form.address} onChange={u('address') as (v: string) => void} placeholder="ул. Спортивная, 1" /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>
-        <Field label="Страна"><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></Field>
+        <Field label="Страна"><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CountryFlag code={form.country} /><div style={{ flex: 1, minWidth: 0 }}><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></div></div></Field>
       </FormSection>
     )
   }
@@ -1075,7 +1076,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
         <Field label="Имя"><TextInput value={form.first_name} onChange={u('first_name') as (v: string) => void} /></Field>
         <Field label="Фамилия"><TextInput value={form.last_name} onChange={u('last_name') as (v: string) => void} /></Field>
         <Field label="Город"><TextInput value={form.city} onChange={u('city') as (v: string) => void} /></Field>
-        <Field label="Страна"><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></Field>
+        <Field label="Страна"><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CountryFlag code={form.country} /><div style={{ flex: 1, minWidth: 0 }}><Select value={form.country} onChange={u('country') as (v: string) => void} options={COUNTRIES} /></div></div></Field>
         <Field label="О себе" full><TextArea value={form.bio} onChange={u('bio') as (v: string) => void} /></Field>
       </FormSection>
     )
