@@ -828,20 +828,6 @@ export default function AthletesPage() {
     load()
   }, [user?.id, user?.role])
 
-  if (user?.role !== 'coach' && user?.role !== 'admin') {
-    return (
-      <Card className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 py-10 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-          <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-foreground">Доступ ограничен</p>
-          <p className="mt-1 text-2sm text-muted-foreground">Этот раздел доступен только тренерам.</p>
-        </div>
-      </Card>
-    )
-  }
-
   // W11 Day 53: URL-driven filter — closes the disabled «Фильтр» button from PR #63 audit
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -871,6 +857,26 @@ export default function AthletesPage() {
     if (filteredAthletes.length === 0) return
     if (selected >= filteredAthletes.length) setSelected(0)
   }, [filteredAthletes.length, selected])
+
+  // Access guard — placed AFTER all hooks so the hook order stays identical
+  // across renders. `user` starts undefined then resolves to coach/admin;
+  // when this guard sat ABOVE useSearchParams/useRouter/useMemo×2/useEffect
+  // the resolved render ran 5 extra hooks vs the first render → React #310
+  // "rendered more hooks than during the previous render" crash for every
+  // coach/admin opening «Мои атлеты».
+  if (user?.role !== 'coach' && user?.role !== 'admin') {
+    return (
+      <Card className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 py-10 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
+          <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">Доступ ограничен</p>
+          <p className="mt-1 text-2sm text-muted-foreground">Этот раздел доступен только тренерам.</p>
+        </div>
+      </Card>
+    )
+  }
 
   const setFilter = (key: 'risk' | 'sport', value: string) => {
     const params = new URLSearchParams(searchParams.toString())
