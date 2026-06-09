@@ -71,7 +71,7 @@ export default function CoachPlansPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Планы</p>
-          <h1 className="text-3xl font-bold text-navy-500">Workout Plans</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Планы тренировок</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Re-usable weekly plans. Создайте один раз → назначайте разным атлетам с разной даты старта.
           </p>

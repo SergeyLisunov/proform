@@ -228,7 +228,7 @@ export default function CoachPassPlansPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Абонементы</p>
-          <h1 className="text-3xl font-bold text-navy-500">Coach Pass Plans</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Абонементы</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Создавайте абонементы для marketplace: пакеты тренировок, безлимит на месяц, групповые блоки.
             Также см. одноразовые услуги в <Link href="/coach/services" className="text-orange-600 font-semibold hover:underline">/coach/services</Link>.

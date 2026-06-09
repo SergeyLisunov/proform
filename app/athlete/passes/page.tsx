@@ -112,7 +112,7 @@ export default function AthletePassesPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Атлет · Абонементы</p>
-            <h1 className="text-3xl font-bold text-navy-500">My Passes</h1>
+            <h1 className="text-3xl font-bold text-navy-500">Мои абонементы</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               {active.length === 0
                 ? 'У вас пока нет активных абонементов. Найдите тренера и купите пакет тренировок.'

@@ -144,7 +144,7 @@ export default function OrgHealthPage() {
       <section className="rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 md:p-7">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
-            <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Health Snapshot</p>
+            <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Снимок здоровья</p>
             <h1 className="text-3xl font-bold text-navy-500 truncate">{snapshot.org_name}</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               Краткий портрет состояния организации на сегодня. Используйте для еженедельных
@@ -350,7 +350,7 @@ export default function OrgHealthPage() {
 
       {/* Footer CTA */}
       <section className="rounded-2xl border border-dashed border-border bg-background/70 px-5 py-4 text-[12px] text-muted-foreground leading-relaxed print-hide">
-        <strong className="text-foreground">Health Snapshot</strong> — наглядный отчёт для еженедельных
+        <strong className="text-foreground">Снимок здоровья</strong> — наглядный отчёт для еженедельных
         обзоров и переговоров. Перешлите ссылку owner'у клуба или board'у — данные доступны только тем,
         кто залогинен в организацию (RLS). Кнопка «Скачать PDF» открывает диалог печати —
         сохраните файл и отправьте по email.

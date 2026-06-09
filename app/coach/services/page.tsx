@@ -222,7 +222,7 @@ export default function CoachServicesPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Тренер · Услуги</p>
-          <h1 className="text-3xl font-bold text-navy-500">Coach Services</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Услуги</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Создавайте offerings для marketplace: консультации, планы тренировок, оценки.
             Активные карточки появятся в каталоге <Link href="/marketplace" className="text-orange-600 font-semibold hover:underline">/marketplace</Link>.

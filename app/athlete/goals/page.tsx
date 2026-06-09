@@ -198,7 +198,7 @@ export default function AthleteGoalsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Атлет · Цели</p>
-          <h1 className="text-3xl font-bold text-navy-500">Goals</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Цели</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Ставьте измеримые цели — личный рекорд 5к, weekly volume, целевой вес. Отмечайте достижения и видите прогресс.
           </p>

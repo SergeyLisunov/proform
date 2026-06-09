@@ -111,7 +111,7 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
       >
         <div className="border-b border-border px-5 py-4 flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">Doctor inquiry</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">Запрос врачу</p>
             <h3 className="mt-0.5 text-lg font-semibold text-navy-500">Спросить врача</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Атлет: <strong className="text-foreground">{athleteName}</strong>

@@ -1100,7 +1100,7 @@ function AdminDash({ name }: { name: string }) {
     <div className="flex flex-col gap-6 pf-enter">
       <div>
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
-        <h2 className="pf-num text-[36px] text-navy-500 leading-none">System Overview</h2>
+        <h2 className="pf-num text-[36px] text-navy-500 leading-none">Обзор системы</h2>
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 pf-stagger">
@@ -1124,7 +1124,7 @@ function AdminDash({ name }: { name: string }) {
 
       <Card className="overflow-hidden">
         <div className="px-5 py-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-navy-500">System Health</h3>
+          <h3 className="text-sm font-semibold text-navy-500">Состояние системы</h3>
         </div>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[

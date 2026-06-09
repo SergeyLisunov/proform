@@ -186,7 +186,7 @@ function MarketplaceInner() {
       </div>
 
       <div className="mb-8">
-        <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-2">Marketplace</p>
+        <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-2">Маркетплейс</p>
         <h1 className="pf-num text-[clamp(2rem,5vw,3.5rem)] text-navy-500 leading-[0.95] tracking-tight mb-3">
           Услуги и абонементы
         </h1>
