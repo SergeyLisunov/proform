@@ -9,8 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['"Bebas Neue"', 'sans-serif'],
+        // Единое семейство Montserrat. `display` сохранён как алиас для
+        // обратной совместимости с существующими `font-display` утилитами,
+        // но указывает на тот же Montserrat (вес даёт иерархию, не гарнитура).
+        sans: ['var(--font-pf-sans)', 'Montserrat', 'system-ui', 'sans-serif'],
+        display: ['var(--font-pf-sans)', 'Montserrat', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Used widely for micro eyebrow/stat labels — was undefined (no-op) before.

@@ -318,7 +318,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
       { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
     ],
     grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontFamily: 'DM Sans', fontSize: '12px' },
+    legend: { position: 'top' as const, fontFamily: 'Montserrat', fontSize: '12px' },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
