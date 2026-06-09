@@ -16,7 +16,7 @@ export default function Error({
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-background p-6">
       <div className="w-20 h-20 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center">
-        <i className="ki-filled ki-information-5 text-3xl text-red-400" />
+        <i className="ki-filled ki-information-4 text-3xl text-red-400" />
       </div>
       <div className="text-center">
         <p className="text-2xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Ошибка</p>

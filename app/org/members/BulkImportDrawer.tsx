@@ -303,14 +303,14 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               {/* Error */}
               {err && (
                 <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <i className="ki-filled ki-information-5 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
+                  <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
                   {err}
                 </div>
               )}
 
               {/* Info */}
               <div style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--accent)', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <i className="ki-filled ki-information-5 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
+                <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
                 <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.55 }}>
                   Каждый получит письмо со ссылкой-приглашением. Если у пользователя ещё нет аккаунта — он зарегистрируется по той же ссылке, и связь установится автоматически.
                 </p>
@@ -341,7 +341,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               }}>
                 {busy
                   ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправляю…</>
-                  : <><i className="ki-filled ki-send text-sm" />Отправить {preview ? `(${preview.valid})` : ''}</>}
+                  : <><i className="ki-filled ki-paper-plane text-sm" />Отправить {preview ? `(${preview.valid})` : ''}</>}
               </button>
               <button onClick={handleClose} style={{ padding: '12px 18px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                 Отмена
@@ -363,7 +363,7 @@ function ResultPanel({ result }: { result: ApiResponse }) {
     { label: 'Приглашено',    value: s.invited,        color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', icon: 'ki-check-circle' },
     { label: 'Уже в команде', value: s.skipped_member, color: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A', icon: 'ki-people' },
     { label: 'Невалидных',    value: s.invalid_email,  color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', icon: 'ki-cross-circle' },
-    { label: 'Ошибок',        value: s.failed,         color: '#9333EA', bg: '#FAF5FF', border: '#E9D5FF', icon: 'ki-information-5' },
+    { label: 'Ошибок',        value: s.failed,         color: '#9333EA', bg: '#FAF5FF', border: '#E9D5FF', icon: 'ki-information-4' },
   ]
 
   return (

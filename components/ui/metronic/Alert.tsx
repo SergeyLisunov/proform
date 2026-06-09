@@ -14,7 +14,7 @@ interface AlertProps {
 const VARIANT: Record<AlertVariant, { wrap: string; icon: string; defaultIcon: string }> = {
   primary:     { wrap: 'bg-[#FEF0E7] border-[#FBC1A0] text-[#8A300A]', icon: 'text-[#F35703]', defaultIcon: 'ki-information-2' },
   success:     { wrap: 'bg-green-50 border-green-200 text-green-800', icon: 'text-green-600', defaultIcon: 'ki-check-circle' },
-  warning:     { wrap: 'bg-amber-50 border-amber-200 text-amber-800', icon: 'text-amber-600', defaultIcon: 'ki-information-5' },
+  warning:     { wrap: 'bg-amber-50 border-amber-200 text-amber-800', icon: 'text-amber-600', defaultIcon: 'ki-information-4' },
   destructive: { wrap: 'bg-red-50 border-red-200 text-red-800', icon: 'text-red-600', defaultIcon: 'ki-cross-circle' },
   info:        { wrap: 'bg-blue-50 border-blue-200 text-blue-800', icon: 'text-blue-600', defaultIcon: 'ki-information-4' },
 }

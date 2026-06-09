@@ -370,7 +370,7 @@ export default function PlanEditor({ mode, initial }: Props) {
         {mode === 'edit' && (
           <button onClick={openAssignDrawer} type="button"
             className="rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-4 py-2.5 text-sm font-bold">
-            <i className="ki-filled ki-send text-sm mr-1.5" />
+            <i className="ki-filled ki-paper-plane text-sm mr-1.5" />
             Назначить атлету
           </button>
         )}

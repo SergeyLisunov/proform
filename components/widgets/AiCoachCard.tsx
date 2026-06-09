@@ -55,7 +55,7 @@ export default function AiCoachCard() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
-              <i className="ki-filled ki-flash text-[14px] text-amber-300" />
+              <i className="ki-filled ki-flash-circle text-[14px] text-amber-300" />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">AI-тренер</span>
           </div>

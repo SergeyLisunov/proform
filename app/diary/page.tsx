@@ -1343,7 +1343,7 @@ function AthleteDiary() {
                 Список
               </button>
               <button onClick={() => setView('grid')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='grid'?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground'}`}>
-                <i className="ki-filled ki-element-grid mr-1.5 text-sm" />
+                <i className="ki-filled ki-element-11 mr-1.5 text-sm" />
                 Сетка
               </button>
             </div>

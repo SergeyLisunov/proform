@@ -139,7 +139,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
-        <i className="ki-filled ki-chat text-2xl text-slate-300" />
+        <i className="ki-filled ki-message-text-2 text-2xl text-slate-300" />
         <p className="text-sm font-medium text-slate-600 mt-2">Нет тренировок атлетов</p>
         <p className="text-xs text-slate-400 mt-1">Пригласите атлетов в сеть — здесь появятся их последние тренировки для обратной связи.</p>
         <Link href="/network" className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-orange-600 hover:underline">
@@ -209,7 +209,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
                   onClick={() => setOpenFor({ id: r.id, title: r.name ?? r.activity_type ?? 'Тренировка' })}
                   className="inline-flex items-center gap-1 rounded-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 text-[11px] font-semibold transition-colors"
                 >
-                  <i className="ki-filled ki-chat" style={{ fontSize: 10 }} />
+                  <i className="ki-filled ki-message-text-2" style={{ fontSize: 10 }} />
                   {r.i_commented ? 'Открыть' : 'Ответить'}
                 </button>
               </div>

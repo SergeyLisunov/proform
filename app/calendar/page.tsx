@@ -541,7 +541,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
             {error && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>
-                <i className="ki-filled ki-information-5" style={{ flexShrink: 0 }} />{error}
+                <i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}
               </div>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
@@ -767,7 +767,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
           )}
         </div>
         <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
-          {error && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}><i className="ki-filled ki-information-5" style={{ flexShrink: 0 }} />{error}</div>}
+          {error && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}><i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}</div>}
           <div style={{ display: 'flex', gap: 8 }}>
             {step === 'info' ? (
               <button onClick={() => { if (!label.trim()) { setError('Введите название'); return } setError(''); setStep('days') }}
@@ -1505,7 +1505,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
           )}
           {(drawerMode==='create'||drawerMode==='edit')&&(
             <>
-              {error&&<div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,marginBottom:16,background:'#FEF2F2',border:'1px solid #FECACA',fontSize:13,color:'#DC2626'}}><i className="ki-filled ki-information-5" style={{color:'#EF4444',flexShrink:0}}/>{error}</div>}
+              {error&&<div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,marginBottom:16,background:'#FEF2F2',border:'1px solid #FECACA',fontSize:13,color:'#DC2626'}}><i className="ki-filled ki-information-4" style={{color:'#EF4444',flexShrink:0}}/>{error}</div>}
               <form onSubmit={drawerMode==='edit'?handleUpdate:handleCreate} style={{display:'flex',flexDirection:'column',gap:18}}>
                 <div><label style={labelStyle}>Тип события</label>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
@@ -2089,7 +2089,7 @@ export default function CalendarPage() {
                       onClick={() => { setIssuePassForAthlete(null); setShowIssuePass(true) }}
                       className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
                     >
-                      <i className="ki-filled ki-ticket text-xs" />
+                      <i className="ki-filled ki-price-tag text-xs" />
                       Абонемент
                     </button>
                   </>

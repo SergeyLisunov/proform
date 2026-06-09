@@ -120,7 +120,7 @@ export const DIARY_TEMPLATES: DiaryTemplate[] = [
   {
     id: 'injury-watch',
     name: 'Наблюдение за травмой',
-    icon: 'ki-health',
+    icon: 'ki-pulse',
     description: 'Отслеживание восстановления после травмы',
     entry_type: 'observation',
     title: 'Наблюдение за травмой',

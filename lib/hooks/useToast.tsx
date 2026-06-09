@@ -23,7 +23,7 @@ const ToastContext = createContext<ToastContextValue>({
 
 const ICONS: Record<ToastType, string> = {
   success: 'ki-check-circle',
-  error:   'ki-information-5',
+  error:   'ki-information-4',
   warning: 'ki-information',
   info:    'ki-information-2',
 }

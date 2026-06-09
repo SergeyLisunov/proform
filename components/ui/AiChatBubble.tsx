@@ -102,7 +102,7 @@ export default function AiChatBubble() {
           >
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
-                <i className="ki-filled ki-flash text-[14px] text-amber-300" />
+                <i className="ki-filled ki-flash-circle text-[14px] text-amber-300" />
               </div>
               <div>
                 <div className="text-sm font-bold text-white leading-none">AI-ассистент</div>
@@ -200,7 +200,7 @@ export default function AiChatBubble() {
                 disabled={!input.trim() || loading}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white transition hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <i className="ki-filled ki-send text-[13px]" />
+                <i className="ki-filled ki-paper-plane text-[13px]" />
               </button>
             </div>
             <div className="mt-1 text-center text-[9px] text-muted-foreground">

@@ -285,7 +285,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
         </div>
       </div>
 
-      <Alert variant="info" icon="ki-information-5">
+      <Alert variant="info" icon="ki-information-4">
         Для точного поиска (специализация, формат, цена) откройте <Link href={`/directory?type=${type}`} className="font-bold underline" style={{ color: accent }}>полный каталог</Link>.
       </Alert>
 
@@ -390,10 +390,10 @@ function ContactsPanel() {
         <PillButton active={tab === 'active'} onClick={() => setTab('active')} icon="ki-check-circle" accent="#16A34A">
           Активные {counts.active > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.active}</span>}
         </PillButton>
-        <PillButton active={tab === 'incoming'} onClick={() => setTab('incoming')} icon="ki-inbox-in" accent="#F35703">
+        <PillButton active={tab === 'incoming'} onClick={() => setTab('incoming')} icon="ki-entrance-right" accent="#F35703">
           Входящие {counts.incoming > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.incoming}</span>}
         </PillButton>
-        <PillButton active={tab === 'outgoing'} onClick={() => setTab('outgoing')} icon="ki-inbox-out" accent="#7C3AED">
+        <PillButton active={tab === 'outgoing'} onClick={() => setTab('outgoing')} icon="ki-exit-right" accent="#7C3AED">
           Исходящие {counts.outgoing > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.outgoing}</span>}
         </PillButton>
         <Link href="/connections" className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-white px-3.5 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground">

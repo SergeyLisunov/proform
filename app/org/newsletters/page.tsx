@@ -20,7 +20,7 @@ const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon
   sent: {
     label: 'Отправлена',
     badge: 'bg-green-50 text-green-600 border border-green-200',
-    icon: 'ki-send',
+    icon: 'ki-paper-plane',
     accent: '#16A34A',
     bg: '#F0FDF4',
   },
@@ -138,7 +138,7 @@ export default function OrgNewslettersPage() {
     { label: 'Всего рассылок', value: newsletters.length, hint: 'Общий архив коммуникаций', icon: 'ki-sms', color: '#2563EB', bg: '#EFF6FF' },
     { label: 'Черновики', value: drafts.length, hint: 'Готовятся к публикации', icon: 'ki-note-2', color: '#64748B', bg: '#F8FAFC' },
     { label: 'Запланированные', value: scheduled.length, hint: 'Уже стоят в очереди', icon: 'ki-calendar-8', color: '#F35703', bg: '#FEF0E7' },
-    { label: 'Отправленные', value: sent.length, hint: 'Ушли в коммуникацию', icon: 'ki-send', color: '#16A34A', bg: '#F0FDF4' },
+    { label: 'Отправленные', value: sent.length, hint: 'Ушли в коммуникацию', icon: 'ki-paper-plane', color: '#16A34A', bg: '#F0FDF4' },
   ]
 
   if (userLoading || loading) {
@@ -310,7 +310,7 @@ export default function OrgNewslettersPage() {
                           disabled={sending === nl.id}
                           className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 disabled:opacity-50"
                         >
-                          <i className={`ki-filled ${sending === nl.id ? 'ki-arrows-circle' : 'ki-send'} text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
+                          <i className={`ki-filled ${sending === nl.id ? 'ki-arrows-circle' : 'ki-paper-plane'} text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
                           {sending === nl.id ? 'Отправка…' : 'Отправить'}
                         </button>
                       )}

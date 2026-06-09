@@ -260,7 +260,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
                       )}
                       {f.error && (
                         <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center">
-                          <i className="ki-filled ki-warning text-white text-xs" />
+                          <i className="ki-filled ki-information-4 text-white text-xs" />
                         </div>
                       )}
                     </div>

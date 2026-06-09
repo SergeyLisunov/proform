@@ -659,7 +659,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
         <div style={{ padding:'16px 24px',borderTop:'1px solid var(--border)',flexShrink:0,display:'flex',flexDirection:'column',gap:10 }}>
           {workouts.length === 0 && !loading && (
             <div style={{ display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,background:'#FEF9C3',border:'1px solid #FDE047',fontSize:12,color:'#854D0E' }}>
-              <i className="ki-filled ki-information-5 shrink-0" />
+              <i className="ki-filled ki-information-4 shrink-0" />
               Нет тренировок за выбранный период. Выберите другой диапазон.
             </div>
           )}

@@ -441,7 +441,7 @@ export function WorkoutLimitBadge() {
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'all 0.15s',
       }} className="hover:opacity-80">
-        <i className="ki-filled ki-warning text-sm" />
+        <i className="ki-filled ki-information-4 text-sm" />
         {isEmpty
           ? 'Лимит тренировок исчерпан — перейдите на Pro'
           : `Осталось тренировок: ${workoutsLeft} — перейдите на Pro`

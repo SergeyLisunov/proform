@@ -158,7 +158,7 @@ export default function OrgDashboard() {
                   </span>
                 )}
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 999, fontSize: 10, fontWeight: 700, background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
-                  <i className="ki-filled ki-link text-xs" />
+                  <i className="ki-filled ki-fasten text-xs" />
                   /{org.org_slug}
                 </span>
               </div>

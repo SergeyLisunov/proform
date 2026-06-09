@@ -36,10 +36,10 @@ type FormState = {
 
 const CATEGORIES: { value: Category; label: string; icon: string; color: string }[] = [
   { value: 'run',      label: 'Бег',         icon: 'ki-route',       color: '#16A34A' },
-  { value: 'bike',     label: 'Вело',        icon: 'ki-scooter',     color: '#0EA5E9' },
+  { value: 'bike',     label: 'Вело',        icon: 'ki-abstract-26',     color: '#0EA5E9' },
   { value: 'swim',     label: 'Плавание',    icon: 'ki-drop',        color: '#06B6D4' },
-  { value: 'strength', label: 'Сила',        icon: 'ki-barbell',     color: '#DC2626' },
-  { value: 'other',    label: 'Другое',      icon: 'ki-flash',       color: '#7C3AED' },
+  { value: 'strength', label: 'Сила',        icon: 'ki-abstract-26',     color: '#DC2626' },
+  { value: 'other',    label: 'Другое',      icon: 'ki-flash-circle',       color: '#7C3AED' },
 ]
 
 const METRICS: { value: Metric; label: string; defaultUnit: string; lowerBetter: boolean }[] = [

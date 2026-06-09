@@ -291,7 +291,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               )}
               {profile.city && (
                 <span style={{ fontSize: 12, color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <i className="ki-filled ki-map-marker text-[11px]" />{profile.city}{profile.country ? `, ${profile.country}` : ''}
+                  <i className="ki-filled ki-geolocation text-[11px]" />{profile.city}{profile.country ? `, ${profile.country}` : ''}
                 </span>
               )}
               {profile.club && (
@@ -336,7 +336,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                   boxShadow: '0 3px 12px rgba(243,87,3,0.3)',
                 }}>
                   {acting ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправка…</>
-                    : <><i className="ki-filled ki-user-plus text-sm" />Пригласить</>}
+                    : <><i className="ki-filled ki-users text-sm" />Пригласить</>}
                 </button>
               )}
             </div>
@@ -405,11 +405,11 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         <Card className="p-5">
           <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Контакты</p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {profile.telegram_url && <SocialLink href={profile.telegram_url} icon="ki-send" label="Telegram" color="#0284C7" />}
+            {profile.telegram_url && <SocialLink href={profile.telegram_url} icon="ki-paper-plane" label="Telegram" color="#0284C7" />}
             {profile.whatsapp_url && <SocialLink href={profile.whatsapp_url} icon="ki-whatsapp" label="WhatsApp" color="#16A34A" />}
             {profile.instagram_url && <SocialLink href={profile.instagram_url} icon="ki-instagram" label="Instagram" color="#E11D48" />}
             {profile.youtube_url && <SocialLink href={profile.youtube_url} icon="ki-youtube" label="YouTube" color="#DC2626" />}
-            {profile.website_url && <SocialLink href={profile.website_url} icon="ki-earth" label="Сайт" color="#0D9488" />}
+            {profile.website_url && <SocialLink href={profile.website_url} icon="ki-geolocation" label="Сайт" color="#0D9488" />}
           </div>
         </Card>
       )}
@@ -441,7 +441,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
           boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
         }}>
-          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-5'} text-sm`} />
+          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-4'} text-sm`} />
           {toast.msg}
         </div>
       )}

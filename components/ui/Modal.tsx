@@ -21,7 +21,7 @@ const TONE_CFG: Record<ModalTone, { icon: string; color: string; bg: string }> =
   default: { icon: 'ki-information-2', color: '#F35703', bg: '#FEF0E7' },
   info:    { icon: 'ki-information-2', color: '#0EA5E9', bg: '#F0F9FF' },
   danger:  { icon: 'ki-trash',         color: '#DC2626', bg: '#FEF2F2' },
-  warning: { icon: 'ki-information-5',  color: '#B45309', bg: '#FFFBEB' },
+  warning: { icon: 'ki-information-4',  color: '#B45309', bg: '#FFFBEB' },
   success: { icon: 'ki-check-circle',   color: '#16A34A', bg: '#F0FDF4' },
 }
 

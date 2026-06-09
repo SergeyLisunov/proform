@@ -141,12 +141,12 @@ function buildBadges(s: Stats | null): Badge[] {
     mk('streak7',   'Неделя подряд',   'ki-flash-circle',  '#F59E0B', s.currentStreak, 7,   'дней'),
     mk('streak14',  'Две недели',      'ki-crown-2',       '#EF4444', s.currentStreak, 14,  'дней'),
     mk('streak30',  'Месяц без пропусков','ki-crown',      '#DC2626', s.currentStreak, 30,  'дней'),
-    mk('streakLongest100', 'Легенда · 100 дней', 'ki-medal', '#7C3AED', s.longestStreak, 100, 'дней'),
+    mk('streakLongest100', 'Легенда · 100 дней', 'ki-medal-star', '#7C3AED', s.longestStreak, 100, 'дней'),
     // Volume
-    mk('sessions10',  '10 тренировок',  'ki-barbell',       '#16A34A', s.total, 10,  'сессий'),
-    mk('sessions50',  '50 тренировок',  'ki-barbell',       '#059669', s.total, 50,  'сессий'),
-    mk('sessions100', '100 сессий',     'ki-barbell',       '#047857', s.total, 100, 'сессий'),
-    mk('sessions500', '500 сессий',     'ki-medal',         '#065F46', s.total, 500, 'сессий'),
+    mk('sessions10',  '10 тренировок',  'ki-abstract-26',       '#16A34A', s.total, 10,  'сессий'),
+    mk('sessions50',  '50 тренировок',  'ki-abstract-26',       '#059669', s.total, 50,  'сессий'),
+    mk('sessions100', '100 сессий',     'ki-abstract-26',       '#047857', s.total, 100, 'сессий'),
+    mk('sessions500', '500 сессий',     'ki-medal-star',         '#065F46', s.total, 500, 'сессий'),
     // Time
     mk('hours10', '10 часов тренировок',  'ki-time', '#0EA5E9', Math.floor(s.totalMinutes / 60), 10,  'часов'),
     mk('hours50', '50 часов тренировок',  'ki-time', '#0284C7', Math.floor(s.totalMinutes / 60), 50,  'часов'),
@@ -230,9 +230,9 @@ export default function StreaksPage() {
       {/* KPIs */}
       {stats && (
         <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <KPI label="Текущая серия" value={stats.currentStreak} suffix="дн." icon="ki-flash" color="#F35703" />
+          <KPI label="Текущая серия" value={stats.currentStreak} suffix="дн." icon="ki-flash-circle" color="#F35703" />
           <KPI label="Рекорд серии" value={stats.longestStreak} suffix="дн." icon="ki-crown" color="#EF4444" />
-          <KPI label="Всего тренировок" value={stats.total} icon="ki-barbell" color="#16A34A" />
+          <KPI label="Всего тренировок" value={stats.total} icon="ki-abstract-26" color="#16A34A" />
           <KPI label="Всего часов" value={Math.round(stats.totalMinutes / 60)} icon="ki-time" color="#0EA5E9" />
           <KPI label="Дней активно" value={stats.daysActive} icon="ki-calendar" color="#7C3AED" />
           <KPI label="Видов активности" value={stats.uniqueTypes} icon="ki-dots-circle-vertical" color="#8B5CF6" />

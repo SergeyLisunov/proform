@@ -193,7 +193,7 @@ function AvatarCropModal({ file, onClose, onCropped }: {
         </div>
         {/* Hint */}
         <div style={{ padding:'10px 22px',display:'flex',alignItems:'center',gap:8 }}>
-          <i className="ki-filled ki-information-5 text-xs" style={{ color:'#94A3B8',flexShrink:0 }} />
+          <i className="ki-filled ki-information-4 text-xs" style={{ color:'#94A3B8',flexShrink:0 }} />
           <p style={{ fontSize:11,color:'var(--muted-foreground)',margin:0 }}>Перетаскивайте фото и масштабируйте слайдером. Оранжевый круг — область аватарки.</p>
         </div>
         {/* Footer */}
@@ -487,7 +487,7 @@ export default function AthleteProfileCard() {
                   {uploadingAvatar
                     ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     : <>
-                        <i className="ki-filled ki-camera text-white text-sm" />
+                        <i className="ki-filled ki-picture text-white text-sm" />
                         <span style={{ fontSize:9, color:'white', fontWeight:700 }}>Изменить</span>
                       </>
                   }

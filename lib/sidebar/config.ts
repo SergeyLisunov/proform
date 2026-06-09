@@ -218,7 +218,7 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // (lib/ai/plan-gate.ts → 402); UI hint скрывает пункт у free-tier
       // чтобы не давать ложного affordance. На /pricing они дойдут через
       // отдельный CTA в /dashboard, не через sidebar.
-      { id: 'smart_tools.ai', href: '/ai', icon: 'ki-sparkle', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'doctor'], requiredPlan: 'pro' },
+      { id: 'smart_tools.ai', href: '/ai', icon: 'ki-message-programming', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'doctor'], requiredPlan: 'pro' },
     ],
   },
   {
@@ -239,7 +239,7 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       { id: 'management.admin_leads',    href: '/admin/leads',            icon: 'ki-magnifier',  label: 'Лиды',             roles: ['admin'] },
       { id: 'management.admin_commerce', href: '/admin/commerce',         icon: 'ki-dollar',     label: 'Коммерция',        roles: ['admin'] },
       { id: 'management.admin_funnel',   href: '/admin/onboarding-funnel',icon: 'ki-filter',     label: 'Воронка онбординга', roles: ['admin'] },
-      { id: 'management.admin_ab',       href: '/admin/landing-ab',       icon: 'ki-flash',      label: 'A/B лендингов',    roles: ['admin'] },
+      { id: 'management.admin_ab',       href: '/admin/landing-ab',       icon: 'ki-flash-circle',      label: 'A/B лендингов',    roles: ['admin'] },
       { id: 'management.admin_ab_tests', href: '/admin/ab-tests',         icon: 'ki-abstract-32',label: 'A/B тесты',        roles: ['admin'] },
     ],
   },

@@ -132,7 +132,7 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
     {
       label: 'Рекомендации',   value: k.activeRecs,
       hint: k.unackByCoach > 0 ? `${k.unackByCoach} не ack тренером` : 'Все учтены',
-      icon: 'ki-clipboard-check', color: '#7C3AED', bg: '#FAF5FF',
+      icon: 'ki-clipboard', color: '#7C3AED', bg: '#FAF5FF',
     },
     {
       label: 'Атлеты в риске', value: k.athletesAtRisk,

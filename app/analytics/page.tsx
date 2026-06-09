@@ -233,7 +233,7 @@ function CoachAnalytics() {
                   title={`${riskCount} атлета с повышенным вниманием`}
                   description="Их лучше держать в коротком цикле контроля и не перегружать."
                   accent="bg-orange-50 text-orange-600"
-                  icon="ki-warning-2"
+                  icon="ki-information-4"
                 />
                 <InsightCard
                   label="Объем"
@@ -278,7 +278,7 @@ function CoachAnalytics() {
           <MetricCard
             label="В зоне риска"
             value={riskCount}
-            icon="ki-warning-2"
+            icon="ki-information-4"
             tone="bg-orange-50 text-orange-600"
             hint="Требует короткого цикла контроля"
           />
@@ -609,7 +609,7 @@ function AthleteAnalytics() {
                 title="День лучше держать предсказуемым"
                 description="Небольшие сессии сейчас выигрывают у длинных и тяжёлых."
                 accent="bg-blue-50 text-blue-600"
-                icon="ki-clock"
+                icon="ki-time"
               />
             </div>
           </Surface>
@@ -654,7 +654,7 @@ function AthleteAnalytics() {
                   title="Не разгонять объём в первой половине дня"
                   description="Если добавить интенсивность, восстановление может уйти в минус."
                   accent="bg-orange-50 text-orange-600"
-                  icon="ki-warning-2"
+                  icon="ki-information-4"
                 />
                 <InsightCard
                   label="Фон"
