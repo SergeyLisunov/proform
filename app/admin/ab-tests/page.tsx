@@ -157,7 +157,7 @@ export default async function AbTestsPage() {
               </span>
             </div>
             <h1 className="pf-num text-[clamp(2rem,3.5vw,3.2rem)] leading-[0.95] tracking-tight text-navy-500">
-              Drip template A/B test
+              A/B-тест шаблонов рассылки
             </h1>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
               Variant A — declarative subjects (existing). Variant B — question-form subjects. Body identical;
@@ -181,8 +181,8 @@ export default async function AbTestsPage() {
       {/* Per-source A vs B table */}
       <Card className="p-6">
         <div className="mb-4">
-          <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Per-source</div>
-          <h2 className="mt-1 text-lg font-semibold text-navy-500">Conversion: variant A vs B</h2>
+          <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">По источникам</div>
+          <h2 className="mt-1 text-lg font-semibold text-navy-500">Конверсия: вариант A vs B</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Lift = (B.cvr − A.cvr) / A.cvr. Sample size {'<'}30 на вариант — результат пока статистически слабый.
           </p>
@@ -192,13 +192,13 @@ export default async function AbTestsPage() {
             <thead>
               <tr className="text-left text-2xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="py-2 pr-3">Источник</th>
-                <th className="py-2 pr-3">A · leads</th>
-                <th className="py-2 pr-3">A · cvr</th>
-                <th className="py-2 pr-3">B · leads</th>
-                <th className="py-2 pr-3">B · cvr</th>
-                <th className="py-2 pr-3">Lift</th>
-                <th className="py-2 pr-3">Sample</th>
-                <th className="py-2 pr-3">Verdict</th>
+                <th className="py-2 pr-3">A · лиды</th>
+                <th className="py-2 pr-3">A · конв.</th>
+                <th className="py-2 pr-3">B · лиды</th>
+                <th className="py-2 pr-3">B · конв.</th>
+                <th className="py-2 pr-3">Прирост</th>
+                <th className="py-2 pr-3">Выборка</th>
+                <th className="py-2 pr-3">Вердикт</th>
               </tr>
             </thead>
             <tbody>
@@ -228,15 +228,15 @@ export default async function AbTestsPage() {
                         const v = verdictMap.get(s.source)
                         if (!v) return <span className="text-muted-foreground">—</span>
                         if (v.label === 'too_small') {
-                          return <span className="rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5">Need 100+</span>
+                          return <span className="rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5">Нужно 100+</span>
                         }
                         if (v.label === 'a_wins') {
-                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A wins <i className="ki-filled ki-check text-xs" /></span>
+                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A лучше <i className="ki-filled ki-check text-xs" /></span>
                         }
                         if (v.label === 'b_wins') {
-                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B wins <i className="ki-filled ki-check text-xs" /></span>
+                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B лучше <i className="ki-filled ki-check text-xs" /></span>
                         }
-                        return <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, not significant`}>Inconclusive</span>
+                        return <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, not significant`}>Неоднозначно</span>
                       })()}
                     </td>
                   </tr>
@@ -250,7 +250,7 @@ export default async function AbTestsPage() {
       {/* W13 Day 66: Touch funnel — drip cadence (W7 Day 35) breakdown per variant */}
       <Card className="p-6">
         <div className="mb-4">
-          <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">3-touch drip funnel</div>
+          <div className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Воронка 3 касаний</div>
           <h2 className="mt-1 text-lg font-semibold text-navy-500">Где конвертируются — после какого touch</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Funnel показывает сколько leads застряли на каждом touch level. Touch 0 = ещё не отправляли (fresh); 1/2/3 = после первого/второго/третьего email. Big drop с touch 1 → touch 2 значит cadence работает (или leads разрешились).
@@ -261,12 +261,12 @@ export default async function AbTestsPage() {
             <thead>
               <tr className="text-left text-2xs font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
                 <th className="py-2 pr-3">Источник</th>
-                <th className="py-2 pr-3">Variant</th>
-                <th className="py-2 pr-3">T0 fresh</th>
+                <th className="py-2 pr-3">Вариант</th>
+                <th className="py-2 pr-3">T0 старт</th>
                 <th className="py-2 pr-3">T1</th>
                 <th className="py-2 pr-3">T2</th>
-                <th className="py-2 pr-3">T3 final</th>
-                <th className="py-2 pr-3">Reached T3</th>
+                <th className="py-2 pr-3">T3 финал</th>
+                <th className="py-2 pr-3">Дошли до T3</th>
               </tr>
             </thead>
             <tbody>

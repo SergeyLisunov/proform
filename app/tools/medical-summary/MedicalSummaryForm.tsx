@@ -286,7 +286,7 @@ export default function MedicalSummaryForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
-              <h2 className="text-lg font-bold">Athlete case</h2>
+              <h2 className="text-lg font-bold">Случай атлета</h2>
               <p className="text-xs text-slate-500 mt-0.5">Все поля приватны — не сохраняются без email confirmation</p>
             </div>
             <div className="flex gap-1.5">

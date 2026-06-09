@@ -137,7 +137,7 @@ export default function DoctorInquiriesPage() {
     <div className="pf-enter max-w-5xl mx-auto px-4 py-8 flex flex-col gap-5">
       <div>
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Врач · Запросы</p>
-        <h1 className="text-3xl font-bold text-navy-500">Doctor Inquiries</h1>
+        <h1 className="text-3xl font-bold text-navy-500">Запросы на заключение</h1>
         <p className="mt-1 text-sm text-muted-foreground max-w-xl">
           Запросы от тренеров на медицинское заключение. Ответ структурирован и сохраняется в системе —
           coach + athlete видят результат.

@@ -86,7 +86,7 @@ export default function AthleteProgressPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Атлет · Прогресс</p>
-          <h1 className="text-3xl font-bold text-navy-500">Progress</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Прогресс</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             8 недель тренировок: weekly volume, completion rate, recovery trend. Цели обновляются в реальном времени.
           </p>
@@ -188,7 +188,7 @@ export default function AthleteProgressPage() {
       {/* Recovery trend */}
       {hasData && s.weeks.some(w => w.avg_recovery !== null) && (
         <Card className="p-5">
-          <h2 className="text-lg font-bold text-navy-500 mb-2">Recovery trend</h2>
+          <h2 className="text-lg font-bold text-navy-500 mb-2">Тренд восстановления</h2>
           <p className="text-xs text-muted-foreground mb-3">Средний recovery score (если есть данные от wearable / ручного ввода)</p>
           <div className="grid grid-cols-4 lg:grid-cols-8 gap-2">
             {s.weeks.map((w, i) => {

@@ -353,7 +353,7 @@ export default async function OnboardingFunnelPage({
       <Card className="p-5 md:p-6">
         <div className="flex items-end justify-between gap-3 flex-wrap mb-4">
           <div>
-            <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Drill-down</p>
+            <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Детализация</p>
             <h2 className="mt-1 text-lg font-bold text-navy-500">
               Список пользователей
               <span className="ml-2 pf-num text-sm font-normal text-muted-foreground">

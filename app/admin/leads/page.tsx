@@ -108,7 +108,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground mb-1">Admin · Leads</p>
-          <h1 className="text-3xl font-bold text-navy-500">Lead capture analytics</h1>
+          <h1 className="text-3xl font-bold text-navy-500">Аналитика лидов</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-xl">
             Все captured leads из W1+W4 lead-magnets. Drip emails отправляются еженедельно cron'ом /api/cron/leads-digest.
           </p>
