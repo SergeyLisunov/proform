@@ -177,11 +177,11 @@ export function PricingModal({
   }
 
   const TRIGGER_MESSAGES: Record<string, string> = {
-    workout_limit: '🏋️ Вы достигли лимита тренировок в этом месяце',
-    analytics:     '📊 Аналитика доступна только на Pro и выше',
-    messenger:     '💬 Мессенджер доступен только на Pro и выше',
-    cycles:        '🔄 Тренировочные циклы доступны на Pro',
-    export:        '📥 Экспорт данных доступен на Pro',
+    workout_limit: 'Вы достигли лимита тренировок в этом месяце',
+    analytics:     'Аналитика доступна только на Pro и выше',
+    messenger:     'Мессенджер доступен только на Pro и выше',
+    cycles:        'Тренировочные циклы доступны на Pro',
+    export:        'Экспорт данных доступен на Pro',
   }
 
   return (
@@ -384,7 +384,7 @@ export function PaywallBanner({
           background: plan.color + '15',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
         }}>
-          🔒
+          <i className="ki-filled ki-lock-2" style={{ color: plan.color }} />
         </div>
 
         {/* Text */}
@@ -570,7 +570,8 @@ export function PricingPage() {
                   padding: '4px 16px', borderRadius: 20,
                   textTransform: 'uppercase', letterSpacing: '0.1em',
                   boxShadow: `0 4px 12px ${p.color}50`,
-                }}>⭐ Популярный</div>
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}><i className="ki-solid ki-star text-[9px]" /> Популярный</div>
               )}
 
               <div className="pf-heading-sm" style={{ color: p.color, marginBottom: 4 }}>{p.name}</div>

@@ -179,7 +179,7 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
           )}
         </button>
       ) : (
-        <span className="text-2xs text-green-600 font-semibold shrink-0">✓ Проверено</span>
+        <span className="inline-flex items-center gap-1 text-2xs text-green-600 font-semibold shrink-0"><i className="ki-filled ki-check text-2xs" />Проверено</span>
       )}
     </div>
   )

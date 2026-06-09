@@ -225,7 +225,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
               </div>
               <div className="shrink-0">
                 {status === 'active' ? (
-                  <span className="text-[11px] font-semibold text-[#16A34A]">✓ в связях</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16A34A]"><i className="ki-filled ki-check text-[11px]" /> в связях</span>
                 ) : status === 'pending' || status === 'pending_outgoing' ? (
                   <span className="text-[11px] font-semibold text-[#F35703]">Ожидает</span>
                 ) : status === 'pending_incoming' ? (
@@ -305,7 +305,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
                     <div className="text-[11px] text-muted-foreground truncate">{[o.org_type, o.sport_type].filter(Boolean).join(' · ') || 'Организация'}</div>
                   </div>
                 </div>
-                {o.city && <div className="text-[11px] text-muted-foreground">📍 {o.city}</div>}
+                {o.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><i className="ki-filled ki-pin text-[11px]" /> {o.city}</div>}
                 {o.members_count ? <div className="text-[11px] text-muted-foreground">{o.members_count} участников</div> : null}
               </Link>
             )
@@ -325,7 +325,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
                   <div className="text-[11px] text-muted-foreground truncate">{spec || (isCoach ? 'Тренер' : 'Врач')}</div>
                 </div>
               </div>
-              {u.city && <div className="text-[11px] text-muted-foreground">📍 {u.city}</div>}
+              {u.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><i className="ki-filled ki-pin text-[11px]" /> {u.city}</div>}
               {price ? (
                 <div className="text-[12px] font-semibold" style={{ color: accent }}>{price} {currency} / {isCoach ? 'час' : 'консультация'}</div>
               ) : null}

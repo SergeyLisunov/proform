@@ -1016,7 +1016,7 @@ export default function AdminPage() {
                         : `Распознано: ${parsedBulkEmails.length}${parsedBulkEmails.length > 50 ? ' (превышает лимит 50)' : ''}`}
                     </span>
                     {parsedBulkEmails.length > 50 && (
-                      <span className="text-red-600 font-semibold">⚠ обрежется до 50</span>
+                      <span className="text-red-600 font-semibold inline-flex items-center gap-1"><i className="ki-filled ki-information-2 text-xs" /> обрежется до 50</span>
                     )}
                   </div>
                 </div>

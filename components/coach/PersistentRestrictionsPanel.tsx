@@ -138,7 +138,7 @@ export default function PersistentRestrictionsPanel({ athleteId }: Props) {
                 onClick={() => acknowledge(r.id)}
                 disabled={busyId === r.id}
                 className="shrink-0 rounded-lg bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 text-[11px] font-bold disabled:opacity-50">
-                {busyId === r.id ? '…' : '✓ Понятно'}
+                {busyId === r.id ? '…' : 'Понятно'}
               </button>
             </div>
           )

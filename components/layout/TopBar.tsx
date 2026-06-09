@@ -319,8 +319,9 @@ function NotificationsDrawer({
                 <div className="flex gap-2 mb-1">
                   {(['comment', 'announcement'] as const).map(t => (
                     <button key={t} type="button" onClick={() => setFormType(t)}
-                      className={`px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all ${formType === t ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-border text-muted-foreground'}`}>
-                      {t === 'comment' ? '💬 Комментарий' : '📢 Объявление'}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all ${formType === t ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-border text-muted-foreground'}`}>
+                      <i className={`ki-filled ${t === 'comment' ? 'ki-message-text-2' : 'ki-notification-bing'} text-2xs`} />
+                      {t === 'comment' ? 'Комментарий' : 'Объявление'}
                     </button>
                   ))}
                 </div>

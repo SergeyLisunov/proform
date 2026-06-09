@@ -30,14 +30,14 @@ import {
 const ACCENT = '#2563EB'   // blue — matches organization role tint
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const ORG_TYPES: Array<{ key: string; label: string; emoji: string }> = [
-  { key: 'club',       label: 'Клуб',           emoji: '🏅' },
-  { key: 'federation', label: 'Федерация',      emoji: '🏛️' },
-  { key: 'team',       label: 'Команда',        emoji: '🚴' },
-  { key: 'school',     label: 'Школа',          emoji: '🎓' },
-  { key: 'gym',        label: 'Фитнес-центр',   emoji: '💪' },
-  { key: 'academy',    label: 'Академия',       emoji: '📘' },
-  { key: 'other',      label: 'Другое',         emoji: '⭐' },
+const ORG_TYPES: Array<{ key: string; label: string; icon: string }> = [
+  { key: 'club',       label: 'Клуб',           icon: 'ki-medal-star' },
+  { key: 'federation', label: 'Федерация',      icon: 'ki-bank' },
+  { key: 'team',       label: 'Команда',        icon: 'ki-abstract-26' },
+  { key: 'school',     label: 'Школа',          icon: 'ki-teacher' },
+  { key: 'gym',        label: 'Фитнес-центр',   icon: 'ki-award' },
+  { key: 'academy',    label: 'Академия',       icon: 'ki-book' },
+  { key: 'other',      label: 'Другое',         icon: 'ki-abstract-41' },
 ]
 
 function slugify(name: string): string {
@@ -296,7 +296,7 @@ export default function OrgOnboardingPage() {
                     className={`rounded-2xl border-2 px-3 py-3 text-sm font-semibold transition flex flex-col items-center gap-1 ${
                       sel ? 'border-blue-400 bg-blue-50 text-blue-700' : 'border-border bg-background hover:border-blue-200 text-foreground'
                     }`}>
-                    <span className="text-xl">{t.emoji}</span>
+                    <i className={`ki-filled ${t.icon} text-xl`} />
                     <span className="text-[12px]">{t.label}</span>
                   </button>
                 )

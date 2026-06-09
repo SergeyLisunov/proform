@@ -36,8 +36,8 @@ export default function DoctorHeroBar({ firstName, stats }: { firstName: string;
 
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-600 mb-1">
-            🩺 {today}
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-600 mb-1 flex items-center gap-1.5">
+            <i className="ki-filled ki-pulse text-[10px]" /> {today}
           </p>
           <h1 className="pf-num text-3xl md:text-4xl text-navy-500 leading-tight">
             {greeting}, <span className="text-red-600">{firstName}</span>!

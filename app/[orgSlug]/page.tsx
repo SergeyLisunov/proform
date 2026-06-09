@@ -115,7 +115,7 @@ export default function OrgPublicPage() {
         {pinned.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <span>📌</span>
+              <i className="ki-filled ki-pin text-sm text-navy-500" />
               <h2 className="text-sm font-semibold text-navy-500 uppercase tracking-wider">Закреплено</h2>
             </div>
             <div className="flex flex-col gap-3">

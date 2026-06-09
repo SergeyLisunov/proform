@@ -185,8 +185,8 @@ export default function CoachOnboardingPage() {
               className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-green-400"
               disabled={inviteSent} />
             {inviteSent && (
-              <p className="mt-1 text-[11px] text-emerald-700 font-semibold">
-                ✓ Приглашение отправлено
+              <p className="mt-1 text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
+                <i className="ki-filled ki-check text-[11px]" /> Приглашение отправлено
               </p>
             )}
           </div>

@@ -128,8 +128,9 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
                   <div className="flex flex-col gap-1 shrink-0">
                     <button disabled={busyId === w.id}
                       onClick={() => setStatus(w.id, 'completed')}
-                      className="rounded-md bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 text-[10px] font-bold disabled:opacity-50">
-                      ✓ Сделано
+                      className="inline-flex items-center gap-1 rounded-md bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 text-[10px] font-bold disabled:opacity-50">
+                      <i className="ki-filled ki-check text-[10px]" />
+                      Сделано
                     </button>
                     <button disabled={busyId === w.id}
                       onClick={() => setStatus(w.id, 'skipped')}
@@ -140,13 +141,16 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
                 ) : (
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     <Badge variant={status === 'completed' ? 'success' : 'secondary'} size="sm" className="uppercase tracking-wider">
-                      {status === 'completed' ? '✓ Сделано' : 'Пропуск'}
+                      {status === 'completed'
+                        ? <span className="inline-flex items-center gap-1"><i className="ki-filled ki-check text-[10px]" />Сделано</span>
+                        : 'Пропуск'}
                     </Badge>
                     {celebrateId === w.id && (
                       <Link href="/diary"
                         className="inline-flex items-center gap-1 rounded-md bg-green-500/10 text-green-700 px-2 py-0.5 text-[10px] font-semibold border border-green-200 hover:bg-green-500/20 animate-pulse"
                         title="Поделиться впечатлениями (опционально)">
-                        🎉 Отлично! Поделиться?
+                        <i className="ki-filled ki-medal-star text-[10px]" />
+                        Отлично! Поделиться?
                       </Link>
                     )}
                   </div>

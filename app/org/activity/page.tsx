@@ -172,7 +172,7 @@ export default async function OrgActivityPage() {
                         {e.tone && e.tone !== 'info' && (
                           <span className="text-[10px] font-bold uppercase tracking-wider"
                             style={{ color: ringColor }}>
-                            {e.tone === 'critical' ? '🔴 critical' : e.tone === 'warning' ? '🟠 warning' : '✓ ok'}
+                            {e.tone === 'critical' ? 'critical' : e.tone === 'warning' ? 'warning' : 'ok'}
                           </span>
                         )}
                       </div>

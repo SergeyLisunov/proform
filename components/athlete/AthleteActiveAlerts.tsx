@@ -62,8 +62,8 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
               className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-[12px] hover:shadow-sm transition-shadow ${
                 isActive ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'
               }`}>
-              <span className={isActive ? 'text-red-600' : 'text-orange-600'}>
-                {isActive ? '🩹' : '🔄'}
+              <span className={`inline-flex items-center ${isActive ? 'text-red-600' : 'text-orange-600'}`}>
+                <i className={`ki-filled ${isActive ? 'ki-shield-cross' : 'ki-arrows-circle'} text-[13px]`} />
               </span>
               <span>
                 <strong className="text-foreground">{part}</strong>
@@ -80,7 +80,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
           return (
             <Link key={p.id} href="/calendar"
               className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-[12px] hover:shadow-sm transition-shadow">
-              <span className="text-purple-600">⏱</span>
+              <span className="inline-flex items-center text-purple-600"><i className="ki-filled ki-time text-[13px]" /></span>
               <span>
                 <strong className="text-foreground">{p.title ?? 'Абонемент'}</strong>
                 <span className="text-muted-foreground"> · {remaining} занятий до {expires}</span>

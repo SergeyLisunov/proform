@@ -117,8 +117,8 @@ const ORG_SERVICE_LABELS: Record<string, string> = {
   recovery: 'Восстановление', rental: 'Аренда площадки',
 }
 const ORG_TYPE_LABELS: Record<string, string> = {
-  club: '🏅 Клуб', federation: '🏛 Федерация', team: '🚴 Команда',
-  school: '🎓 Школа', gym: '💪 Фитнес-центр', academy: '📘 Академия', other: 'Другое',
+  club: 'Клуб', federation: 'Федерация', team: 'Команда',
+  school: 'Школа', gym: 'Фитнес-центр', academy: 'Академия', other: 'Другое',
 }
 
 function asStringList(v: unknown): string[] {

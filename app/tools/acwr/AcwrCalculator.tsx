@@ -141,7 +141,7 @@ export default function AcwrCalculator() {
       <section className="bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-600 mb-4">
-            🎯 Бесплатный инструмент
+            <i className="ki-filled ki-focus text-[11px]" /> Бесплатный инструмент
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
             Калькулятор риска травмы <span className="text-orange-600">(ACWR)</span>
@@ -247,8 +247,8 @@ export default function AcwrCalculator() {
             {/* Email gate */}
             {!sent && result.acwr != null && result.advice.length > 2 && (
               <form onSubmit={handleSubmit} className="mt-4 p-4 rounded-xl border border-dashed border-slate-300 bg-white/70">
-                <p className="text-xs font-bold text-slate-700 mb-2">
-                  🔒 Разблокировать все {result.advice.length} рекомендаций
+                <p className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                  <i className="ki-filled ki-lock-2 text-xs" /> Разблокировать все {result.advice.length} рекомендаций
                 </p>
                 <input type="email" required placeholder="you@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
@@ -268,8 +268,8 @@ export default function AcwrCalculator() {
 
             {sent && (
               <div className="mt-4 p-4 rounded-xl border border-green-200 bg-green-50">
-                <p className="text-sm font-semibold text-green-800">
-                  ✅ Готово! Расширенный разбор и рекомендации открыты выше.
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-green-800">
+                  <i className="ki-filled ki-check text-sm" /> Готово! Расширенный разбор и рекомендации открыты выше.
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите отслеживать ACWR автоматически по всем своим тренировкам и видеть его в реальном времени?
@@ -288,15 +288,15 @@ export default function AcwrCalculator() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как это работает</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1">🧮 Формула</div>
+              <div className="flex items-center gap-1.5 font-bold mb-1"><i className="ki-filled ki-calculator text-sm" /> Формула</div>
               ACWR = острая нагрузка (7&nbsp;дней) / хроническая (28&nbsp;дней, скользящее среднее).
             </div>
             <div>
-              <div className="font-bold mb-1">🎯 Sweet spot</div>
+              <div className="flex items-center gap-1.5 font-bold mb-1"><i className="ki-filled ki-focus text-sm" /> Sweet spot</div>
               0.8–1.3 — зелёная зона, минимальный риск травмы и стабильный прогресс.
             </div>
             <div>
-              <div className="font-bold mb-1">🚨 Красная зона</div>
+              <div className="flex items-center gap-1.5 font-bold mb-1"><i className="ki-filled ki-notification-bing text-sm" /> Красная зона</div>
               ACWR &gt; 1.5 связан с резким ростом риска травмы в мета-анализах Gabbett и Bourdon.
             </div>
           </div>

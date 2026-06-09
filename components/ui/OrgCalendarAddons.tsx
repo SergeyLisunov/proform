@@ -350,10 +350,10 @@ export function OrgSessionDrawer({
                           att === 'declined'  ? 'bg-slate-200 text-slate-600' :
                                                 'bg-muted text-muted-foreground'
                         }`}>
-                        {att === 'pending'   ? '?'    :
-                         att === 'confirmed' ? '✓ да' :
-                         att === 'attended'  ? '✓✓'   :
-                         att === 'absent'    ? '✗'    : '—'}
+                        {att === 'pending'   ? '?' :
+                         att === 'confirmed' ? <span className="inline-flex items-center gap-0.5"><i className="ki-filled ki-check text-[9px]" /> да</span> :
+                         att === 'attended'  ? <span className="inline-flex items-center"><i className="ki-filled ki-check text-[9px]" /><i className="ki-filled ki-check text-[9px] -ml-1" /></span> :
+                         att === 'absent'    ? <i className="ki-filled ki-cross text-[9px]" /> : '—'}
                       </button>
                     )}
                   </div>

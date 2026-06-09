@@ -42,7 +42,7 @@ export default function PrivacyPage() {
       lastUpdated="Версия от мая 2026 г. · Действует с момента публикации"
     >
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-        <strong>⚠ Holding-страница.</strong> Полный документ Политики
+        <strong className="inline-flex items-center gap-1.5"><i className="ki-filled ki-information-4 text-sm" /> Holding-страница.</strong> Полный документ Политики
         конфиденциальности проходит правовую экспертизу. Базовые принципы
         обработки данных изложены ниже; финальная редакция будет опубликована до
         выхода Sporteo из закрытого бета-тестирования.

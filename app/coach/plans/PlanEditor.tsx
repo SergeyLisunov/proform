@@ -328,8 +328,8 @@ export default function PlanEditor({ mode, initial }: Props) {
                                 title="Ниже">↓</button>
                             )}
                             <button onClick={() => removeItem(it.uiId)} type="button"
-                              className="w-5 h-5 rounded bg-white border border-red-200 hover:bg-red-50 text-red-600 text-[10px]"
-                              title="Удалить">✕</button>
+                              className="w-5 h-5 rounded bg-white border border-red-200 hover:bg-red-50 text-red-600 text-[10px] flex items-center justify-center"
+                              title="Удалить"><i className="ki-filled ki-cross" /></button>
                           </div>
                         </div>
                         <input value={it.name} onChange={e => updateItem(it.uiId, { name: e.target.value })} maxLength={160}

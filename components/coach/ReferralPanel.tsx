@@ -28,7 +28,8 @@ export default function ReferralPanel({
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
-            🎁 Реферальная программа
+            <i className="ki-filled ki-gift text-[11px]" />
+            Реферальная программа
           </span>
           <h3 className="pf-num text-xl font-bold text-navy-500 mt-2">
             Приглашай атлетов — получай Pro бесплатно

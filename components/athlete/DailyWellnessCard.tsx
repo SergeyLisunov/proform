@@ -106,7 +106,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
                   )}
                   {today.sleep_hours != null && (
                     <span className="flex items-center gap-1 text-sm font-semibold text-slate-700" title="Сон">
-                      🌙 {today.sleep_hours} ч
+                      <i className="ki-filled ki-moon text-sm text-slate-700" /> {today.sleep_hours} ч
                     </span>
                   )}
                   {today.soreness != null && (

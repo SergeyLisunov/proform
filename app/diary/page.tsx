@@ -1606,7 +1606,7 @@ function AthleteDiary() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-foreground text-background text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter">
-          <i className="ki-filled ki-check-circle text-green-400" />Тренировка сохранена ✓
+          <i className="ki-filled ki-check-circle text-green-400" />Тренировка сохранена
         </div>
       )}
     </div>

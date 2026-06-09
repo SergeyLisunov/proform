@@ -558,7 +558,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                   </button>
                   <button onClick={handleSave} disabled={saving}
                     style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
-                    {saving ? 'Сохранение…' : '✓ Сохранить изменения'}
+                    {saving ? 'Сохранение…' : 'Сохранить изменения'}
                   </button>
                 </>
               )}
@@ -778,7 +778,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
               <>
                 <button onClick={() => setStep('info')} style={{ padding: '11px 16px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>← Назад</button>
                 <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
-                  {saving ? 'Создание…' : '✓ Создать цикл'}
+                  {saving ? 'Создание…' : 'Создать цикл'}
                 </button>
               </>
             )}
@@ -1042,7 +1042,7 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
             </div>
           })}
           {wksDisplay.length>2&&<div className="text-[10px] text-muted-foreground">+{wksDisplay.length-2} трен.</div>}
-          {compsDisplay.map(ev=><div key={ev.id} className="px-2 py-1 rounded-lg text-2xs font-semibold mb-0.5" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}>🏆 {ev.title.slice(0,12)}</div>)}
+          {compsDisplay.map(ev=><div key={ev.id} className="px-2 py-1 rounded-lg text-2xs font-semibold mb-0.5 flex items-center gap-1" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}><i className="ki-filled ki-medal-star text-[9px]"/>{ev.title.slice(0,12)}</div>)}
           {otherDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><i className={`ki-filled ${meta?.icon??'ki-calendar'} text-[9px]`}/>{ev.title.slice(0,12)}</div> })}
           {isEmpty&&<div className="flex items-center justify-center h-12 text-muted-foreground/30"><i className="ki-filled ki-minus text-xs"/></div>}
         </div>

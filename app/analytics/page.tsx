@@ -706,7 +706,7 @@ function AthleteAnalytics() {
 
                 return (
                   <div key={index} className="flex items-center gap-3 px-5 py-3">
-                    <span className="text-base">{competition.status === 'completed' ? '🏁' : '🎯'}</span>
+                    <i className={`ki-filled ${competition.status === 'completed' ? 'ki-flag' : 'ki-focus'} text-base text-muted-foreground`} />
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold text-foreground">{competition.name}</div>
                       <div className="text-2xs text-muted-foreground">

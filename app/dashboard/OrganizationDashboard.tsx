@@ -149,7 +149,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         {p.is_pinned && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]">📌 закреп</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]"><i className="ki-filled ki-pin text-[10px]" /> закреп</span>
                         )}
                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
                           {p.post_type}

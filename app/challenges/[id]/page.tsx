@@ -142,7 +142,7 @@ export default function ChallengeDetailPage() {
     today > challenge.ends_at   ? 'finished' :
     'active'
 
-  const medals = ['🥇', '🥈', '🥉']
+  const medalColors = ['#EAB308', '#94A3B8', '#B45309']
 
   return (
     <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-6">
@@ -241,7 +241,7 @@ export default function ChallengeDetailPage() {
                       className={`border-t border-border ${mine ? 'bg-emerald-50/60' : ''}`}
                     >
                       <td className="px-3 py-2.5 font-bold text-foreground">
-                        {i < 3 ? <span className="text-lg leading-none">{medals[i]}</span> : i + 1}
+                        {i < 3 ? <i className="ki-filled ki-medal-star text-lg leading-none" style={{ color: medalColors[i] }} /> : i + 1}
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-2.5">

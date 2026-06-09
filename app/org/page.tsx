@@ -321,7 +321,7 @@ export default function OrgDashboard() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {p.is_pinned && (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 7px', borderRadius: 999, background: '#FEF3C7', color: '#B45309', border: '1px solid #FDE68A', fontSize: 10, fontWeight: 700 }}>
-                          <span style={{ fontSize: 11 }}>📌</span>
+                          <i className="ki-filled ki-pin" style={{ fontSize: 11 }} />
                           Закреплено
                         </span>
                       )}

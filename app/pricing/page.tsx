@@ -43,11 +43,11 @@ interface Tariff {
   display_order: number
 }
 
-const ROLE_GROUPS: Array<{ key: string; label: string; emoji: string; bg: string; color: string }> = [
-  { key: 'athlete',      label: 'Атлет',           emoji: '🏃', bg: '#FEF0E7', color: '#D44A02' },
-  { key: 'coach',        label: 'Тренер',          emoji: '🥇', bg: '#EFF6FF', color: '#2563EB' },
-  { key: 'specialist',   label: 'Врач / Специалист', emoji: '⚕️', bg: '#FEF2F2', color: '#E11D48' },
-  { key: 'organization', label: 'Организация',     emoji: '🏢', bg: '#FAF5FF', color: '#9333EA' },
+const ROLE_GROUPS: Array<{ key: string; label: string; icon: string; bg: string; color: string }> = [
+  { key: 'athlete',      label: 'Атлет',           icon: 'ki-abstract-26', bg: '#FEF0E7', color: '#D44A02' },
+  { key: 'coach',        label: 'Тренер',          icon: 'ki-medal-star',  bg: '#EFF6FF', color: '#2563EB' },
+  { key: 'specialist',   label: 'Врач / Специалист', icon: 'ki-pulse',     bg: '#FEF2F2', color: '#E11D48' },
+  { key: 'organization', label: 'Организация',     icon: 'ki-office-bag',  bg: '#FAF5FF', color: '#9333EA' },
 ]
 
 function getSb() {
@@ -198,7 +198,7 @@ export default function PricingPage() {
         return (
           <section key={group.key} className="mb-10">
             <div className="flex items-center gap-2.5 mb-4">
-              <span className="text-2xl">{group.emoji}</span>
+              <i className={`ki-filled ${group.icon} text-2xl`} style={{ color: group.color }} />
               <h2 className="text-xl font-bold text-navy-500">Для роли: {group.label}</h2>
             </div>
 
@@ -214,9 +214,9 @@ export default function PricingPage() {
                     }`}>
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
+                        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
                           style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', boxShadow: '0 4px 12px rgba(212,74,2,0.4)' }}>
-                          ⭐ Популярный
+                          <i className="ki-solid ki-star text-[10px]" /> Популярный
                         </span>
                       </div>
                     )}
@@ -245,7 +245,7 @@ export default function PricingPage() {
                     {t.trial_days > 0 && !isFree && (
                       <div className="mb-3 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider self-start"
                         style={{ background: '#FEF0E7', color: '#D44A02', border: '1px solid #FBC1A0' }}>
-                        🎁 Trial {t.trial_days} дней
+                        <i className="ki-filled ki-gift text-[11px]" /> Trial {t.trial_days} дней
                       </div>
                     )}
 

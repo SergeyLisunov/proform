@@ -243,9 +243,9 @@ export default function AthleteProgressPage() {
                 <div key={g.id} className="rounded-xl border border-border bg-background p-3">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h4 className="text-sm font-bold text-foreground line-clamp-2">{g.metric_label}</h4>
-                    <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5"
+                    <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5 inline-flex items-center"
                       style={{ background: STATUS_META.active.bg, color: STATUS_META.active.color }}>
-                      🎯
+                      <i className="ki-filled ki-focus text-[10px]" />
                     </span>
                   </div>
                   {g.target_value !== null && (
@@ -260,8 +260,9 @@ export default function AthleteProgressPage() {
                     </div>
                   )}
                   {g.target_date && (
-                    <div className="text-[10px] text-muted-foreground mt-1.5">
-                      📅 {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                    <div className="text-[10px] text-muted-foreground mt-1.5 inline-flex items-center gap-1">
+                      <i className="ki-filled ki-calendar text-[10px]" />
+                      {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                     </div>
                   )}
                 </div>

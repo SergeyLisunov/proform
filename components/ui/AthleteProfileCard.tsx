@@ -235,11 +235,11 @@ function SocialEditModal({ profile, onClose, onSaved }: {
   }
 
   const fields = [
-    { label: 'Instagram', value: ig, set: setIg, placeholder: 'https://instagram.com/username', emoji: '📸' },
-    { label: 'Telegram',  value: tg, set: setTg, placeholder: 'https://t.me/username',          emoji: '✈️' },
-    { label: 'YouTube',   value: yt, set: setYt, placeholder: 'https://youtube.com/@channel',   emoji: '▶️' },
-    { label: 'TikTok',    value: tt, set: setTt, placeholder: 'https://tiktok.com/@username',   emoji: '🎵' },
-    { label: 'Сайт',      value: ws, set: setWs, placeholder: 'https://yoursite.com',           emoji: '🌐' },
+    { label: 'Instagram', value: ig, set: setIg, placeholder: 'https://instagram.com/username' },
+    { label: 'Telegram',  value: tg, set: setTg, placeholder: 'https://t.me/username'          },
+    { label: 'YouTube',   value: yt, set: setYt, placeholder: 'https://youtube.com/@channel'   },
+    { label: 'TikTok',    value: tt, set: setTt, placeholder: 'https://tiktok.com/@username'   },
+    { label: 'Сайт',      value: ws, set: setWs, placeholder: 'https://yoursite.com'           },
   ]
 
   return (
@@ -256,7 +256,7 @@ function SocialEditModal({ profile, onClose, onSaved }: {
         <div style={{ padding:'20px 24px',display:'flex',flexDirection:'column',gap:12 }}>
           {fields.map(f => (
             <div key={f.label}>
-              <label style={{ fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:5 }}>{f.emoji} {f.label}</label>
+              <label style={{ fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',display:'block',marginBottom:5 }}>{f.label}</label>
               <input type="url" value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder}
                 className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400" />
             </div>
@@ -530,8 +530,8 @@ export default function AthleteProfileCard() {
             )}
             {(profile.height_cm || profile.weight_kg) && (
               <div style={{ display:'flex', gap:14, marginTop:7 }}>
-                {profile.height_cm && <span style={{ fontSize:12, color:'var(--muted-foreground)', display:'flex', alignItems:'center', gap:4 }}><span>📏</span>{profile.height_cm} см</span>}
-                {profile.weight_kg && <span style={{ fontSize:12, color:'var(--muted-foreground)', display:'flex', alignItems:'center', gap:4 }}><span>⚖️</span>{profile.weight_kg} кг</span>}
+                {profile.height_cm && <span style={{ fontSize:12, color:'var(--muted-foreground)', display:'flex', alignItems:'center', gap:4 }}>{profile.height_cm} см</span>}
+                {profile.weight_kg && <span style={{ fontSize:12, color:'var(--muted-foreground)', display:'flex', alignItems:'center', gap:4 }}>{profile.weight_kg} кг</span>}
               </div>
             )}
 

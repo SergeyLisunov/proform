@@ -173,7 +173,7 @@ function CompetitionDrawer({
           {mode === 'view' && competition && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ padding: 16, borderRadius: 14, background: '#FEF0E7', border: '1px solid #FBC1A0' }}>
-                <div className="pf-num" style={{ fontSize: 28, color: '#F35703', lineHeight: 1 }}>🏆</div>
+                <div style={{ lineHeight: 1 }}><i className="ki-filled ki-medal-star" style={{ fontSize: 28, color: '#F35703' }} /></div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 700, color: 'var(--foreground)' }}>{competition.title}</div>
                 <div style={{ marginTop: 4, fontSize: 13, color: 'var(--muted-foreground)' }}>{fmtDate(competition.event_date)}</div>
               </div>

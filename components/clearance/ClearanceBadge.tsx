@@ -38,15 +38,18 @@ interface PropsWithFetch {
 }
 type Props = PropsWithData | PropsWithFetch
 
-const META: Record<ClearanceStatus, { label: string; emoji: string; color: string; bg: string; border: string }> = {
-  full:       { label: 'Полный',      emoji: '🟢', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-  limited:    { label: 'Ограниченный', emoji: '🟡', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
-  light_only: { label: 'Лёгкий',      emoji: '🟠', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
-  banned:     { label: 'Запрет',      emoji: '🔴', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
+// `dot` is the traffic-light colour rendered as a status dot next to the label
+// (green = full, amber = limited, orange = light-only, red = banned).
+const META: Record<ClearanceStatus, { label: string; dot: string; color: string; bg: string; border: string }> = {
+  full:       { label: 'Полный',      dot: '#16A34A', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
+  limited:    { label: 'Ограниченный', dot: '#CA8A04', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
+  light_only: { label: 'Лёгкий',      dot: '#F35703', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  banned:     { label: 'Запрет',      dot: '#DC2626', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
 }
 
+// Review-pending uses a clock icon instead of a status dot.
 const REVIEW_META = {
-  label: 'требуется review', emoji: '⏳', color: '#475569', bg: '#F1F5F9', border: '#CBD5E1',
+  label: 'требуется review', dot: null as string | null, color: '#475569', bg: '#F1F5F9', border: '#CBD5E1',
 }
 
 function sb() {
@@ -95,7 +98,9 @@ export default function ClearanceBadge(props: Props) {
       background: m.bg, color: m.color, border: `1px solid ${m.border}`,
       fontSize: fs, fontWeight: 700, lineHeight: 1.1,
     }}>
-      <span>{m.emoji}</span>
+      {m.dot
+        ? <span style={{ display: 'inline-block', height: 8, width: 8, borderRadius: 999, background: m.dot }} />
+        : <i className="ki-filled ki-time" style={{ fontSize: fs }} />}
       <span>{m.label}</span>
       {showNote && current.valid_until && !current.review_needed && (
         <span style={{ fontWeight: 500, opacity: 0.75, marginLeft: 4 }}>

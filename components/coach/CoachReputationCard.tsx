@@ -71,7 +71,7 @@ export default function CoachReputationCard({
             <span className="pf-num text-2xl font-bold text-foreground">
               {avgRating !== null ? avgRating.toFixed(1) : '—'}
             </span>
-            <span className="text-amber-500">{avgRating !== null ? '★' : ''}</span>
+            {avgRating !== null && <i className="ki-solid ki-star text-amber-500" />}
           </div>
           <p className="text-[11px] text-muted-foreground">
             {reviewCount > 0

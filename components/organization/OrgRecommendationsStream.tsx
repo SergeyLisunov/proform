@@ -121,8 +121,8 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
                 {r.title ? (
                   <div className="mt-0.5 text-[12px] text-foreground/90 truncate">{r.title}</div>
                 ) : (
-                  <div className="mt-0.5 text-[12px] italic text-muted-foreground">
-                    🔒 содержание скрыто (не org_full visibility)
+                  <div className="mt-0.5 inline-flex items-center gap-1 text-[12px] italic text-muted-foreground">
+                    <i className="ki-filled ki-lock-2 text-[12px]" /> содержание скрыто (не org_full visibility)
                   </div>
                 )}
                 <div className="mt-1 text-[10px] text-muted-foreground">

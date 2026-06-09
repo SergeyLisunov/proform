@@ -127,7 +127,7 @@ export default function AthleteLoadPage() {
                       className={`rounded-lg px-2 py-1 text-[10px] font-semibold border transition-all ${highlight
                         ? 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700'
                         : 'bg-background text-purple-700 border-purple-200 hover:bg-purple-50'}`}>
-                      🤖 AI-план
+                      <i className="ki-filled ki-message-programming text-[10px] mr-1" />AI-план
                     </button>
                   </div>
                 </div>
