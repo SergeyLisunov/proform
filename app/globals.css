@@ -82,6 +82,18 @@
 }
 
 /* ── Typography ───────────────────────────────────────────────────────────── */
+
+/* Headings without an explicit `leading-*` utility were inheriting the body's
+   `text-base` line-height (24px). On clamp-sized headings (text-[clamp(...)],
+   up to ~54px) that 0.45 ratio made multi-line headings overlap — exposed once
+   the body font became Montserrat, which is wider than the previous condensed
+   Bebas Neue and therefore wraps long headings onto more lines. A sane default
+   in @layer base fixes every such heading; Tailwind `leading-*` utilities and
+   the `.pf-heading-*` classes have higher precedence and still win. */
+@layer base {
+  h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
+}
+
 .pf-num {
   font-family: var(--pf-font-display);
   font-weight: 700;
