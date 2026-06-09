@@ -376,10 +376,10 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div>
                     <div style={{ fontSize: 10, fontWeight: 700, color: viewCfg.text, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Прогресс</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: viewCfg.text, fontFamily: "'DM Sans', sans-serif" }}>{passed} / {total} дн.</div>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: viewCfg.text, fontFamily: "var(--pf-font-sans)" }}>{passed} / {total} дн.</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 28, fontWeight: 700, color: viewCfg.text, fontFamily: "'DM Sans', sans-serif" }}>{progress}%</div>
+                    <div style={{ fontSize: 28, fontWeight: 700, color: viewCfg.text, fontFamily: "var(--pf-font-sans)" }}>{progress}%</div>
                     <div style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>выполнено</div>
                   </div>
                 </div>
@@ -413,7 +413,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                         <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}20` }}>
                           <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 16, flexShrink: 0 }} />
                           <div>
-                            <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "'DM Sans', sans-serif" }}>{count}</div>
+                            <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "var(--pf-font-sans)" }}>{count}</div>
                             <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
                           </div>
                         </div>

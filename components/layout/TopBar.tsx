@@ -483,7 +483,7 @@ export default function TopBar() {
     <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-all"
       style={{ background: rc.bg, borderColor: rc.border }}>
       <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-        style={{ background: rc.text + '20', color: rc.text, fontFamily: "'Bebas Neue', sans-serif" }}>
+        style={{ background: rc.text + '20', color: rc.text, fontFamily: "var(--pf-font-sans)", fontWeight: 700 }}>
         {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
       </div>
       <span className="text-2sm font-semibold" style={{ color: rc.text }}>

@@ -165,7 +165,7 @@ function CoachAnalytics() {
     xaxis: { categories: ['Нагрузка', 'ВСР', 'Восстановление', 'Тренировки', 'Сон', 'Серия'] },
     yaxis: { show: false },
     grid: { padding: { top: 10, bottom: 10 } },
-    legend: { position: 'bottom' as const, fontFamily: 'DM Sans', fontSize: '12px' },
+    legend: { position: 'bottom' as const, fontFamily: 'Montserrat', fontSize: '12px' },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
@@ -182,7 +182,7 @@ function CoachAnalytics() {
     },
     yaxis: { labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
     grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontFamily: 'DM Sans', fontSize: '12px' },
+    legend: { position: 'top' as const, fontFamily: 'Montserrat', fontSize: '12px' },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
@@ -422,7 +422,7 @@ function AthleteAnalytics() {
       { opposite: true, labels: { style: { fontSize: '11px', colors: '#A1A1AA' } } },
     ],
     grid: { borderColor: '#F4F4F5', strokeDashArray: 3 },
-    legend: { position: 'top' as const, fontFamily: 'DM Sans', fontSize: '12px' },
+    legend: { position: 'top' as const, fontFamily: 'Montserrat', fontSize: '12px' },
     dataLabels: { enabled: false },
     tooltip: { theme: 'light' },
   }
@@ -447,7 +447,7 @@ function AthleteAnalytics() {
     chart: { type: 'donut' as const, toolbar: { show: false }, animations: { enabled: false } },
     colors: ZC,
     labels: ['Z1 Восстановление', 'Z2 Аэробная', 'Z3 Темп', 'Z4 Порог', 'Z5 VO₂max'],
-    legend: { position: 'bottom' as const, fontSize: '12px', fontFamily: 'DM Sans' },
+    legend: { position: 'bottom' as const, fontSize: '12px', fontFamily: 'Montserrat' },
     plotOptions: {
       pie: {
         donut: {
@@ -458,7 +458,7 @@ function AthleteAnalytics() {
               show: true,
               label: 'Итого',
               fontSize: '13px',
-              fontFamily: 'DM Sans',
+              fontFamily: 'Montserrat',
               color: '#A1A1AA',
             },
           },

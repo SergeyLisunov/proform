@@ -45,8 +45,11 @@
        pre-migration Metronic CSS behavior)
      - Network failures (next/font self-hosts но belt-and-suspenders) */
 :root {
-  --pf-font-sans: var(--font-pf-sans), "DM Sans", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  --pf-font-display: var(--font-pf-display), "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
+  /* Единое семейство Montserrat. Обе переменные резолвятся в один шрифт —
+     различие body/display теперь только в весе (см. .pf-heading-*), не в
+     гарнитуре. Montserrat покрывает и латиницу, и кириллицу. */
+  --pf-font-sans: var(--font-pf-sans), "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --pf-font-display: var(--font-pf-sans), "Montserrat", "Segoe UI", system-ui, sans-serif;
 }
 
 /* ── Brand tokens (Sporteo) ───────────────────────────────────────────────────
@@ -81,34 +84,41 @@
 /* ── Typography ───────────────────────────────────────────────────────────── */
 .pf-num {
   font-family: var(--pf-font-display);
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
-/* Heading scale — Bebas Neue */
+/* Heading scale — Montserrat. Прежний Bebas Neue был одновесным impact-
+   шрифтом; Montserrat получает явный вес 800/700 + слегка отрицательный
+   tracking, чтобы заголовки сохраняли «плотность» и иерархию. */
 .pf-heading-xl {
   font-family: var(--pf-font-display);
+  font-weight: 800;
   font-size: 64px;
-  line-height: 0.92;
-  letter-spacing: 0.01em;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
 }
 .pf-heading-lg {
   font-family: var(--pf-font-display);
+  font-weight: 800;
   font-size: 42px;
-  line-height: 1;
-  letter-spacing: 0.01em;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 .pf-heading-md {
   font-family: var(--pf-font-display);
+  font-weight: 700;
   font-size: 32px;
-  line-height: 1;
-  letter-spacing: 0.01em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 .pf-heading-sm {
   font-family: var(--pf-font-display);
+  font-weight: 700;
   font-size: 24px;
-  line-height: 1;
-  letter-spacing: 0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 /* Body-scale utilities — DM Sans */

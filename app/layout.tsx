@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import { Bebas_Neue, DM_Sans } from 'next/font/google'
+import { Montserrat } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
@@ -8,36 +8,24 @@ import { ToastProvider } from '@/lib/hooks/useToast'
 import { MobileMenuProvider } from '@/lib/hooks/useMobileMenu'
 import ClientOverlays from '@/components/ui/ClientOverlays'
 
-// W17 Day 84 — next/font migration.
-// Previously loaded через Metronic CSS bundle (/assets/css/styles.css) —
-// render-blocking + impacted LCP на Hero. next/font:
-//   - Self-hosts font files (no external network round-trip)
-//   - Automatic preload of critical weights
-//   - font-display: swap (text visible с fallback пока font loads)
-//   - Size-adjust generated fallback fonts (eliminate layout shift)
+// Единое семейство — Montserrat (founder decision, 2026-06-08).
+// Заменяет прежнюю пару Bebas Neue (display) + DM Sans (body). Причины:
+//   - Гармонизация: один шрифт на весь сайт, единая типографика.
+//   - Montserrat имеет ПОЛНЫЙ Cyrillic subset на Google Fonts — русский
+//     текст теперь рендерится в том же шрифте, что и латиница (раньше
+//     падал в Trebuchet MS / Impact fallback, см. старый комментарий).
+//   - next/font self-hosts + preload + font-display:swap + size-adjust
+//     fallback (без layout shift) — те же преимущества, что и раньше.
 //
-// Subset choice — neither DM Sans nor Bebas Neue have Cyrillic subsets
-// on Google Fonts. We subset к latin + latin-ext (DM Sans) and latin only
-// (Bebas Neue). Russian text falls к manual fallback chain (Trebuchet MS,
-// Segoe UI, system-ui for body; Impact, Arial Narrow Bold for display) —
-// same behavior as pre-migration Metronic CSS load. См. globals.css.
-//
-// W17+ candidate: evaluate switching body font к Inter / Manrope / Noto Sans
-// (full Cyrillic Google subset) если consistent Latin/Cyrillic typography
-// becomes priority. Day 84 = minimal-change migration, preserves visual
-// parity для Russian content.
-const dmSans = DM_Sans({
-  subsets: ['latin', 'latin-ext'],
+// Одна next/font инстанция экспортирует ОДНУ CSS-переменную (--font-pf-sans).
+// Историческая переменная --font-pf-display сохранена в globals.css и теперь
+// резолвится в тот же Montserrat — заголовки получают вес 700/800 через
+// .pf-heading-* утилиты, сохраняя визуальную иерархию без второго шрифта.
+const montserrat = Montserrat({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
   variable: '--font-pf-sans',
   display: 'swap',
   weight: ['400', '500', '600', '700', '800'],
-})
-
-const bebasNeue = Bebas_Neue({
-  subsets: ['latin'],
-  variable: '--font-pf-display',
-  weight: '400',
-  display: 'swap',
 })
 
 // W15 Day 73 — SEO foundation.
@@ -119,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ru"
-      className={`${dmSans.variable} ${bebasNeue.variable} h-full light`}
+      className={`${montserrat.variable} h-full light`}
       data-kt-theme="true"
       data-kt-theme-mode="light"
     >
