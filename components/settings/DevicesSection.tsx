@@ -179,7 +179,7 @@ export default function DevicesSection() {
                         setBusy(b => ({ ...b, [meta.id]: false }))
                       }}
                       className="rounded-lg bg-orange-500 text-white hover:bg-orange-600 px-2.5 py-1.5 text-[11px] font-semibold disabled:opacity-50">
-                      <i className="ki-filled ki-refresh text-[10px] mr-1" />
+                      <i className="ki-filled ki-arrows-circle text-[10px] mr-1" />
                       {busy[meta.id] ? 'Синхронизация…' : 'Синхронизировать'}
                     </button>
                     <button disabled={!!busy[meta.id]}

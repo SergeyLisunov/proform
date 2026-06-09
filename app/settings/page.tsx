@@ -384,7 +384,7 @@ function PasswordCard() {
               background: msg.type==='ok'?'#F0FDF4':'#FEF2F2',
               color: msg.type==='ok'?'#15803D':'#DC2626',
               border: `1px solid ${msg.type==='ok'?'#BBF7D0':'#FECACA'}` }}>
-              <i className={`ki-filled ${msg.type==='ok'?'ki-check-circle':'ki-information-5'} text-sm`} />
+              <i className={`ki-filled ${msg.type==='ok'?'ki-check-circle':'ki-information-4'} text-sm`} />
               {msg.text}
             </div>
           )}
@@ -867,7 +867,7 @@ export default function SettingsPage() {
           </Card>
 
           <Card>
-            <SectionHeader icon="ki-global" color="#0284C7" title="Социальные сети" />
+            <SectionHeader icon="ki-geolocation" color="#0284C7" title="Социальные сети" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Instagram">
                 <div style={{ position: 'relative' }}>
@@ -1158,7 +1158,7 @@ export default function SettingsPage() {
         )}
         {saveError && (
           <span style={{ fontSize: 13, color: '#DC2626', fontWeight: 600, animation: 'fadeIn 0.3s ease', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <i className="ki-filled ki-information-5 text-sm" />
+            <i className="ki-filled ki-information-4 text-sm" />
             {saveError}
           </span>
         )}

@@ -30,7 +30,7 @@ const SEVERITY_STYLE: Record<Alert['severity'], { bg: string; text: string; icon
 const TYPE_ICON: Record<Alert['type'], string> = {
   recovery: 'ki-heart',
   hrv:      'ki-pulse',
-  strain:   'ki-flash',
+  strain:   'ki-flash-circle',
   load:     'ki-chart-line-up',
   hr:       'ki-abstract-26',
   mood:     'ki-emoji-happy',

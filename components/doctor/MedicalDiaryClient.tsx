@@ -933,7 +933,7 @@ function EntryDrawer({
                       ? 'border-red-400 bg-red-50 text-red-600 animate-pulse'
                       : 'border-border bg-background text-muted-foreground hover:border-red-300 hover:text-red-600'
                   }`}>
-                  <i className={`ki-filled ${dict.state === 'listening' ? 'ki-microphone-2' : 'ki-microphone'} text-xs`} />
+                  <i className={`ki-filled ${dict.state === 'listening' ? 'ki-message-text-2' : 'ki-message-text-2'} text-xs`} />
                   {dict.state === 'listening' ? 'Слушаю…' : 'Диктовать'}
                 </button>
               )}

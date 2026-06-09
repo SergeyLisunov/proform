@@ -59,7 +59,7 @@ export default function NewsletterStatsPage() {
   if (!newsletter) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-information-5 text-3xl text-slate-400" />
+        <i className="ki-filled ki-information-4 text-3xl text-slate-400" />
         <p className="text-sm font-semibold text-foreground">Рассылка не найдена</p>
       </div>
     )
@@ -69,7 +69,7 @@ export default function NewsletterStatsPage() {
   const deliveryRate = stats && stats.sent > 0 ? Math.round((stats.delivered / stats.sent) * 100) : 0
 
   const STAT_CARDS = [
-    { label: 'Отправлено',  value: stats?.sent ?? 0,      icon: 'ki-send',         color: '#2563EB', bg: '#EFF6FF', hint: 'Все отправленные письма' },
+    { label: 'Отправлено',  value: stats?.sent ?? 0,      icon: 'ki-paper-plane',         color: '#2563EB', bg: '#EFF6FF', hint: 'Все отправленные письма' },
     { label: 'Доставлено',  value: stats?.delivered ?? 0, icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4', hint: 'Успешно дошли до адресатов' },
     { label: 'Открыто',     value: stats?.opened ?? 0,    icon: 'ki-eye',          color: '#F35703', bg: '#FEF0E7', hint: 'Получатели открыли письмо' },
     { label: 'Ошибки',      value: stats?.failed ?? 0,    icon: 'ki-shield-cross', color: '#DC2626', bg: '#FEF2F2', hint: 'Неуспешные доставки' },

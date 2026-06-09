@@ -45,11 +45,11 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> 
 }
 
 const NOTIF_ICONS: Record<string, string> = {
-  invitation_received:     'ki-user-plus',
+  invitation_received:     'ki-users',
   claim_request:           'ki-key',
   invitation_accepted:     'ki-check-circle',
   invitation_declined:     'ki-cross-circle',
-  invitation_cancelled:    'ki-information-5',
+  invitation_cancelled:    'ki-information-4',
   connection_terminated:   'ki-disconnect',
   broadcast:               'ki-notification-on',
   system:                  'ki-setting-2',
@@ -60,8 +60,8 @@ const NOTIF_ICONS: Record<string, string> = {
   // W13 Day 65: extend для W12 Day 60 in-app event surface + older types
   session_scheduled:       'ki-calendar',
   session_cancelled:       'ki-calendar-2',
-  checkup_scheduled:       'ki-medical-clinic',
-  checkup_cancelled:       'ki-medical-clinic',
+  checkup_scheduled:       'ki-pulse',
+  checkup_cancelled:       'ki-pulse',
   invited_to_event:        'ki-rocket',
   event_cancelled:         'ki-rocket',
   pass_issued:             'ki-cup',

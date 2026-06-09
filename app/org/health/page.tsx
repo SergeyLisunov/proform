@@ -179,9 +179,9 @@ export default function OrgHealthPage() {
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Всего участников', value: snapshot.members_total, icon: 'ki-people',         bg: 'bg-slate-50 text-slate-600' },
-          { label: 'Атлеты',           value: snapshot.athletes_total, icon: 'ki-running-shoes', bg: 'bg-orange-50 text-orange-600' },
+          { label: 'Атлеты',           value: snapshot.athletes_total, icon: 'ki-abstract-26', bg: 'bg-orange-50 text-orange-600' },
           { label: 'Тренеры',          value: snapshot.coaches_total,  icon: 'ki-cup',           bg: 'bg-emerald-50 text-emerald-600' },
-          { label: 'Врачи',            value: snapshot.doctors_total,  icon: 'ki-medical-clinic', bg: 'bg-red-50 text-red-600' },
+          { label: 'Врачи',            value: snapshot.doctors_total,  icon: 'ki-pulse', bg: 'bg-red-50 text-red-600' },
         ].map(s => (
           <Card key={s.label} className="p-4 rounded-2xl">
             <div className="flex items-start justify-between gap-2">

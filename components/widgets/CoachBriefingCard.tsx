@@ -148,7 +148,7 @@ export default function CoachBriefingCard() {
                         </div>
                         <div className="mt-0.5 text-xs text-foreground">{a.headline}</div>
                         <div className="mt-1 flex items-start gap-1 text-2xs text-muted-foreground">
-                          <i className="ki-filled ki-flash mt-[2px] text-[9px] text-orange-500" />
+                          <i className="ki-filled ki-flash-circle mt-[2px] text-[9px] text-orange-500" />
                           <span>{a.action}</span>
                         </div>
                       </div>

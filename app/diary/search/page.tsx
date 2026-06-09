@@ -189,7 +189,7 @@ export default function DiarySearchPage() {
                     >
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
                         <i
-                          className={`ki-filled ${isNote ? 'ki-notepad-edit text-[18px] text-amber-500' : 'ki-flash text-[18px] text-emerald-500'}`}
+                          className={`ki-filled ${isNote ? 'ki-notepad-edit text-[18px] text-amber-500' : 'ki-flash-circle text-[18px] text-emerald-500'}`}
                         />
                       </div>
                       <div className="min-w-0 flex-1">

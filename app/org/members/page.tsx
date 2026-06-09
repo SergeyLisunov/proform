@@ -168,7 +168,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
             <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 5 }}>Пользователь должен быть зарегистрирован в Sporteo</p>
             {err && (
               <div style={{ marginTop: 8, padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <i className="ki-filled ki-information-5 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
+                <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
                 {err}
               </div>
             )}
@@ -176,7 +176,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
 
           {/* Инфо */}
           <div style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--accent)', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-            <i className="ki-filled ki-information-5 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
+            <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
             <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.55 }}>
               После добавления участник сразу получит доступ к разделам организации согласно своей роли.
             </p>
@@ -615,7 +615,7 @@ export default function OrgMembersPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start' }} className="lg:justify-end">
                     {m.member_role === 'athlete' && m.status === 'active' && (
                       <button onClick={() => setAssignAthlete(m)} title="Назначить тренера" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-link text-xs" />
+                        <i className="ki-filled ki-fasten text-xs" />
                       </button>
                     )}
                     {m.member_role === 'coach' && m.status === 'active' && m.user_id !== orgId && (
@@ -630,7 +630,7 @@ export default function OrgMembersPage() {
                     )}
                     {m.status === 'active' && (
                       <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FBC1A0', background: '#FEF0E7', color: '#F35703', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-pause text-xs" />
+                        <i className="ki-filled ki-minus-circle text-xs" />
                       </button>
                     )}
                     {(m.status === 'suspended' || m.status === 'pending') && (

@@ -76,8 +76,8 @@ export const EVENT_COLORS: Record<string, { bg: string; text: string }> = {
 export const RISK_COLORS: Record<string, { bg: string; text: string; border: string; icon: string }> = {
   low:      { bg: '#F0FDF4', text: '#15803D', border: '#86EFAC', icon: 'ki-check-circle' },
   moderate: { bg: '#FEF0E7', text: '#B03D04', border: '#FBC1A0', icon: 'ki-information-2' },
-  high:     { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA', icon: 'ki-warning-2' },
-  critical: { bg: '#450A0A', text: '#FCA5A5', border: '#7F1D1D', icon: 'ki-danger' },
+  high:     { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA', icon: 'ki-information-4' },
+  critical: { bg: '#450A0A', text: '#FCA5A5', border: '#7F1D1D', icon: 'ki-information-4' },
 }
 
 // ── Coach marks ────────────────────────────────────────────────────────────────

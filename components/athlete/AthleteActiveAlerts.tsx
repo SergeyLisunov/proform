@@ -51,7 +51,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
   if (injuries.length === 0 && passes.length === 0) return null
 
   return (
-    <Alert variant="primary" title="Требуют внимания" icon="ki-information-5">
+    <Alert variant="primary" title="Требуют внимания" icon="ki-information-4">
       <div className="flex flex-wrap gap-2 mt-1">
         {injuries.map(i => {
           const sev = SEVERITY_LABELS[i.severity]

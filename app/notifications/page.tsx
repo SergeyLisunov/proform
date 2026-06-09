@@ -15,10 +15,10 @@ type Notification = {
 }
 
 const TYPE_META: Record<string, { icon: string; color: string; bg: string }> = {
-  invitation_received:     { icon: 'ki-user-plus',       color: '#F35703', bg: '#FEF0E7' },
+  invitation_received:     { icon: 'ki-users',       color: '#F35703', bg: '#FEF0E7' },
   invitation_accepted:     { icon: 'ki-check-circle',    color: '#16A34A', bg: '#F0FDF4' },
   invitation_declined:     { icon: 'ki-cross-circle',    color: '#DC2626', bg: '#FEF2F2' },
-  invitation_cancelled:    { icon: 'ki-information-5',   color: '#64748B', bg: '#F8FAFC' },
+  invitation_cancelled:    { icon: 'ki-information-4',   color: '#64748B', bg: '#F8FAFC' },
   connection_terminated:   { icon: 'ki-disconnect',      color: '#DC2626', bg: '#FEF2F2' },
   broadcast:               { icon: 'ki-notification-on', color: '#2563EB', bg: '#EFF6FF' },
   system:                  { icon: 'ki-setting-2',       color: '#7C3AED', bg: '#F5F3FF' },

@@ -164,7 +164,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setAiOpen(true)}
               className="rounded-xl border border-purple-200 bg-purple-50 text-purple-700 px-4 py-2.5 text-sm font-semibold hover:bg-purple-100">
-              <i className="ki-filled ki-lots-shining text-xs mr-1" />
+              <i className="ki-filled ki-star text-xs mr-1" />
               Обзор недели (AI)
             </button>
             <Link href={pdfHref} target="_blank"
@@ -938,7 +938,7 @@ function EntryDrawer({
                       : 'border-border bg-background text-muted-foreground hover:border-orange-300 hover:text-orange-600'
                   }`}
                   title={dict.state === 'listening' ? 'Остановить запись' : 'Диктовать запись'}>
-                  <i className={`ki-filled ${dict.state === 'listening' ? 'ki-microphone-2' : 'ki-microphone'} text-xs`} />
+                  <i className={`ki-filled ${dict.state === 'listening' ? 'ki-message-text-2' : 'ki-message-text-2'} text-xs`} />
                   {dict.state === 'listening' ? 'Слушаю…' : 'Диктовать'}
                 </button>
               )}

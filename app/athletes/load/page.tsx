@@ -84,7 +84,7 @@ export default function AthleteLoadPage() {
         <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Атлеты · {rows.length}</p>
           <button onClick={load} className="text-[11px] font-semibold text-orange-600 hover:text-orange-700">
-            <i className="ki-filled ki-refresh text-[10px] mr-1"/>
+            <i className="ki-filled ki-arrows-circle text-[10px] mr-1"/>
             Обновить
           </button>
         </div>

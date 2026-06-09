@@ -271,7 +271,7 @@ export default function CoachPassesPage() {
             toast.ok ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
           }`}
         >
-          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-warning-2'} text-sm`} />
+          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-4'} text-sm`} />
           {toast.msg}
         </div>
       )}

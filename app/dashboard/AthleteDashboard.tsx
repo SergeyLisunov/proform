@@ -36,7 +36,7 @@ const TYPE_COLOR: Record<string, string> = {
 }
 const TYPE_ICON: Record<string, string> = {
   Running: 'ki-abstract-26', Cycling: 'ki-car', Swimming: 'ki-drop', HIIT: 'ki-abstract-40',
-  'Weight Training': 'ki-barcode', CrossFit: 'ki-abstract-28', Yoga: 'ki-abstract-33', Walking: 'ki-footprint-2',
+  'Weight Training': 'ki-barcode', CrossFit: 'ki-abstract-28', Yoga: 'ki-abstract-33', Walking: 'ki-abstract-26',
 }
 
 export default async function AthleteDashboard({ userId, name }: { userId: string; name: string }) {

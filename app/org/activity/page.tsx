@@ -21,7 +21,7 @@ import ApexChart from '@/components/charts/ApexChart'
 export const dynamic = 'force-dynamic'
 
 const TYPE_META: Record<OrgEventType, { label: string; icon: string; color: string; bg: string; border: string }> = {
-  member_joined:          { label: 'Член команды',     icon: 'ki-user-plus',        color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+  member_joined:          { label: 'Член команды',     icon: 'ki-users',        color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   inquiry_created:        { label: 'Запрос врачу',     icon: 'ki-message-question', color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
   inquiry_answered:       { label: 'Ответ врача',      icon: 'ki-check-circle',     color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC' },
   recommendation_issued:  { label: 'Рекомендация',     icon: 'ki-shield-cross',     color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },

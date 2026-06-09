@@ -145,7 +145,7 @@ export default function InjuriesPage() {
             Записи · {rows.length}
           </p>
           <button onClick={load} className="text-[11px] font-semibold text-orange-600 hover:text-orange-700">
-            <i className="ki-filled ki-refresh text-[10px] mr-1"/>Обновить
+            <i className="ki-filled ki-arrows-circle text-[10px] mr-1"/>Обновить
           </button>
         </div>
         {loading && rows.length === 0 ? (

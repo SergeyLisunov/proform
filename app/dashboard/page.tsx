@@ -106,7 +106,7 @@ function HeroAvatar({ avatarUrl, name, userId, onAvatarUpdate }: {
         {uploading
           ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           : <>
-              <i className="ki-filled ki-camera text-white text-sm" />
+              <i className="ki-filled ki-picture text-white text-sm" />
               <span className="text-white text-[9px] font-bold mt-0.5">Изменить</span>
             </>
         }
@@ -1017,7 +1017,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
                 const rc          = recoveryColor(a.recovery_score ?? 0)
                 const score       = a.recovery_score
                 const status      = score == null ? 'unknown' : score < 40 ? 'warning' : score > 65 ? 'good' : 'ok'
-                const statusIcon  = status === 'good' ? 'ki-check-circle' : status === 'warning' ? 'ki-warning-2' : status === 'ok' ? 'ki-information-2' : 'ki-minus-circle'
+                const statusIcon  = status === 'good' ? 'ki-check-circle' : status === 'warning' ? 'ki-information-4' : status === 'ok' ? 'ki-information-2' : 'ki-minus-circle'
                 const statusColor = status === 'good' ? 'text-green-500' : status === 'warning' ? 'text-orange-500' : 'text-blue-500'
                 return (
                   <div key={a.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-accent/50 transition-colors">

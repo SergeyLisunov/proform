@@ -106,7 +106,7 @@ export default function VoiceDebriefButton({
           }`}
           title={stage === 'recording' ? 'Остановить запись' : 'Записать голосовой дебриф'}
         >
-          <i className={`ki-filled ${stage === 'recording' ? 'ki-abstract-8' : 'ki-microphone-2'} text-sm`} />
+          <i className={`ki-filled ${stage === 'recording' ? 'ki-abstract-8' : 'ki-message-text-2'} text-sm`} />
         </button>
         <div className="min-w-0 flex-1">
           <div className="text-xs font-bold text-foreground">

@@ -399,7 +399,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
             {error && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>
-                <i className="ki-filled ki-information-5" style={{ flexShrink: 0 }} />{error}
+                <i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}
               </div>
             )}
             <div style={{ display: 'flex', gap: 8 }}>

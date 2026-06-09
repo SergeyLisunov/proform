@@ -450,7 +450,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
           fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
           boxShadow: '0 4px 16px rgba(0,0,0,0.16)',
         }}>
-          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-warning-2'} text-sm`} />
+          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-4'} text-sm`} />
           {toast.msg}
         </div>
       )}

@@ -488,7 +488,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 />
                 <div className="mt-4 grid gap-2">
                   {[
-                    { label: 'Риск перегруза', status: athlete.recovery < 45 ? 'high' : athlete.recovery < 70 ? 'moderate' : 'low', icon: 'ki-warning-2' },
+                    { label: 'Риск перегруза', status: athlete.recovery < 45 ? 'high' : athlete.recovery < 70 ? 'moderate' : 'low', icon: 'ki-information-4' },
                     { label: 'Разрыв восстановления', status: athlete.recovery < 50 ? 'moderate' : 'low', icon: 'ki-abstract-26' },
                     { label: 'Стабильность нагрузки', status: athlete.streak > 10 ? 'moderate' : 'low', icon: 'ki-chart-line-up' },
                     { label: 'Целостность тренда', status: athlete.risk === 'low' ? 'low' : 'moderate', icon: 'ki-abstract-31' },
@@ -941,7 +941,7 @@ export default function AthletesPage() {
             {[
               { label: 'Атлеты', value: athletes.length, icon: 'ki-people', tone: 'bg-blue-50 text-blue-600' },
               { label: 'Средняя готовность', value: `${averageRecovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
-              { label: 'В зоне риска', value: riskCount, icon: 'ki-warning-2', tone: 'bg-orange-50 text-orange-600' },
+              { label: 'В зоне риска', value: riskCount, icon: 'ki-information-4', tone: 'bg-orange-50 text-orange-600' },
               { label: 'Готовы сейчас', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
               { label: 'Сессии', value: totalSessions, icon: 'ki-calendar', tone: 'bg-slate-50 text-slate-600' },
             ].map((item) => (
@@ -976,7 +976,7 @@ export default function AthletesPage() {
             label: 'Риск по составу',
             value: `${riskCount}`,
             hint: 'Атлетам нужен дополнительный контроль',
-            icon: 'ki-warning-2',
+            icon: 'ki-information-4',
             tone: 'bg-orange-50 text-orange-600',
           },
           {

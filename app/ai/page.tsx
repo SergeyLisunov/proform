@@ -32,7 +32,7 @@ const FEATURES: Feature[] = [
   },
   {
     key: 'week',
-    icon: 'ki-sparkle',
+    icon: 'ki-message-programming',
     title: 'Разбор недели',
     subtitle: 'Тренды, риски и рекомендации на основе ваших данных',
     href: '/insights',
@@ -43,7 +43,7 @@ const FEATURES: Feature[] = [
   },
   {
     key: 'video',
-    icon: 'ki-video',
+    icon: 'ki-screen',
     title: 'Видеоразбор техники',
     subtitle: 'Загрузите видео — AI разберёт технику по кадрам',
     href: '/form-analysis',
@@ -54,7 +54,7 @@ const FEATURES: Feature[] = [
   },
   {
     key: 'voice',
-    icon: 'ki-microphone-2',
+    icon: 'ki-message-text-2',
     title: 'Голос → тренировка',
     subtitle: 'Надиктуйте — AI соберёт карточку тренировки',
     href: '/quick',
@@ -287,7 +287,7 @@ function AssistantChat() {
 function CoachToolsPanel({ role }: { role: string | undefined }) {
   const tools = [
     { title: 'Брифинг по атлету', subtitle: 'Краткое резюме состояния выбранного атлета', href: '/athletes', icon: 'ki-people', color: '#16A34A', bg: '#F0FDF4' },
-    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-lamp-on', color: '#F35703', bg: '#FEF0E7' },
+    { title: 'Предложения тренировок', subtitle: 'AI-подсказки по плану на следующую неделю', href: '/athletes', icon: 'ki-information-2', color: '#F35703', bg: '#FEF0E7' },
     { title: 'Детектор аномалий', subtitle: 'Автоматический поиск просадок HRV / сна / нагрузки', href: '/analytics', icon: 'ki-shield-tick', color: '#DC2626', bg: '#FEF2F2' },
     { title: 'Медицинское резюме', subtitle: 'Сводка для врача / консилиума по атлету', href: '/athletes', icon: 'ki-note-2', color: '#0D9488', bg: '#F0FDFA' },
   ]
@@ -344,7 +344,7 @@ export default function AiHubPage() {
         <div className="relative flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E9D5FF] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7C3AED]">
-              <i className="ki-filled ki-sparkle text-[11px]" />
+              <i className="ki-filled ki-message-programming text-[11px]" />
               Sporteo AI
             </span>
             <span className="inline-flex items-center rounded-full border border-[#BAE6FD] bg-[#F0F9FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0EA5E9]">

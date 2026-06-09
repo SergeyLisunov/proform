@@ -326,7 +326,7 @@ type TabDef = { id: string; label: string; icon: string; color: string }
 const COACH_TABS: TabDef[] = [
   { id: 'personal',     label: 'Личные данные', icon: 'ki-profile-circle', color: '#F35703' },
   { id: 'professional', label: 'Профессия',     icon: 'ki-abstract-26',    color: '#2563EB' },
-  { id: 'methodology',  label: 'Методика',      icon: 'ki-flash',          color: '#8B5CF6' },
+  { id: 'methodology',  label: 'Методика',      icon: 'ki-flash-circle',          color: '#8B5CF6' },
   { id: 'experience',   label: 'Опыт и ставка', icon: 'ki-medal-star',     color: '#0D9488' },
   { id: 'contacts',     label: 'Контакты',      icon: 'ki-people',         color: '#7C3AED' },
   { id: 'privacy',      label: 'Приватность',   icon: 'ki-shield-tick',    color: '#16A34A' },
@@ -804,7 +804,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
 
   if (tab === 'methodology') {
     return (
-      <FormSection title="Методика и достижения" icon="ki-flash" iconBg="#F5F3FF" iconColor="#8B5CF6">
+      <FormSection title="Методика и достижения" icon="ki-flash-circle" iconBg="#F5F3FF" iconColor="#8B5CF6">
         <Field label="Философия тренировок" full hint="Ваш подход, принципы работы с атлетами">
           <TextArea value={form.coaching_philosophy} onChange={u('coaching_philosophy') as (v: string) => void} rows={4} placeholder="Индивидуальный план, акцент на восстановлении и биомеханике…" />
         </Field>

@@ -107,7 +107,7 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center">
-              <i className="ki-filled ki-chat text-sm" style={{ color: '#D44A02' }} />
+              <i className="ki-filled ki-message-text-2 text-sm" style={{ color: '#D44A02' }} />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Обратная связь</p>

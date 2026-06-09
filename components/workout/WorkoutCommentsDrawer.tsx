@@ -277,7 +277,7 @@ export default function WorkoutCommentsDrawer({
               {sending ? (
                 <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent pf-spin" />
               ) : (
-                <i className="ki-filled ki-send text-[14px]" />
+                <i className="ki-filled ki-paper-plane text-[14px]" />
               )}
             </button>
           </div>

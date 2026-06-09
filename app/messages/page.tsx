@@ -382,7 +382,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
             }}>
             {sending
               ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              : <i className="ki-filled ki-send text-sm" style={{ color: text.trim() ? 'white' : 'var(--muted-foreground)' }} />
+              : <i className="ki-filled ki-paper-plane text-sm" style={{ color: text.trim() ? 'white' : 'var(--muted-foreground)' }} />
             }
           </button>
         </div>
