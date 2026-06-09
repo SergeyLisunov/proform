@@ -290,7 +290,7 @@ export default function CoachPassPlansPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       <Badge variant="primary" size="sm" className="uppercase tracking-wider">
-                        {tm.emoji} {tm.label}
+                        {tm.label}
                       </Badge>
                       <Badge variant="secondary" size="sm" className="uppercase tracking-wider bg-violet-50 text-violet-700">
                         {p.total_sessions} сессий
@@ -377,7 +377,7 @@ export default function CoachPassPlansPage() {
                   onChange={e => setEditor({ ...editor, service_type: e.target.value as PassServiceType })}
                   className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
                   {(Object.entries(PASS_SERVICE_TYPE_META) as Array<[PassServiceType, typeof PASS_SERVICE_TYPE_META[PassServiceType]]>).map(([k, v]) =>
-                    <option key={k} value={k}>{v.emoji} {v.label} — {v.hint}</option>
+                    <option key={k} value={k}>{v.label} — {v.hint}</option>
                   )}
                 </select>
               </div>

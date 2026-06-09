@@ -285,11 +285,11 @@ export default function CoachServicesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       <Badge variant="primary" size="sm" className="uppercase tracking-wider">
-                        {tm.emoji} {tm.label}
+                        {tm.label}
                       </Badge>
                       {fm && (
                         <Badge variant="info" size="sm" className="uppercase tracking-wider">
-                          {fm.emoji} {fm.label}
+                          {fm.label}
                         </Badge>
                       )}
                       {s.duration_days && (
@@ -377,7 +377,7 @@ export default function CoachServicesPage() {
                     onChange={e => setEditor({ ...editor, service_type: e.target.value as ServiceType })}
                     className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
                     {(Object.entries(SERVICE_TYPE_META) as Array<[ServiceType, typeof SERVICE_TYPE_META[ServiceType]]>).map(([k, v]) =>
-                      <option key={k} value={k}>{v.emoji} {v.label}</option>
+                      <option key={k} value={k}>{v.label}</option>
                     )}
                   </select>
                 </div>
@@ -388,7 +388,7 @@ export default function CoachServicesPage() {
                     className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
                     <option value="">— не указан —</option>
                     {(Object.entries(FORMAT_META) as Array<[ServiceFormat, typeof FORMAT_META[ServiceFormat]]>).map(([k, v]) =>
-                      <option key={k} value={k}>{v.emoji} {v.label}</option>
+                      <option key={k} value={k}>{v.label}</option>
                     )}
                   </select>
                 </div>

@@ -253,7 +253,7 @@ function MarketplaceInner() {
           <div className="flex flex-wrap gap-1.5">
             <FilterChip label="Все" active={!role} onClick={() => setFilter('role', '')} />
             {ROLE_OPTIONS.map(r => (
-              <FilterChip key={r} label={`${ROLE_META[r].emoji} ${ROLE_META[r].label}`}
+              <FilterChip key={r} label={`${ROLE_META[r].label}`}
                 active={role === r}
                 color={ROLE_META[r].color} bg={ROLE_META[r].bg}
                 onClick={() => setFilter('role', r)} />
@@ -268,7 +268,7 @@ function MarketplaceInner() {
             <div className="flex flex-wrap gap-1.5">
               <FilterChip label="Все" active={!specialty} onClick={() => setFilter('specialty', '')} />
               {SPECIALTY_OPTIONS.map(s => (
-                <FilterChip key={s} label={`${SPECIALTY_META[s].emoji} ${SPECIALTY_META[s].label}`}
+                <FilterChip key={s} label={`${SPECIALTY_META[s].label}`}
                   active={specialty === s}
                   onClick={() => setFilter('specialty', s)} />
               ))}
@@ -282,7 +282,7 @@ function MarketplaceInner() {
           <div className="flex flex-wrap gap-1.5">
             <FilterChip label="Все" active={!type} onClick={() => setFilter('type', '')} />
             {TYPE_OPTIONS.map(t => (
-              <FilterChip key={t} label={`${SERVICE_TYPE_META[t].emoji} ${SERVICE_TYPE_META[t].label}`}
+              <FilterChip key={t} label={`${SERVICE_TYPE_META[t].label}`}
                 active={type === t}
                 onClick={() => setFilter('type', t)} />
             ))}
@@ -335,7 +335,7 @@ function MarketplaceInner() {
                     <h3 className="text-base font-bold text-navy-500 line-clamp-2">{o.title}</h3>
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
                       style={{ background: roleMeta.bg, color: roleMeta.color }}>
-                      {roleMeta.emoji} {roleMeta.label}
+                      {roleMeta.label}
                     </span>
                   </div>
                   {o.description && <p className="text-xs text-muted-foreground line-clamp-2 flex-1">{o.description}</p>}
@@ -438,7 +438,6 @@ function MarketplaceInner() {
             return (
               <section key={t}>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-2xl">{meta.emoji}</span>
                   <h2 className="text-lg font-bold text-navy-500">{meta.label}</h2>
                   <span className="text-xs text-muted-foreground">({offs.length})</span>
                 </div>
@@ -457,7 +456,7 @@ function MarketplaceInner() {
                           <h3 className="text-base font-bold text-navy-500 line-clamp-2">{o.title}</h3>
                           <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"
                             style={{ background: roleMeta.bg, color: roleMeta.color }}>
-                            {roleMeta.emoji} {roleMeta.label}
+                            {roleMeta.label}
                           </span>
                         </div>
 
