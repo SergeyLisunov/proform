@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import {
   listMyPlans, archivePlan, ACTIVITY_LABELS,
   type WorkoutPlan,
@@ -16,6 +17,7 @@ import { Card, Badge } from '@/components/ui/metronic'
 
 export default function CoachPlansPage() {
   const { user, loading: userLoading } = useUser()
+  const { confirm } = useDialog()
   const [plans, setPlans]     = useState<WorkoutPlan[]>([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId]   = useState<string | null>(null)
@@ -33,7 +35,7 @@ export default function CoachPlansPage() {
   }, [user, userLoading])
 
   async function handleArchive(planId: string) {
-    if (!confirm('Архивировать план? Восстановить можно через SQL.')) return
+    if (!(await confirm('Архивировать план? Восстановить можно через SQL.'))) return
     setBusyId(planId)
     try {
       const ok = await archivePlan(planId)

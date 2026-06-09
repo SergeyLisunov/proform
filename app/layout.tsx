@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
 import { MobileMenuProvider } from '@/lib/hooks/useMobileMenu'
+import { DialogProvider } from '@/lib/hooks/useDialog'
 import ClientOverlays from '@/components/ui/ClientOverlays'
 
 // Единое семейство — Montserrat (founder decision, 2026-06-08).
@@ -121,10 +122,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           kt-sidebar-* классы продолжают работать как CSS hooks). */}
       <body className="antialiased text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
         <ToastProvider>
-          <MobileMenuProvider>
-            {children}
-            <ClientOverlays />
-          </MobileMenuProvider>
+          <DialogProvider>
+            <MobileMenuProvider>
+              {children}
+              <ClientOverlays />
+            </MobileMenuProvider>
+          </DialogProvider>
         </ToastProvider>
         <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
         {/* W15 Day 76 — Vercel Analytics + Speed Insights.

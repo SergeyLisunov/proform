@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { Alert } from '@/components/ui/metronic'
 
 type Author = {
@@ -54,6 +55,7 @@ export default function WorkoutCommentsDrawer({
   currentUserId: string
   onClose: () => void
 }) {
+  const { confirm } = useDialog()
   const [mounted, setMounted]     = useState(false)
   const [visible, setVisible]     = useState(false)
   const [comments, setComments]   = useState<Comment[]>([])
@@ -122,7 +124,7 @@ export default function WorkoutCommentsDrawer({
   }
 
   async function remove(commentId: string) {
-    if (!confirm('Удалить комментарий?')) return
+    if (!(await confirm('Удалить комментарий?'))) return
     const snapshot = comments
     setComments(prev => prev.filter(c => c.id !== commentId))
     try {

@@ -14,6 +14,7 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { useUser } from '@/lib/hooks/useUser'
 import { Card, Badge } from '@/components/ui/metronic'
 import {
@@ -59,6 +60,7 @@ function StarRating({
 }
 
 export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBlockProps) {
+  const { confirm } = useDialog()
   const { user, loading: userLoading } = useUser()
   const [reviews, setReviews]       = useState<CoachReviewWithAuthor[]>([])
   const [myReview, setMyReview]     = useState<CoachReview | null>(null)
@@ -155,7 +157,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
   }, [saving, formRating, formComment, coachId, myReview, refresh])
 
   const onDelete = useCallback(async () => {
-    if (!confirm('Удалить ваш отзыв безвозвратно?')) return
+    if (!(await confirm('Удалить ваш отзыв безвозвратно?'))) return
     const res = await deleteMyReview(coachId)
     if (!res.ok) {
       setToast({ ok: false, msg: res.error ?? 'Не удалось удалить' })

@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { getMyOrg } from '@/services/org.service'
 import {
   getOrgGroup, listOrgAthletesNotInGroup,
@@ -46,6 +47,7 @@ export default function TeamDetailPage() {
   const groupId = params.id
 
   const { user, loading: userLoading } = useUser()
+  const { confirm }                     = useDialog()
   const [org, setOrg]                   = useState<Organization | null>(null)
   const [group, setGroup]               = useState<OrgGroup | null>(null)
   const [members, setMembers]           = useState<Member[]>([])
@@ -145,7 +147,7 @@ export default function TeamDetailPage() {
   // ── Remove member ───────────────────────────────────────────────────
   async function removeMember(athleteId: string) {
     if (!org) return
-    if (!confirm('Удалить атлета из команды? Профиль атлета останется в организации.')) return
+    if (!(await confirm('Удалить атлета из команды? Профиль атлета останется в организации.'))) return
     setBusyAthleteId(athleteId)
     try {
       const res = await fetch(
@@ -205,7 +207,7 @@ export default function TeamDetailPage() {
 
   // ── Archive ─────────────────────────────────────────────────────────
   async function archive() {
-    if (!confirm('Архивировать команду? Атлеты останутся в системе, команда будет скрыта.')) return
+    if (!(await confirm('Архивировать команду? Атлеты останутся в системе, команда будет скрыта.'))) return
     setArchiving(true)
     try {
       const res = await fetch(`/api/org/teams/${groupId}`, { method: 'DELETE' })

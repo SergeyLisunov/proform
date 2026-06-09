@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { allProviders, type DeviceProvider } from '@/lib/integrations/providers'
 import { Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
 import {
@@ -36,6 +37,7 @@ function fmtSync(iso: string | null): string {
 }
 
 export default function DevicesSection() {
+  const { confirm } = useDialog()
   const [conns, setConns] = useState<DeviceConnection[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<Record<string, boolean>>({})
@@ -182,7 +184,7 @@ export default function DevicesSection() {
                     </button>
                     <button disabled={!!busy[meta.id]}
                       onClick={async () => {
-                        if (!confirm(`Отключить ${meta.name}? Токены будут удалены.`)) return
+                        if (!(await confirm(`Отключить ${meta.name}? Токены будут удалены.`))) return
                         setBusy(b => ({ ...b, [meta.id]: true }))
                         await disconnectDevice(meta.id); await load()
                         setBusy(b => ({ ...b, [meta.id]: false }))

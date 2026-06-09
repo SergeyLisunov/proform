@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Card } from '@/components/ui/metronic'
@@ -279,6 +280,7 @@ function AssignCoachModal({ athlete, coaches, onClose, onLinked }: {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function OrgMembersPage() {
   const { user } = useUser()
+  const { confirm, alert } = useDialog()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [roleFilter, setRoleFilter] = useState<'all' | MemberRole>('all')
@@ -314,7 +316,7 @@ export default function OrgMembersPage() {
 
   async function changeStatus(memberId: string, newStatus: MemberStatus) {
     const { error } = await getSB().from('org_members').update({ status: newStatus }).eq('id', memberId)
-    if (error) { alert('Ошибка при изменении статуса'); return }
+    if (error) { await alert('Ошибка при изменении статуса'); return }
     setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: newStatus } : m).filter(m => m.status !== 'removed'))
     showToastMsg(newStatus === 'removed' ? 'Участник удалён' : 'Статус обновлён')
   }
@@ -324,7 +326,7 @@ export default function OrgMembersPage() {
   async function changeMemberRole(memberId: string, newRole: 'org_admin' | 'coach') {
     const label = newRole === 'org_admin' ? 'сделать админом' : 'снять с админа'
     const reason = window.prompt(`Кратко укажите причину (${label}):`)?.trim() ?? ''
-    if (reason.length < 4) { alert('Нужно указать причину (минимум 4 символа)'); return }
+    if (reason.length < 4) { await alert('Нужно указать причину (минимум 4 символа)'); return }
     const res = await fetch('/api/org/members/role', {
       method:  'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -332,7 +334,7 @@ export default function OrgMembersPage() {
     })
     const json = await res.json().catch(() => ({}))
     if (!res.ok || !json.ok) {
-      alert(`Не удалось изменить роль: ${json.error ?? res.status}`)
+      await alert(`Не удалось изменить роль: ${json.error ?? res.status}`)
       return
     }
     setMembers(prev => prev.map(m => m.id === memberId ? { ...m, member_role: newRole } : m))
@@ -636,7 +638,7 @@ export default function OrgMembersPage() {
                         <i className="ki-filled ki-check text-xs" />
                       </button>
                     )}
-                    <button onClick={() => { if (confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} title="Удалить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
+                    <button onClick={async () => { if (await confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} title="Удалить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                       <i className="ki-filled ki-trash text-xs" />
                     </button>
                   </div>

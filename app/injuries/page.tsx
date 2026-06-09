@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
+import { useDialog } from '@/lib/hooks/useDialog'
 import { createClient } from '@/lib/supabase/client'
 import {
   listInjuries, createInjury, updateInjury, markRecovered, deleteInjury,
@@ -299,6 +300,7 @@ function InjuryRow({
   onChanged: () => void
 }) {
   const [busy, setBusy] = useState(false)
+  const { confirm } = useDialog()
   const sevColor = SEVERITY_COLOR[injury.severity]
   const statusColor = STATUS_COLOR[injury.status]
 
@@ -309,7 +311,7 @@ function InjuryRow({
     setBusy(false); onChanged()
   }
   const handleDelete = async () => {
-    if (!confirm('Удалить запись о травме?')) return
+    if (!(await confirm('Удалить запись о травме?'))) return
     setBusy(true)
     await deleteInjury(injury.id)
     setBusy(false); onChanged()

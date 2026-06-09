@@ -10,6 +10,7 @@ import {
 } from '@/services/doctor.service'
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 export function useDoctorPatients(doctorId: string | null) {
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -107,6 +108,7 @@ export function MedicalCheckupDrawer({
   onSaved: (c: MedicalCheckup) => void
   initial?: MedicalCheckup | null
 }) {
+  const { confirm } = useDialog()
   const [athleteId, setAthleteId]     = useState<string>(initial?.athlete_id ?? initialPatientId ?? patients[0]?.id ?? '')
   const [checkupDate, setCheckupDate] = useState<string>(initial?.checkup_date ?? initialDate)
   const [startTime, setStartTime]     = useState<string>(initial?.start_time ?? '')
@@ -168,7 +170,7 @@ export function MedicalCheckupDrawer({
 
   const handleDelete = useCallback(async () => {
     if (!initial) return
-    if (!confirm('Удалить осмотр?')) return
+    if (!(await confirm('Удалить осмотр?'))) return
     await deleteCheckup(initial.id)
     onSaved({ ...initial, status: 'cancelled' })
     handleClose()

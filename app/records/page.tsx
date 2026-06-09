@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useToast } from '@/lib/hooks/useToast'
+import { useDialog } from '@/lib/hooks/useDialog'
 
 type Category = 'run' | 'bike' | 'swim' | 'strength' | 'other'
 type Metric = 'time' | 'distance' | 'weight' | 'reps' | 'duration' | 'power'
@@ -82,6 +83,7 @@ function catMeta(c: Category) { return CATEGORIES.find(x => x.value === c) ?? CA
 
 export default function RecordsPage() {
   const { success, error } = useToast()
+  const { confirm } = useDialog()
   const [records, setRecords] = useState<Record[] | null>(null)
   const [filter, setFilter] = useState<Category | 'all'>('all')
   const [editing, setEditing] = useState<FormState | null>(null)
@@ -167,7 +169,7 @@ export default function RecordsPage() {
   }, [editing, supabase, success, error, load])
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!confirm('Удалить этот рекорд?')) return
+    if (!(await confirm('Удалить этот рекорд?'))) return
     const { error: err } = await (supabase as any).from('personal_records').delete().eq('id', id)
     if (err) { error(err.message); return }
     success('Удалено')
