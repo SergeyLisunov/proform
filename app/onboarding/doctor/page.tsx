@@ -30,12 +30,12 @@ import {
 
 const ACCENT = '#7C3AED'   // violet — matches doctor role tint in /doctor/inquiries
 
-const SPECIALTIES: Array<{ key: string; label: string; emoji: string; hint: string }> = [
-  { key: 'cardiology',      label: 'Кардиология',         emoji: '❤️', hint: 'Нагрузочные тесты, ЭКГ, допуск к нагрузкам' },
-  { key: 'orthopedic',      label: 'Ортопедия',           emoji: '🦴', hint: 'ОДА, реабилитация, возврат к спорту' },
-  { key: 'sports_medicine', label: 'Спортивная медицина', emoji: '🏃', hint: 'Спортивный скрининг, фарм-сопровождение' },
-  { key: 'general',         label: 'Терапия',             emoji: '🩺', hint: 'Общий осмотр, диспансеризация' },
-  { key: 'other',           label: 'Другое',              emoji: '⭐', hint: 'Психология, питание, физиотерапия' },
+const SPECIALTIES: Array<{ key: string; label: string; icon: string; hint: string }> = [
+  { key: 'cardiology',      label: 'Кардиология',         icon: 'ki-heart',        hint: 'Нагрузочные тесты, ЭКГ, допуск к нагрузкам' },
+  { key: 'orthopedic',      label: 'Ортопедия',           icon: 'ki-shield-cross', hint: 'ОДА, реабилитация, возврат к спорту' },
+  { key: 'sports_medicine', label: 'Спортивная медицина', icon: 'ki-abstract-26',  hint: 'Спортивный скрининг, фарм-сопровождение' },
+  { key: 'general',         label: 'Терапия',             icon: 'ki-pulse',        hint: 'Общий осмотр, диспансеризация' },
+  { key: 'other',           label: 'Другое',              icon: 'ki-abstract-41',  hint: 'Психология, питание, физиотерапия' },
 ]
 
 const DAY_KEYS: Array<{ key: string; label: string }> = [
@@ -191,7 +191,7 @@ export default function DoctorOnboardingPage() {
                 className={`rounded-2xl border-2 px-4 py-3 text-left transition w-full flex items-start gap-3 ${
                   sel ? 'border-violet-400 bg-violet-50' : 'border-border bg-background hover:border-violet-200'
                 }`}>
-                <span className="text-2xl flex-shrink-0">{s.emoji}</span>
+                <i className={`ki-filled ${s.icon} text-2xl flex-shrink-0`} />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold text-foreground">{s.label}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{s.hint}</div>

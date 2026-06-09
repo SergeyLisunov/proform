@@ -94,12 +94,12 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
     )
   }
 
-  const attLabel: Record<AttendanceStatus, { text: string; cls: string }> = {
-    pending:   { text: '?',      cls: 'bg-slate-100 text-slate-500' },
-    confirmed: { text: '✓ буду', cls: 'bg-blue-100 text-blue-700' },
-    attended:  { text: '✓✓',     cls: 'bg-green-100 text-green-700' },
-    absent:    { text: '✗',      cls: 'bg-red-100 text-red-700' },
-    declined:  { text: '—',      cls: 'bg-slate-200 text-slate-600' },
+  const attLabel: Record<AttendanceStatus, { node: React.ReactNode; cls: string }> = {
+    pending:   { node: '?',                                                                                 cls: 'bg-slate-100 text-slate-500' },
+    confirmed: { node: <><i className="ki-filled ki-check" /> буду</>,                                       cls: 'bg-blue-100 text-blue-700' },
+    attended:  { node: <i className="ki-filled ki-double-check" />,                                          cls: 'bg-green-100 text-green-700' },
+    absent:    { node: <i className="ki-filled ki-cross" />,                                                 cls: 'bg-red-100 text-red-700' },
+    declined:  { node: '—',                                                                                 cls: 'bg-slate-200 text-slate-600' },
   }
 
   return (
@@ -169,8 +169,8 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
                 </div>
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
                   <span>{SESSION_TYPE_LABELS[nextGroup.session_type]} · {nextGroup.session_date}</span>
-                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold ${attLabel[nextGroup.my_attendance].cls}`}>
-                    {attLabel[nextGroup.my_attendance].text}
+                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold ${attLabel[nextGroup.my_attendance].cls}`}>
+                    {attLabel[nextGroup.my_attendance].node}
                   </span>
                 </div>
               </div>

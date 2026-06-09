@@ -43,7 +43,7 @@ function StarRating({
             style={{ color: filled ? '#F59E0B' : '#D1D5DB', background: 'none', border: 'none', padding: 0 }}
             aria-label={`${i + 1} звезда`}
           >
-            ★
+            <i className={`${filled ? 'ki-solid' : 'ki-outline'} ki-star`} />
           </button>
         )
       })}

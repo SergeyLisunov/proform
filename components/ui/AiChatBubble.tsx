@@ -134,7 +134,7 @@ export default function AiChatBubble() {
             {messages.length === 0 && (
               <div className="space-y-3">
                 <div className="rounded-xl border border-border bg-card px-3 py-2.5 text-xs text-foreground leading-relaxed">
-                  Привет 👋 Я видел все твои тренировки за последний месяц. Спроси что-нибудь:
+                  Привет! Я видел все твои тренировки за последний месяц. Спроси что-нибудь:
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {STARTER_PROMPTS.map(p => (

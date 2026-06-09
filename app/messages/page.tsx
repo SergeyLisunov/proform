@@ -163,7 +163,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--foreground)' }}>{u.name || u.email}</div>
                 <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 2 }}>
-                  {u.role === 'coach' ? '🏋️ Тренер' : '🏃 Атлет'}
+                  {u.role === 'coach' ? 'Тренер' : 'Атлет'}
                 </div>
               </div>
               {creating === u.id
@@ -301,7 +301,9 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
             </div>
           ) : messages.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: 20, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>👋</div>
+              <div style={{ width: 64, height: 64, borderRadius: 20, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i className="ki-filled ki-message-text-2" style={{ color, fontSize: 28 }} />
+              </div>
               <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)' }}>Начните диалог</div>
               <div style={{ fontSize: 13, color: 'var(--muted-foreground)', textAlign: 'center', maxWidth: 240, lineHeight: 1.5 }}>
                 Напишите первое сообщение {chat.other_user?.name?.split(' ')[0] || 'участникам'}
@@ -464,7 +466,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
                 <Avatar name={u.name || u.email} size={40} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)' }}>{u.name || u.email}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{u.role === 'coach' ? '🏋️ Тренер' : u.role === 'organization' ? '🏢 Организация' : '🏃 Атлет'}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{u.role === 'coach' ? 'Тренер' : u.role === 'organization' ? 'Организация' : 'Атлет'}</div>
                 </div>
                 <div style={{ width: 22, height: 22, borderRadius: 6, border: sel ? 'none' : '1.5px solid var(--border)', background: sel ? '#9333ea' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
                   {sel && <i className="ki-filled ki-check text-white" style={{ fontSize: 11 }} />}
@@ -823,9 +825,9 @@ export default function MessengerPage() {
                               <><span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.8 }} />
                               {c.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}</>
                             ) : c.type === 'group' ? (
-                              `👥 Группа · ${c.member_count ?? '?'} участников`
+                              `Группа · ${c.member_count ?? '?'} участников`
                             ) : (
-                              `📢 Канал · ${c.member_count ?? '?'} участников`
+                              `Канал · ${c.member_count ?? '?'} участников`
                             )}
                           </span>
                         </div>

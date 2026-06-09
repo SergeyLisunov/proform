@@ -46,10 +46,10 @@ interface Snapshot {
   priorities: string[]
 }
 
-const STATUS_META: Record<'ok' | 'watch' | 'risk', { label: string; color: string; bg: string; border: string; emoji: string }> = {
-  ok:    { label: 'Зелёная зона', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', emoji: '🟢' },
-  watch: { label: 'Наблюдение',   color: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A', emoji: '🟡' },
-  risk:  { label: 'Риск',         color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', emoji: '🔴' },
+const STATUS_META: Record<'ok' | 'watch' | 'risk', { label: string; color: string; bg: string; border: string }> = {
+  ok:    { label: 'Зелёная зона', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+  watch: { label: 'Наблюдение',   color: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A' },
+  risk:  { label: 'Риск',         color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
 }
 
 const MOOD_LABELS: Record<Mood, string> = {
@@ -345,7 +345,7 @@ export default function TeamRiskCalculator() {
       <section className="bg-gradient-to-br from-orange-50 via-white to-rose-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-600 mb-4">
-            🎯 Бесплатный AI-инструмент
+            <i className="ki-filled ki-focus text-orange-600" /> Бесплатный AI-инструмент
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
             Team Risk Snapshot — <span className="text-orange-600">атлеты в зоне риска</span> за 60 секунд
@@ -479,7 +479,7 @@ export default function TeamRiskCalculator() {
       {snapshot && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
           <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50/50 to-white p-5 md:p-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-3">📊 Snapshot команды</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-3 inline-flex items-center gap-2"><i className="ki-filled ki-chart-simple" /> Snapshot команды</h2>
 
             <p className="text-base text-slate-700 mb-4">{snapshot.overall}</p>
 
@@ -501,9 +501,9 @@ export default function TeamRiskCalculator() {
                     <div className={blurred ? 'blur-[5px] select-none pointer-events-none' : ''}>
                       <div className="flex items-center justify-between gap-2 mb-1.5">
                         <span className="font-bold text-slate-900 text-sm truncate">{a.name}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                           style={{ background: 'white', color: meta.color, border: `1px solid ${meta.border}` }}>
-                          {meta.emoji} {meta.label}
+                          <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.color }} /> {meta.label}
                         </span>
                       </div>
                       <p className="text-[12px] text-slate-700 mb-1.5">
@@ -515,8 +515,8 @@ export default function TeamRiskCalculator() {
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-                        <span className="text-[11px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">
-                          🔒 email откроет
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">
+                          <i className="ki-filled ki-lock-2" /> email откроет
                         </span>
                       </div>
                     )}
@@ -528,8 +528,8 @@ export default function TeamRiskCalculator() {
             {/* Priorities */}
             {snapshot.priorities.length > 0 && (
               <div className="mt-5 mb-5 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-blue-800 mb-2">
-                  🎯 Главные приоритеты на 7-14 дней
+                <h3 className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-800 mb-2">
+                  <i className="ki-filled ki-focus text-blue-800" /> Главные приоритеты на 7-14 дней
                 </h3>
                 <ol className="space-y-1.5 text-sm text-slate-800">
                   {snapshot.priorities.map((p, i) => {
@@ -548,8 +548,8 @@ export default function TeamRiskCalculator() {
             {/* Email gate */}
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-orange-300 bg-orange-50/40">
-                <p className="text-sm font-bold text-slate-800 mb-2.5">
-                  🔒 Открыть полный snapshot ({snapshot.athletes.length} атлетов + все приоритеты)
+                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 mb-2.5">
+                  <i className="ki-filled ki-lock-2" /> Открыть полный snapshot ({snapshot.athletes.length} атлетов + все приоритеты)
                 </p>
                 <input type="email" required placeholder="coach@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
@@ -569,8 +569,8 @@ export default function TeamRiskCalculator() {
 
             {phase === 'submitted' && (
               <div className="mt-5 p-4 rounded-xl border border-green-200 bg-green-50">
-                <p className="text-sm font-bold text-green-800">
-                  ✅ Готово! Полный snapshot открыт выше.
+                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-green-800">
+                  <i className="ki-filled ki-check-circle text-green-800" /> Готово! Полный snapshot открыт выше.
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите автоматический snapshot по всем тренировкам команды?
@@ -593,17 +593,17 @@ export default function TeamRiskCalculator() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как работает Team Risk Snapshot</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1">📊 ACWR</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-chart-simple" /> ACWR</div>
               Отношение нагрузки текущей недели к среднему за 4 недели.
               Связь с риском травмы — мета-анализы Gabbett & Bourdon.
             </div>
             <div>
-              <div className="font-bold mb-1">💚 Recovery</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-heart text-green-600" /> Recovery</div>
               Если recovery score &lt; 40 — атлет в зоне риска переутомления.
               По данным Whoop validation studies.
             </div>
             <div>
-              <div className="font-bold mb-1">🤖 Claude Sonnet</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Claude Sonnet</div>
               AI читает данные, применяет правила (recovery / ACWR / mood)
               и формулирует action items на русском.
             </div>
@@ -649,8 +649,8 @@ function CountTile({ label, count, status }: { label: string; count: number; sta
     <div className="rounded-xl border p-3 text-center"
       style={{ background: meta.bg, borderColor: meta.border }}>
       <div className="pf-num text-2xl font-bold" style={{ color: meta.color }}>{count}</div>
-      <div className="text-[11px] font-bold uppercase tracking-wider mt-0.5" style={{ color: meta.color }}>
-        {meta.emoji} {label}
+      <div className="inline-flex items-center justify-center gap-1 text-[11px] font-bold uppercase tracking-wider mt-0.5" style={{ color: meta.color }}>
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.color }} /> {label}
       </div>
     </div>
   )

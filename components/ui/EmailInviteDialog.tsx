@@ -116,7 +116,7 @@ export function EmailInviteDialog({
             ) : (
               <>
                 <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-[11px] text-orange-800">
-                  🎁 <strong>Бонус:</strong> за каждого принявшего — <strong>+1 месяц Pro</strong> вам
+                  <i className="ki-filled ki-gift text-[11px] text-orange-800" /> <strong>Бонус:</strong> за каждого принявшего — <strong>+1 месяц Pro</strong> вам
                   автоматически.
                 </div>
                 <div>

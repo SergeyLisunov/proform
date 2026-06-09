@@ -128,14 +128,14 @@ export default function AthleteDashboardPage() {
       <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.08),_transparent_30%),linear-gradient(135deg,#FEF0E7_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
         <p className="text-2xs font-bold uppercase tracking-[0.22em] text-orange-700 mb-1">{todayStr}</p>
         <h1 className="text-3xl md:text-4xl font-bold text-navy-500 tracking-tight">
-          Привет, {name ?? 'атлет'} 👋
+          Привет, {name ?? 'атлет'}
         </h1>
         {todayWorkout ? (
           <p className="mt-3 text-sm text-slate-700 max-w-2xl">
             Сегодня по плану: <strong>{todayWorkout.name ?? todayWorkout.activity_type ?? 'тренировка'}</strong>
             {todayWorkout.activity_duration_min ? ` · ${todayWorkout.activity_duration_min} мин` : ''}
-            {todayWorkout.completion_status === 'completed' ? ' · ✅ выполнено' :
-             todayWorkout.completion_status === 'skipped' ? ' · ⏭ пропущено' : ''}
+            {todayWorkout.completion_status === 'completed' ? ' · выполнено' :
+             todayWorkout.completion_status === 'skipped' ? ' · пропущено' : ''}
           </p>
         ) : (
           <p className="mt-3 text-sm text-slate-700">
@@ -210,11 +210,11 @@ export default function AthleteDashboardPage() {
                     </div>
                     <div className="shrink-0">
                       {w.completion_status === 'completed' ? (
-                        <span className="text-[10px] font-bold text-emerald-700">✅</span>
+                        <i className="ki-filled ki-check-circle text-[12px] text-emerald-700" />
                       ) : w.completion_status === 'skipped' ? (
-                        <span className="text-[10px] font-bold text-red-700">⏭</span>
+                        <i className="ki-filled ki-double-right text-[12px] text-red-700" />
                       ) : isPast ? (
-                        <span className="text-[10px] font-bold text-amber-700">⏳</span>
+                        <i className="ki-filled ki-time text-[12px] text-amber-700" />
                       ) : null}
                     </div>
                   </li>
@@ -259,9 +259,9 @@ export default function AthleteDashboardPage() {
                   <li key={g.id} className="rounded-xl border border-border bg-background p-3">
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <h3 className="text-sm font-bold text-navy-500 line-clamp-2">{g.metric_label}</h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5"
+                      <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5 inline-flex items-center"
                         style={{ background: GOAL_STATUS_META.active.bg, color: GOAL_STATUS_META.active.color }}>
-                        🎯
+                        <i className="ki-filled ki-focus text-[11px]" />
                       </span>
                     </div>
                     {g.target_value !== null && (
@@ -298,8 +298,8 @@ export default function AthleteDashboardPage() {
                     <div className="text-sm font-semibold text-foreground line-clamp-1">
                       {r.title ?? 'Рекомендация'}
                       {/* Schema W5 Day 27: doctor_id NOT NULL → all recs are from doctor. */}
-                      <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                        · 🩺 Врач
+                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                        · <i className="ki-filled ki-pulse text-[11px]" /> Врач
                       </span>
                     </div>
                     {r.body && <div className="text-[12px] text-muted-foreground line-clamp-2 mt-0.5">{r.body}</div>}

@@ -295,7 +295,7 @@ export default function RecordsPage() {
                     onClick={() => openEdit(g.best)}
                     className="rounded-lg border border-border bg-card px-2 py-1 text-[10px] font-bold text-muted-foreground hover:bg-accent"
                   >
-                    ✎
+                    <i className="ki-filled ki-pencil text-[10px]" />
                   </button>
                 </div>
                 <div className="mt-3 flex items-end gap-2">
@@ -338,7 +338,7 @@ export default function RecordsPage() {
                               className="rounded px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
                               title="Изменить"
                             >
-                              ✎
+                              <i className="ki-filled ki-pencil text-[10px]" />
                             </button>
                             <button
                               type="button"
@@ -346,7 +346,7 @@ export default function RecordsPage() {
                               className="rounded px-1.5 text-[10px] text-rose-500 hover:text-rose-700"
                               title="Удалить"
                             >
-                              ✕
+                              <i className="ki-filled ki-cross text-[10px]" />
                             </button>
                           </div>
                         </li>
@@ -373,7 +373,7 @@ export default function RecordsPage() {
                 onClick={() => setEditing(null)}
                 className="rounded-full border border-border bg-card px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
               >
-                ✕
+                <i className="ki-filled ki-cross text-xs" />
               </button>
             </div>
 

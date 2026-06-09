@@ -24,10 +24,10 @@ function pickGreeting(hours: number): string {
   return 'Добрый вечер'
 }
 
-function recoveryEmoji(score: number): string {
-  if (score >= 67) return '🟢'
-  if (score >= 34) return '🟡'
-  return '🔴'
+function recoveryDotColor(score: number): string {
+  if (score >= 67) return '#16A34A'
+  if (score >= 34) return '#CA8A04'
+  return '#DC2626'
 }
 
 function recoveryAdvice(score: number): string {
@@ -65,8 +65,9 @@ export default function AthleteHeroBar({ firstName, metrics }: AthleteHeroBarPro
             {greeting}, <span className="text-orange-600">{firstName}</span>!
           </h1>
           {hasData && recovery != null ? (
-            <p className="mt-2 text-sm md:text-base text-muted-foreground">
-              {recoveryEmoji(recovery)} {recoveryAdvice(recovery)} — восстановление <strong className="text-foreground">{Math.round(recovery)}%</strong>
+            <p className="mt-2 inline-flex items-center gap-1.5 text-sm md:text-base text-muted-foreground">
+              <span className="inline-block h-2 w-2 rounded-full" style={{ background: recoveryDotColor(recovery) }} />
+              {recoveryAdvice(recovery)} — восстановление <strong className="text-foreground">{Math.round(recovery)}%</strong>
             </p>
           ) : (
             <p className="mt-2 text-sm text-muted-foreground">

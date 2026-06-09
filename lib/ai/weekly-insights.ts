@@ -139,7 +139,7 @@ export async function generateInsight(input: {
       w.recovery_score ? `recovery ${w.recovery_score}` : null,
       w.hrv ? `hrv ${w.hrv}` : null,
       w.mood ? `mood ${w.mood}/5` : null,
-      w.risk_flag && w.risk_flag !== 'none' ? `⚠${w.risk_flag}` : null,
+      w.risk_flag && w.risk_flag !== 'none' ? `risk:${w.risk_flag}` : null,
     ].filter(Boolean)
     return '- ' + bits.join(', ') + (w.name ? ` — ${w.name}` : '')
   }).join('\n')

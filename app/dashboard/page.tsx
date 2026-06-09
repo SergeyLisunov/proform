@@ -970,7 +970,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
       <div>
         <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Тренер</p>
         <h2 className="pf-num text-[36px] text-navy-500 leading-none">
-          Привет, {name.split(' ')[0]} 👋
+          Привет, {name.split(' ')[0]}
         </h2>
       </div>
 

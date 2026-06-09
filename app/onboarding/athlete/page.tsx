@@ -25,13 +25,13 @@ import {
 } from '@/services/onboarding.service'
 import { createGoal } from '@/services/athlete-goals.service'
 
-const SPORTS: Array<{ key: string; label: string; emoji: string }> = [
-  { key: 'running',    label: 'Бег',                 emoji: '🏃' },
-  { key: 'cycling',    label: 'Велоспорт',           emoji: '🚴' },
-  { key: 'swimming',   label: 'Плавание',            emoji: '🏊' },
-  { key: 'strength',   label: 'Силовой тренинг',     emoji: '🏋️' },
-  { key: 'team_sport', label: 'Командный спорт',     emoji: '⚽' },
-  { key: 'multi',      label: 'Многоборье / другое', emoji: '🎯' },
+const SPORTS: Array<{ key: string; label: string }> = [
+  { key: 'running',    label: 'Бег' },
+  { key: 'cycling',    label: 'Велоспорт' },
+  { key: 'swimming',   label: 'Плавание' },
+  { key: 'strength',   label: 'Силовой тренинг' },
+  { key: 'team_sport', label: 'Командный спорт' },
+  { key: 'multi',      label: 'Многоборье / другое' },
 ]
 
 const GOAL_PRESETS: Array<{ key: string; label: string; metric_label: string; metric: string }> = [
@@ -195,7 +195,6 @@ export default function AthleteOnboardingPage() {
                 className={`rounded-2xl border-2 px-3 py-4 text-sm font-semibold transition flex flex-col items-center gap-1 ${
                   sel ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-border bg-background hover:border-orange-200 text-foreground'
                 }`}>
-                <span className="text-2xl">{s.emoji}</span>
                 <span>{s.label}</span>
               </button>
             )

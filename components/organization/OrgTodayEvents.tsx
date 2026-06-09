@@ -143,8 +143,9 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
                     {s.location && (s.start_time && s.end_time ? ' · ' : '') + s.location}
                   </div>
                 </div>
-                <Badge variant="info" size="sm" className="!rounded-full shrink-0">
-                  👥 {s.participantCount}
+                <Badge variant="info" size="sm" className="!rounded-full shrink-0 inline-flex items-center gap-1">
+                  <i className="ki-filled ki-people text-[11px]" />
+                  {s.participantCount}
                 </Badge>
               </div>
             ))}

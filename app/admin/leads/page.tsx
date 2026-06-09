@@ -26,18 +26,18 @@ import {
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const SOURCE_META: Record<LeadSource, { label: string; emoji: string; color: string; bg: string; border: string }> = {
-  acwr:              { label: 'ACWR',           emoji: '📊', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
-  overtraining:      { label: 'Overtraining',   emoji: '🥵', color: '#8A300A', bg: '#FEF0E7', border: '#FBC1A0' },
-  templates:         { label: 'Templates',      emoji: '📋', color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
-  'team-risk':       { label: 'Team Risk',      emoji: '🟠', color: '#D44A02', bg: '#FEF0E7', border: '#FBC1A0' },
-  'adaptive-plan':   { label: '7-day Plan',     emoji: '🔵', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  'club-audit':      { label: 'Club Audit',     emoji: '🟢', color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4' },
-  'medical-summary': { label: 'Medical Summary', emoji: '🟣', color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
+const SOURCE_META: Record<LeadSource, { label: string; color: string; bg: string; border: string }> = {
+  acwr:              { label: 'ACWR',           color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
+  overtraining:      { label: 'Overtraining',   color: '#8A300A', bg: '#FEF0E7', border: '#FBC1A0' },
+  templates:         { label: 'Templates',      color: '#475569', bg: '#F8FAFC', border: '#E2E8F0' },
+  'team-risk':       { label: 'Team Risk',      color: '#D44A02', bg: '#FEF0E7', border: '#FBC1A0' },
+  'adaptive-plan':   { label: '7-day Plan',     color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+  'club-audit':      { label: 'Club Audit',     color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4' },
+  'medical-summary': { label: 'Medical Summary', color: '#7C3AED', bg: '#FAF5FF', border: '#E9D5FF' },
   // W16 Day 79 — high-trust landing form (HeroAuditModal + LeadCaptureForm).
   // Distinct brand-orange color separates visually from tool-calculator leads.
-  'landing-audit-form': { label: 'Landing Audit', emoji: '🎯', color: '#B03D04', bg: '#FDDDCB', border: '#F89B6A' },
-  other:             { label: 'Other',          emoji: '⭐', color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
+  'landing-audit-form': { label: 'Landing Audit', color: '#B03D04', bg: '#FDDDCB', border: '#F89B6A' },
+  other:             { label: 'Other',          color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
 }
 
 interface SearchParams {
@@ -159,7 +159,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                     <td className="py-2.5 pr-4">
                       <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                         style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
-                        {meta.emoji} {meta.label}
+                        {meta.label}
                       </span>
                     </td>
                     <td className="py-2.5 pr-4 text-right font-bold text-foreground">{s.total}</td>
@@ -194,7 +194,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
           {(['team-risk','adaptive-plan','club-audit','medical-summary'] as LeadSource[]).map(s => (
             <FilterChip key={s}
               href={`/admin/leads?source=${s}${filterDispatched !== 'all' ? `&dispatched=${filterDispatched}` : ''}`}
-              label={`${SOURCE_META[s].emoji} ${SOURCE_META[s].label}`}
+              label={SOURCE_META[s].label}
               active={filterSource === s} />
           ))}
         </div>
@@ -244,19 +244,19 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                         </td>
                         <td className="py-2 pr-3 text-xs">
                           {r.email_dispatched_at ? (
-                            <span className="text-emerald-700 font-semibold">
-                              ✅ {new Date(r.email_dispatched_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                            <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                              <i className="ki-filled ki-check text-xs" /> {new Date(r.email_dispatched_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                             </span>
                           ) : r.email_attempts >= 3 ? (
-                            <span className="text-red-700">❌ Failed</span>
+                            <span className="text-red-700 inline-flex items-center gap-1"><i className="ki-filled ki-cross text-xs" /> Failed</span>
                           ) : (
-                            <span className="text-cyan-700">⏳ Pending</span>
+                            <span className="text-cyan-700 inline-flex items-center gap-1"><i className="ki-filled ki-time text-xs" /> Pending</span>
                           )}
                         </td>
                         <td className="py-2 pr-3 text-xs">
                           {r.converted_at ? (
-                            <span className="text-violet-700 font-semibold" title={r.user_name ? `${r.user_name} (${r.user_role ?? 'user'})` : 'Signup detected'}>
-                              🎯 {r.user_role ? r.user_role.slice(0, 3).toUpperCase() : 'USR'} · {new Date(r.converted_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                            <span className="text-violet-700 font-semibold inline-flex items-center gap-1" title={r.user_name ? `${r.user_name} (${r.user_role ?? 'user'})` : 'Signup detected'}>
+                              <i className="ki-filled ki-focus text-xs" /> {r.user_role ? r.user_role.slice(0, 3).toUpperCase() : 'USR'} · {new Date(r.converted_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                             </span>
                           ) : (
                             <span className="text-muted-foreground">—</span>
@@ -296,7 +296,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       </Card>
 
       {/* Cron info */}
-      <Alert variant="info" title="⚙️ Auto-drip cron">
+      <Alert variant="info" title="Auto-drip cron">
         <p className="leading-relaxed">
           <code>GET /api/cron/leads-digest</code> запускается еженедельно (Monday 8am UTC) через Vercel cron.
           Обрабатывает до {50} pending leads за раз, отправляет drip emails по 4 W4 sources (team-risk / adaptive-plan / club-audit / medical-summary),

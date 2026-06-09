@@ -178,7 +178,7 @@ export function ProfileShell(props: {
           {props.saveError ? (
             <span className="text-red-600">{props.saveError}</span>
           ) : props.saved ? (
-            <span className="text-emerald-600">Сохранено ✓</span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600">Сохранено <i className="ki-filled ki-check" /></span>
           ) : (
             'Не забудьте сохранить изменения'
           )}

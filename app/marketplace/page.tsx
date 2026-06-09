@@ -213,7 +213,7 @@ function MarketplaceInner() {
           <option value="newest">Сначала новые</option>
           <option value="price_asc">Сначала дешевле</option>
           <option value="price_desc">Сначала дороже</option>
-          <option value="rating_desc">По рейтингу ★</option>
+          <option value="rating_desc">По рейтингу</option>
         </select>
       </form>
 
@@ -236,7 +236,7 @@ function MarketplaceInner() {
               title="Показать только верифицированных тренеров"
             >
               <i className="ki-filled ki-verify text-xs" />
-              {verifiedOnly ? 'Только Verified ✓' : 'Только Verified'}
+              {verifiedOnly ? 'Только Verified' : 'Только Verified'}
             </button>
           </div>
           {activeFiltersCount > 0 && (
@@ -294,9 +294,9 @@ function MarketplaceInner() {
           <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">Формат</div>
           <div className="flex flex-wrap gap-1.5">
             <FilterChip label="Любой" active={!format} onClick={() => setFilter('format', '')} />
-            <FilterChip label="💻 Онлайн"  active={format === 'online'}  onClick={() => setFilter('format', 'online')} />
-            <FilterChip label="🏟 Очно"    active={format === 'offline'} onClick={() => setFilter('format', 'offline')} />
-            <FilterChip label="🔀 Гибрид"   active={format === 'hybrid'}  onClick={() => setFilter('format', 'hybrid')} />
+            <FilterChip label="Онлайн"  active={format === 'online'}  onClick={() => setFilter('format', 'online')} />
+            <FilterChip label="Очно"    active={format === 'offline'} onClick={() => setFilter('format', 'offline')} />
+            <FilterChip label="Гибрид"   active={format === 'hybrid'}  onClick={() => setFilter('format', 'hybrid')} />
           </div>
           <p className="mt-1 text-[10px] text-muted-foreground">При выборе формата абонементы (pass-plans) исключаются — у них нет формата.</p>
         </div>
@@ -317,7 +317,7 @@ function MarketplaceInner() {
       {!loading && featured.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">⭐</span>
+            <i className="ki-solid ki-star text-xl text-amber-400" />
             <h2 className="text-lg font-bold text-navy-500">Рекомендуем</h2>
             <Badge variant="warning" size="sm" className="uppercase tracking-[0.18em]">
               Featured
@@ -347,7 +347,7 @@ function MarketplaceInner() {
                           title={`${ratings.get(o.seller_id)!.review_count} отзывов`}
                           className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 px-1.5 py-0.5 text-[10px] font-bold shrink-0"
                         >
-                          ★ {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                          <i className="ki-solid ki-star text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
                           <span className="font-normal opacity-70">·{ratings.get(o.seller_id)!.review_count}</span>
                         </span>
                       )}
@@ -466,12 +466,12 @@ function MarketplaceInner() {
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {isFeatured && (
                               <Badge variant="warning" size="sm" className="uppercase tracking-wider">
-                                ⭐ Featured
+                                <i className="ki-solid ki-star text-[10px] mr-0.5" /> Featured
                               </Badge>
                             )}
                             {isNew && (
                               <Badge variant="success" size="sm" className="uppercase tracking-wider">
-                                🆕 New this month
+                                New this month
                               </Badge>
                             )}
                           </div>
@@ -516,7 +516,7 @@ function MarketplaceInner() {
                                       title={`${ratings.get(o.seller_id)!.review_count} отзывов · среднее ${ratings.get(o.seller_id)!.avg_rating.toFixed(1)}`}
                                       className="text-[10px] font-bold text-amber-700"
                                     >
-                                      ★ {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                                      <i className="ki-solid ki-star text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
                                       <span className="font-normal text-muted-foreground"> ({ratings.get(o.seller_id)!.review_count})</span>
                                     </span>
                                   )}

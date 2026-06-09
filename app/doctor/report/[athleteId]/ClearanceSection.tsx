@@ -36,11 +36,11 @@ interface Props {
   athleteId: string
 }
 
-const STATUS_META: Record<Status, { label: string; emoji: string; color: string; bg: string; border: string; hint: string }> = {
-  full:       { label: 'Полный',      emoji: '🟢', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', hint: 'Без ограничений' },
-  limited:    { label: 'Ограниченный', emoji: '🟡', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A', hint: '~60% нормы' },
-  light_only: { label: 'Лёгкий',      emoji: '🟠', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA', hint: 'Только реаб / лёгкая зона' },
-  banned:     { label: 'Запрет',      emoji: '🔴', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA', hint: 'Тренировка запрещена' },
+const STATUS_META: Record<Status, { label: string; dot: string; color: string; bg: string; border: string; hint: string }> = {
+  full:       { label: 'Полный',      dot: '#16A34A', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', hint: 'Без ограничений' },
+  limited:    { label: 'Ограниченный', dot: '#CA8A04', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A', hint: '~60% нормы' },
+  light_only: { label: 'Лёгкий',      dot: '#F35703', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA', hint: 'Только реаб / лёгкая зона' },
+  banned:     { label: 'Запрет',      dot: '#DC2626', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA', hint: 'Тренировка запрещена' },
 }
 const STATUS_ORDER: Status[] = ['full', 'limited', 'light_only', 'banned']
 
@@ -138,7 +138,7 @@ export default function ClearanceSection({ athleteId }: Props) {
           <span className="text-2xs text-muted-foreground">Загрузка…</span>
         ) : current && meta ? (
           <div className="flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-bold" style={{ background: meta.bg, color: meta.color, borderColor: meta.border }}>
-            <span>{meta.emoji}</span>
+            <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.dot }} />
             <span>{meta.label}</span>
             {reviewBadge}
           </div>
@@ -173,8 +173,9 @@ export default function ClearanceSection({ athleteId }: Props) {
               <button key={s} type="button" onClick={() => setStatus(s)} title={m.hint}
                 className="flex flex-col items-start gap-1 rounded-xl border-2 p-3 text-left transition"
                 style={{ background: sel ? m.bg : 'var(--card)', borderColor: sel ? m.border : 'var(--border)' }}>
-                <span className="text-sm font-bold" style={{ color: sel ? m.color : 'var(--foreground)' }}>
-                  {m.emoji} {m.label}
+                <span className="inline-flex items-center gap-1.5 text-sm font-bold" style={{ color: sel ? m.color : 'var(--foreground)' }}>
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: m.dot }} />
+                  {m.label}
                 </span>
                 <span className="text-[10px] leading-tight text-muted-foreground">{m.hint}</span>
               </button>
@@ -233,7 +234,7 @@ export default function ClearanceSection({ athleteId }: Props) {
               const m = STATUS_META[h.status]
               return (
                 <li key={h.id} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background/60 px-3 py-1.5 text-2xs">
-                  <span style={{ color: m.color, fontWeight: 700 }}>{m.emoji} {m.label}</span>
+                  <span className="inline-flex items-center gap-1.5" style={{ color: m.color, fontWeight: 700 }}><span className="inline-block h-2 w-2 rounded-full" style={{ background: m.dot }} />{m.label}</span>
                   <span className="text-muted-foreground">{fmtDateTime(h.created_at)}</span>
                 </li>
               )

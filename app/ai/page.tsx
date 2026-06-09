@@ -378,7 +378,7 @@ export default function AiHubPage() {
             ))}
           </div>
           <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs text-muted-foreground">
-            💡 Подсказка: нажмите <kbd className="mx-1 rounded border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
+            <i className="ki-filled ki-information-2 text-xs" /> Подсказка: нажмите <kbd className="mx-1 rounded border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
             в любом разделе, чтобы быстро вызвать команду или задать вопрос ассистенту.
           </div>
         </>

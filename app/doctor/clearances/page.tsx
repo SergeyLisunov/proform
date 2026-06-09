@@ -34,11 +34,11 @@ interface AthleteUser {
   email: string | null
 }
 
-const STATUS_META: Record<Row['status'], { label: string; emoji: string; color: string; bg: string; border: string }> = {
-  full:       { label: 'Полный',      emoji: '🟢', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-  limited:    { label: 'Ограниченный', emoji: '🟡', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
-  light_only: { label: 'Лёгкий',      emoji: '🟠', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
-  banned:     { label: 'Запрет',      emoji: '🔴', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
+const STATUS_META: Record<Row['status'], { label: string; dot: string; color: string; bg: string; border: string }> = {
+  full:       { label: 'Полный',      dot: '#16A34A', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
+  limited:    { label: 'Ограниченный', dot: '#CA8A04', color: '#A16207', bg: '#FEFCE8', border: '#FDE68A' },
+  light_only: { label: 'Лёгкий',      dot: '#F35703', color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA' },
+  banned:     { label: 'Запрет',      dot: '#DC2626', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
 }
 
 const PRIORITY_ORDER: Record<Row['status'], number> = {
@@ -143,13 +143,13 @@ export default async function DoctorClearancesPage() {
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     {r.review_needed ? (
-                      <span className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-slate-700">
-                        ⏳ требуется review
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-slate-700">
+                        <i className="ki-filled ki-time text-2xs text-slate-500" />требуется review
                       </span>
                     ) : (
-                      <span className="rounded-full border px-3 py-1 text-2xs font-bold"
+                      <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-2xs font-bold"
                             style={{ background: m.bg, color: m.color, borderColor: m.border }}>
-                        {m.emoji} {m.label}
+                        <span className="inline-block h-2 w-2 rounded-full" style={{ background: m.dot }} />{m.label}
                       </span>
                     )}
                     {r.valid_until && (

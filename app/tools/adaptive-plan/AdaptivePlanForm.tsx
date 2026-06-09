@@ -45,11 +45,18 @@ interface Plan {
   red_flags:   string[]
 }
 
-const INTENSITY_META: Record<Intensity, { label: string; color: string; bg: string; border: string; emoji: string }> = {
-  rest:     { label: 'Отдых',  color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0', emoji: '🛌' },
-  easy:     { label: 'Easy',   color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', emoji: '🟢' },
-  moderate: { label: 'Mod',    color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC', emoji: '🟦' },
-  hard:     { label: 'Hard',   color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', emoji: '🔥' },
+// `marker` describes the visual indicator next to the intensity label:
+//   - { type: 'icon' } renders a keenicon (rest = moon, hard = flash)
+//   - { type: 'dot' }  renders a colored status dot (easy = green, moderate = blue)
+type IntensityMarker =
+  | { type: 'icon'; icon: string }
+  | { type: 'dot'; dot: string }
+
+const INTENSITY_META: Record<Intensity, { label: string; color: string; bg: string; border: string; marker: IntensityMarker }> = {
+  rest:     { label: 'Отдых',  color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0', marker: { type: 'icon', icon: 'ki-moon' } },
+  easy:     { label: 'Easy',   color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', marker: { type: 'dot', dot: '#16A34A' } },
+  moderate: { label: 'Mod',    color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC', marker: { type: 'dot', dot: '#2563EB' } },
+  hard:     { label: 'Hard',   color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', marker: { type: 'icon', icon: 'ki-flash-circle' } },
 }
 
 const ASSESSMENT_META: Record<Plan['weekly_load_assessment'], { label: string; color: string; bg: string; border: string }> = {
@@ -318,7 +325,7 @@ export default function AdaptivePlanForm() {
       <section className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-4">
-            🎯 Бесплатный AI-инструмент
+            <i className="ki-filled ki-focus text-[11px]" /> Бесплатный AI-инструмент
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
             Free 7-day Adaptive Plan — <span className="text-blue-600">персональный план</span> за 60 секунд
@@ -455,7 +462,7 @@ export default function AdaptivePlanForm() {
       {plan && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
           <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/40 to-white p-5 md:p-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-3">📅 Ваш 7-дневный план</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2"><i className="ki-filled ki-calendar text-xl md:text-2xl" /> Ваш 7-дневный план</h2>
 
             {/* Overview + assessment */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
@@ -492,16 +499,19 @@ export default function AdaptivePlanForm() {
                       <div className="text-[10px] text-slate-700 mb-1.5">
                         {d.duration_min > 0 ? `${d.duration_min} мин` : '—'}
                       </div>
-                      <span className="inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold"
+                      <span className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
                         style={{ background: 'white', color: meta.color, border: `1px solid ${meta.border}` }}>
-                        {meta.emoji} {meta.label}
+                        {meta.marker.type === 'icon'
+                          ? <i className={`ki-filled ${meta.marker.icon} text-[9px]`} />
+                          : <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.marker.dot }} />}
+                        {meta.label}
                       </span>
                       <p className="mt-1.5 text-[10px] text-slate-700 leading-snug">{d.notes}</p>
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
                         <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">
-                          🔒
+                          <i className="ki-filled ki-lock-2 text-[10px]" />
                         </span>
                       </div>
                     )}
@@ -520,8 +530,8 @@ export default function AdaptivePlanForm() {
 
                 {plan.red_flags.length > 0 && (
                   <div className="rounded-xl border border-orange-200 bg-orange-50/40 p-4">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-orange-700 mb-2">
-                      ⚠️ На что обратить внимание
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-orange-700 mb-2 flex items-center gap-1.5">
+                      <i className="ki-filled ki-information-2 text-[10px]" /> На что обратить внимание
                     </div>
                     <ul className="space-y-1 text-sm text-slate-800">
                       {plan.red_flags.map((rf, i) => (
@@ -539,8 +549,8 @@ export default function AdaptivePlanForm() {
             {/* Email gate */}
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/40">
-                <p className="text-sm font-bold text-slate-800 mb-2.5">
-                  🔒 Открыть полный план (все 7 дней + логика + red flags)
+                <p className="text-sm font-bold text-slate-800 mb-2.5 flex items-center gap-2">
+                  <i className="ki-filled ki-lock-2 text-sm" /> Открыть полный план (все 7 дней + логика + red flags)
                 </p>
                 <input type="email" required placeholder="athlete@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
@@ -560,8 +570,8 @@ export default function AdaptivePlanForm() {
 
             {phase === 'submitted' && (
               <div className="mt-5 p-4 rounded-xl border border-green-200 bg-green-50">
-                <p className="text-sm font-bold text-green-800">
-                  ✅ Готово! Полный план открыт выше.
+                <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+                  <i className="ki-filled ki-check-circle text-sm" /> Готово! Полный план открыт выше.
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите чтобы план обновлялся каждую неделю автоматически?
@@ -584,17 +594,17 @@ export default function AdaptivePlanForm() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как работает Adaptive Plan</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1">📊 ACWR + recovery</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-chart-simple" /> ACWR + recovery</div>
               План учитывает соотношение острой к хронической нагрузке (Gabbett, 2016)
               и среднее восстановление за 4 недели.
             </div>
             <div>
-              <div className="font-bold mb-1">⚖️ Принцип балансa</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-element-equal" /> Принцип балансa</div>
               Sweet-spot структура: 1-2 hard + 2-3 moderate + 1-2 easy + 1-2 rest
               в неделю. Минимум 1 день полного отдыха.
             </div>
             <div>
-              <div className="font-bold mb-1">🤖 Claude Haiku</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Claude Haiku</div>
               AI читает историю, применяет правила (deload / ramp-up / sweet-spot)
               и формулирует action items по каждому дню.
             </div>

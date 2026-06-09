@@ -130,8 +130,8 @@ export default function WeeklyPlannerCard() {
           </button>
         )}
         {applied && (
-          <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-2xs font-bold text-emerald-700 border border-emerald-200">
-            ✓ В календаре
+          <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-2xs font-bold text-emerald-700 border border-emerald-200">
+            <i className="ki-filled ki-check text-2xs" /> В календаре
           </span>
         )}
       </div>
@@ -167,7 +167,7 @@ export default function WeeklyPlannerCard() {
                   disabled={loading}
                   className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-95 disabled:opacity-60"
                 >
-                  {loading ? 'Генерирую план…' : '✨ Сгенерировать план'}
+                  {loading ? 'Генерирую план…' : 'Сгенерировать план'}
                 </button>
               </>
             )}

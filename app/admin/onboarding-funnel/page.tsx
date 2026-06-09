@@ -326,7 +326,7 @@ export default async function OnboardingFunnelPage({
                 })}
                 <div className="pt-2 mt-1 border-t border-border">
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-bold text-foreground">✓ Completed</span>
+                    <span className="inline-flex items-center gap-1 font-bold text-foreground"><i className="ki-filled ki-check" /> Completed</span>
                     <span className="pf-num font-bold" style={{ color: meta.accent }}>
                       {f.completed}
                     </span>

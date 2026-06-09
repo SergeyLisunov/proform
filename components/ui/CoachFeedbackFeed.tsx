@@ -216,8 +216,8 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="px-5 py-6 text-center text-xs text-slate-400">
-              Все тренировки прокомментированы 🎯
+            <div className="inline-flex w-full items-center justify-center gap-1.5 px-5 py-6 text-center text-xs text-slate-400">
+              Все тренировки прокомментированы <i className="ki-filled ki-focus text-xs" />
             </div>
           )}
         </div>

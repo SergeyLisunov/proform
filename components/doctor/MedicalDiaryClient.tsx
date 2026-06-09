@@ -411,7 +411,7 @@ function PatientSnapshotPanel({
                       c.status === 'completed' ? 'border-green-200 bg-green-50' : 'border-border bg-background'
                     }`}>
                     {c.checkup_date} · {c.checkup_type}
-                    {c.status === 'completed' ? ' ✓' : ''}
+                    {c.status === 'completed' ? <i className="ki-filled ki-check text-[11px] text-green-600 ml-1" /> : null}
                   </span>
                 ))}
               </div>
@@ -552,7 +552,7 @@ function EntryCard({
             ))}
           </ul>
           {entry.prescription_data.warnings && (
-            <p className="mt-2 text-[11px] text-red-700">⚠ {entry.prescription_data.warnings}</p>
+            <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-red-700"><i className="ki-filled ki-information-2 text-[11px]" />{entry.prescription_data.warnings}</p>
           )}
         </div>
       )}

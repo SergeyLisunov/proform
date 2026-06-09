@@ -30,11 +30,11 @@ const FROM    = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta
 const MAX_OPEN_QUEUE_FANOUT = 20
 
 const QUESTION_TYPE_LABELS: Record<string, { label: string; emoji: string }> = {
-  general:         { label: 'Общий вопрос',          emoji: '💬' },
-  load_clearance:  { label: 'Допуск к нагрузке',     emoji: '✅' },
-  injury_review:   { label: 'Оценка травмы',         emoji: '🩹' },
-  return_to_play:  { label: 'Return to play',        emoji: '🏃' },
-  red_flag:        { label: 'Срочно: красные флаги', emoji: '🚨' },
+  general:         { label: 'Общий вопрос',          emoji: '' },
+  load_clearance:  { label: 'Допуск к нагрузке',     emoji: '' },
+  injury_review:   { label: 'Оценка травмы',         emoji: '' },
+  return_to_play:  { label: 'Return to play',        emoji: '' },
+  red_flag:        { label: 'Срочно: красные флаги', emoji: '' },
 }
 
 const URGENCY_LABELS: Record<'routine' | 'urgent' | 'red_flag', string> = {
@@ -138,7 +138,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const athleteName = namesMap.get(inquiry.athlete_id) ?? 'Атлет'
 
   const qtMeta = QUESTION_TYPE_LABELS[inquiry.question_type]
-    ?? { label: inquiry.question_type, emoji: '📝' }
+    ?? { label: inquiry.question_type, emoji: '' }
 
   // ── Send via Resend (silent-fail per recipient) ──────────────────────
   const RESEND_API_KEY = process.env.RESEND_API_KEY

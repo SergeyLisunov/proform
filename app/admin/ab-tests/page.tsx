@@ -218,8 +218,9 @@ export default async function AbTestsPage() {
                       {s.sampleSize === 0 ? '—' : `${s.lift > 0 ? '+' : ''}${(s.lift * 100).toFixed(1)}%`}
                     </td>
                     <td className="py-3 pr-3 pf-num text-xs">
-                      <span className={`rounded-full px-2 py-0.5 ${insufficient ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                        {s.sampleSize}{insufficient ? ' ⚠' : ' ✓'}
+                      <span className={`rounded-full px-2 py-0.5 inline-flex items-center gap-1 ${insufficient ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                        {s.sampleSize}
+                        <i className={`ki-filled ${insufficient ? 'ki-information-4' : 'ki-check'} text-xs`} />
                       </span>
                     </td>
                     <td className="py-3 pr-3 text-xs">
@@ -230,10 +231,10 @@ export default async function AbTestsPage() {
                           return <span className="rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5">Need 100+</span>
                         }
                         if (v.label === 'a_wins') {
-                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A wins ✓</span>
+                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A wins <i className="ki-filled ki-check text-xs" /></span>
                         }
                         if (v.label === 'b_wins') {
-                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B wins ✓</span>
+                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B wins <i className="ki-filled ki-check text-xs" /></span>
                         }
                         return <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, not significant`}>Inconclusive</span>
                       })()}

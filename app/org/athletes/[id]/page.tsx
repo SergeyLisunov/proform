@@ -235,8 +235,8 @@ export default function OrgAthletePage() {
             )}
           </div>
           <div className="mt-1 text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
-            {profile.sport && <span>🏃 {profile.sport}</span>}
-            {profile.city && <span>📍 {profile.city}</span>}
+            {profile.sport && <span>{profile.sport}</span>}
+            {profile.city && <span className="inline-flex items-center gap-1.5"><i className="ki-filled ki-pin text-xs" />{profile.city}</span>}
             {profile.active_in_org_since && (
               <span>В организации с {new Date(profile.active_in_org_since).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}</span>
             )}

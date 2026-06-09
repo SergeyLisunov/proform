@@ -308,8 +308,9 @@ export default function AthleteGoalsPage() {
                 )}
 
                 {g.target_date && (
-                  <div className="text-[11px] text-muted-foreground">
-                    📅 Дедлайн: {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                    <i className="ki-filled ki-calendar text-[11px]" />
+                    Дедлайн: {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </div>
                 )}
 
@@ -322,34 +323,38 @@ export default function AthleteGoalsPage() {
                   {g.status === 'active' && (
                     <>
                       <button onClick={() => openEdit(g)} disabled={busyId === g.id}
-                        className="rounded-lg border border-border bg-background hover:bg-muted px-2 py-1 text-[11px] font-semibold">
-                        ✏ Edit
+                        className="rounded-lg border border-border bg-background hover:bg-muted px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
+                        <i className="ki-filled ki-pencil text-[11px]" />
+                        Edit
                       </button>
                       <button onClick={() => handleAchieve(g.id)} disabled={busyId === g.id}
-                        className="rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2 py-1 text-[11px] font-semibold">
-                        ✅ Достигнуто
+                        className="rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
+                        <i className="ki-filled ki-check text-[11px]" />
+                        Достигнуто
                       </button>
                       <button onClick={() => handleAbandon(g.id)} disabled={busyId === g.id}
                         className="rounded-lg border border-border bg-background hover:bg-muted text-muted-foreground px-2 py-1 text-[11px] font-semibold">
-                        ⏸ Снять
+                        Снять
                       </button>
                     </>
                   )}
                   {g.status === 'achieved' && (
-                    <span className="text-[11px] text-emerald-700 font-semibold">
-                      ✅ Достигнуто {g.achieved_at ? new Date(g.achieved_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}
+                    <span className="text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
+                      <i className="ki-filled ki-check text-[11px]" />
+                      Достигнуто {g.achieved_at ? new Date(g.achieved_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}
                     </span>
                   )}
                   {g.status === 'abandoned' && (
                     <button onClick={() => handleReactivate(g.id)} disabled={busyId === g.id}
-                      className="rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 text-[11px] font-semibold">
-                      🔄 Вернуть
+                      className="rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
+                      <i className="ki-filled ki-arrows-circle text-[11px]" />
+                      Вернуть
                     </button>
                   )}
                   <button onClick={() => handleDelete(g.id)} disabled={busyId === g.id}
-                    className="rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 text-[11px] font-semibold"
+                    className="rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 text-[11px] font-semibold inline-flex items-center"
                     title="Удалить">
-                    🗑
+                    <i className="ki-filled ki-trash text-[11px]" />
                   </button>
                 </div>
               </Card>

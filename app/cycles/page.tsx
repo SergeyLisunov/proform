@@ -415,8 +415,8 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                     ← Назад
                   </button>
                   <button onClick={handleSave} disabled={saving}
-                    style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer' }}>
-                    {saving ? 'Сохранение…' : '✓ Сохранить изменения'}
+                    style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    {saving ? 'Сохранение…' : <><i className="ki-filled ki-check" style={{ fontSize: 14 }} />Сохранить изменения</>}
                   </button>
                 </>
               )}

@@ -36,7 +36,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-700 mb-1">
-            🏢 {today}
+            <i className="ki-filled ki-office-bag text-[10px]" /> {today}
           </p>
           <h1 className="pf-num text-3xl md:text-4xl text-navy-500 leading-tight">
             {greeting}, <span className="text-blue-700">{orgName}</span>!

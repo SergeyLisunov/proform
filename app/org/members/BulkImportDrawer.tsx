@@ -370,7 +370,7 @@ function ResultPanel({ result }: { result: ApiResponse }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Hero */}
       <div style={{ padding: '20px', borderRadius: 18, background: 'linear-gradient(135deg,#F0FDF4,#DCFCE7)', border: '1px solid #BBF7D0', textAlign: 'center' }}>
-        <div style={{ fontSize: 28 }}>✉️</div>
+        <i className="ki-filled ki-sms" style={{ fontSize: 28, color: '#15803D' }} />
         <h3 style={{ fontSize: 18, fontWeight: 800, color: '#15803D', margin: '8px 0 4px' }}>
           {s.email_sent === s.invited && s.invited > 0 ? 'Все письма отправлены' : `Отправлено ${s.email_sent} из ${s.invited}`}
         </h3>
