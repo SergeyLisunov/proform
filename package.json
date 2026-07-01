@@ -34,6 +34,7 @@
     "date-fns": "^3.6.0",
     "lucide-react": "^0.468.0",
     "next": "^16.2.6",
+    "next-intl": "^4.13.1",
     "react": "^19.2.6",
     "react-apexcharts": "^1.4.0",
     "react-dom": "^19.2.6",

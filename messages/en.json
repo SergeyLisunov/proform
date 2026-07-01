@@ -1,0 +1,58 @@
+{
+  "common": {
+    "language": "Language"
+  },
+  "auth": {
+    "login": {
+      "back": "Back to home",
+      "platform": "Sports platform",
+      "workspace": "Workspace",
+      "title": "Sign in",
+      "subtitle": "An athlete's progress in one system for everyone around them.",
+      "subtitleSignin": " Sign in to your profile.",
+      "subtitleDemo": " Sign in to your profile — or try a demo for one of 5 roles.",
+      "redirectNotice": "You need to sign in to continue. After authorization we'll bring you back to the right screen automatically.",
+      "continueAs": "Continue as {email}",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "demoPassword": "Demo password: {password}",
+      "forgotPassword": "Forgot password?",
+      "capsLockOn": "Caps Lock is on: check your character case.",
+      "emailHint": "Use the work email of an athlete, coach or team.",
+      "demoSelected": "Demo profile selected",
+      "signingIn": "Signing in…",
+      "submit": "Open workspace",
+      "noAccount": "No account?",
+      "register": "Sign up",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "errors": {
+        "invalidCredentials": "Invalid email or password.",
+        "emailNotConfirmed": "Confirm your email before signing in.",
+        "network": "Couldn't reach the server. Check your connection and try again."
+      },
+      "demo": {
+        "quickAccess": "Quick access",
+        "quickAccessDesc": "Test accounts for each role and use case",
+        "oneClick": "One-click demo",
+        "selected": "selected",
+        "signInDemo": "Sign in to demo",
+        "footer": "The demo password is preset. Click “Sign in to demo” — the fields fill in automatically.",
+        "roles": {
+          "athlete": "Athlete",
+          "coach": "Coach",
+          "organization": "Organization",
+          "admin": "Admin",
+          "doctor": "Doctor"
+        },
+        "hints": {
+          "athlete": "Diary, wellness, training load",
+          "coach": "Groups, comments, form control",
+          "organization": "Members, communication, club structure",
+          "admin": "Users, events, action audit",
+          "doctor": "Medical notes, recovery, injuries"
+        }
+      }
+    }
+  }
+}

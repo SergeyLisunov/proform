@@ -3,8 +3,10 @@
 import { type FormEvent, type KeyboardEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 
 // W18 Day 94 C1 SECURITY FIX:
 // Demo password gate. Previously hardcoded `'proform123'` rendered в UI
@@ -18,48 +20,16 @@ import { createClient } from '@/lib/supabase/client'
 const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? null
 const DEMO_ENABLED = DEMO_PASSWORD !== null
 
+// i18n (Этап 0): подписи ролей/подсказки берутся из каталога по roleKey
+// (messages/*.json → auth.login.demo.roles / .hints). Здесь — только
+// не-текстовые атрибуты (email, стили).
 const TEST_ACCOUNTS = [
-  {
-    label: 'Атлет',
-    email: 'athlete@proform.test',
-    hint: 'Дневник, самочувствие, нагрузка',
-    iconBg: 'bg-orange-100',
-    iconColor: 'text-orange-600',
-    ring: 'hover:border-orange-200 hover:bg-orange-50/60',
-  },
-  {
-    label: 'Тренер',
-    email: 'coach@proform.test',
-    hint: 'Группы, комментарии, контроль формы',
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
-    ring: 'hover:border-green-200 hover:bg-green-50/60',
-  },
-  {
-    label: 'Организация',
-    email: 'org@proform.test',
-    hint: 'Участники, коммуникация, структура клуба',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    ring: 'hover:border-blue-200 hover:bg-blue-50/60',
-  },
-  {
-    label: 'Администратор',
-    email: 'admin@proform.test',
-    hint: 'Пользователи, события, аудит действий',
-    iconBg: 'bg-violet-100',
-    iconColor: 'text-violet-600',
-    ring: 'hover:border-violet-200 hover:bg-violet-50/60',
-  },
-  {
-    label: 'Доктор',
-    email: 'doctor@proform.test',
-    hint: 'Медицинские заметки, восстановление, травмы',
-    iconBg: 'bg-red-100',
-    iconColor: 'text-red-600',
-    ring: 'hover:border-red-200 hover:bg-red-50/60',
-  },
-]
+  { roleKey: 'athlete',      email: 'athlete@proform.test', iconBg: 'bg-orange-100', iconColor: 'text-orange-600', ring: 'hover:border-orange-200 hover:bg-orange-50/60' },
+  { roleKey: 'coach',        email: 'coach@proform.test',   iconBg: 'bg-green-100',  iconColor: 'text-green-600',  ring: 'hover:border-green-200 hover:bg-green-50/60' },
+  { roleKey: 'organization', email: 'org@proform.test',     iconBg: 'bg-blue-100',   iconColor: 'text-blue-600',   ring: 'hover:border-blue-200 hover:bg-blue-50/60' },
+  { roleKey: 'admin',        email: 'admin@proform.test',   iconBg: 'bg-violet-100', iconColor: 'text-violet-600', ring: 'hover:border-violet-200 hover:bg-violet-50/60' },
+  { roleKey: 'doctor',       email: 'doctor@proform.test',  iconBg: 'bg-red-100',    iconColor: 'text-red-600',    ring: 'hover:border-red-200 hover:bg-red-50/60' },
+] as const
 
 // W14 Day 71: marketing sidebar removed (now lives на public `/`).
 // Login page focused on auth + demo-accounts only.
@@ -72,36 +42,39 @@ function getSafeRedirect(target: string | null) {
   return target
 }
 
-function getAuthErrorMessage(message: string) {
+// Возвращает КЛЮЧ перевода для известных ошибок Supabase, либо null —
+// тогда показываем сырое сообщение как есть (перевод — в компоненте).
+function getAuthErrorKey(message: string): string | null {
   const normalized = message.toLowerCase()
 
-  if (normalized.includes('invalid login credentials')) {
-    return 'Неверная электронная почта или пароль.'
-  }
+  if (normalized.includes('invalid login credentials')) return 'errors.invalidCredentials'
+  if (normalized.includes('email not confirmed')) return 'errors.emailNotConfirmed'
+  if (normalized.includes('network')) return 'errors.network'
 
-  if (normalized.includes('email not confirmed')) {
-    return 'Подтвердите электронную почту перед входом.'
-  }
-
-  if (normalized.includes('network')) {
-    return 'Не удалось связаться с сервером. Проверьте подключение и попробуйте еще раз.'
-  }
-
-  return message
+  return null
 }
 
 export default function LoginPage() {
   const router = useRouter()
+  const t = useTranslations('auth.login')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [errorKey, setErrorKey] = useState<string | null>(null)
+  const [errorRaw, setErrorRaw] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [capsLockOn, setCapsLockOn] = useState(false)
   const [lastLoginEmail, setLastLoginEmail] = useState('')
   const [selectedDemoEmail, setSelectedDemoEmail] = useState('')
   const [redirectTo, setRedirectTo] = useState('/dashboard')
+
+  const errorText = errorKey ? t(errorKey) : errorRaw
+
+  function clearError() {
+    setErrorKey(null)
+    setErrorRaw('')
+  }
 
   useEffect(() => {
     try {
@@ -123,7 +96,7 @@ export default function LoginPage() {
 
   async function signIn(nextEmail: string, nextPassword: string) {
     setLoading(true)
-    setError('')
+    clearError()
 
     const normalizedEmail = nextEmail.trim().toLowerCase()
     const { error: authError } = await createClient().auth.signInWithPassword({
@@ -132,7 +105,9 @@ export default function LoginPage() {
     })
 
     if (authError) {
-      setError(getAuthErrorMessage(authError.message))
+      const key = getAuthErrorKey(authError.message)
+      if (key) setErrorKey(key)
+      else setErrorRaw(authError.message)
       setLoading(false)
       return
     }
@@ -157,7 +132,7 @@ export default function LoginPage() {
     setSelectedDemoEmail(accountEmail)
     setEmail(accountEmail)
     setPassword(DEMO_PASSWORD)
-    setError('')
+    clearError()
   }
 
   async function handleDemoLogin(accountEmail: string) {
@@ -172,45 +147,48 @@ export default function LoginPage() {
       className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10"
     >
       <div className="mx-auto flex w-full max-w-[560px] flex-col gap-6">
-        {/* Top bar: back-to-landing + logo */}
+        {/* Top bar: back-to-landing + language toggle + logo */}
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground no-underline"
           >
             <ArrowLeft size={15} />
-            На главную
+            {t('back')}
           </Link>
-          <Link href="/" className="flex items-center gap-2.5 no-underline">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
-              <i className="ki-filled ki-abstract-26 text-sm text-white" />
-            </div>
-            <div className="text-right">
-              <div className="pf-num text-lg text-foreground">Sporteo</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground -mt-0.5">Спортивная платформа</div>
-            </div>
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <Link href="/" className="flex items-center gap-2.5 no-underline">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
+                <i className="ki-filled ki-abstract-26 text-sm text-white" />
+              </div>
+              <div className="text-right">
+                <div className="pf-num text-lg text-foreground">Sporteo</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground -mt-0.5">{t('platform')}</div>
+              </div>
+            </Link>
+          </div>
         </div>
 
         {/* Auth card */}
         <div className="rounded-[28px] border border-orange-100/80 bg-white px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
           {/* Header strip (small visual only — marketing moved to /) */}
           <div className="mb-4 inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700">
-            Рабочее пространство
+            {t('workspace')}
           </div>
 
           <div>
-            <h1 className="pf-num text-[40px] leading-none text-navy-500 sm:text-[46px]">Войти</h1>
+            <h1 className="pf-num text-[40px] leading-none text-navy-500 sm:text-[46px]">{t('title')}</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-              Прогресс спортсмена в одной системе для всех, кто рядом.
-              {DEMO_ENABLED ? ' Войдите в свой профиль — или попробуйте demo для одной из 5 ролей.' : ' Войдите в свой профиль.'}
+              {t('subtitle')}
+              {DEMO_ENABLED ? t('subtitleDemo') : t('subtitleSignin')}
             </p>
 
             {redirectTo !== '/dashboard' && (
               <div className="mt-5 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
                 <ShieldCheck className="mt-0.5 shrink-0 text-blue-600" size={17} />
                 <div>
-                  Для продолжения нужно войти в аккаунт. После авторизации вернем вас на нужный экран автоматически.
+                  {t('redirectNotice')}
                 </div>
               </div>
             )}
@@ -222,21 +200,21 @@ export default function LoginPage() {
                 className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-2sm text-foreground transition-colors hover:border-orange-200 hover:text-orange-600"
               >
                 <TimerReset size={15} />
-                Продолжить как {lastLoginEmail}
+                {t('continueAs', { email: lastLoginEmail })}
               </button>
             )}
 
             <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-              {error && (
+              {errorText && (
                 <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
-                  <span>{error}</span>
+                  <span>{errorText}</span>
                 </div>
               )}
 
               <div>
                 <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Электронная почта
+                  {t('emailLabel')}
                 </label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
@@ -255,17 +233,17 @@ export default function LoginPage() {
               <div>
                 <div className="mb-1.5 flex items-center justify-between gap-3">
                   <label className="block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Пароль
+                    {t('passwordLabel')}
                   </label>
                   <div className="flex items-center gap-3">
                     {DEMO_ENABLED && (
-                      <span className="text-2xs text-muted-foreground">Демо пароль: {DEMO_PASSWORD}</span>
+                      <span className="text-2xs text-muted-foreground">{t('demoPassword', { password: DEMO_PASSWORD ?? '' })}</span>
                     )}
                     <Link
                       href="/auth/forgot"
                       className="text-2xs font-semibold text-orange-600 no-underline transition-colors hover:text-orange-700"
                     >
-                      Забыли пароль?
+                      {t('forgotPassword')}
                     </Link>
                   </div>
                 </div>
@@ -287,16 +265,16 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword((value) => !value)}
                     className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-orange-50 hover:text-orange-600"
-                    aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                   >
                     {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
                 <div className="mt-2 flex min-h-5 items-center justify-between gap-2 text-2xs">
                   <span className={capsLockOn ? 'text-amber-600' : 'text-muted-foreground'}>
-                    {capsLockOn ? 'Caps Lock включен: проверьте регистр символов.' : 'Используйте рабочий email спортсмена, тренера или команды.'}
+                    {capsLockOn ? t('capsLockOn') : t('emailHint')}
                   </span>
-                  {selectedDemoEmail && <span className="text-orange-600">Выбран demo-профиль</span>}
+                  {selectedDemoEmail && <span className="text-orange-600">{t('demoSelected')}</span>}
                 </div>
               </div>
 
@@ -308,11 +286,11 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <span className="pf-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent" />
-                    Входим в систему...
+                    {t('signingIn')}
                   </>
                 ) : (
                   <>
-                    Открыть рабочее пространство
+                    {t('submit')}
                     <ArrowRight size={16} />
                   </>
                 )}
@@ -320,9 +298,9 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-5 text-center text-2sm text-muted-foreground">
-              Нет аккаунта?{' '}
+              {t('noAccount')}{' '}
               <Link href="/auth/register" className="font-semibold text-orange-500 no-underline hover:text-orange-600">
-                Зарегистрироваться
+                {t('register')}
               </Link>
             </p>
 
@@ -334,19 +312,21 @@ export default function LoginPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="text-2xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
-                    Быстрый доступ
+                    {t('demo.quickAccess')}
                   </div>
                   <div className="mt-1 text-sm font-medium text-foreground">
-                    Тестовые аккаунты для роли и сценария использования
+                    {t('demo.quickAccessDesc')}
                   </div>
                 </div>
                 <div className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700">
-                  Demo в один клик
+                  {t('demo.oneClick')}
                 </div>
               </div>
 
               <div className="mt-4 grid gap-2.5">
-                {TEST_ACCOUNTS.map((account) => (
+                {TEST_ACCOUNTS.map((account) => {
+                  const roleLabel = t(`demo.roles.${account.roleKey}`)
+                  return (
                   <div
                     key={account.email}
                     className={`flex flex-col gap-3 rounded-2xl border border-border bg-white p-3 transition-all sm:flex-row sm:items-center ${account.ring}`}
@@ -357,19 +337,19 @@ export default function LoginPage() {
                       className="flex flex-1 items-center gap-3 text-left"
                     >
                       <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${account.iconBg}`}>
-                        <span className={`pf-num text-sm ${account.iconColor}`}>{account.label[0]}</span>
+                        <span className={`pf-num text-sm ${account.iconColor}`}>{roleLabel.charAt(0)}</span>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <div className="text-sm font-semibold text-foreground">{account.label}</div>
+                          <div className="text-sm font-semibold text-foreground">{roleLabel}</div>
                           {selectedDemoEmail === account.email && (
                             <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-700">
-                              выбран
+                              {t('demo.selected')}
                             </span>
                           )}
                         </div>
                         <div className="truncate font-mono text-2xs text-muted-foreground">{account.email}</div>
-                        <div className="mt-1 text-2xs text-muted-foreground">{account.hint}</div>
+                        <div className="mt-1 text-2xs text-muted-foreground">{t(`demo.hints.${account.roleKey}`)}</div>
                       </div>
                     </button>
 
@@ -379,15 +359,16 @@ export default function LoginPage() {
                       disabled={loading}
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-2sm font-semibold text-orange-700 transition-colors hover:bg-orange-100 disabled:opacity-60"
                     >
-                      Войти в demo
+                      {t('demo.signInDemo')}
                       <ArrowRight size={14} />
                     </button>
                   </div>
-                ))}
+                  )
+                })}
               </div>
 
               <p className="mt-3 text-2xs leading-relaxed text-muted-foreground">
-                Demo пароль предустановлен. Нажмите «Войти в demo» — данные подставятся автоматически.
+                {t('demo.footer')}
               </p>
             </div>
             )}

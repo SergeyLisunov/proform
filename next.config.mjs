@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 import bundleAnalyzer from '@next/bundle-analyzer'
+import createNextIntlPlugin from 'next-intl/plugin'
+
+// i18n (Этап 0) — next-intl без URL-роутинга, локаль из cookie.
+// Конфиг запроса: i18n/request.ts.
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 // W17 Day 86 — bundle-analyzer wrapper.
 // Enabled via `ANALYZE=true npm run build` (or `npm run analyze`).
@@ -66,4 +71,4 @@ const nextConfig = {
   },
 }
 
-export default withBundleAnalyzer(nextConfig)
+export default withNextIntl(withBundleAnalyzer(nextConfig))
