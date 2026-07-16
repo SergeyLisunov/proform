@@ -113,6 +113,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'profile_not_created' }, { status: 500 })
   }
 
+  // P1 privacy (docs/policy/child-privacy-defaults.md, принцип 1-2): детский
+  // аккаунт приватен по умолчанию. users.is_searchable имеет DB-default TRUE
+  // (взрослые находимы в поиске чата) — для ребёнка принудительно выключаем,
+  // чтобы незнакомцы не находили его в /messages. Родитель сможет включить
+  // позже в настройках, когда ребёнок вырастет / заберёт аккаунт.
+  // Данные-фикс для уже созданных детей — миграция 093.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (admin as any).from('users').update({ is_searchable: false }).eq('id', childId)
+
   // ── 3. Link parent ↔ child ───────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: linkErr } = await (admin as any)
