@@ -199,6 +199,9 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     items: [
       // Этап 9 — admin удалён из network/analytics; backoffice использует
       // /admin/crm и /admin/orgs для просмотра, не client-surface'ы.
+      // P2 — клубные каналы: объявления/достижения/тренерская + per-группа.
+      // Видимость внутри страницы решает RLS (can_read_channel).
+      { id: 'network.channels',  href: '/channels',  icon: 'ki-messages',       label: 'Каналы клуба',    roles: ['athlete', 'coach', 'organization'] },
       { id: 'network.contacts',  href: '/network',   icon: 'ki-people',         label: 'Сеть и контакты', roles: ['athlete', 'organization', 'doctor'] },
       // Coach видит «Мои атлеты» через секцию «Мой кокпит» выше, поэтому здесь
       // dropped из roles чтобы не дублировался. Doctor по-прежнему видит.
@@ -266,6 +269,9 @@ export const PARENT_FAMILY_SECTION: SidebarSection = {
     // что показывает dashboard под каждым ребёнком, но в едином feed: новые
     // сверху, risk_level / category цветные чипы, лимит 50 записей.
     { id: 'family.notes',    href: '/parent/notes',     icon: 'ki-notepad-edit',  label: 'Заметки',    roles: null },
+    // P2 — родитель видит каналы клубов своих детей (RLS-деривация через
+    // parent_links; team_parents_chat — главный сценарий).
+    { id: 'family.channels', href: '/channels',         icon: 'ki-messages',      label: 'Каналы клуба', roles: null },
   ],
 }
 
