@@ -105,6 +105,14 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
     })
     setPatients(list)
 
+    // P0-фикс: ID атлетов-пациентов для скоупинга счётчика травм ниже.
+    const patientAthleteIds = (conns ?? []).reduce<string[]>((acc, raw) => {
+      const c = raw as unknown as ConnRow
+      const other = c.initiator?.id === userId ? c.recipient ?? null : c.initiator ?? null
+      if (other && other.role === 'athlete') acc.push(other.id)
+      return acc
+    }, [])
+
     const { data: notif } = await sb
       .from('notifications')
       .select('id, type, title, body, entity_id, created_at, is_read')
@@ -125,14 +133,23 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
       .eq('doctor_id', userId)
       .eq('status', 'scheduled')
       .gte('checkup_date', todayISO())
-      .lte('checkup_date', tomorrowISO())
+      // P0-фикс: было .lte(tomorrow) — «осмотры сегодня» захватывали 2 дня.
+      .lt('checkup_date', tomorrowISO())
     setTodayCount(todayChk ?? 0)
 
-    const { count: activeInj } = await sb
-      .from('injuries')
-      .select('*', { count: 'exact', head: true })
-      .neq('status', 'recovered')
-    setActiveInjuriesCount(activeInj ?? 0)
+    // P0-фикс: раньше травмы считались без фильтра по своим пациентам —
+    // счётчик показывал всё, что пропустит RLS (потенциально чужих людей).
+    // Теперь только атлеты с активной связью doctor_athlete.
+    if (patientAthleteIds.length > 0) {
+      const { count: activeInj } = await sb
+        .from('injuries')
+        .select('*', { count: 'exact', head: true })
+        .neq('status', 'recovered')
+        .in('athlete_id', patientAthleteIds)
+      setActiveInjuriesCount(activeInj ?? 0)
+    } else {
+      setActiveInjuriesCount(0)
+    }
 
     setLoading(false)
   }, [userId])
