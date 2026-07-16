@@ -33,6 +33,7 @@ const WorkoutCommentsDrawer = dynamic(() => import('@/components/workout/Workout
 const MyRecommendationsCard   = dynamic(() => import('@/components/athlete/MyRecommendationsCard'), { ssr: false })
 const AthleteConnectionsPanel = dynamic(() => import('@/components/ui/AthleteConnectionsPanel').then(m => m.AthleteConnectionsPanel), { ssr: false })
 const CoachRestrictionsCard   = dynamic(() => import('@/components/coach/CoachRestrictionsCard'), { ssr: false })
+const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFeed').then(m => m.OrgWallFeed), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -855,11 +856,13 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
       {/* ── Row 2: AI insights — AI coach + Weekly insights + Recovery trend ── */}
       {/* P0 — межролевые сигналы на живом атлетском дашборде: рекомендации
           врача (скрывается при пустоте) + care team (мой тренер / врач /
-          команда). Раньше жили только в мёртвом AthleteDashboard.tsx. */}
+          команда) + новости клуба (стена организации, видимая членам).
+          Первые два раньше жили только в мёртвом AthleteDashboard.tsx. */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <MyRecommendationsCard athleteId={userId} />
         <AthleteConnectionsPanel userId={userId} />
       </div>
+      <OrgWallFeed userId={userId} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <AiCoachCard />
@@ -1023,6 +1026,9 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
       {/* P0 — петля врач → тренер: расшаренные врачом ограничения теперь на
           живом дашборде (клиентская версия мёртвого CoachRestrictionsWidget). */}
       <CoachRestrictionsCard athleteIds={athletes.map(a => a.id)} />
+
+      {/* P0 — стена организации для членов: тренер тоже видит новости клуба. */}
+      <OrgWallFeed userId={userId} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2 overflow-hidden">
