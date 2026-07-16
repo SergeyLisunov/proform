@@ -185,6 +185,13 @@ export const AlfaBankProvider: PaymentProvider = {
     })
     if (!reg.orderId) throw new Error('AlfaBank register.do (recurring): missing orderId')
 
+    // Персист provider-id ДО списания: если binding-шаг упадёт или ответ
+    // потеряется, deposited-callback всё равно найдёт payments-строку.
+    // Throw колбэка отменяет списание — без персиста денег не двигаем.
+    if (input.onProviderPaymentId) {
+      await input.onProviderPaymentId(reg.orderId)
+    }
+
     await alfaPost('/paymentOrderBinding.do', {
       mdOrder:   reg.orderId,
       bindingId: input.paymentMethodId,

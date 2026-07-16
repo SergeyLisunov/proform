@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentIntent } from '@/services/billing.service'
+import { createMarketplaceCheckout } from '@/services/marketplace-orders.service'
 import { getDefaultProvider } from '@/lib/payments'
 
 /**
@@ -35,23 +36,48 @@ export async function POST(req: NextRequest) {
         { status: 410 },
       )
     }
-    if (typeof body.passPlanId === 'string') {
-      return NextResponse.json(
-        {
-          error: 'MARKETPLACE_SPLIT_PAYMENTS_PENDING',
-          message: 'Покупка абонементов через marketplace требует ЮKassa Split Payments. Активация на стороне ЮKassa.',
-        },
-        { status: 503 },
-      )
-    }
-    if (typeof body.serviceId === 'string') {
-      return NextResponse.json(
-        {
-          error: 'MARKETPLACE_SPLIT_PAYMENTS_PENDING',
-          message: 'Оплата услуг тренера через marketplace требует ЮKassa Split Payments. Активация на стороне ЮKassa.',
-        },
-        { status: 503 },
-      )
+    // ── P2: маркетплейс жив — оплата на счёт платформы, комиссия
+    // (PLATFORM_FEE_BPS) учитывается леджером platform_fee_cents ────────────
+    const passPlanId = typeof body.passPlanId === 'string' ? body.passPlanId : null
+    const serviceId  = typeof body.serviceId  === 'string' ? body.serviceId  : null
+
+    if (passPlanId || serviceId) {
+      const supabase = await createClient()
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      const { data: me } = await supabase
+        .from('users').select('id').eq('auth_id', authUser.id).single()
+      if (!me) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      }
+      const origin =
+        req.headers.get('origin') ??
+        process.env.NEXT_PUBLIC_SITE_URL ??
+        'https://proform-delta.vercel.app'
+      try {
+        const result = await createMarketplaceCheckout({
+          buyerId:    me.id,
+          passPlanId: passPlanId ?? undefined,
+          serviceId:  serviceId ?? undefined,
+          returnUrl:  `${origin}/athlete/passes?purchase=success`,
+        })
+        return NextResponse.json({
+          url:        result.confirmationUrl,
+          payment_id: result.paymentId,
+          provider:   getDefaultProvider(),
+        })
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'CHECKOUT_FAILED'
+        const status =
+          msg.includes('NOT_CONFIGURED') || msg.includes('is not configured') ? 503 :
+          msg.startsWith('OFFERING_NOT_FOUND')       ? 404 :
+          msg.startsWith('OFFERING_FREE_NO_CHECKOUT') ? 400 :
+          msg.startsWith('CANNOT_BUY_OWN_OFFERING')  ? 400 :
+          500
+        return NextResponse.json({ error: msg }, { status })
+      }
     }
 
     if (!tariffCode) {
