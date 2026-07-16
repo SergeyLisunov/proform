@@ -1,0 +1,39 @@
+# nginx для Sporteo на Hostiman VPS (P2 deploy pack).
+# Положить в /etc/nginx/sites-available/sporteo, симлинк в sites-enabled,
+# `nginx -t && systemctl reload nginx`. TLS добавит certbot --nginx
+# (Let's Encrypt) — секции ssl появятся автоматически.
+#
+# ВАЖНО для платёжных callback'ов Альфы: сертификат должен быть
+# CA-signed (Let's Encrypt подходит) — self-signed молча ломает
+# доставку callback. Telegram-вебхук требует того же.
+
+server {
+    listen 80;
+    server_name sporteo.example.ru;   # ← ваш домен (A-запись на VPS)
+
+    # Статика standalone-билда — мимо Node, с иммутабельным кэшем
+    # (CDN Vercel больше нет — заголовки ставим сами).
+    location /_next/static/ {
+        alias /srv/sporteo/current/.next/static/;
+        expires max;
+        add_header Cache-Control "public, immutable";
+    }
+    location /public/ {
+        alias /srv/sporteo/current/public/;
+        expires 7d;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+        proxy_read_timeout 120s;           # маркетплейс/AI-роуты
+    }
+
+    client_max_body_size 20m;              # вложения дневников
+}

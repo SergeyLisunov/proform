@@ -15,6 +15,11 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 const nextConfig = {
+  // P2 — Hostiman deploy pack: standalone-сервер для self-hosted VPS
+  // (.next/standalone/server.js под PM2 + nginx). На Vercel ключ
+  // безвреден — их билдер использует собственный output. См.
+  // docs/deploy/HOSTIMAN.md.
+  output: 'standalone',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
