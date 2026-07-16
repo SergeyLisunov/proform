@@ -39,6 +39,8 @@ const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFee
 const ClubFeed                = dynamic(() => import('@/components/ui/ClubFeed').then(m => m.ClubFeed), { ssr: false })
 const PersonalRecordsCard     = dynamic(() => import('@/components/athlete/PersonalRecordsCard'), { ssr: false })
 const PlanStreakCard          = dynamic(() => import('@/components/athlete/PlanStreakCard'), { ssr: false })
+const MyPlanWeekCard          = dynamic(() => import('@/components/athlete/MyPlanWeekCard'), { ssr: false })
+const CoachNotesCard          = dynamic(() => import('@/components/athlete/CoachNotesCard'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -868,8 +870,10 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         <AthleteConnectionsPanel userId={userId} />
       </div>
       {/* P1 — личные рекорды: соревнование с собой (mastery-safe). */}
+      <MyPlanWeekCard athleteId={userId} />
       <PlanStreakCard athleteId={userId} />
       <PersonalRecordsCard athleteId={userId} />
+      <CoachNotesCard athleteId={userId} />
       <OrgWallFeed userId={userId} />
       {/* P1 — лента клуба: тренировки одноклубников + «респект». */}
       <ClubFeed userId={userId} userName={name} />
