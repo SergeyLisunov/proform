@@ -88,7 +88,9 @@ export function meetsRequiredPlan(current: Plan, required: PaidPlan): boolean {
  * даже если plan выглядит платным.
  */
 export function isSubscriptionActive(status: string | null | undefined): boolean {
-  return status == null || status === 'active' || status === 'trial'
+  // 'trialing' — статус, который пишет вебхук активации (payment-events);
+  // 'trial' — legacy-значение старых строк. Оба активны.
+  return status == null || status === 'active' || status === 'trial' || status === 'trialing'
 }
 
 /**

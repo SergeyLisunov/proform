@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentIntent } from '@/services/billing.service'
+import { getDefaultProvider } from '@/lib/payments'
 
 /**
  * POST /api/billing/checkout — Sprint W6 Day 28 (ЮKassa-only).
@@ -75,7 +76,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // ── ЮKassa subscription checkout ──────────────────────────────────────
+    // ── Subscription checkout (P2: провайдер из PAYMENTS_PROVIDER env,
+    // сейчас alfabank; ЮKassa остаётся зарегистрированной альтернативой) ──
+    const providerId = getDefaultProvider()
     const origin =
       req.headers.get('origin') ??
       process.env.NEXT_PUBLIC_SITE_URL ??
@@ -84,20 +87,21 @@ export async function POST(req: NextRequest) {
       const result = await createPaymentIntent({
         userId:    me.id,
         tariffCode,
-        provider:  'yookassa',
         returnUrl: `${origin}/settings?billing=success&payment_id={payment_id}`,
       })
       return NextResponse.json({
         url:        result.confirmationUrl,
         payment_id: result.paymentId,
-        provider:   'yookassa',
+        provider:   providerId,
       })
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'CHECKOUT_FAILED'
       const status =
-        msg.startsWith('YOOKASSA_NOT_CONFIGURED') ? 503 :
-        msg.startsWith('TARIFF_NOT_FOUND')        ? 404 :
-        msg.startsWith('TARIFF_FREE_NO_CHECKOUT') ? 400 :
+        msg.startsWith('YOOKASSA_NOT_CONFIGURED')  ? 503 :
+        msg.startsWith('ALFABANK_NOT_CONFIGURED')  ? 503 :
+        msg.includes('is not configured')          ? 503 :
+        msg.startsWith('TARIFF_NOT_FOUND')         ? 404 :
+        msg.startsWith('TARIFF_FREE_NO_CHECKOUT')  ? 400 :
         500
       return NextResponse.json({ error: msg }, { status })
     }

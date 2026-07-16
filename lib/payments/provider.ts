@@ -21,7 +21,7 @@
  *   processing, etc).
  */
 
-export type ProviderId = 'yookassa' | 'manual'
+export type ProviderId = 'yookassa' | 'alfabank' | 'manual'
 
 export type Currency = 'RUB' | 'KZT'
 
