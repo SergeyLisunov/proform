@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { isSubscriptionActive } from '@/lib/plans'
 
 /**
  * Subscription gate for expensive AI endpoints — Sprint W1 Day 2.
@@ -96,7 +97,9 @@ export async function enforcePlanForAi(
     const status = row?.status ?? null
 
     // status check — even if plan is paid but cancelled/expired, deny.
-    const isActive = status === null || status === 'active' || status === 'trial'
+    // Единый источник правды (lib/plans), чтобы гейты не расходились:
+    // вебхук активации пишет 'trialing'.
+    const isActive = isSubscriptionActive(status)
     if (!isPaidPlan(plan) || !isActive) {
       const required = opts.requiredPlan ?? 'pro'
       return NextResponse.json<PaywallPayload>(

@@ -11,9 +11,11 @@
  */
 import type { PaymentProvider, ProviderId } from './provider'
 import { YooKassaProvider } from './yookassa'
+import { AlfaBankProvider } from './alfabank'
 
 const REGISTRY: Record<Exclude<ProviderId, 'manual'>, PaymentProvider> = {
   yookassa: YooKassaProvider,
+  alfabank: AlfaBankProvider,
 }
 
 export function getProvider(id: ProviderId): PaymentProvider {
@@ -30,13 +32,14 @@ export function getProvider(id: ProviderId): PaymentProvider {
 
 /**
  * Returns the default provider for a new checkout, configurable via
- * `PAYMENTS_PROVIDER` env. Defaults to 'yookassa' (RU/CIS primary).
+ * `PAYMENTS_PROVIDER` env (P2: `alfabank` — основной шлюз фаундера).
+ * Provider switch = один env-флип, роуты не меняются.
  * `manual` is allowed for admin overrides; all other values fall back.
  */
 export function getDefaultProvider(): ProviderId {
   const env = process.env.PAYMENTS_PROVIDER as ProviderId | undefined
-  if (env === 'yookassa' || env === 'manual') return env
-  return 'yookassa'
+  if (env === 'yookassa' || env === 'alfabank' || env === 'manual') return env
+  return 'alfabank'
 }
 
 export { YOOKASSA_WEBHOOK_IPS, isIpAllowed } from './yookassa'
