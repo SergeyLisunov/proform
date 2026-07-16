@@ -1041,3 +1041,70 @@ function kpiTile(label: string, value: number, color: string): string {
   `
 }
 
+
+// ── Parent weekly digest (P1 соц-ядро, ClassDojo Friday-report модель) ───────
+
+export interface ParentWeeklyChild {
+  name:              string
+  workouts_count:    number
+  total_min:         number
+  clearance_label:   string | null
+  clearance_color:   string
+  review_needed:     boolean
+  records:           string[]
+  coach_notes_count: number
+}
+
+/**
+ * Еженедельный отчёт родителю: «как прошла неделя у ребёнка».
+ * Родитель платит за секцию, но не видит, что происходит на тренировках —
+ * отчёт закрывает разрыв и еженедельно подтверждает ценность занятий.
+ */
+export function renderParentWeeklyDigest(params: {
+  parent_name: string | null
+  children:    ParentWeeklyChild[]
+}): { subject: string; html: string } {
+  const { children } = params
+  const subject = children.length === 1
+    ? `Как прошла неделя у ${children[0].name}`
+    : `Неделя ваших детей в Sporteo`
+
+  const blocks = children.map(c => {
+    const clearance = c.clearance_label
+      ? `<span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:${c.clearance_color}18;color:${c.clearance_color}">Допуск: ${escape(c.clearance_label)}</span>`
+      : ''
+    const review = c.review_needed
+      ? `<div style="margin-top:8px;padding:10px 12px;border-radius:10px;background:#FEF9C3;color:#854D0E;font-size:12px">Срок медицинской справки истёк — требуется пересмотр врачом.</div>`
+      : ''
+    const records = c.records.length
+      ? `<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:#F5F3FF;color:#5B21B6;font-size:12px"><b>Новые личные рекорды:</b><br/>${c.records.map(r => escape(r)).join('<br/>')}</div>`
+      : ''
+    const notes = c.coach_notes_count > 0
+      ? `<div style="margin-top:6px;font-size:12px;color:#475569">Комментариев тренера за неделю: <b>${c.coach_notes_count}</b></div>`
+      : ''
+    return `
+      <div style="margin-top:16px;padding:16px;border:1px solid #E2E8F0;border-radius:14px">
+        <div style="font-size:15px;font-weight:800;color:#1D4672">${escape(c.name)}</div>
+        <div style="margin-top:6px;font-size:13px;color:#0F172A">
+          Тренировок за неделю: <b>${c.workouts_count}</b>${c.total_min > 0 ? ` · <b>${c.total_min} мин</b>` : ''}
+        </div>
+        <div style="margin-top:8px">${clearance}</div>
+        ${review}${records}${notes}
+      </div>`
+  }).join('')
+
+  const inner = `
+    <h1 style="margin:0;font-size:20px;line-height:1.3;color:#1D4672">Итоги недели</h1>
+    <p style="margin:8px 0 0 0;font-size:13px;color:#475569">
+      ${escape(params.parent_name ?? 'Здравствуйте')}! Ваш еженедельный отчёт о тренировках.
+    </p>
+    ${blocks}
+    <div style="margin-top:20px">
+      <a href="${BASE_URL}/parent/dashboard?ref=weekly-email"
+         style="display:inline-block;background:#F35703;color:#fff;font-weight:700;font-size:13px;padding:11px 20px;border-radius:12px;text-decoration:none">
+        Открыть кабинет родителя
+      </a>
+    </div>`
+
+  return { subject, html: wrap(subject, 'Еженедельный отчёт о тренировках ребёнка', inner) }
+}

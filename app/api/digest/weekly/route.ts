@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { runCoachWeeklyDigest } from '@/services/email-digest.service'
+import { runCoachWeeklyDigest, runParentWeeklyDigest } from '@/services/email-digest.service'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -17,8 +17,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 })
   }
   try {
-    const result = await runCoachWeeklyDigest()
-    return NextResponse.json({ ok: true, ...result })
+    // P1 — parent weekly report едет тем же воскресным кроном, что и
+    // coach-дайджест: без новой записи в vercel.json.
+    const [coach, parent] = await Promise.all([
+      runCoachWeeklyDigest(),
+      runParentWeeklyDigest(),
+    ])
+    return NextResponse.json({ ok: true, coach, parent })
   } catch (e) {
     return NextResponse.json({
       ok: false, error: e instanceof Error ? e.message : String(e)
