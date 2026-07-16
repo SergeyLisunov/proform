@@ -28,6 +28,11 @@ const WeeklyPlannerCard    = dynamic(() => import('@/components/widgets/WeeklyPl
 const AnomalyAlertCard     = dynamic(() => import('@/components/widgets/AnomalyAlertCard'),     { ssr: false })
 const TrainingLoadWidget   = dynamic(() => import('@/components/widgets/TrainingLoadWidget'),   { ssr: false })
 const WorkoutCommentsDrawer = dynamic(() => import('@/components/workout/WorkoutCommentsDrawer'), { ssr: false })
+// P0 — оживление межролевых виджетов из мёртвых server-дашбордов
+// (AthleteDashboard.tsx / CoachDashboard.tsx удалены этим же PR).
+const MyRecommendationsCard   = dynamic(() => import('@/components/athlete/MyRecommendationsCard'), { ssr: false })
+const AthleteConnectionsPanel = dynamic(() => import('@/components/ui/AthleteConnectionsPanel').then(m => m.AthleteConnectionsPanel), { ssr: false })
+const CoachRestrictionsCard   = dynamic(() => import('@/components/coach/CoachRestrictionsCard'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -848,6 +853,14 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
       </div>
 
       {/* ── Row 2: AI insights — AI coach + Weekly insights + Recovery trend ── */}
+      {/* P0 — межролевые сигналы на живом атлетском дашборде: рекомендации
+          врача (скрывается при пустоте) + care team (мой тренер / врач /
+          команда). Раньше жили только в мёртвом AthleteDashboard.tsx. */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <MyRecommendationsCard athleteId={userId} />
+        <AthleteConnectionsPanel userId={userId} />
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <AiCoachCard />
         <WeeklyInsightsCard />
@@ -1007,6 +1020,10 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
       {/* AI coach morning briefing */}
       <CoachBriefingCard />
 
+      {/* P0 — петля врач → тренер: расшаренные врачом ограничения теперь на
+          живом дашборде (клиентская версия мёртвого CoachRestrictionsWidget). */}
+      <CoachRestrictionsCard athleteIds={athletes.map(a => a.id)} />
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2 overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -1042,6 +1059,8 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
                       <div className="text-sm font-semibold text-foreground">{a.name}</div>
                       <div className="text-2xs text-muted-foreground">{a.sport_type ?? 'Спорт не указан'}</div>
                     </div>
+                    {/* P0 — светофор допуска в строке атлета (null при отсутствии) */}
+                    <ClearanceBadge athleteId={a.id} size="sm" />
                     <div className="text-right">
                       <div className="pf-num text-lg leading-none" style={{ color: rc }}>
                         {score != null ? `${score}%` : '—'}

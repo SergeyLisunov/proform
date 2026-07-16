@@ -10,6 +10,9 @@ const DoctorHeroBar         = dynamic(() => import('@/components/doctor/DoctorHe
 const DoctorQuickActions    = dynamic(() => import('@/components/doctor/DoctorQuickActions'),    { ssr: false })
 const DoctorTodayCheckups   = dynamic(() => import('@/components/doctor/DoctorTodayCheckups'),   { ssr: false })
 const DoctorActiveInjuries  = dynamic(() => import('@/components/doctor/DoctorActiveInjuries'),  { ssr: false })
+// P0 — очередь допусков «требуют пересмотра»: главный ежедневный артефакт
+// врача (светофор) раньше не имел входа с дашборда.
+const DoctorClearanceQueue  = dynamic(() => import('@/components/doctor/DoctorClearanceQueue'),  { ssr: false })
 
 function getSB() {
   return createBrowserClient(
@@ -173,7 +176,10 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
         }}
       />
 
-      {/* 2. ACTIVE INJURIES — высокий приоритет */}
+      {/* 2. CLEARANCE QUEUE — просроченные допуски первым делом (P0) */}
+      <DoctorClearanceQueue />
+
+      {/* 3. ACTIVE INJURIES — высокий приоритет */}
       <DoctorActiveInjuries />
 
       {/* 3. QUICK ACTIONS */}
