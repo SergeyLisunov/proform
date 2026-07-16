@@ -21,9 +21,11 @@ LOG=/var/log/sporteo/cron.log
 0 18 * * 0  curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/org-weekly-digest      >> $LOG 2>&1
 0 7 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/billing-renewals       >> $LOG 2>&1
 
-# ── Новое на VPS (на Vercel минутных кронов нет) ────────────────────────
-# Очередь Telegram-зеркала (P2-4): раз в минуту, тихо (очередь чаще пуста)
-* * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/telegram/process-queue      >> $LOG 2>&1
+# ── Очередь Telegram-зеркала ─────────────────────────────────────────────
+# ОСНОВНОЙ путь на Hostiman — PM2-воркер sporteo-tg-worker (каждые 15с +
+# аварийный polling-режим), см. ecosystem.config.js. Строка ниже — резерв
+# на случай, если воркер решено не запускать: раскомментируйте ОДНО из двух.
+# * * * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/telegram/process-queue      >> $LOG 2>&1
 
 # Healthcheck Telegram API из RU/EU-локации (алерт при фильтрации трафика)
 */5 * * * * curl -fsS --max-time 10 https://api.telegram.org > /dev/null 2>&1 || echo "$(date) TG API UNREACHABLE" >> $LOG
