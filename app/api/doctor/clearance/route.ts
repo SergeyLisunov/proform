@@ -18,6 +18,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -82,6 +83,50 @@ export async function POST(req: Request) {
       { ok: false, error: isAccess ? 'not_connected' : 'insert_failed' },
       { status: isAccess ? 403 : 500 },
     )
+  }
+
+  // P0: замыкаем петлю светофора. Раньше выставление/смена допуска не слала
+  // уведомлений НИКОМУ — атлет, тренеры и родитель узнавали о смене статуса,
+  // только открыв страницу с badge. Теперь notify всем трём сторонам.
+  // Admin-клиент: batch INSERT в notifications атомарен, а can_notify
+  // (care-team предикаты) не содержит пары doctor↔parent — одна
+  // заблокированная строка провалила бы весь batch. Это доверенный
+  // серверный код после успешной RLS-проверки INSERT самого clearance.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adminAny = createAdminClient() as any
+    const STATUS_LABEL: Record<string, string> = {
+      full:       'Полный допуск',
+      limited:    'Ограниченный допуск',
+      light_only: 'Только лёгкая нагрузка',
+      banned:     'Тренировки запрещены',
+    }
+    const label = STATUS_LABEL[body.status] ?? body.status
+    const [{ data: coachLinks }, { data: parentLinks }] = await Promise.all([
+      adminAny.from('trainer_athletes')
+        .select('trainer_id').eq('athlete_id', body.athlete_id).eq('status', 'accepted'),
+      adminAny.from('parent_links')
+        .select('parent_id').eq('child_id', body.athlete_id).eq('status', 'active'),
+    ])
+    const base = {
+      type:        'broadcast',
+      title:       `Допуск обновлён: ${label}`,
+      body:        body.note ?? null,
+      entity_type: 'clearance',
+      entity_id:   created.id,
+    }
+    const targets = [
+      { ...base, user_id: body.athlete_id, action_url: '/dashboard' },
+      ...((coachLinks ?? []) as Array<{ trainer_id: string }>).map(l => (
+        { ...base, user_id: l.trainer_id, action_url: '/athletes' }
+      )),
+      ...((parentLinks ?? []) as Array<{ parent_id: string }>).map(l => (
+        { ...base, user_id: l.parent_id, action_url: '/parent/dashboard' }
+      )),
+    ]
+    if (targets.length > 0) await adminAny.from('notifications').insert(targets)
+  } catch (e) {
+    console.warn('[clearance.notify]', e instanceof Error ? e.message : e)
   }
 
   return NextResponse.json({ ok: true, clearance: created })

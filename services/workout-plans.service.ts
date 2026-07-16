@@ -15,6 +15,7 @@
  *   - workouts INSERT: needs `trainer_athletes` accepted link для coach→athlete
  */
 import { createClient } from '@/lib/supabase/client'
+import { notify } from './notifications.service'
 
 export type Intensity = 'easy' | 'moderate' | 'hard' | 'rest'
 
@@ -290,6 +291,20 @@ export async function assignPlanToAthlete(
     console.warn('[workout-plans.assignPlanToAthlete]', error.message)
     return { ok: false, workouts_created: 0, error: error.message }
   }
+
+  // P0: замыкаем петлю назначения плана. В отличие от одиночного prescribe
+  // (который шлёт session_scheduled), многодневный план назначался молча —
+  // атлет просто «обнаруживал» тренировки в календаре.
+  await notify({
+    user_id:     athleteId,
+    type:        'session_scheduled',
+    title:       'Тренер назначил план тренировок',
+    body:        `«${plan.name}» · ${payload.length} трен. с ${payload[0]?.event_date ?? ''}`,
+    entity_type: 'workout_plan',
+    entity_id:   planId,
+    action_url:  '/athlete/dashboard',
+  })
+
   return { ok: true, workouts_created: payload.length }
 }
 

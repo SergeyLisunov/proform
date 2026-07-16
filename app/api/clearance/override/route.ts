@@ -78,5 +78,26 @@ export async function POST(req: Request) {
   if (insertErr || !row) {
     return NextResponse.json({ ok: false, error: 'audit_failed' }, { status: 500 })
   }
+  // P0: замыкаем петлю override. Раньше врач, чей запрет тренер сознательно
+  // обошёл, не получал никакого сигнала — узнать об override можно было
+  // только вручную из audit_logs. Admin-клиент, потому что notifications
+  // INSERT гейтится can_notify (care-team предикаты), а это системное
+  // серверное уведомление.
+  if (clearance?.doctor_id) {
+    try {
+      await adminAny.from('notifications').insert({
+        user_id:     clearance.doctor_id,
+        type:        'broadcast',
+        title:       'Тренер обошёл ограничение допуска',
+        body:        `Причина: ${body.reason}`,
+        entity_type: 'clearance_override',
+        entity_id:   row.id,
+        action_url:  '/doctor/clearances',
+      })
+    } catch (e) {
+      console.warn('[clearance-override.notify]', e instanceof Error ? e.message : e)
+    }
+  }
+
   return NextResponse.json({ ok: true, override_id: row.id, created_at: row.created_at })
 }

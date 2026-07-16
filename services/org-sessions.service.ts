@@ -348,8 +348,40 @@ export async function setParticipants(sessionId: string, userIds: string[]): Pro
 
 export async function setAttendance(sessionId: string, userId: string, status: AttendanceStatus): Promise<void> {
   const sb = createClient()
-  await (sb as any)
+  const { error } = await (sb as any)
     .from('org_session_participants')
     .update({ attendance_status: status })
     .eq('session_id', sessionId).eq('user_id', userId)
+  if (error) { console.warn('[setAttendance]', error.message); return }
+
+  // P0: замыкаем RSVP-петлю. Тип rsvp_received был объявлен в
+  // notifications.service, но никем не отправлялся — организация не узнавала
+  // об ответе атлета, пока сама не открывала список участников. Уведомляем
+  // владельца организации (tenant-модель: organizations.id == owner user id)
+  // только о явных ответах атлета; attended/absent проставляет сама
+  // организация после сессии — на них не шумим.
+  if (status !== 'confirmed' && status !== 'declined') return
+  try {
+    const [{ data: session }, { data: me }] = await Promise.all([
+      (sb as any).from('org_group_sessions')
+        .select('organization_id, title, session_date')
+        .eq('id', sessionId).maybeSingle(),
+      (sb as any).from('users').select('name').eq('id', userId).maybeSingle(),
+    ])
+    if (!session?.organization_id) return
+    const who = (me?.name as string | null) ?? 'Участник'
+    await notifyMany([{
+      user_id:     session.organization_id,
+      type:        'rsvp_received',
+      title:       status === 'confirmed'
+        ? `${who} придёт: ${session.title}`
+        : `${who} не придёт: ${session.title}`,
+      body:        `Сессия ${session.session_date}`,
+      entity_type: 'org_group_session',
+      entity_id:   sessionId,
+      action_url:  '/calendar',
+    }])
+  } catch (e) {
+    console.warn('[setAttendance.notify]', e instanceof Error ? e.message : e)
+  }
 }
