@@ -911,11 +911,22 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
 
   useEffect(() => {
     async function load() {
+      // P0-фикс: раньше грузились первые 20 атлетов ВСЕЙ платформы
+      // (.from('users').eq('role','athlete').limit(20)) — тренер видел чужих
+      // людей и их метрики. Теперь только свои связки через trainer_athletes
+      // (accepted) — тот же предикат, что в /athletes и мёртвом CoachDashboard.
+      const { data: links } = await sb()
+        .from('trainer_athletes')
+        .select('athlete_id')
+        .eq('trainer_id', userId)
+        .eq('status', 'accepted')
+      const athleteIds: string[] = (links ?? []).map((l: { athlete_id: string }) => l.athlete_id)
+      if (athleteIds.length === 0) { setAthletes([]); setLoading(false); return }
+
       const { data } = await sb()
         .from('users')
         .select('id, name, role, sport_type')
-        .eq('role', 'athlete')
-        .limit(20)
+        .in('id', athleteIds)
       if (!data) { setLoading(false); return }
 
       const rows: AthleteRow[] = await Promise.all(
@@ -1082,15 +1093,23 @@ function AdminDash({ name }: { name: string }) {
 
   useEffect(() => {
     async function load() {
-      const { data } = await sb().from('users').select('role')
-      if (data) {
-        setStats({
-          total:    data.length,
-          athletes: data.filter(u => u.role === 'athlete').length,
-          coaches:  data.filter(u => u.role === 'coach').length,
-          orgs:     data.filter(u => u.role === 'organization').length,
-        })
+      // P0-фикс: раньше вся таблица users грузилась на клиент ради подсчёта
+      // (select('role') без count) — не масштабируется. Теперь head-count
+      // запросы, данные не покидают БД.
+      const countBy = (role?: string) => {
+        let q = sb().from('users').select('*', { count: 'exact', head: true })
+        if (role) q = q.eq('role', role)
+        return q
       }
+      const [t, a, c, o] = await Promise.all([
+        countBy(), countBy('athlete'), countBy('coach'), countBy('organization'),
+      ])
+      setStats({
+        total:    t.count ?? 0,
+        athletes: a.count ?? 0,
+        coaches:  c.count ?? 0,
+        orgs:     o.count ?? 0,
+      })
       setLoading(false)
     }
     load()
@@ -1122,26 +1141,10 @@ function AdminDash({ name }: { name: string }) {
         ))}
       </div>
 
-      <Card className="overflow-hidden">
-        <div className="px-5 py-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-navy-500">Состояние системы</h3>
-        </div>
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { label: 'Supabase DB',   status: 'Online'  },
-            { label: 'Auth Service',  status: 'Healthy' },
-            { label: 'Vercel Deploy', status: 'Active'  },
-          ].map(s => (
-            <div key={s.label} className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
-              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-foreground">{s.label}</div>
-              </div>
-              <Badge variant="success" size="sm">{s.status}</Badge>
-            </div>
-          ))}
-        </div>
-      </Card>
+      {/* P0-фикс: блок «Состояние системы» удалён — статусы Online/Healthy/
+          Active были хардкодом (ничего не проверяли), декоративная заглушка
+          вводила админа в заблуждение. Реальные сигналы платформы — этап
+          оживления богатого AdminDashboard (P0 PR-3). */}
 
       <div className="flex justify-center">
         <Link href="/admin" className="kt-btn kt-btn-primary gap-2">
@@ -1150,6 +1153,31 @@ function AdminDash({ name }: { name: string }) {
         </Link>
       </div>
     </div>
+  )
+}
+
+// ── PARENT BANNER ────────────────────────────────────────────────────────────
+// P0-фикс: родитель (role='athlete' + активные parent_links) раньше
+// «проваливался» в атлетский дашборд без единого намёка на родительский
+// кабинет. Автredirect не делаем — родитель может быть и атлетом сам;
+// баннер корректен в обоих случаях.
+function ParentCabinetBanner() {
+  return (
+    <Link
+      href="/parent/dashboard"
+      className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4 no-underline transition-colors hover:bg-orange-100/70"
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white">
+          <i className="ki-filled ki-people text-base" />
+        </div>
+        <div className="min-w-0">
+          <div className="text-sm font-bold text-navy-500">Кабинет родителя</div>
+          <div className="text-2xs text-muted-foreground">К вашему аккаунту подключены дети — расписание, допуски и прогресс здесь</div>
+        </div>
+      </div>
+      <i className="ki-filled ki-arrow-right shrink-0 text-orange-600" />
+    </Link>
   )
 }
 
@@ -1175,5 +1203,10 @@ export default function DashboardPage() {
   if (user.role === 'coach') return <CoachDash userId={user.id} name={user.name} />
   // Этап 10 — централизованный helper. Платформенный admin = back-office.
   if (isPlatformAdmin(user.role)) return <AdminDash name={user.name} />
-  return <AthleteDash userId={user.id} name={user.name} />
+  return (
+    <>
+      {user.childCount > 0 && <ParentCabinetBanner />}
+      <AthleteDash userId={user.id} name={user.name} />
+    </>
+  )
 }
