@@ -82,6 +82,17 @@ cd .next/standalone && npm i sharp   # оптимизация изображен
   ```
 
   Изменили `.env` → тот же `source` + `pm2 restart sporteo --update-env`.
+
+- ecosystem поднимает **два** процесса: `sporteo` (веб) и
+  `sporteo-tg-worker` (очередь Telegram каждые 15с + аварийный
+  polling-режим; ~30 MB RSS). Воркер — один файл вне
+  standalone-артефакта, перед первым стартом:
+
+  ```bash
+  cp deploy/telegram-worker.mjs /srv/sporteo/
+  ```
+
+  Подробности и аварийный режим — `docs/deploy/TELEGRAM-BOT.md`.
 - nginx: `deploy/nginx.conf.sample` → sites-available, поправить домен.
   Статику `_next/static` nginx отдаёт сам с `immutable` (CDN больше нет).
 - TLS: `certbot --nginx -d <домен>` — Let's Encrypt, автопродление.

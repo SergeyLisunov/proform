@@ -36,5 +36,25 @@ module.exports = {
       merge_logs: true,
       time: true,
     },
+    {
+      // Telegram-воркер (P2): очередь уведомлений каждые 15с + аварийный
+      // long-polling (TELEGRAM_MODE=polling в .env, если вебхук-трафик
+      // начнут фильтровать). Zero-dependency: файл копируется из репо —
+      //   cp deploy/telegram-worker.mjs /srv/sporteo/
+      // ЗАМЕНЯЕТ crontab-строку про process-queue (см. crontab.sample).
+      name:   'sporteo-tg-worker',
+      cwd:    '/srv/sporteo',
+      script: 'telegram-worker.mjs',
+      interpreter: 'node',
+      env: {
+        NODE_ENV: 'production',
+        APP_INTERNAL_URL: 'http://127.0.0.1:3000',
+      },
+      max_memory_restart: '150M',
+      out_file:  '/var/log/sporteo/tg-worker.log',
+      error_file: '/var/log/sporteo/tg-worker.log',
+      merge_logs: true,
+      time: true,
+    },
   ],
 }
