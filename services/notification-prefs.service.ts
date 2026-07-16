@@ -27,6 +27,10 @@ export type NotificationChannel =
   | 'org_digest_email'
   /** Sprint W11 Day 55: athlete receives email when coach replies to their review. */
   | 'coach_reply_email'
+  /** P2: зеркалирование уведомлений в Telegram-бот. СТРОГО opt-in
+   *  (default false) — линковка сама по себе ни на что не подписывает;
+   *  DB-триггер 099 читает этот же ключ. */
+  | 'telegram'
 
 export interface ChannelMeta {
   key:          NotificationChannel
@@ -38,6 +42,14 @@ export interface ChannelMeta {
 }
 
 export const CHANNELS: ChannelMeta[] = [
+  {
+    key:         'telegram',
+    label:       'Telegram',
+    description: 'Зеркало уведомлений в Telegram-бот (только заголовок + ссылка). Сначала привяжите аккаунт ниже.',
+    icon:        'ki-message-text-2',
+    category:    'core',
+    default:     false,
+  },
   {
     key:         'daily_digest_email',
     label:       'Ежедневная сводка',

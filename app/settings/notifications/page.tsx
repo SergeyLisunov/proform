@@ -14,6 +14,7 @@ import {
   loadMyPrefs, updateMyPrefs, effective,
   CHANNELS, type NotificationChannel, type NotificationPrefs,
 } from '@/services/notification-prefs.service'
+import TelegramLinkCard from '@/components/settings/TelegramLinkCard'
 
 const CATEGORY_META = {
   core:          { label: 'Основные',         description: 'Регулярные сводки — выключайте если не нужно' },
@@ -101,6 +102,9 @@ export default function NotificationSettingsPage() {
       {savedAt && Date.now() - savedAt < 3000 && (
         <Alert variant="success">Настройки сохранены</Alert>
       )}
+
+      {/* P2 — привязка Telegram-бота (тумблер «Telegram» в core-группе ниже) */}
+      <TelegramLinkCard userId={user.id} />
 
       {(['core', 'collaboration', 'marketing'] as Array<keyof typeof CATEGORY_META>).map(cat => {
         const channels = grouped[cat] ?? []
