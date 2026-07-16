@@ -34,6 +34,9 @@ const MyRecommendationsCard   = dynamic(() => import('@/components/athlete/MyRec
 const AthleteConnectionsPanel = dynamic(() => import('@/components/ui/AthleteConnectionsPanel').then(m => m.AthleteConnectionsPanel), { ssr: false })
 const CoachRestrictionsCard   = dynamic(() => import('@/components/coach/CoachRestrictionsCard'), { ssr: false })
 const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFeed').then(m => m.OrgWallFeed), { ssr: false })
+// P1 соц-ядро — закрытая лента тренировок клуба + «респект» (Strava-модель
+// kudos под детскую платформу; см. docs/policy/child-privacy-defaults.md).
+const ClubFeed                = dynamic(() => import('@/components/ui/ClubFeed').then(m => m.ClubFeed), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -863,6 +866,8 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         <AthleteConnectionsPanel userId={userId} />
       </div>
       <OrgWallFeed userId={userId} />
+      {/* P1 — лента клуба: тренировки одноклубников + «респект». */}
+      <ClubFeed userId={userId} userName={name} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <AiCoachCard />
@@ -1029,6 +1034,11 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
 
       {/* P0 — стена организации для членов: тренер тоже видит новости клуба. */}
       <OrgWallFeed userId={userId} />
+
+      {/* P1 — лента клуба у тренера: «респект» на тренировку — ключевой
+          ежедневный ритуал (петля TrainingPeaks: атлет знает, что тренер
+          увидит и отреагирует). */}
+      <ClubFeed userId={userId} userName={name} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2 overflow-hidden">
