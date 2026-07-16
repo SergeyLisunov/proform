@@ -66,11 +66,38 @@ export async function prescribeWorkout(input: {
 /** Athlete marks a prescribed workout as completed/skipped. */
 export async function setPrescribedCompletion(id: string, status: CompletionStatus): Promise<boolean> {
   const sb = createClient()
-  const { error } = await (sb as any)
+  const { data, error } = await (sb as any)
     .from('workouts')
     .update({ completion_status: status })
     .eq('id', id)
+    .select('id, name, event_date, prescribed_by, athlete_id')
+    .maybeSingle()
   if (error) { console.warn('[setPrescribedCompletion]', error.message); return false }
+
+  // P0: замыкаем петлю выполнения. Раньше тренер не получал сигнала о
+  // выполнении/пропуске — только пассивно видел статус в списке и в
+  // недельном дайджесте. Реакция тренера на тренировку — ключевой
+  // engagement-ритуал (петля TrainingPeaks), без уведомления он не случается.
+  const row = data as {
+    id: string; name: string | null; event_date: string;
+    prescribed_by: string | null; athlete_id: string
+  } | null
+  if (row?.prescribed_by && (status === 'completed' || status === 'skipped')) {
+    const { data: me } = await (sb as any)
+      .from('users').select('name').eq('id', row.athlete_id).maybeSingle()
+    const who = (me?.name as string | null) ?? 'Атлет'
+    await notify({
+      user_id:     row.prescribed_by,
+      type:        'rsvp_received',
+      title:       status === 'completed'
+        ? `${who}: тренировка выполнена`
+        : `${who}: тренировка пропущена`,
+      body:        `${row.name ?? 'Тренировка'} · ${row.event_date}`,
+      entity_type: 'workout',
+      entity_id:   row.id,
+      action_url:  '/athletes',
+    })
+  }
   return true
 }
 
