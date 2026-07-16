@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { notify } from './notifications.service'
+import { checkPersonalRecords } from './personal-records.service'
 
 export type CompletionStatus = 'pending' | 'completed' | 'skipped'
 
@@ -70,7 +71,7 @@ export async function setPrescribedCompletion(id: string, status: CompletionStat
     .from('workouts')
     .update({ completion_status: status })
     .eq('id', id)
-    .select('id, name, event_date, prescribed_by, athlete_id')
+    .select('id, name, event_date, prescribed_by, athlete_id, activity_duration_min')
     .maybeSingle()
   if (error) { console.warn('[setPrescribedCompletion]', error.message); return false }
 
@@ -80,7 +81,8 @@ export async function setPrescribedCompletion(id: string, status: CompletionStat
   // engagement-ритуал (петля TrainingPeaks), без уведомления он не случается.
   const row = data as {
     id: string; name: string | null; event_date: string;
-    prescribed_by: string | null; athlete_id: string
+    prescribed_by: string | null; athlete_id: string;
+    activity_duration_min: number | null
   } | null
   if (row?.prescribed_by && (status === 'completed' || status === 'skipped')) {
     const { data: me } = await (sb as any)
@@ -96,6 +98,16 @@ export async function setPrescribedCompletion(id: string, status: CompletionStat
       entity_type: 'workout',
       entity_id:   row.id,
       action_url:  '/athletes',
+    })
+  }
+
+  // P1 — детект личных рекордов после выполненной тренировки (fire-and-forget:
+  // празднование не должно блокировать отметку выполнения).
+  if (row && status === 'completed') {
+    void checkPersonalRecords(row.athlete_id, null, {
+      id:                    row.id,
+      event_date:            row.event_date,
+      activity_duration_min: row.activity_duration_min,
     })
   }
   return true

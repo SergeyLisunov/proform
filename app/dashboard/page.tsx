@@ -37,6 +37,7 @@ const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFee
 // P1 соц-ядро — закрытая лента тренировок клуба + «респект» (Strava-модель
 // kudos под детскую платформу; см. docs/policy/child-privacy-defaults.md).
 const ClubFeed                = dynamic(() => import('@/components/ui/ClubFeed').then(m => m.ClubFeed), { ssr: false })
+const PersonalRecordsCard     = dynamic(() => import('@/components/athlete/PersonalRecordsCard'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -865,6 +866,8 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         <MyRecommendationsCard athleteId={userId} />
         <AthleteConnectionsPanel userId={userId} />
       </div>
+      {/* P1 — личные рекорды: соревнование с собой (mastery-safe). */}
+      <PersonalRecordsCard athleteId={userId} />
       <OrgWallFeed userId={userId} />
       {/* P1 — лента клуба: тренировки одноклубников + «респект». */}
       <ClubFeed userId={userId} userName={name} />

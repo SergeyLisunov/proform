@@ -7,6 +7,8 @@ import type { Workout } from '@/services/workouts.service'
 import VoiceDebriefButton from '@/components/workout/VoiceDebriefButton'
 import { Badge } from '@/components/ui/metronic'
 import ClearanceBadge from '@/components/clearance/ClearanceBadge'
+import { useToast } from '@/lib/hooks/useToast'
+import { checkPersonalRecords, RECORD_LABEL, formatRecordValue } from '@/services/personal-records.service'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -375,6 +377,7 @@ export function WorkoutAddDrawer({
 }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { success: toastSuccess } = useToast()
   const [form, setForm] = useState<WForm>({
     activity_type: 'Бег',
     name: '',
@@ -471,6 +474,22 @@ export function WorkoutAddDrawer({
 
       fireWorkoutsChanged()
       if (workout) onCreated?.(workout as Workout)
+
+      // P1 — авто-детект личных рекордов (fire-and-forget: празднование не
+      // блокирует сохранение; тост показывается поверх уже закрытого drawer).
+      if (workout) {
+        void checkPersonalRecords(userId, null, {
+          id:                    (workout as Workout).id,
+          event_date:            form.event_date,
+          activity_duration_min: duration,
+        }).then(broken => {
+          if (broken.length > 0) {
+            const b = broken[0]
+            toastSuccess(`Новый личный рекорд — ${RECORD_LABEL[b.kind]}: ${formatRecordValue(b.kind, b.value)}`)
+          }
+        })
+      }
+
       onClose()
     } catch (err) {
       console.error('WorkoutAddDrawer save error:', err)
