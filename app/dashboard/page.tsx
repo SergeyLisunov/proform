@@ -38,6 +38,7 @@ const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFee
 // kudos под детскую платформу; см. docs/policy/child-privacy-defaults.md).
 const ClubFeed                = dynamic(() => import('@/components/ui/ClubFeed').then(m => m.ClubFeed), { ssr: false })
 const PersonalRecordsCard     = dynamic(() => import('@/components/athlete/PersonalRecordsCard'), { ssr: false })
+const PlanStreakCard          = dynamic(() => import('@/components/athlete/PlanStreakCard'), { ssr: false })
 
 function sb() {
   return createBrowserClient(
@@ -867,6 +868,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
         <AthleteConnectionsPanel userId={userId} />
       </div>
       {/* P1 — личные рекорды: соревнование с собой (mastery-safe). */}
+      <PlanStreakCard athleteId={userId} />
       <PersonalRecordsCard athleteId={userId} />
       <OrgWallFeed userId={userId} />
       {/* P1 — лента клуба: тренировки одноклубников + «респект». */}
