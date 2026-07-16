@@ -99,6 +99,14 @@ export interface ChargeRecurringInput {
   description: string
   idempotenceKey: string
   metadata?: Record<string, string>
+  /**
+   * P2: вызывается, как только известен provider-side id, ДО фактического
+   * списания, где протокол это позволяет (Альфа: между register.do и
+   * paymentOrderBinding.do). Колбэк ДОЛЖЕН персистить id; его throw
+   * отменяет списание — деньги не двигаются без найденной webhook'ом
+   * строки. У ЮKassa (одиночный вызов) исполняется после ответа API.
+   */
+  onProviderPaymentId?: (providerPaymentId: string) => Promise<void>
 }
 
 /**

@@ -90,7 +90,11 @@ export function meetsRequiredPlan(current: Plan, required: PaidPlan): boolean {
 export function isSubscriptionActive(status: string | null | undefined): boolean {
   // 'trialing' — статус, который пишет вебхук активации (payment-events);
   // 'trial' — legacy-значение старых строк. Оба активны.
-  return status == null || status === 'active' || status === 'trial' || status === 'trialing'
+  // 'past_due' активен: cron продлений обещает пользователю грейс
+  // («доступ сохранится ещё 3 дня») и ретраит списание ежедневно;
+  // терминальный локаут — переход в 'expired' (billing-renewals, шаг 3b).
+  return status == null || status === 'active' || status === 'trial'
+      || status === 'trialing' || status === 'past_due'
 }
 
 /**

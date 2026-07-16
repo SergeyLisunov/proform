@@ -189,6 +189,11 @@ export const YooKassaProvider: PaymentProvider = {
       env.apiUrl, env.shopId, env.secretKey,
       '/payments', payload, input.idempotenceKey,
     )
+    // Одиночный вызов — id известен только после списания; персистим сразу
+    // (см. ChargeRecurringInput.onProviderPaymentId).
+    if (input.onProviderPaymentId) {
+      await input.onProviderPaymentId(data.id)
+    }
     return {
       providerPaymentId: data.id,
       // For recurring there's no redirect — user already authorized once.
