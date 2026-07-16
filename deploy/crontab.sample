@@ -1,0 +1,29 @@
+# Crontab Sporteo на Hostiman VPS (P2 deploy pack) — замена vercel.json crons.
+# Установка: crontab -e (под deploy-пользователем) и вставить строки ниже.
+# CRON_SECRET взять из /srv/sporteo/.env; Vercel слал `Authorization:
+# Bearer $CRON_SECRET` — воспроизводим 1:1, код роутов не меняется.
+#
+# ENV в crontab не читается из .env автоматически — либо задать тут,
+# либо обернуть в скрипт. Ниже — вариант с переменной прямо в crontab.
+
+CRON_SECRET=ЗАМЕНИТЕ_НА_ЗНАЧЕНИЕ_ИЗ_ENV
+BASE=https://sporteo.example.ru
+LOG=/var/log/sporteo/cron.log
+
+# ── Перенос vercel.json (расписания идентичны) ──────────────────────────
+0 4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/digest/daily                >> $LOG 2>&1
+0 17 * * 0  curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/digest/weekly               >> $LOG 2>&1
+0 3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/expire-recommendations >> $LOG 2>&1
+0 5 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/expire-stale-pending   >> $LOG 2>&1
+0 8 * * 1   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/leads-digest           >> $LOG 2>&1
+0 6 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/expire-inquiries       >> $LOG 2>&1
+0 9 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/adherence-nudge        >> $LOG 2>&1
+0 18 * * 0  curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/org-weekly-digest      >> $LOG 2>&1
+0 7 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/cron/billing-renewals       >> $LOG 2>&1
+
+# ── Новое на VPS (на Vercel минутных кронов нет) ────────────────────────
+# Очередь Telegram-зеркала (P2-4): раз в минуту, тихо (очередь чаще пуста)
+* * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" $BASE/api/telegram/process-queue      >> $LOG 2>&1
+
+# Healthcheck Telegram API из RU/EU-локации (алерт при фильтрации трафика)
+*/5 * * * * curl -fsS --max-time 10 https://api.telegram.org > /dev/null 2>&1 || echo "$(date) TG API UNREACHABLE" >> $LOG
