@@ -117,7 +117,9 @@ TELEGRAM_BOT_TOKEN=… / TELEGRAM_BOT_USERNAME=… / TELEGRAM_WEBHOOK_SECRET=…
 1. `curl -I https://<домен>` → 200, HSTS-заголовки на месте.
 2. Callback-URL Альфы в ЛК шлюза → `https://<домен>/api/webhooks/alfabank`
    (+ «симметричная» подпись включена, токен = ALFABANK_CALLBACK_TOKEN).
-3. Telegram: `setWebhook` на `https://<домен>/api/telegram/webhook`
+3. Telegram: `bash deploy/telegram-setup.sh` с новым `APP_URL`
+   (полный runbook бота — `docs/deploy/TELEGRAM-BOT.md`); вручную —
+   `setWebhook` на `https://<домен>/api/telegram/webhook`
    с `secret_token` + `drop_pending_updates=true`; `/start` из настроек.
 4. Кроны: `grep sporteo /var/log/sporteo/cron.log` наутро.
 5. DNS-переключение с Vercel — последним шагом; Vercel оставить живым
