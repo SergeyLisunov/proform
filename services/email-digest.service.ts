@@ -1,8 +1,8 @@
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
-  renderAthleteDailyDigest, renderCoachWeeklyDigest,
-  type AthleteDailyEvent, type CoachWeeklyAthleteStat,
+  renderAthleteDailyDigest, renderCoachWeeklyDigest, renderParentWeeklyDigest,
+  type AthleteDailyEvent, type CoachWeeklyAthleteStat, type ParentWeeklyChild,
 } from '@/lib/email/templates'
 import { isChannelAllowed, type PrefsBag } from './notification-prefs-server'
 
@@ -260,6 +260,144 @@ export async function runCoachWeeklyDigest(): Promise<DigestResult> {
       result.sent++
     } catch (e) {
       result.errors.push(`${c.email}: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }
+
+  return result
+}
+
+// ── Parent weekly digest (P1 соц-ядро) ────────────────────────────────────────
+
+const CLEARANCE_EMAIL_META: Record<string, { label: string; color: string }> = {
+  full:       { label: 'полный',            color: '#16A34A' },
+  limited:    { label: 'ограниченный',      color: '#CA8A04' },
+  light_only: { label: 'только лёгкая',     color: '#F35703' },
+  banned:     { label: 'тренировки запрещены', color: '#DC2626' },
+}
+
+const RECORD_EMAIL_LABEL: Record<string, string> = {
+  longest_workout:      'Самая длинная тренировка',
+  best_week_volume:     'Лучший объём за неделю',
+  training_streak_days: 'Серия дней подряд',
+}
+
+function fmtRecordEmail(kind: string, value: number): string {
+  const label = RECORD_EMAIL_LABEL[kind] ?? kind
+  const unit = kind === 'training_streak_days' ? 'дн.' : 'мин'
+  return `${label}: ${value} ${unit}`
+}
+
+/**
+ * Еженедельный отчёт родителю (вс 17:00, тот же cron, что coach weekly —
+ * без новой записи в vercel.json). ClassDojo Friday-report модель: родитель
+ * платит за секцию, но не видит тренировок — отчёт закрывает разрыв и
+ * еженедельно подтверждает ценность. Данные — строгий safe-набор (как
+ * /parent/dashboard): счётчики тренировок/минут, светофор, рекорды, число
+ * комментариев тренера. Никаких HRV/recovery/медзаписей.
+ * Opt-out: notification_prefs.parent_weekly_email = false.
+ */
+export async function runParentWeeklyDigest(): Promise<DigestResult> {
+  const result: DigestResult = { sent: 0, skipped: 0, skipped_pref: 0, errors: [] }
+  const resend = getResend()
+  if (!resend) { result.errors.push('RESEND_API_KEY missing'); return result }
+
+  const sb = createAdminClient()
+  const weekAgo = weekAgoISO()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sbAny = sb as any
+  const { data: linksRaw, error: lErr } = await sbAny
+    .from('parent_links')
+    .select('parent_id, child_id')
+    .eq('status', 'active')
+  if (lErr) { result.errors.push(`parent_links: ${lErr.message}`); return result }
+  const links = (linksRaw ?? []) as Array<{ parent_id: string; child_id: string }>
+  if (links.length === 0) return result
+
+  const byParent = new Map<string, string[]>()
+  for (const l of links) {
+    if (!byParent.has(l.parent_id)) byParent.set(l.parent_id, [])
+    byParent.get(l.parent_id)!.push(l.child_id)
+  }
+  const parentIds = [...byParent.keys()]
+  const childIds  = [...new Set(links.map(l => l.child_id))]
+
+  const [{ data: parentsRaw }, { data: childrenRaw }] = await Promise.all([
+    sbAny.from('users')
+      .select('id, name, email, notification_prefs').in('id', parentIds),
+    sbAny.from('users').select('id, name').in('id', childIds),
+  ])
+  const parents = (parentsRaw ?? []) as Array<{
+    id: string; name: string | null; email: string | null; notification_prefs: PrefsBag
+  }>
+  const childName = new Map(
+    ((childrenRaw ?? []) as Array<{ id: string; name: string | null }>)
+      .map(c => [c.id, c.name ?? 'Ребёнок']),
+  )
+
+  // Пакетные выборки по всем детям сразу (без N+1 по родителям).
+  const [{ data: workoutsRaw }, { data: clearancesRaw }, { data: recordsRaw }, { data: notesRaw }] =
+    await Promise.all([
+      sbAny.from('workouts')
+        .select('athlete_id, activity_duration_min')
+        .in('athlete_id', childIds).gte('event_date', weekAgo),
+      sbAny.from('current_clearances')
+        .select('athlete_id, status, review_needed').in('athlete_id', childIds),
+      sbAny.from('athlete_records')
+        .select('athlete_id, kind, value')
+        .in('athlete_id', childIds).gte('updated_at', `${weekAgo}T00:00:00Z`),
+      sbAny.from('observation_diary')
+        .select('athlete_id').in('athlete_id', childIds).gte('date', weekAgo),
+    ])
+
+  const statByChild = new Map<string, { count: number; min: number }>()
+  for (const w of ((workoutsRaw ?? []) as Array<{ athlete_id: string; activity_duration_min: number | null }>)) {
+    const s = statByChild.get(w.athlete_id) ?? { count: 0, min: 0 }
+    s.count += 1; s.min += w.activity_duration_min ?? 0
+    statByChild.set(w.athlete_id, s)
+  }
+  const clearanceByChild = new Map(
+    ((clearancesRaw ?? []) as Array<{ athlete_id: string; status: string; review_needed: boolean }>)
+      .map(c => [c.athlete_id, c]),
+  )
+  const recordsByChild = new Map<string, string[]>()
+  for (const r of ((recordsRaw ?? []) as Array<{ athlete_id: string; kind: string; value: number }>)) {
+    if (!recordsByChild.has(r.athlete_id)) recordsByChild.set(r.athlete_id, [])
+    recordsByChild.get(r.athlete_id)!.push(fmtRecordEmail(r.kind, Number(r.value)))
+  }
+  const notesByChild = new Map<string, number>()
+  for (const n of ((notesRaw ?? []) as Array<{ athlete_id: string }>)) {
+    notesByChild.set(n.athlete_id, (notesByChild.get(n.athlete_id) ?? 0) + 1)
+  }
+
+  for (const p of parents) {
+    if (!p.email) { result.skipped += 1; continue }
+    if (!isChannelAllowed(p.notification_prefs, 'parent_weekly_email')) {
+      result.skipped += 1; result.skipped_pref = (result.skipped_pref ?? 0) + 1; continue
+    }
+    const kids: ParentWeeklyChild[] = (byParent.get(p.id) ?? []).map(cid => {
+      const stat = statByChild.get(cid) ?? { count: 0, min: 0 }
+      const cl   = clearanceByChild.get(cid)
+      const meta = cl ? CLEARANCE_EMAIL_META[cl.status] : undefined
+      return {
+        name:              childName.get(cid) ?? 'Ребёнок',
+        workouts_count:    stat.count,
+        total_min:         stat.min,
+        clearance_label:   meta?.label ?? null,
+        clearance_color:   meta?.color ?? '#64748B',
+        review_needed:     cl?.review_needed ?? false,
+        records:           recordsByChild.get(cid) ?? [],
+        coach_notes_count: notesByChild.get(cid) ?? 0,
+      }
+    })
+    if (kids.length === 0) { result.skipped += 1; continue }
+
+    try {
+      const { subject, html } = renderParentWeeklyDigest({ parent_name: p.name, children: kids })
+      await resend.emails.send({ from: FROM, to: p.email, subject, html })
+      result.sent += 1
+    } catch (e) {
+      result.errors.push(`${p.id}: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
 
