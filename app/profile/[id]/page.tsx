@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import AskDoctorButton from '@/components/medical/AskDoctorButton'
 import AthleteMedicalDossier from '@/components/profile/AthleteMedicalDossier'
 import CoachReviewsBlock from '@/components/profile/CoachReviewsBlock'
+import { ReadinessCard } from '@/components/analytics/ReadinessCard'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
@@ -393,6 +394,10 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Medical dossier — linked coach/doctor/org viewing an athlete (audit #2) */}
       {canSeeMedicalDossier && <AthleteMedicalDossier athleteId={profile.id} />}
+
+      {/* Аналитика формы/готовности — коуч-версия карты по этому спортсмену.
+          Тот же гейт, что и досье: связанный тренер/доктор/организация смотрит атлета. */}
+      {canSeeMedicalDossier && <ReadinessCard athleteId={profile.id} />}
 
       {/* Coach — rich profile */}
       {profile.role === 'coach' && <CoachProfile profile={profile} />}

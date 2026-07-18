@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useToast } from '@/lib/hooks/useToast'
 import { ReadinessCard } from '@/components/analytics/ReadinessCard'
+import { loadForWorkout } from '@/lib/analytics'
 
 type Workout = {
   event_date: string
@@ -28,15 +29,16 @@ function num(v: unknown): number | null {
 }
 
 /**
- * Daily load heuristic:
- *   if activity_strain present → strain × 10 (strain is 0..21 scale)
- *   else → activity_duration_min × 1
- * Result is ~0..200 arbitrary units.
+ * Нагрузка одной тренировки — каноническая формула движка (@/lib/analytics):
+ *   activity_strain>0 ? strain : (activity_duration_min>0 ? duration*0.1 : null).
+ * loadForWorkout возвращает number|null; пустую тренировку трактуем как 0.
  */
 function loadFor(w: Workout): number {
-  const s = num(w.activity_strain)
-  if (s !== null && s > 0) return s * 10
-  return w.activity_duration_min ?? 0
+  return loadForWorkout({
+    event_date: w.event_date,
+    activity_strain: num(w.activity_strain),
+    activity_duration_min: w.activity_duration_min,
+  }) ?? 0
 }
 
 function buildDailySeries(workouts: Workout[], days: number): DailyLoad[] {
