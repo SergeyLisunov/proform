@@ -13,6 +13,7 @@
  */
 import { useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { loadForWorkout } from '@/lib/analytics'
 
 function sb() {
   return createBrowserClient(
@@ -21,7 +22,7 @@ function sb() {
   )
 }
 
-type Row = { event_date: string | null; activity_strain: number | null }
+type Row = { event_date: string | null; activity_strain: number | null; activity_duration_min: number | null }
 
 export default function TrainingLoadWidget({ userId }: { userId: string }) {
   const [rows, setRows] = useState<Row[]>([])
@@ -35,7 +36,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
       const sinceStr = since.toISOString().slice(0, 10)
       const { data } = await sb()
         .from('workouts')
-        .select('event_date, activity_strain')
+        .select('event_date, activity_strain, activity_duration_min')
         .eq('athlete_id', userId)
         .gte('event_date', sinceStr)
       if (cancelled) return
@@ -55,7 +56,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
       const d = new Date(r.event_date + 'T00:00:00')
       const diff = Math.floor((today.getTime() - d.getTime()) / 86400000)
       if (diff < 0 || diff > 27) return
-      daily[27 - diff] += Number(r.activity_strain) || 0
+      daily[27 - diff] += loadForWorkout(r) ?? 0
     })
 
     const last7  = daily.slice(-7)
