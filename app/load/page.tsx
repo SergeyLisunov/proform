@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useToast } from '@/lib/hooks/useToast'
+import { ReadinessCard } from '@/components/analytics/ReadinessCard'
 
 type Workout = {
   event_date: string
@@ -206,6 +207,9 @@ export default function LoadPage() {
           </p>
         </div>
       </section>
+
+      {/* Форма, готовность и цели (движок lib/analytics) */}
+      <ReadinessCard />
 
       {workouts === null ? (
         <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center text-sm text-muted-foreground">
