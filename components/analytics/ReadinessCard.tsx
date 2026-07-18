@@ -6,7 +6,9 @@
  * Дополняет существующий «светофор ACWR» новыми сигналами: форма Банистера
  * (TSB), готовность по wellness z-оценкам, надёжный EWMA-ACWR и прогноз целей.
  * Самодостаточна: сама тянет данные через services/training-readiness (клиентский
- * Supabase, текущий атлет). Пока данных мало — показывает пустое состояние.
+ * Supabase). Без пропа — по текущему атлету (getMyAnalytics); с athleteId —
+ * коуч-версия по конкретному спортсмену (getAthleteAnalytics, чтение изолирует
+ * RLS). Пока данных мало — показывает пустое состояние.
  */
 
 import { useEffect, useState } from 'react'
@@ -15,7 +17,7 @@ import {
   type AnalyticsCardView,
   type AnalyticsTone,
 } from '@/lib/analytics'
-import { getMyAnalytics } from '@/services/training-readiness.service'
+import { getAthleteAnalytics, getMyAnalytics } from '@/services/training-readiness.service'
 
 // Тоны -> классы Metronic Tailwind (полные литералы, чтобы их видел сканер Tailwind).
 const TONE_TEXT: Record<AnalyticsTone, string> = {
@@ -39,14 +41,19 @@ type State =
   | { kind: 'error'; message: string }
   | { kind: 'view'; view: AnalyticsCardView }
 
-export function ReadinessCard() {
+interface ReadinessCardProps {
+  /** Коуч-версия: аналитика по конкретному спортсмену. Без пропа — по текущему атлету. */
+  athleteId?: string
+}
+
+export function ReadinessCard({ athleteId }: ReadinessCardProps = {}) {
   const [state, setState] = useState<State>({ kind: 'loading' })
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const analytics = await getMyAnalytics()
+        const analytics = athleteId ? await getAthleteAnalytics(athleteId) : await getMyAnalytics()
         if (cancelled) return
         setState({ kind: 'view', view: buildLoadAnalyticsView(analytics) })
       } catch (err) {
@@ -57,7 +64,7 @@ export function ReadinessCard() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [athleteId])
 
   return (
     <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
