@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { loadForWorkout } from '@/lib/analytics'
 
 /**
  * Acute:Chronic Workload Ratio (ACWR).
@@ -77,9 +78,7 @@ export async function computeCoachAthletesAcwr(coachId: string): Promise<Athlete
   const perAthlete: Record<string, Record<string, number>> = {}
   for (const r of rows) {
     if (!r.event_date) continue
-    const load = (r.activity_strain != null && r.activity_strain > 0)
-      ? r.activity_strain
-      : ((r.activity_duration_min ?? 0) * 0.1)
+    const load = loadForWorkout(r) ?? 0
     if (load <= 0) continue
     const a = (perAthlete[r.athlete_id] ??= {})
     a[r.event_date] = (a[r.event_date] ?? 0) + load
