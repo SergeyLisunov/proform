@@ -2,8 +2,6 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
-import { streamChat } from '@/lib/ai/chat-client'
-import { renderMarkdownLite } from '@/lib/markdown-lite'
 
 type TabKey = 'hub' | 'assistant' | 'week' | 'video' | 'voice' | 'coach' | 'diary-search'
 
@@ -144,176 +142,26 @@ function FeatureCard({ f, onOpen }: { f: Feature; onOpen: (f: Feature) => void }
 type ChatMsg = { role: 'user' | 'assistant'; content: string }
 
 function AssistantChat() {
-  const [messages, setMessages] = useState<ChatMsg[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const abortRef = useRef<AbortController | null>(null)
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages])
-
-  useEffect(() => () => abortRef.current?.abort(), [])
-
-  const stop = useCallback(() => abortRef.current?.abort(), [])
-
-  // Стриминг через /api/ai/chat (Gemma 4): чанки дописываются в последнее
-  // assistant-сообщение по мере генерации; общий хелпер с AiChatBubble.
-  const send = useCallback(async () => {
-    const q = input.trim()
-    if (!q || loading) return
-    setError(null)
-    setInput('')
-    const history = messages.slice(-8)
-    setMessages(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: '' }])
-    setLoading(true)
-
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    const result = await streamChat({
-      question: q,
-      history,
-      signal: controller.signal,
-      onChunk: chunk => {
-        setMessages(prev => {
-          const next = [...prev]
-          const last = next[next.length - 1]
-          next[next.length - 1] = { ...last, content: last.content + chunk }
-          return next
-        })
-      },
-    })
-
-    setLoading(false)
-    abortRef.current = null
-    setMessages(prev => {
-      const last = prev[prev.length - 1]
-      if (last?.role === 'assistant' && !last.content) return prev.slice(0, -1)
-      return prev
-    })
-    if (result.error) setError(result.error)
-    if (result.interrupted) setError('Ответ прерван — попробуйте ещё раз.')
-  }, [input, loading, messages])
-
-  const suggestions = useMemo(
-    () => [
-      'Как распланировать неделю под силовые?',
-      'Почему у меня низкое восстановление?',
-      'Что делать при переутомлении?',
-      'Какие зоны ЧСС нужны для аэробной базы?',
-    ],
-    []
-  )
-
+  // Ролевые AI-ассистенты переехали в отдельный раздел кабинета:
+  // /assistant (единый route, роль/тариф/лимиты определяет сервер).
   return (
-    <div className="flex flex-col rounded-2xl border border-[#E9D5FF] bg-white overflow-hidden" style={{ minHeight: 560 }}>
-      <div className="flex items-center gap-3 border-b border-[#E9D5FF] bg-gradient-to-r from-[#FAF5FF] to-white px-5 py-4">
-        <div style={{ width: 36, height: 36, borderRadius: 12, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <i className="ki-filled ki-message-question text-sm" style={{ color: '#7C3AED' }} />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-foreground">Sporteo AI Ассистент</div>
-          <div className="text-[11px] text-muted-foreground">Задайте вопрос по тренировкам, сну, восстановлению</div>
-        </div>
+    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-[#E9D5FF] bg-white px-6 py-16 text-center" style={{ minHeight: 420 }}>
+      <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <i className="ki-filled ki-message-programming text-xl" style={{ color: '#7C3AED' }} />
       </div>
-
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3" style={{ minHeight: 360, maxHeight: 480 }}>
-        {messages.length === 0 && (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">Попробуйте спросить:</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map(s => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setInput(s)}
-                  className="rounded-full border border-[#E9D5FF] bg-[#FAF5FF] px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#F3E8FF]"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {messages.map((m, i) => {
-          const showTyping = loading && i === messages.length - 1 && m.role === 'assistant' && !m.content
-          return (
-            <div
-              key={i}
-              className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                  m.role === 'user'
-                    ? 'bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] text-white rounded-tr-sm'
-                    : 'bg-[#F8FAFC] text-foreground rounded-tl-sm border border-[#E2E8F0]'
-                }`}
-              >
-                {m.role === 'assistant' ? (
-                  showTyping ? (
-                    <span className="inline-flex items-center gap-2 text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '120ms' }} />
-                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '240ms' }} />
-                      думаю…
-                    </span>
-                  ) : (
-                    // renderMarkdownLite экранирует весь ввод до замен — XSS-safe
-                    <div dangerouslySetInnerHTML={{ __html: renderMarkdownLite(m.content) }} />
-                  )
-                ) : (
-                  m.content
-                )}
-              </div>
-            </div>
-          )
-        })}
+      <div>
+        <div className="text-base font-semibold text-foreground">AI-помощник переехал в отдельный раздел</div>
+        <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+          Теперь у каждой роли — свой ассистент: врач, тренер, спортсмен и организация.
+          Лимиты и история — по вашему тарифу.
+        </p>
       </div>
-
-      {error && (
-        <div className="border-t border-red-100 bg-red-50 px-5 py-2 text-xs text-red-700">{error}</div>
-      )}
-
-      <div className="border-t border-[#E9D5FF] bg-white p-3">
-        <div className="flex items-end gap-2">
-          <textarea
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                send()
-              }
-            }}
-            placeholder="Спросите что-нибудь…"
-            rows={1}
-            maxLength={2000}
-            className="flex-1 resize-none rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED]/50 focus:bg-white"
-            style={{ maxHeight: 140 }}
-          />
-          {loading ? (
-            <button
-              type="button"
-              onClick={stop}
-              className="rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800"
-            >
-              Остановить
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={send}
-              disabled={!input.trim()}
-              className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Отправить
-            </button>
-          )}
-        </div>
-      </div>
+      <Link
+        href="/assistant"
+        className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
+      >
+        Открыть AI-помощника
+      </Link>
     </div>
   )
 }

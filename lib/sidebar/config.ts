@@ -221,6 +221,10 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // (lib/ai/plan-gate.ts → 402); UI hint скрывает пункт у free-tier
       // чтобы не давать ложного affordance. На /pricing они дойдут через
       // отдельный CTA в /dashboard, не через sidebar.
+      // Ролевые AI-ассистенты: единый route, роль/тариф/лимит определяет
+      // сервер (capabilities). Без requiredPlan — free-tier имеет малый
+      // лимит, страница сама показывает остаток и upgrade CTA.
+      { id: 'smart_tools.assistant', href: '/assistant', icon: 'ki-message-question', label: 'AI-помощник', roles: ['athlete', 'coach', 'organization', 'doctor'] },
       { id: 'smart_tools.ai', href: '/ai', icon: 'ki-message-programming', label: 'Sporteo AI', roles: ['athlete', 'coach', 'organization', 'doctor'], requiredPlan: 'pro' },
     ],
   },

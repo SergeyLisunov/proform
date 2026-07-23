@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1780422781931,
+  "lastScanned": 1784705227160,
   "projectRoot": "/Users/sergeylisunov/proform",
   "techStack": {
     "languages": [
@@ -108,28 +108,41 @@
     "app": {
       "path": "app",
       "purpose": "Application code",
-      "fileCount": 8,
-      "lastAccessed": 1780422781880,
+      "fileCount": 9,
+      "lastAccessed": 1784705227109,
       "keyFiles": [
         "error.tsx",
         "globals.css",
+        "icon.tsx",
         "layout.tsx",
-        "not-found.tsx",
-        "opengraph-image.tsx"
+        "not-found.tsx"
       ]
     },
     "components": {
       "path": "components",
       "purpose": "UI components",
       "fileCount": 0,
-      "lastAccessed": 1780422781883,
+      "lastAccessed": 1784705227109,
       "keyFiles": []
+    },
+    "deploy": {
+      "path": "deploy",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1784705227113,
+      "keyFiles": [
+        "crontab.sample",
+        "ecosystem.config.js",
+        "nginx.conf.sample",
+        "telegram-setup.sh",
+        "telegram-worker.mjs"
+      ]
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 9,
-      "lastAccessed": 1780422781884,
+      "lastAccessed": 1784705227114,
       "keyFiles": [
         "DB_SCHEMA_REALITY.md",
         "bundle-budget.md",
@@ -142,30 +155,56 @@
       "path": "hooks",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1780422781884,
+      "lastAccessed": 1784705227114,
       "keyFiles": [
         "useDictation.ts"
+      ]
+    },
+    "i18n": {
+      "path": "i18n",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1784705227114,
+      "keyFiles": [
+        "config.ts",
+        "request.ts"
       ]
     },
     "lib": {
       "path": "lib",
       "purpose": "Library code",
-      "fileCount": 0,
-      "lastAccessed": 1780422781884,
-      "keyFiles": []
+      "fileCount": 2,
+      "lastAccessed": 1784705227114,
+      "keyFiles": [
+        "permissions.ts",
+        "plans.ts"
+      ]
+    },
+    "messages": {
+      "path": "messages",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1784705227115,
+      "keyFiles": [
+        "en.json",
+        "ru.json"
+      ]
     },
     "public": {
       "path": "public",
       "purpose": "Public files",
-      "fileCount": 0,
-      "lastAccessed": 1780422781884,
-      "keyFiles": []
+      "fileCount": 2,
+      "lastAccessed": 1784705227115,
+      "keyFiles": [
+        "sporteo-logo.png",
+        "sporteo-mark.png"
+      ]
     },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 5,
-      "lastAccessed": 1780422781884,
+      "lastAccessed": 1784705227118,
       "keyFiles": [
         "audit-duplicate-exports.sh",
         "audit-landing.mjs",
@@ -177,8 +216,8 @@
     "services": {
       "path": "services",
       "purpose": "Business logic services",
-      "fileCount": 43,
-      "lastAccessed": 1780422781885,
+      "fileCount": 49,
+      "lastAccessed": 1784705227120,
       "keyFiles": [
         "acwr.service.ts",
         "adherence-nudge.service.ts",
@@ -191,28 +230,28 @@
       "path": "supabase",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1780422781885,
+      "lastAccessed": 1784705227121,
       "keyFiles": []
     },
     "test-results": {
       "path": "test-results",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1780422781886,
+      "lastAccessed": 1784705227121,
       "keyFiles": []
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 0,
-      "lastAccessed": 1780422781886,
+      "lastAccessed": 1784705227121,
       "keyFiles": []
     },
     "types": {
       "path": "types",
       "purpose": "Type definitions",
       "fileCount": 3,
-      "lastAccessed": 1780422781886,
+      "lastAccessed": 1784705227122,
       "keyFiles": [
         "database.ts",
         "org.types.ts",
@@ -223,21 +262,21 @@
       "path": "app/api",
       "purpose": "API routes",
       "fileCount": 0,
-      "lastAccessed": 1780422781886,
+      "lastAccessed": 1784705227122,
       "keyFiles": []
     },
     "public/assets": {
       "path": "public/assets",
       "purpose": "Static assets",
       "fileCount": 0,
-      "lastAccessed": 1780422781887,
+      "lastAccessed": 1784705227125,
       "keyFiles": []
     },
     "supabase/migrations": {
       "path": "supabase/migrations",
       "purpose": "Database migrations",
-      "fileCount": 70,
-      "lastAccessed": 1780422781888,
+      "fileCount": 87,
+      "lastAccessed": 1784705227126,
       "keyFiles": [
         "009_cycle_blocks.sql",
         "010_workout_comments.sql",
@@ -247,303 +286,219 @@
   },
   "hotPaths": [
     {
-      "path": "app/analytics/AnalyticsCharts.tsx",
-      "accessCount": 14,
-      "lastAccessed": 1780491412175,
+      "path": "app/ai/page.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1784797739661,
       "type": "file"
     },
     {
-      "path": "components/ui/metronic/Card.tsx",
-      "accessCount": 14,
-      "lastAccessed": 1780492925570,
+      "path": "lib/ai/assistant/usage.ts",
+      "accessCount": 11,
+      "lastAccessed": 1784798002881,
       "type": "file"
     },
     {
-      "path": "components/ui/metronic/Badge.tsx",
-      "accessCount": 13,
-      "lastAccessed": 1780492926982,
+      "path": "app/api/assistant/conversations/[id]/messages/route.ts",
+      "accessCount": 11,
+      "lastAccessed": 1784798013732,
       "type": "file"
     },
     {
-      "path": "components/ui/metronic/Alert.tsx",
-      "accessCount": 13,
-      "lastAccessed": 1780492927453,
-      "type": "file"
-    },
-    {
-      "path": "components/ui/metronic/ChartCard.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1780492927682,
-      "type": "file"
-    },
-    {
-      "path": "components/ui/metronic/Accordion.tsx",
-      "accessCount": 10,
-      "lastAccessed": 1780492926489,
-      "type": "file"
-    },
-    {
-      "path": "components/settings/DevicesSection.tsx",
+      "path": "app/api/ai/chat/route.ts",
       "accessCount": 9,
-      "lastAccessed": 1780491100613,
+      "lastAccessed": 1784792749397,
       "type": "file"
     },
     {
-      "path": "components/ui/metronic/index.ts",
+      "path": "lib/ai/chat-client.ts",
+      "accessCount": 9,
+      "lastAccessed": 1784792750505,
+      "type": "file"
+    },
+    {
+      "path": "lib/ai/assistant/gateway.ts",
+      "accessCount": 9,
+      "lastAccessed": 1784798050213,
+      "type": "file"
+    },
+    {
+      "path": "components/ui/AiChatBubble.tsx",
       "accessCount": 8,
-      "lastAccessed": 1780492925097,
+      "lastAccessed": 1784792749840,
       "type": "file"
     },
     {
-      "path": "app/athlete/progress/page.tsx",
+      "path": "lib/ai/ollama.ts",
+      "accessCount": 8,
+      "lastAccessed": 1784797751535,
+      "type": "file"
+    },
+    {
+      "path": "lib/ai/rate-limit.ts",
+      "accessCount": 8,
+      "lastAccessed": 1784798030397,
+      "type": "file"
+    },
+    {
+      "path": "lib/ai/assistant/context.ts",
       "accessCount": 7,
-      "lastAccessed": 1780491121777,
+      "lastAccessed": 1784797993491,
       "type": "file"
     },
     {
-      "path": "app/coach/plans/PlanEditor.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1780491293692,
-      "type": "file"
-    },
-    {
-      "path": "components/charts/ApexChart.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1780491294608,
-      "type": "file"
-    },
-    {
-      "path": "app/athlete/dashboard/page.tsx",
+      "path": "lib/ai/assistant/policy.ts",
       "accessCount": 6,
-      "lastAccessed": 1780491067246,
+      "lastAccessed": 1784798050631,
       "type": "file"
     },
     {
-      "path": "app/athlete/passes/page.tsx",
-      "accessCount": 6,
-      "lastAccessed": 1780491211258,
-      "type": "file"
-    },
-    {
-      "path": "components/doctor/DoctorActiveInjuries.tsx",
+      "path": "lib/ai/assistant/provider.ts",
       "accessCount": 5,
-      "lastAccessed": 1780491032180,
+      "lastAccessed": 1784797617115,
       "type": "file"
     },
     {
-      "path": "app/coach/services/page.tsx",
+      "path": "lib/ai/assistant/prompts.ts",
       "accessCount": 5,
-      "lastAccessed": 1780491150438,
+      "lastAccessed": 1784797833160,
       "type": "file"
     },
     {
-      "path": "app/athlete/goals/page.tsx",
+      "path": "lib/ai/assistant/tariff.ts",
       "accessCount": 5,
-      "lastAccessed": 1780491157606,
+      "lastAccessed": 1784797937057,
       "type": "file"
     },
     {
-      "path": "app/coach/pass-plans/page.tsx",
+      "path": "lib/ai/assistant/types.ts",
       "accessCount": 5,
-      "lastAccessed": 1780491185475,
+      "lastAccessed": 1784797937953,
       "type": "file"
     },
     {
-      "path": "app/coach/inquiries/page.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780491218049,
-      "type": "file"
-    },
-    {
-      "path": "components/profile/AthleteMedicalDossier.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780491335114,
-      "type": "file"
-    },
-    {
-      "path": "components/profile/CoachReviewsBlock.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1780491368329,
-      "type": "file"
-    },
-    {
-      "path": "app/doctor/report/[athleteId]/page.tsx",
+      "path": "lib/markdown-lite.ts",
       "accessCount": 4,
-      "lastAccessed": 1780491078554,
+      "lastAccessed": 1784792386526,
       "type": "file"
     },
     {
-      "path": "app/coach/passes/page.tsx",
+      "path": "lib/markdown-lite.test.ts",
       "accessCount": 4,
-      "lastAccessed": 1780491242392,
+      "lastAccessed": 1784792394658,
       "type": "file"
     },
     {
-      "path": "app/coach/plans/page.tsx",
+      "path": "supabase/migrations/100_ai_assistants.sql",
+      "accessCount": 4,
+      "lastAccessed": 1784797613710,
+      "type": "file"
+    },
+    {
+      "path": "app/api/assistant/capabilities/route.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784797622575,
+      "type": "file"
+    },
+    {
+      "path": "app/api/assistant/conversations/route.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784797622779,
+      "type": "file"
+    },
+    {
+      "path": "app/api/assistant/conversations/[id]/route.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784797623640,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/092_clearances_foundation.sql",
+      "accessCount": 4,
+      "lastAccessed": 1784797996683,
+      "type": "file"
+    },
+    {
+      "path": "app/assistant/page.tsx",
       "accessCount": 3,
-      "lastAccessed": 1780491034720,
+      "lastAccessed": 1784797710386,
       "type": "file"
     },
     {
-      "path": "components/doctor/DoctorTodayCheckups.tsx",
+      "path": "components/ui/ClientOverlays.tsx",
       "accessCount": 3,
-      "lastAccessed": 1780491049562,
+      "lastAccessed": 1784797732134,
       "type": "file"
     },
     {
-      "path": "app/doctor/inquiries/page.tsx",
+      "path": "lib/ai/assistant/client.ts",
       "accessCount": 3,
-      "lastAccessed": 1780491099199,
+      "lastAccessed": 1784797971278,
       "type": "file"
     },
     {
-      "path": "components/doctor/RecommendationForm.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780491116571,
+      "path": ".env.example",
+      "accessCount": 2,
+      "lastAccessed": 1784797805858,
       "type": "file"
     },
     {
-      "path": "components/medical/AskDoctorButton.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1780491131250,
-      "type": "file"
-    },
-    {
-      "path": "supabase/migrations/083_fix_connection_notify_phantom_name.sql",
+      "path": "app/api/ai/ask/route.ts",
       "accessCount": 1,
-      "lastAccessed": 1780429285158,
+      "lastAccessed": 1784792398845,
       "type": "file"
     },
     {
-      "path": "services/notifications.service.ts",
+      "path": "components/layout/MobileBottomNav.tsx",
       "accessCount": 1,
-      "lastAccessed": 1780429420562,
+      "lastAccessed": 1784792519169,
       "type": "file"
     },
     {
-      "path": "supabase/migrations/084_drop_stale_notifications_type_check.sql",
+      "path": "vitest.config.ts",
       "accessCount": 1,
-      "lastAccessed": 1780429617446,
+      "lastAccessed": 1784792575322,
       "type": "file"
     },
     {
-      "path": "supabase/migrations/085_sync_trainer_athletes_from_connections.sql",
+      "path": "vercel.json",
       "accessCount": 1,
-      "lastAccessed": 1780472883393,
+      "lastAccessed": 1784792650253,
       "type": "file"
     },
     {
-      "path": "supabase/migrations/081_can_notify_function.sql",
+      "path": "lib/ai/assistant/assistant.test.ts",
       "accessCount": 1,
-      "lastAccessed": 1780474534451,
+      "lastAccessed": 1784797526392,
       "type": "file"
     },
     {
-      "path": "supabase/migrations/086_can_notify_care_team_predicate.sql",
+      "path": "lib/sidebar/config.ts",
       "accessCount": 1,
-      "lastAccessed": 1780474629271,
+      "lastAccessed": 1784797792047,
       "type": "file"
     },
     {
-      "path": "app/layout.tsx",
+      "path": "app/settings/page.tsx",
       "accessCount": 1,
-      "lastAccessed": 1780489746472,
+      "lastAccessed": 1784797862081,
       "type": "file"
     },
     {
-      "path": "components/ui/StatCard.tsx",
+      "path": "supabase/migrations/024_org_group_sessions.sql",
       "accessCount": 1,
-      "lastAccessed": 1780490016775,
+      "lastAccessed": 1784798006011,
       "type": "file"
     },
     {
-      "path": "app/globals.css",
+      "path": "supabase/migrations/088_org_record_and_owner_id.sql",
       "accessCount": 1,
-      "lastAccessed": 1780490132332,
+      "lastAccessed": 1784798018936,
       "type": "file"
     },
     {
-      "path": "app/cycles/page.tsx",
+      "path": "supabase/migrations/053_org_members_role_widening.sql",
       "accessCount": 1,
-      "lastAccessed": 1780490966007,
-      "type": "file"
-    },
-    {
-      "path": "app/diary/DiaryClient.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490966195,
-      "type": "file"
-    },
-    {
-      "path": "app/doctor/layout.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490966251,
-      "type": "file"
-    },
-    {
-      "path": "app/notes/page.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490966829,
-      "type": "file"
-    },
-    {
-      "path": "app/doctor/reports/page.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490967289,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/AiCoachCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490967425,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/AnomalyAlertCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490967912,
-      "type": "file"
-    },
-    {
-      "path": "components/doctor/DoctorHeroBar.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490968790,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/CoachBriefingCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490969032,
-      "type": "file"
-    },
-    {
-      "path": "components/doctor/DoctorQuickActions.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490969490,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/RecoveryTrendWidget.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490969711,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/TrainingLoadWidget.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490970057,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/WeeklyInsightsCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490970813,
-      "type": "file"
-    },
-    {
-      "path": "components/widgets/WeeklyPlannerCard.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1780490970916,
+      "lastAccessed": 1784798018988,
       "type": "file"
     }
   ],
