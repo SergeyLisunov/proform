@@ -1,5 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { streamChat } from '@/lib/ai/chat-client'
+import { renderMarkdownLite } from '@/lib/markdown-lite'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -11,14 +13,15 @@ const STARTER_PROMPTS = [
 ]
 
 export default function AiChatBubble() {
-  const [open, setOpen]         = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput]       = useState('')
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
-  const [hidden, setHidden]     = useState(false)
-  const scrollRef               = useRef<HTMLDivElement>(null)
-  const inputRef                = useRef<HTMLTextAreaElement>(null)
+  const [open, setOpen]           = useState(false)
+  const [messages, setMessages]   = useState<Message[]>([])
+  const [input, setInput]         = useState('')
+  const [streaming, setStreaming] = useState(false)
+  const [error, setError]         = useState<string | null>(null)
+  const [hidden, setHidden]       = useState(false)
+  const scrollRef                 = useRef<HTMLDivElement>(null)
+  const inputRef                  = useRef<HTMLTextAreaElement>(null)
+  const abortRef                  = useRef<AbortController | null>(null)
 
   // Hide entirely on auth pages
   useEffect(() => {
@@ -32,52 +35,69 @@ export default function AiChatBubble() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages, loading])
+  }, [messages, streaming])
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100)
   }, [open])
 
+  // Обрываем генерацию при размонтировании
+  useEffect(() => () => abortRef.current?.abort(), [])
+
+  const stop = useCallback(() => abortRef.current?.abort(), [])
+
   const send = useCallback(async (text: string) => {
-    if (!text.trim() || loading) return
+    if (!text.trim() || streaming) return
     const userMsg: Message = { role: 'user', content: text.trim() }
-    setMessages(m => [...m, userMsg])
+    const history = messages.slice(-8)
+    setMessages(m => [...m, userMsg, { role: 'assistant', content: '' }])
     setInput('')
-    setLoading(true)
+    setStreaming(true)
     setError(null)
-    try {
-      const res = await fetch('/api/ai/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: userMsg.content,
-          history: messages.slice(-8),
-        }),
-      })
-      if (res.status === 503) {
-        setError('AI отключён. Добавьте ANTHROPIC_API_KEY.')
-        return
+
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    // Чанки дописываем в последнее (пустое) assistant-сообщение
+    const result = await streamChat({
+      question: userMsg.content,
+      history,
+      signal: controller.signal,
+      onChunk: chunk => {
+        setMessages(m => {
+          const next = [...m]
+          const last = next[next.length - 1]
+          next[next.length - 1] = { ...last, content: last.content + chunk }
+          return next
+        })
+      },
+    })
+
+    setStreaming(false)
+    abortRef.current = null
+
+    setMessages(m => {
+      const last = m[m.length - 1]
+      if (last?.role === 'assistant' && !last.content) {
+        // Ответ так и не начался (ошибка/стоп до первого чанка) — убираем пузырь
+        return m.slice(0, -1)
       }
-      const json = await res.json()
-      if (!res.ok || !json.ok) throw new Error(json.error ?? 'AI_ERROR')
-      setMessages(m => [...m, { role: 'assistant', content: json.answer }])
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'AI_ERROR')
-    } finally {
-      setLoading(false)
-    }
-  }, [messages, loading])
+      return m
+    })
+    if (result.error) setError(result.error)
+    if (result.interrupted) setError('Ответ прерван — попробуйте ещё раз.')
+  }, [messages, streaming])
 
   if (hidden) return null
 
   return (
     <>
-      {/* Floating launcher */}
+      {/* Floating launcher — на мобиле поднят над MobileBottomNav */}
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-[9997] flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105"
+          className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 z-[9997] flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F35703 0%,#D44A02 60%,#7C3AED 130%)' }}
           title="AI-ассистент"
         >
@@ -92,8 +112,8 @@ export default function AiChatBubble() {
       {/* Chat panel */}
       {open && (
         <div
-          className="fixed bottom-6 right-6 z-[9998] flex w-[380px] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_32px_80px_rgba(0,0,0,0.28)]"
-          style={{ height: 'min(560px, 80vh)' }}
+          className="fixed bottom-20 right-2 lg:bottom-6 lg:right-6 z-[9998] flex w-[380px] max-w-[95vw] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_32px_80px_rgba(0,0,0,0.28)]"
+          style={{ height: 'min(560px, 76vh)' }}
         >
           {/* Header */}
           <div
@@ -106,11 +126,11 @@ export default function AiChatBubble() {
               </div>
               <div>
                 <div className="text-sm font-bold text-white leading-none">AI-ассистент</div>
-                <div className="text-[10px] text-white/70 mt-0.5">На базе Claude</div>
+                <div className="text-[10px] text-white/70 mt-0.5">На базе Gemma 4</div>
               </div>
             </div>
             <div className="flex items-center gap-1">
-              {messages.length > 0 && (
+              {messages.length > 0 && !streaming && (
                 <button
                   onClick={() => { setMessages([]); setError(null) }}
                   className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/15"
@@ -120,7 +140,7 @@ export default function AiChatBubble() {
                 </button>
               )}
               <button
-                onClick={() => setOpen(false)}
+                onClick={() => { stop(); setOpen(false) }}
                 className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/15"
                 title="Закрыть"
               >
@@ -149,26 +169,33 @@ export default function AiChatBubble() {
                 </div>
               </div>
             )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
-                    m.role === 'user'
-                      ? 'bg-orange-500 text-white rounded-br-sm'
-                      : 'bg-card border border-border text-foreground rounded-bl-sm'
-                  }`}
-                >
-                  {m.content}
+            {messages.map((m, i) => {
+              const isLast = i === messages.length - 1
+              const showTyping = streaming && isLast && m.role === 'assistant' && !m.content
+              return (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                      m.role === 'user'
+                        ? 'bg-orange-500 text-white rounded-br-sm whitespace-pre-wrap'
+                        : 'bg-card border border-border text-foreground rounded-bl-sm'
+                    }`}
+                  >
+                    {m.role === 'assistant' ? (
+                      showTyping ? (
+                        <TypingDots />
+                      ) : (
+                        // renderMarkdownLite экранирует ВЕСЬ ввод до замен —
+                        // инъекция HTML из ответа модели невозможна.
+                        <div dangerouslySetInnerHTML={{ __html: renderMarkdownLite(m.content) }} />
+                      )
+                    ) : (
+                      m.content
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-sm bg-card border border-border px-3 py-2 text-sm">
-                  <TypingDots />
-                </div>
-              </div>
-            )}
+              )
+            })}
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
                 {error}
@@ -191,17 +218,30 @@ export default function AiChatBubble() {
                 }}
                 placeholder="Спроси что-нибудь…"
                 rows={1}
+                maxLength={2000}
                 className="flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-orange-400 max-h-32"
                 style={{ minHeight: 36 }}
               />
-              <button
-                type="button"
-                onClick={() => send(input)}
-                disabled={!input.trim() || loading}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white transition hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <i className="ki-filled ki-paper-plane text-[13px]" />
-              </button>
+              {streaming ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-700 text-white transition hover:bg-slate-800"
+                  title="Остановить генерацию"
+                >
+                  <i className="ki-filled ki-cross text-[13px]" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => send(input)}
+                  disabled={!input.trim()}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white transition hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Отправить"
+                >
+                  <i className="ki-filled ki-paper-plane text-[13px]" />
+                </button>
+              )}
             </div>
             <div className="mt-1 text-center text-[9px] text-muted-foreground">
               Enter — отправить · Shift+Enter — новая строка

@@ -2,6 +2,8 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { streamChat } from '@/lib/ai/chat-client'
+import { renderMarkdownLite } from '@/lib/markdown-lite'
 
 type TabKey = 'hub' | 'assistant' | 'week' | 'video' | 'voice' | 'coach' | 'diary-search'
 
@@ -147,36 +149,54 @@ function AssistantChat() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
+  useEffect(() => () => abortRef.current?.abort(), [])
+
+  const stop = useCallback(() => abortRef.current?.abort(), [])
+
+  // Стриминг через /api/ai/chat (Gemma 4): чанки дописываются в последнее
+  // assistant-сообщение по мере генерации; общий хелпер с AiChatBubble.
   const send = useCallback(async () => {
     const q = input.trim()
     if (!q || loading) return
     setError(null)
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: q }])
+    const history = messages.slice(-8)
+    setMessages(prev => [...prev, { role: 'user', content: q }, { role: 'assistant', content: '' }])
     setLoading(true)
-    try {
-      const res = await fetch('/api/ai/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q }),
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      const answer = data.answer ?? data.response ?? data.text ?? data.message ?? 'Ответ получен.'
-      setMessages(prev => [...prev, { role: 'assistant', content: typeof answer === 'string' ? answer : JSON.stringify(answer) }])
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Ошибка'
-      setError(msg)
-      setMessages(prev => [...prev, { role: 'assistant', content: `Не удалось получить ответ: ${msg}` }])
-    } finally {
-      setLoading(false)
-    }
-  }, [input, loading])
+
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    const result = await streamChat({
+      question: q,
+      history,
+      signal: controller.signal,
+      onChunk: chunk => {
+        setMessages(prev => {
+          const next = [...prev]
+          const last = next[next.length - 1]
+          next[next.length - 1] = { ...last, content: last.content + chunk }
+          return next
+        })
+      },
+    })
+
+    setLoading(false)
+    abortRef.current = null
+    setMessages(prev => {
+      const last = prev[prev.length - 1]
+      if (last?.role === 'assistant' && !last.content) return prev.slice(0, -1)
+      return prev
+    })
+    if (result.error) setError(result.error)
+    if (result.interrupted) setError('Ответ прерван — попробуйте ещё раз.')
+  }, [input, loading, messages])
 
   const suggestions = useMemo(
     () => [
@@ -218,34 +238,39 @@ function AssistantChat() {
             </div>
           </div>
         )}
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+        {messages.map((m, i) => {
+          const showTyping = loading && i === messages.length - 1 && m.role === 'assistant' && !m.content
+          return (
             <div
-              className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.role === 'user'
-                  ? 'bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] text-white rounded-tr-sm'
-                  : 'bg-[#F8FAFC] text-foreground rounded-tl-sm border border-[#E2E8F0]'
-              }`}
+              key={i}
+              className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {m.content}
+              <div
+                className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  m.role === 'user'
+                    ? 'bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] text-white rounded-tr-sm'
+                    : 'bg-[#F8FAFC] text-foreground rounded-tl-sm border border-[#E2E8F0]'
+                }`}
+              >
+                {m.role === 'assistant' ? (
+                  showTyping ? (
+                    <span className="inline-flex items-center gap-2 text-muted-foreground">
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '120ms' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '240ms' }} />
+                      думаю…
+                    </span>
+                  ) : (
+                    // renderMarkdownLite экранирует весь ввод до замен — XSS-safe
+                    <div dangerouslySetInnerHTML={{ __html: renderMarkdownLite(m.content) }} />
+                  )
+                ) : (
+                  m.content
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2.5 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" />
-                <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '120ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '240ms' }} />
-                думаю…
-              </span>
-            </div>
-          </div>
-        )}
+          )
+        })}
       </div>
 
       {error && (
@@ -265,17 +290,28 @@ function AssistantChat() {
             }}
             placeholder="Спросите что-нибудь…"
             rows={1}
+            maxLength={2000}
             className="flex-1 resize-none rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED]/50 focus:bg-white"
             style={{ maxHeight: 140 }}
           />
-          <button
-            type="button"
-            onClick={send}
-            disabled={!input.trim() || loading}
-            className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? '…' : 'Отправить'}
-          </button>
+          {loading ? (
+            <button
+              type="button"
+              onClick={stop}
+              className="rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800"
+            >
+              Остановить
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={send}
+              disabled={!input.trim()}
+              className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Отправить
+            </button>
+          )}
         </div>
       </div>
     </div>
