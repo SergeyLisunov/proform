@@ -77,8 +77,24 @@ export async function streamOllamaChat(
   const apiKey = process.env.OLLAMA_API_KEY
   if (!apiKey) throw new OllamaError('OLLAMA_NOT_CONFIGURED')
 
-  const deadline = AbortSignal.timeout(opts.deadlineMs ?? 50_000)
-  const signal = opts.signal ? AbortSignal.any([opts.signal, deadline]) : deadline
+  // Дедлайн — РУЧНОЙ setTimeout+AbortController, НЕ AbortSignal.timeout/
+  // AbortSignal.any: на прод-рантайме Vercel комбинированный сигнал не
+  // срабатывал (функции висели до maxDuration и умирали 504 — поймано
+  // смоуком). Ручная связка гарантированно тикает в любом Node-рантайме.
+  const ctrl = new AbortController()
+  let deadlineFired = false
+  const deadlineTimer = setTimeout(() => {
+    deadlineFired = true
+    ctrl.abort()
+  }, opts.deadlineMs ?? 50_000)
+  const onCallerAbort = () => ctrl.abort()
+  opts.signal?.addEventListener('abort', onCallerAbort, { once: true })
+  const cleanup = () => {
+    clearTimeout(deadlineTimer)
+    opts.signal?.removeEventListener('abort', onCallerAbort)
+  }
+  const deadline = { get aborted() { return deadlineFired } }
+  const signal = ctrl.signal
 
   let upstream: Response
   try {
@@ -102,6 +118,7 @@ export async function streamOllamaChat(
       signal,
     })
   } catch (e) {
+    cleanup()
     if (deadline.aborted && !opts.signal?.aborted) {
       // Дедлайн до первого байта — апстрим завис/перегружен.
       throw new OllamaError('OLLAMA_UPSTREAM', 'upstream deadline before first byte')
@@ -111,6 +128,7 @@ export async function streamOllamaChat(
   }
 
   if (!upstream.ok) {
+    cleanup()
     const detail = (await upstream.text().catch(() => '')).slice(0, 300)
     if (upstream.status === 401 || upstream.status === 403) {
       throw new OllamaError('OLLAMA_KEY_INVALID', detail)
@@ -120,7 +138,7 @@ export async function streamOllamaChat(
     }
     throw new OllamaError('OLLAMA_UPSTREAM', `HTTP ${upstream.status}: ${detail}`)
   }
-  if (!upstream.body) throw new OllamaError('OLLAMA_UPSTREAM', 'empty response body')
+  if (!upstream.body) { cleanup(); throw new OllamaError('OLLAMA_UPSTREAM', 'empty response body') }
 
   const reader  = upstream.body.getReader()
   const decoder = new TextDecoder()
@@ -133,6 +151,7 @@ export async function streamOllamaChat(
         const { done, value } = await reader.read()
         if (done) {
           // Апстрим закрылся без {"done":true} — отдаём, что есть.
+          cleanup()
           controller.close()
           return
         }
@@ -157,12 +176,14 @@ export async function streamOllamaChat(
           const text = chunk.message?.content
           if (text) controller.enqueue(encoder.encode(text))
           if (chunk.done) {
+            cleanup()
             controller.close()
             await reader.cancel().catch(() => {})
             return
           }
         }
       } catch (e) {
+        cleanup()
         if (deadline.aborted && !opts.signal?.aborted) {
           // Дедлайн посреди генерации — осознанное усечение: закрываем
           // мягко, клиент получает частичный текст с чистым концом.
@@ -174,6 +195,7 @@ export async function streamOllamaChat(
       }
     },
     async cancel() {
+      cleanup()
       await reader.cancel().catch(() => {})
     },
   })

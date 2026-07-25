@@ -71,12 +71,18 @@ function clientIp(req: Request): string | null {
 }
 
 export async function POST(req: Request) {
+  // Поэтапные метки времени — диагностика зависаний на прод-рантайме
+  // (смоук ловил 504 на maxDuration): по логам видно последнюю стадию.
+  const t0 = Date.now()
+  const mark = (stage: string) => console.log(`[demo-ai] ${stage} +${Date.now() - t0}ms`)
+
   let body: z.infer<typeof BodySchema>
   try {
     body = BodySchema.parse(await req.json())
   } catch {
     return NextResponse.json({ ok: false, error: 'Некорректный запрос.' }, { status: 400 })
   }
+  mark('parsed')
 
   const provider = getAssistantProvider()
   if (!provider.isConfigured()) {
@@ -98,10 +104,12 @@ export async function POST(req: Request) {
   const now = new Date()
 
   // Лимит по session
+  mark('cookies+admin')
   const { data: usageRaw } = await adminAny.from('demo_ai_usage')
     .select('id, requests_used, expires_at')
     .eq('session_hash', sessionHash)
     .maybeSingle()
+  mark('usage-read')
   const usage = usageRaw as { id: string; requests_used: number; expires_at: string } | null
   const sessionUsed = usage && new Date(usage.expires_at) > now ? usage.requests_used : 0
 
@@ -147,21 +155,27 @@ export async function POST(req: Request) {
     { role: 'user', content: body.message },
   ]
 
+  mark('provider-start')
   let answer = ''
   try {
     const stream = await provider.streamChat(messages, {
       signal: req.signal,
       maxOutputTokens: 250,
     })
+    mark('stream-open')
     const reader = stream.getReader()
     const decoder = new TextDecoder()
+    let first = true
     for (;;) {
       const { done, value } = await reader.read()
       if (done) break
+      if (first) { mark('first-chunk'); first = false }
       answer += decoder.decode(value, { stream: true })
     }
     answer += decoder.decode()
-  } catch {
+    mark(`collected ${answer.length} chars`)
+  } catch (e) {
+    mark(`provider-error: ${e instanceof Error ? e.message : String(e)}`)
     return NextResponse.json({ ok: false, error: 'AI временно недоступен — попробуйте позже.' }, { status: 502 })
   }
 
