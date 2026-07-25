@@ -8,7 +8,10 @@ import type { OllamaChatMessage } from '@/lib/ai/ollama'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const maxDuration = 30
+// 60, не 30: дедлайн провайдера — 50с; при maxDuration=30 холодный старт
+// Gemma приводил к FUNCTION_INVOCATION_TIMEOUT (платформа убивала функцию
+// раньше мягкого усечения) — поймано смоуком на проде.
+export const maxDuration = 60
 
 /**
  * POST /api/demo/assistant — демо-режим ролевых ассистентов (публичный).
