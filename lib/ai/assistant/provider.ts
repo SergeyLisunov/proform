@@ -11,7 +11,7 @@
  * ключи живут только в env провайдера; во frontend не попадают.
  */
 import {
-  streamOllamaChat, isOllamaConfigured,
+  streamOllamaChat, ollamaChatOnce, isOllamaConfigured,
   type OllamaChatMessage,
 } from '@/lib/ai/ollama'
 
@@ -26,6 +26,11 @@ export interface AIProvider {
   readonly name: ProviderName
   isConfigured(): boolean
   streamChat(messages: OllamaChatMessage[], opts: ProviderStreamOpts): Promise<ReadableStream<Uint8Array>>
+  /**
+   * Нестриминговый ответ целиком — для коротких сценариев (demo):
+   * минимальная поверхность отказов, никакого построчного парсинга.
+   */
+  chatOnce(messages: OllamaChatMessage[], opts: ProviderStreamOpts): Promise<string>
 }
 
 const ollamaProvider: AIProvider = {
@@ -35,7 +40,13 @@ const ollamaProvider: AIProvider = {
     streamOllamaChat(messages, {
       signal:     opts.signal,
       numPredict: opts.maxOutputTokens,
-      deadlineMs: 50_000,
+      deadlineMs: 45_000,
+    }),
+  chatOnce: (messages, opts) =>
+    ollamaChatOnce(messages, {
+      signal:     opts.signal,
+      numPredict: opts.maxOutputTokens,
+      deadlineMs: 45_000,
     }),
 }
 
@@ -62,6 +73,14 @@ const mockProvider: AIProvider = {
         await new Promise(r => setTimeout(r, 25))
       },
     })
+  },
+  async chatOnce(messages) {
+    const lastUser = [...messages].reverse().find(m => m.role === 'user')
+    return (
+      `**Тестовый режим** (mock, внешний AI не вызывался).\n\n` +
+      `Ваш запрос: «${(lastUser?.content ?? '').slice(0, 200)}»\n\n` +
+      `Подключите OLLAMA_API_KEY для боевых ответов.`
+    )
   },
 }
 
