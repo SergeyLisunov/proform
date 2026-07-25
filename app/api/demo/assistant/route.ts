@@ -158,22 +158,16 @@ export async function POST(req: Request) {
   mark('provider-start')
   let answer = ''
   try {
-    const stream = await provider.streamChat(messages, {
+    // stream:false — ответ одним JSON: для короткого demo минимальная
+    // поверхность отказов (прод-урок: построчный стрим на Vercel висел).
+    answer = await provider.chatOnce(messages, {
       signal: req.signal,
       maxOutputTokens: 250,
     })
-    mark('stream-open')
-    const reader = stream.getReader()
-    const decoder = new TextDecoder()
-    let first = true
-    for (;;) {
-      const { done, value } = await reader.read()
-      if (done) break
-      if (first) { mark('first-chunk'); first = false }
-      answer += decoder.decode(value, { stream: true })
-    }
-    answer += decoder.decode()
     mark(`collected ${answer.length} chars`)
+    if (!answer.trim()) {
+      return NextResponse.json({ ok: false, error: 'AI временно недоступен — попробуйте позже.' }, { status: 502 })
+    }
   } catch (e) {
     mark(`provider-error: ${e instanceof Error ? e.message : String(e)}`)
     return NextResponse.json({ ok: false, error: 'AI временно недоступен — попробуйте позже.' }, { status: 502 })
