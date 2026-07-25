@@ -73,10 +73,13 @@ export async function updateSession(request: NextRequest) {
   const isApiRoute = pathname.startsWith('/api/')
 
   // Public multi-segment prefixes — lead-magnet tools, invite tokens, network pages.
+  // /demo/* — публичные демо-витрины (AI-ассистент: 2 запроса на вымышленных
+  // данных, свой лимит в /api/demo/*); логин для них не требуется.
   const isPublicPrefix =
     pathname.startsWith('/tools/') ||
     pathname.startsWith('/invite/') ||
     pathname.startsWith('/p/') ||
+    pathname.startsWith('/demo/') ||
     pathname.startsWith('/network')
 
   // W7 Day 33: paths exempt from onboarding redirect (in addition to
