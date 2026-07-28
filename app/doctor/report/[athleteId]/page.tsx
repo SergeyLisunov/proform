@@ -113,7 +113,7 @@ export default function DoctorReportPage() {
     try {
       const res = await fetch(`/api/ai/medical-summary?athlete_id=${athleteId}&from=${from}&to=${to}`, { cache: 'no-store' })
       if (res.status === 503) {
-        setSummaryError('AI-резюме недоступно (ANTHROPIC_API_KEY не настроен)')
+        setSummaryError('AI-резюме временно недоступно')
         setSummary(null)
       } else {
         const json = await res.json()

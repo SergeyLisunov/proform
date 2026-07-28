@@ -138,7 +138,7 @@ export default function AdaptivePlanModal({
           ) : err ? (
             <Alert variant="destructive">
               Ошибка: {err === 'AI_NOT_CONFIGURED'
-                ? 'AI не настроен (ANTHROPIC_API_KEY)'
+                ? 'AI временно недоступен'
                 : err === 'COACH_ONLY' ? 'Доступно только тренерам'
                 : err === 'NOT_LINKED' ? 'Атлет не связан с вами'
                 : err}
