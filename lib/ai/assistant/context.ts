@@ -87,8 +87,10 @@ async function athleteSelfBlock(sb: Sb, athleteId: string, budget: number): Prom
       .gte('event_date', since)
       .order('event_date', { ascending: false })
       .limit(30),
+    // Колонки сверены с прод-схемой: у athlete_goals нет title —
+    // цель описывается metric_label + target_value/unit (смоук поймал).
     sb.from('athlete_goals')
-      .select('title, status, target_date')
+      .select('metric_label, target_value, target_unit, current_value, target_date, status')
       .eq('athlete_id', athleteId)
       .limit(5),
     sb.from('workouts')
@@ -139,12 +141,13 @@ async function coachBlock(sb: Sb, coachId: string, athleteId: string | null, bud
         .select('status, valid_until, review_needed')
         .eq('athlete_id', athleteId)
         .maybeSingle(),
-      // Только записи, которыми АТЛЕТ ПОДЕЛИЛСЯ с тренером (без диагнозов).
+      // Только записи, которыми ПОДЕЛИЛИСЬ с тренером (без диагнозов).
+      // Колонка даты называется `date` (не entry_date) — сверено со схемой.
       sb.from('medical_diary')
-        .select('entry_date, severity, title')
+        .select('date, severity, title')
         .eq('athlete_id', athleteId)
         .eq('is_shared_with_coach', true)
-        .order('entry_date', { ascending: false })
+        .order('date', { ascending: false })
         .limit(5),
     ])
     parts.push(
@@ -180,15 +183,17 @@ async function doctorBlock(sb: Sb, doctorId: string, athleteId: string | null, b
         .eq('athlete_id', athleteId)
         .order('created_at', { ascending: false })
         .limit(10),
+      // Схема injuries: onset_date/description (не injury_date/title);
+      // medical_diary: date/note/pain_level (не entry_date/symptoms).
       sb.from('injuries')
-        .select('injury_date, body_part, severity, status, title')
+        .select('onset_date, body_part, side, severity, status, description, expected_recovery_days')
         .eq('athlete_id', athleteId)
-        .order('injury_date', { ascending: false })
+        .order('onset_date', { ascending: false })
         .limit(10),
       sb.from('medical_diary')
-        .select('entry_date, severity, title, symptoms')
+        .select('date, entry_type, severity, title, note, pain_level, body_part')
         .eq('athlete_id', athleteId)
-        .order('entry_date', { ascending: false })
+        .order('date', { ascending: false })
         .limit(10),
     ])
     parts.push(
