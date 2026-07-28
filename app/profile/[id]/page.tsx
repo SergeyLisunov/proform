@@ -10,6 +10,7 @@ import { ReadinessCard } from '@/components/analytics/ReadinessCard'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
+import AskAiButton from '@/components/assistant/AskAiButton'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FEF0E7' },
@@ -389,6 +390,14 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>уровень</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Контекстный переход в плавающий AI-помощник: только связанный
+          тренер/врач; серверная перепроверка доступа на каждом сообщении. */}
+      {canSeeMedicalDossier && (user?.role === 'coach' || user?.role === 'doctor') && (
+        <div>
+          <AskAiButton viewerRole={user.role} athleteId={profile.id} athleteName={displayName} />
         </div>
       )}
 

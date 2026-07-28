@@ -100,7 +100,7 @@ export default function AnomalyAlertCard() {
 
       <div className="p-5">
         {disabled ? (
-          <p className="text-xs text-muted-foreground">Мониторинг отключён. Добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.</p>
+          <p className="text-xs text-muted-foreground">AI-мониторинг скоро появится — функция настраивается.</p>
         ) : error ? (
           <p className="text-xs text-red-600">Не удалось получить отчёт. <button onClick={load} className="underline">Повторить</button></p>
         ) : loading && !data ? (

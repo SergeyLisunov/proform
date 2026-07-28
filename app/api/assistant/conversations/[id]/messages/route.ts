@@ -79,6 +79,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   } | null
   if (!conv) return NextResponse.json({ ok: false, error: 'Диалог не найден.' }, { status: 404 })
 
+  // Изоляция истории по роли: диалог, созданный в другой роли аккаунта,
+  // продолжать нельзя — контекст и политика той роли не действуют.
+  if (conv.role_snapshot !== actor.profile.role) {
+    return NextResponse.json(
+      { ok: false, error: 'Диалог создан в другой роли — начните новый.' },
+      { status: 403 },
+    )
+  }
+
   // Anti-burst поверх месячной квоты (частотный, НЕ квотный лимит).
   const burst = await enforceAiRateLimit(req, actor.sb, 'assistant', 30, 3600)
   if (burst) {

@@ -145,7 +145,7 @@ export default function WeeklyPlannerCard() {
             description={paywall.message}
           />
         ) : disabled ? (
-          <p className="text-xs text-muted-foreground">Планировщик отключён. Добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.</p>
+          <p className="text-xs text-muted-foreground">AI-планировщик скоро появится — функция настраивается.</p>
         ) : (
           <>
             {!plan && (

@@ -71,7 +71,7 @@ export default function AiCoachCard() {
 
         {disabled ? (
           <div className="text-xs leading-snug text-white/80">
-            AI-рекомендации недоступны. Добавьте <code className="rounded bg-white/10 px-1">ANTHROPIC_API_KEY</code> в Vercel env — и карточка оживёт.
+            AI-рекомендации скоро появятся — эта функция настраивается.
           </div>
         ) : error ? (
           <div className="text-xs text-red-200">Не удалось получить рекомендацию. <button onClick={load} className="underline">Повторить</button></div>

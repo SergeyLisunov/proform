@@ -617,7 +617,7 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
           ) : error ? (
             <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
               Ошибка: {error === 'AI_NOT_CONFIGURED'
-                ? 'AI не настроен (ANTHROPIC_API_KEY не задан)'
+                ? 'AI-сводка временно недоступна'
                 : error === 'COACH_ONLY'
                 ? 'Доступно только тренерам'
                 : error}

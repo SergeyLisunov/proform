@@ -25,12 +25,16 @@ export async function GET() {
   if (!actor.config.history_enabled) {
     return NextResponse.json({ ok: true, conversations: [], historyEnabled: false })
   }
+  // Разделение истории по роли: показываем только диалоги, созданные в
+  // ТЕКУЩЕЙ роли (role_snapshot). Если роль аккаунта сменится, прошлые
+  // ролевые диалоги не подмешиваются (и наоборот).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data } = await (actor.sb as any)
     .from('ai_conversations')
     .select('id, title, context_type, context_entity_id, updated_at')
     .is('deleted_at', null)
     .eq('status', 'active')
+    .eq('role_snapshot', actor.profile.role)
     .order('updated_at', { ascending: false })
     .limit(30)
   return NextResponse.json({ ok: true, conversations: data ?? [], historyEnabled: true })

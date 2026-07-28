@@ -93,7 +93,7 @@ export default function CoachBriefingCard() {
             description={paywall.message}
           />
         ) : disabled ? (
-          <p className="text-xs text-muted-foreground">AI-брифинг отключён. Добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.</p>
+          <p className="text-xs text-muted-foreground">AI-брифинг скоро появится — функция настраивается.</p>
         ) : error ? (
           <p className="text-xs text-red-600">Не удалось получить брифинг. <button onClick={load} className="underline">Повторить</button></p>
         ) : loading && !data ? (

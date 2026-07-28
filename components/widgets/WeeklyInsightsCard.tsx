@@ -58,7 +58,7 @@ export default function WeeklyInsightsCard() {
       <div className="p-5">
         {disabled ? (
           <p className="text-xs text-muted-foreground leading-snug">
-            AI-инсайты отключены: добавьте <code className="rounded bg-accent px-1">ANTHROPIC_API_KEY</code>.
+            AI-инсайты скоро появятся — функция настраивается.
           </p>
         ) : error ? (
           <p className="text-xs text-red-600">Не удалось получить анализ. <button onClick={load} className="underline">Повторить</button></p>

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { RESERVED_TOP_LEVEL_SLUGS } from '@/lib/routes/reserved-slugs'
 
 /**
  * Middleware — refreshes the Supabase session cookie on every request
@@ -87,24 +88,12 @@ export async function updateSession(request: NextRequest) {
   const isOnboardingRoute = pathname.startsWith('/onboarding')
   const isLegalRoute      = pathname.startsWith('/legal/')
 
-  // Public org pages: /[orgSlug] — single-segment paths that do not collide with app slugs.
-  const reservedTopLevelSlugs = new Set([
-    'dashboard',
-    'calendar',
-    'diary',
-    'analytics',
-    'athletes',
-    'messages',
-    'settings',
-    'pricing',
-    'admin',
-    'org',
-    'auth',
-    'api',
-    'onboarding',
-  ])
+  // Public org pages: /[orgSlug] — single-segment paths that do not collide
+  // with app slugs. Список — ЕДИНЫЙ источник правды (ревью-находка: прежний
+  // локальный хардкод упускал /templates, /notes и др. — эти разделы
+  // кабинета не требовали авторизации).
   const isOrgPublicPage =
-    !reservedTopLevelSlugs.has(pathname.slice(1)) &&
+    !RESERVED_TOP_LEVEL_SLUGS.has(pathname.slice(1)) &&
     /^\/[a-z0-9-]+$/.test(pathname)
 
   if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage && !isApiRoute) {
