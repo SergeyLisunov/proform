@@ -4455,6 +4455,7 @@ export type Database = {
         | "role_change"
         | "privacy_change"
         | "assign_athlete"
+        | "clearance_override"
       calendar_view: "day" | "week" | "month" | "quarter" | "year"
       competition_status:
         | "planned"
@@ -4600,6 +4601,7 @@ export const Constants = {
         "role_change",
         "privacy_change",
         "assign_athlete",
+        "clearance_override",
       ],
       calendar_view: ["day", "week", "month", "quarter", "year"],
       competition_status: [

@@ -1,52 +1,70 @@
+/**
+ * /org/analytics — серверная страница.
+ *
+ * P1: гейт стоял на `me.role !== 'organization'`, а все счётчики фильтровались
+ * по `me.id`. Для org_admin оба условия ложны: глобальной роли нет, а его
+ * users.id — это не organizations.id клуба. Обе половины закрывает
+ * серверный резолвер getOrgContext().
+ */
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getOrgContext } from '@/lib/org/org-context'
+import { isPlatformAdmin } from '@/lib/permissions'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
 
 export default async function OrgAnalyticsPage() {
-  const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
-  if (!authUser) redirect('/auth/login')
+  const ctx = await getOrgContext()
+  if (!ctx) redirect('/auth/login')
+  // Платформенный admin сохраняет доступ (compliance/поддержка), как и раньше.
+  if (!ctx.canManage && !isPlatformAdmin(ctx.globalRole)) redirect('/dashboard')
 
-  const { data: me } = await supabase
-    .from('users')
-    .select('id, role')
-    .eq('auth_id', authUser.id)
-    .single()
-  if (!me) redirect('/auth/login')
-  if (me.role !== 'organization' && me.role !== 'admin') redirect('/dashboard')
+  const orgId = ctx.orgId
+  if (!orgId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3 text-center">
+        <i className="ki-filled ki-office-bag text-3xl text-muted-foreground" />
+        <p className="text-sm font-semibold text-foreground">Клуб не найден</p>
+        <p className="text-xs text-muted-foreground max-w-md">
+          Вы не управляете ни одной организацией — аналитику показывать не по чему.
+        </p>
+      </div>
+    )
+  }
+
+  const supabase = await createClient()
 
   const { data: org } = await supabase
     .from('organizations')
     .select('id, org_name, members_count, coaches_count')
-    .eq('id', me.id)
+    .eq('id', orgId)
     .maybeSingle()
 
   const { count: activeMembers } = await supabase
     .from('org_members')
     .select('id', { count: 'exact', head: true })
-    .eq('org_id', me.id)
+    .eq('org_id', orgId)
     .eq('status', 'active')
 
   const { count: athleteMembers } = await supabase
     .from('org_members')
     .select('id', { count: 'exact', head: true })
-    .eq('org_id', me.id)
+    .eq('org_id', orgId)
     .eq('member_role', 'athlete')
     .eq('status', 'active')
 
   const { count: coachMembers } = await supabase
     .from('org_members')
     .select('id', { count: 'exact', head: true })
-    .eq('org_id', me.id)
+    .eq('org_id', orgId)
     .eq('member_role', 'coach')
     .eq('status', 'active')
 
   const { count: pendingMembers } = await supabase
     .from('org_members')
     .select('id', { count: 'exact', head: true })
-    .eq('org_id', me.id)
+    .eq('org_id', orgId)
     .eq('status', 'pending')
 
   const kpis = [

@@ -94,8 +94,11 @@ export default function AthleteAdherenceCard({ nudges }: AthleteAdherenceCardPro
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
+          {/* P1 — было href="/workouts": маршрута с таким именем в app/ нет,
+              CTA «Открыть план» вела на 404. План атлета (prescribed workouts
+              на неделю вперёд) живёт на /athlete/dashboard. */}
           <Link
-            href="/workouts"
+            href="/athlete/dashboard"
             className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 text-sm font-bold shadow-sm no-underline"
           >
             <i className="ki-filled ki-abstract-26 text-sm" />

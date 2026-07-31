@@ -77,13 +77,36 @@ export async function POST(req: Request) {
   }
 
   // Аудит — обязателен: смена роли меняет объём доступа к данным.
-  await admin.from('audit_logs').insert({
+  //
+  // action — enum public.audit_action, а не свободный текст. Здесь стояло
+  // 'admin.user.role_changed', которого в enum нет: Postgres отвечал 22P02,
+  // результат insert никто не проверял, и маршрут возвращал 200 с пустым
+  // журналом. Пишем валидное значение, детализацию — в payload.
+  const { error: auditErr } = await admin.from('audit_logs').insert({
     actor_id: actorId,
-    action: 'admin.user.role_changed',
+    action: 'role_change',
     target_table: 'users',
     target_id: userId,
-    payload: { from: prevRole, to: nextRole, email: (target as { email: string }).email },
+    payload: {
+      kind: 'admin.user.role_changed',
+      from: prevRole,
+      to: nextRole,
+      email: (target as { email: string }).email,
+    },
   })
 
-  return NextResponse.json({ ok: true, role: nextRole, previousRole: prevRole })
+  // Роль уже изменена, откатывать её из-за журнала неверно — клиент получил
+  // бы «не сработало» при фактически применённом изменении. Поэтому провал
+  // аудита не отменяет операцию, но и не остаётся невидимым: пишем в лог
+  // сервера и честно отдаём audited в ответе.
+  if (auditErr) {
+    console.error('[admin.users.role] запись в audit_logs не удалась:', auditErr.message)
+  }
+
+  return NextResponse.json({
+    ok: true,
+    role: nextRole,
+    previousRole: prevRole,
+    audited: !auditErr,
+  })
 }

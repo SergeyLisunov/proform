@@ -63,6 +63,21 @@ export async function notify(input: NotifyInput): Promise<void> {
   if (error) console.warn('[notify] failed:', error.message)
 }
 
+/**
+ * Батч уведомлений. Silent-fail, как и notify().
+ *
+ * ВАЖНО про частичный отказ: INSERT политика notifications (миграция 082)
+ * зовёт can_notify(actor, user_id) в WITH CHECK, а Postgres откатывает
+ * statement ЦЕЛИКОМ, если хоть одна строка не прошла проверку. Из-за этого
+ * один «неразрешённый» адресат убивал весь батч: например, празднование
+ * личного рекорда не доходило ни до атлета, ни до тренеров, если в списке
+ * был родитель (can_notify не знал про parent_links — чиним в миграции 108).
+ *
+ * Поэтому: быстрый путь — одна вставка (1 round-trip, как раньше); если она
+ * отвергнута — повторяем построчно, чтобы потерялись только реально
+ * запрещённые адресаты. Дубли исключены: при ошибке батча не вставилось
+ * ничего (statement-level rollback).
+ */
 export async function notifyMany(inputs: NotifyInput[]): Promise<void> {
   if (inputs.length === 0) return
   const sb = createClient()
@@ -75,8 +90,23 @@ export async function notifyMany(inputs: NotifyInput[]): Promise<void> {
     entity_id:   i.entity_id ?? null,
     action_url:  i.action_url ?? null,
   }))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (sb as any).from('notifications').insert(rows)
-  if (error) console.warn('[notifyMany] failed:', error.message)
+  if (!error) return
+
+  console.warn('[notifyMany] batch rejected, retrying row-by-row:', error.message)
+
+  const results = await Promise.all(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rows.map(row => (sb as any).from('notifications').insert(row)),
+  )
+  const failed = results.filter((r: { error: { message: string } | null }) => r.error)
+  if (failed.length > 0) {
+    console.warn(
+      `[notifyMany] ${failed.length}/${rows.length} rows rejected:`,
+      failed.map((r: { error: { message: string } | null }) => r.error?.message).join('; '),
+    )
+  }
 }
 
 export async function getUnreadCount(userId: string): Promise<number> {

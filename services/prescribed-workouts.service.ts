@@ -58,7 +58,11 @@ export async function prescribeWorkout(input: {
     body: `${input.name ?? 'Тренировка'} · ${input.event_date}${input.activity_duration_min ? ` · ${input.activity_duration_min} мин` : ''}`,
     entity_type: 'workout',
     entity_id: row.id,
-    action_url: '/workouts',
+    // P1 — раньше здесь был '/workouts': такого маршрута в app/ нет и никогда
+    // не было, атлет из уведомления попадал на 404. /athlete/dashboard — это
+    // ровно тот экран, который грузит workouts с event_type='prescribed' на
+    // ближайшую неделю, то есть показывает именно назначенную тренировку.
+    action_url: '/athlete/dashboard',
   })
 
   return row

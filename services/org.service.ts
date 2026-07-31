@@ -108,14 +108,28 @@ export async function getOrgMembers(orgId: string): Promise<OrgMember[]> {
     .map(rowToOrgMember)
 }
 
-export async function getAllOrgs(): Promise<Organization[]> {
+/**
+ * Полный список организаций для админ-модерации.
+ *
+ * Возвращает ошибку отдельным полем, а не глотает её: до миграции 107 на
+ * organizations не было admin-политики RLS, запрос отдавал только
+ * верифицированные строки — и экран /admin/orgs честно рисовал «Ожидают: 0».
+ * Пустой ответ и сбой выглядели одинаково, поэтому мёртвый сценарий
+ * модерации никак себя не проявлял.
+ */
+export async function getAllOrgs(): Promise<{ orgs: Organization[]; error: string | null }> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('organizations')
     .select('*')
     .order('created_at', { ascending: false })
 
-  return ((data ?? []) as OrgRow[]).map(rowToOrganization)
+  if (error) {
+    console.warn('[org.service.getAllOrgs]', error.message)
+    return { orgs: [], error: error.message }
+  }
+
+  return { orgs: ((data ?? []) as OrgRow[]).map(rowToOrganization), error: null }
 }
 
 export async function getOrgStats(orgId: string) {
@@ -173,11 +187,33 @@ export async function updateMemberStatus(
   await supabase.from('org_members').update(payload).eq('id', memberId)
 }
 
-export async function verifyOrg(orgId: string): Promise<void> {
+/**
+ * Верификация организации админом. RLS-политика organizations_admin_update
+ * (миграция 107) — единственное, что реально разрешает эту запись.
+ *
+ * `.select('id')` здесь не для данных, а для проверки факта записи: когда
+ * строку отсекает RLS, PostgREST отвечает успехом с нулём затронутых строк,
+ * а не ошибкой. Прежняя версия игнорировала и то и другое, возвращала void —
+ * и UI ставил галочку «Проверено» на организацию, которая в базе осталась
+ * неверифицированной (обман до первой перезагрузки страницы).
+ */
+export async function verifyOrg(orgId: string): Promise<{ ok: boolean; error: string | null }> {
   const supabase = createClient()
   const payload: OrganizationUpdate = { is_verified: true }
-  await supabase
+  const { data, error } = await supabase
     .from('organizations')
     .update(payload)
     .eq('id', orgId)
+    .select('id')
+    .maybeSingle()
+
+  if (error) {
+    console.warn('[org.service.verifyOrg]', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data) {
+    return { ok: false, error: 'Организация не обновлена — недостаточно прав' }
+  }
+
+  return { ok: true, error: null }
 }

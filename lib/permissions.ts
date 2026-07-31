@@ -55,6 +55,30 @@ export function isClubManager(
   return isOrgOwner(globalRole, scopedOrgRole) || scopedOrgRole === 'org_admin'
 }
 
+/**
+ * Значения `org_members.member_role`, которые дают управление клубом.
+ *
+ * Дефект, ради которого константа появилась: список `['org_owner','org_admin']`
+ * был скопирован в useEffectiveRole и в каждый будущий резолвер, поэтому
+ * добавление роли требовало grep'а. Теперь он один и используется и в
+ * `.in('member_role', …)` фильтрах запросов, и в чистом резолвере.
+ */
+export const CLUB_MANAGER_MEMBER_ROLES: readonly ScopedOrgRole[] = ['org_owner', 'org_admin']
+
+/**
+ * Type guard: строка из БД — это управляющая org-роль?
+ *
+ * Нужен потому, что `org_members.member_role` в схеме — свободная строка
+ * (org_owner|org_admin|coach|doctor|specialist|athlete), а `ScopedOrgRole`
+ * покрывает только управляющие две. Без guard'а call-site вынужден писать
+ * `as ScopedOrgRole` и теряет проверку.
+ */
+export function isClubManagerMemberRole(
+  memberRole: string | null | undefined,
+): memberRole is ScopedOrgRole {
+  return memberRole === 'org_owner' || memberRole === 'org_admin'
+}
+
 /** Врач (глобальная роль). */
 export function isDoctor(role: GlobalRole | undefined): boolean {
   return role === 'doctor'

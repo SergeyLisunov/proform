@@ -107,6 +107,12 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
     title: 'Мой кокпит',
     items: [
       { id: 'coach.athletes', href: '/athletes', icon: 'ki-abstract-26', label: 'Мои атлеты', roles: ['coach'] },
+      // P1 — /coach/plans существует и является единственным рабочим путём
+      // назначения тренировок (билдер недельного плана → prescribed workouts),
+      // но входа в навигации у него не было: тренер попадал туда только по
+      // прямой ссылке. Ставим сразу за «Мои атлеты» — это второй шаг того же
+      // сценария «открыть атлета → выдать план».
+      { id: 'coach.plans',    href: '/coach/plans', icon: 'ki-notepad-edit', label: 'Планы тренировок', roles: ['coach'] },
     ],
   },
   // Этап 6a sidebar-rebuild — Owner/Org Admin «Клуб». Главные задачи Owner'а
@@ -168,6 +174,14 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // При rebuild (этап 3) athlete-вариант остаётся, но это de-facto «дневник
       // тренировок» — будущий /training pillar после consolidate /calendar+/diary.
       { id: 'training.diary_athlete', href: '/diary', icon: 'ki-book-open',     label: 'Дневник тренировок', roles: ['athlete'] },
+      // P1 — /athlete/goals и /athlete/progress существуют с W5, но были
+      // недостижимы из меню: попасть туда можно было только с /athlete/dashboard,
+      // на который тоже нет входа. Ставим рядом с athlete-only «Дневником» —
+      // мобильная навигация подхватывает их через filterSidebarForRole.
+      // Top-level slug 'athlete' уже в RESERVED_TOP_LEVEL_SLUGS, так что
+      // floating-assistant.test.ts (перебирает все href сайдбара) остаётся зелёным.
+      { id: 'training.goals_athlete',    href: '/athlete/goals',    icon: 'ki-medal-star',    label: 'Мои цели',    roles: ['athlete'] },
+      { id: 'training.progress_athlete', href: '/athlete/progress', icon: 'ki-chart-line-up', label: 'Мой прогресс', roles: ['athlete'] },
       { id: 'training.diary_coach',   href: '/diary', icon: 'ki-notepad-edit',  label: 'Дневник тренера',     roles: ['coach'] },
       { id: 'training.diary_doctor',  href: '/diary', icon: 'ki-heart-circle',  label: 'Дневник врача',       roles: ['doctor'] },
       // Notes — рабочий инструмент тренера/врача (комментарии). Athlete не

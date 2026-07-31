@@ -103,17 +103,39 @@ export async function createWallPost(post: {
   return rowToPost(data as WallPostRow)
 }
 
-export async function togglePin(postId: string, isPinned: boolean): Promise<void> {
+/**
+ * Возвращает true, только если строка действительно изменена.
+ *
+ * Раньше функция возвращала void и глотала результат. Под RLS это опаснее
+ * обычного: UPDATE, не нашедший ни одной доступной строки, не считается
+ * ошибкой — supabase-js отдаёт error = null, и вызывающий код показывал
+ * «Готово», хотя не изменилось ничего. Ровно на этом обжигались раньше
+ * (см. комментарий к softDeletePost ниже), поэтому здесь и далее судим по
+ * фактически затронутым строкам, а не по отсутствию ошибки.
+ */
+export async function togglePin(postId: string, isPinned: boolean): Promise<boolean> {
   const supabase = createClient()
   const payload: WallPostUpdate = { is_pinned: isPinned }
-  await supabase.from('wall_posts').update(payload).eq('id', postId)
+  const { data, error } = await supabase
+    .from('wall_posts').update(payload).eq('id', postId).select('id')
+  if (error) {
+    console.warn('[wall.togglePin]', error.message)
+    return false
+  }
+  return (data ?? []).length > 0
 }
 
 // Soft delete: set deleted_at to now(). Read paths filter on
 // `deleted_at IS NULL`. The previous implementation set a non-existent
 // `is_deleted` column — every soft delete silently failed.
-export async function softDeletePost(postId: string): Promise<void> {
+export async function softDeletePost(postId: string): Promise<boolean> {
   const supabase = createClient()
   const payload: WallPostUpdate = { deleted_at: new Date().toISOString() }
-  await supabase.from('wall_posts').update(payload).eq('id', postId)
+  const { data, error } = await supabase
+    .from('wall_posts').update(payload).eq('id', postId).select('id')
+  if (error) {
+    console.warn('[wall.softDeletePost]', error.message)
+    return false
+  }
+  return (data ?? []).length > 0
 }

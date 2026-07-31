@@ -15,6 +15,14 @@ import {
   listMyAdminInvites, revokeAdminInvite,
   type AdminUserInvite, type AdminInviteRole,
 } from '@/services/admin-invites.service'
+import {
+  listRecentAuditLog,
+  type AuditAction, type AuditLogEntry,
+} from '@/services/admin-audit.service'
+import {
+  assignAthleteToCoach, listCoachAthleteLinks,
+  type CoachAthleteLink,
+} from '@/services/admin-assignments.service'
 
 function getSB() {
   return createBrowserClient(
@@ -25,56 +33,29 @@ function getSB() {
 
 type AdminTab = 'users' | 'verification' | 'privacy' | 'audit' | 'system'
 
-type DBUser = { id: string; name: string; email: string; role: string; created_at: string }
+type DBUser = { id: string; name: string | null; email: string | null; role: string; created_at: string; is_searchable: boolean | null }
 type RecentActivity = { id: string; actor: string; action: string; detail: string; table_name: string; created_at: string }
 
-type AdminUser = {
-  email: string
-  name: string
-  role: 'athlete' | 'coach' | 'admin'
-  status: 'active'
-  created: string
-  lastLogin: string
+/** Состояние живой проверки связи с БД — единственное, что панель может
+ *  утверждать о «системе» без внешнего мониторинга. */
+type DbPing = {
+  state: 'idle' | 'checking' | 'ok' | 'fail'
+  ms:    number | null
+  at:    string | null
+  error: string | null
 }
 
-type AuditEntry = {
-  actor: string
-  action: 'login' | 'create' | 'update' | 'privacy_change' | 'role_change' | 'delete'
-  target: 'users' | 'workouts' | 'athletes' | 'observation_diary'
-  detail: string
-  time: string
-}
-
-const USERS: AdminUser[] = [
-  { email: 'athlete@proform.test', name: 'Sara Kowalski', role: 'athlete', status: 'active', created: '2025-01-15', lastLogin: '2 часа назад' },
-  { email: 'coach@proform.test', name: 'Alex Trainer', role: 'coach', status: 'active', created: '2025-01-10', lastLogin: '1 день назад' },
-  { email: 'admin@proform.test', name: 'Admin User', role: 'admin', status: 'active', created: '2025-01-01', lastLogin: 'Только что' },
-]
-
-const AUDIT: AuditEntry[] = [
-  { actor: 'Sara Kowalski', action: 'login', target: 'users', detail: 'Вход через веб-интерфейс', time: '2 ч назад' },
-  { actor: 'Sara Kowalski', action: 'create', target: 'workouts', detail: 'Создана тренировка на 62 минуты', time: '2 ч назад' },
-  { actor: 'Sara Kowalski', action: 'update', target: 'workouts', detail: 'Публичность тренировки включена', time: '3 ч назад' },
-  { actor: 'Sara Kowalski', action: 'privacy_change', target: 'athletes', detail: 'Тренировки доступны только тренерам', time: '1 д назад' },
-  { actor: 'Alex Trainer', action: 'create', target: 'observation_diary', detail: 'Добавлена заметка: Возвращение в форму', time: '1 д назад' },
-  { actor: 'Admin User', action: 'role_change', target: 'users', detail: 'Подтверждена роль атлета для Sara', time: '5 д назад' },
-]
-
-const SYSTEM_SERVICES = [
-  { service: 'База данных Supabase', region: 'Франкфурт', status: 'Работает', uptime: '99.9%', icon: 'ki-data', tone: 'blue' },
-  { service: 'Аутентификация', region: 'Глобальный контур', status: 'Работает', uptime: '100%', icon: 'ki-security-user', tone: 'green' },
-  { service: 'Синхронизация WHOOP', region: 'Европейский узел', status: 'Активно', uptime: '99.7%', icon: 'ki-chart-line-up', tone: 'violet' },
-  { service: 'Vercel Edge', region: 'Глобальный контур', status: 'Работает', uptime: '100%', icon: 'ki-route', tone: 'orange' },
-  { service: 'Политики доступа', region: 'Слой данных', status: 'Включено', uptime: '100%', icon: 'ki-shield-tick', tone: 'emerald' },
-  { service: 'Журнал действий', region: 'Слой данных', status: 'Активно', uptime: '100%', icon: 'ki-abstract-26', tone: 'slate' },
-] as const
+// Ревизия P1: отсюда удалены константы USERS (три выдуманных аккаунта),
+// AUDIT (шесть выдуманных записей журнала) и SYSTEM_SERVICES (uptime «99.9%»
+// и статусы сервисов, которые никто не измерял). Все три рендерились как
+// настоящие данные рядом с реальными загрузчиками.
 
 const TABS: { id: AdminTab; label: string; icon: string; hint: string }[] = [
-  { id: 'users', label: 'Пользователи', icon: 'ki-people', hint: 'Роли, статусы и доступы' },
+  { id: 'users', label: 'Пользователи', icon: 'ki-people', hint: 'Роли и приглашения' },
   { id: 'verification', label: 'Верификация', icon: 'ki-verify', hint: 'Подтверждение тренеров' },
-  { id: 'privacy', label: 'Приватность', icon: 'ki-lock', hint: 'Политики видимости данных' },
-  { id: 'audit', label: 'Журнал действий', icon: 'ki-notepad-edit', hint: 'Последние изменения и входы' },
-  { id: 'system', label: 'Система', icon: 'ki-setting-2', hint: 'Ключевые сервисы и контуры' },
+  { id: 'privacy', label: 'Приватность', icon: 'ki-lock', hint: 'Только просмотр' },
+  { id: 'audit', label: 'Журнал действий', icon: 'ki-notepad-edit', hint: 'Записи audit_logs' },
+  { id: 'system', label: 'Система', icon: 'ki-setting-2', hint: 'Проверка связи с БД' },
 ]
 
 const ROLE_BADGE: Record<string, string> = {
@@ -83,6 +64,7 @@ const ROLE_BADGE: Record<string, string> = {
   admin: 'bg-violet-50 text-violet-700 border border-violet-200',
   organization: 'bg-blue-50 text-blue-700 border border-blue-200',
   doctor: 'bg-red-50 text-red-700 border border-red-200',
+  specialist: 'bg-sky-50 text-sky-700 border border-sky-200',
 }
 
 const ROLE_LABEL: Record<string, string> = {
@@ -91,60 +73,66 @@ const ROLE_LABEL: Record<string, string> = {
   admin: 'Администратор',
   organization: 'Организация',
   doctor: 'Доктор',
+  specialist: 'Специалист',
 }
 
-const STATUS_LABEL: Record<AdminUser['status'], string> = {
-  active: 'Активен',
-}
+/** Ровно тот же белый список, что проверяет сервер в /api/admin/users/role —
+ *  предлагать в UI роль, которую маршрут отвергнет, значит снова обманывать. */
+const ASSIGNABLE_ROLES = ['athlete', 'coach', 'doctor', 'specialist', 'organization', 'admin'] as const
 
-const ACTION_BADGE: Record<AuditEntry['action'], string> = {
+const ACTION_BADGE: Record<AuditAction, string> = {
   login: 'bg-blue-50 text-blue-700 border border-blue-200',
+  logout: 'bg-slate-100 text-slate-700 border border-slate-200',
   create: 'bg-green-50 text-green-700 border border-green-200',
   update: 'bg-orange-50 text-orange-700 border border-orange-200',
   privacy_change: 'bg-violet-50 text-violet-700 border border-violet-200',
   role_change: 'bg-red-50 text-red-700 border border-red-200',
+  assign_athlete: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
   delete: 'bg-red-50 text-red-700 border border-red-200',
+  clearance_override: 'bg-amber-50 text-amber-800 border border-amber-300',
 }
 
-const ACTION_LABEL: Record<AuditEntry['action'], string> = {
+const ACTION_LABEL: Record<AuditAction, string> = {
   login: 'Вход',
+  logout: 'Выход',
   create: 'Создание',
   update: 'Обновление',
   privacy_change: 'Приватность',
   role_change: 'Смена роли',
+  assign_athlete: 'Назначение тренера',
   delete: 'Удаление',
+  // Обход врачебного ограничения — событие для разбора, поэтому у него
+  // собственный ярлык, а не безликое «Обновление» (миграция 109).
+  clearance_override: 'Обход допуска',
 }
 
-const TARGET_LABEL: Record<AuditEntry['target'], string> = {
+/** Человеческие имена только для таблиц, которые реально встречаются в
+ *  audit_logs; для остальных показываем сырое имя, а не выдумываем перевод. */
+const TARGET_LABEL: Record<string, string> = {
   users: 'Пользователи',
   workouts: 'Тренировки',
   athletes: 'Атлеты',
+  trainer_athletes: 'Связки тренер↔спортсмен',
   observation_diary: 'Дневник наблюдений',
 }
 
-const SYSTEM_TONE: Record<(typeof SYSTEM_SERVICES)[number]['tone'], { bg: string; icon: string; dot: string }> = {
-  blue: { bg: 'bg-blue-50', icon: 'text-blue-600', dot: 'bg-blue-500' },
-  green: { bg: 'bg-green-50', icon: 'text-green-600', dot: 'bg-green-500' },
-  violet: { bg: 'bg-violet-50', icon: 'text-violet-600', dot: 'bg-violet-500' },
-  orange: { bg: 'bg-orange-50', icon: 'text-orange-600', dot: 'bg-orange-500' },
-  emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600', dot: 'bg-emerald-500' },
-  slate: { bg: 'bg-slate-100', icon: 'text-slate-600', dot: 'bg-slate-500' },
+function getInitials(name: string | null | undefined) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '—'
+  return parts.map(part => part[0]).join('').slice(0, 2).toUpperCase()
 }
 
-const PRIVACY_RESOURCES = [
-  { id: 'profile', label: 'Профиль' },
-  { id: 'workouts', label: 'Тренировки' },
-  { id: 'metrics', label: 'Метрики' },
-  { id: 'competitions', label: 'Соревнования' },
-  { id: 'diary', label: 'Дневник' },
-] as const
+function formatDateTime(iso: string | null) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
+/** payload журнала — свободный jsonb; печатаем как есть, без домысливания. */
+function describePayload(payload: Record<string, unknown> | null): string {
+  if (!payload || typeof payload !== 'object') return 'Без деталей'
+  const parts = Object.entries(payload).map(([key, value]) =>
+    `${key}: ${value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value)}`)
+  return parts.length > 0 ? parts.join(' · ') : 'Без деталей'
 }
 
 export default function AdminPage() {
@@ -163,6 +151,13 @@ export default function AdminPage() {
   // Activity
   const [activity, setActivity] = useState<RecentActivity[]>([])
   const [actLoading, setActLoading] = useState(false)
+
+  // Журнал действий — реальные audit_logs вместо константы AUDIT (ревизия P1)
+  const [auditEntries, setAuditEntries] = useState<AuditLogEntry[]>([])
+  const [auditLoading, setAuditLoading] = useState(true)
+
+  // Вкладка «Система»: измеряемая проверка связи вместо выдуманного uptime
+  const [dbPing, setDbPing] = useState<DbPing>({ state: 'idle', ms: null, at: null, error: null })
 
   // W9 Day 45: verification tab
   const [verCoaches, setVerCoaches] = useState<VerifiableCoach[]>([])
@@ -281,6 +276,12 @@ export default function AdminPage() {
     }
   }, [bulkSaving, parsedBulkEmails, inviteRole, success, loadInvites])
 
+  /** Хост Supabase — публичная переменная, единственный проверяемый факт
+   *  о том, к какому контуру подключена панель. */
+  const supabaseHost = useMemo(() => {
+    try { return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').host } catch { return '—' }
+  }, [])
+
   const onRevokeInvite = useCallback(async (inviteId: string) => {
     const res = await revokeAdminInvite(inviteId)
     if (!res.ok) {
@@ -309,23 +310,30 @@ export default function AdminPage() {
   const [assignAthlete, setAssignAthlete] = useState('')
   const [assignCoach, setAssignCoach] = useState('')
   const [assigning, setAssigning] = useState(false)
+  const [links, setLinks] = useState<CoachAthleteLink[]>([])
+  const [linksLoading, setLinksLoading] = useState(false)
 
   const loadUsers = useCallback(async () => {
     setUsersLoading(true)
     const sb = getSB()
     const { data, error } = await sb
       .from('users')
-      .select('id, name, email, role, created_at')
+      .select('id, name, email, role, created_at, is_searchable')
       .order('created_at', { ascending: false })
     if (error) { console.error(error); setUsersLoading(false); return }
     const list = (data ?? []) as DBUser[]
     setUsers(list)
-    setStats({
+    // Обновляем ТОЛЬКО свои поля. Абсолютный setStats с workouts: 0 затирал
+    // счётчик, который параллельно проставляет loadWorkoutCount: запросы
+    // стартуют вместе, а count по workouts (head:true) обычно возвращается
+    // раньше полного select по users — и реальное число заменялось нулём
+    // до перезагрузки страницы.
+    setStats(prev => ({
+      ...prev,
       total: list.length,
       athletes: list.filter(u => u.role === 'athlete').length,
       coaches: list.filter(u => u.role === 'coach').length,
-      workouts: 0, // loaded separately
-    })
+    }))
     setUsersLoading(false)
   }, [])
 
@@ -356,19 +364,50 @@ export default function AdminPage() {
     setActLoading(false)
   }, [])
 
+  const loadAuditLog = useCallback(async () => {
+    setAuditLoading(true)
+    setAuditEntries(await listRecentAuditLog(50))
+    setAuditLoading(false)
+  }, [])
+
+  const loadLinks = useCallback(async () => {
+    setLinksLoading(true)
+    setLinks(await listCoachAthleteLinks())
+    setLinksLoading(false)
+  }, [])
+
+  /** Единственное проверяемое утверждение о «системе»: база ответила за N мс. */
+  const checkDbConnection = useCallback(async () => {
+    setDbPing(prev => ({ ...prev, state: 'checking' }))
+    const startedAt = performance.now()
+    const { error } = await getSB().from('users').select('id', { count: 'exact', head: true })
+    const ms = Math.round(performance.now() - startedAt)
+    setDbPing({
+      state: error ? 'fail' : 'ok',
+      ms,
+      at: new Date().toISOString(),
+      error: error?.message ?? null,
+    })
+  }, [])
+
   useEffect(() => {
     if (user?.role !== 'admin') return
-    loadUsers()
-    loadWorkoutCount()
-  }, [user, loadUsers, loadWorkoutCount])
+    void loadUsers()
+    void loadWorkoutCount()
+    void loadAuditLog()
+  }, [user, loadUsers, loadWorkoutCount, loadAuditLog])
 
   useEffect(() => {
-    if (tab === 'audit' && activity.length === 0) loadActivity()
+    if (user?.role !== 'admin') return
+    if (tab === 'audit' && activity.length === 0) void loadActivity()
     if (tab === 'verification' && verCoaches.length === 0) void loadVerCoaches()
     if (tab === 'users' && invites.length === 0) void loadInvites()
-  }, [tab, activity.length, loadActivity])
+    if (tab === 'system' && dbPing.state === 'idle') void checkDbConnection()
+  }, [tab, user, activity.length, verCoaches.length, invites.length, dbPing.state,
+      loadActivity, loadVerCoaches, loadInvites, checkDbConnection])
 
   async function changeRole(userId: string, newRole: string) {
+    if (changingRole) return
     setChangingRole(userId)
     // Смена роли идёт через серверный маршрут: он перепроверяет права админа
     // на сервере и пишет запись в audit_logs. Прямая запись users.role из
@@ -386,25 +425,45 @@ export default function AdminPage() {
       setChangingRole(null)
       return
     }
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    const nextUsers = users.map(u => u.id === userId ? { ...u, role: newRole } : u)
+    setUsers(nextUsers)
+    // Пересчитываем срезы по ролям на месте — иначе карточки «Атлеты/Тренеры»
+    // разъезжаются с таблицей до следующей полной загрузки.
+    setStats(prev => ({
+      ...prev,
+      athletes: nextUsers.filter(u => u.role === 'athlete').length,
+      coaches:  nextUsers.filter(u => u.role === 'coach').length,
+    }))
     success('Роль обновлена')
+    void loadAuditLog() // смена роли пишется в журнал — показываем свежую запись
     setChangingRole(null)
   }
 
+  /**
+   * Назначение тренера. Прежняя версия писала в athletes.coach_id — колонку,
+   * которой нет в модели доступа; реальная связь живёт в trainer_athletes
+   * (см. services/admin-assignments.service.ts).
+   */
   async function handleAssign() {
-    if (!assignAthlete || !assignCoach) return
+    if (!assignAthlete || !assignCoach || assigning) return
     setAssigning(true)
-    const sb = getSB()
-    const { error } = await sb
-      .from('athletes')
-      .update({ coach_id: assignCoach })
-      .eq('id', assignAthlete)
-    if (error) { toastError('Ошибка назначения тренера'); setAssigning(false); return }
-    success('Тренер назначен')
+    const res = await assignAthleteToCoach({ athleteId: assignAthlete, coachId: assignCoach })
     setAssigning(false)
+    if (!res.ok) {
+      toastError(res.error ?? 'Не удалось назначить тренера')
+      return
+    }
+    if (res.alreadyLinked) {
+      success('Связь уже существует — ничего не изменилось')
+    } else {
+      success('Тренер назначен')
+      if (res.auditWarning) toastError(`Связь создана, но запись в журнал не прошла: ${res.auditWarning}`)
+    }
     setShowAssign(false)
     setAssignAthlete('')
     setAssignCoach('')
+    void loadLinks()
+    void loadAuditLog()
   }
 
   if (user?.role !== 'admin') {
@@ -421,15 +480,24 @@ export default function AdminPage() {
     )
   }
 
-  const todayActiveCount = USERS.filter(item => item.lastLogin === 'Только что' || item.lastLogin.includes('час')).length
-  const athleteCount = USERS.filter(item => item.role === 'athlete').length
-  const coachCount = USERS.filter(item => item.role === 'coach').length
+  const athleteCount = stats.athletes
+  const coachCount = stats.coaches
+  const adminCount = users.filter(u => u.role === 'admin').length
+  const athleteOptions = users.filter(u => u.role === 'athlete')
+  const coachOptions = users.filter(u => u.role === 'coach')
+  const nameById = new Map(users.map(u => [u.id, u.name ?? u.email ?? u.id]))
+  const coachesOfSelectedAthlete = assignAthlete
+    ? links.filter(l => l.athlete_id === assignAthlete)
+    : []
 
+  // Все четыре плитки — счётчики из БД. Прежние «Сущности данных: 13» и
+  // «Журналы и sync: 100K» ничего не считали (ревизия P1).
+  const dash = (value: number) => (usersLoading ? '—' : value)
   const summary = [
-    { label: 'Пользователи', value: USERS.length, hint: 'Все тестовые аккаунты контура', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF' },
-    { label: 'Активны сегодня', value: todayActiveCount, hint: 'Свежие входы и действия за день', icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4' },
-    { label: 'Сущности данных', value: '13', hint: 'Базовые системные таблицы и политики', icon: 'ki-data', color: '#F35703', bg: '#FEF0E7' },
-    { label: 'Журналы и sync', value: '100K', hint: 'События аудита и интеграций', icon: 'ki-chart-line-up', color: '#9333EA', bg: '#FAF5FF' },
+    { label: 'Пользователи', value: dash(stats.total), hint: 'Строк в таблице users', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF' },
+    { label: 'Атлеты', value: dash(stats.athletes), hint: 'Пользователи с ролью athlete', icon: 'ki-check-circle', color: '#16A34A', bg: '#F0FDF4' },
+    { label: 'Тренеры', value: dash(stats.coaches), hint: 'Пользователи с ролью coach', icon: 'ki-security-user', color: '#F35703', bg: '#FEF0E7' },
+    { label: 'Тренировки', value: stats.workouts, hint: 'Всего записей в workouts', icon: 'ki-chart-line-up', color: '#9333EA', bg: '#FAF5FF' },
   ]
 
   return (
@@ -455,7 +523,7 @@ export default function AdminPage() {
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-2.5">
                 <button
-                  onClick={() => setShowAssign(true)}
+                  onClick={() => { setShowAssign(true); void loadLinks() }}
                   className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] transition-transform hover:-translate-y-0.5"
                 >
                   <i className="ki-filled ki-people text-sm" />
@@ -485,9 +553,17 @@ export default function AdminPage() {
                 <div className="mt-1 text-2xs text-muted-foreground">Роли, политики и связки доступны для проверки</div>
               </div>
               <div className="rounded-2xl border border-border bg-background/85 p-4 shadow-sm">
-                <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Живая активность</div>
-                <div className="mt-2 text-lg font-semibold text-foreground">{AUDIT.length} событий</div>
-                <div className="mt-1 text-2xs text-muted-foreground">Свежие логи входов, изменений и политик</div>
+                <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Журнал действий</div>
+                <div className="mt-2 text-lg font-semibold text-foreground">
+                  {auditLoading ? 'Загружаю…' : `${auditEntries.length} записей`}
+                </div>
+                <div className="mt-1 text-2xs text-muted-foreground">
+                  {auditLoading
+                    ? 'Читаю audit_logs'
+                    : auditEntries.length === 0
+                      ? 'В audit_logs пока пусто'
+                      : `Последняя — ${formatDateTime(auditEntries[0].created_at)}`}
+                </div>
               </div>
             </div>
           </div>
@@ -557,17 +633,17 @@ export default function AdminPage() {
                   <div className="mt-4 grid gap-3">
                     <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Атлеты</div>
-                      <div className="pf-num mt-2 text-3xl text-foreground">{athleteCount}</div>
+                      <div className="pf-num mt-2 text-3xl text-foreground">{dash(athleteCount)}</div>
                       <div className="mt-1 text-2xs text-muted-foreground">Основные участники продуктового контура</div>
                     </div>
                     <div className="rounded-2xl border border-green-100 bg-green-50/70 p-4">
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-green-700">Тренеры</div>
-                      <div className="pf-num mt-2 text-3xl text-foreground">{coachCount}</div>
+                      <div className="pf-num mt-2 text-3xl text-foreground">{dash(coachCount)}</div>
                       <div className="mt-1 text-2xs text-muted-foreground">Наставники и кураторы программ</div>
                     </div>
                     <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
                       <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-violet-700">Администраторы</div>
-                      <div className="pf-num mt-2 text-3xl text-foreground">1</div>
+                      <div className="pf-num mt-2 text-3xl text-foreground">{dash(adminCount)}</div>
                       <div className="mt-1 text-2xs text-muted-foreground">Контроль ролей, приватности и системных связок</div>
                     </div>
                   </div>
@@ -588,53 +664,84 @@ export default function AdminPage() {
                     </button>
                   </div>
 
+                  {/* Ревизия P1: список — это реальные строки users, которые
+                      грузились и выбрасывались; раньше здесь рендерились три
+                      выдуманных аккаунта вида athlete@proform.test. */}
                   <div className="mt-4 space-y-3">
-                    {USERS.map(userItem => (
-                      <div key={userItem.email} className="rounded-2xl border border-border bg-card p-4 shadow-sm transition-transform hover:-translate-y-0.5">
+                    {usersLoading ? (
+                      <div className="py-10 text-center">
+                        <div className="mx-auto h-6 w-6 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
+                      </div>
+                    ) : users.length === 0 ? (
+                      <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
+                        <i className="ki-filled ki-people mb-2 block text-3xl text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">Пользователей не найдено.</p>
+                      </div>
+                    ) : users.map(userItem => {
+                      const isSelf = userItem.id === user?.id
+                      const busy = changingRole === userItem.id
+                      const knownRole = (ASSIGNABLE_ROLES as readonly string[]).includes(userItem.role)
+                      return (
+                      <div key={userItem.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm transition-transform hover:-translate-y-0.5">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
                           <div className="flex min-w-0 flex-1 items-center gap-3">
                             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-sm font-bold pf-num text-foreground">
                               {getInitials(userItem.name)}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm font-semibold text-foreground">{userItem.name}</div>
-                              <div className="truncate font-mono text-2xs text-muted-foreground">{userItem.email}</div>
+                              <div className="text-sm font-semibold text-foreground">
+                                {userItem.name ?? 'Без имени'}
+                                {isSelf && <span className="ml-2 text-2xs font-medium text-muted-foreground">(вы)</span>}
+                              </div>
+                              <div className="truncate font-mono text-2xs text-muted-foreground">{userItem.email ?? '—'}</div>
                             </div>
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-semibold ${ROLE_BADGE[userItem.role]}`}>
-                              {ROLE_LABEL[userItem.role]}
-                            </span>
-                            <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-2xs font-medium text-muted-foreground">
-                              {STATUS_LABEL[userItem.status]}
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-semibold ${ROLE_BADGE[userItem.role] ?? 'bg-accent text-muted-foreground border border-border'}`}>
+                              {ROLE_LABEL[userItem.role] ?? userItem.role}
                             </span>
                           </div>
 
+                          {/* «Последний вход» убран: users не хранит время входа,
+                              а auth.users из браузера недоступна — показывать было
+                              нечего, кроме выдуманного «2 часа назад». */}
                           <div className="grid min-w-[190px] gap-1 rounded-2xl border border-border bg-background/70 px-3 py-2 lg:text-right">
-                            <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Последний вход</div>
-                            <div className="text-2sm font-medium text-foreground">{userItem.lastLogin}</div>
-                            <div className="text-[11px] text-muted-foreground">Создан {userItem.created}</div>
+                            <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Регистрация</div>
+                            <div className="text-2sm font-medium text-foreground">{formatDateTime(userItem.created_at)}</div>
                           </div>
 
                           <div className="flex items-center gap-2">
                             <button
                               disabled
-                              title="Редактирование профиля — Sprint W10. Сейчас пользователь правит сам через /settings"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground opacity-60 cursor-not-allowed"
+                              title="Редактирование чужого профиля из админки не реализовано — пользователь правит данные сам в /settings"
+                              className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-xl border border-border bg-background text-muted-foreground opacity-60"
                             >
                               <i className="ki-filled ki-pencil text-xs" />
                             </button>
-                            <select className="rounded-xl border border-border bg-background px-3 py-2 text-2xs text-muted-foreground outline-none transition-colors focus:border-orange-400">
-                              <option>Сменить роль</option>
-                              <option>атлет</option>
-                              <option>тренер</option>
-                              <option>администратор</option>
+                            <select
+                              value={userItem.role}
+                              disabled={isSelf || changingRole !== null}
+                              title={isSelf
+                                ? 'Нельзя менять роль самому себе — защита от потери последнего доступа'
+                                : 'Смена роли идёт через серверный маршрут с записью в журнал'}
+                              onChange={e => {
+                                const nextRole = e.target.value
+                                if (nextRole !== userItem.role) void changeRole(userItem.id, nextRole)
+                              }}
+                              className="rounded-xl border border-border bg-background px-3 py-2 text-2xs text-foreground outline-none transition-colors focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {!knownRole && <option value={userItem.role}>{userItem.role} (нестандартная роль)</option>}
+                              {ASSIGNABLE_ROLES.map(role => (
+                                <option key={role} value={role}>{ROLE_LABEL[role] ?? role}</option>
+                              ))}
                             </select>
+                            {busy && <div className="h-4 w-4 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />}
                           </div>
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
 
@@ -817,36 +924,50 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Ревизия P1: матрица из пяти селектов была декорацией — ни
+                    value/onChange, ни источника данных; значения «Приватно» для
+                    выдуманных атлетов выглядели как настоящие политики.
+                    Оставлено только проверяемое: список реальных атлетов и флаг
+                    users.is_searchable. Остальную приватность спортсмен задаёт
+                    сам в /settings — админского канала записи здесь нет. */}
                 <div className="space-y-4">
-                  {USERS.filter(item => item.role === 'athlete').map(userItem => (
-                    <div key={userItem.email} className="rounded-[26px] border border-border bg-background p-5">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <div className="text-sm font-semibold text-foreground">{userItem.name}</div>
-                          <div className="text-2xs text-muted-foreground">Текущие политики видимости для athlete-профиля</div>
-                        </div>
-                        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-2xs font-semibold text-orange-700">
-                          Доступ контролируется вручную
-                        </span>
-                      </div>
+                  <Alert variant="warning">
+                    Редактирование политик видимости из админки не реализовано. Настройки приватности
+                    (публичный профиль, публичные тренировки, доступ для поиска) меняет сам спортсмен
+                    в разделе «Настройки → Приватность».
+                  </Alert>
 
-                      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {PRIVACY_RESOURCES.map(resource => (
-                          <div key={resource.id} className="rounded-2xl border border-border bg-card px-3 py-3 shadow-sm">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-2sm font-medium text-foreground">{resource.label}</span>
-                              <i className="ki-filled ki-security-user text-sm text-orange-500" />
-                            </div>
-                            <select className="mt-3 w-full rounded-xl border border-border bg-background px-3 py-2 text-2xs text-muted-foreground outline-none transition-colors focus:border-orange-400">
-                              <option value="private">Приватно</option>
-                              <option value="coaches_only">Только тренеры</option>
-                              <option value="public">Публично</option>
-                            </select>
-                          </div>
-                        ))}
-                      </div>
+                  {usersLoading ? (
+                    <div className="py-10 text-center">
+                      <div className="mx-auto h-6 w-6 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
                     </div>
-                  ))}
+                  ) : athleteOptions.length === 0 ? (
+                    <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
+                      <i className="ki-filled ki-lock mb-2 block text-3xl text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Атлетов в базе пока нет.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {athleteOptions.map(userItem => (
+                        <div key={userItem.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-background px-4 py-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-2xs font-bold pf-num text-foreground">
+                            {getInitials(userItem.name)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-2sm font-semibold text-foreground">{userItem.name ?? 'Без имени'}</div>
+                            <div className="truncate font-mono text-2xs text-muted-foreground">{userItem.email ?? '—'}</div>
+                          </div>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-semibold ${
+                            userItem.is_searchable
+                              ? 'border border-green-200 bg-green-50 text-green-700'
+                              : 'border border-border bg-card text-muted-foreground'
+                          }`}>
+                            {userItem.is_searchable ? 'Доступен для поиска' : 'Скрыт из поиска'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -859,38 +980,67 @@ export default function AdminPage() {
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Журнал действий</div>
                   <h3 className="mt-2 text-lg font-semibold text-navy-500">Входы, изменения и чувствительные операции</h3>
                 </div>
-                <button
-                  disabled
-                  title="Экспорт audit-журнала в CSV — Sprint W10"
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground opacity-60 cursor-not-allowed"
-                >
-                  <i className="ki-filled ki-abstract-26 text-xs" />
-                  Экспорт CSV
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => { void loadAuditLog(); void loadActivity() }}
+                    disabled={auditLoading}
+                    className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-orange-200 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <i className="ki-filled ki-arrows-circle text-xs" />
+                    {auditLoading ? 'Обновляю…' : 'Обновить'}
+                  </button>
+                  <button
+                    disabled
+                    title="Экспорт журнала в CSV не реализован"
+                    className="inline-flex cursor-not-allowed items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground opacity-60"
+                  >
+                    <i className="ki-filled ki-abstract-26 text-xs" />
+                    Экспорт CSV
+                  </button>
+                </div>
               </div>
 
+              {/* Ревизия P1: слева — настоящие audit_logs (раньше константа AUDIT
+                  из шести придуманных записей), справа — реальная лента последних
+                  тренировок из loadActivity(), которая грузилась и не рендерилась. */}
               <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,0.9fr)]">
                 <div className="space-y-3">
-                  {AUDIT.map((entry, index) => (
-                    <div key={`${entry.actor}-${index}`} className="rounded-2xl border border-border bg-background px-4 py-4 shadow-sm">
+                  {auditLoading ? (
+                    <div className="py-10 text-center">
+                      <div className="mx-auto h-6 w-6 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
+                    </div>
+                  ) : auditEntries.length === 0 ? (
+                    <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
+                      <i className="ki-filled ki-notepad-edit mb-2 block text-3xl text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">В audit_logs нет записей.</p>
+                      <p className="mt-1 text-2xs text-muted-foreground">
+                        Журнал заполняется только привилегированными операциями (смена роли, назначение тренера).
+                      </p>
+                    </div>
+                  ) : auditEntries.map(entry => (
+                    <div key={entry.id} className="rounded-2xl border border-border bg-background px-4 py-4 shadow-sm">
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                         <div className="flex min-w-0 flex-1 items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-2xs font-bold pf-num text-foreground">
-                            {getInitials(entry.actor)}
+                            {getInitials(entry.actor_name ?? entry.actor_email)}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-2sm font-semibold text-foreground">{entry.actor}</div>
-                            <div className="truncate text-2xs text-muted-foreground">{entry.detail}</div>
+                            <div className="text-2sm font-semibold text-foreground">
+                              {entry.actor_name ?? entry.actor_email ?? 'Системное событие'}
+                            </div>
+                            <div className="truncate text-2xs text-muted-foreground">{describePayload(entry.payload)}</div>
                           </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-semibold ${ACTION_BADGE[entry.action]}`}>
-                            {ACTION_LABEL[entry.action]}
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-semibold ${ACTION_BADGE[entry.action] ?? 'border border-border bg-accent text-muted-foreground'}`}>
+                            {ACTION_LABEL[entry.action] ?? entry.action}
                           </span>
-                          <span className="inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1 text-2xs font-medium text-muted-foreground">
-                            {TARGET_LABEL[entry.target]}
-                          </span>
-                          <span className="text-2xs text-muted-foreground">{entry.time}</span>
+                          {entry.target_table && (
+                            <span className="inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1 text-2xs font-medium text-muted-foreground">
+                              {TARGET_LABEL[entry.target_table] ?? entry.target_table}
+                            </span>
+                          )}
+                          <span className="text-2xs text-muted-foreground">{formatDateTime(entry.created_at)}</span>
                         </div>
                       </div>
                     </div>
@@ -898,21 +1048,27 @@ export default function AdminPage() {
                 </div>
 
                 <div className="rounded-[26px] border border-border bg-background p-5">
-                  <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Фокус контроля</div>
-                  <div className="mt-4 space-y-3">
-                    <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
-                      <div className="text-sm font-semibold text-foreground">Роли и назначения</div>
-                      <div className="mt-1 text-2xs text-muted-foreground">Подтверждение athlete-ролей и ручные связки с тренерами.</div>
+                  <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Последние тренировки</div>
+                  <p className="mt-2 text-2xs text-muted-foreground">
+                    Не журнал аудита: тренировки в audit_logs не пишутся, это отдельная лента из таблицы workouts.
+                  </p>
+                  {actLoading ? (
+                    <div className="py-8 text-center">
+                      <div className="mx-auto h-5 w-5 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
                     </div>
-                    <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
-                      <div className="text-sm font-semibold text-foreground">Приватность</div>
-                      <div className="mt-1 text-2xs text-muted-foreground">Изменения видимости тренировок и чувствительных метрик.</div>
+                  ) : activity.length === 0 ? (
+                    <p className="mt-4 text-sm text-muted-foreground">Тренировок пока нет.</p>
+                  ) : (
+                    <div className="mt-4 space-y-2">
+                      {activity.slice(0, 10).map(item => (
+                        <div key={item.id} className="rounded-2xl border border-border bg-card px-3 py-2">
+                          <div className="text-2sm font-semibold text-foreground">{item.actor}</div>
+                          <div className="truncate text-2xs text-muted-foreground">{item.detail}</div>
+                          <div className="text-[11px] text-muted-foreground">{formatDateTime(item.created_at)}</div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="rounded-2xl border border-green-100 bg-green-50/70 p-4">
-                      <div className="text-sm font-semibold text-foreground">Авторизация</div>
-                      <div className="mt-1 text-2xs text-muted-foreground">Последние входы и активные пользовательские сессии.</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -922,33 +1078,82 @@ export default function AdminPage() {
             <div className="space-y-5">
               <div>
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Система</div>
-                <h3 className="mt-2 text-lg font-semibold text-navy-500">Сервисы, политики и инфраструктурные контуры</h3>
+                <h3 className="mt-2 text-lg font-semibold text-navy-500">Что панель может проверить прямо сейчас</h3>
               </div>
+
+              {/* Ревизия P1: раньше здесь были шесть карточек сервисов с uptime
+                  99.9% / 100% и статусами «Работает» — ни одна цифра ниоткуда не
+                  бралась. Мониторинга у проекта нет, поэтому вместо выдуманной
+                  сводки — честное предупреждение и один измеряемый факт. */}
+              <Alert variant="warning" title="Мониторинга у платформы нет">
+                Панель не знает uptime сервисов, состояние Vercel Edge или синхронизаций — эти данные
+                собирал бы внешний мониторинг, которого в проекте нет. Ниже показано только то, что
+                браузер может проверить сам.
+              </Alert>
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {SYSTEM_SERVICES.map(service => {
-                  const tone = SYSTEM_TONE[service.tone]
-                  return (
-                    <div key={service.service} className="rounded-[24px] border border-border bg-background p-5 shadow-sm">
-                      <div className="flex items-start gap-3">
-                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${tone.bg}`}>
-                          <i className={`ki-filled ${service.icon} text-base ${tone.icon}`} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={`h-2.5 w-2.5 rounded-full ${tone.dot}`} />
-                            <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{service.status}</span>
-                          </div>
-                          <div className="mt-2 text-sm font-semibold text-foreground">{service.service}</div>
-                          <div className="mt-1 text-2xs text-muted-foreground">{service.region}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="pf-num text-xl text-foreground">{service.uptime}</div>
-                          <div className="text-[11px] text-muted-foreground">uptime</div>
-                        </div>
+                <div className="rounded-[24px] border border-border bg-background p-5 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`h-2.5 w-2.5 rounded-full ${
+                          dbPing.state === 'ok' ? 'bg-green-500'
+                          : dbPing.state === 'fail' ? 'bg-red-500'
+                          : 'bg-slate-400'
+                        }`} />
+                        <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          {dbPing.state === 'ok' ? 'Ответила'
+                            : dbPing.state === 'fail' ? 'Ошибка'
+                            : dbPing.state === 'checking' ? 'Проверяю'
+                            : 'Не проверялось'}
+                        </span>
                       </div>
+                      <div className="mt-2 text-sm font-semibold text-foreground">Связь с базой данных</div>
+                      <div className="mt-1 break-all text-2xs text-muted-foreground">
+                        {dbPing.at ? `Проверено ${formatDateTime(dbPing.at)}` : 'Запрос к таблице users из браузера'}
+                      </div>
+                      {dbPing.error && <div className="mt-1 text-2xs text-red-600">{dbPing.error}</div>}
                     </div>
-                  )
-                })}
+                    <div className="text-right">
+                      <div className="pf-num text-xl text-foreground">{dbPing.ms === null ? '—' : `${dbPing.ms} мс`}</div>
+                      <div className="text-[11px] text-muted-foreground">ответ</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => void checkDbConnection()}
+                    disabled={dbPing.state === 'checking'}
+                    className="mt-4 inline-flex items-center gap-2 rounded-[14px] border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:border-orange-200 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <i className="ki-filled ki-arrows-circle text-xs" />
+                    {dbPing.state === 'checking' ? 'Проверяю…' : 'Проверить связь'}
+                  </button>
+                </div>
+
+                <div className="rounded-[24px] border border-border bg-background p-5 shadow-sm">
+                  <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Подключение</div>
+                  <dl className="mt-3 space-y-2 text-2sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-muted-foreground">Проект Supabase</dt>
+                      <dd className="break-all text-right font-mono text-2xs text-foreground">{supabaseHost}</dd>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-muted-foreground">Окружение сборки</dt>
+                      <dd className="font-mono text-2xs text-foreground">{process.env.NODE_ENV}</dd>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-muted-foreground">Пользователей в базе</dt>
+                      <dd className="pf-num text-foreground">{dash(stats.total)}</dd>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-muted-foreground">Тренировок в базе</dt>
+                      <dd className="pf-num text-foreground">{stats.workouts}</dd>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-muted-foreground">Записей в журнале</dt>
+                      <dd className="pf-num text-foreground">{auditLoading ? '—' : auditEntries.length}</dd>
+                    </div>
+                  </dl>
+                </div>
               </div>
             </div>
           )}
@@ -1155,32 +1360,76 @@ export default function AdminPage() {
                 <i className="ki-filled ki-cross text-sm" />
               </button>
             </div>
+            {/* Ревизия P1: селекты получили value/onChange и реальные списки,
+                кнопка пишет связь в trainer_athletes (раньше просто закрывала
+                модалку, а мёртвый handleAssign целился в athletes.coach_id). */}
             <div className="flex flex-col gap-3">
               <div>
                 <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Атлет</label>
-                <select className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400">
-                  <option>Sara Kowalski (athlete@proform.test)</option>
+                <select
+                  value={assignAthlete}
+                  onChange={e => setAssignAthlete(e.target.value)}
+                  disabled={usersLoading || athleteOptions.length === 0}
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">
+                    {usersLoading ? 'Загружаю…' : athleteOptions.length === 0 ? 'Атлетов в базе нет' : '— выберите атлета —'}
+                  </option>
+                  {athleteOptions.map(a => (
+                    <option key={a.id} value={a.id}>{a.name ?? 'Без имени'}{a.email ? ` (${a.email})` : ''}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Тренер</label>
-                <select className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400">
-                  <option>Alex Trainer (coach@proform.test)</option>
+                <select
+                  value={assignCoach}
+                  onChange={e => setAssignCoach(e.target.value)}
+                  disabled={usersLoading || coachOptions.length === 0}
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">
+                    {usersLoading ? 'Загружаю…' : coachOptions.length === 0 ? 'Тренеров в базе нет' : '— выберите тренера —'}
+                  </option>
+                  {coachOptions.map(c => (
+                    <option key={c.id} value={c.id}>{c.name ?? 'Без имени'}{c.email ? ` (${c.email})` : ''}</option>
+                  ))}
                 </select>
               </div>
+
+              {assignAthlete && (
+                <div className="rounded-2xl border border-border bg-background px-3 py-2.5">
+                  <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Текущие тренеры атлета</div>
+                  {linksLoading ? (
+                    <div className="mt-2 h-4 w-4 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
+                  ) : coachesOfSelectedAthlete.length === 0 ? (
+                    <div className="mt-1 text-2sm text-muted-foreground">Связей нет</div>
+                  ) : (
+                    <ul className="mt-1 space-y-0.5">
+                      {coachesOfSelectedAthlete.map(link => (
+                        <li key={`${link.trainer_id}-${link.athlete_id}`} className="text-2sm text-foreground">
+                          {nameById.get(link.trainer_id) ?? link.trainer_id}
+                          <span className="ml-1 text-2xs text-muted-foreground">({link.status ?? '—'})</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
               <Alert variant="primary">
-                Назначение связывает тестового атлета с тренером в рамках демонстрационного admin-сценария.
+                Создаёт связь в trainer_athletes со статусом «accepted» — тренер получит доступ к тренировкам,
+                метрикам и травмам спортсмена. Действие пишется в журнал действий.
               </Alert>
+
               <div className="flex gap-2 pt-1">
                 <button
-                  onClick={() => {
-                    // Demo flow — реальное назначение через RPC будет в Sprint W10.
-                    setShowAssign(false)
-                  }}
-                  className="kt-btn kt-btn-primary flex-1"
-                  title="Демо-режим — закроет диалог. Реальное назначение в Sprint W10"
+                  onClick={() => void handleAssign()}
+                  disabled={!assignAthlete || !assignCoach || assigning}
+                  title={!assignAthlete || !assignCoach ? 'Выберите атлета и тренера' : 'Создать связь тренер↔спортсмен'}
+                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
                 >
-                  Назначить
+                  {assigning ? 'Назначаю…' : 'Назначить'}
                 </button>
                 <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
               </div>

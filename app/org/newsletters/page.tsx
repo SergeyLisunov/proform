@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { useDialog } from '@/lib/hooks/useDialog'
-import { getMyOrg } from '@/services/org.service'
 import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewsletter } from '@/services/newsletter.service'
-import type { Organization, Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
+import type { Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
 
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
@@ -42,9 +41,10 @@ function formatAudience(roles: OrgMemberRole[]) {
 }
 
 export default function OrgNewslettersPage() {
-  const { user, loading: userLoading } = useUser()
-  const { confirm } = useDialog()
-  const [org, setOrg] = useState<Organization | null>(null)
+  // P1: гейт по глобальной роли + getMyOrg() (ищет членство с ролью 'coach')
+  // не работали для org_admin. Резолвер даёт и право, и правильный org_id.
+  const { userId, orgId, org, canManage, loading: ctxLoading } = useOrgContext()
+  const { confirm, alert } = useDialog()
   const [newsletters, setNewsletters] = useState<Newsletter[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -61,21 +61,20 @@ export default function OrgNewslettersPage() {
   const [saveAction, setSaveAction] = useState<'draft' | 'send' | 'schedule'>('draft')
 
   useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'organization') { setLoading(false); return }
-    async function load() {
-      const orgData = await getMyOrg()
-      if (!orgData) { setLoading(false); return }
-      setOrg(orgData)
-      const nls = await getNewsletters(orgData.id)
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    let cancelled = false
+    void (async () => {
+      const nls = await getNewsletters(orgId)
+      if (cancelled) return
       setNewsletters(nls)
       setLoading(false)
-    }
-    load()
-  }, [user, userLoading])
+    })()
+    return () => { cancelled = true }
+  }, [ctxLoading, canManage, orgId])
 
   async function handleSave(action: 'draft' | 'send' | 'schedule') {
-    if (!org || !user) return
+    if (!orgId || !userId) return
     setSaving(true)
     setSaveAction(action)
 
@@ -85,8 +84,8 @@ export default function OrgNewslettersPage() {
     ]
 
     const nl = await createNewsletter({
-      org_id: org.id,
-      author_id: user.id,
+      org_id: orgId,
+      author_id: userId,
       subject: form.subject,
       body: form.body,
       target_roles,
@@ -98,6 +97,11 @@ export default function OrgNewslettersPage() {
       setNewsletters(prev => [nl, ...prev])
       setForm({ subject: '', body: '', target_athlete: true, target_coach: true, scheduled_at: '' })
       setShowCreate(false)
+    } else {
+      // Раньше при отказе не происходило ничего: форма оставалась открытой,
+      // и было не понять, сохранилось или нет. Под RLS отказ вообще не
+      // приходит ошибкой, поэтому сообщаем явно.
+      await alert('Рассылка не сохранена — недостаточно прав или ошибка сети.')
     }
     setSaving(false)
   }
@@ -141,7 +145,7 @@ export default function OrgNewslettersPage() {
     { label: 'Отправленные', value: sent.length, hint: 'Ушли в коммуникацию', icon: 'ki-paper-plane', color: '#16A34A', bg: '#F0FDF4' },
   ]
 
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -149,11 +153,11 @@ export default function OrgNewslettersPage() {
     )
   }
 
-  if (user?.role !== 'organization') {
+  if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
   }

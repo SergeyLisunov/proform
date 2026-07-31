@@ -18,14 +18,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { useDialog } from '@/lib/hooks/useDialog'
-import { getMyOrg } from '@/services/org.service'
 import {
   getOrgGroup, listOrgAthletesNotInGroup,
   LEVEL_META, type SkillLevel, type OrgGroup,
 } from '@/services/org-groups.service'
-import type { Organization } from '@/types/org.types'
 import { Card, Badge } from '@/components/ui/metronic'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
@@ -46,9 +44,9 @@ export default function TeamDetailPage() {
   const router = useRouter()
   const groupId = params.id
 
-  const { user, loading: userLoading } = useUser()
+  // P1: гейт по глобальной роли + getMyOrg() не пускали org_admin.
+  const { orgId, org, canManage, loading: ctxLoading } = useOrgContext()
   const { confirm }                     = useDialog()
-  const [org, setOrg]                   = useState<Organization | null>(null)
   const [group, setGroup]               = useState<OrgGroup | null>(null)
   const [members, setMembers]           = useState<Member[]>([])
   const [available, setAvailable]       = useState<AvailableAthlete[]>([])
@@ -74,7 +72,7 @@ export default function TeamDetailPage() {
   }
 
   // ── Load ────────────────────────────────────────────────────────────
-  const load = useCallback(async (orgId: string) => {
+  const load = useCallback(async (id: string) => {
     setLoading(true)
     try {
       const data = await getOrgGroup(groupId)
@@ -84,7 +82,7 @@ export default function TeamDetailPage() {
       }
       setGroup(data.group)
       setMembers(data.members)
-      const avail = await listOrgAthletesNotInGroup(orgId, groupId)
+      const avail = await listOrgAthletesNotInGroup(id, groupId)
       setAvailable(avail)
     } finally {
       setLoading(false)
@@ -92,18 +90,10 @@ export default function TeamDetailPage() {
   }, [groupId])
 
   useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'organization') { setLoading(false); return }
-    let cancelled = false
-    async function init() {
-      const orgData = await getMyOrg()
-      if (cancelled || !orgData) { setLoading(false); return }
-      setOrg(orgData)
-      await load(orgData.id)
-    }
-    init()
-    return () => { cancelled = true }
-  }, [user, userLoading, load])
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    void load(orgId)
+  }, [ctxLoading, canManage, orgId, load])
 
   // ── Sync edit form when group loads/changes ────────────────────────
   useEffect(() => {
@@ -124,7 +114,7 @@ export default function TeamDetailPage() {
 
   // ── Add member ──────────────────────────────────────────────────────
   async function addMember(athleteId: string) {
-    if (!org) return
+    if (!orgId) return
     setBusyAthleteId(athleteId)
     try {
       const res = await fetch(`/api/org/teams/${groupId}/members`, {
@@ -138,7 +128,7 @@ export default function TeamDetailPage() {
         return
       }
       showToast('Атлет добавлен')
-      await load(org.id)
+      await load(orgId)
     } finally {
       setBusyAthleteId(null)
     }
@@ -146,7 +136,7 @@ export default function TeamDetailPage() {
 
   // ── Remove member ───────────────────────────────────────────────────
   async function removeMember(athleteId: string) {
-    if (!org) return
+    if (!orgId) return
     if (!(await confirm('Удалить атлета из команды? Профиль атлета останется в организации.'))) return
     setBusyAthleteId(athleteId)
     try {
@@ -159,7 +149,7 @@ export default function TeamDetailPage() {
         return
       }
       showToast('Атлет удалён из команды')
-      await load(org.id)
+      await load(orgId)
     } finally {
       setBusyAthleteId(null)
     }
@@ -199,7 +189,7 @@ export default function TeamDetailPage() {
       }
       setShowEdit(false)
       showToast('Команда обновлена')
-      if (org) await load(org.id)
+      if (orgId) await load(orgId)
     } finally {
       setSaving(false)
     }
@@ -222,7 +212,7 @@ export default function TeamDetailPage() {
   }
 
   // ── States ──────────────────────────────────────────────────────────
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full pf-spin" />
@@ -230,11 +220,11 @@ export default function TeamDetailPage() {
     )
   }
 
-  if (user?.role !== 'organization') {
+  if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
   }

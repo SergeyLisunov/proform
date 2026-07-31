@@ -33,6 +33,10 @@ const WorkoutCommentsDrawer = dynamic(() => import('@/components/workout/Workout
 const MyRecommendationsCard   = dynamic(() => import('@/components/athlete/MyRecommendationsCard'), { ssr: false })
 const AthleteConnectionsPanel = dynamic(() => import('@/components/ui/AthleteConnectionsPanel').then(m => m.AthleteConnectionsPanel), { ssr: false })
 const CoachRestrictionsCard   = dynamic(() => import('@/components/coach/CoachRestrictionsCard'), { ssr: false })
+// P1 — виджет быстрых действий тренера (в т.ч. drawer назначения одиночной
+// тренировки) был написан, но нигде не смонтирован: назначить тренировку без
+// недельного плана было невозможно из UI. Монтируем в тренерский дашборд.
+const CoachQuickActions       = dynamic(() => import('@/components/coach/CoachQuickActions'), { ssr: false })
 const OrgWallFeed             = dynamic(() => import('@/components/ui/OrgWallFeed').then(m => m.OrgWallFeed), { ssr: false })
 // P1 соц-ядро — закрытая лента тренировок клуба + «респект» (Strava-модель
 // kudos под детскую платформу; см. docs/policy/child-privacy-defaults.md).
@@ -1033,6 +1037,14 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
           </Card>
         ))}
       </div>
+
+      {/* P1 — быстрые действия тренера. Кнопка «Назначить» открывает
+          PrescribeWorkoutDrawer прямо здесь: до этого единственным путём выдать
+          тренировку был недельный билдер /coach/plans, а одиночное назначение
+          из UI не запускалось вовсе (компонент существовал, но не был
+          смонтирован). Список атлетов — те же accepted-связки trainer_athletes,
+          что уже загружены выше для карточек статуса. */}
+      <CoachQuickActions coachId={userId} athletes={athletes.map(a => ({ id: a.id, name: a.name }))} />
 
       {/* AI coach morning briefing */}
       <CoachBriefingCard />
