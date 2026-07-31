@@ -65,19 +65,11 @@ export function useUser() {
 
   useEffect(() => { fetchUser() }, [fetchUser])
 
-  const switchRole = useCallback(async (newRole: UserRole) => {
-    if (!user) return
-    setSwitching(true)
-    const supabase = createClient()
-    const payload: UserUpdate = { role: newRole }
-    const { error } = await (supabase.from('users') as any).update(payload).eq('id', user.id)
-    if (!error) {
-      setUser(prev => prev ? { ...prev, role: newRole } : null)
-      // Hard reload so all server components & layouts re-render with new role
-      window.location.href = '/dashboard'
-    }
-    setSwitching(false)
-  }, [user])
+  // switchRole удалён (P0, ревизия 2026-07-31): функция позволяла пользователю
+  // переписать собственный users.role из браузера. Вызовов у неё не было, но
+  // сам путь был открыт — RLS-политика users_update_own не ограничивает
+  // колонки, поэтому роль менялась успешно (см. миграцию 104 и qa/ralph/
+  // rls-probe.mjs, проверка WR-02). Смена роли — только через админ-канал.
 
-  return { user, loading, switching, switchRole }
+  return { user, loading, switching }
 }

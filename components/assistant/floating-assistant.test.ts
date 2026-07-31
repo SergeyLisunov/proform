@@ -9,6 +9,8 @@ describe('isAssistantPublicPath — виджет не существует на 
       '/legal/privacy', '/demo/ai-assistant', '/tools/acwr',
       '/invite/abc123', '/p/some-athlete', '/pricing',
       'volna-club', // публичная страница клуба (одиночный slug)
+      // публичные разделы приложения: зарезервированы, но открыты анонимно
+      '/about', '/contacts', '/directory',
     ].map(x => (x.startsWith('/') ? x : `/${x}`))) {
       expect(isAssistantPublicPath(p), p).toBe(true)
     }
@@ -22,8 +24,7 @@ describe('isAssistantPublicPath — виджет не существует на 
       '/settings/notifications',
       // ревью-находка: разделы, которые пропускал старый хардкод
       '/templates', '/notes', '/challenges', '/competitions', '/streaks',
-      '/notifications', '/connections', '/contacts', '/directory',
-      '/search', '/share', '/about',
+      '/notifications', '/connections', '/search', '/share',
     ]) {
       expect(isAssistantPublicPath(p), p).toBe(false)
     }

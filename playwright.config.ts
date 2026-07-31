@@ -26,7 +26,34 @@ export default defineConfig({
   },
 
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Публичные (неавторизованные) проверки — безопасны и против прод-URL.
+    {
+      name: 'public',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /smoke\.spec\.ts/,
+    },
+    // Ролевой вход через настоящую форму; готовит storageState для ролей.
+    {
+      name: 'setup',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /auth\.setup\.ts/,
+    },
+    // Ролевые сценарии: каждый файл сам выбирает нужный storageState.
+    {
+      name: 'roles',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /roles\/.*\.spec\.ts/,
+      dependencies: ['setup'],
+    },
+    // Мобильный проход по ключевым ролевым экранам.
+    // Pixel 5, а не iPhone: профили Apple тянут WebKit, которого нет в
+    // CI-образе (ставится только chromium) — прогон падал на запуске браузера.
+    {
+      name: 'mobile',
+      use: { ...devices['Pixel 5'] },
+      testMatch: /mobile\.spec\.ts/,
+      dependencies: ['setup'],
+    },
   ],
 
   webServer: process.env.PLAYWRIGHT_BASE_URL

@@ -1,0 +1,197 @@
+{
+  "ranAt": "2026-07-31T14:02:32.030Z",
+  "total": 23,
+  "failed": 0,
+  "results": [
+    {
+      "id": "XT-01",
+      "title": "Владелец Alpha НЕ видит состав организации Beta",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true,
+      "detail": "org_members(beta) → []"
+    },
+    {
+      "id": "XT-02",
+      "title": "Владелец Beta НЕ видит состав организации Alpha",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "XT-03",
+      "title": "Тренер Alpha НЕ читает профиль спортсмена Beta",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "XT-04",
+      "title": "Тренер Alpha НЕ читает тренировки спортсмена Beta",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "XT-05",
+      "title": "Врач Alpha НЕ читает самочувствие спортсмена Beta",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "IN-01",
+      "title": "Тренер Alpha-2 НЕ читает тренировки спортсмена другого тренера",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "IN-02",
+      "title": "Спортсмен НЕ читает тренировки другого спортсмена",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "POS-01",
+      "title": "Тренер Alpha-1 ВИДИТ тренировки своего спортсмена",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "id": "POS-02",
+      "title": "Спортсмен ВИДИТ свои тренировки",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "id": "MED-01",
+      "title": "Организация НЕ читает медицинский дневник",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "MED-02",
+      "title": "Тренер НЕ читает медицинский дневник",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "MED-03",
+      "title": "Врач Beta НЕ читает рекомендации спортсмена Alpha",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "MED-04",
+      "title": "Тренер-адресат ВИДИТ рекомендацию (visibility coach_and_athlete)",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "id": "MED-05",
+      "title": "Спортсмен ВИДИТ адресованную ему рекомендацию",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "id": "MED-06",
+      "title": "Посторонний тренер НЕ видит чужую рекомендацию",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "WR-01",
+      "title": "Спортсмен НЕ может записать тренировку другому спортсмену",
+      "severity": "P0",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "id": "WR-02",
+      "title": "Спортсмен НЕ может повысить себе роль до admin",
+      "severity": "P0",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "роль после попытки: athlete (PATCH status=403)"
+    },
+    {
+      "id": "WR-03",
+      "title": "Спортсмен НЕ может вписать себя админом в чужую организацию",
+      "severity": "P0",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "id": "MED-07",
+      "title": "Врач НЕ может выписать рекомендацию не своему пациенту",
+      "severity": "P0",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "id": "MED-08",
+      "title": "Врач ВСЁ ЕЩЁ может выписать рекомендацию своему пациенту",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "detail": "status=201"
+    },
+    {
+      "id": "AI-01",
+      "title": "Организация НЕ читает чужие AI-диалоги",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "AI-02",
+      "title": "Владелец платформы НЕ читает приватные AI-диалоги по умолчанию",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "OWN-01",
+      "title": "Владелец платформы НЕ читает медицинский дневник по умолчанию",
+      "severity": "P0",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  ]
+}
