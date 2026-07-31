@@ -370,9 +370,22 @@ export default function AdminPage() {
 
   async function changeRole(userId: string, newRole: string) {
     setChangingRole(userId)
-    const sb = getSB()
-    const { error } = await sb.from('users').update({ role: newRole }).eq('id', userId)
-    if (error) { toastError('Ошибка смены роли'); setChangingRole(null); return }
+    // Смена роли идёт через серверный маршрут: он перепроверяет права админа
+    // на сервере и пишет запись в audit_logs. Прямая запись users.role из
+    // браузера запрещена (P0-ревизия, миграция 104).
+    const res = await fetch('/api/admin/users/role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, role: newRole }),
+    })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({})) as { error?: string }
+      toastError(j.error === 'self_role_change_forbidden'
+        ? 'Нельзя менять роль самому себе'
+        : 'Ошибка смены роли')
+      setChangingRole(null)
+      return
+    }
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
     success('Роль обновлена')
     setChangingRole(null)

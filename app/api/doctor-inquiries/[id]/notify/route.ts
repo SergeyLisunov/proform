@@ -98,12 +98,43 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       .maybeSingle()
     if (data) recipients = [data as NamedUser]
   } else {
+    // P0: раньше открытая очередь рассылала имя спортсмена и клинический
+    // вопрос ВСЕМ врачам платформы — межорганизационная утечка медданных по
+    // почте. Теперь адресаты ограничены врачами тех организаций, где состоит
+    // сам спортсмен: за пределы его клуба сведения не уходят.
+    const { data: athleteOrgs } = await admin
+      .from('org_members')
+      .select('org_id')
+      .eq('user_id', inquiry.athlete_id)
+      .eq('status', 'active')
+
+    const orgIds = ((athleteOrgs ?? []) as { org_id: string }[]).map(o => o.org_id)
+    if (orgIds.length === 0) {
+      return NextResponse.json({
+        ok: true, sent_count: 0, recipients: [], note: 'NO_ORG_SCOPE',
+      })
+    }
+
+    const { data: orgDoctors } = await admin
+      .from('org_members')
+      .select('user_id')
+      .in('org_id', orgIds)
+      .in('member_role', ['doctor', 'specialist'])
+      .eq('status', 'active')
+
+    const doctorIds = [...new Set(((orgDoctors ?? []) as { user_id: string }[]).map(d => d.user_id))]
+    if (doctorIds.length === 0) {
+      return NextResponse.json({
+        ok: true, sent_count: 0, recipients: [], note: 'NO_ORG_DOCTORS',
+      })
+    }
+
     const { data } = await admin
       .from('users')
       .select('id, name, email, notification_prefs')
+      .in('id', doctorIds.slice(0, MAX_OPEN_QUEUE_FANOUT))
       .eq('role', 'doctor')
       .not('email', 'is', null)
-      .limit(MAX_OPEN_QUEUE_FANOUT)
     recipients = ((data ?? []) as NamedUser[]).filter(r => !!r.email)
   }
   if (recipients.length === 0) {

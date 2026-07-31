@@ -35,7 +35,7 @@ import {
 import type {
   AssistantCapabilities, ConversationSummary, AssistantMessage, AssistantContextType,
 } from '@/lib/ai/assistant/types'
-import { RESERVED_TOP_LEVEL_SLUGS } from '@/lib/routes/reserved-slugs'
+import { RESERVED_TOP_LEVEL_SLUGS, PUBLIC_APP_SLUGS } from '@/lib/routes/reserved-slugs'
 
 export const ASSISTANT_OPEN_EVENT = 'sporteo-assistant:open'
 
@@ -61,6 +61,9 @@ export function isAssistantPublicPath(pathname: string): boolean {
   // два рассинхронизированных хардкода прятали виджет на /templates и др.).
   const m = /^\/([a-z0-9-]+)$/.exec(pathname)
   if (m && !RESERVED_TOP_LEVEL_SLUGS.has(m[1])) return true
+  // Публичные разделы приложения (/about, /contacts, /directory):
+  // зарезервированы как маршруты, но открыты анонимно — помощника там нет.
+  if (m && PUBLIC_APP_SLUGS.has(m[1])) return true
   return false
 }
 

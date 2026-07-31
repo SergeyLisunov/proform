@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { RESERVED_TOP_LEVEL_SLUGS } from '@/lib/routes/reserved-slugs'
+import { RESERVED_TOP_LEVEL_SLUGS, PUBLIC_APP_SLUGS } from '@/lib/routes/reserved-slugs'
 
 /**
  * Middleware — refreshes the Supabase session cookie on every request
@@ -96,7 +96,13 @@ export async function updateSession(request: NextRequest) {
     !RESERVED_TOP_LEVEL_SLUGS.has(pathname.slice(1)) &&
     /^\/[a-z0-9-]+$/.test(pathname)
 
-  if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage && !isApiRoute) {
+  // Публичные разделы приложения (/about, /contacts, /directory): они
+  // зарезервированы как app-маршруты, но авторизации не требуют. Без этого
+  // маркетинговые страницы, на которые ведут ссылки с лендинга и из
+  // политики конфиденциальности, уходят за форму входа.
+  const isPublicAppPage = PUBLIC_APP_SLUGS.has(pathname.slice(1))
+
+  if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage && !isPublicAppPage && !isApiRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     url.searchParams.set('redirectTo', `${pathname}${request.nextUrl.search}`)
@@ -104,7 +110,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // ── W7 Day 33: onboarding gate for authenticated non-admin users ────
-  if (user && !isAuthRoute && !isApiRoute && !isOnboardingRoute && !isLegalRoute && !isPublicPrefix && !isOrgPublicPage && !isPublic) {
+  if (user && !isAuthRoute && !isApiRoute && !isOnboardingRoute && !isLegalRoute && !isPublicPrefix && !isOrgPublicPage && !isPublicAppPage && !isPublic) {
     try {
       const { data: meRow } = await supabase
         .from('users')

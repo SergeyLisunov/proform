@@ -57,6 +57,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
   }
 
+  // P0: раньше проверялась ТОЛЬКО роль автора, а athlete_id брался из тела —
+  // врач мог завести медицинскую рекомендацию любому спортсмену платформы,
+  // включая чужой клуб. Требуем подтверждённую связь врач↔пациент, как это
+  // делает /api/ai/medical-summary. БД дублирует проверку политикой
+  // recommendations_doctor_insert (миграция 105).
+  if (meRow.role === 'doctor') {
+    const { data: link } = await sb
+      .from('connections')
+      .select('id')
+      .eq('connection_type', 'doctor_athlete')
+      .eq('status', 'active')
+      .or(
+        `and(initiator_id.eq.${meRow.id},recipient_id.eq.${body.athlete_id}),` +
+        `and(initiator_id.eq.${body.athlete_id},recipient_id.eq.${meRow.id})`
+      )
+      .maybeSingle()
+    if (!link) {
+      return NextResponse.json(
+        { ok: false, error: 'NOT_YOUR_PATIENT' },
+        { status: 403 }
+      )
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: row, error } = await (sb as any)
     .from('recommendations')
