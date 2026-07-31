@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
+import { useToast } from '@/lib/hooks/useToast'
 import { getAllOrgs, verifyOrg } from '@/services/org.service'
 import type { Organization } from '@/types/org.types'
 import { Card, Badge } from '@/components/ui/metronic'
@@ -14,29 +15,56 @@ const SPORT_LABELS: Record<string, string> = {
 
 export default function AdminOrgsPage() {
   const { user, loading: userLoading } = useUser()
+  const { success, error: toastError } = useToast()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [verifying, setVerifying] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'admin') { setLoading(false); return }
-    async function load() {
-      const data = await getAllOrgs()
-      setOrgs(data)
-      setLoading(false)
-    }
+  // Флаг loading взводит инициатор перезагрузки (кнопка «Повторить»), а не
+  // сам load: так в синхронной части эффекта не остаётся ни одного setState.
+  const load = useCallback(async () => {
+    // Сбой загрузки больше не маскируется под «организаций нет»: раньше
+    // getAllOrgs при любой ошибке возвращала [], и экран показывал пустую
+    // модерацию вместо причины.
+    const { orgs: data, error } = await getAllOrgs()
+    setOrgs(data)
+    setLoadError(error)
+    setLoading(false)
+  }, [])
+
+  function retry() {
+    setLoadError(null)
+    setLoading(true)
     load()
-  }, [user, userLoading])
+  }
+
+  // Роль выведена в переменную: раньше эффект гасил спиннер вызовом
+  // setLoading(false) прямо в своём теле — каскадный ререндер (правило
+  // react-hooks/set-state-in-effect).
+  const isAdmin = user?.role === 'admin'
+
+  useEffect(() => {
+    if (userLoading || !isAdmin) return
+    load()
+  }, [isAdmin, userLoading, load])
 
   async function handleVerify(orgId: string) {
     setVerifying(orgId)
-    await verifyOrg(orgId)
-    setOrgs(prev => prev.map(o => o.id === orgId ? { ...o, is_verified: true } : o))
+    const { ok, error } = await verifyOrg(orgId)
+    // Оптимистичный апдейт только после подтверждённой записи. Без RLS-политики
+    // на organizations UPDATE не менял ни одной строки, но UI всё равно ставил
+    // «Проверено» — расхождение с базой жило до перезагрузки страницы.
+    if (ok) {
+      setOrgs(prev => prev.map(o => o.id === orgId ? { ...o, is_verified: true } : o))
+      success('Организация верифицирована')
+    } else {
+      toastError(error ?? 'Не удалось верифицировать организацию')
+    }
     setVerifying(null)
   }
 
-  if (userLoading || loading) {
+  if (userLoading || (isAdmin && loading)) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -44,7 +72,7 @@ export default function AdminOrgsPage() {
     )
   }
 
-  if (user?.role !== 'admin') {
+  if (!isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
@@ -52,6 +80,19 @@ export default function AdminOrgsPage() {
         </div>
         <p className="text-sm font-semibold text-foreground">Требуются права администратора</p>
         <p className="text-2sm text-muted-foreground">У вас нет доступа к этому разделу.</p>
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
+          <i className="ki-filled ki-information-4 text-2xl text-red-400" />
+        </div>
+        <p className="text-sm font-semibold text-foreground">Не удалось загрузить организации</p>
+        <p className="text-2sm text-muted-foreground">{loadError}</p>
+        <button onClick={retry} className="kt-btn kt-btn-sm kt-btn-primary">Повторить</button>
       </div>
     )
   }

@@ -102,12 +102,17 @@ export async function PATCH(req: Request) {
 
   if (upErr) return NextResponse.json({ ok: false, error: 'update_failed' }, { status: 500 })
 
-  await adminAny.from('audit_logs').insert({
+  // action — enum public.audit_action. Значения 'org_member_role_change' в
+  // нём нет: insert падал с 22P02, ошибку никто не проверял, и смена роли
+  // участника клуба не попадала в журнал вообще. Валидное значение +
+  // детализация в payload.
+  const { error: auditErr } = await adminAny.from('audit_logs').insert({
     actor_id:     actorId,
-    action:       'org_member_role_change',
+    action:       'role_change',
     target_table: 'org_members',
     target_id:    target.id,
     payload: {
+      kind:         'org_member_role_change',
       org_id:       target.org_id,
       target_user:  target.user_id,
       prev_role:    prevRole,
@@ -116,5 +121,14 @@ export async function PATCH(req: Request) {
     },
   })
 
-  return NextResponse.json({ ok: true, member_id: target.id, new_role: body.new_role })
+  if (auditErr) {
+    console.error('[org.members.role] запись в audit_logs не удалась:', auditErr.message)
+  }
+
+  return NextResponse.json({
+    ok: true,
+    member_id: target.id,
+    new_role: body.new_role,
+    audited: !auditErr,
+  })
 }

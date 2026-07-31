@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
+import { canAssignOrgAdmin } from '@/lib/permissions'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
@@ -279,7 +280,10 @@ function AssignCoachModal({ athlete, coaches, onClose, onLinked }: {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function OrgMembersPage() {
-  const { user } = useUser()
+  // P1: org_id брался из `user.id` — это верно только для аккаунта-организации
+  // (organizations.id = users.id). У org_admin это чужой id, поэтому список
+  // участников всегда приходил пустым. Плюс гейта не было вовсе.
+  const { orgId: ctxOrgId, canManage, globalRole, loading: ctxLoading } = useOrgContext()
   const { confirm, alert } = useDialog()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
@@ -291,10 +295,18 @@ export default function OrgMembersPage() {
   const [assignAthlete, setAssignAthlete] = useState<Member | null>(null)
   const [toast, setToast] = useState('')
 
-  const orgId = user?.id ?? ''
+  const orgId = ctxOrgId ?? ''
   const activeCoaches = members.filter(m => m.member_role === 'coach' && m.status === 'active')
+  // Делегировать права может только глобальный аккаунт-организация — тот же
+  // helper стоит на PATCH /api/org/members/role. org_admin не должен видеть
+  // кнопку, которая гарантированно вернёт ему 403.
+  const canDelegateAdmin = canAssignOrgAdmin(globalRole)
 
-  useEffect(() => { if (orgId) loadMembers() }, [orgId]) // eslint-disable-line
+  useEffect(() => {
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    loadMembers()
+  }, [ctxLoading, canManage, orgId]) // eslint-disable-line
 
   async function loadMembers() {
     setLoading(true)
@@ -315,8 +327,17 @@ export default function OrgMembersPage() {
   }
 
   async function changeStatus(memberId: string, newStatus: MemberStatus) {
-    const { error } = await getSB().from('org_members').update({ status: newStatus }).eq('id', memberId)
+    // .select('id') обязателен: под RLS запись, не нашедшая доступных строк,
+    // НЕ считается ошибкой — supabase-js вернёт error = null, и проверка
+    // «нет ошибки → получилось» показывала «Статус обновлён» там, где в базе
+    // не изменилось ничего. Судим по фактически затронутым строкам.
+    const { data, error } = await getSB()
+      .from('org_members').update({ status: newStatus }).eq('id', memberId).select('id')
     if (error) { await alert('Ошибка при изменении статуса'); return }
+    if ((data ?? []).length === 0) {
+      await alert('Статус не изменён — недостаточно прав для этого участника.')
+      return
+    }
     setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: newStatus } : m).filter(m => m.status !== 'removed'))
     showToastMsg(newStatus === 'removed' ? 'Участник удалён' : 'Статус обновлён')
   }
@@ -373,9 +394,17 @@ export default function OrgMembersPage() {
     { id: 'suspended', label: STATUS_CFG.suspended.label },
   ]
 
-  if (loading) return (
+  if (ctxLoading || loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
+    </div>
+  )
+
+  if (!canManage) return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+      <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
+      <p className="text-2sm text-muted-foreground">Раздел доступен владельцу клуба и его администраторам.</p>
     </div>
   )
 
@@ -618,12 +647,12 @@ export default function OrgMembersPage() {
                         <i className="ki-filled ki-fasten text-xs" />
                       </button>
                     )}
-                    {m.member_role === 'coach' && m.status === 'active' && m.user_id !== orgId && (
+                    {canDelegateAdmin && m.member_role === 'coach' && m.status === 'active' && m.user_id !== orgId && (
                       <button onClick={() => changeMemberRole(m.id, 'org_admin')} title="Сделать админом" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #A7F3D0', background: '#ECFDF5', color: '#0F766E', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-shield-tick text-xs" />
                       </button>
                     )}
-                    {m.member_role === 'org_admin' && m.status === 'active' && (
+                    {canDelegateAdmin && m.member_role === 'org_admin' && m.status === 'active' && (
                       <button onClick={() => changeMemberRole(m.id, 'coach')} title="Снять с админа" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FEF3C7', background: '#FFFBEB', color: '#B45309', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                         <i className="ki-filled ki-shield-cross text-xs" />
                       </button>

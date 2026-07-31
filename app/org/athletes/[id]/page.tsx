@@ -21,10 +21,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
-import { getMyOrg } from '@/services/org.service'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { createClient } from '@/lib/supabase/client'
-import type { Organization } from '@/types/org.types'
 import { Card, Alert, Badge } from '@/components/ui/metronic'
 
 interface AthleteProfile {
@@ -51,30 +49,26 @@ interface AthleteCounts {
 export default function OrgAthletePage() {
   const params = useParams<{ id: string }>()
   const athleteId = params.id
-  const { user, loading: userLoading } = useUser()
+  // P1: гейт по глобальной роли + getMyOrg() отбрасывали org_admin.
+  const { orgId, org, canManage, loading: ctxLoading } = useOrgContext()
 
-  const [org, setOrg]                 = useState<Organization | null>(null)
   const [profile, setProfile]         = useState<AthleteProfile | null>(null)
   const [counts, setCounts]           = useState<AthleteCounts | null>(null)
   const [loading, setLoading]         = useState(true)
   const [forbidden, setForbidden]     = useState(false)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (id: string) => {
     if (!athleteId) return
     setLoading(true)
     setForbidden(false)
     try {
-      const orgData = await getMyOrg()
-      if (!orgData) { setForbidden(true); return }
-      setOrg(orgData)
-
       const sb = createClient()
 
       // Verify athlete is in this org
       const { data: memberRaw } = await sb
         .from('org_members')
         .select('member_role, joined_at, status')
-        .eq('org_id', orgData.id)
+        .eq('org_id', id)
         .eq('user_id', athleteId)
         .maybeSingle()
       const member = memberRaw as { member_role: string; joined_at: string | null; status: string } | null
@@ -183,12 +177,12 @@ export default function OrgAthletePage() {
   }, [athleteId])
 
   useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'organization') { setForbidden(true); setLoading(false); return }
-    load()
-  }, [user, userLoading, load])
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setForbidden(true); setLoading(false); return }
+    void load(orgId)
+  }, [ctxLoading, canManage, orgId, load])
 
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />

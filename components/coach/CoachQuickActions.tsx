@@ -33,14 +33,28 @@ interface CoachQuickActionsProps {
 export default function CoachQuickActions({ coachId, athletes }: CoachQuickActionsProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  // Назначать некому — у тренера ещё нет принятых спортсменов. Drawer в этом
+  // случае не рендерится (условие ниже), поэтому кнопка, открывающая его,
+  // была бы кнопкой-обманкой: нажатие без единого видимого следствия. Вместо
+  // этого ведём туда, где связь заводится.
+  const hasAthletes = athletes.length > 0
+
   const actions: QuickAction[] = [
-    {
-      onClick: () => setDrawerOpen(true),
-      icon: 'ki-plus-squared',
-      label: 'Назначить',
-      hint: 'Тренировка атлету',
-      bg: '#FEF0E7', color: '#D44A02', border: '#FBC1A0',
-    },
+    hasAthletes
+      ? {
+          onClick: () => setDrawerOpen(true),
+          icon: 'ki-plus-squared',
+          label: 'Назначить',
+          hint: 'Тренировка атлету',
+          bg: '#FEF0E7', color: '#D44A02', border: '#FBC1A0',
+        }
+      : {
+          href: '/athletes',
+          icon: 'ki-plus-squared',
+          label: 'Добавить атлета',
+          hint: 'Нет подопечных',
+          bg: '#FEF0E7', color: '#D44A02', border: '#FBC1A0',
+        },
     {
       href: '/diary',
       icon: 'ki-notepad-edit',

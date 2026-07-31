@@ -8,13 +8,18 @@
  * Server component. Pulls up to 50 events from the last 30 days via
  * services/org-activity.service.ts (aggregates 4 source tables).
  *
- * Auth: organization role required. Non-org users redirected to
- * /dashboard.
+ * Auth (P1): раньше требовалась глобальная роль 'organization' — админ клуба
+ * (org_members.member_role='org_admin') видел пункт в сайдбаре и получал
+ * редирект на /dashboard. Теперь право проверяется резолвером org-контекста:
+ * управляющая роль в конкретном клубе + резолвнутый org_id.
  */
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
-import { getRecentOrgActivity, type OrgEvent, type OrgEventType } from '@/services/org-activity.service'
+import { getOrgContext } from '@/lib/org/org-context'
+import {
+  getRecentOrgActivity, findActivityForOrg,
+  type OrgEvent, type OrgEventType,
+} from '@/services/org-activity.service'
 import { ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
 
@@ -54,13 +59,19 @@ function shortName(name: string | null, id: string | null): string {
 }
 
 export default async function OrgActivityPage() {
-  const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
-  if (!authUser) redirect('/auth/login')
-  const { data: me } = await supabase.from('users').select('id, role').eq('auth_id', authUser.id).single()
-  if (!me || me.role !== 'organization') redirect('/dashboard')
+  const ctx = await getOrgContext()
+  if (!ctx) redirect('/auth/login')
+  if (!ctx.canManage || !ctx.orgId) redirect('/dashboard')
 
-  const events = await getRecentOrgActivity()
+  // getRecentOrgActivity() сам гейтит выборку по users.role='organization' и
+  // для org_admin вернул бы пустую ленту. Файл сервиса вне зоны этой правки,
+  // поэтому для scoped-админа берём экспортированный вариант с явным orgId.
+  // Он ходит service-role клиентом — допустимо ровно потому, что orgId выше
+  // резолвлен из СОБСТВЕННОГО активного членства пользователя с управляющей
+  // ролью: чужой клуб сюда подставить нечем (значение не приходит из запроса).
+  const events = ctx.globalRole === 'organization'
+    ? await getRecentOrgActivity()
+    : await findActivityForOrg(ctx.orgId)
 
   // Counts per type (for filter chips header).
   const counts: Record<OrgEventType, number> = {

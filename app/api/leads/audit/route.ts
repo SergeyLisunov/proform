@@ -128,6 +128,12 @@ export async function POST(req: Request) {
   }
 
   // Insert lead — single source of truth, must succeed before email send.
+  //
+  // Схемная зависимость (миграция 108): до неё этот insert падал ВСЕГДА —
+  // колонки consent_at в tool_leads не существовало, а CHECK
+  // tool_leads_source_check (ред. 059) не знал источника 'landing-audit-form'.
+  // Оба факта чинятся в 108; при откате миграции маршрут снова начнёт отдавать
+  // 500, поэтому ниже логируем полный код ошибки PostgREST, а не только message.
   const { error: insertError } = await admin
     .from('tool_leads')
     .insert({
@@ -140,7 +146,15 @@ export async function POST(req: Request) {
     })
 
   if (insertError) {
-    console.error('[/api/leads/audit] insert failed', insertError.message)
+    // code/details/hint критичны для диагностики: '42703' = нет колонки,
+    // '23514' = нарушен CHECK. Раньше в логе был только message — из-за этого
+    // «всегда 500» жил незамеченным.
+    console.error('[/api/leads/audit] insert failed', {
+      code:    insertError.code,
+      message: insertError.message,
+      details: insertError.details,
+      hint:    insertError.hint,
+    })
     return bad('server_error', 500)
   }
 

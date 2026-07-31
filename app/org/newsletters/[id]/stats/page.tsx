@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { getNewsletter, getNewsletterStats } from '@/services/newsletter.service'
 import type { Newsletter, NewsletterStats } from '@/types/org.types'
 import { Card, ChartCard } from '@/components/ui/metronic'
@@ -20,13 +20,16 @@ function formatAudience(targetRoles: Newsletter['target_roles']) {
 
 export default function NewsletterStatsPage() {
   const { id } = useParams<{ id: string }>()
-  const { user, loading: userLoading } = useUser()
+  // P1: гейт по глобальной роли отбрасывал org_admin — статистика клуба
+  // должна быть доступна и администратору клуба.
+  const { canManage, loading: ctxLoading } = useOrgContext()
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null)
   const [stats, setStats] = useState<NewsletterStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (userLoading) return
+    if (ctxLoading) return
+    if (!canManage) { setLoading(false); return }
     async function load() {
       const [nl, s] = await Promise.all([
         getNewsletter(id),
@@ -37,9 +40,9 @@ export default function NewsletterStatsPage() {
       setLoading(false)
     }
     load()
-  }, [id, userLoading])
+  }, [id, ctxLoading, canManage])
 
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -47,11 +50,11 @@ export default function NewsletterStatsPage() {
     )
   }
 
-  if (user?.role !== 'organization') {
+  if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
   }

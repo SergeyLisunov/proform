@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { useToast } from '@/lib/hooks/useToast'
 import { useDialog } from '@/lib/hooks/useDialog'
-import { getMyOrg } from '@/services/org.service'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
-import type { Organization, WallPost, PostType, PostVisibility } from '@/types/org.types'
+import type { WallPost, PostType, PostVisibility } from '@/types/org.types'
 import { Card, Alert } from '@/components/ui/metronic'
 
 const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: string; accent: string; panel: string }> = {
@@ -66,10 +65,12 @@ function formatDate(date: string, options: Intl.DateTimeFormatOptions = { day: '
 }
 
 export default function OrgWallPage() {
-  const { user, loading: userLoading } = useUser()
+  // P1: гейт по глобальной роли отбрасывал org_admin. Плюс getMyOrg() выбирал
+  // членство с ролью 'coach' — у админа клуба такой строки нет, и он получал
+  // произвольную (возможно чужую) организацию. Оба вопроса решает резолвер.
+  const { userId, orgId, org, canManage, loading: ctxLoading } = useOrgContext()
   const { warning } = useToast()
   const { confirm } = useDialog()
-  const [org, setOrg] = useState<Organization | null>(null)
   const [posts, setPosts] = useState<WallPost[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -85,26 +86,25 @@ export default function OrgWallPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'organization') { setLoading(false); return }
-    async function load() {
-      const orgData = await getMyOrg()
-      if (!orgData) { setLoading(false); return }
-      setOrg(orgData)
-      const p = await getWallPosts(orgData.id)
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    let cancelled = false
+    void (async () => {
+      const p = await getWallPosts(orgId)
+      if (cancelled) return
       setPosts(p)
       setLoading(false)
-    }
-    load()
-  }, [user, userLoading])
+    })()
+    return () => { cancelled = true }
+  }, [ctxLoading, canManage, orgId])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
-    if (!org || !user) return
+    if (!orgId || !userId) return
     setSaving(true)
     const post = await createWallPost({
-      org_id: org.id,
-      author_id: user.id,
+      org_id: orgId,
+      author_id: userId,
       title: form.title,
       body: form.body,
       post_type: form.post_type,
@@ -115,6 +115,10 @@ export default function OrgWallPage() {
       setPosts(prev => [post, ...prev])
       setForm({ title: '', body: '', post_type: 'announcement', event_date: '', visible_to: 'all' })
       setShowCreate(false)
+    } else {
+      // Молчаливый провал был худшим из вариантов: форма оставалась открытой,
+      // текст на месте, и было непонятно — сохранилось или нет.
+      warning('Публикация не сохранена — недостаточно прав или ошибка сети.')
     }
     setSaving(false)
   }
@@ -125,17 +129,28 @@ export default function OrgWallPage() {
       warning('Максимум 5 закреплённых публикаций.')
       return
     }
-    await togglePin(post.id, !post.is_pinned)
+    // Локальный список правим только после подтверждённой записи: под RLS
+    // отказ не приходит ошибкой — запись просто не находит доступных строк.
+    // Раньше интерфейс переставлял закрепление, которого в базе не было.
+    const ok = await togglePin(post.id, !post.is_pinned)
+    if (!ok) {
+      warning('Не удалось изменить закрепление — недостаточно прав.')
+      return
+    }
     setPosts(prev => prev.map(p => p.id === post.id ? { ...p, is_pinned: !p.is_pinned } : p))
   }
 
   async function handleDelete(postId: string) {
     if (!(await confirm('Удалить эту публикацию?'))) return
-    await softDeletePost(postId)
+    const ok = await softDeletePost(postId)
+    if (!ok) {
+      warning('Не удалось удалить публикацию — недостаточно прав.')
+      return
+    }
     setPosts(prev => prev.filter(p => p.id !== postId))
   }
 
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -143,11 +158,11 @@ export default function OrgWallPage() {
     )
   }
 
-  if (user?.role !== 'organization') {
+  if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
   }

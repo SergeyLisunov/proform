@@ -13,22 +13,20 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { useDialog } from '@/lib/hooks/useDialog'
-import { getMyOrg } from '@/services/org.service'
 import {
   listOrgGroups, createOrgGroup, archiveOrgGroup,
   LEVEL_META, type SkillLevel, type OrgGroupWithCounts,
 } from '@/services/org-groups.service'
-import type { Organization } from '@/types/org.types'
 import { Card, Badge } from '@/components/ui/metronic'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
 export default function OrgTeamsPage() {
-  const { user, loading: userLoading } = useUser()
+  // P1: гейт по глобальной роли + getMyOrg() не пускали org_admin.
+  const { orgId, org, canManage, loading: ctxLoading } = useOrgContext()
   const { confirm }                 = useDialog()
-  const [org, setOrg]               = useState<Organization | null>(null)
   const [groups, setGroups]         = useState<OrgGroupWithCounts[]>([])
   const [loading, setLoading]       = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -43,10 +41,10 @@ export default function OrgTeamsPage() {
   const [saving, setSaving]             = useState(false)
   const [error, setError]               = useState<string | null>(null)
 
-  const load = useCallback(async (orgId: string) => {
+  const load = useCallback(async (id: string) => {
     setLoading(true)
     try {
-      const list = await listOrgGroups(orgId)
+      const list = await listOrgGroups(id)
       setGroups(list)
     } finally {
       setLoading(false)
@@ -54,16 +52,10 @@ export default function OrgTeamsPage() {
   }, [])
 
   useEffect(() => {
-    if (userLoading) return
-    if (user?.role !== 'organization') { setLoading(false); return }
-    async function init() {
-      const orgData = await getMyOrg()
-      if (!orgData) { setLoading(false); return }
-      setOrg(orgData)
-      await load(orgData.id)
-    }
-    init()
-  }, [user, userLoading, load])
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    void load(orgId)
+  }, [ctxLoading, canManage, orgId, load])
 
   const submit = async () => {
     if (!org) return
@@ -105,7 +97,7 @@ export default function OrgTeamsPage() {
     } finally { setBusyId(null) }
   }
 
-  if (userLoading || loading) {
+  if (ctxLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
@@ -113,11 +105,11 @@ export default function OrgTeamsPage() {
     )
   }
 
-  if (user?.role !== 'organization' || !org) {
+  if (!canManage || !org) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
-        <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
+        <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
   }

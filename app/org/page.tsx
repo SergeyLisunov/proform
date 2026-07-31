@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
-import { useUser } from '@/lib/hooks/useUser'
+import { useOrgContext } from '@/lib/hooks/useOrgContext'
 
 // Sprint W2 Day 11 — management widgets (dynamic-loaded to avoid bloating
 // initial bundle and to keep org owners with empty data fast).
@@ -19,10 +19,6 @@ function getSB() {
   )
 }
 
-type Org = {
-  id: string; org_name: string; org_slug: string
-  sport_type: string | null; city: string | null; is_verified: boolean
-}
 type WallPost = {
   id: string; title: string; body: string; post_type: string
   is_pinned: boolean; created_at: string
@@ -52,35 +48,30 @@ function formatRuDate(value: string | null | undefined, options: Intl.DateTimeFo
 }
 
 export default function OrgDashboard() {
-  const { user, loading: userLoading } = useUser()
-  const [org, setOrg] = useState<Org | null>(null)
+  // P1: раньше гейт был `user.role !== 'organization'`, а org_id брался из
+  // `user.id` — org_admin не проходил ни то, ни другое (у него чужой org_id).
+  const { orgId, org, canManage, loading: ctxLoading } = useOrgContext()
   const [stats, setStats] = useState({ total: 0, coaches: 0, athletes: 0 })
   const [posts, setPosts] = useState<WallPost[]>([])
   const [newsletters, setNewsletters] = useState<Newsletter[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (userLoading || !user?.id) return
-    if (user.role !== 'organization') { setLoading(false); return }
-    load(user.id)
-  }, [user, userLoading])
+    if (ctxLoading) return
+    if (!canManage || !orgId) { setLoading(false); return }
+    load(orgId)
+  }, [ctxLoading, canManage, orgId])
 
-  async function load(userId: string) {
+  async function load(id: string) {
     const sb = getSB()
     try {
-      // Загружаем организацию
-      const { data: orgData } = await sb
-        .from('organizations').select('*').eq('id', userId).maybeSingle()
-      if (!orgData) { setLoading(false); return }
-      setOrg(orgData)
-
-      // Загружаем всё параллельно
+      // Профиль клуба уже резолвлен хуком — здесь только агрегаты.
       const [{ data: membersData }, { data: postsData }, { data: nlData }] = await Promise.all([
-        sb.from('org_members').select('member_role, status').eq('org_id', orgData.id).neq('status', 'removed'),
+        sb.from('org_members').select('member_role, status').eq('org_id', id).neq('status', 'removed'),
         sb.from('wall_posts').select('id, title, body, post_type, is_pinned, created_at')
-          .eq('org_id', orgData.id).is('deleted_at', null).order('created_at', { ascending: false }).limit(4),
+          .eq('org_id', id).is('deleted_at', null).order('created_at', { ascending: false }).limit(4),
         sb.from('newsletters').select('id, subject, status, sent_at, created_at, recipients_count')
-          .eq('org_id', orgData.id).order('created_at', { ascending: false }).limit(3),
+          .eq('org_id', id).order('created_at', { ascending: false }).limit(3),
       ])
 
       const members = membersData ?? []
@@ -95,19 +86,19 @@ export default function OrgDashboard() {
     finally { setLoading(false) }
   }
 
-  if (userLoading || loading) return (
+  if (ctxLoading || loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full pf-spin" />
     </div>
   )
 
-  if (user?.role !== 'organization') return (
+  if (!canManage) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 pf-enter">
       <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <i className="ki-filled ki-office-bag text-2xl" style={{ color: '#2563EB' }} />
       </div>
-      <p className="text-sm font-semibold text-foreground">Требуется доступ организации</p>
-      <p className="text-2sm text-muted-foreground">Этот раздел доступен только аккаунтам организаций.</p>
+      <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
+      <p className="text-2sm text-muted-foreground">Раздел доступен владельцу клуба и его администраторам.</p>
     </div>
   )
 
@@ -139,7 +130,9 @@ export default function OrgDashboard() {
     { href: '/org/members', icon: 'ki-people', color: '#2563EB', bg: '#EFF6FF', label: 'Участники', meta: 'Состав и статусы' },
     { href: '/org/wall', icon: 'ki-abstract-45', color: '#F35703', bg: '#FEF0E7', label: 'Стена', meta: 'Публикации и анонсы' },
     { href: '/org/newsletters', icon: 'ki-sms', color: '#9333EA', bg: '#FAF5FF', label: 'Рассылки', meta: 'Сообщения и охват' },
-    { href: '/org/settings', icon: 'ki-setting-2', color: '#64748B', bg: '#F8FAFC', label: 'Настройки', meta: 'Профиль и права' },
+    // Раньше здесь была плитка «Настройки» → /org/settings. Такого маршрута в
+    // app/ нет и не было — клик давал 404. Заменена на существующий раздел.
+    { href: '/org/teams', icon: 'ki-abstract-32', color: '#64748B', bg: '#F8FAFC', label: 'Группы', meta: 'Команды и состав' },
   ]
 
   return (

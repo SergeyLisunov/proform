@@ -95,6 +95,13 @@ export async function POST(req: Request) {
     .eq('athlete_id', body.athlete_id)
     .maybeSingle()
 
+  // action — enum public.audit_action. Значения 'clearance_override' в нём
+  // не было, поэтому insert падал с 22P02 — а он здесь ПРОВЕРЯЕТСЯ и
+  // возвращается как 500 'audit_failed'. То есть обход допуска не просто не
+  // логировался: маршрут падал на каждом вызове, функция была мертва
+  // целиком. Значение добавлено в enum миграцией 109; строгое поведение
+  // «нет записи в журнале — нет операции» здесь оставлено намеренно:
+  // обход врачебного ограничения без следа недопустим.
   const { data: row, error: insertErr } = await adminAny.from('audit_logs').insert({
     actor_id:     actorId,
     action:       'clearance_override',
