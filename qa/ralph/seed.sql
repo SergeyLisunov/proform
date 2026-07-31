@@ -116,9 +116,10 @@ WHERE NOT EXISTS (SELECT 1 FROM org_members x WHERE x.org_id = o.id AND x.user_i
 -- ── Тренер → спортсмен ──────────────────────────────────────────────────────
 -- Alpha-1: назначен coach1 + doctor. Alpha-2: назначен coach2, БЕЗ доктора
 -- (проверка empty state и последующего назначения).
--- ВНИМАНИЕ: канонический статус связи в коде — 'accepted'
--- (lib/ai/assistant/context.ts:verifyTrainerAthlete и др.). В проде
--- встречается и 'active' — расхождение вынесено в BUG_BACKLOG.
+-- Статус связи: 'accepted' — единственное рабочее значение (так читают код
+-- и все RLS-политики). Словарь сведён миграцией 111 к
+-- pending → accepted → inactive; умолчание колонки тоже 'accepted', так что
+-- вставка без явного статуса больше не создаёт мёртвую связь.
 INSERT INTO trainer_athletes (trainer_id, athlete_id, status)
 SELECT t.id, a.id, 'accepted'
 FROM (VALUES
