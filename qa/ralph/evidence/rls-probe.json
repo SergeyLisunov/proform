@@ -1,6 +1,6 @@
 {
-  "ranAt": "2026-07-31T14:02:32.030Z",
-  "total": 23,
+  "ranAt": "2026-07-31T19:40:22.045Z",
+  "total": 31,
   "failed": 0,
   "results": [
     {
@@ -163,6 +163,77 @@
     {
       "id": "MED-08",
       "title": "Врач ВСЁ ЕЩЁ может выписать рекомендацию своему пациенту",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "detail": "status=201"
+    },
+    {
+      "id": "INQ-01",
+      "title": "Тренер НЕ может создать запрос врачу о чужом спортсмене",
+      "severity": "P1",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "id": "INQ-02",
+      "title": "Тренер ВСЁ ЕЩЁ может спросить врача о своём спортсмене",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "detail": "status=201"
+    },
+    {
+      "id": "INJ-01",
+      "title": "Врач может внести запись о травме своему пациенту",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "detail": "status=201"
+    },
+    {
+      "id": "INJ-02",
+      "title": "Связанный тренер ВИДИТ запись врача о травме",
+      "severity": "P2",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "id": "INJ-03",
+      "title": "Тренер НЕ может удалить запись о травме, внесённую врачом",
+      "severity": "P1",
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "detail": "DELETE status=204"
+    },
+    {
+      "id": "INJ-04",
+      "title": "Тренер НЕ может присвоить себе запись врача",
+      "severity": "P1",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "PATCH status=204"
+    },
+    {
+      "id": "GRP-01",
+      "title": "Клуб НЕ может добавить в команду спортсмена другого клуба",
+      "severity": "P1",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "id": "GRP-02",
+      "title": "Клуб ВСЁ ЕЩЁ может добавить своего спортсмена",
       "severity": "P1",
       "expected": 1,
       "actual": 1,

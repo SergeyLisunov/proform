@@ -49,6 +49,40 @@ export async function POST(req: Request) {
   try { body = BodySchema.parse(await req.json()) }
   catch { return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 }) }
 
+  // P1: маршрут принимал произвольный athlete_id от ЛЮБОГО
+  // аутентифицированного пользователя и дальше работал admin-клиентом в
+  // обход RLS: посторонний мог записать «обход медицинского допуска» на
+  // чужого спортсмена и отправить уведомление его врачу. Обход допуска —
+  // действие тренера этого спортсмена (или его врача / администратора).
+  if (actorRole !== 'admin') {
+    let allowed = false
+
+    if (actorRole === 'coach') {
+      const { data: link } = await supabase.from('trainer_athletes')
+        .select('athlete_id')
+        .eq('trainer_id', actorId)
+        .eq('athlete_id', body.athlete_id)
+        .eq('status', 'accepted')
+        .maybeSingle()
+      allowed = !!link
+    } else if (actorRole === 'doctor' || actorRole === 'specialist') {
+      const { data: link } = await supabase.from('connections')
+        .select('id')
+        .eq('connection_type', 'doctor_athlete')
+        .eq('status', 'active')
+        .or(
+          `and(initiator_id.eq.${actorId},recipient_id.eq.${body.athlete_id}),` +
+          `and(initiator_id.eq.${body.athlete_id},recipient_id.eq.${actorId})`
+        )
+        .maybeSingle()
+      allowed = !!link
+    }
+
+    if (!allowed) {
+      return NextResponse.json({ ok: false, error: 'not_your_athlete' }, { status: 403 })
+    }
+  }
+
   const admin = createAdminClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adminAny = admin as any
