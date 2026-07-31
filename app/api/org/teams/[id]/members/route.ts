@@ -38,6 +38,13 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     if (error.code === '23505') {
       return NextResponse.json({ ok: false, error: 'ALREADY_MEMBER' }, { status: 409 })
     }
+    // P1: раньше принадлежность спортсмена клубу не проверялась нигде —
+    // в команду можно было добавить спортсмена другого клуба. Теперь это
+    // запрещает политика org_group_members_admin_write (миграция 106);
+    // отказ RLS отдаём как 403, а не как «внутренняя ошибка».
+    if (error.code === '42501') {
+      return NextResponse.json({ ok: false, error: 'NOT_ORG_ATHLETE' }, { status: 403 })
+    }
     return NextResponse.json({ ok: false, error: 'INSERT_FAILED' }, { status: 500 })
   }
   return NextResponse.json({ ok: true })

@@ -68,6 +68,48 @@ test.describe('cross-tenant: спортсмен не получает админ
   })
 })
 
+test.describe('медицинские рекомендации: роли не подменяются', () => {
+  test.use({ storageState: statePath('athlete-alpha1') })
+
+  test('спортсмен не может подтвердить рекомендацию «от имени тренера»', async ({ request }) => {
+    const list = await request.get('/api/recommendations')
+    expect(list.status()).toBe(200)
+    const body = await list.json() as { data?: Array<{ id: string }> }
+    const rec = (body.data ?? [])[0]
+    test.skip(!rec, 'нет ни одной рекомендации в фикстурах')
+
+    const forged = await request.post(`/api/recommendations/${rec!.id}/ack`, {
+      data: { as: 'coach' },
+    })
+    expect(FORBIDDEN_OK, `подделка подтверждения вернула ${forged.status()}`)
+      .toContain(forged.status())
+  })
+
+  test('спортсмен может подтвердить рекомендацию от своего имени', async ({ request }) => {
+    const list = await request.get('/api/recommendations')
+    const body = await list.json() as { data?: Array<{ id: string }> }
+    const rec = (body.data ?? [])[0]
+    test.skip(!rec, 'нет ни одной рекомендации в фикстурах')
+
+    const ok = await request.post(`/api/recommendations/${rec!.id}/ack`, {
+      data: { as: 'athlete' },
+    })
+    expect(ok.status(), 'легитимное подтверждение не должно ломаться').toBe(200)
+  })
+
+  test('спортсмен не может отменить врачебную рекомендацию', async ({ request }) => {
+    const list = await request.get('/api/recommendations')
+    const body = await list.json() as { data?: Array<{ id: string }> }
+    const rec = (body.data ?? [])[0]
+    test.skip(!rec, 'нет ни одной рекомендации в фикстурах')
+
+    const cancelled = await request.patch(`/api/recommendations/${rec!.id}`, {
+      data: { action: 'cancel' },
+    })
+    expect(cancelled.status(), 'отмена доступна только автору-врачу').not.toBe(200)
+  })
+})
+
 test.describe('администратор платформы: смена роли аудируется', () => {
   test.use({ storageState: statePath('platform-owner') })
 

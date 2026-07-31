@@ -207,5 +207,37 @@ export async function GET(req: Request) {
 
   const { data, error } = await q
   if (error) return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
-  return NextResponse.json({ ok: true, data: data ?? [] })
+
+  // P1: RLS пускает администрацию клуба к строкам рекомендаций, чтобы она
+  // видела ФАКТ и операционную важность ограничения. Но выдача отдавала
+  // строку целиком — включая клинический текст записей с
+  // visibility_level='athlete_only', адресованных только спортсмену.
+  // Скрываем содержательные поля от всех, кому запись не адресована;
+  // автор-врач и сам спортсмен видят её полностью.
+  const { data: meRow } = await sb
+    .from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string; role: string | null } | null
+
+  type Rec = {
+    id: string; athlete_id: string; doctor_id: string | null; coach_id: string | null
+    visibility_level: string; body: string | null; title: string
+    [k: string]: unknown
+  }
+
+  const redacted = ((data ?? []) as Rec[]).map(r => {
+    if (!me || me.role === 'admin') return r
+    const isAuthor  = r.doctor_id === me.id
+    const isAthlete = r.athlete_id === me.id
+    const isCoach   = r.coach_id === me.id
+    if (isAuthor || isAthlete) return r
+
+    const coachMayRead = ['coach_only', 'coach_and_athlete', 'org_full'].includes(r.visibility_level)
+    if (isCoach && coachMayRead) return r
+    if (r.visibility_level === 'org_full') return r
+
+    // Остальным (в т.ч. администрации клуба) — только факт и метаданные.
+    return { ...r, body: null, title: 'Медицинское ограничение', redacted: true }
+  })
+
+  return NextResponse.json({ ok: true, data: redacted })
 }

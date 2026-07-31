@@ -246,6 +246,100 @@ async function main() {
     await rest(tokens.doctorAlpha, `recommendations?title=eq.${encodeURIComponent('QA-PROBE: свой пациент')}`, { method: 'DELETE' })
   }
 
+  // ── 6c. Запрос врачу о чужом спортсмене (P1, миграция 106) ────────────────
+  const forgeInquiry = await rest(tokens.coachAlpha2, 'doctor_inquiries', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({
+      coach_id: ids.coachAlpha2, athlete_id: ids.athleteAlpha1,
+      question: 'QA-PROBE: вопрос о чужом спортсмене', question_type: 'general',
+    }),
+  })
+  check('INQ-01', 'Тренер НЕ может создать запрос врачу о чужом спортсмене', 'P1', true,
+    forgeInquiry.status >= 400 || rows(forgeInquiry) === 0, `status=${forgeInquiry.status}`)
+
+  const ownInquiry = await rest(tokens.coachAlpha1, 'doctor_inquiries', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({
+      coach_id: ids.coachAlpha1, athlete_id: ids.athleteAlpha1,
+      question: 'QA-PROBE: вопрос о своём спортсмене', question_type: 'general',
+    }),
+  })
+  check('INQ-02', 'Тренер ВСЁ ЕЩЁ может спросить врача о своём спортсмене', 'P1', 1, rows(ownInquiry),
+    `status=${ownInquiry.status}`)
+  if (rows(ownInquiry) === 1) {
+    await rest(tokens.coachAlpha1, `doctor_inquiries?id=eq.${ownInquiry.body[0].id}`, { method: 'DELETE' })
+  }
+
+  // ── 6d. Записи о травме: авторство (P1, миграция 106) ─────────────────────
+  const docInjury = await rest(tokens.doctorAlpha, 'injuries', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({
+      athlete_id: ids.athleteAlpha1, reported_by: ids.doctorAlpha,
+      onset_date: new Date().toISOString().slice(0, 10),
+      body_part: 'QA-PROBE колено', description: 'Синтетическая запись QA',
+    }),
+  })
+  check('INJ-01', 'Врач может внести запись о травме своему пациенту', 'P1', 1, rows(docInjury),
+    `status=${docInjury.status}`)
+
+  if (rows(docInjury) === 1) {
+    const injuryId = docInjury.body[0].id
+
+    const coachSees = await rest(tokens.coachAlpha1, `injuries?select=id&id=eq.${injuryId}`)
+    check('INJ-02', 'Связанный тренер ВИДИТ запись врача о травме', 'P2', 1, rows(coachSees))
+
+    const coachDeletes = await rest(tokens.coachAlpha1, `injuries?id=eq.${injuryId}`, { method: 'DELETE' })
+    const stillThere = await rest(tokens.doctorAlpha, `injuries?select=id&id=eq.${injuryId}`)
+    check('INJ-03', 'Тренер НЕ может удалить запись о травме, внесённую врачом', 'P1', 1, rows(stillThere),
+      `DELETE status=${coachDeletes.status}`)
+
+    const coachHijacks = await rest(tokens.coachAlpha1, `injuries?id=eq.${injuryId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reported_by: ids.coachAlpha1, description: 'QA-PROBE: присвоено' }),
+    })
+    const afterHijack = await rest(tokens.doctorAlpha, `injuries?select=reported_by&id=eq.${injuryId}`)
+    check('INJ-04', 'Тренер НЕ может присвоить себе запись врача', 'P1', true,
+      afterHijack.body?.[0]?.reported_by === ids.doctorAlpha,
+      `PATCH status=${coachHijacks.status}`)
+
+    await rest(tokens.doctorAlpha, `injuries?id=eq.${injuryId}`, { method: 'DELETE' })
+  }
+
+  // ── 6e. Команда клуба: чужой спортсмен (P1, миграция 106) ─────────────────
+  const group = await rest(tokens.ownerAlpha, 'org_groups', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ organization_id: alphaOrgId, name: 'QA-PROBE команда' }),
+  })
+  if (rows(group) === 1) {
+    const groupId = group.body[0].id
+
+    const addForeign = await rest(tokens.ownerAlpha, 'org_group_members', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ group_id: groupId, athlete_id: ids.athleteBeta }),
+    })
+    check('GRP-01', 'Клуб НЕ может добавить в команду спортсмена другого клуба', 'P1', true,
+      addForeign.status >= 400 || rows(addForeign) === 0, `status=${addForeign.status}`)
+
+    const addOwn = await rest(tokens.ownerAlpha, 'org_group_members', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ group_id: groupId, athlete_id: ids.athleteAlpha1 }),
+    })
+    check('GRP-02', 'Клуб ВСЁ ЕЩЁ может добавить своего спортсмена', 'P1', 1, rows(addOwn),
+      `status=${addOwn.status}`)
+
+    await rest(tokens.ownerAlpha, `org_group_members?group_id=eq.${groupId}`, { method: 'DELETE' })
+    await rest(tokens.ownerAlpha, `org_groups?id=eq.${groupId}`, { method: 'DELETE' })
+  } else {
+    check('GRP-01', 'Клуб НЕ может добавить в команду спортсмена другого клуба', 'P1', true, false,
+      `не удалось создать тестовую команду: status=${group.status}`)
+  }
+
   // ── 7. Приватные AI-диалоги ───────────────────────────────────────────────
   const ownerSeesAiConv = await rest(tokens.ownerAlpha, 'ai_conversations?select=id&limit=5')
   check('AI-01', 'Организация НЕ читает чужие AI-диалоги', 'P0', 0, rows(ownerSeesAiConv))

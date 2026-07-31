@@ -51,7 +51,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .insert({
       owner_id:    meRow.id,
       title:       body.title_override ?? tplRow.name,
-      event_type:  'training',
+      // P1: здесь стояло 'training' — значения, которого НЕТ в
+      // calendar_events_event_type_check. Применение шаблона в календарь
+      // падало всегда (23514), молча ломая единственный быстрый путь
+      // планирования тренировки. Словарь уже содержит нужный термин.
+      event_type:  'workout',
       start_date:  body.date,
       event_date:  body.date,
       start_time:  body.time ?? null,

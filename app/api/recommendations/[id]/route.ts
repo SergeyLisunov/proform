@@ -37,10 +37,22 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
   // Read current state to validate transition
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: cur } = await (sb as any).from('recommendations')
-    .select('status, athlete_id, coach_id, title')
+    .select('status, athlete_id, coach_id, doctor_id, title')
     .eq('id', params.id)
     .maybeSingle()
   if (!cur) return NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 })
+
+  // P1: закрыть или отменить медицинскую рекомендацию мог кто угодно —
+  // маршрут не проверял, кто вызывает. Спортсмен или тренер снимали
+  // врачебное ограничение нагрузки со своей же карточки. Управляет
+  // жизненным циклом только автор-врач (и администратор платформы).
+  const { data: meRow } = await sb
+    .from('users').select('id, role').eq('auth_id', auth.user.id).maybeSingle()
+  const me = meRow as { id: string; role: string | null } | null
+  if (!me) return NextResponse.json({ ok: false, error: 'NO_PROFILE' }, { status: 404 })
+  if (me.role !== 'admin' && cur.doctor_id !== me.id) {
+    return NextResponse.json({ ok: false, error: 'AUTHOR_ONLY' }, { status: 403 })
+  }
 
   // Validate transition
   if (body.action === 'resolve' && !['sent', 'active', 'acknowledged'].includes(cur.status)) {

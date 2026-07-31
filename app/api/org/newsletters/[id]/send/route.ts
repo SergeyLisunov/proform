@@ -117,10 +117,13 @@ export async function POST(_req: Request, props: { params: Promise<{ id: string 
   const nl = nlRow as NewsletterCols | null
   if (!nl) return NextResponse.json({ ok: false, error: 'NOT_FOUND' }, { status: 404 })
 
-  // ── Ownership: admin role bypasses; organization must be an active
-  // member of newsletter.org_id with member_role='coach' (de-facto admin
-  // in this product, see services/org.service.ts comment). The
-  // `organizations` table has no owner_id — membership IS the auth.
+  // ── Ownership: admin role bypasses; аккаунт организации должен быть
+  // активным участником newsletter.org_id с управляющей ролью.
+  //
+  // P1: раньше требовался строго member_role='coach'. Но владельцу клуба
+  // при создании организации проставляется 'org_owner' (см. миграцию 088),
+  // поэтому собственную рассылку он отправить не мог — получал 403 на своей
+  // же организации. Принимаем все управляющие роли клуба.
   if (me.role === 'organization') {
     const { data: memRow } = await sb
       .from('org_members')
@@ -128,7 +131,7 @@ export async function POST(_req: Request, props: { params: Promise<{ id: string 
       .eq('org_id', nl.org_id)
       .eq('user_id', me.id)
       .eq('status', 'active')
-      .eq('member_role', 'coach')
+      .in('member_role', ['org_owner', 'org_admin', 'coach'])
       .maybeSingle()
     if (!memRow) {
       return NextResponse.json({ ok: false, error: 'FORBIDDEN' }, { status: 403 })
