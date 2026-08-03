@@ -128,6 +128,17 @@ export async function sendNewsletter(id: string): Promise<NewsletterSendResult |
   return json.data as NewsletterSendResult
 }
 
+/**
+ * Статистика доставок. Читается пользовательским клиентом сознательно:
+ * доступ управляющего клуба открыт политикой
+ * newsletter_deliveries_manager_read (миграция 112) через SECURITY DEFINER
+ * предикат is_org_manager_of. До неё у таблицы были только own-read
+ * политики, а строки пишет админ-клиент маршрута отправки — поэтому экран
+ * статистики показывал нули при любом числе реально отправленных писем.
+ *
+ * Админ-клиент здесь не нужен и вреден: страница /org/newsletters/[id]/stats
+ * клиентская, service-ключ в браузер отдавать нельзя.
+ */
 export async function getNewsletterStats(newsletterId: string): Promise<NewsletterStats> {
   const supabase = createClient()
   const { data } = await supabase

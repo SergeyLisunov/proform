@@ -1,0 +1,526 @@
+{
+  "backlog_audit": {
+    "verified": [
+      {
+        "item": "P1-1. Роль org_admin неработоспособна — /org/* требуют глобальную роль 'organization'",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "lib/org/org-context.ts: `.from('org_members').select('org_id, member_role, status').eq('user_id', me.id).eq('status','active').in('member_role', CLUB_MANAGER_MEMBER_ROLES)` → `resolveOrgContext(...)`. app/org/page.tsx: `if (!canManage) return (... 'Раздел доступен владельцу клуба и его администраторам')`. Резолвер подключён к 10 страницам /org/*. RLS-половина тоже живая (проверено в БД): политика org_members_manager_read USING `is_org_manager_of(org_id)`, org_members_manager_insert WITH CHECK `is_org_manager_of(org_id) AND ((member_role <> 'org_owner') OR is_org_owner_of(org_id))` — миграция 110 применена (schema_migrations: 20260731202525 org_admin_scopes).",
+        "file": "lib/org/org-context.ts"
+      },
+      {
+        "item": "P1-2. Владелец клуба не может отправить рассылку (проверка требует member_role='coach')",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/org/newsletters/[id]/send/route.ts: `.in('member_role', ['org_owner', 'org_admin', 'coach'])` с комментарием «владельцу клуба при создании организации проставляется 'org_owner' (см. миграцию 088), поэтому собственную рассылку он отправить не мог». Файл не изменён в рабочем дереве — состояние стабильное.",
+        "file": "app/api/org/newsletters/[id]/send/route.ts"
+      },
+      {
+        "item": "P1-3. Спортсмен подделывает подтверждение рекомендации от имени тренера (поле `as` из тела)",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/recommendations/[id]/ack/route.ts: `if (body.as === 'athlete') { if (rec.athlete_id !== me.id) return ... 'NOT_YOUR_RECOMMENDATION' 403 } else { if (me.role !== 'coach' && me.role !== 'admin') return ... 'COACH_ONLY' 403; if (me.role === 'coach' && rec.coach_id !== me.id) { ...trainer_athletes.eq('status','accepted')... if (!link) return 'NOT_YOUR_ATHLETE' 403 } }`",
+        "file": "app/api/recommendations/[id]/ack/route.ts"
+      },
+      {
+        "item": "P1-4. POST /api/clearance/override принимает любой athlete_id от любого пользователя",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/clearance/override/route.ts: `if (actorRole !== 'admin') { let allowed = false; if (actorRole === 'coach') {...trainer_athletes .eq('status','accepted')...} else if (actorRole === 'doctor' || actorRole === 'specialist') {...connections .eq('connection_type','doctor_athlete').eq('status','active')...} if (!allowed) return NextResponse.json({ ok:false, error:'not_your_athlete' }, { status: 403 }) }`. Значение 'clearance_override' в enum public.audit_action подтверждено в живой БД.",
+        "file": "app/api/clearance/override/route.ts"
+      },
+      {
+        "item": "P1-5. GET /api/recommendations отдаёт админу клуба полный текст, включая visibility_level='athlete_only'",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/recommendations/route.ts: `const redacted = ((data ?? []) as Rec[]).map(r => { if (!me || me.role === 'admin') return r; const isAuthor = r.doctor_id === me.id; const isAthlete = r.athlete_id === me.id; ... if (isAuthor || isAthlete) return r; ... // Остальным (в т.ч. администрации клуба) — только факт и метаданные. return { ...r, body: null, title: 'Медицинское ограничение', redacted: true } })`",
+        "file": "app/api/recommendations/route.ts"
+      },
+      {
+        "item": "P1-6. Спортсмен и тренер могут отменить рекомендацию врача через PATCH /api/recommendations/[id]",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/recommendations/[id]/route.ts: `if (me.role !== 'admin' && cur.doctor_id !== me.id) { return NextResponse.json({ ok: false, error: 'AUTHOR_ONLY' }, { status: 403 }) }`",
+        "file": "app/api/recommendations/[id]/route.ts"
+      },
+      {
+        "item": "P1-7. Тренер создаёт запрос врачу о любом спортсмене (doctor_inquiries_coach_own не требует связи)",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД, pg_policies: политика doctor_inquiries_coach_own отсутствует, вместо неё четыре раздельные. doctor_inquiries_coach_insert [INSERT] WITH CHECK: `((coach_id = get_my_user_id()) AND (EXISTS (SELECT 1 FROM trainer_athletes ta WHERE ((ta.trainer_id = get_my_user_id()) AND (ta.athlete_id = doctor_inquiries.athlete_id) AND (ta.status = 'accepted'::text)))))`",
+        "file": "supabase/migrations/106_p1_security_scopes.sql"
+      },
+      {
+        "item": "P1-8. Тренер имеет FOR ALL на injuries — может удалить/переписать записи врача",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД: injuries_coach_rw и injuries_doctor_rw отсутствуют. Есть injuries_coach_update [UPDATE] USING `(reported_by = get_my_user_id())` WITH CHECK `(reported_by = get_my_user_id())` и injuries_coach_delete [DELETE] USING `(reported_by = get_my_user_id())`; чтение отделено: injuries_coach_select USING `EXISTS (SELECT 1 FROM trainer_athletes ta WHERE ... ta.status = 'accepted')`.",
+        "file": "supabase/migrations/106_p1_security_scopes.sql"
+      },
+      {
+        "item": "P1-9. Добавление в команду не проверяет принадлежность спортсмена клубу",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД, org_group_members_admin_write WITH CHECK содержит доп. предикат: `AND (EXISTS (SELECT 1 FROM (org_groups og JOIN org_members om_a ON ((om_a.org_id = og.organization_id))) WHERE ((og.id = org_group_members.group_id) AND (om_a.user_id = org_group_members.athlete_id) AND (om_a.status = 'active'))))`. Маршрут: `if (error.code === '42501') return NextResponse.json({ ok:false, error:'NOT_ORG_ATHLETE' }, { status: 403 })`.",
+        "file": "app/api/org/teams/[id]/members/route.ts"
+      },
+      {
+        "item": "P1-10. channel_posts_update без WITH CHECK — автор переносит пост в канал чужого клуба",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД, channel_posts_update [UPDATE] WITH CHECK: `(((author_id = (SELECT get_my_user_id())) OR is_channel_moderator(channel_id)) AND can_post_channel(channel_id))` — раньше поле with_check было пустым.",
+        "file": "supabase/migrations/106_p1_security_scopes.sql"
+      },
+      {
+        "item": "P1-11. channels_admin_update без WITH CHECK — модератор переназначает канал в другую организацию",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Закрыт триггером, а не политикой. Живая БД, pg_trigger: `trg_guard_channel_immutable_columns` на таблице channels → функция `guard_channel_immutable_columns`, тело которой содержит `IF NEW.org_id IS DISTINCT FROM OLD.org_id THEN RAISE EXCEPTION 'Перенос канала в другую организацию запрещён' USING ERRCODE = '42501'`.",
+        "file": "supabase/migrations/106_p1_security_scopes.sql"
+      },
+      {
+        "item": "P1-12. org_groups_head_coach_update без привязки к организации — перенос команды в чужой клуб",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД, org_groups_head_coach_update [UPDATE] WITH CHECK: `((head_coach_id = (SELECT get_my_user_id())) AND (EXISTS (SELECT 1 FROM org_members om WHERE ((om.org_id = org_groups.organization_id) AND (om.user_id = (SELECT get_my_user_id())) AND (om.status = 'active')))))`.",
+        "file": "supabase/migrations/106_p1_security_scopes.sql"
+      },
+      {
+        "item": "P1-13. Применение шаблона в календарь всегда падает (event_type='training')",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/api/workout-templates/[id]/apply/route.ts: `// P1: здесь стояло 'training' — значения, которого НЕТ в calendar_events_event_type_check. ... event_type: 'workout',`",
+        "file": "app/api/workout-templates/[id]/apply/route.ts"
+      },
+      {
+        "item": "P1-14. UI назначения одиночной тренировки (CoachQuickActions) нигде не смонтирован",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/dashboard/page.tsx:39 `const CoachQuickActions = dynamic(() => import('@/components/coach/CoachQuickActions'), { ssr: false })` и app/dashboard/page.tsx:1047 `<CoachQuickActions coachId={userId} athletes={athletes.map(a => ({ id: a.id, name: a.name }))} />`",
+        "file": "app/dashboard/page.tsx"
+      },
+      {
+        "item": "P1-15. /coach/plans отсутствует в навигации",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "lib/sidebar/config.ts:115 `{ id: 'coach.plans', href: '/coach/plans', icon: 'ki-notepad-edit', label: 'Планы тренировок', roles: ['coach'] }` (строка 110 — комментарий «/coach/plans существует и является единственным рабочим путём»).",
+        "file": "lib/sidebar/config.ts"
+      },
+      {
+        "item": "P1-16. Уведомление «Тренер назначил тренировку» ведёт на несуществующий /workouts",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "services/prescribed-workouts.service.ts:61-65 `// P1 — раньше здесь был '/workouts': такого маршрута в app/ нет ... action_url: '/athlete/dashboard',`. Отсутствие каталога app/workouts подтверждено.",
+        "file": "services/prescribed-workouts.service.ts"
+      },
+      {
+        "item": "P1-17. /athlete/goals и /athlete/progress недостижимы из меню",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "lib/sidebar/config.ts:183-184 `{ id: 'training.goals_athlete', href: '/athlete/goals', ... roles: ['athlete'] }` и `{ id: 'training.progress_athlete', href: '/athlete/progress', ... roles: ['athlete'] }`.",
+        "file": "lib/sidebar/config.ts"
+      },
+      {
+        "item": "P1-18…21. Экраны админки на хардкоде (главный экран, «Пользователи», селект роли, «Журнал действий»)",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/admin/page.tsx:48 `// Ревизия P1: отсюда удалены константы USERS (три выдуманных аккаунта), AUDIT (шесть выдуманных записей журнала) и SYSTEM_SERVICES`. loadUsers: `.from('users').select('id, name, email, role, created_at, is_searchable')`; loadAuditLog: `setAuditEntries(await listRecentAuditLog(50))`; селект роли (стр. 728-730): `onChange={e => { const nextRole = ...; if (nextRole !== userItem.role) void changeRole(userItem.id, nextRole) }}`. Файл не изменён в рабочем дереве.",
+        "file": "app/admin/page.tsx"
+      },
+      {
+        "item": "P1-22. /admin/orgs не видит неверифицированные организации и не может их верифицировать",
+        "severity": "P1",
+        "status": "ЗАКРЫТ",
+        "evidence": "Живая БД: organizations_admin_read [SELECT] USING `((SELECT get_my_role()) = 'admin')` и organizations_admin_update [UPDATE] USING/WITH CHECK `((SELECT get_my_role()) = 'admin')` — миграция 107 применена (20260731204400 admin_orgs_moderation). services/org.service.ts getAllOrgs (в т.ч. на HEAD) возвращает ошибку отдельным полем: `if (error) { console.warn('[org.service.getAllOrgs]', error.message); return { orgs: [], error: error.message } }`. Триггер самоверификации живой: trg_guard_org_verification_columns.",
+        "file": "services/org.service.ts"
+      },
+      {
+        "item": "P1-23. POST /api/leads/audit всегда падает 500 (tool_leads.consent_at + source 'landing-audit-form')",
+        "severity": "P1",
+        "status": "ОТКРЫТ",
+        "evidence": "МИГРАЦИЯ 108 НЕ ПРИМЕНЕНА К БАЗЕ. supabase_migrations.schema_migrations после 20260731135637 содержит только: p1_security_scopes, org_admin_scopes, admin_orgs_moderation, fix_org_verification_guard_columns, trainer_athletes_status_vocabulary — записи leads_consent_and_parent_notify нет. Живая проверка: колонок `consent_at` в public.tool_leads — 0 штук; `tool_leads_source_check` = `CHECK (source = ANY (ARRAY['acwr','overtraining','templates','team-risk','adaptive-plan','club-audit','medical-summary','other']))` — значения 'landing-audit-form' в словаре НЕТ. Код при этом пишет оба: app/api/leads/audit/route.ts:140 `source: 'landing-audit-form',` и :145 `consent_at: new Date().toISOString(),`. Дефект воспроизводится в проде: файл миграции есть в репозитории, но её эффекты в БД отсутствуют.",
+        "file": "supabase/migrations/108_leads_consent_and_parent_notify.sql"
+      },
+      {
+        "item": "P1-24. can_notify() не знает про parent_links — батч уведомлений с родителем отвергается целиком",
+        "severity": "P1",
+        "status": "ЧАСТИЧНО",
+        "evidence": "Первопричина ОТКРЫТА в БД: живая проверка `position('parent_links' in pg_get_functiondef(...)) > 0` для public.can_notify → **false** (миграция 108 не применена, см. предыдущий пункт). Последствие «теряется ВЕСЬ батч» закрыто в коде второй линией обороны: services/notifications.service.ts:97-101 `console.warn('[notifyMany] batch rejected, retrying row-by-row:', error.message)` → `rows.map(row => (sb as any).from('notifications').insert(row))`. Итог: уведомление родителю по-прежнему не проходит, но остальные адресаты его больше не теряют.",
+        "file": "services/notifications.service.ts"
+      },
+      {
+        "item": "P2. Mass assignment athleteId в /api/form-analysis",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD (a4e1f96) дефект воспроизводится: `git show HEAD:app/api/form-analysis/route.ts` строка 45 — `const athleteId = typeof body.athleteId === 'string' ? body.athleteId : (me.id as string)`, далее строка 49 `athlete_id: athleteId`. В рабочем дереве правка УЖЕ ЕСТЬ, но НЕ ЗАКОММИЧЕНА (файл в `git status` как ` M`): строки 52-65 `const requestedAthleteId = ...; if (requestedAthleteId && requestedAthleteId !== me.id) { ...trainer_athletes .eq('status','accepted')...; if (!link) return NextResponse.json({ ok:false, error:'NOT_YOUR_ATHLETE' }, { status: 403 }) }`. Правку вносит параллельный агент волны 4.",
+        "file": "app/api/form-analysis/route.ts"
+      },
+      {
+        "item": "P2. /admin/commerce читает payments/invoices/coach_orders пользовательским клиентом (панель выручки всегда пуста)",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "Первопричина в БД подтверждена и НЕ устранена: pg_policies даёт payments → `payments_read_own [SELECT] | payments_service_write [ALL]`, invoices → `invoices_read_own [SELECT] | invoices_service_write [ALL]`, coach_orders → `coach_orders_read_party [SELECT] | ...` — admin-политики нет ни на одной таблице. На HEAD страница ходит пользовательским клиентом. В рабочем дереве (не закоммичено) обход добавлен на уровне кода: app/admin/commerce/page.tsx:4 `import { createAdminClient } from '@/lib/supabase/admin'` и :84 `const admin = createAdminClient()`.",
+        "file": "app/admin/commerce/page.tsx"
+      },
+      {
+        "item": "P2. Churn на /admin/commerce всегда 0% (фильтр по несуществующим статусам)",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "Расхождение словаря подтверждено на живой базе: `subscriptions_status_check` = `CHECK (status = ANY (ARRAY['active','trial','trialing','past_due','cancelled','expired','blocked','manual_review']))` — ни 'canceled' (одна L), ни 'unpaid' в словаре нет. На HEAD: `git show HEAD:app/admin/commerce/page.tsx` строка 70 `.in('status', ['canceled', 'unpaid'])` → всегда 0 строк. В рабочем дереве (не закоммичено) строка 104 заменена на `.in('status', CHURNED_STATUSES as unknown as string[])`.",
+        "file": "app/admin/commerce/page.tsx"
+      },
+      {
+        "item": "P2. Вкладка «События» CRM всегда пуста — в user_events никто не пишет",
+        "severity": "P2",
+        "status": "ОТКРЫТ",
+        "evidence": "Единственное обращение к таблице во всём репозитории — чтение: app/admin/crm/page.tsx:119 `sb.from('user_events').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30)`. Поиск `from('user_events')` по app/, services/, lib/, components/ не даёт ни одной вставки. Живая база: `SELECT count(*) FROM public.user_events` → **0**. Политики есть (`user_events: admin all`, `user_events: own insert`), но писать некому.",
+        "file": "app/admin/crm/page.tsx"
+      },
+      {
+        "item": "P2. Статистика рассылки нулевая — нет политики чтения newsletter_deliveries",
+        "severity": "P2",
+        "status": "ОТКРЫТ",
+        "evidence": "Живая база, все три политики на newsletter_deliveries — только «своя строка»: `newsletter_deliveries: own read` USING `EXISTS (SELECT 1 FROM users u WHERE u.auth_id = auth.uid() AND u.id = newsletter_deliveries.user_id)`; `newsletter_deliveries_own_read` USING `(user_id = auth.uid())`; `nl_deliveries: own read` USING `(user_id = auth.uid())`. Политики чтения для управляющего клубом нет. services/newsletter.service.ts:1 `import { createClient } from '@/lib/supabase/client'` → getNewsletterStats ходит пользовательским клиентом: `.from('newsletter_deliveries').select('status, opened_at').eq('newsletter_id', newsletterId)` → 0 строк. Правка страницы stats в рабочем дереве касается только сверки org_id, вызов `getNewsletterStats(id)` остался прежним. Побочно: две из трёх политик сравнивают user_id (это users.id) с auth.uid() — они мертвы в любом случае.",
+        "file": "services/newsletter.service.ts"
+      },
+      {
+        "item": "P2. Счётчики карточки спортсмена в клубном виде всегда 0 (head:true вместо count)",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD дефект воспроизводится: `git show HEAD:app/org/athletes/[id]/page.tsx` — три запроса `.select('id', { count: 'exact', head: true })` (строки 105/109/113), а результат считается по длине данных: строка 162 `const recsCount = Array.isArray(recsRaw) ? recsRaw.length : 0` — при head:true `data` всегда null, значит счётчики всегда 0. В рабочем дереве (не закоммичено) переписано: рекомендации тянутся данными `.select('id, severity')`, тренировки — через деструктуризацию `{ count: workoutsCountRaw }`.",
+        "file": "app/org/athletes/[id]/page.tsx"
+      },
+      {
+        "item": "P2. Плитка «Атлеты в риске» всегда 0 (запрос injuries без скоупа)",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD дефект воспроизводится: `git show HEAD:components/organization/OrgKpiTiles.tsx` строки 61-63 — `sb.from('injuries').select('id, status, athlete_id').neq('status','recovered')` без какой-либо привязки к orgId; под RLS injuries (миграция 106) у аккаунта клуба нет ни одной подходящей политики, выборка пуста. В рабочем дереве (не закоммичено) запрос к injuries удалён вовсе, риск считается по recommendations: `atRiskAthletes.add(rec.athlete_id)`, с комментарием «висел запрос к injuries без скоупа по org: он всегда возвращал пустой…».",
+        "file": "components/organization/OrgKpiTiles.tsx"
+      },
+      {
+        "item": "P2. DELETE /api/org/teams/[id] рапортует успех, когда RLS не дала удалить",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD дефект воспроизводится: `git show HEAD:app/api/org/teams/[id]/route.ts` — `const { error } = await sb.from('org_groups').update({ is_active: false }).eq('id', params.id)` без `.select()`; под RLS запись, не нашедшая доступных строк, отдаёт error = null. В рабочем дереве (не закоммичено) добавлено `.select('id')` и суждение по затронутым строкам с комментарием «Проверка „нет ошибки → получилось“ рапортовала успех и уводила на /org/teams, хотя команда оставалась активной».",
+        "file": "app/api/org/teams/[id]/route.ts"
+      },
+      {
+        "item": "P2. Квота AI списывается за пустой ответ",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD дефект воспроизводится: `git show HEAD:app/api/assistant/conversations/[id]/messages/route.ts` — в persistSuccess строка 228 `charged = true` без какой-либо проверки текста (грепы `fullText.trim()` и `empty_response` на HEAD не дают совпадений). В рабочем дереве (не закоммичено) добавлен ранний выход: `if (!fullText.trim()) { await logUsageEvent(..., eventType: 'provider_error', metadata: { code: 'empty_response' } ); return }` перед `charged = true`.",
+        "file": "app/api/assistant/conversations/[id]/messages/route.ts"
+      },
+      {
+        "item": "P2. Старая полностраничная /assistant не удалена и содержит уже исправленные в виджете дефекты",
+        "severity": "P2",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD файл существует (`git show HEAD:app/assistant/page.tsx` отдаёт содержимое). Удаление есть в индексе, но НЕ закоммичено: `git status` показывает `D  app/assistant/page.tsx`, каталога app/assistant в рабочем дереве уже нет.",
+        "file": "app/assistant/page.tsx"
+      },
+      {
+        "item": "P2. Кнопка «Назначить» в админке только закрывает модалку",
+        "severity": "P2",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/admin/page.tsx, handleAssign: `const res = await assignAthleteToCoach({ athleteId: assignAthlete, coachId: assignCoach }); ... if (!res.ok) { toastError(res.error ?? 'Не удалось назначить тренера'); return }` с комментарием «Прежняя версия писала в athletes.coach_id — колонку, которой нет в модели доступа; реальная связь живёт в trainer_athletes». Файл не изменён в рабочем дереве.",
+        "file": "app/admin/page.tsx"
+      },
+      {
+        "item": "P2. Вкладка «Система» выдаёт захардкоженный uptime за мониторинг",
+        "severity": "P2",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/admin/page.tsx:1084-1089 `// Ревизия P1: раньше здесь были шесть карточек сервисов с uptime ... Мониторинга у проекта нет`; вместо него измеряемая проверка: `/** Единственное проверяемое утверждение о «системе»: база ответила за N мс. */ const checkDbConnection = ... const { error } = await getSB().from('users').select('id', { count: 'exact', head: true })`.",
+        "file": "app/admin/page.tsx"
+      },
+      {
+        "item": "P2. Плитка «Настройки» ведёт на несуществующий /org/settings",
+        "severity": "P2",
+        "status": "ЗАКРЫТ",
+        "evidence": "app/org/page.tsx:133 `// Раньше здесь была плитка «Настройки» → /org/settings. Такого маршрута в` (плитка удалена). Каталог app/org/settings отсутствует; других ссылок на /org/settings в app/, components/, lib/ нет.",
+        "file": "app/org/page.tsx"
+      },
+      {
+        "item": "P2. Локальный npm run dev отдаёт неинтерактивный клиент (форма входа не активируется)",
+        "severity": "P2",
+        "status": "НЕ ПРОВЕРЯЕТСЯ",
+        "evidence": "Проверка требует запуска dev-сервера и интерактивного браузера — в рамках задачи «только чтение» это невыполнимо. Косвенно: qa/ralph/DECISIONS.md, D-02 «Локальный dev-сервер не пригоден для E2E»: «`npm run dev` (`next dev --webpack`) отдаёт страницы, клиентский код которых не оживает… кнопка отправки формы входа остаётся `disabled`. На production-сборке … та же форма работает». Решение зафиксировано как обход (E2E гоняются против прод-URL), сам дефект dev-режима никем не закрывался — правок в next.config/package.json по этому поводу не найдено.",
+        "file": "qa/ralph/DECISIONS.md"
+      },
+      {
+        "item": "P2. Две мёртвые RLS-политики org_members сравнивают users.id с auth.uid()",
+        "severity": "P2",
+        "status": "ОТКРЫТ",
+        "evidence": "Живая база, pg_policies на public.org_members — обе политики на месте: `org_members_org_manage [ALL]` USING `((org_id = (SELECT auth.uid())) AND (EXISTS (SELECT 1 FROM users WHERE ((users.id = (SELECT auth.uid())) AND (users.role = 'organization')))))` и `org_members_own_read [SELECT]` USING `(user_id = (SELECT auth.uid()))`. В обеих колонки org_id/user_id/users.id хранят users.id, а auth.uid() — это auth.users.id: пространства идентификаторов разные, предикаты не истинны никогда. Схлопывание десяти политик в волне 3 касалось таблицы organizations, а не org_members.",
+        "file": "supabase/migrations/110_org_admin_scopes.sql"
+      },
+      {
+        "item": "P3. Мёртвый компонент AthleteAdherenceCard со ссылкой на несуществующий /workouts",
+        "severity": "P3",
+        "status": "ЧАСТИЧНО",
+        "evidence": "Ссылка исправлена: components/athlete/AthleteAdherenceCard.tsx:97 `{/* P1 — было href=\"/workouts\": маршрута с таким именем в app/ нет, CTA «Открыть план» вела на 404. */}` → `<Link href=\"/athlete/dashboard\" ...>`. Но компонент по-прежнему мёртв: grep по app/ и components/ с исключением самого файла не даёт ни одного импорта или использования — потребителей ноль.",
+        "file": "components/athlete/AthleteAdherenceCard.tsx"
+      },
+      {
+        "item": "P3. Мёртвый AthleteProfileCard (673 строки, ноль потребителей) с CTA на /diary/new",
+        "severity": "P3",
+        "status": "ЗАКРЫТ",
+        "evidence": "Файл удалён: `git log --diff-filter=D --name-only -- \"*AthleteProfileCard*\"` → коммит 18b2d91 «fix: роль org_admin, реальные данные в админке, аудит и оболочки кабинетов (#241)», удалённый путь `components/ui/AthleteProfileCard.tsx`. Поиск по репозиторию (без node_modules) не находит ни файла, ни ссылок на него.",
+        "file": "components/ui/AthleteProfileCard.tsx"
+      },
+      {
+        "item": "P3. GET одного AI-диалога не проверяет role_snapshot",
+        "severity": "P3",
+        "status": "ЧАСТИЧНО",
+        "evidence": "На HEAD дефект воспроизводится: `git show HEAD:app/api/assistant/conversations/[id]/route.ts` — role_snapshot встречается ровно один раз, в строке 21 списка колонок `.select('id, title, context_type, context_entity_id, role_snapshot')`, и нигде не сравнивается. В рабочем дереве (не закоммичено) проверка добавлена: строки 32-37 `if (!actor.profile || conv.role_snapshot !== actor.profile.role) { return NextResponse.json({ ok:false, error:'Диалог создан в другой роли — начните новый.' }, { status: 403 }) }`.",
+        "file": "app/api/assistant/conversations/[id]/route.ts"
+      }
+    ],
+    "summary": "Проверил все 24 пункта раздела «P1 — остаются открытыми», 15 пунктов «P2 — открыты» и 3 пункта «P3 — открыты». Реестр устарел радикально: из 24 P1 закрыт 21.\n\nГЛАВНАЯ НАХОДКА — миграция 108 существует в репозитории, но НЕ ПРИМЕНЕНА к базе. В supabase_migrations.schema_migrations после 105 идут только p1_security_scopes (106), org_admin_scopes (110), admin_orgs_moderation (107), fix_org_verification_guard_columns и trainer_athletes_status_vocabulary (111). Записи leads_consent_and_parent_notify нет, и её эффекты в БД отсутствуют: колонки tool_leads.consent_at нет, tool_leads_source_check не знает 'landing-audit-form', can_notify() не содержит parent_links. Поэтому P1-23 (форма аудита на лендинге, 500 на каждой отправке) — ОТКРЫТ, а P1-24 — ЧАСТИЧНО (первопричина в БД жива, но потеря всего батча закрыта построчным ретраем в services/notifications.service.ts). Код при этом уже пишет consent_at и source='landing-audit-form' — то есть дефект воспроизводится в проде прямо сейчас. Миграция 109 в списке тоже отсутствует, но её эффект в базе ЕСТЬ: enum audit_action содержит clearance_override, так что аудит обхода допуска работает.\n\nP1: закрыт 21 пункт из 24 (роли и доступ 1-4, медконфиденциальность 5-8, изоляция организаций 9-12, тренировочные сценарии 13-17, админка 18-22). Все шесть политик миграции 106 и обе группы миграций 107/110 проверены не по файлам, а по pg_policies живой базы; триггеры trg_guard_channel_immutable_columns, trg_guard_org_verification_columns и trg_guard_users_privileged_columns на месте.\n\nP2: закрыто 4 (кнопка «Назначить», uptime на вкладке «Система», плитка /org/settings, ...), ОТКРЫТЫ 3 — вкладка «События» CRM (в user_events никто не пишет, в таблице 0 строк), статистика рассылки (на newsletter_deliveries только политики «своя строка», управляющему клубом читать нечем) и две мёртвые политики org_members, сравнивающие users.id с auth.uid(). Один пункт (неинтерактивный dev-сервер) — НЕ ПРОВЕРЯЕТСЯ без запуска сервера и браузера.\n\nP3: AthleteProfileCard удалён (коммит 18b2d91) — ЗАКРЫТ; AthleteAdherenceCard — ЧАСТИЧНО (ссылка на /workouts исправлена, но потребителей у компонента по-прежнему ноль).\n\nВАЖНАЯ ОГОВОРКА О МЕТОДЕ. По ходу проверки выяснилось, что параллельные агенты волны 4 прямо сейчас правят файлы: git status показывает 20+ изменённых и не закоммиченных файлов (app/admin/commerce/page.tsx, app/api/form-analysis/route.ts, app/api/org/teams/[id]/route.ts, components/organization/OrgKpiTiles.tsx, app/org/athletes/[id]/page.tsx, оба маршрута assistant/conversations, удаление app/assistant/page.tsx). Один из моих ранних грепов вернул содержимое, которого в файле уже не было, — поэтому все спорные пункты я перепроверил через `git show HEAD:<файл>`. Восемь пунктов P2/P3 помечены ЧАСТИЧНО именно по этой причине: на HEAD (a4e1f96) дефект воспроизводится, в рабочем дереве правка уже написана, но не закоммичена и не отревьюена. Считать их закрытыми до коммита нельзя; в evidence по каждому приведены обе цитаты — и с HEAD, и из рабочего дерева.\n\nНичего не менял: только чтение файлов, git show и read-only SQL к базе."
+  },
+  "streams": [
+    {
+      "stream": "org-debt",
+      "summary": "Все четыре пункта проверены на воспроизводимость — ни один не был закрыт волнами 2–3, все четыре исправлены. Ключевое решение: вместо четвёртой копии правила «какой клуб мой» все три сервиса переведены на единый резолвер lib/org/resolve-org-context.ts, а сам резолвер сделан полностью детерминированным (роль → joined_at → org_id). Юнит-тесты резолвера расширены с 10 до 15 кейсов, npx vitest run lib/ — 116/116 зелёных.\n\nВАЖНО про tsc: `npx tsc --noEmit` выдаёт ровно 4 ошибки, и ни одна не в моих файлах — это устаревшие сгенерированные заглушки в .next/types/app/assistant/page.ts и .next/(dev/)types/validator.ts, ссылающиеся на app/assistant/page.js. В рабочем дереве этого маршрута нет: `git status` показывает `D  app/assistant/page.tsx` — соседний агент удалил роут, а артефакты .next остались от прошлого дев-сервера. Мои пять файлов дают ноль диагностик. Поэтому tsc_clean=false — честно, но регрессия не моя и лечится удалением .next.",
+      "fixed": [
+        {
+          "title": "getMyOrg() отдавал произвольную (потенциально чужую) организацию",
+          "file": "/Users/sergeylisunov/proform/services/org.service.ts",
+          "root_cause": "Функция искала членство `members.find(m => m.member_role === 'coach')`, а при неудаче брала `members[0]` — первую строку в НЕГАРАНТИРОВАННОМ порядке ответа PostgREST. У администратора клуба (member_role='org_admin') строки с ролью 'coach' нет вовсе, поэтому срабатывал фолбэк: тренер, состоящий в чужом клубе рядовым атлетом, мог получить именно этот чужой клуб. Вдобавок фильтр по статусу шёл без сужения по роли, а аккаунт-организация без строки в org_members получал null, хотя organizations.id = users.id. Прямых вызовов в app/org/** действительно уже нет (проверено грепом — остались только упоминания в комментариях), но экспорт жив и воспроизводим при следующем вызове.",
+          "fix": "Функция переведена на общий резолвер resolveOrgContext() — тот же, что используют getOrgContext() (сервер) и useOrgContext() (клиент). Запрос сужен до управляющих ролей через CLUB_MANAGER_MEMBER_ROLES, добавлены колонки status и joined_at (нужны резолверу), из users теперь выбирается ещё и role. Семантика стала идентичной резолверу: приоритет org_owner → org_admin, детерминированный тай-брейк, аккаунт-организация получает свой users.id как org_id даже без строки членства. `.single()` на organizations заменён на `.maybeSingle()` — отсутствие клуба это не ошибка, а null."
+        },
+        {
+          "title": "getRecentOrgActivity() отбрасывал org_admin — лента событий клуба всегда пустая",
+          "file": "/Users/sergeylisunov/proform/services/org-activity.service.ts",
+          "root_cause": "Гейт был `if (!me || me.role !== 'organization') return []` — сравнение ГЛОБАЛЬНОЙ роли из users.role, которой у администратора клуба нет. Дальше org_id брался как `me.id`, что верно только для аккаунта-организации (organizations.id = users.id); у org_admin собственный users.id — это не id клуба. Итог: для org_admin функция молча возвращала пустой массив, неотличимый от «событий действительно нет». Страница /org/activity обошла дефект ветвлением на findActivityForOrg(), но сама функция осталась некорректной для любого будущего вызова.",
+          "fix": "Гейт заменён на общий резолвер: `const ctx = await getOrgContext(); if (!ctx || !ctx.canManage || !ctx.orgId) return []`. Право и org_id теперь берутся оттуда же, откуда их берут гейты страниц /org/**, поэтому расхождение «пункт меню вижу — данных нет» структурно исключено. Клиент остался SSR-овским (createClient), привилегии НЕ повышены до service-role: org_admin получает ровно ту видимость, которую даёт ему RLS (org_members_manager_read из миграции 110 покрывает и ростер, и member-join события). Сигнатура не изменилась — `(): Promise<OrgEvent[]>`, вызов без аргументов, поэтому app/org/activity/page.tsx продолжает компилироваться и работать без правок; его ветвление стало избыточным, но безвредным. Обновлён и устаревший заголовочный комментарий файла (\"Caller must be the org user (role='organization')\")."
+        },
+        {
+          "title": "resolveOrgContext(): у администратора двух клубов открывался произвольный",
+          "file": "/Users/sergeylisunov/proform/lib/org/resolve-org-context.ts",
+          "root_cause": "Приоритет был задан только для org_owner: `managing.find(m => m.member_role === 'org_owner') ?? managing[0]`. Как только управляющих членств несколько и все они org_admin, выбор падал на managing[0] — а порядок строк PostgREST без явного ORDER BY не гарантирован и может меняться между запросами (перепланирование, seq/index scan, вакуум). Администратор двух клубов получал то один orgId, то другой — от загрузки к загрузке, без всякого действия с его стороны.",
+          "fix": "Введена чистая функция compareMemberships() с полным правилом сортировки, описанным в JSDoc: (1) роль — org_owner старше org_admin, владение сильнее делегированных прав; (2) при равной роли раньше вступил — тот и основной клуб (joined_at по возрастанию), причём строки без joined_at уводятся В КОНЕЦ явными ветками, иначе пустая строка выиграла бы у любой ISO-даты как лексикографически меньшая; (3) при полном равенстве — org_id по возрастанию: значение произвольное, но одинаковое при каждом вызове, что и есть требуемое свойство. Выбор: `[...managing].sort(compareMemberships)[0] ?? null` — копия перед сортировкой, чтобы не переставить строки в массиве вызывающего. Поле joined_at в OrgMembershipRow сделано ОПЦИОНАЛЬНЫМ (`joined_at?: string | null`): существующие вызывающие (lib/org/org-context.ts, lib/hooks/useOrgContext.ts) эту колонку не выбирают и находятся вне моего списка файлов — благодаря опциональности они не сломались и остались детерминированными за счёт тай-брейка по org_id."
+        },
+        {
+          "title": "Тесты резолвера не покрывали детерминизм выбора между несколькими клубами",
+          "file": "/Users/sergeylisunov/proform/lib/org/resolve-org-context.test.ts",
+          "root_cause": "Существовавший кейс «org_owner приоритетнее org_admin» проверял только старший ключ сортировки. Сценарий «несколько org_admin-членств» — ровно тот, где брался managing[0], — не был покрыт вовсе, поэтому дефект и дожил до волны 4.",
+          "fix": "Хелпер member() принимает необязательный joined_at, добавлен CLUB_C. Пять новых кейсов, каждый проверяет ИНВАРИАНТ, а не одно значение: два из них прогоняют один и тот же набор строк в прямом и обратном порядке и требуют одинаковый orgId (два org_admin с датами → побеждает ранний; три org_admin без дат → побеждает наименьший org_id). Плюс кейс «членство с датой приоритетнее членства без даты», кейс «org_owner бьёт org_admin даже с более поздним joined_at» и кейс на отсутствие мутации входного массива. Итог 15 тестов, все зелёные."
+        },
+        {
+          "title": "Страница статистики рассылки не сверяла org_id — защита держалась на одном рубеже",
+          "file": "/Users/sergeylisunov/proform/app/org/newsletters/[id]/stats/page.tsx",
+          "root_cause": "Гейт был `if (!canManage)`, то есть отвечал только на вопрос «управляю ли я ХОТЬ КАКИМ-ТО клубом», а id рассылки приходит из URL. Логически страница разрешала запросить чужой id: фактической утечки нет, потому что RLS-политика newsletters_manager_manage (миграция 110, `USING (public.is_org_manager_of(org_id))`) отсекает менеджера от чужих рассылок, — но это единственный рубеж, и ошибается он молча. Ослабнет или будет случайно пересоздана политика — утечка пройдёт незамеченной, потому что приложение не возражает.",
+          "fix": "Из useOrgContext() дополнительно берётся orgId, вход в загрузку требует `canManage && orgId`. После загрузки добавлена явная сверка `nl.org_id !== orgId` → состояние foreignOrg, при котором и newsletter, и stats сбрасываются в null. Новая ветка рендера показывает понятное сообщение «Рассылка принадлежит другому клубу» с пояснением и ссылкой на /org/newsletters (Link уже был импортирован) — вместо того чтобы выдать «не найдена» и оставить пользователя гадать. Заодно в useEffect добавлен флаг cancelled: без него ответ по старому id мог перезаписать состояние после смены маршрута."
+        }
+      ],
+      "already_fixed": [],
+      "changed_files": [
+        "/Users/sergeylisunov/proform/services/org.service.ts",
+        "/Users/sergeylisunov/proform/services/org-activity.service.ts",
+        "/Users/sergeylisunov/proform/lib/org/resolve-org-context.ts",
+        "/Users/sergeylisunov/proform/lib/org/resolve-org-context.test.ts",
+        "/Users/sergeylisunov/proform/app/org/newsletters/[id]/stats/page.tsx"
+      ],
+      "not_done": [
+        "lib/org/org-context.ts и lib/hooks/useOrgContext.ts НЕ трогал (вне моего списка, рядом работают другие агенты). Они по-прежнему делают `.select('org_id, member_role, status')` без joined_at. Из-за опционального joined_at ничего не сломано и выбор остаётся детерминированным, но у них тай-брейк идёт по org_id, а не по дате вступления. Чтобы правило «раньше вступил — тот и основной клуб» реально заработало на сервере и в клиентском хуке, в обоих select'ах нужно добавить joined_at — правка на одно слово в каждом файле, безопасна и не меняет сигнатур.",
+        "app/org/activity/page.tsx НЕ трогал по прямому указанию. Ветвление `ctx.globalRole === 'organization' ? getRecentOrgActivity() : findActivityForOrg(ctx.orgId)` теперь избыточно — обе ветки корректны. Стоит учитывать нюанс при будущем упрощении: findActivityForOrg ходит service-role клиентом (createAdminClient), а починенный getRecentOrgActivity — SSR-клиентом под RLS. Для member_joined результат одинаков (org_members_manager_read из миграции 110 покрывает менеджера), а вот doctor_inquiries и recommendations под RLS могут отдать меньше строк. Я сознательно НЕ повышал привилегии сервиса до service-role — это было бы расширением поверхности атаки под видом починки бага.",
+        "Живой прогон под ролью org_admin не делал: по инструкции не запускал build, не применял миграции и не ходил в базу. Проверка ограничена юнит-тестами резолвера (15 кейсов) и типами. Для полной уверенности стоит прогнать qa/ralph/rls-probe.mjs и ролевые e2e — особенно сценарий /org/newsletters/[чужой-id]/stats, где теперь ожидается сообщение «Рассылка принадлежит другому клубу» вместо «Рассылка не найдена».",
+        "Юнит-тестов на services/org.service.ts и services/org-activity.service.ts в проекте нет вообще (services/*.test.ts не существует) — новых не добавлял, потому что обе функции завязаны на supabase-клиент и требуют инфраструктуры моков, которой в репозитории пока нет. Логика выбора клуба, ради которой правились обе функции, вынесена в резолвер и покрыта там."
+      ],
+      "review_ok": true,
+      "review_notes": "Ревью правки потока org_admin-techdebt-wave4. Прочитан фактический diff и текущее состояние всех 5 файлов + смежные потребители (lib/org/org-context.ts, lib/hooks/useOrgContext.ts, app/org/activity/page.tsx, services/newsletter.service.ts, supabase/migrations/110_org_admin_scopes.sql). Проверено: npx tsc --noEmit — 0 ошибок (заявленные исполнителем 4 ошибки в .next больше не воспроизводятся); npx vitest run lib/ — 120/120, включая 15 кейсов резолвера.\n\n1) ОСЛАБЛЕНИЯ ДОСТУПА НЕТ.\n- services/org.service.ts:77-82 — getMyOrg стал СТРОЖЕ: .in('member_role', CLUB_MANAGER_MEMBER_ROLES) вместо «любое активное членство + members[0]».\n- services/org-activity.service.ts:268-272 — гейт расширен на org_admin, но клиент остался SSR-овским (createClient из @/lib/supabase/server); createAdminClient в этот путь НЕ добавлен. Ни в один 'use client'-файл service-role клиент не попал (проверено: org-activity.service импортируется только из app/org/activity/page.tsx и app/api/cron/org-weekly-digest/route.ts, оба серверные).\n- Медицинских данных организация НЕ получила сверх прежнего: для org_admin страница /org/activity по-прежнему уходит в findActivityForOrg (service-role, файл не менялся), то есть починенная RLS-версия строго УЖЕ того, что эта роль достаёт уже сегодня. Для аккаунта-организации ctx.orgId === userId — поведение идентично прежнему me.id.\n- app/org/newsletters/[id]/stats/page.tsx — правка только ДОБАВЛЯЕТ рубеж (сверка nl.org_id !== orgId).\n\n2) РЕГРЕССИЙ НЕ НАЙДЕНО. getMyOrg не имеет ни одного живого вызова (grep по всем .ts/.tsx: только упоминания в комментариях app/org/{wall,teams,athletes,newsletters} и types/org.types.ts:30), поэтому сужение до управляющих ролей не может сломать сценарий тренера/спортсмена. Сигнатура getRecentOrgActivity не менялась — app/org/activity/page.tsx компилируется, обе ветки корректны. admin/coach/athlete без управляющего членства по-прежнему получают orgId=null, canManage=false (покрыто тестами resolve-org-context.test.ts:162-187).\n\n3) ОБМАНОК НЕТ. Новая ветка foreignOrg ведёт на существующий /org/newsletters, класс иконки ki-shield-cross уже используется в этом же файле, мёртвых кнопок и хардкода нет.\n\n4) СХЕМА СОБЛЮДЕНА. org_members(status='active', member_role ∈ org_owner|org_admin), joined_at — реальная nullable-колонка (уже выбиралась в adminFetchMemberJoins), newsletters.org_id существует и маппится в rowToNewsletter. trainer_athletes / connections / audit_action не затронуты.\n\n5) compareMemberships — корректный полный порядок: строки без joined_at уводятся в конец явными ветками (lib/org/resolve-org-context.ts:60-61), поэтому ловушка «пустая строка меньше любой ISO-даты» действительно закрыта; тай-брейк по org_id даёт стабильность при отсутствии колонки. [...managing].sort() копирует массив — мутации входа нет (проверено тестом).\n\n6) ТИПЫ ЧИСТЫЕ, неиспользуемых импортов нет.\n\nНЕБЛОКИРУЮЩИЕ ЗАМЕЧАНИЯ (не правил, передаю как есть):\na) lib/org/org-context.ts:54 и lib/hooks/useOrgContext.ts:64 по-прежнему .select('org_id, member_role, status') без joined_at. Новое правило «раньше вступил — тот и основной клуб» живёт ТОЛЬКО в getMyOrg (у которого нет вызовов), а два реальных резолвера падают на тай-брейк по org_id. Оба детерминированы, но у одного и того же админа двух клубов могут выбрать РАЗНЫЕ клубы — это частично обнуляет заявленную цель «одно правило на весь проект». Правка на одно слово в каждом select; исполнитель честно отметил это в not_done.\nb) app/org/activity/page.tsx:66-68 — комментарий стал фактически неверным («getRecentOrgActivity() сам гейтит выборку по users.role='organization'»). Только документация, файл вне списка потока.\nc) /org/activity для аккаунта-организации теперь резолвит org-контекст дважды (страница + сервис) — два лишних запроса на загрузку.\nd) app/org/newsletters/[id]/stats/page.tsx:37-40 — getNewsletterStats(id) всё ещё стартует параллельно ДО сверки принадлежности. Утечки нет (результат отбрасывается, RLS newsletters_manager_manage режет), но последовательная загрузка (сначала newsletter → сверка → потом stats) сделала бы новую проверку настоящим гейтом, а не пост-фильтром.\ne) Там же: при смене id loading не возвращается в true, поэтому кратковременно рендерится предыдущая рассылка. Паттерн доставшийся, не внесённый; добавленный флаг cancelled при этом действительно закрывает худшую гонку (перезапись состояния устаревшим ответом)."
+    },
+    {
+      "stream": "admin-commerce",
+      "summary": "Все четыре дефекта воспроизвелись на живой схеме (проверено через pg_policies / pg_constraint / count(*)), ни один не был закрыт предыдущими волнами. Исправлены все четыре. Важная поправка к постановке: /admin/commerce — НЕ клиентская страница (нет 'use client', createClient берётся из lib/supabase/server, компонент async), поэтому корректный путь для неё — admin-клиент строго после проверки роли, а не миграция; service-ключ в браузер не уходит. Дополнительно в том же блоке /admin/commerce исправлены три смежных счётчика, ломавшихся по той же причине (устаревший stripe-словарь статусов и двойной учёт free в знаменателе долей). Миграция 112 написана, но НЕ применена. npx tsc --noEmit — чисто.",
+      "fixed": [
+        {
+          "title": "Панель выручки /admin/commerce всегда пуста: payments/invoices/coach_orders читались пользовательским клиентом без admin-политик",
+          "file": "/Users/sergeylisunov/proform/app/admin/commerce/page.tsx",
+          "root_cause": "Воспроизведение: pg_policies показывает у этих трёх таблиц только own-политики — payments_read_own USING (user_id = get_my_user_id()), invoices_read_own USING (user_id = get_my_user_id()), coach_orders_read_party USING (coach_id = ... OR athlete_id = ...) — все из миграции 047. Admin-политики SELECT нет ни одной (в отличие от subscriptions, где есть 'subscriptions: admin all'). Админ, читая эти таблицы своей сессией, видел только собственные платежи, то есть панель показывала ноль всегда, независимо от объёма выручки.",
+          "fix": "Три billing-запроса переведены на createAdminClient() из lib/supabase/admin.ts, вызванный СТРОГО после проверки me.role === 'admin' (строка редиректа выше по файлу). Обоснование выбора против RLS-миграции: страница серверная (нет 'use client', createClient из @/lib/supabase/server, export default async function), поэтому service-ключ остаётся на сервере; тот же приём уже применён в app/parent/dashboard/page.tsx:160 и app/api/org/newsletters/[id]/send/route.ts:147. RLS-политика дополнительно открыла бы эти таблицы для чтения анонимным ключом из браузера — лишняя поверхность ради экрана, который и так серверный. Запросы к subscriptions оставлены на пользовательском клиенте: там admin-политика уже есть."
+        },
+        {
+          "title": "Churn на /admin/commerce всегда 0%: фильтр по статусам, запрещённым CHECK-констрейнтом",
+          "file": "/Users/sergeylisunov/proform/app/admin/commerce/page.tsx",
+          "root_cause": "Воспроизведение: subscriptions_status_check (живой pg_constraint, миграция 096) допускает ТОЛЬКО active | trial | trialing | past_due | cancelled | expired | blocked | manual_review. Код фильтровал .in('status', ['canceled', 'unpaid']) — 'canceled' с одной L и 'unpaid' физически не могут появиться в таблице, БД их отвергает. Наследие Stripe, чьи колонки выпилила миграция 075. Реально отток пишет cron продлений: app/api/cron/billing-renewals/route.ts:201 → status='cancelled' (шаг 3a) и :211 → status='expired' (шаг 3b). Счётчик отмен возвращал 0 при любых данных.",
+          "fix": "Введена именованная константа CHURNED_STATUSES = ['cancelled', 'expired'] с комментарием, откуда взят словарь (констрейнт 096 + шаги 3a/3b крона). Заодно исправлены три смежных счётчика того же корня: (1) paying теперь фильтруется через isSubscriptionActive() из lib/plans.ts вместо инлайнового ('active' || 'trialing') — прежний вариант терял 'trial' (legacy-строки) и 'past_due' (грейс, доступ ещё открыт), из-за чего MRR и плитки Pro/Team занижались; (2) upcomingCancel по той же причине не видел подписки в trialing/past_due, хотя шаг 3a крона гасит cancel_at_period_end для всех трёх; (3) знаменатель долей тарифов был paying.length + byPlan.free, а byPlan заполняется из paying — free считался дважды, при 6 подписках знаменатель выходил 12 и все доли занижались вдвое; (4) подпись MRR-плитки говорила «N платящих подписок», подставляя paying.length, куда входят и free-подписки — заменено на byPlan.pro + byPlan.team."
+        },
+        {
+          "title": "Вкладка «События» в CRM-drawer всегда пуста: user_events никто не заполняет",
+          "file": "/Users/sergeylisunov/proform/app/admin/crm/page.tsx",
+          "root_cause": "Воспроизведение: grep по всему репозиторию (app, lib, services, components, qa, supabase) даёт ровно две ссылки на user_events — сам этот запрос в app/admin/crm/page.tsx:119 и сгенерированный тип в types/database.ts:3671. Ни одной записи в таблицу. select count(*) from public.user_events → 0. RLS у таблицы при этом настроен ('user_events: admin all' + 'user_events: own insert'), то есть выглядела она рабочей. Вкладка гарантированно рисовала «Нет событий» независимо от активности пользователя — пустой экран, выдающий себя за работающий.",
+          "fix": "Вкладка перенаправлена на audit_logs — таблицу, в которую реально пишут (три маршрута: /api/admin/users/role, /api/org/members/role, /api/clearance/override; в базе 4 строки) и которая полностью открыта админу политикой audit_logs_select. В существующий services/admin-audit.service.ts (а не новым сервисом — там уже живут listRecentAuditLog/writeAuditEntry и тип AuditLogEntry) добавлены listAuditLogForUser(userId, limit), отбирающая и действия пользователя (actor_id), и действия над ним (target_table='users' + target_id), и экспортируемый словарь AUDIT_ACTION_LABEL. userId валидируется UUID-регуляркой до подстановки: он склеивается в строку фильтра PostgREST .or(), где запятая или скобка изменили бы сам предикат. Вкладка теперь показывает действие, автора и payload, а под списком — честную сноску о том, что в audit_logs попадают смена роли, обход допуска и назначения, но не входы и тренировки. Вкладку не удалял: удаление лишило бы админа единственного пер-пользовательского среза журнала, который в проекте уже есть и работает."
+        },
+        {
+          "title": "Статистика рассылки всегда нулевая: у newsletter_deliveries нет политики чтения для организации",
+          "file": "/Users/sergeylisunov/proform/supabase/migrations/112_newsletter_deliveries_read.sql",
+          "root_cause": "Воспроизведение: строки в newsletter_deliveries пишет маршрут отправки через createAdminClient() (app/api/org/newsletters/[id]/send/route.ts:246 — RLS обходится), а читает их getNewsletterStats пользовательским клиентом. В pg_policies у таблицы было ТРИ политики и все три «только своя строка»: 'newsletter_deliveries: own read', newsletter_deliveries_own_read и 'nl_deliveries: own read'. Управляющему клубом не подходит ни одна — он не адресат рассылки, поэтому sent/delivered/opened/failed выходили нулями при любом объёме отправленных писем. Вдобавок две из трёх сравнивали user_id с auth.uid(), тогда как newsletter_deliveries.user_id — это users.id: эти две не пропускали даже «свою» доставку, оставаясь мёртвым предикатом, вычисляемым на каждой строке.",
+          "fix": "Написана миграция 112_newsletter_deliveries_read.sql (НЕ применена, по инструкции): три перекрывающиеся own-политики схлопнуты в одну корректную через get_my_user_id(); добавлена newsletter_deliveries_manager_read FOR SELECT TO authenticated с EXISTS по newsletters и SECURITY DEFINER предикатом public.is_org_manager_of(n.org_id) из миграции 110 — тем же, что уже охраняет newsletters_manager_manage. Предикат идёт через newsletters, потому что у newsletter_deliveries нет колонки org_id. Проверено, что сам аккаунт-организация тоже проходит is_org_manager_of: миграция 088 триггером и backfill'ом заводит ему org_members(org_id=user_id, member_role='org_owner', status='active') — подтверждено запросом по всем четырём существующим org-аккаунтам, у каждого self_manager_rows=1, поэтому отдельная ветка «или ты и есть org_id» не нужна. Рекурсии нет: политики newsletters не ссылаются на newsletter_deliveries. Добавлен индекс newsletter_deliveries_newsletter_idx под предикат политики и под сам запрос статистики. Доступ строго read-only: писать по-прежнему может лишь service_role. В services/newsletter.service.ts добавлен комментарий, объясняющий, почему getNewsletterStats сознательно остаётся на пользовательском клиенте (страница статистики клиентская, service-ключ в браузер отдавать нельзя)."
+        }
+      ],
+      "already_fixed": [],
+      "changed_files": [
+        "/Users/sergeylisunov/proform/app/admin/commerce/page.tsx",
+        "/Users/sergeylisunov/proform/app/admin/crm/page.tsx",
+        "/Users/sergeylisunov/proform/services/admin-audit.service.ts",
+        "/Users/sergeylisunov/proform/services/newsletter.service.ts",
+        "/Users/sergeylisunov/proform/supabase/migrations/112_newsletter_deliveries_read.sql"
+      ],
+      "not_done": [
+        "НАЙДЕН, НО НЕ ИСПРАВЛЕН (нужно решение по ценам, дефект сейчас не воспроизводим на данных). /Users/sergeylisunov/proform/app/admin/commerce/page.tsx: byPlan группирует по сырому s.plan в Record<'free'|'pro'|'team'>, а миграция 096 явно сняла subscriptions_plan_check с комментарием «вебхук пишет plan = tariff.code ('pro_trainer', 'club', ...)». Реальная Pro-подписка с plan='pro_trainer' создаст в byPlan лишний ключ, плитка Pro покажет 0, а в MRR она войдёт с PLAN_PRICE_MONTH['pro_trainer'] === undefined ?? 0. Готовая абстракция для нормализации уже есть — parsePlan() из lib/plans.ts (мапит префиксы pro_/team_/club_/federation_/enterprise_). Не тронул по двум причинам: (1) в базе сейчас все 6 строк subscriptions имеют plan='free', то есть проверить воспроизведение невозможно; (2) PLAN_PRICE_MONTH покрывает только free/pro/team, а club/federation/enterprise из типа Plan остались бы с ценой 0 — это продуктовое решение, а не техническое.",
+        "AUDIT_ACTION_LABEL, добавленный в services/admin-audit.service.ts, дублирует локальную (неэкспортируемую) константу ACTION_LABEL в /Users/sergeylisunov/proform/app/admin/page.tsx (~строка 100). Схлопнуть их в один источник не стал: app/admin/page.tsx вне моего списка файлов, рядом работают другие агенты. Отдельной задачей: удалить локальную копию в app/admin/page.tsx и импортировать AUDIT_ACTION_LABEL из сервиса.",
+        "Миграция 112 к базе НЕ применена — по инструкции. Пока она не применена, статистика рассылки продолжит показывать нули: правка чисто на стороне RLS, кода менять больше нечего.",
+        "Для newsletter_deliveries политика на запись сознательно не добавлялась — писать должен только service_role через маршрут отправки, иначе управляющий смог бы подделать статистику прямым PATCH'ем из браузера."
+      ],
+      "review_ok": true,
+      "review_notes": "Правка проверена по существу; блокирующих дефектов нет. Проверено против живой схемы (pg_policies, pg_constraint, grants), кода и tsc/eslint.\n\nПОДТВЕРЖДЕНО (не сломано):\n1. Service-ключ в браузер не уходит. app/admin/commerce/page.tsx — серверный компонент (нет 'use client', createClient из lib/supabase/server, async default export); createAdminClient() на строке 84 идёт после гейта на строке 67 (`if (!me || me.role !== 'admin') redirect('/dashboard')`), redirect бросает исключение — для не-админа ничего ниже не выполняется.\n2. Выбор admin-клиента обоснован: живой pg_policies подтверждает, что у payments/invoices/coach_orders есть только own-политики (payments_read_own, invoices_read_own, coach_orders_read_party) и ни одной admin-SELECT, а у subscriptions есть \"subscriptions: admin all\" — поэтому оставить subs на пользовательском клиенте верно.\n3. Словарь churn совпадает с живым subscriptions_status_check (active|trial|trialing|past_due|cancelled|expired|blocked|manual_review) и с шагами 3a/3b крона billing-renewals (cancelled/expired). Прежние 'canceled'/'unpaid' действительно недостижимы.\n4. CRM: services/admin-audit.service.ts использует @/lib/supabase/client (createBrowserClient из @supabase/ssr) — та же cookie-сессия, что и getSB() на странице, поэтому сессия админа доносится. audit_logs_select = get_my_role()='admin', страница гейтится на строке 430. Фильтр .or() валиден: живой REST-запрос дошёл до стадии RLS (permission denied for function get_my_role для anon), а не упал парсером. Ключи AUDIT_ACTION_LABEL совпадают с enum audit_action один в один.\n5. Миграция 112 не ослабляет доступ: is_org_manager_of — SECURITY DEFINER по org_members со status='active' и member_role IN ('org_owner','org_admin'), scope — один клуб через newsletters.org_id; медицинских таблиц не касается, запись по-прежнему только service_role. Две из трёх удаляемых политик были мёртвыми (user_id = auth.uid() при user_id = users.id), третья семантически эквивалентна новой. Рекурсии нет — политики newsletters не ссылаются на newsletter_deliveries. Грант authenticated:SELECT и relrowsecurity=true подтверждены. Потребитель (/org/newsletters/[id]/stats) гейтится по useOrgContext().canManage — совпадает с предикатом. Миграция идемпотентна (DROP IF EXISTS перед каждым CREATE, CREATE INDEX IF NOT EXISTS, NOTIFY pgrst).\n6. npx tsc --noEmit — чисто. eslint по четырём файлам — одна ошибка на app/admin/crm/page.tsx:422 (useEffect(() => { load() }, [load])), она дословно присутствует в HEAD (строка 390) — предсуществующая, к правке отношения не имеет.\n\nНЕБЛОКИРУЮЩИЕ ЗАМЕЧАНИЯ (на будущие волны, менять сейчас не требуется):\nA. Сноска во вкладке «События» обещает больше, чем даёт фильтр. listAuditLogForUser отбирает actor_id = userId ИЛИ (target_table='users' AND target_id=userId). Но /api/clearance/override пишет target_table='clearances' (target_id = clearance.id, пострадавший атлет — только в payload.athlete_id), а /api/org/members/role пишет target_table='org_members' (target_id = org_members.id, пользователь — в payload.target_user). Значит для ЗАТРОНУТОГО пользователя обход допуска и смена клубной роли во вкладке не появятся — только если он сам был автором. Либо расширить фильтр по payload->>'athlete_id' / payload->>'target_user', либо смягчить формулировку сноски.\nB. Смена смысла метрики: paying теперь через isSubscriptionActive, то есть в MRR попадают 'past_due' (грейс, деньги ещё не получены) и 'trial'. Плюс isSubscriptionActive(null) === true — если status когда-нибудь станет nullable, строка попадёт в платящие. Решение осознанное и задокументировано в комментарии, но это продуктовое определение метрики — стоит подтвердить у владельца продукта.\nC. Латентный дефект (исполнитель верно вынес в not_done, править не требовалось): byPlan группирует по сырому s.plan, а subscriptions_plan_check снят миграцией 096. Строка кода не менялась этой правкой. Пока в базе все 6 подписок с plan='free' — не воспроизводится.\nD. Пока миграция 112 не применена, статистика рассылки продолжит показывать нули — правка чисто на стороне RLS.\nE. Мелкая связанность по доступности: createAdminClient() бросает при отсутствии SUPABASE_SERVICE_ROLE_KEY, поэтому в окружении без этой переменной /admin/commerce теперь отдаст 500 вместо страницы с пустыми billing-блоками. В .env.local ключ есть, приём совпадает с app/parent/dashboard; в e2e route-matrix есть проверка /admin/commerce — если стенд поднимается без service-ключа, тест упадёт."
+    },
+    {
+      "stream": "scattered",
+      "summary": "Все 4 дефекта воспроизводились на текущем коде — ни один не был закрыт предыдущими волнами. Исправлены: (1) mass assignment в POST /api/form-analysis — athlete_id из тела теперь требует accepted-связи trainer_athletes, иначе 403 NOT_YOUR_ATHLETE; (2) счётчики карточки спортсмена в клубном виде — head:true отдаёт данные в count, а не в data, плюс убран мёртвый Array.isArray-fallback и плитка травм, которую организация по RLS всё равно никогда не увидит; (3) «Атлеты в риске» — снят запрос к injuries (RLS 106 не даёт организации медзаписи и не должен), риск считается по уникальным athlete_id рекомендаций severity high/critical, скоупленных по organization_id; убран мёртвый цикл и исправлен докстринг; (4) DELETE /api/org/teams/[id] и archiveOrgGroup — судят по фактически затронутым строкам через .select('id'), отказ RLS отдаёт 403 вместо ложного 200. Заодно PATCH того же роута отдаёт 403 на PGRST116 вместо вводящего в заблуждение 500. npx tsc --noEmit: в моих файлах ошибок нет (остаются 4 предсуществующие ошибки в сгенерированных .next/types на удалённый маршрут app/assistant — к правкам отношения не имеют).",
+      "fixed": [
+        {
+          "title": "Mass assignment: разбор техники можно было записать в чужой аккаунт",
+          "file": "/Users/sergeylisunov/proform/app/api/form-analysis/route.ts",
+          "root_cause": "athleteId брался прямо из тела запроса без единой проверки: `const athleteId = typeof body.athleteId === 'string' ? body.athleteId : (me.id as string)`. RLS-политика form_analyses_owner_insert (миграция 016) проверяет ТОЛЬКО `author_id = get_my_user_id()`, athlete_id ничем не ограничен, поэтому база вставку пропускала. Жертва при этом видела чужой разбор у себя: form_analyses_select пускает по `athlete_id = get_my_user_id() or author_id = get_my_user_id()`. Ни один клиент athleteId не шлёт (grep по app/components/lib — вызовов с athleteId нет), то есть дыра была чисто серверная и эксплуатировалась прямым запросом.",
+          "fix": "athleteId по умолчанию = me.id. Если в теле пришёл другой id, требуем подтверждённую связь тренер↔спортсмен: SELECT из trainer_athletes по trainer_id=me.id, athlete_id=requested, status='accepted'. Нет связи → 403 NOT_YOUR_ATHLETE. Предикат тот же, что в /api/recommendations (там он применён к connections для врача). Проверено, что тренер читает свои строки trainer_athletes под RLS — этим же запросом пользуется app/dashboard/page.tsx:953."
+        },
+        {
+          "title": "Счётчики карточки спортсмена в клубном виде всегда 0",
+          "file": "/Users/sergeylisunov/proform/app/org/athletes/[id]/page.tsx",
+          "root_cause": "Три запроса шли с `{ count: 'exact', head: true }` — при head:true тело ответа пустое, data всегда null, число приходит в count. Код же читал `Array.isArray(recsRaw) ? recsRaw.length : 0`, то есть гарантированно 0 при любых данных. Комментарий рядом (стр. 158-161) оправдывал это несуществующим ограничением типов — на самом деле count в PostgrestResponse типизирован. Отдельно: плитка «Активных травм» не могла показать ничего кроме 0 и по другой причине — у injuries нет ни одной политики для организации (027 + 106: только спортсмен, связанный тренер по trainer_athletes и врач по connections).",
+          "fix": "Тренировки считаются из count (`{ count: workoutsCountRaw }`). Рекомендации переведены на обычный select('id, severity') без head — из одной выборки берутся и общее число, и число high/critical. Мёртвый fallback на Array.isArray и вводящий в заблуждение комментарий удалены. Плитка «Активных травм» заменена на «Серьёзных ограничений» (high/critical рекомендации — данные, которые организация по RLS реально читает, recommendations_org_admin_read из 052); запрос к injuries снят, докстринг файла и поле интерфейса поясняют почему. Медконтент (title/body) не запрашивается."
+        },
+        {
+          "title": "Плитка «Атлеты в риске» на дашборде организации всегда 0",
+          "file": "/Users/sergeylisunov/proform/components/organization/OrgKpiTiles.tsx",
+          "root_cause": "Запрос `sb.from('injuries').select('id, status, athlete_id').neq('status','recovered')` не скоупился по организации вообще, но главное — RLS injuries не даёт организации читать травмы ни в каком виде (миграция 106 оставила только injuries_coach_select по trainer_athletes и injuries_doctor_select по connections; политики для org_members нет). Набор всегда пустой → atRiskAthletes пуст. Второй источник риска был мёртв буквально: цикл по рекомендациям (стр. 73-82) содержал только комментарий, тело if пустое, в Set ничего не добавлялось. Докстринг (стр. 10, 13-14) описывал composite-метрику и «2 batched calls» при трёх запросах.",
+          "fix": "Запрос к injuries удалён — организация НЕ должна получать доступ к медицинским записям, это прямо запрещено моделью приватности, поэтому чинить «расширением RLS» нельзя. Риск считается по данным, которые организации доступны легально: в проекцию recommendations добавлен athlete_id, atRiskAthletes = уникальные athlete_id со severity high/critical (статусы уже отфильтрованы .in(['sent','active','acknowledged'])). Мёртвый цикл заменён рабочим, хинт плитки переписан («Ограничения high/critical» вместо «Травмы или ограничения»), докстринг приведён в соответствие — включая явное объяснение, почему травмы исключены. Запросов стало ровно 2, как и заявлено в докстринге."
+        },
+        {
+          "title": "DELETE /api/org/teams/[id] рапортует успех при отказе RLS",
+          "file": "/Users/sergeylisunov/proform/app/api/org/teams/[id]/route.ts",
+          "root_cause": "`const { error } = await sb.from('org_groups').update({ is_active: false }).eq('id', params.id)` без .select(). Под RLS UPDATE, не нашедший ни одной доступной строки, не является ошибкой: supabase-js отдаёт error = null и 0 затронутых строк. Проверка «нет ошибки → получилось» возвращала 200 ok:true, клиент app/org/teams/[id]/page.tsx:203-208 видел res.ok и уводил пользователя на /org/teams, хотя команда оставалась активной. Тот же класс дефекта в PATCH: .single() при 0 доступных строк даёт PGRST116, который маппился в 500 UPDATE_FAILED вместо 403.",
+          "fix": "DELETE: добавлен .select('id'), при пустом результате возвращается 403 FORBIDDEN — приём уже применён в app/org/members/page.tsx:334-340 и services/wall.service.ts:116-126. PATCH: PGRST116 распознаётся отдельно и отдаёт 403 вместо 500. Докстринг файла переписан — прежний текст утверждал, что отказ RLS приходит ошибкой Postgres и превращается в 500, что и было ложной предпосылкой дефекта."
+        },
+        {
+          "title": "archiveOrgGroup возвращает true при отказе RLS",
+          "file": "/Users/sergeylisunov/proform/services/org-groups.service.ts",
+          "root_cause": "Та же причина, что в DELETE-роуте: UPDATE без .select(), возврат `true` по отсутствию error. Вызывающий app/org/teams/page.tsx:95 (`const ok = await archiveOrgGroup(groupId); if (ok && org) await load(org.id)`) получал ok=true и перерисовывал список так, будто команда заархивирована.",
+          "fix": "Добавлен .select('id'), функция возвращает true только при непустом результате. Докстринг объясняет причину."
+        }
+      ],
+      "already_fixed": [],
+      "changed_files": [
+        "/Users/sergeylisunov/proform/app/api/form-analysis/route.ts",
+        "/Users/sergeylisunov/proform/app/org/athletes/[id]/page.tsx",
+        "/Users/sergeylisunov/proform/components/organization/OrgKpiTiles.tsx",
+        "/Users/sergeylisunov/proform/app/api/org/teams/[id]/route.ts",
+        "/Users/sergeylisunov/proform/services/org-groups.service.ts"
+      ],
+      "not_done": [
+        "app/org/teams/page.tsx:91-98 — вызывающий archiveOrgGroup теперь корректно получает false при отказе RLS, но обрабатывает его молча: ни тоста, ни сообщения, просто не перерисовывает список. Файл вне моего списка (рядом работают другие агенты), поэтому не трогал. Стоит добавить showToast('Не удалось архивировать — недостаточно прав') по аналогии с app/org/teams/[id]/page.tsx:204-207.",
+        "Юнит-тестов на изменённые модули в репозитории нет (в tests/ нет файлов, ссылающихся на archiveOrgGroup, OrgKpiTiles, form-analysis или org-groups), новых не писал — задача сформулирована как точечные правки. Регрессию на 403 при DELETE команды разумно добавить в qa/ralph/rls-probe.mjs (сейчас 31 проверка, trainer_athletes и org_groups в них не покрыты).",
+        "Проверку связи в /api/form-analysis дублирует только приложение — на уровне БД athlete_id в form_analyses по-прежнему ничем не ограничен (политика form_analyses_owner_insert из миграции 016 смотрит только на author_id). Для симметрии с миграцией 105, где серверная проверка подстрахована политикой recommendations_doctor_insert, стоит добавить аналогичный WITH CHECK на form_analyses. Миграции применять было запрещено, поэтому не делал."
+      ],
+      "review_ok": true,
+      "review_notes": "Правка проверена по фактическому коду и по боевым политикам RLS (pg_policies). Блокирующих дефектов нет.\n\nПОДТВЕРЖДЕНО ПО СУЩЕСТВУ\n\n1. Ослабления доступа нет, есть ужесточение.\n- form_analyses в проде: form_analyses_owner_insert WITH CHECK = (author_id = get_my_user_id()) — athlete_id не ограничен ничем; form_analyses_select USING = (athlete_id = me OR author_id = me). То есть дыра была настоящая, и серверная проверка — единственный барьер. Замечание исполнителя про отсутствующий WITH CHECK на athlete_id верно и остаётся открытым (миграции применять было запрещено).\n- Проверка связи корректна: trainer_athletes.status = 'accepted' (словарь миграции 111), политика ta_select USING (trainer_id = me OR athlete_id = me OR admin) — тренер свои строки читает, ложных 403 не будет. Нестроковый/пустой athleteId → фолбэк на me.id; дубли связей → maybeSingle даёт null → 403 (fail closed).\n- Медданные организации не открылись: запросы к injuries сняты в обоих файлах (в проде у injuries действительно нет ни одной org-политики). В /org/athletes/[id] проекция рекомендаций — только id, severity; в OrgKpiTiles добавлен athlete_id. И severity, и athlete_id уже входят в штатный org-контракт проекта: services/recommendations.service.ts:419-437 редактирует организации ТОЛЬКО title/body, а athlete_id/severity отдаёт. Нового раскрытия нет.\n- Ни в одном 'use client'-файле нет createAdminClient / SERVICE_ROLE (проверено grep по всем трём клиентским файлам).\n\n2. Регрессий не найдено.\n- athleteId в /api/form-analysis не шлёт ни один клиент (grep по app, components, lib, services — только сам роут). Сценарии спортсмена, тренера, врача, клуба не задеты.\n- /org/athletes/[id]: порядок деструктуризации Promise.all совпадает с порядком запросов (recs → workouts count → org_group_members → trainer_athletes → connections). trainer_athletes фильтруется по 'accepted', connections по 'active' — соответствует схеме.\n- OrgKpiTiles реально живой для роли организации: recommendations_org_admin_read требует member_role IN (org_owner, org_admin), в проде 4 активные строки org_members с member_role='org_owner'.\n- DELETE /api/org/teams/[id] и archiveOrgGroup: ложного 403 не будет. Прод-политика org_groups_member_read даёт SELECT ЛЮБОМУ активному участнику организации (не завязана на is_active), поэтому .select('id') после архивации возвращает строку и админу клуба, и владельцу. Главному тренеру миграция 106 разрешает UPDATE только при активном членстве в организации — значит SELECT ему тоже доступен; при нарушении WITH CHECK Postgres вернёт ошибку (500 ARCHIVE_FAILED), а не тихий 403. Повторная архивация уже архивной команды всё равно матчит строку → идемпотентный 200.\n- Единственный вызывающий DELETE — app/org/teams/[id]/page.tsx:203, он уже показывает тост на !res.ok. E2E cross-tenant.spec.ts ожидает статус из FORBIDDEN_OK, конфликта нет.\n- Переименование плиток («Активных травм» → «Серьёзных ограничений», хинт «Атлеты в риске») ни в одном тесте не используется — grep по tests/ и qa/ пуст.\n\n3. Типы: ./node_modules/.bin/tsc --noEmit → exit 0 (заявленных 4 ошибок в .next/types уже нет). Неиспользуемых импортов не осталось.\n\nНЕБЛОКИРУЮЩИЕ ЗАМЕЧАНИЯ (передать дальше, менять в этой волне не требуется)\n\na) /Users/sergeylisunov/proform/app/org/athletes/[id]/page.tsx:115-118 — плитка «Тренировок за 30д» починена лишь наполовину. Прод-политика workouts_select: (athlete_id = me OR is_public = true OR EXISTS trainer_athletes OR admin). У организации нет ни одной ветки, кроме is_public, поэтому счётчик считает только ПУБЛИЧНЫЕ тренировки спортсмена и молча занижает реальное число. Исполнитель убрал плитку травм ровно по этой причине, но эту оставил и отчитался как о починенной. Правильное решение — агрегирующая SECURITY DEFINER RPC со скоупом по org_members, как отмечено в прошлой волне (qa/ralph/evidence/audit-workflow.json).\n\nb) /Users/sergeylisunov/proform/app/org/teams/page.tsx:94-96 — archiveOrgGroup теперь честно возвращает false, но вызывающий глотает его молча: ни тоста, ни перерисовки. Пользователь жмёт «Архивировать», подтверждает — и не видит ничего. Отказ достижим только для того, кто и так не должен архивировать, поэтому не блокирую; по аналогии с app/org/teams/[id]/page.tsx:204-206 стоит добавить showToast.\n\nc) На уровне БД athlete_id в form_analyses по-прежнему ничем не ограничен (подтверждено запросом к pg_policy). Пока миграции нет, сервер — единственная защита: любой новый путь записи в form_analyses обязан повторить ту же проверку."
+    },
+    {
+      "stream": "ai-cleanup",
+      "summary": "Все три пункта воспроизвелись на текущем коде — ни один не был закрыт предыдущими волнами. (1) flush безусловно вызывал persistSuccess → пустой ответ провайдера писался в историю со status 'ok' и списывал квоту; починено на сервере (не списываем, не пишем сообщение, журналируем provider_error/empty_response) и на клиенте (200 с пустым телом → внятная ошибка вместо молчания). Идемпотентность не тронута: PK user-сообщения и ключ chg:<clientMessageId> работают как раньше, просто ключ не расходуется. (2) Полностраничная /assistant удалена вместе с обеими ссылками (/ai → открытие виджета событием sporteo-assistant:open, /demo/ai-assistant → /dashboard, т.к. на публичной странице виджета нет); slug 'assistant' в reserved-slugs.ts оставлен и прокомментирован. (3) GET одного диалога теперь отдаёт 403 при несовпадении role_snapshot — как список и как запись. Проверки: npx tsc --noEmit — 0 ошибок; npx vitest run — 124 теста зелёные (включая 4 новых регрессионных на пустой ответ); eslint по затронутым файлам — 0 замечаний (заодно убраны мёртвые импорты и тип ChatMsg в app/ai/page.tsx, оставшиеся от вырезанного инлайн-чата).",
+      "fixed": [
+        {
+          "title": "Квота списывалась за пустой ответ модели",
+          "file": "/Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/messages/route.ts",
+          "root_cause": "flush TransformStream'а вызывал persistSuccess() безусловно, а persistSuccess не проверял fullText. Провайдер закрывает стрим ШТАТНО и молча (idle-watchdog и mid-stream дедлайн в lib/ai/ollama.ts делают finish('close') без ошибки), поэтому flush приходил с пустым текстом: в ai_messages писалась пустая строка со status 'ok' (она потом подмешивалась в промпт, т.к. история фильтруется только по status==='ok'), а chargeRequest списывал единицу месячного лимита. Ассиметрия была видна в том же файле: persistPartial имел guard `if (charged || !fullText) return`, persistSuccess — нет.",
+          "fix": "В начало persistSuccess добавлен guard `if (!fullText.trim())`: сообщение не сохраняется, chargeRequest не вызывается, флаг charged НЕ выставляется, вместо этого пишется logUsageEvent(eventType 'provider_error', metadata { code: 'empty_response' }) для наблюдаемости. Идемпотентность сохранена: ключ chg:<clientMessageId> просто не расходуется, а повторная доставка того же clientMessageId по-прежнему ловится PK-конфликтом user-сообщения (409); атомарный RPC increment_ai_usage не затронут. Обновлён инвариант в шапке файла: «Успех = стрим дочитан И ответ непустой»."
+        },
+        {
+          "title": "Пустой ответ не показывал пользователю ошибку (200 с пустым телом = «тишина»)",
+          "file": "/Users/sergeylisunov/proform/lib/ai/assistant/client.ts",
+          "root_cause": "sendAssistantMessage возвращал { ok: true } после нулевого тела: заголовки уже отправлены (text/plain 200), JSON-ошибку сервер послать не может. Виджет тихо удалял пустой плейсхолдер — пользователь видел только исчезнувший пузырь и не понимал, что произошло.",
+          "fix": "Заведён флаг hasText (есть ли хоть один значащий символ среди чанков и хвоста декодера); при !hasText возвращается { ok: false, error: 'AI не ответил — попробуйте ещё раз.' }. Так клиент согласован с сервером: не успех → не reloadCaps, показывается ошибка. Дополнительно в components/assistant/FloatingAssistant.tsx очистка плейсхолдера переведена на content.trim(), чтобы ответ из одних переводов строки не оставлял пустую рамку рядом с текстом ошибки. Новый регрессионный тест lib/ai/assistant/client.test.ts (4 кейса: пустое тело, только пробелы, нормальный ответ, JSON-ошибка до стрима)."
+        },
+        {
+          "title": "Старая полностраничная /assistant не удалена: дублировала виджет и несла уже исправленные в нём дефекты",
+          "file": "/Users/sergeylisunov/proform/app/assistant/page.tsx",
+          "root_cause": "Страница осталась живой и залинкованной после продуктового решения «единая точка входа — плавающий виджет». На /assistant рендерились ДВА независимых чата сразу (isAssistantPublicPath('/assistant') === false, виджет монтируется глобально из ClientOverlays), а копия чата содержала дефекты, которые в виджете уже закрыты: onChunk писал в хвост массива (TypeError при «Новый диалог»/удалении во время стрима), openConversation и удаление активного диалога без abortRef.current?.abort(), send без синхронного sendingRef-guard'а. Чинить второй раз то же самое — плодить дубли.",
+          "fix": "Файл удалён (git rm). Ссылка в app/ai/page.tsx заменена на кнопку, диспатчащую ASSISTANT_OPEN_EVENT ('sporteo-assistant:open') — тот же контракт, что у AskAiButton; текст карточки переписан («открывается кнопкой в правом нижнем углу»). Ссылка на публичной app/demo/ai-assistant/page.tsx переведена на /dashboard, потому что на публичных страницах виджета не существует вовсе. Slug 'assistant' оставлен в lib/routes/reserved-slugs.ts с пояснением (иначе /assistant прочитается как публичная страница клуба), обновлён docs/SPORTEO_GEMMA_AI_WIDGET.md. Проверено grep'ом: других ссылок нет — /quick и CommandPalette ведут на /ai?tab=assistant, оставшиеся упоминания в тестах (floating-assistant.test.ts, tests/e2e/roles/ai-widget.spec.ts) утверждают ОТСУТСТВИЕ пункта в навигации и продолжают проходить."
+        },
+        {
+          "title": "GET одного диалога не проверял role_snapshot (P3)",
+          "file": "/Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/route.ts",
+          "root_cause": "Изоляция истории по роли была дырявой: список фильтрует .eq('role_snapshot', actor.profile.role), POST сообщения отдаёт 403 при несовпадении, а чтение конкретного диалога ограничивалось только RLS-владением. После смены роли аккаунта переписка прошлой роли открывалась по прямой ссылке (id диалога виден клиенту), плюс роли без ассистента (admin, profile === null) могли читать диалоги вообще.",
+          "fix": "После проверки существования диалога добавлен guard `if (!actor.profile || conv.role_snapshot !== actor.profile.role)` → 403 с тем же текстом, что и в маршруте сообщений («Диалог создан в другой роли — начните новый»). Обновлён doc-комментарий маршрута."
+        }
+      ],
+      "already_fixed": [],
+      "changed_files": [
+        "/Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/messages/route.ts",
+        "/Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/route.ts",
+        "/Users/sergeylisunov/proform/lib/ai/assistant/client.ts",
+        "/Users/sergeylisunov/proform/lib/ai/assistant/client.test.ts",
+        "/Users/sergeylisunov/proform/components/assistant/FloatingAssistant.tsx",
+        "/Users/sergeylisunov/proform/app/assistant/page.tsx",
+        "/Users/sergeylisunov/proform/app/ai/page.tsx",
+        "/Users/sergeylisunov/proform/app/demo/ai-assistant/page.tsx",
+        "/Users/sergeylisunov/proform/lib/routes/reserved-slugs.ts",
+        "/Users/sergeylisunov/proform/docs/SPORTEO_GEMMA_AI_WIDGET.md"
+      ],
+      "not_done": [
+        "Серверный guard пустого ответа юнит-тестом не покрыт: логика живёт внутри POST-хендлера роута и тянет resolveActor/провайдера/Supabase — вынос в чистую функцию был бы отдельным рефакторингом. Покрыт клиентский контракт (lib/ai/assistant/client.test.ts) и вручную сверен с lib/ai/ollama.integration.test.ts, где idle-watchdog штатно закрывает молчащий стрим.",
+        "Стенд qa/ralph/rls-probe.mjs и e2e не запускались (нужна живая база и сервер) — проверено tsc, vitest (124 теста) и eslint.",
+        "Реестр qa/ralph/BUG_BACKLOG.md и qa/ralph/FINAL_REPORT.md не правил (общие для всех агентов волны — их обновляет оркестратор).",
+        "app/assistant/page.tsx удалён через git rm — изменение в индексе, но не закоммичено (коммит по инструкции не делал). Заодно почистил сгенерированные .next/types/**/validator.ts и .next/types/app/assistant (gitignored-артефакты со ссылкой на удалённый route), иначе tsc падал на них."
+      ],
+      "review_ok": false,
+      "review_notes": "Проверено по фактическому коду, а не по отчёту.\n\nЧТО СДЕЛАНО ВЕРНО (правки трогать не нужно):\n\n1) Пустой ответ не списывает квоту — /Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/messages/route.ts:228-246. Guard `if (!fullText.trim())` стоит ДО `charged = true`, поэтому: сообщение со status 'ok' не пишется (история для промпта фильтруется по status==='ok', route.ts:157 — пустая строка больше не подмешивается), chargeRequest не вызывается, флаг charged остаётся false → persistPartial при последующем abort корректно выходит по `!fullText`. Значение eventType 'provider_error' допустимо: CHECK в supabase/migrations/100_ai_assistants.sql:98-99 разрешает ('request_charged','denied_quota','denied_policy','provider_error'), и union-тип logUsageEvent (lib/ai/assistant/usage.ts:196) его содержит. Идемпотентность не нарушена: ключ chg:<clientMessageId> не расходуется, а повторная доставка того же id по-прежнему ловится PK-конфликтом user-сообщения (route.ts:167-182), атомарный RPC increment_ai_usage не затронут.\n\n2) Клиент согласован с сервером — /Users/sergeylisunov/proform/lib/ai/assistant/client.ts:100-121. hasText считается по чанкам через trim(); это эквивалентно серверному fullText.trim() (если все чанки — пробелы, то и сумма пробельная, и наоборот). При !hasText возвращается ok:false → FloatingAssistant не зовёт reloadCaps (правильно, списания не было) и показывает текст ошибки. Ветки aborted/interrupted не задеты. FloatingAssistant.tsx:269 (`content.trim()`) убирает пустой пузырь — согласовано.\n\n3) GET одного диалога — /Users/sergeylisunov/proform/app/api/assistant/conversations/[id]/route.ts:32. Сравнение идёт с actor.profile.role, а не с users.role, — тем же значением, которое пишется в role_snapshot при создании (app/api/assistant/conversations/route.ts:110) и по которому фильтруется список (route.ts:37). Поэтому роль 'specialist' (маппится в профиль doctor, lib/ai/assistant/policy.ts:69-70) доступ НЕ теряет, а владелец клуба ('organization') и тренер работают как раньше. Доступ только сузился; DELETE не тронут.\n\n4) Ослабления доступа нет: медданные не расширены, service-ключ в клиент не попал (lib/ai/assistant/client.ts тянет только типы; actor.admin живёт исключительно в route-хендлерах через lib/ai/assistant/gateway.ts). Имена таблиц/колонок и статусы связей правка не затрагивает.\n\n5) Мёртвых ссылок на удалённый маршрут не осталось: grep по href/redirect/router.push даёт только тесты, утверждающие ОТСУТСТВИЕ пункта (components/assistant/floating-assistant.test.ts:51, tests/e2e/roles/ai-widget.spec.ts:51). npx tsc --noEmit — чисто. npx vitest run lib/ai/assistant components/assistant lib/routes — 31 тест зелёный, включая 4 новых в lib/ai/assistant/client.test.ts.\n\nНЕБЛОКИРУЮЩИЕ ЗАМЕЧАНИЯ (на усмотрение, чинить в этой волне не обязательно):\n\n- /assistant теперь проваливается в динамический маршрут app/[orgSlug]/page.tsx и старая закладка показывает экран «клуб не найден» вместо 404/редиректа (slug зарезервирован, так что middleware сначала потребует авторизацию). Заодно на этом экране плавающий виджет рендерится, т.к. isAssistantPublicPath('/assistant') === false. Редирект /assistant → /dashboard был бы аккуратнее.\n\n- Отчёт исполнителя утверждает, что «/quick и CommandPalette ведут на /ai?tab=assistant» как рабочая точка входа. Фактически app/ai/page.tsx инициализирует вкладку `useState<TabKey>('hub')` и параметр tab не читает вовсе — оба перехода приземляются на «Обзор». Это дефект НЕ этой правки (в HEAD ровно так же, git show HEAD:app/ai/page.tsx:204), но он усиливает пункт из blocking_issues: карточка ассистента остаётся единственным внутристраничным входом.\n\n- При открытии виджета событием (в отличие от клика по плавающей кнопке, FloatingAssistant.tsx:300-304) не вызывается loadHistory(), поэтому панель истории подтянется только по клику на иконку часов. Косметика, поведение не ломается."
+    },
+    {
+      "stream": "harness",
+      "summary": "Дефект воспроизвёлся полностью: у проекта `setup` не было ни ретраев, ни ограничения параллельности, а ожидание редиректа (20 с) не помещалось в холодный старт серверной функции. Локальный прогон шёл в 5 воркеров с retries=0 (10 ядер / 2; `retries: process.env.CI ? 2 : 0`), то есть 10 логинов уходили в Supabase Auth залпом по пять и любая заминка роняла половину набора. Исправлено точечно на уровне проекта `setup`: retries=2 (3 попытки), workers=2, timeout теста 90 с, ожидание ухода с /auth/login поднято до 45 с. Критерий успеха не тронут — страница по-прежнему обязана уйти с /auth/login и сохранить storageState. Проверено на настоящем конфиге: банер сменился с «using 5 workers» на «Running 10 tests using 2 workers», в артефактах появились каталоги `-setup-retry2` (третья попытка реально выполняется), а при заведомо недостижимом хосте все 10 входов честно упали — ретраи не маскируют настоящую поломку. `npx tsc --noEmit` чистый.",
+      "fixed": [
+        {
+          "title": "Проект setup Playwright не имеет ретраев — разовая заминка авторизации роняет весь ролевой прогон",
+          "file": "/Users/sergeylisunov/proform/playwright.config.ts",
+          "root_cause": "Ретраи задавались только глобально и только для CI (`retries: process.env.CI ? 2 : 0`), а ролевой стенд гоняется локально против прод-URL через PLAYWRIGHT_BASE_URL. В итоге у setup было 0 попыток повтора: единственный таймаут входа помечал тест failed, а зависимые проекты roles и mobile уходили в skipped и выглядели как регрессия продукта.",
+          "fix": "Добавлен `retries: 2` в проект `setup` (3 попытки), независимо от CI. Настоящая поломка входа воспроизводится стабильно и переживает все три попытки — проверено запуском против недостижимого хоста: все 10 тестов упали, в артефактах присутствуют каталоги `-setup-retry2`."
+        },
+        {
+          "title": "Пять параллельных воркеров setup бьют по Supabase Auth залпом password-grant'ов",
+          "file": "/Users/sergeylisunov/proform/playwright.config.ts",
+          "root_cause": "`workers: process.env.CI ? 2 : undefined` при 10 логических ядрах даёт 5 воркеров локально, а `fullyParallel: true` распределяет все 10 setup-тестов по ним. Пять одновременных входов уходят в один и тот же эндпоинт авторизации — особенно больно, когда прогон стартует сразу за предыдущим (mobile следом за roles).",
+          "fix": "Добавлен `workers: 2` на уровне проекта `setup` (Playwright 1.59.1 поддерживает per-project workers, см. TestProject.workers в types/test.d.ts). Остальные проекты сохраняют прежнюю параллельность. Подтверждено сравнительным прогоном: без ограничения — «Running 10 tests using 5 workers», после правки на настоящем конфиге — «Running 10 tests using 2 workers»."
+        },
+        {
+          "title": "20 с на редирект с /auth/login объективно мало для холодного старта, и 30 с глобального таймаута теста не хватает под увеличенное ожидание",
+          "file": "/Users/sergeylisunov/proform/tests/e2e/auth.setup.ts",
+          "root_cause": "В бюджет ожидания входит холодный старт серверной функции: POST входа, обмен на сессию Supabase и редирект через middleware. 20 с не покрывали этот путь — те же учётки через минуту логинились с HTTP 200. Вдобавок глобальный `timeout: 30_000` не вмещал бы даже одно увеличенное ожидание вместе с загрузкой страницы логина.",
+          "fix": "Ожидание вынесено в именованную константу LOGIN_REDIRECT_TIMEOUT_MS = 45_000 с комментарием о причине, а проекту `setup` в playwright.config.ts задан `timeout: 90_000` под полный путь (загрузка /auth/login + POST + 45 с ожидания редиректа + запись storageState). Само условие не изменилось: `await expect(page).not.toHaveURL(/\\/auth\\/login/, { timeout: LOGIN_REDIRECT_TIMEOUT_MS })` плюс сохранение storageState."
+        }
+      ],
+      "already_fixed": [],
+      "changed_files": [
+        "/Users/sergeylisunov/proform/playwright.config.ts",
+        "/Users/sergeylisunov/proform/tests/e2e/auth.setup.ts"
+      ],
+      "not_done": [
+        "Живой прогон setup против прода не выполнялся: он требует QA_PASSWORD и настоящих запросов к прод-авторизации. Поведение раннера подтверждено на настоящем конфиге против недостижимого хоста (banner воркеров, каталоги retry2, честное падение всех 10 при невозможности войти) и синтетическим сравнительным прогоном 5 vs 2 воркера.",
+        "Глобальные `retries` и `workers` для проектов roles/mobile намеренно не менялись — послабления там маскировали бы настоящие поломки продукта.",
+        "qa/ralph/BUG_BACKLOG.md не обновлялся (файл вне выданного списка, рядом работают другие агенты)."
+      ],
+      "review_ok": true,
+      "review_notes": "Правка проверена по фактическому диффу; блокирующих дефектов нет.\n\nПРОВЕРЕНО:\n1. Область правки. `git status` подтверждает: изменены только playwright.config.ts и tests/e2e/auth.setup.ts. Это файлы QA-стенда — прикладного кода, RLS, клиент/сервер-границы, createAdminClient, обращений к таблицам/колонкам/enum'ам в диффе нет. Пункты «ослабление доступа», «соответствие схеме БД» и «квоты/идемпотентность» неприменимы: медицинские данные, org_members/trainer_athletes/connections и audit_action правка не затрагивает вообще.\n\n2. API реален. retries/workers/timeout — настоящие поля TestProject в установленном Playwright 1.59.1: node_modules/playwright/types/test.d.ts, `interface TestProject` начинается на 105, `retries?: number` — 437, `timeout?: number` — 701, `workers?: number|string` — 742. Документация к testProject.workers прямо описывает этот сценарий: «when all tests from a project share a single resource like a test account». Заявление исполнителя о поддержке per-project workers подтвердилось.\n\n3. Конфиг грузится. `npx playwright test --project=setup --list` перечисляет все 10 ролевых входов из ROLE_ACCOUNTS — сопоставление testMatch и связи dependencies не сломаны.\n\n4. Ретраи действительно срабатывают и НЕ маскируют настоящую поломку. Прогон против недостижимого хоста: тест упал, каталог артефактов — test-results/auth.setup.ts-вход-owner-alpha-setup-retry2, то есть третья попытка реально выполнилась, и итог всё равно «1 failed». Артефакты после проверки удалены (каталог и так в .gitignore).\n\n5. Критерий успеха не ослаблен. Утверждение по существу прежнее: `await expect(page).not.toHaveURL(/\\/auth\\/login/, { timeout: LOGIN_REDIRECT_TIMEOUT_MS })` + сохранение storageState. Изменилось только значение 20_000 → 45_000. Увеличение таймаута у негативного URL-ассерта даёт только больше ожидания и не может дать ложный проход.\n\n6. Регрессий у остальных проектов нет. Глобальные `retries: process.env.CI ? 2 : 0` и `workers: process.env.CI ? 2 : undefined` не тронуты — public, roles и mobile сохранили прежнюю параллельность и нулевые локальные ретраи. В CI фактически изменился только таймаут setup (30 с → 90 с), потому что там уже было retries=2/workers=2. Зависимости `dependencies: ['setup']` на месте: если setup падает на всех попытках, roles/mobile по-прежнему уходят в skipped.\n\n7. Типы. `npx tsc --noEmit` чистый. Неиспользуемых импортов не добавлено, LOGIN_REDIRECT_TIMEOUT_MS используется в единственной точке.\n\n8. Безопасность при 2 воркерах. `mkdirSync(AUTH_DIR, { recursive: true })` идемпотентен, каждая роль пишет собственный файл statePath(role) — снижение параллельности на корректность записи состояний не влияет.\n\nНЕБЛОКИРУЮЩИЕ ЗАМЕЧАНИЯ:\n- При настоящей поломке входа обратная связь стала медленнее: худший случай 10 тестов × 3 попытки × до 90 с / 2 воркера ≈ 22 мин против ≈ 1 мин раньше. Это осознанная цена правки, падение по-прежнему честное.\n- retries=2 на setup спрячет действительно плавающий баг продукта в логине (например, гонку в middleware 1 из 10) — он будет виден только как retry в отчёте. Для auth-фикстуры это стандартная практика и исполнитель оговорил компромисс в комментарии, но знать об этом стоит.\n- Локально теперь возможны trace/video для ретраев setup; Playwright не редактирует значения fill(), поэтому QA-пароль может попасть в лог действий трассы. Новой утечки на практике нет: test-results/, playwright-report/ и tests/e2e/.auth/ в .gitignore (строки 13, 14, 20), в CI ретраи были и раньше, а на той же машине пароль и так лежит открытым в ~/sporteo-qa-accounts.txt.\n\nОбманок (мёртвых кнопок, хардкода вместо данных, ссылок на несуществующие маршруты) в правке нет — она состоит из трёх числовых опций раннера и одной именованной константы."
+    }
+  ],
+  "blocking": [
+    {
+      "stream": "ai-cleanup",
+      "file": "/Users/sergeylisunov/proform/app/ai/page.tsx",
+      "issue": "Кнопка «Открыть AI-помощника» на вкладке «Ассистент» стала обманкой для всех состояний, где capabilities.available === false, и вместе с удалением /assistant из приложения исчезла ЕДИНСТВЕННАЯ поверхность, показывающая unavailableReason и upgrade-CTA.",
+      "why_blocking": "app/ai/page.tsx:161-167 диспатчит ASSISTANT_OPEN_EVENT; слушатель в FloatingAssistant ставит open=true, но рендер обрезан раньше: components/assistant/FloatingAssistant.tsx:283 `if (!caps?.available) return null`. Итог — клик не даёт ни панели, ни сообщения, ни ошибки. Кого задевает: (1) платформенный админ — resolveAssistantProfile (lib/ai/assistant/policy.ts:65-73) для 'admin' возвращает null → buildCapabilities отдаёт available:false, при этом вкладка «Ассистент» рендерится всем (app/ai/page.tsx:251), а карточка FEATURES прямо включает 'admin' в roles (app/ai/page.tsx:32); текст карточки при этом утверждает «открывается кнопкой в правом нижнем углу», хотя у админа этой кнопки нет вовсе; (2) любой пользователь, если провайдер не сконфигурирован — app/api/assistant/capabilities/route.ts:20-28 отдаёт available:false с причиной «AI временно не настроен на сервере»; (3) тариф с ai_config.enabled=false (по дизайну миграции 100 конфиг правится в БД без кода) — gateway.ts:87-93 отдаёт available:false + upgrade {cta:'Подключить тариф с AI', href:'/pricing'}. Удалённая app/assistant/page.tsx рендерила ровно эти состояния (git show HEAD:app/assistant/page.tsx:184-193 — блок `if (!caps.available)` с unavailableReason и Link на caps.upgrade.href). Сейчас grep по unavailableReason во всех .tsx не даёт ни одного попадания: поля capabilities.unavailableReason и capabilities.upgrade больше нигде не отображаются, то есть путь «нет AI в тарифе → /pricing» потерян целиком. Минимальная починка в рамках правки: на вкладке assistant в app/ai/page.tsx запросить fetchCapabilities() и при !available показывать unavailableReason + upgrade-CTA вместо кнопки (либо не рендерить кнопку, если виджет открыться не может)."
+    }
+  ]
+}

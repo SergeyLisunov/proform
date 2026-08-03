@@ -10,7 +10,10 @@
  * Что показывается:
  *   - name + photo + team + coach + doctor — basic identity
  *   - last_activity_at — когда athlete последний раз был активен
- *   - aggregated counts: active recommendations, injuries, attendance
+ *   - aggregated counts: active recommendations (всего и high/critical),
+ *     тренировки за 30 дней. Травмы НЕ считаем: injuries по RLS доступны
+ *     только связанному тренеру, врачу и самому спортсмену (миграция 106),
+ *     организация в этот список не входит.
  *   - team membership badge
  *   - "Открыть полный профиль" — disabled для org_admin, доступно только
  *     coach/doctor с active connection
@@ -39,7 +42,10 @@ interface AthleteProfile {
 
 interface AthleteCounts {
   active_recommendations: number
-  active_injuries: number
+  /** high/critical среди активных рекомендаций. Травмы сюда не входят:
+   *  injuries по RLS (миграция 106) читают только связанный тренер, врач и
+   *  сам спортсмен — организация не имеет доступа к медзаписям. */
+  severe_recommendations: number
   workouts_last_30d: number
   team_names: string[]
   coach_names: string[]
@@ -92,23 +98,20 @@ export default function OrgAthletePage() {
         member_role: member.member_role,
       })
 
-      // Aggregations in parallel — never fetch raw medical content
+      // Aggregations in parallel — never fetch raw medical content.
+      // По рекомендациям тянем severity (без title/body — это медконтент):
+      // из неё считается «серьёзных ограничений», см. ниже.
       const [
         { data: recsRaw },
-        { data: injuriesRaw },
-        { data: workoutsRaw },
+        { count: workoutsCountRaw },
         { data: groupsRaw },
         { data: coachLinksRaw },
         { data: doctorLinksRaw },
       ] = await Promise.all([
         sb.from('recommendations')
-          .select('id', { count: 'exact', head: true })
+          .select('id, severity')
           .eq('athlete_id', athleteId)
           .in('status', ['sent', 'active', 'acknowledged']),
-        sb.from('injuries')
-          .select('id', { count: 'exact', head: true })
-          .eq('athlete_id', athleteId)
-          .neq('status', 'recovered'),
         sb.from('workouts')
           .select('id', { count: 'exact', head: true })
           .eq('athlete_id', athleteId)
@@ -155,18 +158,17 @@ export default function OrgAthletePage() {
           .map(u => [u.id, u.name ?? '—']))
       }
 
-      // For count headers — we used head:true so data is null but count is set on
-      // the response — TypeScript types in this project don't expose count via
-      // .select(); we mimic the behavior with separate eager queries. To keep
-      // it simple we use array-length on the wide queries.
-      const recsCount     = Array.isArray(recsRaw) ? recsRaw.length : 0
-      const injuriesCount = Array.isArray(injuriesRaw) ? injuriesRaw.length : 0
-      const workoutsCount = Array.isArray(workoutsRaw) ? workoutsRaw.length : 0
+      // При head:true тело ответа пустое — data всегда null, а число приходит
+      // в count. Старый код читал Array.isArray(data).length и поэтому всегда
+      // показывал 0. Счётчик тренировок берём из count, рекомендации считаем
+      // по фактически полученным строкам (там head не используется).
+      const recs = (recsRaw ?? []) as Array<{ id: string; severity: string | null }>
+      const severeRecs = recs.filter(r => r.severity === 'high' || r.severity === 'critical').length
 
       setCounts({
-        active_recommendations: recsCount,
-        active_injuries:        injuriesCount,
-        workouts_last_30d:      workoutsCount,
+        active_recommendations: recs.length,
+        severe_recommendations: severeRecs,
+        workouts_last_30d:      workoutsCountRaw ?? 0,
         team_names:             teamNames,
         coach_names:            coachIds.map(id => nameById.get(id) ?? '—').filter(n => n !== '—'),
         doctor_names:           doctorIds.map(id => nameById.get(id) ?? '—').filter(n => n !== '—'),
@@ -245,7 +247,7 @@ export default function OrgAthletePage() {
       {/* Aggregations grid (no raw medical detail) */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Tile label="Активных рекомендаций" value={counts.active_recommendations} icon="ki-clipboard" color="#7C3AED" bg="#FAF5FF" />
-        <Tile label="Активных травм" value={counts.active_injuries} icon="ki-shield-cross" color="#B91C1C" bg="#FEF2F2" />
+        <Tile label="Серьёзных ограничений" value={counts.severe_recommendations} icon="ki-shield-cross" color="#B91C1C" bg="#FEF2F2" />
         <Tile label="Тренировок за 30д" value={counts.workouts_last_30d} icon="ki-flash-circle" color="#F35703" bg="#FEF0E7" />
         <Tile label="Команд" value={counts.team_names.length} icon="ki-people" color="#2563EB" bg="#EFF6FF" />
       </section>

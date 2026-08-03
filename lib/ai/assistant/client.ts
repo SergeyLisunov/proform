@@ -1,5 +1,5 @@
 /**
- * Клиентский сервис страницы /assistant (browser-side).
+ * Клиентский сервис AI-помощника (browser-side, плавающий виджет).
  *
  * Только вызовы /api/assistant/* — никаких промптов, ролей и лимитов на
  * клиенте: всё решает сервер, клиент лишь отображает capabilities.
@@ -97,15 +97,28 @@ export async function sendAssistantMessage(opts: {
 
   const reader = res.body.getReader()
   const decoder = new TextDecoder()
+  /** Пришёл ли хоть один значащий символ: 200 с пустым телом — это отказ. */
+  let hasText = false
   try {
     for (;;) {
       const { done, value } = await reader.read()
       if (done) break
       const text = decoder.decode(value, { stream: true })
-      if (text) opts.onChunk(text)
+      if (text) {
+        hasText ||= text.trim().length > 0
+        opts.onChunk(text)
+      }
     }
     const tail = decoder.decode()
-    if (tail) opts.onChunk(tail)
+    if (tail) {
+      hasText ||= tail.trim().length > 0
+      opts.onChunk(tail)
+    }
+    // Провайдер закрыл стрим, не сказав ничего (штатный soft close по
+    // idle-watchdog). Сервер такой ответ успехом не считает и квоту не
+    // списывает — значит и пользователю нужна понятная ошибка, а не
+    // молчаливо исчезнувший пустой пузырь.
+    if (!hasText) return { ok: false, error: 'AI не ответил — попробуйте ещё раз.' }
     return { ok: true }
   } catch (e) {
     if (e instanceof Error && e.name === 'AbortError') return { ok: false, aborted: true }

@@ -9,9 +9,11 @@
  * RLS handles authorization:
  *   - org_admin / org_owner of the host org can update/archive any team
  *   - head_coach of the team can update their own team only
- *   - Anyone else gets a 403 from Postgres which we surface as 500
- *     unless RLS denies are reported at the query level — we trust the
- *     existing policies from migration 054.
+ *   - всем остальным политики миграции 054 просто не отдают строку.
+ *
+ * Важно: отказ RLS на записи — НЕ ошибка Postgres. UPDATE, не нашедший
+ * доступных строк, возвращает error = null и 0 затронутых строк, поэтому
+ * оба хендлера судят по факту изменения строки и отдают 403, а не 200/500.
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
@@ -88,6 +90,14 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
         { status: 409 },
       )
     }
+    // PGRST116 = .single() не нашёл строку. Под RLS это не сбой сервера, а
+    // отказ в доступе (или несуществующая команда) — 500 вводил в заблуждение.
+    if (error.code === 'PGRST116') {
+      return NextResponse.json(
+        { ok: false, error: 'FORBIDDEN' },
+        { status: 403 },
+      )
+    }
     return NextResponse.json(
       { ok: false, error: 'UPDATE_FAILED' },
       { status: 500 },
@@ -106,15 +116,29 @@ export async function DELETE(_req: Request, props: { params: Promise<{ id: strin
   }
 
   // Soft-archive: preserve team in audit history.
-  const { error } = await sb
+  // .select('id') обязателен: под RLS запись, не нашедшая ни одной доступной
+  // строки, НЕ считается ошибкой — supabase-js отдаёт error = null и 0
+  // затронутых строк. Проверка «нет ошибки → получилось» рапортовала успех
+  // и уводила на /org/teams, хотя команда оставалась активной. Судим по
+  // фактически затронутым строкам (тот же приём — в app/org/members/page.tsx
+  // и services/wall.service.ts).
+  const { data, error } = await sb
     .from('org_groups')
     .update({ is_active: false })
     .eq('id', params.id)
+    .select('id')
 
   if (error) {
     return NextResponse.json(
       { ok: false, error: 'ARCHIVE_FAILED' },
       { status: 500 },
+    )
+  }
+
+  if ((data ?? []).length === 0) {
+    return NextResponse.json(
+      { ok: false, error: 'FORBIDDEN' },
+      { status: 403 },
     )
   }
 

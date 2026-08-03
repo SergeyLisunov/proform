@@ -5,7 +5,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * GET    /api/assistant/conversations/:id — сообщения диалога (RLS owner).
+ * GET    /api/assistant/conversations/:id — сообщения диалога
+ *        (RLS owner + диалог должен быть создан в ТЕКУЩЕЙ роли).
  * DELETE /api/assistant/conversations/:id — мягкое удаление владельцем.
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -23,6 +24,17 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .is('deleted_at', null)
     .maybeSingle()
   if (!conv) return NextResponse.json({ ok: false, error: 'Диалог не найден.' }, { status: 404 })
+
+  // Изоляция истории по роли должна быть ПОЛНОЙ: список уже фильтрует по
+  // role_snapshot, отправка сообщения отдаёт 403, а чтение одного диалога
+  // проверок не имело — после смены роли аккаунта переписка прошлой роли
+  // открывалась по прямой ссылке (id диалога виден клиенту).
+  if (!actor.profile || conv.role_snapshot !== actor.profile.role) {
+    return NextResponse.json(
+      { ok: false, error: 'Диалог создан в другой роли — начните новый.' },
+      { status: 403 },
+    )
+  }
 
   const { data: messages } = await sbAny
     .from('ai_messages')

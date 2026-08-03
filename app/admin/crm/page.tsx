@@ -4,6 +4,11 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/metronic'
+import {
+  listAuditLogForUser,
+  AUDIT_ACTION_LABEL,
+  type AuditLogEntry,
+} from '@/services/admin-audit.service'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type CRMUser = {
@@ -20,7 +25,11 @@ type CRMUser = {
 }
 
 type UserDetail = CRMUser & {
-  events: { event_type: string; created_at: string; metadata: Record<string, unknown> }[]
+  // Вкладка «События» читает audit_logs, а не user_events: в user_events
+  // никто не пишет (единственная ссылка на таблицу была здесь, в базе ноль
+  // строк), поэтому вкладка всегда рисовала «Нет событий» — пустой экран,
+  // выдающий себя за работающий. См. services/admin-audit.service.ts.
+  events: AuditLogEntry[]
   notes: { id: string; body: string; created_at: string; author_name: string }[]
   workouts: { event_date: string; activity_type: string; activity_strain: number | null }[]
 }
@@ -49,6 +58,17 @@ function fmtDate(iso: string | null) {
 
 function fmtDateTime(iso: string) {
   return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+/** payload журнала — свободный jsonb; печатаем как есть, без домысливания. */
+function describeAuditPayload(e: AuditLogEntry): string {
+  const who = e.actor_name ?? e.actor_email ?? 'система'
+  const p = e.payload
+  if (!p || typeof p !== 'object' || Object.keys(p).length === 0) return who
+  const details = Object.entries(p)
+    .map(([k, v]) => `${k}: ${v !== null && typeof v === 'object' ? JSON.stringify(v) : String(v)}`)
+    .join(' · ')
+  return `${who} — ${details}`
 }
 
 function getSegment(u: { created_at: string; workout_count: number; plan: string; last_active: string | null }): CRMUser['segment'] {
@@ -116,7 +136,8 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
         sb.from('users').select('*').eq('id', userId).single(),
         sb.from('subscriptions').select('*').eq('user_id', userId).single(),
         sb.from('workouts').select('event_date, activity_type, activity_strain').eq('athlete_id', userId).order('event_date', { ascending: false }).limit(10),
-        sb.from('user_events').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30),
+        // Промис-обёртка: listAuditLogForUser возвращает массив, а не { data }
+        listAuditLogForUser(userId, 30).then(rows => ({ data: rows })),
         sb.from('crm_notes').select('*, author:author_id(name)').eq('about_user_id', userId).order('created_at', { ascending: false }),
       ])
       if (!u) return
@@ -281,19 +302,30 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
           ) : tab === 'events' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {data.events.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted-foreground)', fontSize: 13 }}>Нет событий</div>
-              ) : data.events.map((e, i) => (
-                <div key={i} style={{ padding: '10px 14px', background: 'var(--accent)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted-foreground)', fontSize: 13 }}>
+                  В журнале аудита нет записей по этому пользователю
+                </div>
+              ) : data.events.map(e => (
+                <div key={e.id} style={{ padding: '10px 14px', background: 'var(--accent)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F35703', flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)' }}>{e.event_type}</div>
-                    {Object.keys(e.metadata).length > 0 && (
-                      <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{JSON.stringify(e.metadata)}</div>
-                    )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)' }}>
+                      {AUDIT_ACTION_LABEL[e.action] ?? e.action}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1, overflowWrap: 'anywhere' }}>
+                      {describeAuditPayload(e)}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 10, color: 'var(--muted-foreground)', flexShrink: 0 }}>{fmtDateTime(e.created_at)}</div>
+                  <div style={{ fontSize: 10, color: 'var(--muted-foreground)', flexShrink: 0 }}>
+                    {e.created_at ? fmtDateTime(e.created_at) : '—'}
+                  </div>
                 </div>
               ))}
+              <p style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 4, lineHeight: 1.5 }}>
+                Источник — audit_logs: смена роли, обход врачебного допуска,
+                назначения. Обычные действия (вход, тренировки) в журнал
+                аудита не пишутся.
+              </p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

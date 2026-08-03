@@ -263,7 +263,10 @@ export default function FloatingAssistant() {
       abortRef.current = null
       setMessages(m => {
         const idx = m.findIndex(x => x.id === assistantId)
-        if (idx !== -1 && !m[idx].content) return m.filter(x => x.id !== assistantId)
+        // trim: провайдер может прислать только переводы строк — сервер
+        // такой ответ не сохраняет и квоту не списывает, значит и пузыря
+        // в переписке быть не должно (иначе пустая рамка рядом с ошибкой).
+        if (idx !== -1 && !m[idx].content.trim()) return m.filter(x => x.id !== assistantId)
         return m
       })
       if (result.error) setError(result.error)

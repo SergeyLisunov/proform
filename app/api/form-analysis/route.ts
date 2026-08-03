@@ -42,7 +42,28 @@ export async function POST(req: NextRequest) {
   const exercise = typeof body.exercise === 'string' ? body.exercise.trim().slice(0, 60) : null
   const videoPath      = typeof body.videoPath      === 'string' ? body.videoPath      : null
   const videoPublicUrl = typeof body.videoPublicUrl === 'string' ? body.videoPublicUrl : null
-  const athleteId      = typeof body.athleteId      === 'string' ? body.athleteId      : (me.id as string)
+
+  // Mass assignment: athlete_id брался из тела запроса без единой проверки, а
+  // RLS-политика form_analyses_owner_insert смотрит ТОЛЬКО на author_id — то
+  // есть любой авторизованный пользователь мог записать разбор техники в чужой
+  // аккаунт (жертва видит его у себя: form_analyses_select пускает по
+  // athlete_id). Разбор на чужого спортсмена разрешаем только тренеру с
+  // подтверждённой связью — тем же предикатом, что и /api/recommendations.
+  const requestedAthleteId = typeof body.athleteId === 'string' ? body.athleteId.trim() : ''
+  let athleteId = me.id as string
+  if (requestedAthleteId && requestedAthleteId !== me.id) {
+    const { data: link } = await supabase
+      .from('trainer_athletes')
+      .select('trainer_id')
+      .eq('trainer_id', me.id as string)
+      .eq('athlete_id', requestedAthleteId)
+      .eq('status', 'accepted')
+      .maybeSingle()
+    if (!link) {
+      return NextResponse.json({ ok: false, error: 'NOT_YOUR_ATHLETE' }, { status: 403 })
+    }
+    athleteId = requestedAthleteId
+  }
 
   // Create row (status=analyzing). Row lives in public.form_analyses.
   const insertBase = {
