@@ -18,13 +18,16 @@
  * volume justifies it).
  *
  * Auth model:
- *   organizations.id == users.id (W6 Day 31 1:1 schema convention).
- *   Caller must be the org user (role='organization'). RLS on
- *   org_members + child tables enforces visibility; this service
- *   issues queries as the calling user via SSR supabase client.
+ *   Право и org_id даёт общий резолвер `lib/org/org-context.ts` — управлять
+ *   клубом может и аккаунт-организация (`users.role='organization'`, где
+ *   `organizations.id = users.id`), и назначенный администратор
+ *   (`org_members.member_role='org_admin'`, org_id — ЧУЖОЙ id). RLS на
+ *   org_members + дочерних таблицах ограничивает видимость; запросы идут
+ *   от имени вызывающего через SSR supabase client.
  */
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getOrgContext } from '@/lib/org/org-context'
 
 export type OrgEventType =
   | 'member_joined'
@@ -250,22 +253,23 @@ async function adminFetchRecsIssued(admin: any, athleteIds: string[], sinceIso: 
  * Returns the most recent 50 org-relevant events from the last 30 days
  * (mix of member joins, inquiries, recommendations).
  *
- * Returns [] if caller isn't a logged-in org user OR has no member roster.
+ * Возвращает [] если вызывающий не аутентифицирован или не управляет клубом.
+ *
+ * Дефект, который здесь чинится: гейт был `me.role !== 'organization'`, то есть
+ * по ГЛОБАЛЬНОЙ роли, а org_id брался как `me.id`. У администратора клуба
+ * (`org_members.member_role='org_admin'`) глобальной роли 'organization' нет, а
+ * его `users.id` — не id клуба; функция молча отдавала пустую ленту. Право и
+ * org_id теперь даёт общий резолвер — тот же, что гейтит страницы /org/**,
+ * поэтому «вижу пункт меню, но лента пустая» больше не воспроизводится.
+ *
+ * Сигнатура не изменилась (вызов без аргументов), поэтому вызывающим правка
+ * не видна; ветвление на стороне /org/activity стало избыточным.
  */
 export async function getRecentOrgActivity(): Promise<OrgEvent[]> {
-  const sb = await createClient()
-  const { data: auth } = await sb.auth.getUser()
-  if (!auth?.user) return []
+  const ctx = await getOrgContext()
+  if (!ctx || !ctx.canManage || !ctx.orgId) return []
 
-  const { data: meRow } = await sb
-    .from('users')
-    .select('id, role')
-    .eq('auth_id', auth.user.id)
-    .maybeSingle()
-  const me = meRow as { id: string; role: string } | null
-  if (!me || me.role !== 'organization') return []
-
-  const orgId = me.id   // organizations.id = users.id by convention
+  const orgId = ctx.orgId
   const since = new Date(Date.now() - SINCE_WINDOW_DAYS * 24 * 3600 * 1000).toISOString()
 
   const athleteIds = await getOrgAthleteIds(orgId)

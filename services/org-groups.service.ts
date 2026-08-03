@@ -194,18 +194,25 @@ export async function updateOrgGroup(groupId: string, patch: Partial<OrgGroupUpd
 }
 
 /** Soft-archive (sets is_active=false). Use this instead of DELETE to
- * preserve the team in audit history. */
+ * preserve the team in audit history.
+ *
+ * Возвращает true, только если строка действительно изменена. Под RLS
+ * UPDATE, не нашедший ни одной доступной строки, не считается ошибкой:
+ * supabase-js отдаёт error = null, поэтому проверка «нет ошибки → получилось»
+ * рапортовала успех и вызывающий /org/teams перерисовывал список так, будто
+ * команда заархивирована. Судим по фактически затронутым строкам. */
 export async function archiveOrgGroup(groupId: string): Promise<boolean> {
   const sb = createClient()
-  const { error } = await sb
+  const { data, error } = await sb
     .from('org_groups')
     .update({ is_active: false })
     .eq('id', groupId)
+    .select('id')
   if (error) {
     console.warn('[archiveOrgGroup]', error.message)
     return false
   }
-  return true
+  return ((data ?? []) as Array<{ id: string }>).length > 0
 }
 
 // ── Members ────────────────────────────────────────────────────────────

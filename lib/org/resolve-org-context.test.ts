@@ -18,12 +18,15 @@ const ADMIN_USER    = 'u-club-admin'
 const CLUB_A        = 'org-a'
 const CLUB_B        = 'org-b'
 
+const CLUB_C        = 'org-c'
+
 function member(
   org_id: string,
   member_role: string,
   status: string = 'active',
+  joined_at?: string | null,
 ): OrgMembershipRow {
-  return { org_id, member_role, status }
+  return { org_id, member_role, status, joined_at }
 }
 
 describe('resolveOrgContext', () => {
@@ -79,6 +82,67 @@ describe('resolveOrgContext', () => {
     expect(ctx.scopedOrgRole).toBe('org_owner')
     expect(ctx.orgId).toBe(CLUB_B)
     expect(ctx.isOwner).toBe(true)
+  })
+
+  it('два org_admin-членства: выигрывает раннее joined_at, а не порядок строк', () => {
+    // Регрессия «администратор двух клубов открывает произвольный».
+    // Тот же набор строк в обратном порядке обязан дать тот же клуб.
+    const rows = [
+      member(CLUB_B, 'org_admin', 'active', '2025-03-01T00:00:00Z'),
+      member(CLUB_A, 'org_admin', 'active', '2024-01-15T00:00:00Z'),
+      member(CLUB_C, 'org_admin', 'active', '2025-09-20T00:00:00Z'),
+    ]
+
+    expect(resolveOrgContext(ADMIN_USER, 'coach', rows).orgId).toBe(CLUB_A)
+    expect(resolveOrgContext(ADMIN_USER, 'coach', [...rows].reverse()).orgId).toBe(CLUB_A)
+  })
+
+  it('без joined_at выбор всё равно стабилен — тай-брейк по org_id', () => {
+    // Вызывающие, которые не выбирают колонку joined_at, не должны получать
+    // «то один клуб, то другой»: правило обязано доработать без неё.
+    const rows = [
+      member(CLUB_C, 'org_admin'),
+      member(CLUB_A, 'org_admin'),
+      member(CLUB_B, 'org_admin'),
+    ]
+
+    expect(resolveOrgContext(ADMIN_USER, 'coach', rows).orgId).toBe(CLUB_A)
+    expect(resolveOrgContext(ADMIN_USER, 'coach', [...rows].reverse()).orgId).toBe(CLUB_A)
+  })
+
+  it('членство с датой приоритетнее членства без даты', () => {
+    // Пустой joined_at не должен выигрывать у реальной даты только потому,
+    // что пустая строка меньше любой ISO-даты.
+    const withDate    = member(CLUB_B, 'org_admin', 'active', '2025-03-01T00:00:00Z')
+    const withoutDate = member(CLUB_A, 'org_admin')
+
+    expect(resolveOrgContext(ADMIN_USER, 'coach', [withoutDate, withDate]).orgId).toBe(CLUB_B)
+    expect(resolveOrgContext(ADMIN_USER, 'coach', [withDate, withoutDate]).orgId).toBe(CLUB_B)
+  })
+
+  it('org_owner бьёт org_admin даже с более поздним joined_at', () => {
+    // Роль — старший ключ сортировки: владение сильнее делегированных прав.
+    const rows = [
+      member(CLUB_A, 'org_admin', 'active', '2020-01-01T00:00:00Z'),
+      member(CLUB_B, 'org_owner', 'active', '2026-01-01T00:00:00Z'),
+    ]
+
+    const ctx = resolveOrgContext(ADMIN_USER, 'coach', rows)
+    expect(ctx.orgId).toBe(CLUB_B)
+    expect(ctx.scopedOrgRole).toBe('org_owner')
+  })
+
+  it('резолвер не мутирует переданный массив членств', () => {
+    // Сортировка «на месте» переставила бы строки в кэше вызывающего.
+    const rows = [
+      member(CLUB_C, 'org_admin', 'active', '2025-09-20T00:00:00Z'),
+      member(CLUB_A, 'org_admin', 'active', '2024-01-15T00:00:00Z'),
+    ]
+    const snapshot = rows.map(r => r.org_id)
+
+    resolveOrgContext(ADMIN_USER, 'coach', rows)
+
+    expect(rows.map(r => r.org_id)).toEqual(snapshot)
   })
 
   it('неактивное членство прав не даёт', () => {

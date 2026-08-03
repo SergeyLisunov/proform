@@ -22,25 +22,45 @@ export default function NewsletterStatsPage() {
   const { id } = useParams<{ id: string }>()
   // P1: гейт по глобальной роли отбрасывал org_admin — статистика клуба
   // должна быть доступна и администратору клуба.
-  const { canManage, loading: ctxLoading } = useOrgContext()
+  const { canManage, orgId, loading: ctxLoading } = useOrgContext()
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null)
   const [stats, setStats] = useState<NewsletterStats | null>(null)
   const [loading, setLoading] = useState(true)
+  /** Рассылка существует, но принадлежит другому клубу — см. сверку ниже. */
+  const [foreignOrg, setForeignOrg] = useState(false)
 
   useEffect(() => {
     if (ctxLoading) return
-    if (!canManage) { setLoading(false); return }
+    if (!canManage || !orgId) { setLoading(false); return }
+    let cancelled = false
     async function load() {
       const [nl, s] = await Promise.all([
         getNewsletter(id),
         getNewsletterStats(id),
       ])
+      if (cancelled) return
+
+      // canManage отвечает лишь на вопрос «управляю ли я ХОТЬ КАКИМ-ТО клубом»,
+      // а id рассылки приходит из URL. Без сверки org_id страница логически
+      // разрешала запросить чужую рассылку, и вся защита держалась на одном
+      // рубеже — RLS newsletters_manager_manage (миграция 110). Один рубеж
+      // ошибается молча: ослабнет политика — утечка пройдёт незамеченной.
+      if (nl && nl.org_id !== orgId) {
+        setForeignOrg(true)
+        setNewsletter(null)
+        setStats(null)
+        setLoading(false)
+        return
+      }
+
+      setForeignOrg(false)
       setNewsletter(nl)
       setStats(s)
       setLoading(false)
     }
     load()
-  }, [id, ctxLoading, canManage])
+    return () => { cancelled = true }
+  }, [id, ctxLoading, canManage, orgId])
 
   if (ctxLoading || loading) {
     return (
@@ -55,6 +75,21 @@ export default function NewsletterStatsPage() {
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
+      </div>
+    )
+  }
+
+  if (foreignOrg) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <p className="text-sm font-semibold text-foreground">Рассылка принадлежит другому клубу</p>
+        <p className="max-w-sm text-center text-2sm text-muted-foreground">
+          Статистика доступна только по рассылкам того клуба, которым вы управляете.
+        </p>
+        <Link href="/org/newsletters" className="text-2sm font-semibold text-orange-600 hover:text-orange-700">
+          К рассылкам моего клуба
+        </Link>
       </div>
     )
   }

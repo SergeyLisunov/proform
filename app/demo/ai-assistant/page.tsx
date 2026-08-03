@@ -204,7 +204,10 @@ export default function DemoAssistantPage() {
       )}
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Уже с нами? <Link href="/assistant" className="font-semibold text-orange-600 hover:underline">Открыть своего AI-помощника</Link>
+        {/* Страница публичная — плавающего виджета здесь нет вовсе, поэтому
+            ведём в кабинет: там ассистент открывается кнопкой в углу экрана.
+            Прежняя ссылка вела на удалённую полностраничную /assistant. */}
+        Уже с нами? <Link href="/dashboard" className="font-semibold text-orange-600 hover:underline">Открыть своего AI-помощника в кабинете</Link>
       </p>
     </div>
   )

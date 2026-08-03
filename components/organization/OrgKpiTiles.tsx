@@ -7,8 +7,15 @@
  *   - coaches count
  *   - doctors+specialists count (with breakdown)
  *   - active recommendations count + unack-by-coach
- *   - athletes-at-risk (composite: active injury OR active high/critical recommendation)
+ *   - athletes-at-risk — уникальные спортсмены с активной рекомендацией
+ *     severity high/critical по этой организации.
  *   - MRR placeholder (zero until ЮKassa active subscriptions)
+ *
+ * Травмы в расчёт риска не входят намеренно: RLS injuries (миграция 106)
+ * пускает только связанного тренера, врача и самого спортсмена — у
+ * организации доступа к медзаписям нет и не должно быть. Раньше здесь
+ * висел запрос к injuries без скоупа по org: он всегда возвращал пустой
+ * набор, поэтому плитка показывала 0 при любых реальных рисках.
  *
  * Data fetched in 2 batched calls — no waterfall. RLS scopes to user's
  * own org via org_members membership.
@@ -48,36 +55,28 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
       const [
         { data: members },
         { data: recs },
-        { data: injuries },
       ] = await Promise.all([
         sb.from('org_members')
           .select('member_role')
           .eq('org_id', orgId)
           .eq('status', 'active'),
+        // athlete_id нужен, чтобы считать УНИКАЛЬНЫХ спортсменов в риске:
+        // без него прошлая версия не могла посчитать ничего и молча давала 0.
+        // Медконтент (title/body) не запрашиваем — организации он не положен.
         sb.from('recommendations')
-          .select('id, severity, acknowledged_by_coach_at, status')
+          .select('id, athlete_id, severity, acknowledged_by_coach_at, status')
           .eq('organization_id', orgId)
           .in('status', ['sent', 'active', 'acknowledged']),
-        sb.from('injuries')
-          .select('id, status, athlete_id')
-          .neq('status', 'recovered'),
       ])
       const m = (members ?? []) as Array<{ member_role: string }>
-      const r = (recs ?? []) as Array<{ id: string; severity: string; acknowledged_by_coach_at: string | null; status: string }>
-      const i = (injuries ?? []) as Array<{ id: string; status: string; athlete_id: string }>
+      const r = (recs ?? []) as Array<{ id: string; athlete_id: string; severity: string; acknowledged_by_coach_at: string | null; status: string }>
 
-      // composite "athletes-at-risk": athlete has active injury, OR
-      // there's an active high/critical recommendation against them.
+      // "athletes-at-risk" — уникальные спортсмены с активным ограничением
+      // high/critical. Статусы уже отфильтрованы .in() выше.
       const atRiskAthletes = new Set<string>()
-      for (const inj of i) atRiskAthletes.add(inj.athlete_id)
       for (const rec of r) {
-        if ((rec.severity === 'high' || rec.severity === 'critical') && rec.status !== 'resolved') {
-          // We don't have athlete_id in this projection — but recommendations RLS
-          // guarantees the row's athlete is part of org context. The count is
-          // approximate (intersection with injuries gives correct count); we
-          // overestimate by injuries+severe-rec count. This is good enough
-          // for a KPI tile — exact count needs a separate aggregation in
-          // PR #11+.
+        if (rec.severity === 'high' || rec.severity === 'critical') {
+          atRiskAthletes.add(rec.athlete_id)
         }
       }
 
@@ -136,7 +135,7 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
     },
     {
       label: 'Атлеты в риске', value: k.athletesAtRisk,
-      hint: k.athletesAtRisk === 0 ? 'Нет рисков' : 'Травмы или ограничения',
+      hint: k.athletesAtRisk === 0 ? 'Нет серьёзных ограничений' : 'Ограничения high/critical',
       icon: 'ki-shield-cross',   color: '#B91C1C', bg: '#FEF2F2',
     },
     {

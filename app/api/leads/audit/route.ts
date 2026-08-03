@@ -68,14 +68,25 @@ export async function POST(req: Request) {
     return bad('invalid_json')
   }
 
-  const name         = (body.name ?? '').trim()
-  const email        = (body.email ?? '').trim().toLowerCase()
-  const telegram     = body.telegram ? String(body.telegram).trim() : null
-  const organization = (body.organization ?? '').trim()
-  const orgType      = (body.orgType ?? '').trim()
-  const coachCount   = (body.coachCount ?? '').trim()
-  const athleteCount = (body.athleteCount ?? '').trim()
-  const painPoints   = Array.isArray(body.painPoints) ? body.painPoints.slice(0, 10) : []
+  // Тело запроса — НЕДОВЕРЕННЫЙ ввод: маршрут публичный, шлют не только наша
+  // форма, но и боты, сканеры и любой, кто открыл DevTools. Типы в интерфейсе
+  // выше описывают ОЖИДАНИЕ, а не гарантию: JSON `{"coachCount": 3}` проходит
+  // парсер и роняет `.trim()` необработанным TypeError — функция отвечает
+  // пустым 500 вместо честного 400. Поймано живой проверкой прода.
+  // Приводим к строке до любых строковых операций.
+  const str = (v: unknown): string => (typeof v === 'string' ? v : v == null ? '' : String(v)).trim()
+
+  const name         = str(body.name)
+  const email        = str(body.email).toLowerCase()
+  const telegram     = body.telegram ? str(body.telegram) : null
+  const organization = str(body.organization)
+  const orgType      = str(body.orgType)
+  const coachCount   = str(body.coachCount)
+  const athleteCount = str(body.athleteCount)
+  // Элементы списка тоже приводим: массив строк — ожидание, не гарантия.
+  const painPoints   = Array.isArray(body.painPoints)
+    ? body.painPoints.slice(0, 10).map(str).filter(Boolean)
+    : []
 
   // Validation — match client-side rules
   if (!name || name.length < 2 || name.length > 100)         return bad('invalid_name')

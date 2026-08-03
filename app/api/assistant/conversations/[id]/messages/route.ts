@@ -21,7 +21,8 @@ export const maxDuration = 60
  * anti-burst rate limit → КВОТА (без списания) → повторная object-level
  * проверка контекстной сущности → allowlist-контекст → провайдер (стрим)
  * → персист ответа → СПИСАНИЕ ТОЛЬКО ПОСЛЕ УСПЕХА (идемпотентно) → аудит.
- * Любая ошибка/отказ/отмена до успешного конца — лимит не тронут.
+ * Успех = стрим дочитан И ответ непустой; любая ошибка/отказ/отмена/пустой
+ * ответ — лимит не тронут.
  */
 const BodySchema = z.object({
   content: z.string().min(1).transform(s => s.slice(0, MAX_MESSAGE_LENGTH)),
@@ -218,13 +219,31 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   // Стрим наружу + аккумулятор; успех фиксируем в flush (upstream дочитан
-  // до конца) — только тогда персист ответа и СПИСАНИЕ (идемпотентное).
+  // до конца И текст непустой) — только тогда персист ответа и СПИСАНИЕ
+  // (идемпотентное).
   const decoder = new TextDecoder()
   let fullText = ''
   let charged = false
 
   const persistSuccess = async () => {
     if (charged) return
+    // Пустой ответ — НЕ успешная пара «сообщение → ответ». Провайдер может
+    // закрыть стрим ШТАТНО, не сказав ни слова (idle-watchdog и mid-stream
+    // дедлайн в lib/ai/ollama.ts делают soft close без ошибки) — flush
+    // приходит с нулевым текстом, и пользователь платил запросом за пустоту.
+    // Ни 'ok'-сообщения в истории (иначе пустая строка подмешается в
+    // следующий промпт), ни списания — только журнал для наблюдаемости.
+    // Идемпотентность не страдает: ключ chg:<clientMessageId> просто не
+    // расходуется, а повторная доставка того же clientMessageId по-прежнему
+    // упирается в PK-конфликт user-сообщения.
+    if (!fullText.trim()) {
+      await logUsageEvent(actor.admin, {
+        userId: actor.userId, organizationId: actor.usageScope.organizationId,
+        conversationId, eventType: 'provider_error',
+        metadata: { code: 'empty_response' },
+      })
+      return
+    }
     charged = true
     // Ответ пользователю уже доставлен стримом — НИЧТО ниже не должно
     // уронить хвост стрима (flush). Каждая ступень изолирована; сбой

@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
+import { CLUB_MANAGER_MEMBER_ROLES, type GlobalRole } from '@/lib/permissions'
+import { resolveOrgContext, type OrgMembershipRow } from '@/lib/org/resolve-org-context'
 import type { Database } from '@/types/database'
 import type { Organization, OrgMember, MemberStatus, OrgMemberRole } from '@/types/org.types'
 
@@ -41,11 +43,20 @@ function rowToOrgMember(row: OrgMemberRow & { user?: { name: string; email: stri
 // ─── reads ────────────────────────────────────────────────────────────────
 
 /**
- * "My organisation" = the org where I'm an active member with the
- * `coach` role (de-facto admin in the current product). The previous
- * implementation queried `organizations.user_id` which doesn't exist
- * — every call returned null and the org dashboard appeared empty for
- * legitimately-onboarded users.
+ * «Мой клуб» = организация, которой пользователь УПРАВЛЯЕТ.
+ *
+ * Прежняя версия искала членство с ролью `coach` и, не найдя его, брала
+ * `members[0]` — произвольную строку в порядке ответа БД. У администратора
+ * клуба (`member_role='org_admin'`) строки с ролью `coach` нет вовсе, поэтому
+ * функция отдавала случайное членство: тренер, состоящий в чужом клубе
+ * атлетом, мог получить именно его. Плюс аккаунт-организация без строки в
+ * `org_members` получал null, хотя `organizations.id = users.id`.
+ *
+ * Теперь правило одно на весь проект — общий резолвер
+ * `lib/org/resolve-org-context.ts` (тот же, что у `getOrgContext` и
+ * `useOrgContext`): приоритет org_owner → org_admin, детерминированный выбор
+ * при нескольких клубах. Расхождение резолверов — ровно та первопричина,
+ * из-за которой org_admin получал сайдбар, но не получал данные.
  */
 export async function getMyOrg(): Promise<Organization | null> {
   const supabase = createClient()
@@ -54,29 +65,34 @@ export async function getMyOrg(): Promise<Organization | null> {
 
   const { data: userData } = await supabase
     .from('users')
-    .select('id')
+    .select('id, role')
     .eq('auth_id', authData.user.id)
     .single()
-  const userRecord = userData as Pick<UserRow, 'id'> | null
+  const userRecord = userData as Pick<UserRow, 'id' | 'role'> | null
   if (!userRecord) return null
 
-  // Find an active org_members row for this user. Coach takes precedence
-  // over athlete if the user is somehow in both.
+  // Сужаем до управляющих ролей в запросе; резолвер всё равно перепроверит,
+  // но тащить все членства (у клуба их могут быть сотни) незачем.
+  // `joined_at` нужен резолверу для тай-брейка между несколькими клубами.
   const { data: memberRows } = await supabase
     .from('org_members')
-    .select('org_id, member_role')
+    .select('org_id, member_role, status, joined_at')
     .eq('user_id', userRecord.id)
     .eq('status', 'active')
-  const members = (memberRows ?? []) as Pick<OrgMemberRow, 'org_id' | 'member_role'>[]
-  if (members.length === 0) return null
+    .in('member_role', CLUB_MANAGER_MEMBER_ROLES)
 
-  const preferred = members.find(m => m.member_role === 'coach') ?? members[0]
+  const ctx = resolveOrgContext(
+    userRecord.id,
+    userRecord.role as GlobalRole,
+    (memberRows ?? []) as OrgMembershipRow[],
+  )
+  if (!ctx.orgId) return null
 
   const { data: orgData } = await supabase
     .from('organizations')
     .select('*')
-    .eq('id', preferred.org_id)
-    .single()
+    .eq('id', ctx.orgId)
+    .maybeSingle()
   if (!orgData) return null
 
   return rowToOrganization(orgData as OrgRow)

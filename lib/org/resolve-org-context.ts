@@ -28,6 +28,41 @@ export interface OrgMembershipRow {
   org_id:      string
   member_role: string
   status:      string
+  /**
+   * Опционально: колонку выбирают не все вызывающие. Если её нет, порядок
+   * всё равно остаётся детерминированным — тай-брейк уходит на `org_id`.
+   */
+  joined_at?:  string | null
+}
+
+/**
+ * Правило выбора членства, когда управляющих строк несколько.
+ *
+ * Порядок строк PostgREST без явного ORDER BY не гарантирован, поэтому
+ * `managing[0]` у администратора двух клубов открывал то один клуб, то
+ * другой — от запроса к запросу. Правило фиксируем целиком:
+ *   1. `org_owner` важнее `org_admin` — владение сильнее делегированных прав
+ *      и не даёт паре (роль, org_id) разъехаться;
+ *   2. при равной роли — раньше вступил, тот и основной клуб (`joined_at`
+ *      по возрастанию); строки без `joined_at` уходят в конец, чтобы
+ *      отсутствие колонки не выигрывало у реальной даты;
+ *   3. при полном равенстве — `org_id` по возрастанию: значение произвольное,
+ *      но одинаковое при каждом вызове, а это и есть требуемое свойство.
+ */
+function compareMemberships(a: OrgMembershipRow, b: OrgMembershipRow): number {
+  const rankA = a.member_role === 'org_owner' ? 0 : 1
+  const rankB = b.member_role === 'org_owner' ? 0 : 1
+  if (rankA !== rankB) return rankA - rankB
+
+  const joinedA = a.joined_at ?? ''
+  const joinedB = b.joined_at ?? ''
+  if (joinedA !== joinedB) {
+    if (!joinedA) return 1
+    if (!joinedB) return -1
+    return joinedA < joinedB ? -1 : 1
+  }
+
+  return a.org_id < b.org_id ? -1 : a.org_id > b.org_id ? 1 : 0
 }
 
 export interface OrgContext {
@@ -65,12 +100,11 @@ export function resolveOrgContext(
     m => m.status === 'active' && isClubManagerMemberRole(m.member_role),
   )
 
-  // Детерминированный выбор: org_owner важнее org_admin. Без явного
-  // приоритета `.limit(1)` в запросе возвращал произвольную строку, и
-  // пара (роль, org_id) могла разъехаться у пользователя, который владеет
-  // одним клубом и админит другой.
-  const preferred =
-    managing.find(m => m.member_role === 'org_owner') ?? managing[0] ?? null
+  // Полностью детерминированный выбор — правило в compareMemberships.
+  // Раньше приоритет был только у org_owner, а дальше брался managing[0],
+  // то есть произвольная строка в порядке ответа БД: администратор двух
+  // клубов попадал каждый раз в непредсказуемый.
+  const preferred = [...managing].sort(compareMemberships)[0] ?? null
 
   const scopedOrgRole: ScopedOrgRole | null =
     preferred && isClubManagerMemberRole(preferred.member_role) ? preferred.member_role : null

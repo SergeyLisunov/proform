@@ -35,7 +35,9 @@ export const RESERVED_TOP_LEVEL_SLUGS = new Set<string>([
   // ядро приложения
   'dashboard', 'calendar', 'diary', 'analytics', 'athletes', 'messages',
   'settings', 'pricing', 'admin', 'org', 'auth', 'api', 'onboarding',
-  // разделы кабинета
+  // разделы кабинета ('assistant' — страницы больше нет (вход в помощника
+  // только через плавающий виджет), но slug остаётся зарезервированным:
+  // иначе /assistant прочитается как публичная страница клуба)
   'assistant', 'channels', 'workouts', 'profile', 'network', 'insights',
   'load', 'quick', 'ai', 'injuries', 'goals', 'records', 'cycles',
   'marketplace', 'coach', 'doctor', 'athlete', 'parent', 'form-analysis',

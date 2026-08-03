@@ -14,6 +14,19 @@ import { join } from 'node:path'
 
 import { ROLE_ACCOUNTS, AUTH_DIR, statePath, type RoleKey } from './accounts'
 
+/**
+ * Сколько ждать ухода с /auth/login. 45 с вместо прежних 20 с: 20 с объективно
+ * не покрывали холодный старт серверной функции — POST входа, обмен на сессию
+ * Supabase и редирект через middleware. Из-за этого исправные учётки падали по
+ * таймауту, а через минуту логинились с HTTP 200.
+ *
+ * Критерий успеха НЕ ослаблен: страница обязана уйти с /auth/login, иначе тест
+ * падает — и падает на всех трёх попытках, если вход сломан по-настоящему.
+ * Медленный, но состоявшийся вход не повод красить прогон; невход остаётся
+ * невходом.
+ */
+const LOGIN_REDIRECT_TIMEOUT_MS = 45_000
+
 function qaPassword(): string {
   if (process.env.QA_PASSWORD) return process.env.QA_PASSWORD
   const file = process.env.QA_ACCOUNTS_FILE || join(homedir(), 'sporteo-qa-accounts.txt')
@@ -33,7 +46,7 @@ for (const [role, email] of Object.entries(ROLE_ACCOUNTS)) {
     await page.locator('button[type="submit"]').first().click()
 
     // Успешный вход уводит с /auth/* (на /dashboard или ролевую домашнюю).
-    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 20_000 })
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: LOGIN_REDIRECT_TIMEOUT_MS })
 
     await page.context().storageState({ path: statePath(role as RoleKey) })
   })

@@ -1,10 +1,27 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { isSubscriptionActive } from '@/lib/plans'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * Терминальные статусы подписки для расчёта churn.
+ *
+ * Почему список именно такой: subscriptions_status_check (миграция 096)
+ * допускает ТОЛЬКО active | trial | trialing | past_due | cancelled |
+ * expired | blocked | manual_review, а cron продлений
+ * (app/api/cron/billing-renewals) переводит подписку ровно в 'cancelled'
+ * (шаг 3a) и 'expired' (шаг 3b). Раньше фильтр искал stripe-словарь
+ * 'canceled'/'unpaid' — эти значения CHECK запрещает физически, поэтому
+ * счётчик отмен возвращал 0 всегда, при любых данных, и churn показывал
+ * ровный 0% даже после массового оттока. Наследие эпохи Stripe, чьи
+ * колонки выпилила миграция 075.
+ */
+const CHURNED_STATUSES = ['cancelled', 'expired'] as const
 
 // Nominal monthly price per plan (used as MRR proxy when ЮKassa tariffs are
 // not synced into the DB). Override via env if needed.
@@ -49,6 +66,23 @@ export default async function AdminCommercePage() {
     .single()
   if (!me || me.role !== 'admin') redirect('/dashboard')
 
+  // Почему для billing-таблиц отдельный клиент: у payments, invoices и
+  // coach_orders в RLS есть только «свои строки» — payments_read_own,
+  // invoices_read_own, coach_orders_read_party (миграция 047), admin-политики
+  // SELECT у них нет вовсе (в отличие от subscriptions, где есть
+  // «subscriptions: admin all»). Пользовательским клиентом админ видел
+  // исключительно собственные платежи, то есть панель выручки была пуста
+  // всегда — не «данных нет», а «данные скрыты от того, кому они нужны».
+  //
+  // Почему admin-клиент, а не новая RLS-политика: страница серверная (нет
+  // 'use client', createClient берётся из lib/supabase/server), service-ключ
+  // остаётся на сервере и в браузер не уходит. Проверка роли выполнена
+  // СТРОГО выше — до первого запроса. Тот же приём уже применён в
+  // app/parent/dashboard/page.tsx и в /api/org/newsletters/[id]/send.
+  // Политика в БД открыла бы эти таблицы ещё и для чтения анонимным ключом
+  // из браузера — лишняя поверхность ради экрана, который и так серверный.
+  const admin = createAdminClient()
+
   // ── Snapshot queries (all in parallel) ───────────────────────────────────
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString()
@@ -67,22 +101,22 @@ export default async function AdminCommercePage() {
     supabase
       .from('subscriptions')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['canceled', 'unpaid'])
+      .in('status', [...CHURNED_STATUSES])
       .gte('updated_at', thirtyDaysAgo),
     supabase
       .from('subscriptions')
       .select('id', { count: 'exact', head: true }),
-    supabase
+    admin
       .from('payments')
       .select('id, user_id, amount, currency, status, created_at, order_id')
       .order('created_at', { ascending: false })
       .limit(12),
-    supabase
+    admin
       .from('invoices')
       .select('id, amount, currency, status, number, created_at, hosted_invoice_url')
       .order('created_at', { ascending: false })
       .limit(10),
-    supabase
+    admin
       .from('coach_orders')
       .select('price_amount, currency')
       .eq('status', 'paid')
@@ -91,8 +125,14 @@ export default async function AdminCommercePage() {
 
   const subs = (subsRes.data ?? []) as { plan: Plan; status: string; current_period_end: string | null; cancel_at_period_end: boolean | null }[]
 
-  // Plan distribution (active + trialing = "paying")
-  const paying = subs.filter(s => s.status === 'active' || s.status === 'trialing')
+  // Распределение по тарифам среди действующих подписок.
+  // Раньше здесь был свой инлайновый список ('active' || 'trialing'), который
+  // терял 'trial' (legacy-строки) и 'past_due' (грейс-период — доступ ещё
+  // открыт, деньги ещё ожидаются). Единственный источник правды о том, что
+  // считается действующей подпиской, — isSubscriptionActive из lib/plans.ts:
+  // по нему же работают все гейты доступа, и расхождение между «что мы
+  // считаем в MRR» и «кого мы пускаем в продукт» недопустимо.
+  const paying = subs.filter(s => isSubscriptionActive(s.status))
   const byPlan: Record<Plan, number> = { free: 0, pro: 0, team: 0 }
   for (const s of paying) byPlan[s.plan] = (byPlan[s.plan] ?? 0) + 1
 
@@ -117,14 +157,19 @@ export default async function AdminCommercePage() {
   const payments = recentPaymentsRes.data ?? []
   const invoices = recentInvoicesRes.data ?? []
 
-  // Upcoming cancellations (cancel_at_period_end = true, active)
-  const upcomingCancel = subs.filter(s => s.cancel_at_period_end && s.status === 'active').length
+  // Отмены в конце периода. Сравнение только с 'active' теряло подписки в
+  // грейсе: шаг 3a крона продлений гасит cancel_at_period_end для
+  // ['active','trialing','past_due'], значит и предупреждать надо про все три.
+  const upcomingCancel = subs.filter(s => s.cancel_at_period_end && isSubscriptionActive(s.status)).length
 
   const kpis = [
     {
       label: 'MRR (прогноз)',
       value: fmtMoney(mrr, 'RUB'),
-      hint: `${paying.length} платящих подписок`,
+      // paying включает и действующие free-подписки — подписывать их числом
+      // «платящих» значило бы завышать метрику. Платят те, чей тариф вносит
+      // вклад в MRR.
+      hint: `${byPlan.pro + byPlan.team} платящих подписок`,
       tone: 'orange',
       icon: 'ki-chart-line-up',
     },
@@ -245,7 +290,10 @@ export default async function AdminCommercePage() {
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {(['free', 'pro', 'team'] as Plan[]).map(p => {
             const count = byPlan[p] ?? 0
-            const total = paying.length + byPlan.free
+            // paying уже содержит free-подписки (byPlan заполняется из него),
+            // поэтому прежнее `paying.length + byPlan.free` считало free дважды
+            // и занижало все доли: при 6 подписках знаменатель выходил 12.
+            const total = paying.length
             const pct = total > 0 ? count / total : 0
             const toneKey = p === 'team' ? 'violet' : p === 'pro' ? 'orange' : 'blue'
             const tone = TONE[toneKey]

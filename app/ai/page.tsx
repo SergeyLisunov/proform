@@ -1,7 +1,10 @@
 'use client'
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { ASSISTANT_OPEN_EVENT } from '@/components/assistant/FloatingAssistant'
+import { fetchCapabilities } from '@/lib/ai/assistant/client'
+import type { AssistantCapabilities } from '@/lib/ai/assistant/types'
 
 type TabKey = 'hub' | 'assistant' | 'week' | 'video' | 'voice' | 'coach' | 'diary-search'
 
@@ -137,31 +140,87 @@ function FeatureCard({ f, onOpen }: { f: Feature; onOpen: (f: Feature) => void }
   )
 }
 
-// ── Мини-чат ассистента ───────────────────────────────────────────────────────
-
-type ChatMsg = { role: 'user' | 'assistant'; content: string }
+// ── Карточка входа в ассистента ──────────────────────────────────────────────
 
 function AssistantChat() {
-  // Ролевые AI-ассистенты переехали в отдельный раздел кабинета:
-  // /assistant (единый route, роль/тариф/лимиты определяет сервер).
+  // Единая точка входа в ролевого ассистента — плавающий виджет
+  // (FloatingAssistant в root-layout). Полностраничная /assistant удалена:
+  // она дублировала виджет вторым независимым чатом на том же экране.
+  // Открываем виджет тем же событием, что и «Спросить AI» на карточках.
+  //
+  // ВАЖНО (находка ревью): виджет рендерится только при caps.available.
+  // Когда доступа нет, кнопка «Открыть» была обманкой — клик не давал ни
+  // панели, ни сообщения. А вместе с удалённой /assistant исчезло
+  // единственное место, где показывались причина недоступности и переход
+  // на тариф. Задеты трое: платформенный админ (ассистент ему не положен
+  // по ролевой политике), любой пользователь при ненастроенном провайдере
+  // и тариф с выключенным AI — последним терялся путь «нет AI → /pricing».
+  // Поэтому спрашиваем capabilities и показываем состояние честно.
+  const [caps, setCaps] = useState<AssistantCapabilities | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchCapabilities()
+      .then(c => { if (!cancelled) setCaps(c) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const shell = 'flex flex-col items-center justify-center gap-4 rounded-2xl border border-[#E9D5FF] bg-white px-6 py-16 text-center'
+
+  if (loading) {
+    return (
+      <div className={shell} style={{ minHeight: 420 }}>
+        <div className="h-8 w-8 rounded-full border-2 border-[#7C3AED] border-t-transparent pf-spin" />
+      </div>
+    )
+  }
+
+  if (!caps?.available) {
+    return (
+      <div className={shell} style={{ minHeight: 420 }}>
+        <div style={{ width: 56, height: 56, borderRadius: 18, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <i className="ki-filled ki-lock-2 text-xl text-muted-foreground" />
+        </div>
+        <div>
+          <div className="text-base font-semibold text-foreground">AI-помощник недоступен</div>
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+            {caps?.unavailableReason ?? 'Помощник не подключён для вашей роли или тарифа.'}
+          </p>
+        </div>
+        {caps?.upgrade && (
+          <Link
+            href={caps.upgrade.href}
+            className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md no-underline"
+          >
+            {caps.upgrade.cta}
+          </Link>
+        )}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-[#E9D5FF] bg-white px-6 py-16 text-center" style={{ minHeight: 420 }}>
+    <div className={shell} style={{ minHeight: 420 }}>
       <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <i className="ki-filled ki-message-programming text-xl" style={{ color: '#7C3AED' }} />
       </div>
       <div>
-        <div className="text-base font-semibold text-foreground">AI-помощник переехал в отдельный раздел</div>
+        <div className="text-base font-semibold text-foreground">AI-помощник всегда под рукой</div>
         <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
-          Теперь у каждой роли — свой ассистент: врач, тренер, спортсмен и организация.
+          У каждой роли — свой ассистент: врач, тренер, спортсмен и организация.
+          Он открывается кнопкой в правом нижнем углу на любой странице кабинета.
           Лимиты и история — по вашему тарифу.
         </p>
       </div>
-      <Link
-        href="/assistant"
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new CustomEvent(ASSISTANT_OPEN_EVENT))}
         className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
       >
         Открыть AI-помощника
-      </Link>
+      </button>
     </div>
   )
 }
