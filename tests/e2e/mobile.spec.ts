@@ -33,12 +33,26 @@ for (const screen of SCREENS) {
       ).toBeLessThanOrEqual(2)
     })
 
-    test('AI-виджет виден и не выходит за экран', async ({ page }) => {
+    test('AI-виджет виден и не выходит за экран', async ({ page, request }) => {
+      // Пропуск ТОЛЬКО когда сервер сам сказал, что ассистент недоступен
+      // (в локальном окружении обычно нет ключа провайдера). Это не то же
+      // самое, что прежний вариант «подождать чуть-чуть и пропустить, если
+      // не нашли» — тот молча зеленел при настоящей поломке. Здесь причина
+      // берётся у сервера и видна в отчёте.
+      const res = await request.get('/api/assistant/capabilities')
+      const caps = res.ok()
+        ? ((await res.json().catch(() => ({}))) as {
+            capabilities?: { available?: boolean; unavailableReason?: string }
+          }).capabilities
+        : undefined
+      test.skip(
+        caps?.available !== true,
+        `AI недоступен в этом окружении: ${caps?.unavailableReason ?? `capabilities → HTTP ${res.status()}`}`,
+      )
+
       await page.goto(screen.path)
       const widget = page.locator('button[aria-label="AI-помощник"]')
       // Ждём явно: виджет появляется после загрузки сессии и capabilities.
-      // Раньше здесь стоял короткий таймаут + skip — проверка молча
-      // пропускалась и не доказывала ничего.
       await expect(widget).toBeVisible({ timeout: 20_000 })
 
       const box = await widget.boundingBox()
