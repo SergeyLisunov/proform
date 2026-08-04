@@ -1,9 +1,31 @@
 import { defineConfig, devices } from '@playwright/test'
 
 /**
- * Playwright E2E smoke config.
- * - Local: `npm run test:e2e` spins up `next dev` and hits it.
- * - CI: expects the app to already be running at BASE_URL.
+ * Playwright E2E.
+ *
+ * ПО УМОЛЧАНИЮ ПРОГОН ЛОКАЛЬНЫЙ: Playwright сам поднимает dev-сервер и бьёт
+ * в него. Так и было задумано, но какое-то время ролевые сценарии гоняли
+ * против прод-URL — локальный dev не отдавал интерактивный клиент
+ * (Next 16 блокировал dev-ресурсы для origin 127.0.0.1, см. DECISIONS D-02).
+ * Причина устранена `allowedDevOrigins` в next.config.mjs, и зависимость от
+ * прод-приложения больше не нужна.
+ *
+ * Режимы:
+ *   npm run test:e2e                     — локально, dev-сервер поднимется сам
+ *   PLAYWRIGHT_BASE_URL=https://…        — против уже запущенного адреса
+ *                                          (прод-смоук, preview-деплой, CI)
+ *
+ * Честная оговорка про «нагрузку на прод»: локальный прогон снимает нагрузку
+ * с прод-ПРИЛОЖЕНИЯ, но входы всё равно идут в настоящий Supabase Auth —
+ * отдельной тестовой базы у проекта нет (BLOCKERS B-01). Поэтому у проекта
+ * setup остаются ретраи и пониженная параллельность.
+ *
+ * Почему dev, а не production-сборка: в next.config.mjs включён
+ * `output: 'standalone'`, а с ним `next start` НЕ РАБОТАЕТ — Next отвечает
+ * 404 на маршруты приложения и пишет об этом в лог. Прод-подобный прогон
+ * требует `node .next/standalone/server.js` с предварительным копированием
+ * `.next/static` и `public` внутрь standalone — это отдельный шаг, и
+ * навешивать его на каждый E2E-прогон неоправданно.
  */
 const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3000)
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${PORT}`
@@ -76,12 +98,18 @@ export default defineConfig({
     },
   ],
 
+  // Поднимаем локальный сервер, только если адрес не задан извне.
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
         command: `npm run dev -- -p ${PORT}`,
         url: BASE_URL,
-        timeout: 120_000,
+        // 180 с вместо 120: dev-сервер компилирует страницы по требованию, и
+        // холодный старт первой авторизованной страницы заметно дольше, чем
+        // отдача уже собранного бандла.
+        timeout: 180_000,
         reuseExistingServer: !process.env.CI,
+        stdout: 'pipe',
+        stderr: 'pipe',
       },
 })
