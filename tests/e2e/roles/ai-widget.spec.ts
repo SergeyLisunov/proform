@@ -10,6 +10,21 @@ import { statePath } from '../accounts'
 const WIDGET = 'button[aria-label="AI-помощник"]'
 
 /**
+ * Кнопка появляется не сразу: сначала грузится сессия, затем виджет ходит за
+ * capabilities — и только потом рендерится. Против прода при холодном старте
+ * серверной функции 15 с не хватало, и прогон давал ЧАСТИЧНЫЕ падения (у одних
+ * ролей проходило, у других нет) — верный признак таймаута, а не исчезнувшего
+ * виджета. Проверено вручную в момент такого падения: у всех ролей
+ * `available: true` и кнопка на месте.
+ *
+ * Свой вклад в задержку вносит и проверка ниже: она делает отдельный запрос к
+ * тому же `/api/assistant/capabilities`, и при пяти параллельных воркерах это
+ * ощутимо. Запас увеличен вдвое — настоящее исчезновение виджета всё равно не
+ * пройдёт, потому что там элемента нет вовсе, сколько ни жди.
+ */
+const WIDGET_TIMEOUT = 30_000
+
+/**
  * Виджет рендерится только когда сервер отвечает `available: true`. В
  * локальном окружении ключа AI-провайдера обычно нет, и маршрут capabilities
  * честно отдаёт `available: false` с причиной «AI временно не настроен на
@@ -46,7 +61,7 @@ test.describe('AI-виджет у ролей с доступом', () => {
         test.skip(!available, `AI недоступен в этом окружении: ${reason}`)
 
         await page.goto('/dashboard')
-        await expect(page.locator(WIDGET)).toBeVisible({ timeout: 15_000 })
+        await expect(page.locator(WIDGET)).toBeVisible({ timeout: WIDGET_TIMEOUT })
       })
 
       test(`${role}: панель открывается и показывает остаток лимита`, async ({ page, request }) => {
@@ -54,9 +69,12 @@ test.describe('AI-виджет у ролей с доступом', () => {
         test.skip(!available, `AI недоступен в этом окружении: ${reason}`)
 
         await page.goto('/dashboard')
+        // Ждём появления кнопки ЯВНО, прежде чем кликать: click() ждёт по
+        // своему таймауту, и при медленном ответе capabilities падал именно он.
+        await expect(page.locator(WIDGET)).toBeVisible({ timeout: WIDGET_TIMEOUT })
         await page.locator(WIDGET).click()
         const dialog = page.locator('[role="dialog"]')
-        await expect(dialog).toBeVisible({ timeout: 10_000 })
+        await expect(dialog).toBeVisible({ timeout: 15_000 })
         await expect(dialog).toContainText(/запросов|Sporteo AI/i)
       })
     })
