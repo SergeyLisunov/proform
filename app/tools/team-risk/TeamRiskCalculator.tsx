@@ -357,7 +357,7 @@ export default function TeamRiskCalculator() {
           <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
             <span className="rounded-full bg-orange-100 text-orange-700 px-3 py-1">Без регистрации</span>
             <span className="rounded-full bg-blue-100 text-blue-700 px-3 py-1">CSV-импорт</span>
-            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Claude Sonnet 4.5</span>
+            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Gemma 4</span>
             <span className="rounded-full bg-green-100 text-green-700 px-3 py-1">152-ФЗ совместимо</span>
           </div>
         </div>
@@ -603,7 +603,7 @@ export default function TeamRiskCalculator() {
               По данным Whoop validation studies.
             </div>
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Claude Sonnet</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Gemma 4</div>
               AI читает данные, применяет правила (recovery / ACWR / mood)
               и формулирует action items на русском.
             </div>

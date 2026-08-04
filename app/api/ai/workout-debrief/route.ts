@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { aiObject, isAiConfigured } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured } from '@/lib/ai/gemma'
 import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 
 export const runtime = 'nodejs'
+
+// Бюджет функции на Vercel. Обёртка Gemma (lib/ai/gemma.ts) держит общий
+// дедлайн вызова 45 с и при провале валидации делает одну ремонтную попытку —
+// это рассчитано на maxDuration=60. Без явного значения платформа даёт свой
+// умолчательный лимит, он МЕНЬШЕ, и функция умирает раньше собственного
+// дедлайна: watchdog внутри клиента не успевает отработать, а пользователь
+// получает обрыв вместо понятной ошибки.
+export const maxDuration = 60
+
 
 const DebriefSchema = z.object({
   mood:          z.number().int().min(0).max(4).describe('Настроение 0 (ужасно) – 4 (отлично)'),

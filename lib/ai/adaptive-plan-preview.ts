@@ -16,13 +16,13 @@
  *   - prompt адаптирован под "no athlete context" (нет ACWR из БД,
  *     только то что предоставил user)
  *
- * AI fallback: если ANTHROPIC_API_KEY отсутствует или AI call падает —
+ * AI fallback: если OLLAMA_API_KEY отсутствует или AI call падает —
  * возвращаем deterministic stub из rule-based heuristic (deload если
  * weekly_minutes > 600 OR avg_recovery < 50; ramp-up если < 90 мин;
  * иначе balanced 4-tier pattern).
  */
 import { z } from 'zod'
-import { aiObject, isAiConfigured, AI_MODEL_FAST } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured, AI_MODEL_FAST } from '@/lib/ai/gemma'
 
 // ── Public input shape ─────────────────────────────────────────────────
 

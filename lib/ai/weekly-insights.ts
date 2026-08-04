@@ -1,12 +1,10 @@
 /**
  * AI weekly/monthly training insights.
- * Combines raw metrics (computed in SQL/code) with Claude-generated narrative
+ * Combines raw metrics (computed in SQL/code) with a model-generated narrative
  * so we don't pay the model to do arithmetic.
  */
-import { anthropic } from '@ai-sdk/anthropic'
-import { generateObject } from 'ai'
 import { z } from 'zod'
-import { AI_MODEL_SMART, isAiConfigured } from './claude'
+import { AI_MODEL_SMART, aiObject, isAiConfigured } from './gemma'
 
 export type PeriodKind = 'week' | 'month'
 
@@ -170,14 +168,13 @@ ${notesLine || '- нет заметок'}
 highlights, trends (up/down/flat по метрикам), risks (low/medium/high),
 recommendations.`
 
-  const { object } = await generateObject({
-    model: anthropic(AI_MODEL_SMART),
+  return aiObject({
     schema: InsightSchema,
+    model: AI_MODEL_SMART,
     system,
     prompt: user,
-    maxOutputTokens: 1200,
+    maxTokens: 1200,
   })
-  return object
 }
 
 export function periodRange(kind: PeriodKind, ref: Date = new Date()): { start: string; end: string } {

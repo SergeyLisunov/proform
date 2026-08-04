@@ -592,7 +592,7 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
         className="relative z-10 w-full max-w-3xl rounded-2xl bg-background shadow-2xl border border-purple-200">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-purple-700">AI · Claude</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-purple-700">AI · Gemma</p>
             <h3 className="text-lg font-semibold text-navy-500">Обзор за {days} дней</h3>
           </div>
           <div className="flex items-center gap-2">
@@ -612,7 +612,7 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
           {loading ? (
             <div className="py-10 text-center text-sm text-muted-foreground">
               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full pf-spin mx-auto mb-3" />
-              Claude анализирует ваши записи…
+              Gemma анализирует ваши записи…
             </div>
           ) : error ? (
             <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">

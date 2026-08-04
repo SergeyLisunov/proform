@@ -337,7 +337,7 @@ export default function AdaptivePlanForm() {
           <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
             <span className="rounded-full bg-blue-100 text-blue-700 px-3 py-1">Без регистрации</span>
             <span className="rounded-full bg-green-100 text-green-700 px-3 py-1">CSV-импорт</span>
-            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Claude Haiku 4.5</span>
+            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Gemma 4</span>
             <span className="rounded-full bg-orange-100 text-orange-700 px-3 py-1">Под уровень / цель</span>
           </div>
         </div>
@@ -604,7 +604,7 @@ export default function AdaptivePlanForm() {
               в неделю. Минимум 1 день полного отдыха.
             </div>
             <div>
-              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Claude Haiku</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Gemma 4</div>
               AI читает историю, применяет правила (deload / ramp-up / sweet-spot)
               и формулирует action items по каждому дню.
             </div>

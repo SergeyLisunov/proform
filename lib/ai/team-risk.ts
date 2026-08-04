@@ -16,12 +16,12 @@
  *     делать сегодня"); тон чуть менее operational, больше strategic
  *   - Schema идентична BriefingSchema чтобы UI можно было унифицировать
  *
- * AI fallback: если ANTHROPIC_API_KEY не настроен — возвращаем
+ * AI fallback: если OLLAMA_API_KEY не настроен — возвращаем
  * детерминистический stub из rule-based heuristic. Lead capture не
  * блокируется отсутствием AI ключа.
  */
 import { z } from 'zod'
-import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/gemma'
 
 // ── Public input shape ─────────────────────────────────────────────────
 
@@ -91,7 +91,7 @@ function round2(n: number): number {
 // ── Rule-based stub (when AI not configured) ───────────────────────────
 
 /**
- * Detereministic snapshot when ANTHROPIC_API_KEY isn't set. Same Zod
+ * Detereministic snapshot when OLLAMA_API_KEY isn't set. Same Zod
  * shape so UI code is identical. Used in dev / preview without AI quota
  * and as fallback if AI request fails.
  */

@@ -24,14 +24,12 @@
     "postcss": "^8.5.10"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.71",
     "@hookform/resolvers": "^3.9.1",
     "@sentry/nextjs": "^10.50.0",
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.49.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "ai": "^6.0.168",
     "apexcharts": "^4.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",

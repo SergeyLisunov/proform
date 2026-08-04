@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { aiObject, isAiConfigured } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured } from '@/lib/ai/gemma'
 import { enforceAiRateLimit } from '@/lib/ai/rate-limit'
 import { enforcePlanForAi } from '@/lib/ai/plan-gate'
 import { computeCoachAthletesAcwr } from '@/services/acwr.service'
@@ -12,7 +12,7 @@ export const maxDuration = 60
 
 /**
  * GET /api/ai/adaptive-plan/[athleteId]
- * Тренер → Claude анализирует ACWR атлета + статус последних
+ * Тренер → Gemma анализирует ACWR атлета + статус последних
  * назначенных тренировок и предлагает корректировку плана на
  * ближайшие 7 дней.
  */

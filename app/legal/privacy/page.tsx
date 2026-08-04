@@ -123,7 +123,7 @@ export default function PrivacyPage() {
             платежей, реквизиты карт. Россия.
           </li>
           <li>
-            <strong className="text-foreground">Anthropic / OpenAI</strong> — обработка
+            <strong className="text-foreground">Ollama Cloud</strong> — обработка
             запросов к AI-инструментам платформы (только если вы используете
             соответствующую функциональность). Передаются только данные конкретного
             запроса, без аккаунтной идентификации.

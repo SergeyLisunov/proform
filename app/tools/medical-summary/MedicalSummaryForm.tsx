@@ -268,7 +268,7 @@ export default function MedicalSummaryForm() {
           <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
             <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Без регистрации</span>
             <span className="rounded-full bg-blue-100 text-blue-700 px-3 py-1">~5 минут</span>
-            <span className="rounded-full bg-pink-100 text-pink-700 px-3 py-1">Claude Sonnet 4.5</span>
+            <span className="rounded-full bg-pink-100 text-pink-700 px-3 py-1">Gemma 4</span>
             <span className="rounded-full bg-green-100 text-green-700 px-3 py-1">152-ФЗ совместимо</span>
           </div>
 

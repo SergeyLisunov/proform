@@ -1,11 +1,9 @@
 /**
  * Parse a free-form athlete description ("сегодня 5км бег пульс 150 ...")
- * into a structured workout record using Claude with a Zod schema.
+ * into a structured workout record using Gemma with a Zod schema.
  */
-import { anthropic } from '@ai-sdk/anthropic'
-import { generateObject } from 'ai'
 import { z } from 'zod'
-import { AI_MODEL_FAST, isAiConfigured } from './claude'
+import { AI_MODEL_FAST, aiObject, isAiConfigured } from './gemma'
 
 export const WorkoutDraftSchema = z.object({
   event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe('ISO date YYYY-MM-DD; if user did not say, leave empty string'),
@@ -39,12 +37,11 @@ export async function parseWorkoutText(opts: { text: string; todayISO: string })
 Верни JSON по схеме. Для event_date: если упомянуто "сегодня" → ${opts.todayISO};
 "вчера" → день назад; "позавчера" → два дня назад. Если даты нет — ставь сегодняшнюю.`
 
-  const { object } = await generateObject({
-    model: anthropic(AI_MODEL_FAST),
+  return aiObject({
     schema: WorkoutDraftSchema,
+    model: AI_MODEL_FAST,
     system: SYSTEM,
     prompt,
-    maxOutputTokens: 600,
+    maxTokens: 600,
   })
-  return object
 }

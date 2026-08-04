@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { analyzeFormFrames } from '@/lib/ai/form-analyze'
+import {
+  analyzeFormFrames, isFormAnalysisAvailable, FORM_ANALYSIS_UNAVAILABLE,
+} from '@/lib/ai/form-analyze'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -8,6 +10,21 @@ export const maxDuration = 60
 // POST /api/form-analysis
 // Body: { title, sport?, exercise?, videoPath?, videoPublicUrl?, frames: string[], athleteId? }
 export async function POST(req: NextRequest) {
+  // Отказ ДО создания строки в form_analyses: иначе каждая попытка
+  // оставляла бы мусорную запись analyzing → error. Разбор техники
+  // требует мультимодального вызова, которого у текущего провайдера
+  // нет — подробности в шапке lib/ai/form-analyze.
+  if (!isFormAnalysisAvailable()) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: FORM_ANALYSIS_UNAVAILABLE,
+        message: 'Видеоразбор техники временно недоступен: AI-провайдер платформы не принимает изображения.',
+      },
+      { status: 501 },
+    )
+  }
+
   const supabase = await createClient()
   const { data: { user: authUser } } = await supabase.auth.getUser()
   if (!authUser) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })

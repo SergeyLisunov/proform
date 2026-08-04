@@ -36,7 +36,7 @@
  *   - Иначе → monitor / return_to_play
  */
 import { z } from 'zod'
-import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/gemma'
 
 // ── Public input shape ─────────────────────────────────────────────────
 
