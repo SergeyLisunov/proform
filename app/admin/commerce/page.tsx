@@ -33,6 +33,31 @@ const PLAN_PRICE_MONTH: Record<'free' | 'pro' | 'team', number> = {
 
 type Plan = keyof typeof PLAN_PRICE_MONTH
 
+// Формы строк billing-таблиц. Нужны потому, что createAdminClient() отдаёт
+// нетипизированный SupabaseClient: без них ветка «service-ключа нет» и ветка
+// с реальным запросом расходятся по типам, и пустой массив пришлось бы
+// протаскивать как any.
+type PaymentRow = {
+  id: string
+  amount: number | null
+  currency: string | null
+  status: string | null
+  created_at: string | null
+}
+type InvoiceRow = {
+  id: string
+  amount: number | null
+  currency: string | null
+  status: string | null
+  number: string | null
+  created_at: string | null
+  hosted_invoice_url: string | null
+}
+type CoachOrderRow = {
+  price_amount: number | null
+  currency: string | null
+}
+
 function fmtMoney(v: number, currency = 'RUB') {
   try {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency, maximumFractionDigits: 0 }).format(v)
@@ -81,19 +106,67 @@ export default async function AdminCommercePage() {
   // app/parent/dashboard/page.tsx и в /api/org/newsletters/[id]/send.
   // Политика в БД открыла бы эти таблицы ещё и для чтения анонимным ключом
   // из браузера — лишняя поверхность ради экрана, который и так серверный.
-  const admin = createAdminClient()
+  //
+  // Почему вызов обёрнут, а не оставлен «как есть»: createAdminClient()
+  // БРОСАЕТ, когда не задан SUPABASE_SERVICE_ROLE_KEY, и стоит он прямо в теле
+  // серверного компонента — исключение отсюда роняет весь маршрут в HTTP 500.
+  // До появления admin-клиента страница от этой переменной не зависела вовсе,
+  // так что окружение без service-ключа (превью-стенд, CI, свежий клон с
+  // неполным .env.local) получало не «блоки биллинга пусты», а полностью
+  // недоступную коммерческую панель. Цена ошибки конфигурации при этом
+  // несоразмерна: MRR, churn и распределение тарифов читаются ОБЫЧНЫМ
+  // клиентом по политике «subscriptions: admin all» и к service-ключу
+  // отношения не имеют — терять их вместе с платежами незачем.
+  const admin = (() => {
+    try {
+      return createAdminClient()
+    } catch {
+      return null
+    }
+  })()
 
   // ── Snapshot queries (all in parallel) ───────────────────────────────────
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString()
 
+  // Три billing-запроса вынесены в отдельную ветку: без service-ключа их
+  // выполнить нечем, и вместо падения отдаём пустые списки. Молчать об этом
+  // нельзя — пустой блок «Платежей пока нет» читается админом как «выручки
+  // нет», хотя на деле данные просто не запрашивались; ниже это состояние
+  // помечено явным баннером.
+  async function loadBilling() {
+    if (!admin) {
+      return { payments: [] as PaymentRow[], invoices: [] as InvoiceRow[], orders: [] as CoachOrderRow[] }
+    }
+    const [paymentsRes, invoicesRes, ordersRes] = await Promise.all([
+      admin
+        .from('payments')
+        .select('id, user_id, amount, currency, status, created_at, order_id')
+        .order('created_at', { ascending: false })
+        .limit(12),
+      admin
+        .from('invoices')
+        .select('id, amount, currency, status, number, created_at, hosted_invoice_url')
+        .order('created_at', { ascending: false })
+        .limit(10),
+      admin
+        .from('coach_orders')
+        .select('price_amount, currency')
+        .eq('status', 'paid')
+        .gte('paid_at', thirtyDaysAgo),
+    ])
+    return {
+      payments: (paymentsRes.data ?? []) as PaymentRow[],
+      invoices: (invoicesRes.data ?? []) as InvoiceRow[],
+      orders:   (ordersRes.data ?? []) as CoachOrderRow[],
+    }
+  }
+
   const [
     subsRes,
     canceledRes,
     totalSubsRes,
-    recentPaymentsRes,
-    recentInvoicesRes,
-    ordersPaidRes,
+    billing,
   ] = await Promise.all([
     supabase
       .from('subscriptions')
@@ -106,21 +179,7 @@ export default async function AdminCommercePage() {
     supabase
       .from('subscriptions')
       .select('id', { count: 'exact', head: true }),
-    admin
-      .from('payments')
-      .select('id, user_id, amount, currency, status, created_at, order_id')
-      .order('created_at', { ascending: false })
-      .limit(12),
-    admin
-      .from('invoices')
-      .select('id, amount, currency, status, number, created_at, hosted_invoice_url')
-      .order('created_at', { ascending: false })
-      .limit(10),
-    admin
-      .from('coach_orders')
-      .select('price_amount, currency')
-      .eq('status', 'paid')
-      .gte('paid_at', thirtyDaysAgo),
+    loadBilling(),
   ])
 
   const subs = (subsRes.data ?? []) as { plan: Plan; status: string; current_period_end: string | null; cancel_at_period_end: boolean | null }[]
@@ -149,13 +208,13 @@ export default async function AdminCommercePage() {
 
   // Coach-service revenue (last 30 days, summed per currency)
   const oneOffByCurrency: Record<string, number> = {}
-  for (const o of ordersPaidRes.data ?? []) {
+  for (const o of billing.orders) {
     const c = (o.currency ?? 'RUB').toUpperCase()
     oneOffByCurrency[c] = (oneOffByCurrency[c] ?? 0) + (o.price_amount ?? 0)
   }
 
-  const payments = recentPaymentsRes.data ?? []
-  const invoices = recentInvoicesRes.data ?? []
+  const payments = billing.payments
+  const invoices = billing.invoices
 
   // Отмены в конце периода. Сравнение только с 'active' теряло подписки в
   // грейсе: шаг 3a крона продлений гасит cancel_at_period_end для
@@ -190,7 +249,7 @@ export default async function AdminCommercePage() {
     {
       label: 'Разовые услуги (30д)',
       value: Object.entries(oneOffByCurrency).map(([c, v]) => fmtMoney(v, c)).join(' · ') || '—',
-      hint: `${(ordersPaidRes.data ?? []).length} заказов`,
+      hint: `${billing.orders.length} заказов`,
       tone: 'green',
       icon: 'ki-wallet',
     },
@@ -243,6 +302,22 @@ export default async function AdminCommercePage() {
           </div>
         </div>
       </section>
+
+      {/* Честное состояние вместо тихого нуля: без service-ключа платежи,
+          инвойсы и разовые услуги не запрашивались вовсе, и пустые блоки ниже
+          означают «не смогли прочитать», а не «выручки нет». */}
+      {!admin && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <i className="ki-filled ki-information-2 mt-0.5 text-base text-amber-600" />
+          <div className="text-xs text-amber-900">
+            <div className="font-semibold">Блоки биллинга недоступны</div>
+            <p className="mt-1 text-amber-800">
+              В окружении не задан <code className="rounded bg-amber-100 px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>,
+              поэтому платежи, инвойсы и разовые услуги не читались. Подписки, MRR и churn ниже — настоящие.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* KPI tiles */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
