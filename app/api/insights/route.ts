@@ -4,7 +4,7 @@ import {
   computeMetrics, generateInsight, periodRange, prevRange,
   type PeriodKind, type WorkoutRow, type NoteRow,
 } from '@/lib/ai/weekly-insights'
-import { AI_MODEL_SMART } from '@/lib/ai/claude'
+import { AI_MODEL_SMART } from '@/lib/ai/gemma'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60

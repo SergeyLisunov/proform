@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * Per-user + per-IP rate limit guard for AI endpoints. Each AI route
- * should call this BEFORE doing the expensive Claude call. Backed by the
+ * should call this BEFORE doing the expensive AI call. Backed by the
  * `check_and_increment_ai_rate_limit` RPC (migrations 040, 043), which
  * atomically counts the user's calls and the IP's total AI calls inside
  * sliding windows and records the hit only if both limits pass.

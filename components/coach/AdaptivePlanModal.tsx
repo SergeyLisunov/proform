@@ -126,7 +126,7 @@ export default function AdaptivePlanModal({
           {loading ? (
             <div className="py-10 text-center text-sm text-muted-foreground">
               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full pf-spin mx-auto mb-3" />
-              Claude анализирует ACWR и последние 14 дней…
+              Gemma анализирует ACWR и последние 14 дней…
             </div>
           ) : paywall ? (
             <PaywallBanner
@@ -171,7 +171,7 @@ export default function AdaptivePlanModal({
               ) : (
                 <div className="space-y-2">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                    Предложения Claude ({data.suggestions.filter(s => picked[s.workout_id]).length} выбрано из {data.suggestions.length})
+                    Предложения Gemma ({data.suggestions.filter(s => picked[s.workout_id]).length} выбрано из {data.suggestions.length})
                   </p>
                   {data.suggestions.map(s => {
                     const meta = ACTION_LABEL[s.proposed_action]

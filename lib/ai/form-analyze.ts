@@ -1,12 +1,33 @@
 /**
- * Form (technique) analysis via Claude Vision.
- * Input: ordered list of base64-encoded JPEG keyframes from a short athlete video.
- * Output: structured feedback — strengths, issues, recommendations.
+ * Form (technique) analysis — разбор техники по ключевым кадрам видео.
+ *
+ * СТАТУС: ФУНКЦИЯ НЕДОСТУПНА. Это единственный AI-инструмент платформы,
+ * которому нужен мультимодальный вход: на вход шла последовательность
+ * base64-JPEG кадров, и разбор строился по картинкам.
+ *
+ * Почему не переносится на Gemma:
+ *   - канал изображений в lib/ai/ollama отсутствует физически —
+ *     OllamaChatMessage это { role, content: string }, картинке в теле
+ *     запроса просто негде поехать;
+ *   - добавить его вслепую нельзя: неизвестно, принимает ли закреплённая
+ *     модель gemma4:31b изображения через Ollama Cloud вообще. Пока это
+ *     не проверено вживую (как проверялись стриминг и watchdog-таймеры),
+ *     любой код здесь был бы догадкой.
+ *
+ * Поэтому здесь НЕТ подделки: текстовый «разбор техники» без единого
+ * кадра — это выдуманный отзыв о движении, которого модель не видела.
+ * Для разбора техники такой ответ хуже отказа: тренер и атлет получили
+ * бы уверенные рекомендации, ни на чём не основанные. Вызов честно
+ * падает типизированной ошибкой, маршрут отвечает 501.
+ *
+ * Что нужно, чтобы включить обратно: подтвердить приём изображений
+ * моделью, добавить в клиент поле `images` у сообщения (нативный
+ * /api/chat Ollama его поддерживает) и вернуть сюда вызов.
+ *
+ * Схема FormFeedbackSchema сохранена: по ней лежат данные в
+ * public.form_analyses.ai_feedback и её читает UI истории разборов.
  */
-import { anthropic } from '@ai-sdk/anthropic'
-import { generateObject } from 'ai'
 import { z } from 'zod'
-import { isAiConfigured, AI_MODEL_SMART } from './claude'
 
 export const FormFeedbackSchema = z.object({
   summary: z.string().describe('2–3 sentence overall assessment in Russian'),
@@ -23,51 +44,35 @@ export const FormFeedbackSchema = z.object({
 
 export type FormFeedback = z.infer<typeof FormFeedbackSchema>
 
-const SYSTEM_PROMPT =
-`Ты — опытный тренер по спортивной технике. На вход тебе дают последовательность кадров (ключевые фреймы) из короткого видео упражнения.
-Проанализируй технику атлета:
-- Оцени позицию тела, траекторию, ритм, симметрию.
-- Укажи сильные стороны (до 5).
-- Укажи проблемы (до 8): в какой номер кадра видно, краткое название, описание, severity.
-- Дай практические рекомендации и упражнения (до 6).
-- Верни summary и общую оценку 0..10.
-Пиши строго по-русски. Будь конкретен — избегай общих фраз.`
+/** Машиночитаемый код отказа — его же маршрут отдаёт клиенту. */
+export const FORM_ANALYSIS_UNAVAILABLE = 'FORM_ANALYSIS_UNAVAILABLE' as const
 
-export async function analyzeFormFrames(input: {
+/**
+ * Доступен ли разбор техники. Сейчас всегда false — см. шапку файла.
+ * Маршруты обязаны спрашивать ДО создания строки в form_analyses,
+ * иначе каждая попытка оставляет мусорную запись analyzing → error.
+ */
+export function isFormAnalysisAvailable(): boolean {
+  return false
+}
+
+export class FormAnalysisUnavailableError extends Error {
+  readonly code = FORM_ANALYSIS_UNAVAILABLE
+  constructor() {
+    super(FORM_ANALYSIS_UNAVAILABLE)
+    this.name = 'FormAnalysisUnavailableError'
+  }
+}
+
+// Аргумент не читается, но сигнатуру сохраняем намеренно: это контракт
+// функции на момент, когда мультимодальный вызов вернётся, и он же держит
+// типы на стороне вызывающего маршрута.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function analyzeFormFrames(_input: {
   frames: string[] // base64 JPEG without data: prefix
   sport?: string
   exercise?: string
   title?: string
 }): Promise<FormFeedback> {
-  if (!isAiConfigured()) throw new Error('AI_NOT_CONFIGURED')
-  if (!input.frames.length) throw new Error('NO_FRAMES')
-
-  const context = [
-    input.title ? `Название разбора: ${input.title}` : null,
-    input.sport ? `Вид спорта: ${input.sport}` : null,
-    input.exercise ? `Упражнение: ${input.exercise}` : null,
-    `Количество кадров: ${input.frames.length} (в хронологическом порядке).`,
-  ].filter(Boolean).join('\n')
-
-  const imageParts = input.frames.map((b64, i) => ([
-    { type: 'text' as const, text: `Кадр #${i + 1}:` },
-    { type: 'image' as const, image: `data:image/jpeg;base64,${b64}` },
-  ])).flat()
-
-  const { object } = await generateObject({
-    model: anthropic(AI_MODEL_SMART),
-    schema: FormFeedbackSchema,
-    system: SYSTEM_PROMPT,
-    messages: [{
-      role: 'user',
-      content: [
-        { type: 'text', text: context },
-        ...imageParts,
-        { type: 'text', text: 'Проанализируй технику и верни JSON по схеме.' },
-      ],
-    }],
-    maxOutputTokens: 1400,
-  })
-
-  return object
+  throw new FormAnalysisUnavailableError()
 }

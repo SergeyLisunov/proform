@@ -20,7 +20,7 @@
  * Health score (0-100) = weighted combination этих факторов.
  */
 import { z } from 'zod'
-import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/claude'
+import { aiObject, isAiConfigured, AI_MODEL_SMART } from '@/lib/ai/gemma'
 
 // ── Public input shape ─────────────────────────────────────────────────
 

@@ -279,7 +279,7 @@ export default function ClubAuditForm() {
           <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
             <span className="rounded-full bg-emerald-100 text-emerald-700 px-3 py-1">Без регистрации</span>
             <span className="rounded-full bg-blue-100 text-blue-700 px-3 py-1">~3 минуты</span>
-            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Claude Sonnet 4.5</span>
+            <span className="rounded-full bg-violet-100 text-violet-700 px-3 py-1">Gemma 4</span>
             <span className="rounded-full bg-orange-100 text-orange-700 px-3 py-1">Конкретные числа, не общие фразы</span>
           </div>
         </div>

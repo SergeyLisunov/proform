@@ -26,8 +26,12 @@
 
 /** env-override — ТОЛЬКО для интеграционных тестов парсера (см. *.test.ts). */
 const OLLAMA_CHAT_URL = process.env.OLLAMA_CHAT_URL ?? 'https://ollama.com/api/chat'
-/** Строго закреплённая версия; env-override только для осознанной смены. */
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4:31b'
+/**
+ * Строго закреплённая версия; env-override только для осознанной смены.
+ * Экспортируется, чтобы обёртки (lib/ai/gemma) не дублировали литерал:
+ * единственное место, где живёт имя модели, — здесь.
+ */
+export const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4:31b'
 
 export type OllamaErrorCode =
   | 'OLLAMA_NOT_CONFIGURED'
@@ -61,6 +65,18 @@ interface StreamOpts {
   deadlineMs?: number
   /** Максимальная пауза между чанками апстрима, мс (дефолт 20с). */
   idleMs?: number
+  /**
+   * Ollama-параметр `format`. 'json' включает constrained decoding до
+   * синтаксически валидного JSON — нужен структурированным вызовам
+   * (lib/ai/gemma → aiObject). По умолчанию не передаём вовсе, чтобы не
+   * менять поведение чата: с format:'json' модель обязана начать с '{',
+   * и обычный текстовый ответ сломается.
+   *
+   * ВАЖНО: format гарантирует только СИНТАКСИС. Соответствие нужной
+   * форме (поля, enum'ы, диапазоны) обязан проверять вызывающий —
+   * gemma.aiObject прогоняет ответ через ту же Zod-схему.
+   */
+  format?: 'json'
 }
 
 interface OllamaChunk {
@@ -80,11 +96,19 @@ function raceIdle<T>(p: Promise<T>, ms: number): Promise<T | typeof IDLE_SENTINE
   return Promise.race([p, idle]).finally(() => clearTimeout(timer))
 }
 
-function buildBody(messages: OllamaChatMessage[], stream: boolean, numPredict?: number): string {
+function buildBody(
+  messages: OllamaChatMessage[],
+  stream: boolean,
+  numPredict?: number,
+  format?: 'json',
+): string {
   return JSON.stringify({
     model: OLLAMA_MODEL,
     stream,
     messages,
+    // Ключ format отсутствует, если не запрошен явно — старые вызовы
+    // отправляют ровно тот же body, что и до появления параметра.
+    ...(format ? { format } : {}),
     options: {
       temperature: 1.0,
       top_p:       0.95,
@@ -143,7 +167,10 @@ export async function ollamaChatOnce(
   opts.signal?.addEventListener('abort', onCallerAbort, { once: true })
   try {
     const work = (async () => {
-      const upstream = await openUpstream(buildBody(messages, false, opts.numPredict), ctrl.signal)
+      const upstream = await openUpstream(
+        buildBody(messages, false, opts.numPredict, opts.format),
+        ctrl.signal,
+      )
       const json = (await upstream.json().catch(() => null)) as
         { message?: { content?: string }; error?: string } | null
       if (!json || json.error) {
@@ -186,7 +213,7 @@ export async function streamOllamaChat(
   let opened: Response | typeof IDLE_SENTINEL
   try {
     opened = await raceIdle(
-      openUpstream(buildBody(messages, true, opts.numPredict), ctrl.signal),
+      openUpstream(buildBody(messages, true, opts.numPredict, opts.format), ctrl.signal),
       deadlineMs,
     )
   } catch (e) {

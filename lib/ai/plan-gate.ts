@@ -8,7 +8,7 @@ import { isSubscriptionActive } from '@/lib/plans'
  * Background: prior to this gate, free-tier users could call any AI endpoint
  * (limited only by per-user/per-IP rate-limit). For "structured generation"
  * endpoints — adaptive-plan, weekly-plan, coach-briefing, medical-summary —
- * each call hits Anthropic Sonnet/Haiku and costs real money. With 30 calls/h
+ * each call hits the Gemma provider and costs real money. With 30 calls/h
  * cap per user (chat) and no plan check, a free user could rack up ~720
  * AI calls per day at zero revenue. Audit flagged this as a COGS-leak.
  *

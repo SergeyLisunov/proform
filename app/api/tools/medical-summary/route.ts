@@ -16,6 +16,12 @@ import { MedicalCaseInputSchema, analyzeMedicalCase } from '@/lib/ai/medical-sum
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+// Бюджет функции на Vercel: инструмент ходит в Gemma (общий дедлайн вызова
+// 45 с внутри lib/ai/gemma.ts). Без явного значения платформа даёт меньший
+// умолчательный лимит, и функция умирает раньше собственного дедлайна.
+export const maxDuration = 60
+
+
 const RATE_LIMIT_HOUR = 5
 const RATE_LIMIT_DAY  = 20
 

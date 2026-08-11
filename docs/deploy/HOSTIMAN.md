@@ -22,7 +22,8 @@
 - 2 GB хватает: standalone-сервер (~200–400 MB RSS) + nginx.
   **`next build` на этой машине НЕ запускать** (OOM) — билд в CI.
 - У Hostiman есть 14-дневный бесплатный триал VDS — проверьте с сервера
-  `curl https://api.telegram.org/bot<TOKEN>/getMe` и латентность до
+  `curl https://api.telegram.org/bot<TOKEN>/getMe`, `curl -sI
+  https://ollama.com` (AI-провайдер) и латентность до
   `hhyjihbctidtucvpgjzv.supabase.co` ДО оплаты.
 
 ## 1. Первичная настройка сервера (Ubuntu 24.04)
@@ -115,7 +116,7 @@ Variables. Критичные для новых P2-фич:
 SUPABASE_SERVICE_ROLE_KEY=…
 CRON_SECRET=…
 RESEND_API_KEY=…
-ANTHROPIC_API_KEY=…
+OLLAMA_API_KEY=…            # единственный AI-ключ: Gemma 4 (Ollama Cloud)
 ALFABANK_USERNAME=… / ALFABANK_PASSWORD=… / ALFABANK_CALLBACK_TOKEN=…
 ALFABANK_API_URL=…            # прод-URL выдаёт поддержка банка!
 PAYMENTS_PROVIDER=alfabank
@@ -133,7 +134,11 @@ TELEGRAM_BOT_TOKEN=… / TELEGRAM_BOT_USERNAME=… / TELEGRAM_WEBHOOK_SECRET=…
    `setWebhook` на `https://<домен>/api/telegram/webhook`
    с `secret_token` + `drop_pending_updates=true`; `/start` из настроек.
 4. Кроны: `grep sporteo /var/log/sporteo/cron.log` наутро.
-5. DNS-переключение с Vercel — последним шагом; Vercel оставить живым
+5. AI: с сервера `curl -sI https://ollama.com` → соединение есть. Gemma
+   ходит наружу по HTTPS так же, как Telegram, — из RU-локации трафик
+   может фильтроваться (ещё одна причина брать ЕВРОПУ). Затем в UI ни
+   один AI-эндпоинт не должен отдавать `503 AI_NOT_CONFIGURED`.
+6. DNS-переключение с Vercel — последним шагом; Vercel оставить живым
    на неделю как rollback.
 
 ## 8. Что теряем после Vercel и чем компенсируем
