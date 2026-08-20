@@ -4,7 +4,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAssistantProvider } from '@/lib/ai/assistant/provider'
-import type { OllamaChatMessage } from '@/lib/ai/ollama'
+import { OllamaError, type OllamaChatMessage } from '@/lib/ai/ollama'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -30,6 +30,24 @@ export const maxDuration = 60
 const DEMO_SESSION_LIMIT = 2
 const DEMO_IP_LIMIT_24H  = 6
 const COOKIE_NAME        = 'sporteo_demo_sid'
+
+/** Текст для человека — одинаковый на любой сбой: причина его не касается. */
+const AI_DOWN_TEXT = 'AI временно недоступен — попробуйте позже.'
+
+/**
+ * Машинный код рядом с человеческим текстом.
+ *
+ * УРОК ПРОДА: все сбои провайдера схлопывались в одну фразу, и отличить
+ * «ключ отвергнут» от «упёрлись в лимит частоты» или «модель не отдала
+ * ответ» можно было только через логи Vercel. Код в теле ответа не говорит
+ * пользователю ничего лишнего (ни ключа, ни адреса апстрима), но снимает
+ * поход в логи на каждом разборе.
+ */
+function providerErrorCode(e: unknown): string {
+  if (e instanceof OllamaError) return e.code
+  if (e instanceof Error && (e.name === 'AbortError' || e.name === 'TimeoutError')) return 'AI_TIMEOUT'
+  return 'AI_UNKNOWN'
+}
 
 const BodySchema = z.object({
   role:    z.enum(['athlete', 'coach', 'doctor', 'organization']),
@@ -166,11 +184,17 @@ export async function POST(req: Request) {
     })
     mark(`collected ${answer.length} chars`)
     if (!answer.trim()) {
-      return NextResponse.json({ ok: false, error: 'AI временно недоступен — попробуйте позже.' }, { status: 502 })
+      return NextResponse.json(
+        { ok: false, error: AI_DOWN_TEXT, code: 'EMPTY_ANSWER' },
+        { status: 502 },
+      )
     }
   } catch (e) {
     mark(`provider-error: ${e instanceof Error ? e.message : String(e)}`)
-    return NextResponse.json({ ok: false, error: 'AI временно недоступен — попробуйте позже.' }, { status: 502 })
+    return NextResponse.json(
+      { ok: false, error: AI_DOWN_TEXT, code: providerErrorCode(e) },
+      { status: 502 },
+    )
   }
 
   // Учёт ПОСЛЕ успешного ответа (ошибка не жгёт демо-попытку).
