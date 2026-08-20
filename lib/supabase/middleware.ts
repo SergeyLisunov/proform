@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { RESERVED_TOP_LEVEL_SLUGS, PUBLIC_APP_SLUGS } from '@/lib/routes/reserved-slugs'
+import { isAnonymousAllowed } from '@/lib/routes/public-routes'
 
 /**
  * Middleware — refreshes the Supabase session cookie on every request
@@ -102,7 +103,11 @@ export async function updateSession(request: NextRequest) {
   // политики конфиденциальности, уходят за форму входа.
   const isPublicAppPage = PUBLIC_APP_SLUGS.has(pathname.slice(1))
 
-  if (!user && !isAuthRoute && !isPublic && !isPublicPrefix && !isOrgPublicPage && !isPublicAppPage && !isApiRoute) {
+  // Правило публичности целиком живёт в isAnonymousAllowed (lib/routes/
+  // public-routes.ts) и покрыто юнит-тестами по списку путей. Прежний
+  // набор локальных флагов проверялся только живым запросом — из-за этого
+  // /legal/*, /tools и /pricing тихо ушли за форму входа.
+  if (!user && !isAnonymousAllowed(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     url.searchParams.set('redirectTo', `${pathname}${request.nextUrl.search}`)
