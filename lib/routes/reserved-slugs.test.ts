@@ -24,11 +24,32 @@ describe('публичные разделы приложения не требу
     }
   })
 
-  it('middleware учитывает публичные страницы в ОБОИХ гейтах (auth и onboarding)', () => {
+  /**
+   * Раньше здесь считались строки исходника с `isPublicAppPage` — проверка
+   * реализации, а не поведения: она осталась зелёной, пока /pricing,
+   * /legal/privacy и /legal/terms уходили на форму входа. Само правило для
+   * анонима теперь проверяется по списку путей в public-routes.test.ts.
+   *
+   * За этим тестом остаётся второй гейт — онбординговый, для уже вошедших:
+   * он живёт в middleware отдельным условием, и публичные страницы обязан
+   * пропускать, иначе пользователь с незавершённым онбордингом не откроет
+   * ни тарифы, ни политику конфиденциальности.
+   */
+  it('онбординговый гейт пропускает публичные страницы и юридические документы', () => {
     const src = readFileSync(join(process.cwd(), 'lib', 'supabase', 'middleware.ts'), 'utf8')
-    expect(src).toContain('PUBLIC_APP_SLUGS')
-    const gateLines = src.split('\n').filter(l => l.includes('isPublicAppPage') && l.includes('if ('))
-    expect(gateLines.length, 'оба гейта должны пропускать публичные страницы').toBe(2)
+    const onboardingGate = src
+      .split('\n')
+      .find(l => l.includes('if (user &&') && l.includes('isOnboardingRoute'))
+    expect(onboardingGate, 'онбординговый гейт не найден — проверку нужно обновить').toBeDefined()
+    expect(onboardingGate).toContain('isPublicAppPage')
+    expect(onboardingGate).toContain('isLegalRoute')
+  })
+
+  it('анонимный гейт делегирует правило единой функции', () => {
+    const src = readFileSync(join(process.cwd(), 'lib', 'supabase', 'middleware.ts'), 'utf8')
+    // Дублирование правила в middleware — как раз то, из-за чего расхождение
+    // накопилось незаметно. Источник должен остаться один.
+    expect(src).toContain('isAnonymousAllowed(pathname)')
   })
 
   it('разделы кабинета публичными не объявлены', () => {

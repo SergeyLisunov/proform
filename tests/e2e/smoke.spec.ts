@@ -24,6 +24,25 @@ test.describe('public pages render', () => {
     expect(res?.status()).toBeLessThan(500)
   })
 
+  /**
+   * Проверка КОНЕЧНОГО адреса, а не только статуса.
+   *
+   * Прод-инцидент: /pricing, /legal/privacy и /legal/terms отвечали 307 на
+   * /auth/login, а этот файл оставался зелёным — goto идёт по редиректу, и
+   * форма входа возвращает те же «меньше 500». Статус подтверждает, что
+   * страница не упала, но ничего не говорит о том, ТА ЛИ это страница.
+   *
+   * Юридические документы особенно: их открывает человек, который решает,
+   * соглашаться ли, — то есть ещё без аккаунта.
+   */
+  for (const path of ['/pricing', '/about', '/contacts', '/legal/privacy', '/legal/terms', '/demo/ai-assistant']) {
+    test(`${path} доступна без входа и не уводит на форму логина`, async ({ page }) => {
+      const res = await page.goto(path)
+      expect(res?.status(), `${path} упала`).toBeLessThan(500)
+      expect(page.url(), `${path} увела на форму входа`).not.toContain('/auth/login')
+    })
+  }
+
   test('invite page with fake token shows error state', async ({ page }) => {
     const res = await page.goto('/invite/00000000-0000-0000-0000-000000000000')
     // Page must not 500. The client component starts loading then shows an

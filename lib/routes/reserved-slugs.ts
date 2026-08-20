@@ -29,6 +29,10 @@
  */
 export const PUBLIC_APP_SLUGS = new Set<string>([
   'about', 'contacts', 'directory',
+  // 'pricing' — витрина тарифов. Ссылки «Тарифы» стоят на /about, /contacts,
+  // на форме регистрации и в лендингах /p и /tools, то есть её открывают
+  // именно анонимные посетители; за формой входа она бессмысленна.
+  'pricing',
 ])
 
 export const RESERVED_TOP_LEVEL_SLUGS = new Set<string>([
