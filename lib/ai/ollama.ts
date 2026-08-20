@@ -52,8 +52,22 @@ export interface OllamaChatMessage {
   content: string
 }
 
+/**
+ * Ключ читается ТОЛЬКО здесь и всегда через trim.
+ *
+ * УРОК ПРОДА: значение задаётся в панели Vercel вставкой из буфера, и туда
+ * легко утягивается пробел или перенос строки. Заголовок `Bearer <ключ>\n`
+ * Ollama отвергает с 401 {"error":"Unauthorized"} — ровно тем же ответом,
+ * что и на полностью отсутствующий ключ. Диагностика в этот момент уходит
+ * в ложное русло «ключ неверный», хотя неверен только способ его вставки.
+ * Один trim снимает целый класс таких разборов.
+ */
+function readApiKey(): string {
+  return (process.env.OLLAMA_API_KEY ?? '').trim()
+}
+
 export function isOllamaConfigured(): boolean {
-  return !!process.env.OLLAMA_API_KEY
+  return readApiKey().length > 0
 }
 
 interface StreamOpts {
@@ -122,7 +136,7 @@ async function openUpstream(
   body: string,
   signal: AbortSignal,
 ): Promise<Response> {
-  const apiKey = process.env.OLLAMA_API_KEY
+  const apiKey = readApiKey()
   if (!apiKey) throw new OllamaError('OLLAMA_NOT_CONFIGURED')
   let upstream: Response
   try {
