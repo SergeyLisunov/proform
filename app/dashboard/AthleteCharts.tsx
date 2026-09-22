@@ -58,8 +58,8 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
         subtitle="7-дневные биометрики WHOOP"
         toolbar={
           <div className="flex gap-3 text-xs text-slate-500">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-green-500" />Восстановление %</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded inline-block bg-blue-500 border-dashed border-t border-blue-500" />ВСР мс</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded-sm inline-block bg-green-500" />Восстановление %</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded-sm inline-block bg-blue-500 border-dashed border-t border-blue-500" />ВСР мс</span>
           </div>
         }
       >

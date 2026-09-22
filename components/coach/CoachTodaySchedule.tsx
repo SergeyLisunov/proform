@@ -97,7 +97,7 @@ export default function CoachTodaySchedule({ coachId }: { coachId: string }) {
   const dates = Object.keys(byDate).sort()
 
   return (
-    <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50/60 to-white p-5">
+    <div className="rounded-2xl border border-orange-200 bg-linear-to-br from-orange-50/60 to-white p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Расписание</p>

@@ -252,7 +252,7 @@ export default function MedicalSummaryForm() {
   return (
     <div>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-violet-50 via-white to-fuchsia-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-violet-700 mb-4">
             <i className="ki-filled ki-pulse text-[11px]" />
@@ -307,11 +307,11 @@ export default function MedicalSummaryForm() {
               <Field label="Возраст *">
                 <input value={age} onChange={e => setAge(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={8} max={99} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
               <Field label="Пол">
                 <select value={sex} onChange={e => setSex(e.target.value as Sex)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                   <option value="unspecified">Не указано</option>
                   <option value="male">Мужской</option>
                   <option value="female">Женский</option>
@@ -320,13 +320,13 @@ export default function MedicalSummaryForm() {
               </Field>
               <Field label="Спорт">
                 <select value={sport} onChange={e => setSport(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                   {SPORT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </Field>
               <Field label="Уровень">
                 <select value={level} onChange={e => setLevel(e.target.value as Level)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                   <option value="recreational">Любитель</option>
                   <option value="club">Клубный</option>
                   <option value="national">Национальный</option>
@@ -343,17 +343,17 @@ export default function MedicalSummaryForm() {
                 <textarea value={primarySymptom} onChange={e => setPrimarySymptom(e.target.value)}
                   rows={2} maxLength={400} required
                   placeholder="Боль в передней части голени, усиливается на 2-3 км"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Field label="Локализация *">
                   <input value={location} onChange={e => setLocation(e.target.value)} maxLength={120} required
                     placeholder="Правая голень, medial tibial border"
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
                 </Field>
                 <Field label="Onset">
                   <select value={onset} onChange={e => setOnset(e.target.value as Onset)}
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400">
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                     <option value="acute">Acute (&lt; 1 нед)</option>
                     <option value="sub_acute">Sub-acute (1-6 нед)</option>
                     <option value="chronic">Chronic (&gt; 6 нед)</option>
@@ -362,7 +362,7 @@ export default function MedicalSummaryForm() {
                 <Field label="Длительность (дни) *">
                   <input value={durationDays} onChange={e => setDurationDays(e.target.value === '' ? '' : Number(e.target.value))}
                     type="number" min={0} max={3650} required
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
                 </Field>
               </div>
               <Field label={`Pain scale (VAS): ${painScale}/10`}>
@@ -382,16 +382,16 @@ export default function MedicalSummaryForm() {
               <Field label="Часы тек. неделя">
                 <input value={hoursCurrent} onChange={e => setHoursCurrent(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={60} step={0.5}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
               <Field label="Avg 4 нед">
                 <input value={hoursAvg4w} onChange={e => setHoursAvg4w(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={60} step={0.5}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
               <Field label="Изм. нагрузки">
                 <select value={loadChange} onChange={e => setLoadChange(e.target.value as '' | LoadCh)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                   <option value="">—</option>
                   <option value="none">Стабильна</option>
                   <option value="increased">Выросла</option>
@@ -401,7 +401,7 @@ export default function MedicalSummaryForm() {
               <Field label="Тип активности">
                 <input value={activityType} onChange={e => setActivityType(e.target.value)} maxLength={60}
                   placeholder="Бег по асфальту"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
             </div>
           </FormSection>
@@ -418,13 +418,13 @@ export default function MedicalSummaryForm() {
                 <textarea value={chronicConditions} onChange={e => setChronicConditions(e.target.value)}
                   rows={2} maxLength={400}
                   placeholder="Диабет, гипертония, известная травма колена 2 года назад…"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
               <Field label="Текущие препараты">
                 <textarea value={medications} onChange={e => setMedications(e.target.value)}
                   rows={2} maxLength={400}
                   placeholder="NSAIDs prn, мультивитамины, …"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
             </div>
           </FormSection>
@@ -453,14 +453,14 @@ export default function MedicalSummaryForm() {
                 <textarea value={examNotes} onChange={e => setExamNotes(e.target.value)}
                   rows={3} maxLength={400}
                   placeholder="Локальная болезненность medial tibial border ~10 см от tibial plateau, без неврологического дефицита…"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
               </Field>
             </div>
           </FormSection>
 
           <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-slate-200">
             <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
-              className="rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-600 hover:from-violet-600 hover:to-fuchsia-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+              className="rounded-lg bg-linear-to-r from-violet-500 to-fuchsia-600 hover:from-violet-600 hover:to-fuchsia-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Анализируем case…' : 'Получить assessment template →'}
             </button>
           </div>
@@ -474,7 +474,7 @@ export default function MedicalSummaryForm() {
       {/* ── Result ─────────────────────────────────────────────────────── */}
       {summary && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
-          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50/40 to-white p-5 md:p-6">
+          <div className="rounded-2xl border border-violet-200 bg-linear-to-br from-violet-50/40 to-white p-5 md:p-6">
             {/* Disclaimer at top */}
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 mb-5 text-xs text-amber-900 leading-relaxed">
               <strong className="inline-flex items-center gap-1.5"><i className="ki-filled ki-information-4 text-xs" /> AI-generated draft. NOT a diagnosis.</strong> Все clinical decisions требуют review licensed practitioner.
@@ -539,7 +539,7 @@ export default function MedicalSummaryForm() {
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                        <span className="text-[11px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm inline-flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-xs inline-flex items-center gap-1.5">
                           <i className="ki-filled ki-lock-2 text-[11px]" />
                           email откроет
                         </span>
@@ -598,7 +598,7 @@ export default function MedicalSummaryForm() {
                 </p>
                 <input type="email" required placeholder="doctor@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400" />
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-violet-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-violet-500" />
@@ -654,7 +654,7 @@ export default function MedicalSummaryForm() {
 
       {/* ── CTA ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 pb-10">
-        <div className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white p-6 md:p-8">
+        <div className="rounded-2xl bg-linear-to-r from-violet-600 to-fuchsia-600 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Документируйте medical findings правильно</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
             Sporteo для врачей: structured recommendations с privacy levels (athlete only / coach + athlete / org_full),

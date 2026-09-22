@@ -208,8 +208,8 @@ export default function StreaksPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.16),_transparent_42%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.16),transparent_42%)]" />
         <div className="relative flex flex-col gap-2">
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-600">
             Стрик & достижения
@@ -243,17 +243,17 @@ export default function StreaksPage() {
 
       {/* Heatmap */}
       {stats && (
-        <section className="rounded-[24px] border border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[24px] border border-border bg-card p-5 shadow-xs">
           <div className="mb-3 flex items-center gap-3">
             <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               Карта активности · 12 недель
             </div>
             <div className="ml-auto flex items-center gap-2 text-[10px] text-muted-foreground">
               <span>реже</span>
-              <span className="h-3 w-3 rounded-sm bg-muted/40" />
-              <span className="h-3 w-3 rounded-sm bg-emerald-200" />
-              <span className="h-3 w-3 rounded-sm bg-emerald-400" />
-              <span className="h-3 w-3 rounded-sm bg-emerald-600" />
+              <span className="h-3 w-3 rounded-xs bg-muted/40" />
+              <span className="h-3 w-3 rounded-xs bg-emerald-200" />
+              <span className="h-3 w-3 rounded-xs bg-emerald-400" />
+              <span className="h-3 w-3 rounded-xs bg-emerald-600" />
               <span>чаще</span>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function StreaksPage() {
                   {week.map(d => (
                     <div
                       key={d.date}
-                      className={`h-4 w-4 rounded-sm ${heatColor(d.count)}`}
+                      className={`h-4 w-4 rounded-xs ${heatColor(d.count)}`}
                       title={`${d.date}: ${d.count < 0 ? 'будущее' : d.count === 0 ? '—' : `${d.count} сессий`}`}
                     />
                   ))}
@@ -287,9 +287,9 @@ export default function StreaksPage() {
             {badges.map(b => (
               <li
                 key={b.id}
-                className={`rounded-2xl border p-4 shadow-sm transition ${
+                className={`rounded-2xl border p-4 shadow-xs transition ${
                   b.earned
-                    ? 'border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50'
+                    ? 'border-amber-200 bg-linear-to-br from-amber-50 to-orange-50'
                     : 'border-border bg-card opacity-80'
                 }`}
               >
@@ -335,7 +335,7 @@ function KPI({
   icon: string; color: string; small?: boolean
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-3 shadow-xs">
       <div className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `${color}18` }}>
           <i className={`ki-filled ${icon} text-[14px]`} style={{ color }} />

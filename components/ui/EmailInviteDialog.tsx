@@ -73,8 +73,8 @@ export function EmailInviteDialog({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex items-center justify-center px-4" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`}/>
       <div
         onClick={e => e.stopPropagation()}
         className={`relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border transition-all ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}

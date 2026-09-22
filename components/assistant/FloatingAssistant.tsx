@@ -302,7 +302,7 @@ export default function FloatingAssistant() {
             if (caps.historyEnabled) void loadHistory()
             setTimeout(() => inputRef.current?.focus(), 120)
           }}
-          className="fixed bottom-24 right-4 z-[9996] flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 lg:bottom-6 lg:right-6"
+          className="fixed bottom-24 right-4 z-9996 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105 focus:outline-hidden focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 lg:bottom-6 lg:right-6"
           style={{ background: 'linear-gradient(135deg,#F35703 0%,#D44A02 60%,#7C3AED 130%)' }}
         >
           <i className="ki-filled ki-message-question text-xl text-white" />
@@ -315,7 +315,7 @@ export default function FloatingAssistant() {
           role="dialog"
           aria-modal="true"
           aria-label={caps.assistantName}
-          className="fixed inset-x-2 bottom-20 z-[9998] flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_32px_80px_rgba(0,0,0,0.28)] lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[420px]"
+          className="fixed inset-x-2 bottom-20 z-9998 flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_32px_80px_rgba(0,0,0,0.28)] lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[420px]"
           style={{ height: 'min(600px, 78vh)' }}
         >
           {/* Header */}
@@ -412,7 +412,7 @@ export default function FloatingAssistant() {
                         if (activeConv?.id === c.id) { setActiveConv(null); setMessages([]) }
                       }
                     }}
-                    className="hidden h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-red-50 hover:text-red-600 group-hover:flex"
+                    className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-red-50 hover:text-red-600 group-hover:flex"
                     aria-label="Удалить диалог"
                   >
                     <i className="ki-filled ki-trash text-[11px]" />
@@ -500,7 +500,7 @@ export default function FloatingAssistant() {
                     rows={1}
                     maxLength={caps.maxMessageLength}
                     aria-label="Сообщение AI-помощнику"
-                    className="max-h-28 flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-orange-400"
+                    className="max-h-28 flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground outline-hidden focus:border-orange-400"
                     style={{ minHeight: 38 }}
                   />
                   {streaming ? (

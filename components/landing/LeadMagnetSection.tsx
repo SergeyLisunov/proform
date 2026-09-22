@@ -82,7 +82,7 @@ function FeaturedCard() {
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-4 rounded-3xl border-2 bg-white p-7 no-underline shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-8 lg:flex-row lg:items-start lg:gap-7"
+      className="group flex flex-col gap-4 rounded-3xl border-2 bg-white p-7 no-underline shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-8 lg:flex-row lg:items-start lg:gap-7"
       style={{ borderColor: hue.ring }}
     >
       {/* Left: icon + featured badge */}
@@ -136,7 +136,7 @@ function SecondaryCard({ magnet }: { magnet: LeadMagnet }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-3 rounded-3xl border-2 bg-white p-6 no-underline shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+      className="group flex flex-col gap-3 rounded-3xl border-2 bg-white p-6 no-underline shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-lg"
       style={{ borderColor: hue.ring }}
     >
       <div className="flex items-start justify-between gap-3">

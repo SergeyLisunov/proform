@@ -74,7 +74,7 @@ export default function PlanStreakCard({ athleteId }: { athleteId: string }) {
             <div
               key={c.from}
               title={cellTitle(c)}
-              className={`h-6 w-3 rounded-sm border ${cellClass(c, i === last)}`}
+              className={`h-6 w-3 rounded-xs border ${cellClass(c, i === last)}`}
             />
           ))}
         </div>

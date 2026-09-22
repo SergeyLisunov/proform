@@ -30,7 +30,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
   const description = [meta.type, meta.sport, meta.city].filter(Boolean).join(' · ') || 'Команда на базе Sporteo'
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-[#BFDBFE] bg-gradient-to-br from-[#EFF6FF] via-white to-[#FAF5FF] p-5 md:p-7">
+    <section className="relative overflow-hidden rounded-3xl border border-[#BFDBFE] bg-linear-to-br from-[#EFF6FF] via-white to-[#FAF5FF] p-5 md:p-7">
       <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-blue-200/40 blur-3xl pointer-events-none" />
 
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">
@@ -58,7 +58,7 @@ export default function OrgHeroBar({ orgName, meta, stats }: OrgHeroBarProps) {
 
 function Stat({ label, value, color, highlight }: { label: string; value: string; color: string; highlight?: boolean }) {
   return (
-    <Card className={`px-3 py-2.5 ${highlight ? '!border-purple-300' : ''}`}>
+    <Card className={`px-3 py-2.5 ${highlight ? 'border-purple-300!' : ''}`}>
       <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="pf-num text-xl font-bold mt-0.5" style={{ color }}>{value}</div>
     </Card>

@@ -98,9 +98,9 @@ export default function CoachBriefingCard() {
           <p className="text-xs text-red-600">Не удалось получить брифинг. <button onClick={load} className="underline">Повторить</button></p>
         ) : loading && !data ? (
           <div className="space-y-2">
-            <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
-            <div className="h-10 w-full animate-pulse rounded bg-muted" />
-            <div className="h-10 w-full animate-pulse rounded bg-muted" />
+            <div className="h-3 w-5/6 animate-pulse rounded-sm bg-muted" />
+            <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
+            <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
           </div>
         ) : data ? (
           <div className="space-y-4">
@@ -140,7 +140,7 @@ export default function CoachBriefingCard() {
                         <div className="flex items-center gap-2">
                           <span className="truncate text-sm font-bold text-foreground">{a.name}</span>
                           <span
-                            className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
+                            className="rounded-full px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
                             style={{ background: s.bg, color: s.dot }}
                           >
                             {s.label}

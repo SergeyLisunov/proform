@@ -76,7 +76,7 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
       style={{ background: 'linear-gradient(160deg,#EFF6FF 0%,#F0F9FF 60%,#FFFFFF 100%)' }}>
       <div className="flex items-center justify-between border-b border-blue-100 px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-blue-100">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-blue-100">
             <i className="ki-filled ki-heart-circle text-base text-blue-600" />
           </div>
           <div>
@@ -101,7 +101,7 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-sm font-bold text-foreground truncate">{r.title}</span>
-                  <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
+                  <span className="rounded-full px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
                     style={{ background: sev.bg, color: sev.color, border: `1px solid ${sev.border}` }}>
                     {sev.label}
                   </span>

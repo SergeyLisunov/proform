@@ -116,7 +116,7 @@ export default function RoleSection() {
 
         {/* Mobile: horizontal carousel (W17 Day 87) — overflows max-w container */}
         <div
-          className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:hidden"
+          className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden sm:hidden"
           aria-label="Карусель ролей — пролистайте чтобы увидеть все"
         >
           {ROLES.map((entry) => (

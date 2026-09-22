@@ -33,7 +33,7 @@ function fmtDate(s: string | null | undefined): string {
 
 function SurfaceFrame({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-xs ${className}`}>
       {children}
     </div>
   )
@@ -314,7 +314,7 @@ function CompetitionsContent() {
     <div className="flex flex-col gap-5 pf-enter">
       {/* Header KPI */}
       <SurfaceFrame>
-        <div className="bg-gradient-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
+        <div className="bg-linear-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex-1 min-w-0">
               <Badge variant="primary" className="rounded-full uppercase tracking-[0.18em]">
@@ -401,7 +401,7 @@ function CompetitionsContent() {
               <button
                 key={c.id}
                 onClick={() => setDrawer(c)}
-                className="group flex items-center gap-4 rounded-2xl border border-orange-100 bg-orange-50/50 p-4 text-left transition-all hover:border-orange-300 hover:shadow-sm"
+                className="group flex items-center gap-4 rounded-2xl border border-orange-100 bg-orange-50/50 p-4 text-left transition-all hover:border-orange-300 hover:shadow-xs"
               >
                 <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-orange-500 text-white">
                   <span className="pf-num text-lg leading-none">{parseLocalDate(c.event_date).getDate()}</span>
@@ -433,7 +433,7 @@ function CompetitionsContent() {
               <button
                 key={c.id}
                 onClick={() => setDrawer(c)}
-                className="group flex items-center gap-4 rounded-2xl border border-border bg-background/60 p-4 text-left transition-all hover:border-orange-200 hover:shadow-sm"
+                className="group flex items-center gap-4 rounded-2xl border border-border bg-background/60 p-4 text-left transition-all hover:border-orange-200 hover:shadow-xs"
               >
                 <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-muted text-muted-foreground">
                   <span className="pf-num text-lg leading-none">{parseLocalDate(c.event_date).getDate()}</span>

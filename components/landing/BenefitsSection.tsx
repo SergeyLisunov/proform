@@ -81,11 +81,11 @@ export default function BenefitsSection() {
           {BENEFITS.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="group flex items-start gap-4 rounded-2xl border border-border bg-slate-50/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-sm sm:p-6"
+              className="group flex items-start gap-4 rounded-2xl border border-border bg-slate-50/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-xs sm:p-6"
             >
               <div
                 aria-hidden="true"
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm transition-colors group-hover:bg-orange-500 group-hover:text-white"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-xs transition-colors group-hover:bg-orange-500 group-hover:text-white"
               >
                 <Icon size={22} strokeWidth={2} />
               </div>

@@ -229,7 +229,7 @@ export default function CoachServicesPage() {
           </p>
         </div>
         <button onClick={openCreate}
-          className="rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
+          className="rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
           <i className="ki-filled ki-plus text-sm" />
           Создать услугу
         </button>
@@ -346,9 +346,9 @@ export default function CoachServicesPage() {
 
       {/* Editor modal */}
       {editor && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={closeEditor}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-lg rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -366,7 +366,7 @@ export default function CoachServicesPage() {
                   onChange={e => setEditor({ ...editor, title: e.target.value })}
                   placeholder="Например: Видео-консультация · 60 мин"
                   maxLength={120}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{editor.title.length}/120</p>
               </div>
 
@@ -375,7 +375,7 @@ export default function CoachServicesPage() {
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Тип</label>
                   <select value={editor.service_type}
                     onChange={e => setEditor({ ...editor, service_type: e.target.value as ServiceType })}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-hidden focus:border-orange-400">
                     {(Object.entries(SERVICE_TYPE_META) as Array<[ServiceType, typeof SERVICE_TYPE_META[ServiceType]]>).map(([k, v]) =>
                       <option key={k} value={k}>{v.label}</option>
                     )}
@@ -385,7 +385,7 @@ export default function CoachServicesPage() {
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Формат</label>
                   <select value={editor.format}
                     onChange={e => setEditor({ ...editor, format: e.target.value as ServiceFormat | '' })}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-hidden focus:border-orange-400">
                     <option value="">— не указан —</option>
                     {(Object.entries(FORMAT_META) as Array<[ServiceFormat, typeof FORMAT_META[ServiceFormat]]>).map(([k, v]) =>
                       <option key={k} value={k}>{v.label}</option>
@@ -400,7 +400,7 @@ export default function CoachServicesPage() {
                   <input type="number" value={editor.price_amount}
                     onChange={e => setEditor({ ...editor, price_amount: Number.parseInt(e.target.value, 10) || 0 })}
                     min={0} max={10000000} step={100}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 pf-num" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 pf-num" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Длительность (дни)</label>
@@ -408,7 +408,7 @@ export default function CoachServicesPage() {
                     onChange={e => setEditor({ ...editor, duration_days: e.target.value })}
                     placeholder="например: 30"
                     min={1} max={3650}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 pf-num" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 pf-num" />
                 </div>
               </div>
 
@@ -418,7 +418,7 @@ export default function CoachServicesPage() {
                   onChange={e => setEditor({ ...editor, description: e.target.value })}
                   rows={4} maxLength={1000}
                   placeholder="Что входит в услугу? Какой результат получит атлет? Сколько занимает по времени?"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 resize-vertical" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 resize-vertical" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{editor.description.length}/1000</p>
               </div>
 
@@ -428,7 +428,7 @@ export default function CoachServicesPage() {
                   onChange={e => setEditor({ ...editor, seller_specialty: e.target.value })}
                   placeholder="Например: марафон, триатлон, силовая"
                   maxLength={120}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
               </div>
 
               {formError && (
@@ -451,7 +451,7 @@ export default function CoachServicesPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[99] rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg"
+        <div className="fixed bottom-6 right-6 z-99 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg"
           style={toast.ok
             ? { background: '#F0FDF4', color: '#15803D', borderColor: '#BBF7D0' }
             : { background: '#FEF2F2', color: '#B91C1C', borderColor: '#FECACA' }}>

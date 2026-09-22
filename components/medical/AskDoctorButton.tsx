@@ -103,8 +103,8 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
   }
 
   return (
-    <div className="fixed inset-0 z-[90] flex justify-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-90 flex justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
       <div
         onClick={e => e.stopPropagation()}
         className="relative z-10 flex h-full w-full max-w-md flex-col bg-background border-l border-border shadow-2xl"
@@ -154,7 +154,7 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Тип вопроса</label>
                 <select value={questionType} onChange={e => setQuestionType(e.target.value as QuestionType)}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400">
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                   {(Object.entries(QUESTION_TYPE_META) as Array<[QuestionType, typeof QUESTION_TYPE_META[QuestionType]]>).map(([k, v]) =>
                     <option key={k} value={k}>{v.label}</option>
                   )}
@@ -184,7 +184,7 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Вопрос * (мин. 10 символов)</label>
                 <textarea value={question} onChange={e => setQuestion(e.target.value)} rows={8} maxLength={2000}
                   placeholder={QUESTION_TYPE_META[questionType].placeholder}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400 resize-vertical" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400 resize-vertical" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{question.length}/2000</p>
               </div>
 

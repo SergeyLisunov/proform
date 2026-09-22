@@ -229,7 +229,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
           placeholder="Иван Иванов"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'lc-name-err' : undefined}
-          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
         />
         {errors.name && <p id="lc-name-err" className="mt-1 text-xs text-red-600">{errors.name}</p>}
       </div>
@@ -250,7 +250,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
             placeholder="ivan@club.ru"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'lc-email-err' : undefined}
-            className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+            className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
           />
         </div>
         {errors.email && <p id="lc-email-err" className="mt-1 text-xs text-red-600">{errors.email}</p>}
@@ -271,7 +271,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
             placeholder="@ivan_proform"
             aria-invalid={!!errors.telegram}
             aria-describedby={errors.telegram ? 'lc-tg-err' : undefined}
-            className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+            className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
           />
         </div>
         {errors.telegram && <p id="lc-tg-err" className="mt-1 text-xs text-red-600">{errors.telegram}</p>}
@@ -291,7 +291,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
           placeholder="Клуб «Спарта»"
           aria-invalid={!!errors.organization}
           aria-describedby={errors.organization ? 'lc-org-err' : undefined}
-          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
         />
         {errors.organization && <p id="lc-org-err" className="mt-1 text-xs text-red-600">{errors.organization}</p>}
       </div>
@@ -307,7 +307,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
           onChange={(e) => setField('orgType', e.target.value)}
           aria-invalid={!!errors.orgType}
           aria-describedby={errors.orgType ? 'lc-type-err' : undefined}
-          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
         >
           <option value="">Выберите тип</option>
           {ORG_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -397,7 +397,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
           checked={data.consent}
           onChange={(e) => setField('consent', e.target.checked)}
           aria-invalid={!!errors.consent}
-          className="mt-0.5 h-4 w-4 rounded border-input text-orange-500 focus:ring-orange-500/30"
+          className="mt-0.5 h-4 w-4 rounded-sm border-input text-orange-500 focus:ring-orange-500/30"
         />
         <span>
           Согласен на обработку персональных данных в соответствии с{' '}

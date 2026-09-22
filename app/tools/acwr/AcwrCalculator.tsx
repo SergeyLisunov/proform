@@ -138,7 +138,7 @@ export default function AcwrCalculator() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-orange-50 via-white to-blue-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-600 mb-4">
             <i className="ki-filled ki-focus text-[11px]" /> Бесплатный инструмент
@@ -198,7 +198,7 @@ export default function AcwrCalculator() {
                       next[i] = Number.isFinite(parsed) ? Math.max(0, parsed) : 0
                       setW(next)
                     }}
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100" />
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-100" />
                 </div>
               ))}
             </div>
@@ -252,7 +252,7 @@ export default function AcwrCalculator() {
                 </p>
                 <input type="email" required placeholder="you@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-orange-500" />
@@ -303,7 +303,7 @@ export default function AcwrCalculator() {
         </div>
 
         {/* CTA */}
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
+        <div className="mt-10 rounded-2xl bg-linear-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Хотите, чтобы ACWR считался сам по каждой тренировке?</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
             В Sporteo подключается Garmin, Whoop и ручной ввод. Тренер видит ACWR по всем атлетам одной таблицей.

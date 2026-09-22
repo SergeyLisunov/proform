@@ -67,7 +67,7 @@ export default function BuyPassButton({
         {busy ? 'Переходим к оплате…' : (children ?? (priceLabel ? `Купить за ${priceLabel}` : 'Купить абонемент'))}
       </button>
       {error && (
-        <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+        <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-sm px-2 py-1">
           {error}
         </div>
       )}

@@ -502,8 +502,8 @@ export default function AdminPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
-      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.12),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.08),_transparent_28%)]" />
+      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-xs">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -531,14 +531,14 @@ export default function AdminPage() {
                 </button>
                 <Link
                   href="/admin/orgs"
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-sm transition-all hover:border-orange-200 hover:text-orange-700"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-orange-200 hover:text-orange-700"
                 >
                   <i className="ki-filled ki-office-bag text-sm" />
                   Управление организациями
                 </Link>
                 <Link
                   href="/admin/commerce"
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-green-200 bg-green-50/80 px-4 py-2.5 text-sm font-semibold text-green-700 no-underline shadow-sm transition-all hover:bg-green-100"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-green-200 bg-green-50/80 px-4 py-2.5 text-sm font-semibold text-green-700 no-underline shadow-xs transition-all hover:bg-green-100"
                 >
                   <i className="ki-filled ki-chart-line-up text-sm" />
                   Коммерция · MRR
@@ -547,12 +547,12 @@ export default function AdminPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[380px]">
-              <div className="rounded-2xl border border-border bg-background/85 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/85 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Контур доступа</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">Права admin активны</div>
                 <div className="mt-1 text-2xs text-muted-foreground">Роли, политики и связки доступны для проверки</div>
               </div>
-              <div className="rounded-2xl border border-border bg-background/85 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/85 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Журнал действий</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">
                   {auditLoading ? 'Загружаю…' : `${auditEntries.length} записей`}
@@ -589,7 +589,7 @@ export default function AdminPage() {
         ))}
       </section>
 
-      <section className="overflow-hidden rounded-[30px] border border-border bg-card shadow-sm">
+      <section className="overflow-hidden rounded-[30px] border border-border bg-card shadow-xs">
         <div className="border-b border-border px-5 py-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -605,7 +605,7 @@ export default function AdminPage() {
                   className={[
                     'rounded-2xl border px-4 py-3 text-left transition-all',
                     tab === t.id
-                      ? 'border-orange-200 bg-orange-50/80 shadow-sm'
+                      ? 'border-orange-200 bg-orange-50/80 shadow-xs'
                       : 'border-border bg-background/80 hover:border-orange-200 hover:bg-orange-50/40',
                   ].join(' ')}
                 >
@@ -682,7 +682,7 @@ export default function AdminPage() {
                       const busy = changingRole === userItem.id
                       const knownRole = (ASSIGNABLE_ROLES as readonly string[]).includes(userItem.role)
                       return (
-                      <div key={userItem.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm transition-transform hover:-translate-y-0.5">
+                      <div key={userItem.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs transition-transform hover:-translate-y-0.5">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
                           <div className="flex min-w-0 flex-1 items-center gap-3">
                             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-sm font-bold pf-num text-foreground">
@@ -729,7 +729,7 @@ export default function AdminPage() {
                                 const nextRole = e.target.value
                                 if (nextRole !== userItem.role) void changeRole(userItem.id, nextRole)
                               }}
-                              className="rounded-xl border border-border bg-background px-3 py-2 text-2xs text-foreground outline-none transition-colors focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                              className="rounded-xl border border-border bg-background px-3 py-2 text-2xs text-foreground outline-hidden transition-colors focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                               {!knownRole && <option value={userItem.role}>{userItem.role} (нестандартная роль)</option>}
                               {ASSIGNABLE_ROLES.map(role => (
@@ -878,7 +878,7 @@ export default function AdminPage() {
                           <button
                             onClick={() => onToggleVerification(c)}
                             disabled={busy}
-                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold shadow-sm transition disabled:cursor-not-allowed ${
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold shadow-xs transition disabled:cursor-not-allowed ${
                               c.is_verified
                                 ? 'bg-card border border-border text-muted-foreground hover:bg-accent'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -1018,7 +1018,7 @@ export default function AdminPage() {
                       </p>
                     </div>
                   ) : auditEntries.map(entry => (
-                    <div key={entry.id} className="rounded-2xl border border-border bg-background px-4 py-4 shadow-sm">
+                    <div key={entry.id} className="rounded-2xl border border-border bg-background px-4 py-4 shadow-xs">
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                         <div className="flex min-w-0 flex-1 items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-2xs font-bold pf-num text-foreground">
@@ -1092,7 +1092,7 @@ export default function AdminPage() {
               </Alert>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-border bg-background p-5 shadow-sm">
+                <div className="rounded-[24px] border border-border bg-background p-5 shadow-xs">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -1129,7 +1129,7 @@ export default function AdminPage() {
                   </button>
                 </div>
 
-                <div className="rounded-[24px] border border-border bg-background p-5 shadow-sm">
+                <div className="rounded-[24px] border border-border bg-background p-5 shadow-xs">
                   <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Подключение</div>
                   <dl className="mt-3 space-y-2 text-2sm">
                     <div className="flex items-start justify-between gap-3">
@@ -1184,7 +1184,7 @@ export default function AdminPage() {
                 onClick={() => { setInviteMode('single'); setBulkResults(null); setInviteError(null) }}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition ${
                   inviteMode === 'single'
-                    ? 'bg-card text-foreground shadow-sm'
+                    ? 'bg-card text-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -1194,7 +1194,7 @@ export default function AdminPage() {
                 onClick={() => { setInviteMode('bulk'); setInviteError(null) }}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition ${
                   inviteMode === 'bulk'
-                    ? 'bg-card text-foreground shadow-sm'
+                    ? 'bg-card text-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -1211,7 +1211,7 @@ export default function AdminPage() {
                     value={inviteEmail}
                     onChange={e => setInviteEmail(e.target.value)}
                     placeholder="newuser@example.com"
-                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                   />
                 </div>
               ) : (
@@ -1224,7 +1224,7 @@ export default function AdminPage() {
                     onChange={e => setBulkEmails(e.target.value)}
                     rows={6}
                     placeholder="coach1@example.com&#10;coach2@example.com&#10;coach3@example.com"
-                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-vertical font-mono"
+                    className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 resize-vertical font-mono"
                     style={{ minHeight: 110 }}
                   />
                   <div className="mt-1 flex items-center justify-between text-[11px]">
@@ -1245,7 +1245,7 @@ export default function AdminPage() {
                 <select
                   value={inviteRole}
                   onChange={e => setInviteRole(e.target.value as AdminInviteRole)}
-                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                 >
                   <option value="athlete">Атлет</option>
                   <option value="coach">Тренер</option>
@@ -1370,7 +1370,7 @@ export default function AdminPage() {
                   value={assignAthlete}
                   onChange={e => setAssignAthlete(e.target.value)}
                   disabled={usersLoading || athleteOptions.length === 0}
-                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="">
                     {usersLoading ? 'Загружаю…' : athleteOptions.length === 0 ? 'Атлетов в базе нет' : '— выберите атлета —'}
@@ -1386,7 +1386,7 @@ export default function AdminPage() {
                   value={assignCoach}
                   onChange={e => setAssignCoach(e.target.value)}
                   disabled={usersLoading || coachOptions.length === 0}
-                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="">
                     {usersLoading ? 'Загружаю…' : coachOptions.length === 0 ? 'Тренеров в базе нет' : '— выберите тренера —'}

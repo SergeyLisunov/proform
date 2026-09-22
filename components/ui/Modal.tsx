@@ -79,11 +79,11 @@ export function Modal({
     <div
       aria-modal="true"
       role="dialog"
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      className="fixed inset-0 z-9999 flex items-center justify-center p-4"
     >
       <div
         onClick={closeOnBackdrop ? onClose : undefined}
-        className={`absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
       />
       <div
         style={{ maxWidth }}

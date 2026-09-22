@@ -175,8 +175,8 @@ export default function TemplatesPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       {/* Header */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.12),_transparent_32%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_32%)]" />
         <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-700">
@@ -217,7 +217,7 @@ export default function TemplatesPage() {
 
       {/* Form */}
       {formOpen && (
-        <section className="rounded-[20px] border border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[20px] border border-border bg-card p-5 shadow-xs">
           <form className="grid gap-4 md:grid-cols-2" onSubmit={save}>
             <div className="md:col-span-2">
               <label className="text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Название</label>
@@ -227,7 +227,7 @@ export default function TemplatesPage() {
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 maxLength={160}
                 required
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400"
                 placeholder="Интервалы 5×1000"
               />
             </div>
@@ -236,7 +236,7 @@ export default function TemplatesPage() {
               <select
                 value={form.activity_type}
                 onChange={e => setForm(f => ({ ...f, activity_type: e.target.value }))}
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400"
               >
                 <option value="">—</option>
                 {ACTIVITY_OPTIONS.map(a => <option key={a} value={a}>{a}</option>)}
@@ -250,7 +250,7 @@ export default function TemplatesPage() {
                 onChange={e => setForm(f => ({ ...f, duration_min: e.target.value }))}
                 min={1}
                 max={600}
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400"
               />
             </div>
             <div className="md:col-span-2">
@@ -260,7 +260,7 @@ export default function TemplatesPage() {
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 rows={4}
                 maxLength={4000}
-                className="mt-1 w-full resize-y rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400"
+                className="mt-1 w-full resize-y rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400"
                 placeholder="Разминка 10 мин, 5×1000м через 2 мин отдыха, заминка 10 мин..."
               />
             </div>
@@ -269,7 +269,7 @@ export default function TemplatesPage() {
                 type="checkbox"
                 checked={form.is_public}
                 onChange={e => setForm(f => ({ ...f, is_public: e.target.checked }))}
-                className="h-4 w-4 rounded"
+                className="h-4 w-4 rounded-sm"
               />
               Опубликовать в общедоступной библиотеке
             </label>
@@ -294,7 +294,7 @@ export default function TemplatesPage() {
       )}
 
       {/* List */}
-      <section className="rounded-[20px] border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-[20px] border border-border bg-card p-5 shadow-xs">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="h-6 w-6 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
@@ -379,7 +379,7 @@ export default function TemplatesPage() {
       {/* Apply modal */}
       {applyFor && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/35 backdrop-blur-sm"
+          className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-900/35 backdrop-blur-xs"
           onClick={() => !applying && setApplyFor(null)}
         >
           <div

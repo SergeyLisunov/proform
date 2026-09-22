@@ -82,7 +82,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
   const { name, role, organization, initials, icon: Icon, quote, outcome, hue } = story
   return (
     <article
-      className="flex flex-col gap-5 rounded-3xl border-2 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-7"
+      className="flex flex-col gap-5 rounded-3xl border-2 bg-white p-6 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-7"
       style={{ borderColor: hue.ring }}
     >
       {/* Persona header */}
@@ -97,7 +97,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
           </div>
           <div
             aria-hidden="true"
-            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-white shadow-sm"
+            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-white shadow-xs"
             style={{ color: hue.text }}
           >
             <Icon size={14} strokeWidth={2.4} />

@@ -157,7 +157,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
 
   return (
     <div
-      className="rounded-xl border border-amber-100 p-4 shadow-sm h-full flex flex-col"
+      className="rounded-xl border border-amber-100 p-4 shadow-xs h-full flex flex-col"
       style={{ background: 'linear-gradient(160deg,#FFFBEB 0%,#FFFDF5 60%,#FFFFFF 100%)' }}
     >
       {/* Header */}
@@ -177,7 +177,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
         onChange={e => setTitle(e.target.value)}
         placeholder="Название (необязательно)"
         className="w-full mb-2 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground
-                   placeholder:text-muted-foreground/60 outline-none bg-background
+                   placeholder:text-muted-foreground/60 outline-hidden bg-background
                    focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all"
       />
 

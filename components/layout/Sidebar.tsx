@@ -153,7 +153,7 @@ export default function Sidebar() {
           type="button"
           aria-label="Закрыть меню"
           onClick={closeMobile}
-          className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-xs lg:hidden"
         />
       )}
       <div
@@ -183,7 +183,7 @@ export default function Sidebar() {
         type="button"
         aria-label="Закрыть меню"
         onClick={closeMobile}
-        className="lg:hidden absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:border-orange-200 hover:text-orange-600"
+        className="lg:hidden absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-xs transition-colors hover:border-orange-200 hover:text-orange-600"
       >
         <i className="ki-filled ki-cross text-base" />
       </button>
@@ -192,7 +192,7 @@ export default function Sidebar() {
         id="sidebar_header"
         style={{ height: 'auto' }}
       >
-        <Link href="/dashboard" className="flex items-center gap-3 no-underline group rounded-2xl border border-border/70 bg-background/80 px-3 py-3 shadow-sm transition-all hover:border-orange-200 hover:bg-orange-50/70">
+        <Link href="/dashboard" className="flex items-center gap-3 no-underline group rounded-2xl border border-border/70 bg-background/80 px-3 py-3 shadow-xs transition-all hover:border-orange-200 hover:bg-orange-50/70">
           <div className="min-w-0 flex-1">
             <SporteoLogo size="md" />
             <p className="mt-1.5 text-xs text-muted-foreground">Панель атлета и тренера</p>
@@ -260,7 +260,7 @@ export default function Sidebar() {
                           className={[
                             'kt-menu-link group flex min-h-[56px] items-center gap-3 rounded-2xl border-l-4 px-3 py-3 text-sm font-medium transition-all duration-150',
                             active
-                              ? 'border-l-orange-500 border-y border-r border-y-orange-100 border-r-orange-100 bg-gradient-to-r from-orange-50 via-orange-50/70 to-white text-orange-700 shadow-sm'
+                              ? 'border-l-orange-500 border-y border-r border-y-orange-100 border-r-orange-100 bg-linear-to-r from-orange-50 via-orange-50/70 to-white text-orange-700 shadow-xs'
                               : 'border-l-transparent border-y border-r border-y-transparent border-r-transparent text-foreground/75 hover:border-border hover:bg-muted/60 hover:text-foreground',
                           ].join(' ')}
                         >
@@ -275,12 +275,12 @@ export default function Sidebar() {
                             <i className={`ki-filled ${item.icon} text-[15px]`} />
                           </span>
 
-                          <span className="kt-menu-title min-w-0 flex-1 text-[15px] leading-5 break-words">
+                          <span className="kt-menu-title min-w-0 flex-1 text-[15px] leading-5 wrap-break-word">
                             {item.label}
                           </span>
 
                           {showBadge ? (
-                            <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-sm">
+                            <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-xs">
                               {badgeVal > 99 ? '99+' : badgeVal}
                             </span>
                           ) : active ? (

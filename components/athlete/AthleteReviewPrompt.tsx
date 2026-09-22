@@ -75,7 +75,7 @@ export default function AthleteReviewPrompt({
   const initial = (coachName ?? '?').charAt(0).toUpperCase()
 
   return (
-    <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4">
+    <div className="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-sm font-bold text-amber-700 overflow-hidden shrink-0">
@@ -103,7 +103,7 @@ export default function AthleteReviewPrompt({
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              className="inline-flex items-center gap-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 text-xs font-bold shadow-sm"
+              className="inline-flex items-center gap-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 text-xs font-bold shadow-xs"
             >
               <i className="ki-filled ki-star text-xs" />
               Оставить отзыв
@@ -135,7 +135,7 @@ export default function AthleteReviewPrompt({
               onChange={e => setComment(e.target.value.slice(0, 1000))}
               rows={3}
               placeholder="Чем запомнились тренировки?"
-              className="w-full rounded-xl border border-amber-200 bg-card px-3 py-2 text-sm outline-none focus:border-amber-400 resize-vertical"
+              className="w-full rounded-xl border border-amber-200 bg-card px-3 py-2 text-sm outline-hidden focus:border-amber-400 resize-vertical"
               style={{ minHeight: 70 }}
             />
             <p className="text-right text-[10px] text-muted-foreground mt-0.5">{comment.length}/1000</p>
@@ -148,7 +148,7 @@ export default function AthleteReviewPrompt({
               type="button"
               onClick={onSubmit}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white px-3 py-1.5 text-xs font-bold shadow-sm disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white px-3 py-1.5 text-xs font-bold shadow-xs disabled:cursor-not-allowed"
             >
               {saving
                 ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full pf-spin" /> Сохраняю…</>

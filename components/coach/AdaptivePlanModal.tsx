@@ -107,8 +107,8 @@ export default function AdaptivePlanModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start justify-center px-4 py-10 overflow-y-auto" onClick={onClose}>
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-60 flex items-start justify-center px-4 py-10 overflow-y-auto" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
       <div onClick={e => e.stopPropagation()}
         className="relative z-10 w-full max-w-3xl rounded-2xl bg-background shadow-2xl border border-purple-200">
 
@@ -185,7 +185,7 @@ export default function AdaptivePlanModal({
                             checked={!!picked[s.workout_id]}
                             onChange={e => setPicked(p => ({ ...p, [s.workout_id]: e.target.checked }))}
                             disabled={isKeep}
-                            className="mt-1 w-4 h-4 rounded accent-purple-600" />
+                            className="mt-1 w-4 h-4 rounded-sm accent-purple-600" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"

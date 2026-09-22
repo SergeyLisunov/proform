@@ -194,8 +194,8 @@ export default function LoadPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.14),_transparent_42%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_42%)]" />
         <div className="relative flex flex-col gap-2">
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-600">
             Нагрузка · ACWR
@@ -247,7 +247,7 @@ export default function LoadPage() {
           <WeeklyBars weekly={stats.weekly} />
 
           {/* Info block */}
-          <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+          <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
             <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               Как читать
             </div>
@@ -270,7 +270,7 @@ function TrafficLight({
 }: { acwr: number | null; acute: number | null; chronic: number | null }) {
   const zone = acwrZone(acwr)
   return (
-    <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
       <div className="flex flex-col gap-5 md:flex-row md:items-center">
         <div className="flex items-center gap-4">
           <div className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-3xl font-bold text-white ${zone.bar}`}>
@@ -294,7 +294,7 @@ function TrafficLight({
             <div className="absolute inset-y-0 left-[75%]  w-[25%] bg-rose-400" />
             {acwr !== null && (
               <div
-                className="absolute top-[-4px] h-6 w-1 rounded bg-foreground"
+                className="absolute top-[-4px] h-6 w-1 rounded-sm bg-foreground"
                 style={{ left: `${Math.min(100, Math.max(0, (acwr / 2) * 100))}%` }}
                 title={`ACWR ${acwr.toFixed(2)}`}
               />
@@ -341,15 +341,15 @@ function ChartCard({
   const barW = Math.max(2, innerW / n - 1)
 
   return (
-    <section className="rounded-[24px] border border-border bg-card p-5 shadow-sm">
+    <section className="rounded-[24px] border border-border bg-card p-5 shadow-xs">
       <div className="mb-3 flex items-center gap-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
           Нагрузка · последние {series.length} дней
         </div>
         <div className="ml-auto flex items-center gap-3 text-[11px]">
-          <span className="flex items-center gap-1"><span className="h-2 w-3 rounded bg-slate-300" /> день</span>
-          <span className="flex items-center gap-1"><span className="h-0.5 w-4 rounded bg-rose-500" /> острая 7д</span>
-          <span className="flex items-center gap-1"><span className="h-0.5 w-4 rounded bg-sky-500" /> хрон. 28д</span>
+          <span className="flex items-center gap-1"><span className="h-2 w-3 rounded-sm bg-slate-300" /> день</span>
+          <span className="flex items-center gap-1"><span className="h-0.5 w-4 rounded-sm bg-rose-500" /> острая 7д</span>
+          <span className="flex items-center gap-1"><span className="h-0.5 w-4 rounded-sm bg-sky-500" /> хрон. 28д</span>
         </div>
       </div>
       <div className="w-full overflow-x-auto">
@@ -384,7 +384,7 @@ function MetricCard({
   title, value, subtitle, zone,
 }: { title: string; value: string; subtitle?: string; zone?: Zone }) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <section className="rounded-2xl border border-border bg-card p-4 shadow-xs">
       <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{title}</div>
       <div className="mt-1 flex items-center gap-2">
         <div className={`pf-num text-2xl font-bold ${zone ? zone.text : 'text-foreground'}`}>{value}</div>
@@ -401,7 +401,7 @@ function MetricCard({
 function WeeklyBars({ weekly }: { weekly: { start: string; total: number }[] }) {
   const max = Math.max(1, ...weekly.map(w => w.total))
   return (
-    <section className="rounded-[24px] border border-border bg-card p-5 shadow-sm">
+    <section className="rounded-[24px] border border-border bg-card p-5 shadow-xs">
       <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
         Недельные объёмы
       </div>

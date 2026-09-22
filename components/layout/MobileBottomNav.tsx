@@ -76,7 +76,7 @@ export default function MobileBottomNav() {
   return (
     <nav
       aria-label="Мобильная навигация"
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur shadow-[0_-2px_12px_rgba(15,23,42,0.06)] lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm shadow-[0_-2px_12px_rgba(15,23,42,0.06)] lg:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <ul

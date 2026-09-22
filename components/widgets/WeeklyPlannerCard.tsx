@@ -112,7 +112,7 @@ export default function WeeklyPlannerCard() {
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-purple-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-purple-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-purple-100">
             <i className="ki-filled ki-calendar-tick text-[14px] text-purple-600" />
           </div>
           <div>
@@ -159,13 +159,13 @@ export default function WeeklyPlannerCard() {
                     value={goal}
                     onChange={e => setGoal(e.target.value)}
                     placeholder="напр. подготовка к полумарафону, восстановление, базовый объём"
-                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-orange-400"
+                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm text-foreground outline-hidden focus:border-orange-400"
                   />
                 </div>
                 <button
                   onClick={generate}
                   disabled={loading}
-                  className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-95 disabled:opacity-60"
+                  className="w-full rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-95 disabled:opacity-60"
                 >
                   {loading ? 'Генерирую план…' : 'Сгенерировать план'}
                 </button>

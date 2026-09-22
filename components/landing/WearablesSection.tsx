@@ -76,7 +76,7 @@ export default function WearablesSection() {
           ].map(({ icon: Icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 rounded-2xl border border-border bg-white px-4 py-3 shadow-sm"
+              className="flex items-center gap-2.5 rounded-2xl border border-border bg-white px-4 py-3 shadow-xs"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                 <Icon size={18} strokeWidth={2} />

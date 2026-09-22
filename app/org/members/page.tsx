@@ -410,7 +410,7 @@ export default function OrgMembersPage() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.15),_transparent_28%),radial-gradient(circle_at_88%_12%,_rgba(59,130,246,0.08),_transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_20px_55px_rgba(15,23,42,0.06)] sm:p-7">
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.15),transparent_28%),radial-gradient(circle_at_88%_12%,rgba(59,130,246,0.08),transparent_24%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_52%,#FFF4EC_100%)] p-6 shadow-[0_20px_55px_rgba(15,23,42,0.06)] sm:p-7">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -432,7 +432,7 @@ export default function OrgMembersPage() {
 
           <div className="flex flex-col gap-3 sm:min-w-[280px]">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-              <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-white/80 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">В выборке</div>
                 <div className="mt-2 pf-num text-2xl text-foreground">{filtered.length}</div>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
@@ -449,7 +449,7 @@ export default function OrgMembersPage() {
             </button>
             <button
               onClick={() => setShowBulkImport(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 text-sm font-bold text-blue-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 text-sm font-bold text-blue-700 shadow-xs transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
             >
               <i className="ki-filled ki-cloud-add text-sm" />
               Импорт CSV
@@ -464,7 +464,7 @@ export default function OrgMembersPage() {
             { label: 'Тренеров', value: coaches, color: '#16A34A', bg: '#F0FDF4', icon: 'ki-notepad-edit' },
             { label: 'Ожидают', value: pending, color: '#CA8A04', bg: '#FEFCE8', icon: 'ki-time' },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm">
+            <div key={s.label} className="rounded-2xl border border-border bg-white/80 p-4 shadow-xs">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="pf-num text-2xl leading-none text-foreground">{s.value}</div>
@@ -509,7 +509,7 @@ export default function OrgMembersPage() {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Поиск по имени или email…"
-                  className="w-full rounded-2xl border border-border bg-card pl-9 pr-4 py-3 text-sm outline-none transition-all focus:border-orange-400"
+                  className="w-full rounded-2xl border border-border bg-card pl-9 pr-4 py-3 text-sm outline-hidden transition-all focus:border-orange-400"
                 />
               </div>
 
@@ -526,7 +526,7 @@ export default function OrgMembersPage() {
                           className={[
                             'rounded-full border px-3.5 py-2 text-xs font-semibold transition-all',
                             active
-                              ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-sm'
+                              ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-xs'
                               : 'border-border bg-card text-muted-foreground hover:border-orange-100 hover:text-foreground',
                           ].join(' ')}
                         >
@@ -547,7 +547,7 @@ export default function OrgMembersPage() {
                           className={[
                             'rounded-full border px-3.5 py-2 text-xs font-semibold transition-all',
                             active
-                              ? 'border-blue-200 bg-blue-50 text-blue-700 shadow-sm'
+                              ? 'border-blue-200 bg-blue-50 text-blue-700 shadow-xs'
                               : 'border-border bg-card text-muted-foreground hover:border-blue-100 hover:text-foreground',
                           ].join(' ')}
                         >
@@ -569,7 +569,7 @@ export default function OrgMembersPage() {
 
       {filtered.length === 0 ? (
         <Card className="rounded-[28px] px-6 py-16 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FEF0E7)] text-orange-400 shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FEF0E7)] text-orange-400 shadow-xs">
             <i className="ki-filled ki-people text-3xl" />
           </div>
           <p className="mt-5 text-lg font-semibold text-foreground">

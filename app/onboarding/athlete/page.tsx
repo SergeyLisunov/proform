@@ -211,7 +211,7 @@ export default function AthleteOnboardingPage() {
                 className={`rounded-2xl border-2 px-4 py-3 text-sm text-left transition flex items-center gap-3 ${
                   sel ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-border bg-background hover:border-orange-200 text-foreground'
                 }`}>
-                <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+                <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
                   style={{ borderColor: sel ? ACCENT : 'var(--border)', background: sel ? ACCENT : 'transparent' }}>
                   {sel && <i className="ki-filled ki-check text-[10px] text-white" />}
                 </span>
@@ -224,7 +224,7 @@ export default function AthleteOnboardingPage() {
               goalKey === 'custom' ? 'border-orange-400 bg-orange-50' : 'border-border bg-background hover:border-orange-200'
             }`}>
             <div className="flex items-center gap-3 mb-2">
-              <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+              <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
                 style={{ borderColor: goalKey === 'custom' ? ACCENT : 'var(--border)', background: goalKey === 'custom' ? ACCENT : 'transparent' }}>
                 {goalKey === 'custom' && <i className="ki-filled ki-check text-[10px] text-white" />}
               </span>
@@ -234,7 +234,7 @@ export default function AthleteOnboardingPage() {
               <input type="text" value={goalCustom} onChange={e => setGoalCustom(e.target.value)}
                 placeholder="Например: пробежать первый триатлон до конца сезона"
                 maxLength={120}
-                className="ml-9 w-[calc(100%-2.25rem)] rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                className="ml-9 w-[calc(100%-2.25rem)] rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
             )}
           </button>
         </div>

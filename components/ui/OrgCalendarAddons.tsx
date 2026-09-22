@@ -251,8 +251,8 @@ export function OrgSessionDrawer({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
       <div onClick={e=>e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[480px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible?'translate-x-0':'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -367,7 +367,7 @@ export function OrgSessionDrawer({
               <GroupConflictWarning items={conflictsByUser} color="purple" />
               <label className="flex items-center gap-2 cursor-pointer text-[11px] text-purple-700">
                 <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-purple-300"/>
+                  className="w-3.5 h-3.5 rounded-sm border-purple-300"/>
                 <span>Всё равно назначить (я согласовал с участниками)</span>
               </label>
             </div>
@@ -377,7 +377,7 @@ export function OrgSessionDrawer({
             <div className="rounded-xl border border-border bg-muted/20 p-3">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={recurring} onChange={e => setRecurring(e.target.checked)}
-                  className="w-4 h-4 rounded border-border"/>
+                  className="w-4 h-4 rounded-sm border-border"/>
                 <span className="text-xs font-semibold text-foreground">Повторяющееся событие</span>
               </label>
               {recurring && (

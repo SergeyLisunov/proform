@@ -169,7 +169,7 @@ export default function CoachOnboardingPage() {
           <textarea value={speciality} onChange={e => setSpeciality(e.target.value)}
             placeholder="Например: тренер по бегу на длинные дистанции, опыт 8 лет, методология MAF, подготовка к марафонам"
             rows={5} maxLength={500}
-            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-green-400 resize-vertical" />
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-green-400 resize-vertical" />
           <p className="mt-1 text-[11px] text-muted-foreground">{speciality.length}/500 · мин. 5 символов</p>
         </div>
       )}
@@ -182,7 +182,7 @@ export default function CoachOnboardingPage() {
             </label>
             <input type="email" value={inviteEmail} onChange={e => { setInviteEmail(e.target.value); setSkipInvite(false); setInviteSent(false) }}
               placeholder="athlete@example.com"
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-green-400"
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-green-400"
               disabled={inviteSent} />
             {inviteSent && (
               <p className="mt-1 text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
@@ -207,7 +207,7 @@ export default function CoachOnboardingPage() {
         <div className="space-y-4">
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                 <i className="ki-filled ki-calendar-2 text-lg" />
               </div>
               <div className="flex-1 min-w-0">
@@ -226,7 +226,7 @@ export default function CoachOnboardingPage() {
 
           <div className="rounded-2xl border border-violet-200 bg-violet-50/40 p-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
                 <i className="ki-filled ki-message-question text-lg" />
               </div>
               <div className="flex-1 min-w-0">
@@ -242,7 +242,7 @@ export default function CoachOnboardingPage() {
           {/* W7 Day 34: highlight the new service builder */}
           <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
                 <i className="ki-filled ki-shop text-lg" />
               </div>
               <div className="flex-1 min-w-0">
@@ -262,7 +262,7 @@ export default function CoachOnboardingPage() {
           {/* W8 Day 38: pass-plans (multi-session subscriptions) */}
           <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                 <i className="ki-filled ki-cup text-lg" />
               </div>
               <div className="flex-1 min-w-0">

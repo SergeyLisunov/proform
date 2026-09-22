@@ -235,7 +235,7 @@ export default function CoachPassPlansPage() {
           </p>
         </div>
         <button onClick={openCreate}
-          className="rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
+          className="rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
           <i className="ki-filled ki-plus text-sm" />
           Создать абонемент
         </button>
@@ -347,9 +347,9 @@ export default function CoachPassPlansPage() {
 
       {/* Editor modal */}
       {editor && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={closeEditor}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-lg rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -367,7 +367,7 @@ export default function CoachPassPlansPage() {
                   onChange={e => setEditor({ ...editor, title: e.target.value })}
                   placeholder="Например: 10 тренировок за месяц"
                   maxLength={120}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{editor.title.length}/120</p>
               </div>
 
@@ -375,7 +375,7 @@ export default function CoachPassPlansPage() {
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Тип абонемента</label>
                 <select value={editor.service_type}
                   onChange={e => setEditor({ ...editor, service_type: e.target.value as PassServiceType })}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none focus:border-orange-400">
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm outline-hidden focus:border-orange-400">
                   {(Object.entries(PASS_SERVICE_TYPE_META) as Array<[PassServiceType, typeof PASS_SERVICE_TYPE_META[PassServiceType]]>).map(([k, v]) =>
                     <option key={k} value={k}>{v.label} — {v.hint}</option>
                   )}
@@ -388,14 +388,14 @@ export default function CoachPassPlansPage() {
                   <input type="number" value={editor.total_sessions}
                     onChange={e => setEditor({ ...editor, total_sessions: Number.parseInt(e.target.value, 10) || 0 })}
                     min={1} max={365} step={1}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 pf-num" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 pf-num" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Период (дней) *</label>
                   <input type="number" value={editor.period_days}
                     onChange={e => setEditor({ ...editor, period_days: Number.parseInt(e.target.value, 10) || 0 })}
                     min={1} max={3650} step={1}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 pf-num" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 pf-num" />
                 </div>
               </div>
 
@@ -404,7 +404,7 @@ export default function CoachPassPlansPage() {
                 <input type="number" value={editor.price_rub}
                   onChange={e => setEditor({ ...editor, price_rub: Number.parseInt(e.target.value, 10) || 0 })}
                   min={0} max={1000000} step={500}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 pf-num" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 pf-num" />
                 {editor.total_sessions > 0 && editor.price_rub > 0 && (
                   <p className="mt-1 text-[11px] text-muted-foreground">
                     ≈ {Math.round(editor.price_rub / editor.total_sessions).toLocaleString('ru-RU')} ₽/сессию
@@ -418,7 +418,7 @@ export default function CoachPassPlansPage() {
                   onChange={e => setEditor({ ...editor, description: e.target.value })}
                   rows={4} maxLength={1000}
                   placeholder="Что входит в абонемент? Формат сессий, периодичность, что получит атлет."
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 resize-vertical" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 resize-vertical" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{editor.description.length}/1000</p>
               </div>
 
@@ -428,7 +428,7 @@ export default function CoachPassPlansPage() {
                   onChange={e => setEditor({ ...editor, seller_specialty: e.target.value })}
                   placeholder="Например: марафон, плавание, силовой тренинг"
                   maxLength={120}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
               </div>
 
               {formError && (
@@ -451,7 +451,7 @@ export default function CoachPassPlansPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[99] rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg"
+        <div className="fixed bottom-6 right-6 z-99 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg"
           style={toast.ok
             ? { background: '#F0FDF4', color: '#15803D', borderColor: '#BBF7D0' }
             : { background: '#FEF2F2', color: '#B91C1C', borderColor: '#FECACA' }}>

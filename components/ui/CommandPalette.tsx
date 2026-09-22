@@ -108,7 +108,7 @@ export default function CommandPalette() {
             value={q}
             onChange={e => setQ(e.target.value)}
             placeholder="Искать страницу или действие…"
-            className="flex-1 bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-sm font-medium text-foreground outline-hidden placeholder:text-muted-foreground"
           />
           <kbd className="rounded-md border border-border bg-accent px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">ESC</kbd>
         </div>
@@ -149,12 +149,12 @@ export default function CommandPalette() {
 
         <div className="flex items-center justify-between border-t border-border px-4 py-2 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span><kbd className="rounded bg-accent px-1 font-bold">↑ ↓</kbd> навигация</span>
-            <span><kbd className="rounded bg-accent px-1 font-bold">↵</kbd> открыть</span>
+            <span><kbd className="rounded-sm bg-accent px-1 font-bold">↑ ↓</kbd> навигация</span>
+            <span><kbd className="rounded-sm bg-accent px-1 font-bold">↵</kbd> открыть</span>
           </div>
           <div className="flex items-center gap-1">
-            <kbd className="rounded bg-accent px-1 font-bold">⌘</kbd>
-            <kbd className="rounded bg-accent px-1 font-bold">K</kbd>
+            <kbd className="rounded-sm bg-accent px-1 font-bold">⌘</kbd>
+            <kbd className="rounded-sm bg-accent px-1 font-bold">K</kbd>
             <span className="ml-1">переключить</span>
           </div>
         </div>

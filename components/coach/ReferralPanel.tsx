@@ -24,10 +24,10 @@ export default function ReferralPanel({
   useEffect(() => { load() }, [load])
 
   return (
-    <div className="rounded-2xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#FEF2F2] p-5">
+    <div className="rounded-2xl border border-orange-200 bg-linear-to-br from-[#FEF0E7] via-white to-[#FEF2F2] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
             <i className="ki-filled ki-gift text-[11px]" />
             Реферальная программа
           </span>

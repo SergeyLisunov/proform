@@ -127,7 +127,7 @@ export default function CoachPassesPage() {
   return (
     <div className="pf-enter max-w-4xl mx-auto px-4 py-8 flex flex-col gap-5">
       {/* Hero */}
-      <section className="rounded-3xl border border-orange-100/80 bg-gradient-to-br from-orange-50 to-white p-6 md:p-7">
+      <section className="rounded-3xl border border-orange-100/80 bg-linear-to-br from-orange-50 to-white p-6 md:p-7">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Тренер · Абонементы</p>
@@ -217,7 +217,7 @@ export default function CoachPassesPage() {
                   <button
                     onClick={() => setConfirming(p)}
                     disabled={busy}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white px-3 py-2 text-xs font-bold shadow-sm transition disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white px-3 py-2 text-xs font-bold shadow-xs transition disabled:cursor-not-allowed"
                   >
                     {busy
                       ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full pf-spin" /> Списываю…</>
@@ -254,7 +254,7 @@ export default function CoachPassesPage() {
               </button>
               <button
                 onClick={onConfirmUseSession}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-bold shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-bold shadow-xs"
               >
                 <i className="ki-filled ki-check text-xs" />
                 Да, списать

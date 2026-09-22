@@ -85,8 +85,8 @@ export default async function OrgActivityPage() {
   return (
     <div className="mx-auto flex w-full max-w-[920px] flex-col gap-6 pf-enter">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.10),_transparent_28%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card shadow-xs">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.10),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(243,87,3,0.10),transparent_28%)]" />
         <div className="relative flex flex-col gap-3 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Организация · Лента событий</p>
@@ -167,7 +167,7 @@ export default async function OrgActivityPage() {
                   <span className="absolute left-[26px] top-12 bottom-0 w-px bg-border" />
                 )}
                 {/* Icon */}
-                <div className="relative z-10 flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
+                <div className="relative z-10 shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
                   style={{ background: m.bg, border: `2px solid ${ringColor}`, color: m.color }}>
                   <i className={`ki-filled ${m.icon} text-lg`} />
                 </div>
@@ -212,9 +212,9 @@ export default async function OrgActivityPage() {
       )}
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
-        Aggregated from <code className="rounded bg-muted px-1 py-0.5">org_members</code>,
-        <code className="rounded bg-muted px-1 py-0.5">doctor_inquiries</code>,
-        <code className="rounded bg-muted px-1 py-0.5">recommendations</code>. Окно 30 дней, лимит 50.
+        Aggregated from <code className="rounded-sm bg-muted px-1 py-0.5">org_members</code>,
+        <code className="rounded-sm bg-muted px-1 py-0.5">doctor_inquiries</code>,
+        <code className="rounded-sm bg-muted px-1 py-0.5">recommendations</code>. Окно 30 дней, лимит 50.
         Pagination + email digest — W8 candidates.
       </div>
     </div>

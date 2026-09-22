@@ -191,7 +191,7 @@ export default function ClearanceSection({ athleteId }: Props) {
             <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)}
               min={new Date().toISOString().slice(0, 10)}
               disabled={status === 'full'}
-              className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 disabled:opacity-50" />
+              className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 disabled:opacity-50" />
             <p className="mt-1 text-[10px] text-muted-foreground">
               {status === 'full' ? 'Для full срок не задаётся (бессрочно)' : 'По умолчанию +30 дней'}
             </p>
@@ -203,7 +203,7 @@ export default function ClearanceSection({ athleteId }: Props) {
             <input type="text" value={note} onChange={(e) => setNote(e.target.value)}
               maxLength={500}
               placeholder="Без прыжков, без HIIT"
-              className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+              className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
             <p className="mt-1 text-[10px] text-muted-foreground">
               Видна тренеру. <strong>Без диагноза</strong> — только функциональные ограничения.
             </p>

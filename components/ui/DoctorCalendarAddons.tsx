@@ -68,7 +68,7 @@ export function DoctorPatientsPanel({
             <button
               key={r.athlete_id}
               onClick={() => onPickPatient(r.athlete_id, r.athlete_name)}
-              className="flex flex-col gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm hover:border-red-200"
+              className="flex flex-col gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xs hover:border-red-200"
             >
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-semibold text-[11px]">
@@ -179,8 +179,8 @@ export function MedicalCheckupDrawer({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
       <div onClick={e=>e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[460px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible?'translate-x-0':'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -267,7 +267,7 @@ export function MedicalCheckupDrawer({
               <ConflictWarning conflicts={conflicts} color="red" />
               <label className="flex items-center gap-2 cursor-pointer text-[11px] text-red-700">
                 <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-red-300"/>
+                  className="w-3.5 h-3.5 rounded-sm border-red-300"/>
                 <span>Всё равно назначить осмотр</span>
               </label>
             </div>

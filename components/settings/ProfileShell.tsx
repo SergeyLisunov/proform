@@ -98,7 +98,7 @@ export function ProfileShell(props: {
               onClick={() => props.onTabChange(t.id)}
               className={`flex flex-1 min-w-[120px] items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition sm:min-w-[140px] sm:px-4 ${
                 active
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
               style={active ? { color: t.color } : undefined}
@@ -111,7 +111,7 @@ export function ProfileShell(props: {
       </div>
 
       {/* Avatar block */}
-      <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+      <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
         <div className="mb-4 flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50">
             <i className="ki-filled ki-picture text-base text-orange-500" />
@@ -173,7 +173,7 @@ export function ProfileShell(props: {
       {props.children}
 
       {/* Save bar */}
-      <div className="sticky bottom-4 z-30 flex items-center justify-between rounded-2xl border border-border bg-card/90 px-4 py-3 shadow-lg backdrop-blur">
+      <div className="sticky bottom-4 z-30 flex items-center justify-between rounded-2xl border border-border bg-card/90 px-4 py-3 shadow-lg backdrop-blur-sm">
         <div className="text-xs text-muted-foreground">
           {props.saveError ? (
             <span className="text-red-600">{props.saveError}</span>
@@ -210,7 +210,7 @@ export function FormSection({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
       <div className="mb-5 flex items-center gap-2">
         <div
           className="flex h-8 w-8 items-center justify-center rounded-xl"
@@ -245,7 +245,7 @@ export function Field(props: {
 }
 
 export const inputClass =
-  'w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100'
+  'w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-hidden transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100'
 
 export function TextInput(props: {
   value: string

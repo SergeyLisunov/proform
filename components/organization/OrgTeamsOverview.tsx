@@ -32,7 +32,7 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
         <p className="text-sm font-bold mb-3">Загрузка команд…</p>
         <div className="grid grid-cols-2 gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 bg-muted rounded animate-pulse" />
+            <div key={i} className="h-20 bg-muted rounded-sm animate-pulse" />
           ))}
         </div>
       </Card>
@@ -84,12 +84,12 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {ageRange && (
-                  <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
+                  <Badge variant="warning" size="sm" className="rounded-full! uppercase tracking-wider">
                     {ageRange}
                   </Badge>
                 )}
                 {lvl && (
-                  <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
+                  <span className="rounded-full px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
                     style={{ background: lvl.bg, color: lvl.color, border: `1px solid ${lvl.border}` }}>
                     {lvl.label}
                   </span>

@@ -153,7 +153,7 @@ export default async function ParentSchedulePage() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <header className="rounded-[28px] border border-orange-100 bg-[linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_50%,#FFF4EC_100%)] p-7 shadow-sm">
+      <header className="rounded-[28px] border border-orange-100 bg-[linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_50%,#FFF4EC_100%)] p-7 shadow-xs">
         <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Кабинет родителя</p>
         <h1 className="mt-2 text-[clamp(1.75rem,3vw,2.5rem)] font-semibold tracking-tight text-navy-500">
           Расписание · 4 недели
@@ -167,7 +167,7 @@ export default async function ParentSchedulePage() {
 
       {days.length === 0 ? (
         <Card className="rounded-[28px] p-12 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-400 shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-400 shadow-xs">
             <i className="ki-filled ki-calendar text-3xl" />
           </div>
           <h2 className="mt-5 text-lg font-semibold text-foreground">Ближайших событий нет</h2>

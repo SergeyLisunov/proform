@@ -68,7 +68,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
     return (
       <Alert variant="primary" title="Паспорт атлета" icon="ki-information-2">
         <p>
-          Чтобы получить публичную ссылку <code className="font-mono bg-white px-1 rounded">/p/nickname</code>,
+          Чтобы получить публичную ссылку <code className="font-mono bg-white px-1 rounded-sm">/p/nickname</code>,
           задайте никнейм в настройках.
         </p>
         <Link href="/settings" className="mt-3 inline-block text-sm font-semibold text-orange-600 hover:underline">
@@ -79,7 +79,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-gradient-to-br from-orange-50 via-white to-blue-50 p-5">
+    <div className="rounded-2xl border border-border bg-linear-to-br from-orange-50 via-white to-blue-50 p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
@@ -129,7 +129,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
           <label className="mt-3 flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={workoutsPublic ?? false} disabled={saving}
               onChange={e => toggleWorkouts(e.target.checked)}
-              className="w-4 h-4 rounded border-border accent-orange-500" />
+              className="w-4 h-4 rounded-sm border-border accent-orange-500" />
             <span className="text-[12px] text-foreground">
               Показывать последние тренировки и статистику за 90 дней
             </span>

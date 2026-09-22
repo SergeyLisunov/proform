@@ -27,10 +27,10 @@ export default function PassportShareBar({
 
   return (
     <div className="mx-auto max-w-5xl px-5 -mt-4">
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-slate-200 bg-white shadow-xs px-4 py-2.5">
         <div className="flex items-center gap-2 text-xs text-slate-500 min-w-0">
           <i className="ki-filled ki-paper-clip hidden sm:inline text-sm" />
-          <code className="font-mono text-[11px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded truncate max-w-[320px]">
+          <code className="font-mono text-[11px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-sm truncate max-w-[320px]">
             {url}
           </code>
         </div>

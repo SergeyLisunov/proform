@@ -125,7 +125,7 @@ export default function AthleteDashboardPage() {
   return (
     <div className="pf-enter max-w-5xl mx-auto px-4 py-8 flex flex-col gap-5">
       {/* Greeting hero */}
-      <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.08),_transparent_30%),linear-gradient(135deg,#FEF0E7_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
+      <section className="rounded-3xl border border-orange-200 bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.08),transparent_30%),linear-gradient(135deg,#FEF0E7_0%,#FFFFFF_50%,#FFFBEB_100%)] p-6">
         <p className="text-2xs font-bold uppercase tracking-[0.22em] text-orange-700 mb-1">{todayStr}</p>
         <h1 className="text-3xl md:text-4xl font-bold text-navy-500 tracking-tight">
           Привет, {name ?? 'атлет'}

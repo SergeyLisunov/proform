@@ -101,8 +101,8 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i} className="p-5 animate-pulse rounded-2xl">
-            <div className="h-3 w-2/3 bg-muted rounded mb-3" />
-            <div className="h-8 w-1/2 bg-muted rounded" />
+            <div className="h-3 w-2/3 bg-muted rounded-sm mb-3" />
+            <div className="h-8 w-1/2 bg-muted rounded-sm" />
           </Card>
         ))}
       </div>

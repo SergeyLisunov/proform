@@ -108,7 +108,7 @@ export default function AthletePassesPage() {
   return (
     <div className="pf-enter max-w-4xl mx-auto px-4 py-8 flex flex-col gap-5">
       {/* Hero */}
-      <section className="rounded-3xl border border-orange-100/80 bg-gradient-to-br from-orange-50 to-white p-6 md:p-7">
+      <section className="rounded-3xl border border-orange-100/80 bg-linear-to-br from-orange-50 to-white p-6 md:p-7">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Атлет · Абонементы</p>

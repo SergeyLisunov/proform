@@ -69,7 +69,7 @@ export default function AnomalyAlertCard() {
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-rose-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-rose-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-rose-100">
             <i className="ki-filled ki-shield-tick text-[14px] text-rose-600" />
           </div>
           <div>
@@ -105,8 +105,8 @@ export default function AnomalyAlertCard() {
           <p className="text-xs text-red-600">Не удалось получить отчёт. <button onClick={load} className="underline">Повторить</button></p>
         ) : loading && !data ? (
           <div className="space-y-2">
-            <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
-            <div className="h-10 w-full animate-pulse rounded bg-muted" />
+            <div className="h-3 w-5/6 animate-pulse rounded-sm bg-muted" />
+            <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
           </div>
         ) : data ? (
           <div className="space-y-3">
@@ -132,7 +132,7 @@ export default function AnomalyAlertCard() {
                         <div className="flex items-center gap-2">
                           <span className="truncate text-sm font-bold text-foreground">{a.title}</span>
                           <span
-                            className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
+                            className="rounded-full px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
                             style={{ background: sev.bg, color: sev.text }}
                           >
                             {a.severity}

@@ -210,7 +210,7 @@ export default function OfferingDetailPage() {
 
       <div>
         <button onClick={buy} disabled={busy}
-          className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 text-base font-bold shadow-md disabled:opacity-50 transition">
+          className="w-full rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 text-base font-bold shadow-md disabled:opacity-50 transition">
           {busy ? 'Открываем оплату…' : `Купить за ${fmtPrice(offering.price_cents, offering.currency)}`}
         </button>
         <p className="mt-2 text-center text-[11px] text-muted-foreground">

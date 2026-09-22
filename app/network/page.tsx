@@ -183,13 +183,13 @@ function PeopleSearch({ myRole }: { myRole: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-sm">
+      <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
         <i className="ki-filled ki-magnifier text-muted-foreground" />
         <input
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder="Имя, @никнейм…"
-          className="flex-1 bg-transparent text-sm outline-none"
+          className="flex-1 bg-transparent text-sm outline-hidden"
         />
         {q && <button onClick={() => setQ('')} className="text-xs text-muted-foreground hover:text-foreground">×</button>}
       </div>
@@ -234,7 +234,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
                   <button
                     onClick={() => invite(u)}
                     disabled={busy === u.id}
-                    className="rounded-lg bg-gradient-to-r from-[#F35703] to-[#D44A02] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                    className="rounded-lg bg-linear-to-r from-[#F35703] to-[#D44A02] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
                   >
                     {busy === u.id ? '…' : 'Пригласить'}
                   </button>
@@ -275,13 +275,13 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
           <i className="ki-filled ki-magnifier text-muted-foreground" />
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder={type === 'organization' ? 'Название, вид спорта…' : 'Имя, специализация…'} className="flex-1 bg-transparent text-sm outline-none" />
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder={type === 'organization' ? 'Название, вид спорта…' : 'Имя, специализация…'} className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
           <i className="ki-filled ki-map text-muted-foreground" />
-          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Город" className="flex-1 bg-transparent text-sm outline-none" />
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="Город" className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
       </div>
 
@@ -501,10 +501,10 @@ function NetworkPageInner() {
 
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
-      <div className="relative overflow-hidden rounded-3xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-orange-200 bg-linear-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
             <i className="ki-filled ki-people text-[11px]" />
             Сеть
           </span>
@@ -524,7 +524,7 @@ function NetworkPageInner() {
         </PillButton>
         <button
           onClick={() => setInviteOpen(true)}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
         >
           <i className="ki-filled ki-sms text-xs"/>
           Пригласить по email

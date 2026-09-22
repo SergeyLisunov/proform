@@ -18,7 +18,7 @@ interface AthleteDiscoverCTAProps {
 export default function AthleteDiscoverCTA({ hasNoConnections }: AthleteDiscoverCTAProps) {
   if (!hasNoConnections) return null
   return (
-    <section className="rounded-3xl border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-white p-5 md:p-6">
+    <section className="rounded-3xl border-2 border-dashed border-orange-200 bg-linear-to-br from-orange-50 to-white p-5 md:p-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex-1 min-w-0">
           <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700 mb-1">Старт</p>
@@ -31,7 +31,7 @@ export default function AthleteDiscoverCTA({ hasNoConnections }: AthleteDiscover
         <div className="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
           <Link
             href="/marketplace?verified=1&sort=rating_desc"
-            className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-sm no-underline"
+            className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-xs no-underline"
           >
             <i className="ki-filled ki-verify text-sm" />
             Verified тренеры

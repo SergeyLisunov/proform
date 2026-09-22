@@ -85,7 +85,7 @@ function getInitials(name: string) {
 
 function Surface({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-xs ${className}`}>
       {children}
     </div>
   )
@@ -128,7 +128,7 @@ function StatTile({
   tone: string
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-sm">
+    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
@@ -166,8 +166,8 @@ function AthleteCard({
       className={[
         'group w-full rounded-[24px] border p-4 text-left transition-all',
         selected
-          ? 'border-orange-300 bg-orange-50/50 shadow-sm shadow-orange-100'
-          : 'border-border bg-card hover:border-orange-200 hover:bg-orange-50/30 hover:shadow-sm',
+          ? 'border-orange-300 bg-orange-50/50 shadow-xs shadow-orange-100'
+          : 'border-border bg-card hover:border-orange-200 hover:bg-orange-50/30 hover:shadow-xs',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">
@@ -358,7 +358,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             </div>
           </div>
 
-          <div className="flex min-w-[240px] items-center gap-4 rounded-3xl border border-border bg-card px-4 py-3 shadow-sm">
+          <div className="flex min-w-[240px] items-center gap-4 rounded-3xl border border-border bg-card px-4 py-3 shadow-xs">
             <RecoveryRing score={athlete.recovery} size={88} />
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Сигнал тренера</p>
@@ -421,7 +421,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
       </div>
 
       <div className="border-b border-border bg-background/40 px-4 py-3 md:px-6">
-        <div className="flex flex-wrap gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm">
+        <div className="flex flex-wrap gap-2 rounded-2xl border border-border bg-card p-2 shadow-xs">
           {tabs.map((item) => (
             <button
               key={item.id}
@@ -430,7 +430,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               className={[
                 'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-2sm font-semibold transition-all',
                 tab === item.id
-                  ? 'bg-orange-50 text-orange-600 shadow-sm'
+                  ? 'bg-orange-50 text-orange-600 shadow-xs'
                   : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
               ].join(' ')}
             >
@@ -456,7 +456,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             </div>
 
             <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-              <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
+              <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-xs">
                 <SectionHeader
                   eyebrow="Заметки тренера"
                   title="Что делать дальше"
@@ -480,7 +480,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-sm">
+              <div className="rounded-[24px] border border-border bg-background/75 p-4 shadow-xs">
                 <SectionHeader
                   eyebrow="Карта риска"
                   title="Сигналы для наблюдения"
@@ -551,7 +551,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 <p className="text-sm text-muted-foreground">Тренировок пока нет</p>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-[24px] border border-border bg-background/75 shadow-sm">
+              <div className="overflow-hidden rounded-[24px] border border-border bg-background/75 shadow-xs">
                 {athlete.recentWorkouts.slice(0, 8).map((w, index) => {
                   const strain = w.activity_strain ?? 0
                   const rc = w.recovery_score != null ? recoveryColor(Math.round(w.recovery_score)) : '#94A3B8'
@@ -657,7 +657,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               {Object.entries(COACH_MARKS).map(([key, mark]) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between gap-3 rounded-[24px] border px-4 py-3 shadow-sm"
+                  className="flex items-center justify-between gap-3 rounded-[24px] border px-4 py-3 shadow-xs"
                   style={{ background: mark.bg, borderColor: `${mark.text}30` }}
                 >
                   <div className="min-w-0">
@@ -708,7 +708,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   value={cTitle}
                   onChange={e => setCTitle(e.target.value.slice(0, 120))}
                   placeholder="Короткий заголовок…"
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                 />
               </div>
               <div>
@@ -718,7 +718,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   onChange={e => setCNote(e.target.value.slice(0, 2000))}
                   rows={5}
                   placeholder="Что вы заметили? Что важно зафиксировать…"
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-vertical"
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 resize-vertical"
                   style={{ minHeight: 100 }}
                 />
                 <p className="mt-1 text-right text-[10px] text-muted-foreground">{cNote.length}/2000</p>
@@ -951,7 +951,7 @@ export default function AthletesPage() {
               { label: 'Готовы сейчас', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
               { label: 'Сессии', value: totalSessions, icon: 'ki-calendar', tone: 'bg-slate-50 text-slate-600' },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border bg-background/75 p-4 shadow-sm">
+              <div key={item.label} className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="pf-num text-2xl leading-none text-foreground">{item.value}</div>
@@ -1120,7 +1120,7 @@ export default function AthletesPage() {
       </div>
 
       {selectedAthlete && (
-        <div className="rounded-[24px] border border-border bg-card px-5 py-4 text-2sm text-muted-foreground shadow-sm">
+        <div className="rounded-[24px] border border-border bg-card px-5 py-4 text-2sm text-muted-foreground shadow-xs">
           Выберите атлета из списка, оцените готовность, а затем поставьте метку или оставьте заметку из detail-панели.
           <span className="ml-1 font-semibold text-foreground">Текущий фокус:</span>
           <span className="ml-1" style={{ color: selectedTone }}>

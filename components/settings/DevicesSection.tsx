@@ -72,7 +72,7 @@ export default function DevicesSection() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 via-white to-orange-50 p-5">
+      <div className="rounded-2xl border border-purple-200 bg-linear-to-br from-purple-50 via-white to-orange-50 p-5">
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-purple-700">
@@ -110,7 +110,7 @@ export default function DevicesSection() {
           const isPrimary   = !!conn?.is_primary && isConnected
           return (
             <div key={meta.id}
-              className="kt-card rounded-2xl border bg-card p-4 flex flex-col gap-3 transition-all hover:shadow-sm"
+              className="kt-card rounded-2xl border bg-card p-4 flex flex-col gap-3 transition-all hover:shadow-xs"
               style={{ borderColor: isPrimary ? meta.brandColor : meta.border }}>
               <div className="flex items-start gap-3">
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"

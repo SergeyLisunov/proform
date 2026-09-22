@@ -59,7 +59,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
           const isActive = i.status === 'active'
           return (
             <Link key={i.id} href="/injuries"
-              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-[12px] hover:shadow-sm transition-shadow ${
+              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-[12px] hover:shadow-xs transition-shadow ${
                 isActive ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'
               }`}>
               <span className={`inline-flex items-center ${isActive ? 'text-red-600' : 'text-orange-600'}`}>
@@ -79,7 +79,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
           const expires = p.expires_at ? new Date(p.expires_at + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : '—'
           return (
             <Link key={p.id} href="/calendar"
-              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-[12px] hover:shadow-sm transition-shadow">
+              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-[12px] hover:shadow-xs transition-shadow">
               <span className="inline-flex items-center text-purple-600"><i className="ki-filled ki-time text-[13px]" /></span>
               <span>
                 <strong className="text-foreground">{p.title ?? 'Абонемент'}</strong>

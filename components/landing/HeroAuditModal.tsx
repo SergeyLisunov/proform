@@ -105,7 +105,7 @@ export default function HeroAuditModal({
         ref={dialogRef}
         onClick={handleBackdropClick}
         aria-labelledby="audit-modal-title"
-        className="w-full max-w-2xl rounded-3xl border border-border bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm"
+        className="w-full max-w-2xl rounded-3xl border border-border bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs"
       >
         {/* Modal header */}
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-white px-6 py-4 sm:px-8">

@@ -34,7 +34,7 @@ export function SporteoLogo({ size = 'md', iconOnly = false, onDark = false, cla
     return (
       <span className={`inline-flex items-center gap-2 ${className}`} aria-label="Sporteo">
         <img src="/sporteo-mark.png" alt="" width={markW} height={h} className="inline-block align-middle" />
-        <span className="font-extrabold leading-none tracking-[0.05em] text-white" style={{ fontSize: Math.round(h * 0.66) }}>
+        <span className="font-extrabold leading-none tracking-wider text-white" style={{ fontSize: Math.round(h * 0.66) }}>
           SPORTEO
         </span>
       </span>

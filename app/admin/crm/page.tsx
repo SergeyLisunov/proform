@@ -333,7 +333,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
               <div>
                 <textarea value={note} onChange={e => setNote(e.target.value)} rows={3}
                   placeholder="Заметка по пользователю…"
-                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400 resize-none" />
+                  className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 resize-none" />
                 <button onClick={addNote} disabled={!note.trim() || savingNote} className="kt-btn kt-btn-primary mt-2 gap-2">
                   <i className="ki-filled ki-plus text-xs" />{savingNote ? 'Сохранение…' : 'Добавить заметку'}
                 </button>
@@ -480,7 +480,7 @@ export default function AdminCRMPage() {
         <div style={{ position: 'relative', flex: '1', minWidth: 200, maxWidth: 320 }}>
           <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по имени или email…"
-            className="w-full rounded-xl border border-input text-sm outline-none bg-card focus:border-orange-400"
+            className="w-full rounded-xl border border-input text-sm outline-hidden bg-card focus:border-orange-400"
             style={{ padding: '10px 12px 10px 34px' }} />
         </div>
 
@@ -496,7 +496,7 @@ export default function AdminCRMPage() {
 
         {/* Role filter */}
         <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
-          className="rounded-xl border border-input text-sm outline-none bg-card px-3 py-2 focus:border-orange-400">
+          className="rounded-xl border border-input text-sm outline-hidden bg-card px-3 py-2 focus:border-orange-400">
           <option value="all">Все роли</option>
           <option value="athlete">Атлеты</option>
           <option value="coach">Тренеры</option>
@@ -506,7 +506,7 @@ export default function AdminCRMPage() {
 
         {/* Plan filter */}
         <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-          className="rounded-xl border border-input text-sm outline-none bg-card px-3 py-2 focus:border-orange-400">
+          className="rounded-xl border border-input text-sm outline-hidden bg-card px-3 py-2 focus:border-orange-400">
           <option value="all">Все планы</option>
           <option value="free">Free</option>
           <option value="pro">Pro</option>

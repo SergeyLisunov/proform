@@ -141,7 +141,7 @@ export default function OrgHealthPage() {
       </div>
 
       {/* Hero */}
-      <section className="rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 md:p-7">
+      <section className="rounded-3xl border border-blue-100 bg-linear-to-br from-blue-50 to-white p-6 md:p-7">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-blue-700 mb-1">Снимок здоровья</p>
@@ -157,7 +157,7 @@ export default function OrgHealthPage() {
           <div className="flex flex-col sm:flex-row gap-2 print-hide">
             <button
               onClick={onShare}
-              className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-sm"
+              className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-xs"
               title="Скопировать ссылку — recipient видит ту же страницу, если у него доступ к организации"
             >
               <i className="ki-filled ki-copy text-sm" />

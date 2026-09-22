@@ -169,7 +169,7 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
                 </div>
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
                   <span>{SESSION_TYPE_LABELS[nextGroup.session_type]} · {nextGroup.session_date}</span>
-                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold ${attLabel[nextGroup.my_attendance].cls}`}>
+                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-semibold ${attLabel[nextGroup.my_attendance].cls}`}>
                     {attLabel[nextGroup.my_attendance].node}
                   </span>
                 </div>

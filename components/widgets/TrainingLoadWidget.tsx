@@ -90,7 +90,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-sky-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-sky-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-sky-100">
             <i className="ki-filled ki-chart-line-up text-[14px] text-sky-600" />
           </div>
           <div>
@@ -103,8 +103,8 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
       <div className="p-5 space-y-4">
         {loading ? (
           <div className="space-y-2">
-            <div className="h-10 w-full animate-pulse rounded bg-muted" />
-            <div className="h-10 w-full animate-pulse rounded bg-muted" />
+            <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
+            <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
           </div>
         ) : (
           <>

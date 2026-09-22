@@ -32,7 +32,7 @@ function enumerateDays(from: string, to: string): string[] {
 
 function SurfaceFrame({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-xs ${className}`}>
       {children}
     </div>
   )
@@ -498,7 +498,7 @@ function CyclesContent() {
               <button
                 key={c.id}
                 onClick={() => setDrawer(c)}
-                className="group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+                className="group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-xs"
                 style={{ background: cc.bg, borderColor: cc.border }}
               >
                 <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl" style={{ background: cc.text + '20', border: `1px solid ${cc.border}` }}>
@@ -529,7 +529,7 @@ function CyclesContent() {
     <div className="flex flex-col gap-5 pf-enter">
       {/* Header */}
       <SurfaceFrame>
-        <div className="bg-gradient-to-br from-emerald-50 via-background to-background px-5 py-5 md:px-6">
+        <div className="bg-linear-to-br from-emerald-50 via-background to-background px-5 py-5 md:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex-1 min-w-0">
               <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">

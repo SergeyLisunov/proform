@@ -305,7 +305,7 @@ export default function NotesPage() {
                 value={searchInput}
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder="Поиск заметок…"
-                className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
             </div>
           </div>
@@ -371,13 +371,13 @@ export default function NotesPage() {
                   value={editTitle}
                   onChange={e => setEditTitle(e.target.value)}
                   placeholder="Заголовок (необязательно)"
-                  className="flex-1 text-base font-semibold text-foreground bg-transparent outline-none placeholder:text-muted-foreground/50"
+                  className="flex-1 text-base font-semibold text-foreground bg-transparent outline-hidden placeholder:text-muted-foreground/50"
                 />
                 <input
                   type="date"
                   value={editDate}
                   onChange={e => setEditDate(e.target.value)}
-                  className="text-xs text-muted-foreground border border-border rounded-md px-2 py-1 outline-none focus:border-orange-400"
+                  className="text-xs text-muted-foreground border border-border rounded-md px-2 py-1 outline-hidden focus:border-orange-400"
                 />
               </div>
 

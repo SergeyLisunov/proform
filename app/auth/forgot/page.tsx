@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
   return (
     <main
       id="main-content"
-      className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10"
+      className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.14),transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10"
     >
       <div className="mx-auto flex w-full max-w-[480px] flex-col gap-6">
         {/* Top bar: back-to-login + logo */}
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage() {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="you@example.com"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                     />
                   </div>
                 </div>

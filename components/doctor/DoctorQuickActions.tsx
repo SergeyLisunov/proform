@@ -59,7 +59,7 @@ export default function DoctorQuickActions() {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
       {ACTIONS.map(a => (
         <Link key={a.label} href={a.href}
-          className="group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm flex items-center gap-3"
+          className="group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-xs flex items-center gap-3"
           style={{ borderColor: a.border }}>
           <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: a.bg, color: a.color }}>

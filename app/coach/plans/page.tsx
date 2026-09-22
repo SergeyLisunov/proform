@@ -77,7 +77,7 @@ export default function CoachPlansPage() {
           </p>
         </div>
         <Link href="/coach/plans/new"
-          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md no-underline">
+          className="inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md no-underline">
           <i className="ki-filled ki-plus text-sm" />
           Создать план
         </Link>
