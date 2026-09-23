@@ -202,7 +202,7 @@ export default function ChannelsPage() {
                 onChange={e => setDraft(e.target.value)}
                 rows={2}
                 placeholder="Написать в канал…"
-                className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400"
+                className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400"
               />
               <button
                 onClick={send}

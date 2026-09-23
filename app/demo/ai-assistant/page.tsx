@@ -110,7 +110,7 @@ export default function DemoAssistantPage() {
             onClick={() => { setRole(r.key); setMessages([]); setError(null) }}
             className={`rounded-2xl border p-3 text-left transition ${
               role === r.key
-                ? 'border-orange-400 bg-orange-50 shadow-sm'
+                ? 'border-orange-400 bg-orange-50 shadow-xs'
                 : 'border-border bg-card hover:border-orange-200'
             }`}>
             <i className={`ki-filled ${r.icon} text-lg ${role === r.key ? 'text-orange-500' : 'text-muted-foreground'}`} />
@@ -186,7 +186,7 @@ export default function DemoAssistantPage() {
                     placeholder="Свой вопрос (демо-данные)…"
                     rows={1}
                     maxLength={300}
-                    className="max-h-24 flex-1 resize-none rounded-xl border border-input bg-card px-3 py-2 text-sm outline-none focus:border-orange-400"
+                    className="max-h-24 flex-1 resize-none rounded-xl border border-input bg-card px-3 py-2 text-sm outline-hidden focus:border-orange-400"
                   />
                   <button onClick={() => send(input)} disabled={loading || !input.trim()}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-40">

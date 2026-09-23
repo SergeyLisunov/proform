@@ -128,7 +128,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
   if (loading) {
     return (
       <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-5 w-40 animate-pulse rounded bg-slate-100 mb-3" />
+        <div className="h-5 w-40 animate-pulse rounded-sm bg-slate-100 mb-3" />
         <div className="space-y-2">
           {[0, 1, 2].map(i => <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-50" />)}
         </div>

@@ -308,7 +308,7 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
                 type="url" value={f.value}
                 onChange={e => f.set(e.target.value)}
                 placeholder={f.placeholder}
-                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm bg-background text-foreground outline-none focus:border-orange-400 transition-colors"
+                className="w-full rounded-xl border border-input px-3 py-2.5 text-sm bg-background text-foreground outline-hidden focus:border-orange-400 transition-colors"
               />
             </div>
           ))}
@@ -396,7 +396,7 @@ function TrainingWidget({
       {/* Header — без ссылок и кнопки */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-orange-100/80 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-orange-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-orange-100">
             <i className="ki-filled ki-abstract-26 text-[14px] text-orange-500" />
           </div>
           <h3 className="text-sm font-bold text-navy-500">Тренировки</h3>
@@ -555,7 +555,7 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
         <span className="min-w-0 flex-1 text-base font-extrabold leading-none text-foreground truncate">
           Добавить тренировку
         </span>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-sm transition-transform group-hover:translate-x-1">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-xs transition-transform group-hover:translate-x-1">
           <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
         </div>
       </div>
@@ -729,7 +729,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
     <div className="flex flex-col gap-6 pf-enter">
 
       {/* ── Hero ── */}
-      <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-xs">
         {/* Gradient banner */}
         <div style={{
           background: 'linear-gradient(135deg,#FEF0E7 0%,#FFFBF5 60%,#F0F9FF 100%)',

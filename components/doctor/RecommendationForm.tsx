@@ -92,8 +92,8 @@ export default function RecommendationForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto" onClick={onClose}>
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
       <div onClick={e => e.stopPropagation()}
         className="relative z-10 w-full max-w-xl rounded-2xl bg-background shadow-2xl border border-border">
 
@@ -116,7 +116,7 @@ export default function RecommendationForm({
               onChange={e => setTitle(e.target.value)}
               placeholder="Например: «Без прыжков 2 недели»"
               maxLength={120}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-none" />
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-hidden" />
           </div>
 
           {/* Category */}
@@ -194,7 +194,7 @@ export default function RecommendationForm({
               value={validUntil}
               onChange={e => setValidUntil(e.target.value)}
               min={new Date().toISOString().slice(0, 10)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-none" />
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-hidden" />
             <p className="mt-1 text-[11px] text-muted-foreground">
               Если оставить пустым, рекомендация будет действовать бессрочно. По истечении срока статус автоматически меняется на «Истекло».
             </p>
@@ -209,13 +209,13 @@ export default function RecommendationForm({
               rows={4}
               maxLength={4000}
               placeholder="Опишите подробности — причину ограничения, рекомендации тренеру по корректировке плана и т.д."
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-none" />
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-rose-400 outline-hidden" />
           </div>
 
           {/* Save as draft */}
           <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-border bg-muted/20 px-3 py-2.5">
             <input type="checkbox" checked={saveAsDraft} onChange={e => setSaveAsDraft(e.target.checked)}
-              className="w-4 h-4 rounded border-border accent-rose-500" />
+              className="w-4 h-4 rounded-sm border-border accent-rose-500" />
             <div className="flex-1">
               <div className="text-sm font-semibold text-foreground">Сохранить как черновик</div>
               <div className="text-[11px] text-muted-foreground">Получатели не получат уведомление, пока вы не отправите.</div>

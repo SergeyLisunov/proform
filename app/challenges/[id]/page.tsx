@@ -151,8 +151,8 @@ export default function ChallengeDetailPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.14),_transparent_40%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_40%)]" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-700">
@@ -206,7 +206,7 @@ export default function ChallengeDetailPage() {
       </section>
 
       {/* Leaderboard */}
-      <section className="rounded-[20px] border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-[20px] border border-border bg-card p-5 shadow-xs">
         <div className="mb-3 flex items-center justify-between">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Лидерборд</div>

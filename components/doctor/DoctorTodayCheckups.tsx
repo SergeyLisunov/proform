@@ -106,7 +106,7 @@ export default function DoctorTodayCheckups({ doctorId }: { doctorId: string }) 
   const dates = Object.keys(byDate).sort()
 
   return (
-    <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50/60 to-white p-5">
+    <div className="rounded-2xl border border-red-200 bg-linear-to-br from-red-50/60 to-white p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-700">Расписание</p>

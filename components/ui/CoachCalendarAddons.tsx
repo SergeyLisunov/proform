@@ -106,7 +106,7 @@ export function CoachAthletesPanel({
               <button
                 key={r.athlete_id}
                 onClick={() => onPickAthlete(r.athlete_id, r.athlete_name)}
-                className="flex flex-col gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm hover:border-orange-200"
+                className="flex flex-col gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xs hover:border-orange-200"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-semibold text-[11px]">
@@ -236,8 +236,8 @@ export function CoachSessionDrawer({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
       <div
         onClick={(e) => e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[440px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible?'translate-x-0':'translate-x-full'}`}
@@ -314,7 +314,7 @@ export function CoachSessionDrawer({
               <ConflictWarning conflicts={conflicts} color="orange" />
               <label className="flex items-center gap-2 cursor-pointer text-[11px] text-orange-700">
                 <input type="checkbox" checked={ackConflicts} onChange={e => setAckConflicts(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-orange-300"/>
+                  className="w-3.5 h-3.5 rounded-sm border-orange-300"/>
                 <span>Всё равно назначить (я согласовал с атлетом)</span>
               </label>
             </div>
@@ -411,8 +411,8 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
       <div onClick={e=>e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[480px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible?'translate-x-0':'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -610,8 +610,8 @@ export function IssuePassDrawer({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible?'opacity-100':'opacity-0'}`}/>
       <div onClick={e=>e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[480px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible?'translate-x-0':'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -689,7 +689,7 @@ export function IssuePassDrawer({
           <div className="rounded-xl border border-border bg-muted/20 p-3">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={autoSchedule} onChange={e => setAutoSchedule(e.target.checked)}
-                className="w-4 h-4 rounded border-border"/>
+                className="w-4 h-4 rounded-sm border-border"/>
               <span className="text-xs font-semibold text-foreground">Сразу создать занятия в календаре</span>
             </label>
             {autoSchedule && (

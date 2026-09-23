@@ -65,7 +65,7 @@ function VariantInput({
           onChange({ ...value, visitors: Math.max(0, Number(e.target.value || 0)) })
         }
         placeholder="напр. 1200"
-        className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20"
+        className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20"
       />
 
       <label className="mt-3 mb-2 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -79,7 +79,7 @@ function VariantInput({
           onChange({ ...value, conversions: Math.max(0, Number(e.target.value || 0)) })
         }
         placeholder="напр. 84"
-        className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20"
+        className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20"
       />
 
       <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-center">

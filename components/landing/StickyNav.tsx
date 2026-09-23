@@ -5,7 +5,7 @@
  * (stays visible на scroll). Mobile: collapse секции links, keep auth
  * CTAs visible.
  *
- * Design: ultra-light bg-white/80 backdrop-blur для floating-over-content
+ * Design: ultra-light bg-white/80 backdrop-blur-sm для floating-over-content
  * effect — matches modern marketing landing convention.
  */
 import Link from 'next/link'

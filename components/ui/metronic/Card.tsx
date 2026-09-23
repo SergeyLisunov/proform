@@ -13,7 +13,7 @@ interface BaseProps {
 export function Card({ children, className = '', accent = false }: BaseProps & { accent?: boolean }) {
   return (
     <div
-      className={`kt-card bg-card border border-border rounded-xl shadow-sm ${
+      className={`kt-card bg-card border border-border rounded-xl shadow-xs ${
         accent ? 'kt-card-accent border-t-2 border-t-[#F35703]' : ''
       } ${className}`}
     >

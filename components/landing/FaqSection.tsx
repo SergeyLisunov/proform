@@ -81,7 +81,7 @@ export default function FaqSection() {
             <TrackedFaqItem
               key={item.q}
               question={item.q}
-              className="group rounded-2xl border border-border bg-white p-5 shadow-sm transition-all open:shadow-md"
+              className="group rounded-2xl border border-border bg-white p-5 shadow-xs transition-all open:shadow-md"
             >
               <summary className="flex cursor-pointer items-start justify-between gap-3 list-none">
                 <h3 className="text-base font-bold leading-tight text-navy-500">

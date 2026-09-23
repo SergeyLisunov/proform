@@ -87,7 +87,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
       >
         <div className="relative flex items-center gap-3 px-4 py-3.5">
           <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-105"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-xs transition-transform group-hover:scale-105"
             style={{ background: 'linear-gradient(135deg,#10B981,#059669)' }}
           >
             <i className="ki-filled ki-heart text-white text-lg" />
@@ -160,7 +160,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-100/80">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-emerald-100">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-emerald-100">
             <i className="ki-filled ki-heart text-base text-emerald-600" />
           </div>
           <div>
@@ -200,7 +200,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
                 setSleepHours(v === '' ? '' : parseFloat(v))
               }}
               placeholder="напр. 7.5"
-              className="mt-1 w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-400 outline-none" />
+              className="mt-1 w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-400 outline-hidden" />
           </div>
           <div>
             <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Качество сна</label>
@@ -254,7 +254,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
             onChange={e => setNotes(e.target.value)}
             placeholder="напр. ноет колено / простуда / отлично"
             maxLength={200}
-            className="mt-1 w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-400 outline-none" />
+            className="mt-1 w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-400 outline-hidden" />
         </div>
 
         {/* Save */}

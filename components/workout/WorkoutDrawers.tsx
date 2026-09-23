@@ -190,7 +190,7 @@ function DrawerShell({
 
 // ── Общие стили инпута ───────────────────────────────────────────────────────
 const INPUT_CLASS =
-  'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
+  'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
 
 // ── Общая форма полей ────────────────────────────────────────────────────────
 type WForm = {

@@ -109,7 +109,7 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
   const dates = Object.keys(byDate).sort()
 
   return (
-    <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/60 to-white p-5">
+    <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50/60 to-white p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-700">События</p>
@@ -143,7 +143,7 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
                     {s.location && (s.start_time && s.end_time ? ' · ' : '') + s.location}
                   </div>
                 </div>
-                <Badge variant="info" size="sm" className="!rounded-full shrink-0 inline-flex items-center gap-1">
+                <Badge variant="info" size="sm" className="rounded-full! shrink-0 inline-flex items-center gap-1">
                   <i className="ki-filled ki-people text-[11px]" />
                   {s.participantCount}
                 </Badge>

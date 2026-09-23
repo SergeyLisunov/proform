@@ -106,7 +106,7 @@ export default async function AthletePassportPage(
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] bg-white/15 backdrop-blur rounded-full px-2.5 py-1">
+                <span className="text-[10px] font-bold uppercase tracking-[0.25em] bg-white/15 backdrop-blur-sm rounded-full px-2.5 py-1">
                   Паспорт атлета
                 </span>
                 {p.sport && (
@@ -223,7 +223,7 @@ export default async function AthletePassportPage(
 
       {/* CTA */}
       <section className="mx-auto max-w-5xl px-5 pb-14">
-        <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
+        <div className="rounded-2xl bg-linear-to-r from-orange-500 to-red-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Создай свой «Паспорт атлета»</h3>
           <p className="mt-1 text-sm md:text-base opacity-90 max-w-2xl">
             Шарабельная ссылка, публичные PR&apos;ы, статистика за 90 дней, подключение

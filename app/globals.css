@@ -1,40 +1,210 @@
-@import url('/assets/vendors/keenicons/styles.bundle.css');
-@import url('/assets/css/core.bundle.css');
-@import url('/assets/css/styles.css');
+@import url('/assets/vendors/keenicons/styles.bundle.css') layer(base);
+@import url('/assets/css/core.bundle.css') layer(base);
+@import url('/assets/css/styles.css') layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-/* W12 Day 59: print stylesheet for forwardable PDF (Org Health Snapshot).
+@theme {
+  --font-sans: var(--font-pf-sans), Montserrat, system-ui, sans-serif;
+  --font-display: var(--font-pf-sans), Montserrat, system-ui, sans-serif;
+
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.9rem;
+
+  --color-orange-50: #fef0e7;
+  --color-orange-100: #fdddcb;
+  --color-orange-200: #fbc1a0;
+  --color-orange-300: #f89b6a;
+  --color-orange-400: #f5733a;
+  --color-orange-500: #f35703;
+  --color-orange-600: #d44a02;
+  --color-orange-700: #b03d04;
+  --color-orange-800: #8a300a;
+  --color-orange-900: #702a0c;
+  --color-orange-950: #3d1604;
+
+  --color-navy-50: #eaf0f6;
+  --color-navy-100: #d2deeb;
+  --color-navy-200: #a6bdd7;
+  --color-navy-300: #6e8fb6;
+  --color-navy-400: #3e6796;
+  --color-navy-500: #1d4672;
+  --color-navy-600: #163a5e;
+  --color-navy-700: #142f4b;
+  --color-navy-800: #11263b;
+  --color-navy-900: #0e1e2e;
+
+  --color-brand-orange: #f35703;
+  --color-brand-orange-light: #fef0e7;
+  --color-brand-orange-mid: #fdddcb;
+  --color-brand-blue: #1d4672;
+  --color-brand-blue-light: #eaf0f6;
+  --color-brand-blue-mid: #d2deeb;
+  --color-brand-navy: #1d4672;
+  --color-brand-cream: #fbf3ec;
+
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-slide-in: slide-in 0.25s ease-out both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* ── Семантическая тема ───────────────────────────────────────────────────
+  СОБСТВЕННЫЙ источник правды для --background/--card/--border/--muted и
+  остальных семантических токенов.
+
+  Почему это здесь, а не наследуется. До сих пор весь набор приходил из
+  скомпилированного Metronic (public/assets/css/styles.css, строки 4720+),
+  а код опирается на него массово: text-muted-foreground — 184 файла,
+  border-border — 154, bg-background — 125, bg-card — 83. То есть снятие
+  Metronic обрушило бы тему всего приложения. Объявив токены у себя, мы
+  разрываем эту зависимость: Metronic можно удалять, ничего не перекрашивая.
+
+  Блок объявлен ВНЕ каскадных слоёв, а Metronic импортируется в layer(base) —
+  поэтому наши значения выигрывают независимо от порядка импортов.
+
+  Значения светлой темы повторяют то, что было (zinc-шкала), кроме --primary:
+  он брендовый оранжевый Sporteo, а не синий Metronic. Тёмная тема лежала в
+  Metronic готовой, но в разметке не использовалась (0 классов dark:) —
+  переносим её как основу для переключателя темы.
+*/
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e9e9ec;
+  --input: #e4e4e7;
+  --ring: var(--pf-brand);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  --popover: #09090b;
+  --popover-foreground: #fafafa;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #18181b;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: var(--pf-brand);
+}
+
+/* Маппинг семантических токенов в утилиты Tailwind v4.
+   Без него `bg-card` и `text-muted-foreground` существуют только потому,
+   что их сгенерировал сборщик Metronic; после его удаления классы обязан
+   генерировать наш Tailwind — а он берёт их из --color-*. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer utilities {
+  /* W12 Day 59: print stylesheet for forwardable PDF (Org Health Snapshot).
    - Force exact colors on all printed surfaces so gradients/bars survive
      the print pipeline.
    - A4 page geometry with sensible margins for one-page reports.
    - `.print-only` reveals a watermark banner that's hidden on screen. */
-@media print {
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  @page {
-    size: A4;
-    margin: 12mm;
-  }
-  body {
-    background: #fff !important;
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+    body {
+      background: #fff !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+    .print-hide {
+      display: none !important;
+    }
   }
   .print-only {
-    display: block !important;
+    display: none;
   }
-  .print-hide {
-    display: none !important;
-  }
-}
-.print-only {
-  display: none;
-}
 
-/* W17 Day 84 — next/font migration.
+  /* W17 Day 84 — next/font migration.
    --font-pf-sans + --font-pf-display injected from app/layout.tsx via
    next/font/google (subsetted, preloaded, size-adjusted fallback).
    Manual fallback chain preserved для:
@@ -44,52 +214,55 @@
        Russian display falls к Impact / Arial Narrow Bold (same as
        pre-migration Metronic CSS behavior)
      - Network failures (next/font self-hosts но belt-and-suspenders) */
-:root {
-  /* Единое семейство Montserrat. Обе переменные резолвятся в один шрифт —
+  :root {
+    /* Единое семейство Montserrat. Обе переменные резолвятся в один шрифт —
      различие body/display теперь только в весе (см. .pf-heading-*), не в
      гарнитуре. Montserrat покрывает и латиницу, и кириллицу. */
-  --pf-font-sans: var(--font-pf-sans), "Montserrat", "Segoe UI", system-ui, sans-serif;
-  --pf-font-display: var(--font-pf-sans), "Montserrat", "Segoe UI", system-ui, sans-serif;
-}
+    --pf-font-sans:
+      var(--font-pf-sans), 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+    --pf-font-display:
+      var(--font-pf-sans), 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  }
 
-/* ── Brand tokens (Sporteo) ───────────────────────────────────────────────────
+  /* ── Brand tokens (Sporteo) ───────────────────────────────────────────────────
    Palette sampled from the Sporteo deck: orange #F35703 + navy #1D4672 + cream.
    --pf-brand kept as the token name (used app-wide) but now carries the Sporteo
    orange. Metronic's --primary is overridden so all kt-*-primary components
    render on-brand. */
-:root {
-  --pf-brand:        #F35703;
-  --pf-brand-hover:  #D44A02;
-  --pf-brand-muted:  #FEF0E7;
-  --pf-brand-border: #FBD0B5;
+  :root {
+    --pf-brand: #f35703;
+    --pf-brand-hover: #d44a02;
+    --pf-brand-muted: #fef0e7;
+    --pf-brand-border: #fbd0b5;
 
-  /* Sporteo navy — secondary / headings / panels */
-  --sporteo-navy:        #1D4672;
-  --sporteo-navy-hover:  #163A5E;
-  --sporteo-navy-muted:  #EAF0F6;
-  --sporteo-cream:       #FBF3EC;
-}
+    /* Sporteo navy — secondary / headings / panels */
+    --sporteo-navy: #1d4672;
+    --sporteo-navy-hover: #163a5e;
+    --sporteo-navy-muted: #eaf0f6;
+    --sporteo-cream: #fbf3ec;
+  }
 
-/* Override Metronic theme primary → Sporteo orange so kt-btn-primary,
+  /* Override Metronic theme primary → Sporteo orange so kt-btn-primary,
    kt-badge-primary, kt-alert-primary, etc. are on-brand. */
-:root,
-[data-kt-theme="true"],
-.demo1 {
-  --primary: #F35703;
-  --primary-active: #D44A02;
-  --primary-foreground: #ffffff;
-  --primary-clarity: rgba(243, 87, 3, 0.15);
-}
+  :root,
+  [data-kt-theme='true'],
+  .demo1 {
+    --primary: #f35703;
+    --primary-active: #d44a02;
+    --primary-foreground: #ffffff;
+    --primary-clarity: rgba(243, 87, 3, 0.15);
+  }
 
-/* ── Typography ───────────────────────────────────────────────────────────── */
+  /* ── Typography ───────────────────────────────────────────────────────────── */
 
-/* Headings without an explicit `leading-*` utility were inheriting the body's
+  /* Headings without an explicit `leading-*` utility were inheriting the body's
    `text-base` line-height (24px). On clamp-sized headings (text-[clamp(...)],
    up to ~54px) that 0.45 ratio made multi-line headings overlap — exposed once
    the body font became Montserrat, which is wider than the previous condensed
    Bebas Neue and therefore wraps long headings onto more lines. A sane default
    in @layer base fixes every such heading; Tailwind `leading-*` utilities and
    the `.pf-heading-*` classes have higher precedence and still win. */
+}
 @layer base {
   h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
 }

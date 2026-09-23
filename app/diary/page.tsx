@@ -308,7 +308,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
             className={[
               'px-3 py-1.5 rounded-lg text-2sm font-semibold transition-all',
               period === p.id
-                ? 'bg-orange-500 text-white shadow-sm'
+                ? 'bg-orange-500 text-white shadow-xs'
                 : 'text-muted-foreground hover:bg-accent hover:text-foreground',
             ].join(' ')}>
             {p.label}
@@ -518,7 +518,7 @@ function ViewEditDrawer({
 
   const ac = ACTIVITY_CONFIG[workout.activity_type ?? ''] ?? DEFAULT_AC
   const displayName = workout.name || workout.activity_type || 'Тренировка'
-  const inputClass = 'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
+  const inputClass = 'w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10'
   const quickFacts = [
     workout.activity_duration_min != null
       ? { label: 'Длительность', value: fmtDuration(workout.activity_duration_min), tone: '#F35703' }
@@ -539,7 +539,7 @@ function ViewEditDrawer({
       <div onClick={handleClose} style={{ position:'fixed',inset:0,zIndex:9998,background:'rgba(15,23,42,0.65)',backdropFilter:'blur(3px)',transition:'opacity 0.26s',opacity:visible?1:0 }} />
       <div style={{ position:'fixed',top:0,right:0,bottom:0,width:520,maxWidth:'100vw',zIndex:9999,background:'#ffffff',borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column',transition:'transform 0.26s cubic-bezier(.32,.72,0,1)',transform:visible?'translateX(0)':'translateX(100%)' }}>
 
-        <div className="sticky top-0 z-[1] border-b border-border px-6 py-5" style={{ background: '#ffffff' }}>
+        <div className="sticky top-0 z-1 border-b border-border px-6 py-5" style={{ background: '#ffffff' }}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <div
@@ -568,7 +568,7 @@ function ViewEditDrawer({
           {mode === 'view' ? (
             <div className="flex flex-col gap-5">
               <section
-                className="rounded-[28px] border p-5 shadow-sm"
+                className="rounded-[28px] border p-5 shadow-xs"
                 style={{
                   background: `linear-gradient(135deg, ${ac.bg} 0%, rgba(255,255,255,0.98) 100%)`,
                   borderColor: ac.border,
@@ -576,28 +576,28 @@ function ViewEditDrawer({
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
+                    <div className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-xs">
                       Сессия атлета
                     </div>
                     <h3 className="mt-3 text-[28px] font-semibold leading-none text-navy-500">{displayName}</h3>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                      <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-xs">
                         {fmtFullDate(workout.event_date)}
                       </span>
                       {workout.start_time && (
-                        <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                        <span className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-xs">
                           {workout.start_time}
                         </span>
                       )}
                       {workout.mood != null && workout.mood >= 0 && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-white/80 bg-white/80 px-3 py-1 text-xs font-semibold text-foreground shadow-xs">
                           Самочувствие {MOODS[workout.mood]}
                         </span>
                       )}
                     </div>
                   </div>
                   <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border bg-white/80 shadow-sm"
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border bg-white/80 shadow-xs"
                     style={{ borderColor: ac.border }}
                   >
                     <i className={`ki-filled ${ac.icon} text-lg`} style={{ color: ac.text }} />
@@ -607,7 +607,7 @@ function ViewEditDrawer({
                 {quickFacts.length > 0 && (
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     {quickFacts.map(fact => (
-                      <div key={fact.label} className="rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm">
+                      <div key={fact.label} className="rounded-2xl border border-white/80 bg-white/85 p-4 shadow-xs">
                         <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{fact.label}</div>
                         <div className="mt-2 pf-num text-[26px] leading-none" style={{ color: fact.tone }}>{fact.value}</div>
                       </div>
@@ -616,7 +616,7 @@ function ViewEditDrawer({
                 )}
               </section>
 
-              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-xs">
                 <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Структура сессии</div>
                 <div className="grid grid-cols-2 gap-4">
                   <InfoRow label="Дата" value={fmtFullDate(workout.event_date)} />
@@ -626,7 +626,7 @@ function ViewEditDrawer({
                 </div>
               </section>
 
-              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-xs">
                 <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Нагрузка и физиология</div>
                 <div className="grid grid-cols-2 gap-4">
                   <InfoRow label="Нагрузка" value={workout.activity_strain != null ? Number(workout.activity_strain).toFixed(1) : null} />
@@ -637,7 +637,7 @@ function ViewEditDrawer({
               </section>
 
               {(workout.description || workout.created_at) && (
-                <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+                <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-xs">
                   <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Контекст</div>
                   {workout.description ? (
                     <p className="m-0 whitespace-pre-wrap text-sm leading-6 text-foreground">{workout.description}</p>
@@ -654,7 +654,7 @@ function ViewEditDrawer({
             </div>
           ) : (
             <div className="flex flex-col gap-5">
-              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-xs">
                 <div className="mb-4">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Основное</div>
                   <h4 className="mt-1 text-base font-semibold text-foreground">Редактирование тренировки</h4>
@@ -708,7 +708,7 @@ function ViewEditDrawer({
                 </div>
               </section>
 
-              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-sm">
+              <section className="rounded-[24px] border border-border bg-background/70 p-5 shadow-xs">
                 <div className="mb-4">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Метрики и контекст</div>
                   <h4 className="mt-1 text-base font-semibold text-foreground">Физиология и ощущения</h4>
@@ -740,7 +740,7 @@ function ViewEditDrawer({
                 </div>
                 <div className="mt-4">
                   <label className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-muted-foreground">Заметки</label>
-                  <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Ощущения, условия, наблюдения..." className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 resize-none" />
+                  <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Ощущения, условия, наблюдения..." className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 resize-none" />
                 </div>
               </section>
             </div>
@@ -867,7 +867,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
     form.activity_strain > 0 ? `${form.activity_strain.toFixed(1)} нагрузка` : 'Нагрузка не задана',
   ]
   const inputClass = (hasError = false) => [
-    'w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all bg-background',
+    'w-full rounded-2xl border px-4 py-3 text-sm outline-hidden transition-all bg-background',
     hasError
       ? 'border-red-300 text-foreground focus:border-red-400 focus:ring-4 focus:ring-red-500/10'
       : 'border-input text-foreground focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10',
@@ -912,7 +912,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {quickSummary.map(item => (
-                <span key={item} className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold text-foreground shadow-sm">
+                <span key={item} className="inline-flex items-center rounded-full border border-white/80 bg-white/80 px-3 py-1 text-[11px] font-semibold text-foreground shadow-xs">
                   {item}
                 </span>
               ))}
@@ -923,7 +923,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
 
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-xs">
               <div className="mb-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Основное</div>
                 <h4 className="mt-1 text-base font-semibold text-foreground">Быстрый захват тренировки</h4>
@@ -939,7 +939,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                       type="button"
                       onClick={() => setForm(f => ({ ...f, activity_type: at.value }))}
                       className={`flex flex-col items-center gap-2 rounded-2xl border px-3 py-3 transition-all ${
-                        sel ? 'shadow-sm' : 'hover:border-border hover:bg-card'
+                        sel ? 'shadow-xs' : 'hover:border-border hover:bg-card'
                       }`}
                       style={{
                         borderColor: sel ? ac.border : 'var(--border)',
@@ -1001,7 +1001,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
               </div>
             </section>
 
-            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-xs">
               <div className="mb-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Интенсивность</div>
                 <h4 className="mt-1 text-base font-semibold text-foreground">Нагрузка и метрики</h4>
@@ -1076,7 +1076,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
               </div>
             </section>
 
-            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-sm">
+            <section className="rounded-[26px] border border-border bg-background/70 p-5 shadow-xs">
               <div className="mb-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Контекст</div>
                 <h4 className="mt-1 text-base font-semibold text-foreground">Самочувствие и заметки</h4>
@@ -1254,7 +1254,7 @@ function AthleteDiary() {
 
   return (
     <div className="flex flex-col gap-5 pf-enter">
-      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.14),_transparent_36%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_56%,#FFF4EC_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-7">
+      <section className="relative overflow-hidden rounded-[30px] border border-orange-100 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.14),transparent_36%),linear-gradient(135deg,#FFF8F1_0%,#FFFFFF_56%,#FFF4EC_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-7">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -1271,17 +1271,17 @@ function AthleteDiary() {
               Добавляйте тренировку сразу после сессии, фиксируйте самочувствие и держите историю нагрузки под рукой в одном рабочем пространстве.
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">За 7 дней</div>
                 <div className="mt-2 pf-num text-[28px] leading-none text-foreground">{recentCount}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">тренировок за последнюю неделю</div>
               </div>
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Общий объем</div>
                 <div className="mt-2 text-xl font-semibold text-foreground">{totalMinutes ? fmtDuration(totalMinutes) : '—'}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">суммарное время по сохраненным записям</div>
               </div>
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Основной тип</div>
                 <div className="mt-2 text-xl font-semibold text-foreground">{topActivity}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">
@@ -1291,7 +1291,7 @@ function AthleteDiary() {
             </div>
           </div>
 
-          <div className="flex w-full max-w-[340px] flex-col gap-3 rounded-[26px] border border-border bg-white/85 p-4 shadow-sm">
+          <div className="flex w-full max-w-[340px] flex-col gap-3 rounded-[26px] border border-border bg-white/85 p-4 shadow-xs">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Быстрый старт</div>
               <div className="mt-2 text-base font-semibold text-foreground">Сохраните тренировку, пока ощущения свежие</div>
@@ -1300,7 +1300,7 @@ function AthleteDiary() {
               </div>
             </div>
             <div className="flex flex-col gap-2.5">
-              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)] transition-transform hover:translate-y-[-1px]">
+              <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)] transition-transform hover:-translate-y-px">
                 <i className="ki-filled ki-plus text-sm" />
                 Новая тренировка
               </button>
@@ -1319,7 +1319,7 @@ function AthleteDiary() {
       <WorkoutLimitBadge />
       <AnalyticsBlock workouts={workouts} />
 
-      <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-[28px] border border-border bg-card p-5 shadow-xs">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -1338,11 +1338,11 @@ function AthleteDiary() {
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex items-center gap-1 rounded-2xl border border-border bg-background p-1">
-              <button onClick={() => setView('list')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='list'?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground'}`}>
+              <button onClick={() => setView('list')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='list'?'bg-orange-50 text-orange-600 shadow-xs':'text-muted-foreground'}`}>
                 <i className="ki-filled ki-row-horizontal mr-1.5 text-sm" />
                 Список
               </button>
-              <button onClick={() => setView('grid')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='grid'?'bg-orange-50 text-orange-600 shadow-sm':'text-muted-foreground'}`}>
+              <button onClick={() => setView('grid')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='grid'?'bg-orange-50 text-orange-600 shadow-xs':'text-muted-foreground'}`}>
                 <i className="ki-filled ki-element-11 mr-1.5 text-sm" />
                 Сетка
               </button>
@@ -1357,7 +1357,7 @@ function AthleteDiary() {
         <div className="mt-5 flex flex-wrap gap-2">
           {FILTER_OPTIONS.map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={['rounded-full border px-3 py-2 text-sm font-semibold transition-all', filter===f?'border-orange-200 bg-orange-50 text-orange-700 shadow-sm':'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground'].join(' ')}>
+              className={['rounded-full border px-3 py-2 text-sm font-semibold transition-all', filter===f?'border-orange-200 bg-orange-50 text-orange-700 shadow-xs':'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground'].join(' ')}>
               {f}
             </button>
           ))}
@@ -1391,7 +1391,7 @@ function AthleteDiary() {
       </section>
 
       {filtered.length === 0 ? (
-        <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-sm">
+        <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-xs">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[20px] bg-orange-50 text-orange-500">
             <i className="ki-filled ki-calendar text-2xl" />
           </div>
@@ -1413,7 +1413,7 @@ function AthleteDiary() {
       ) : view === 'list' ? (
         <div className="flex flex-col gap-5">
           {groupedWorkouts.map(group => (
-            <section key={group.label} className="rounded-[26px] border border-border bg-card p-4 shadow-sm sm:p-5">
+            <section key={group.label} className="rounded-[26px] border border-border bg-card p-4 shadow-xs sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Группа истории</div>
@@ -1437,7 +1437,7 @@ function AthleteDiary() {
                       key={w.id}
                       type="button"
                       onClick={() => setSelectedWorkout(w)}
-                      className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-white hover:shadow-sm sm:p-5"
+                      className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-white hover:shadow-xs sm:p-5"
                     >
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
                         <i className={`ki-filled ${ac.icon} text-base`} style={{ color:ac.text }} />
@@ -1518,7 +1518,7 @@ function AthleteDiary() {
                 key={w.id}
                 type="button"
                 onClick={() => setSelectedWorkout(w)}
-                className="flex flex-col gap-4 rounded-[26px] border border-border bg-card p-5 text-left transition-all hover:border-orange-200 hover:shadow-sm"
+                className="flex flex-col gap-4 rounded-[26px] border border-border bg-card p-5 text-left transition-all hover:border-orange-200 hover:shadow-xs"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
@@ -1605,7 +1605,7 @@ function AthleteDiary() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-foreground text-background text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-9999 bg-foreground text-background text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter">
           <i className="ki-filled ki-check-circle text-green-400" />Тренировка сохранена
         </div>
       )}

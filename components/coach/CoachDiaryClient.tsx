@@ -147,11 +147,11 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
   return (
     <div className="flex flex-col gap-5 pf-enter">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl border border-[#FBC1A0] bg-gradient-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-orange-200 bg-linear-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FBC1A0] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#D44A02]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
               <i className="ki-filled ki-notepad-edit text-[11px]" />
               Рабочий журнал
             </span>
@@ -200,7 +200,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
                 const id = e.dataTransfer.getData('text/plain')
                 if (id) handleTypeDrop(t, id)
               }}
-              className={`rounded-xl border p-3 text-left transition-all ${active ? 'ring-2 ring-offset-1' : hot ? 'scale-105' : 'hover:-translate-y-0.5 hover:shadow-sm'}`}
+              className={`rounded-xl border p-3 text-left transition-all ${active ? 'ring-2 ring-offset-1' : hot ? 'scale-105' : 'hover:-translate-y-0.5 hover:shadow-xs'}`}
               style={{
                 borderColor: hot ? meta.color : meta.border,
                 background: hot ? meta.bg : meta.bg,
@@ -398,7 +398,7 @@ function EntryCard({
     <div
       draggable
       onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', entry.id) }}
-      className="bg-card border border-border rounded-xl p-5 hover:border-orange-200 hover:shadow-sm transition-all cursor-grab active:cursor-grabbing"
+      className="bg-card border border-border rounded-xl p-5 hover:border-orange-200 hover:shadow-xs transition-all cursor-grab active:cursor-grabbing"
       title="Перетащите на плитку типа, чтобы изменить тип записи">
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
@@ -457,7 +457,7 @@ function EntryCard({
           <button onClick={onEdit} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost" title="Редактировать">
             <i className="ki-filled ki-pencil text-xs text-muted-foreground" />
           </button>
-          <button onClick={onDelete} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost hover:!bg-red-50" title="Удалить">
+          <button onClick={onDelete} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost hover:bg-red-50!" title="Удалить">
             <i className="ki-filled ki-trash text-xs text-red-500" />
           </button>
         </div>
@@ -586,8 +586,8 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
   useEffect(() => { run(days) }, [run, days])
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start justify-center px-4 py-12 overflow-y-auto" onClick={onClose}>
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-60 flex items-start justify-center px-4 py-12 overflow-y-auto" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
       <div onClick={e => e.stopPropagation()}
         className="relative z-10 w-full max-w-3xl rounded-2xl bg-background shadow-2xl border border-purple-200">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -845,8 +845,8 @@ function EntryDrawer({
   const meta = ENTRY_TYPE_META[type]
 
   return (
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`} />
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`} />
       <div onClick={e => e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[560px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -1012,8 +1012,8 @@ function EntryDrawer({
 
           {/* Session data */}
           {type === 'session_summary' && (
-            <div className="rounded-xl border border-[#FBC1A0] bg-[#FEF0E7]/60 p-3 space-y-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B03D04]">Детали тренировки</p>
+            <div className="rounded-xl border border-orange-200 bg-[#FEF0E7]/60 p-3 space-y-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">Детали тренировки</p>
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="text-[10px] text-muted-foreground">Длительность, мин</label>
@@ -1180,7 +1180,7 @@ function EntryDrawer({
           {athleteId && (
             <label className="flex items-center gap-2 cursor-pointer rounded-xl border border-border bg-muted/20 px-3 py-2.5">
               <input type="checkbox" checked={shared} onChange={e => setShared(e.target.checked)}
-                className="w-4 h-4 rounded border-border accent-blue-500" />
+                className="w-4 h-4 rounded-sm border-border accent-blue-500" />
               <div className="flex-1">
                 <div className="text-sm font-semibold text-foreground">Показать атлету</div>
                 <div className="text-[11px] text-muted-foreground">

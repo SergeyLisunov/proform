@@ -77,7 +77,7 @@ export default function RecoveryTrendWidget({ userId }: { userId: string }) {
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-100/80">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-emerald-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-emerald-100">
             <i className="ki-filled ki-heart text-[14px] text-emerald-600" />
           </div>
           <h3 className="text-sm font-bold text-navy-500">Готовность · 14 дней</h3>
@@ -96,7 +96,7 @@ export default function RecoveryTrendWidget({ userId }: { userId: string }) {
 
       <div className="px-5 py-4">
         {loading ? (
-          <div className="h-14 animate-pulse rounded bg-muted" />
+          <div className="h-14 animate-pulse rounded-sm bg-muted" />
         ) : path.d ? (
           <svg width="100%" height={path.H} viewBox={`0 0 ${path.W} ${path.H}`} preserveAspectRatio="none">
             <defs>

@@ -121,7 +121,7 @@ export default function BeforeAfterSection() {
           {ROWS.map((row) => (
             <article
               key={row.topic}
-              className="grid gap-3 rounded-3xl border border-border bg-white p-5 shadow-sm lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-5"
+              className="grid gap-3 rounded-3xl border border-border bg-white p-5 shadow-xs lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-5"
             >
               {/* Topic */}
               <div className="flex items-center">

@@ -22,7 +22,7 @@ export default function AdminHeroBar({ stats }: { stats: AdminHeroStats }) {
     : '—'
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-purple-50 via-white to-blue-50 p-5 md:p-7">
+    <section className="relative overflow-hidden rounded-3xl border border-purple-200 bg-linear-to-br from-purple-50 via-white to-blue-50 p-5 md:p-7">
       <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-purple-200/40 blur-3xl pointer-events-none" />
 
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">

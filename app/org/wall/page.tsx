@@ -182,7 +182,7 @@ export default function OrgWallPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.15),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.15),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -213,7 +213,7 @@ export default function OrgWallPage() {
                 </button>
                 <Link
                   href="/org/newsletters"
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-sm transition-all hover:border-orange-200 hover:text-orange-700"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-orange-200 hover:text-orange-700"
                 >
                   <i className="ki-filled ki-sms text-sm" />
                   Перейти к рассылкам
@@ -222,14 +222,14 @@ export default function OrgWallPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[360px]">
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Состояние ленты</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{pinned.length} закрепл. · {posts.length} публикац.</div>
                 <div className="mt-1 text-2xs text-muted-foreground">
                   {latestPost ? `Последняя запись ${formatDate(latestPost.created_at, { day: 'numeric', month: 'long' })}` : 'Лента пока пустая'}
                 </div>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Публичность</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{publicPosts} открытых постов</div>
                 <div className="mt-1 text-2xs text-muted-foreground">
@@ -259,7 +259,7 @@ export default function OrgWallPage() {
       </section>
 
       {pinned.length > 0 && (
-        <section className="rounded-3xl border border-orange-100 bg-[linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_100%)] p-4 md:p-5 shadow-sm">
+        <section className="rounded-3xl border border-orange-100 bg-[linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_100%)] p-4 md:p-5 shadow-xs">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -309,7 +309,7 @@ export default function OrgWallPage() {
             </p>
             <button
               onClick={() => setShowCreate(true)}
-              className="mt-5 inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-700 shadow-sm transition-all hover:bg-orange-50"
+              className="mt-5 inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-700 shadow-xs transition-all hover:bg-orange-50"
             >
               <i className="ki-filled ki-plus text-sm" />
               Создать первую публикацию
@@ -348,7 +348,7 @@ export default function OrgWallPage() {
                     <select
                       value={form.post_type}
                       onChange={e => setForm(f => ({ ...f, post_type: e.target.value as PostType }))}
-                      className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                      className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                     >
                       {POST_TYPES.map(t => (
                         <option key={t} value={t}>{POST_TYPE_META[t].label}</option>
@@ -360,7 +360,7 @@ export default function OrgWallPage() {
                     <select
                       value={form.visible_to}
                       onChange={e => setForm(f => ({ ...f, visible_to: e.target.value as PostVisibility }))}
-                      className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                      className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                     >
                       <option value="all">Все (публично)</option>
                       <option value="members">Только участники</option>
@@ -377,7 +377,7 @@ export default function OrgWallPage() {
                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                     required
                     placeholder="Например: Сбор команды перед стартом сезона"
-                    className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                    className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                   />
                 </div>
 
@@ -389,7 +389,7 @@ export default function OrgWallPage() {
                     required
                     rows={5}
                     placeholder="Расскажите участникам, что произошло, что важно сделать или к какому событию подготовиться…"
-                    className="w-full resize-none rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                    className="w-full resize-none rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                   />
                 </div>
 
@@ -400,7 +400,7 @@ export default function OrgWallPage() {
                       type="date"
                       value={form.event_date}
                       onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))}
-                      className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                      className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400"
                     />
                   </div>
                 )}
@@ -431,9 +431,9 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
   const visibilityMeta = VISIBILITY_META[post.visible_to]
 
   return (
-    <Card className={`p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-sm ${
+    <Card className={`p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-xs ${
       pinnedStyle
-        ? '!border-orange-100 !bg-white shadow-[0_12px_28px_rgba(243,87,3,0.08)]'
+        ? 'border-orange-100! bg-white! shadow-[0_12px_28px_rgba(243,87,3,0.08)]'
         : ''
     }`}>
       <div className="flex items-start justify-between gap-4">
@@ -473,7 +473,7 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
           <button
             onClick={onDelete}
             title="Удалить"
-            className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline hover:!bg-red-50 hover:!border-red-200 hover:!text-red-600"
+            className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline hover:bg-red-50! hover:border-red-200! hover:text-red-600!"
           >
             <i className="ki-filled ki-trash text-xs" />
           </button>

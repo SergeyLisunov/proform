@@ -138,7 +138,7 @@ function strainColor(strain: number): string {
 
 function SurfaceFrame({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-[28px] border border-border bg-card shadow-xs ${className}`}>
       {children}
     </div>
   )
@@ -180,7 +180,7 @@ function SegmentedButton({ active, children, ...props }: ButtonHTMLAttributes<HT
       {...props}
       className={[
         'inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-2sm font-medium transition-all',
-        active ? 'bg-orange-50 text-orange-600 shadow-sm' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+        active ? 'bg-orange-50 text-orange-600 shadow-xs' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
         props.className ?? '',
       ].join(' ')}
     >
@@ -799,12 +799,12 @@ function YearView({ year, onSelect, cycles, selected }: { year: number; onSelect
       <div className="flex items-center gap-3 flex-wrap">
         {(['macro','meso','micro'] as CycleType[]).map(t => { const c = CYCLE_TYPE_CFG[t]; return (
           <div key={t} className="flex items-center gap-1.5 text-2xs text-muted-foreground">
-            <span className="w-3 h-3 rounded-sm" style={{ background: c.bg, border: `1px solid ${c.border}` }} />{c.label}
+            <span className="w-3 h-3 rounded-xs" style={{ background: c.bg, border: `1px solid ${c.border}` }} />{c.label}
           </div>
         )})}
         <div className="flex items-center gap-1.5 text-2xs text-muted-foreground ml-auto">
           Интенсивность:
-          {['#DBEAFE','#93C5FD','#3B82F6','#1D4ED8'].map((c,i) => <span key={i} className="w-4 h-3 rounded-sm inline-block" style={{ background: c }} />)}
+          {['#DBEAFE','#93C5FD','#3B82F6','#1D4ED8'].map((c,i) => <span key={i} className="w-4 h-3 rounded-xs inline-block" style={{ background: c }} />)}
           Высокая
         </div>
       </div>
@@ -828,12 +828,12 @@ function YearView({ year, onSelect, cycles, selected }: { year: number; onSelect
                   const isToday = ds === today
                   return (
                     <div key={di} onClick={() => onSelect(ds)}
-                      className="aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
+                      className="aspect-square rounded-xs cursor-pointer hover:ring-1 hover:ring-orange-400 transition-all flex items-center justify-center relative group"
                       title={ds}
                       style={{ background: isSel ? '#FEF0E7' : (cc ? cc.bg : (h ? strainColor(h.strain) : '#F8FAFC')), outline: isSel ? '2px solid #F35703' : (cc ? `1px solid ${cc.border}` : 'none') }}>
                       {h?.hasComp && <span className="absolute bottom-0 right-0 w-1 h-1 rounded-full bg-orange-500" />}
                       {isToday && <span className="absolute top-0 left-0 w-1 h-1 rounded-full bg-rose-500" />}
-                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-medium px-1.5 py-0.5 rounded-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                         {parseLocalDate(ds).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                       </span>
                     </div>
@@ -863,14 +863,14 @@ function QuarterView({ year, quarter, onSelect, cycles, selected }: { year: numb
             <div className="px-4 py-3 border-b border-border"><h3 className="pf-num text-lg text-navy-500">{MONTHS_RU[mi]} {year}</h3></div>
             <div className="p-3">
               <div className="grid grid-cols-7 mb-1">{DAYS_SHORT.map(d => <div key={d} className="text-center text-2xs text-muted-foreground/60 font-medium py-0.5">{d[0]}</div>)}</div>
-              {mc.map((c,ci) => { const cc=CYCLE_TYPE_CFG[c.type]; return <div key={ci} className="mb-1 px-2 py-0.5 rounded text-2xs font-medium truncate border" style={{ background:cc.bg, color:cc.text, borderColor:cc.border }}>{c.label}</div> })}
+              {mc.map((c,ci) => { const cc=CYCLE_TYPE_CFG[c.type]; return <div key={ci} className="mb-1 px-2 py-0.5 rounded-sm text-2xs font-medium truncate border" style={{ background:cc.bg, color:cc.text, borderColor:cc.border }}>{c.label}</div> })}
               <div className="grid grid-cols-7 gap-[2px]">
                 {cells.map((day,di) => {
                   if (!day) return <div key={di} />
                   const ds = `${year}-${String(mi+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
                   const h=HEATMAP[ds]; const inC=cycles.find(c=>ds>=c.start_date&&ds<=c.end_date); const cc=inC?CYCLE_TYPE_CFG[inC.type]:null
                   const isSel = ds === selected; const isToday = ds === today
-                  return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5"
+                  return <div key={di} onClick={()=>onSelect(ds)} className="min-h-[36px] rounded-sm cursor-pointer hover:border-orange-300 transition-all border flex flex-col items-center justify-start pt-1 gap-0.5"
                     style={{ background: isSel ? '#FEF0E7' : (cc?cc.bg:(h?strainColor(h.strain):'#FAFAFA')), borderColor: isSel ? '#F35703' : (isToday ? '#F5733A' : (cc?cc.border:'transparent')), borderWidth: isSel ? '2px' : '1px' }}>
                     <span className={`text-[9px] font-medium ${isSel ? 'text-orange-600' : isToday ? 'text-orange-500' : 'text-foreground/60'}`}>{day}</span>
                     {isToday && <span className="w-1 h-1 rounded-full bg-orange-400"/>}
@@ -959,7 +959,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
               style={{ borderLeft: ccfgDisplay?`3px solid ${ccfgDisplay.text}`:undefined, background: isSel ? undefined : cellBg }}>
               {day&&<>
                 <div className={['w-7 h-7 rounded-lg flex items-center justify-center text-2sm font-semibold mb-1 mx-auto', isT?'bg-orange-500 text-white':isSel?'bg-orange-100 text-orange-600':'text-foreground'].join(' ')}>{day}</div>
-                {cdcfgDisplay&&<div className="mb-0.5 px-1 py-0.5 rounded text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfgDisplay.bg,color:cdcfgDisplay.color}}><i className={`ki-filled ${cdcfgDisplay.icon} text-[8px]`}/>{cdcfgDisplay.label.slice(0,8)}</div>}
+                {cdcfgDisplay&&<div className="mb-0.5 px-1 py-0.5 rounded-sm text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfgDisplay.bg,color:cdcfgDisplay.color}}><i className={`ki-filled ${cdcfgDisplay.icon} text-[8px]`}/>{cdcfgDisplay.label.slice(0,8)}</div>}
                 {dayWksDisplay.slice(0,2).map(w => {
                   const ac = getActivityCfg(w.activity_type)
                   return <div
@@ -967,7 +967,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
                     draggable
                     onClick={(e) => e.stopPropagation()}
                     onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.setData('application/x-proform-workout', w.id); e.dataTransfer.effectAllowed = 'move' }}
-                    className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
+                    className="mb-0.5 px-1.5 py-0.5 rounded-sm text-[10px] font-semibold truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
                     style={{background:ac.bg,color:ac.color}}
                     title="Перетащите для переноса"
                   >
@@ -980,7 +980,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
                   draggable
                   onClick={(e) => e.stopPropagation()}
                   onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.setData('application/x-proform-event', ev.id); e.dataTransfer.effectAllowed = 'move' }}
-                  className="mb-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
+                  className="mb-0.5 px-1.5 py-0.5 rounded-sm text-[10px] font-medium truncate flex items-center gap-1 cursor-grab active:cursor-grabbing"
                   style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}
                   title="Перетащите для переноса"
                 ><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
@@ -1022,14 +1022,14 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
         const inCD   = showCyc ? inC   : null
         const isEmpty = wksDisplay.length===0 && compsDisplay.length===0 && otherDisplay.length===0 && !cdcfgD && !inCD
         return <div key={di} onClick={()=>onSelect(ds)}
-          className={['bg-card border rounded-xl p-3 cursor-pointer transition-all hover:border-orange-200 hover:shadow-sm', isSel?'border-orange-400 shadow-sm':isT?'border-orange-300':'border-border'].join(' ')}
+          className={['bg-card border rounded-xl p-3 cursor-pointer transition-all hover:border-orange-200 hover:shadow-xs', isSel?'border-orange-400 shadow-xs':isT?'border-orange-300':'border-border'].join(' ')}
           style={{ borderTop: ccfgD?`3px solid ${ccfgD.text}`:undefined }}>
           <div className="text-center mb-2">
             <div className="text-2xs text-muted-foreground uppercase tracking-widest">{DAYS_SHORT[di]}</div>
             <div className={`pf-num text-2xl ${isT?'text-orange-500':'text-foreground'}`}>{d.getDate()}</div>
           </div>
           {cdcfgD&&<div className="mb-1.5 px-1.5 py-1 rounded-lg text-2xs font-semibold flex items-center gap-1" style={{background:cdcfgD.bg,color:cdcfgD.color}}><i className={`ki-filled ${cdcfgD.icon} text-[10px]`}/>{cdcfgD.label}</div>}
-          {inCD&&!cdcfgD&&ccfgD&&<div className="mb-1 px-1.5 py-0.5 rounded text-[9px] font-bold border truncate" style={{background:ccfgD.bg,color:ccfgD.text,borderColor:ccfgD.border}}>{inCD.label.slice(0,12)}</div>}
+          {inCD&&!cdcfgD&&ccfgD&&<div className="mb-1 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border truncate" style={{background:ccfgD.bg,color:ccfgD.text,borderColor:ccfgD.border}}>{inCD.label.slice(0,12)}</div>}
           {wksDisplay.slice(0,2).map(w=>{
             const ac=getActivityCfg(w.activity_type)
             const zones=[w.hr_zone_1_min??0,w.hr_zone_2_min??0,w.hr_zone_3_min??0,w.hr_zone_4_min??0,w.hr_zone_5_min??0]
@@ -1043,7 +1043,7 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
           })}
           {wksDisplay.length>2&&<div className="text-[10px] text-muted-foreground">+{wksDisplay.length-2} трен.</div>}
           {compsDisplay.map(ev=><div key={ev.id} className="px-2 py-1 rounded-lg text-2xs font-semibold mb-0.5 flex items-center gap-1" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}><i className="ki-filled ki-medal-star text-[9px]"/>{ev.title.slice(0,12)}</div>)}
-          {otherDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><i className={`ki-filled ${meta?.icon??'ki-calendar'} text-[9px]`}/>{ev.title.slice(0,12)}</div> })}
+          {otherDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded-sm text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><i className={`ki-filled ${meta?.icon??'ki-calendar'} text-[9px]`}/>{ev.title.slice(0,12)}</div> })}
           {isEmpty&&<div className="flex items-center justify-center h-12 text-muted-foreground/30"><i className="ki-filled ki-minus text-xs"/></div>}
         </div>
       })}
@@ -1078,7 +1078,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
 
   return (
     <SurfaceFrame className="flex h-full flex-col">
-      <div className="border-b border-border bg-gradient-to-br from-orange-50/90 via-card to-card px-5 py-4">
+      <div className="border-b border-border bg-linear-to-br from-orange-50/90 via-card to-card px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Выбрано</p>
@@ -1122,7 +1122,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                   <button
                     key={i}
                     onClick={() => onOpenCycle?.(c)}
-                    className="group flex flex-col gap-2 rounded-2xl border p-3 text-left transition-all hover:shadow-sm"
+                    className="group flex flex-col gap-2 rounded-2xl border p-3 text-left transition-all hover:shadow-xs"
                     style={{ background: cc.bg, borderColor: cc.border }}
                   >
                     <div className="flex items-center gap-2.5">
@@ -1987,7 +1987,7 @@ export default function CalendarPage() {
   return (
     <div className="flex flex-col gap-5 pf-enter">
       <SurfaceFrame>
-        <div className="bg-gradient-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
+        <div className="bg-linear-to-br from-orange-50 via-background to-background px-5 py-5 md:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex-1 min-w-0">
               <Tag tone="border-orange-200 bg-orange-50 text-orange-700">График тренировок</Tag>
@@ -1996,7 +1996,7 @@ export default function CalendarPage() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {/* KPI 1 — Тренировки → дневник с диапазоном дат */}
                 <Link href={diaryPeriodLink()} className="no-underline group">
-                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                       <i className="ki-filled ki-abstract-26 text-base" />
                     </div>
@@ -2014,7 +2014,7 @@ export default function CalendarPage() {
                 </Link>
                 {/* KPI 2 — Соревнования → страница соревнований с диапазоном дат */}
                 <Link href={`/competitions?${periodRangeParams()}`} className="no-underline group">
-                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                       <i className="ki-filled ki-medal-star text-base" />
                     </div>
@@ -2032,7 +2032,7 @@ export default function CalendarPage() {
                 </Link>
                 {/* KPI 3 — Циклы → страница циклов с диапазоном дат */}
                 <Link href={`/cycles?${periodRangeParams()}`} className="no-underline group">
-                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+                  <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                       <i className="ki-filled ki-abstract-45 text-base" />
                     </div>
@@ -2162,7 +2162,7 @@ export default function CalendarPage() {
               <button
                 key={c.id}
                 onClick={() => setCycleDrawer(c)}
-                className="flex items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+                className="flex items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-xs"
                 style={{ background: cc.bg, borderColor: cc.border }}
               >
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: cc.text }} />
@@ -2210,7 +2210,7 @@ export default function CalendarPage() {
                 onClick={() => setFilterType(f)}
                 className={[
                   'rounded-full border px-3 py-1.5 text-2xs font-semibold transition-all',
-                  filterType === f ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-sm' : 'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground',
+                  filterType === f ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-xs' : 'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-foreground',
                 ].join(' ')}
               >
                 {f === 'all' ? 'Все' : f === 'workout' ? 'Тренировки' : f === 'competition' ? 'Соревнования' : 'Циклы'}
@@ -2327,7 +2327,7 @@ export default function CalendarPage() {
             ...(['macro', 'meso', 'micro'] as CycleType[]).map(t => ({ label: CYCLE_TYPE_CFG[t].label, color: CYCLE_TYPE_CFG[t].text, type: 'bar' })),
           ].map(l => (
             <div key={l.label} className="flex items-center gap-1.5">
-              <span className={`inline-block w-3 h-3 ${l.type === 'circle' ? 'rounded-full' : 'rounded-sm'}`} style={{ background: l.color }} />
+              <span className={`inline-block w-3 h-3 ${l.type === 'circle' ? 'rounded-full' : 'rounded-xs'}`} style={{ background: l.color }} />
               <span className="text-2xs text-muted-foreground">{l.label}</span>
             </div>
           ))}
@@ -2335,7 +2335,7 @@ export default function CalendarPage() {
             <span className="text-2xs text-muted-foreground">Нагрузка:</span>
             {[['Низкая', '#DBEAFE'], ['Средняя', '#93C5FD'], ['Высокая', '#3B82F6'], ['Пик', '#1D4ED8']].map(([l, c]) => (
               <span key={l} className="flex items-center gap-0.5">
-                <span className="inline-block h-3 w-4 rounded-sm" style={{ background: c }} />
+                <span className="inline-block h-3 w-4 rounded-xs" style={{ background: c }} />
                 <span className="text-[9px] text-muted-foreground">{l}</span>
               </span>
             ))}

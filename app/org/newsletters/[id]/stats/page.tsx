@@ -116,7 +116,7 @@ export default function NewsletterStatsPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(147,51,234,0.12),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(243,87,3,0.08),transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -144,12 +144,12 @@ export default function NewsletterStatsPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[360px]">
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Дата отправки</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{formatDate(newsletter.sent_at)}</div>
                 <div className="mt-1 text-2xs text-muted-foreground">Фактический момент последней отправки</div>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Аудитория</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{formatAudience(newsletter.target_roles)}</div>
                 <div className="mt-1 text-2xs text-muted-foreground">Роли получателей этой коммуникации</div>

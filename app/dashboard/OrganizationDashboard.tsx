@@ -207,7 +207,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
           <p className="min-w-0 flex-1">
             Структура команды, тренировочная база, профиль организации, публичная страница и история всех событий — в разделе /org.
           </p>
-          <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm">
+          <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-xs">
             Открыть /org
             <i className="ki-filled ki-right text-xs" />
           </Link>

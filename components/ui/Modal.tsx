@@ -1,28 +1,42 @@
 'use client'
 
 /**
- * Modal — единая Metronic-стилизованная модалка (центрированный диалог).
+ * Modal — центрированный диалог приложения.
  *
- * Образец: keenthemes Metronic docs base/modal — центрированный card с
- * header (иконка + заголовок + close-X), body, footer с кнопками справа.
- * Используется как презентационная основа для useDialog() (confirm/alert),
- * и доступна для любых кастомных модалок.
+ * Публичный API не менялся: это по-прежнему `open/onClose/title/tone/...`,
+ * и все 26 файлов, которые ходят сюда через useDialog(), остались как были.
+ * Изменилась начинка — вместо самодельного портала внутри Base UI Dialog.
  *
- * Поведение: portal в document.body, backdrop с blur, Escape и клик по
- * фону закрывают (если closeOnBackdrop), плавный enter/exit transition,
- * блокировка скролла body пока открыта.
+ * ЗАЧЕМ. Прежняя реализация делала portal, backdrop, Escape и блокировку
+ * скролла руками, но не удерживала фокус: Tab уводил на страницу под
+ * открытой модалкой, а после закрытия фокус не возвращался на кнопку,
+ * которая её открыла. Для пользователя на клавиатуре это означало потерю
+ * места в интерфейсе; для платформы с медицинскими данными — ещё и риск
+ * подтвердить действие вслепую. Dialog даёт focus trap, возврат фокуса,
+ * inert-фон и связку aria-labelledby/aria-describedby из коробки.
  */
-import { useEffect, useState, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
+import type { ReactNode } from 'react'
+import { Info, Trash2, TriangleAlert, CheckCircle2 } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/reui/dialog'
 
 export type ModalTone = 'default' | 'info' | 'danger' | 'warning' | 'success'
 
-const TONE_CFG: Record<ModalTone, { icon: string; color: string; bg: string }> = {
-  default: { icon: 'ki-information-2', color: '#F35703', bg: '#FEF0E7' },
-  info:    { icon: 'ki-information-2', color: '#0EA5E9', bg: '#F0F9FF' },
-  danger:  { icon: 'ki-trash',         color: '#DC2626', bg: '#FEF2F2' },
-  warning: { icon: 'ki-information-4',  color: '#B45309', bg: '#FFFBEB' },
-  success: { icon: 'ki-check-circle',   color: '#16A34A', bg: '#F0FDF4' },
+type ToneConfig = { Icon: typeof Info; color: string; bg: string }
+
+/** Цвета тонов — те же, что были: смена начинки не должна менять вид. */
+const TONE_CFG: Record<ModalTone, ToneConfig> = {
+  default: { Icon: Info,          color: '#F35703', bg: '#FEF0E7' },
+  info:    { Icon: Info,          color: '#0EA5E9', bg: '#F0F9FF' },
+  danger:  { Icon: Trash2,        color: '#DC2626', bg: '#FEF2F2' },
+  warning: { Icon: TriangleAlert, color: '#B45309', bg: '#FFFBEB' },
+  success: { Icon: CheckCircle2,  color: '#16A34A', bg: '#F0FDF4' },
 }
 
 export interface ModalProps {
@@ -31,12 +45,15 @@ export interface ModalProps {
   title: string
   description?: ReactNode
   tone?: ModalTone
-  /** Имя keenicon без префикса (напр. 'ki-trash'). null — без иконки. undefined — иконка по tone. */
+  /**
+   * null — без иконки. undefined — иконка по тону.
+   * Строка принимается для обратной совместимости со старыми вызовами,
+   * передававшими имя keenicon: имя игнорируется, берётся иконка тона.
+   * Так вызывающий код не ломается, пока keenicons уезжают из проекта.
+   */
   icon?: string | null
   closeOnBackdrop?: boolean
-  /** Контент между заголовком и футером (формы и т.п.). */
   children?: ReactNode
-  /** Кнопки футера (обычно справа). */
   footer?: ReactNode
   maxWidth?: number
 }
@@ -46,86 +63,42 @@ export function Modal({
   tone = 'default', icon, closeOnBackdrop = true,
   children, footer, maxWidth = 460,
 }: ModalProps) {
-  const [mounted, setMounted] = useState(false)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => { setMounted(true) }, [])
-
-  useEffect(() => {
-    if (!open) { setVisible(false); return }
-    const t = setTimeout(() => setVisible(true), 10)
-    return () => clearTimeout(t)
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
-  }, [open, onClose])
-
-  if (!mounted || !open) return null
-
-  const cfg = TONE_CFG[tone]
+  const { Icon, color, bg } = TONE_CFG[tone]
   const showIcon = icon !== null
-  const iconClass = icon ?? cfg.icon
 
-  return createPortal(
-    <div
-      aria-modal="true"
-      role="dialog"
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={next => { if (!next) onClose() }}
+      // Клик по фону закрывает только когда это разрешено вызывающим кодом;
+      // Escape продолжает работать в любом случае — это выход, а не действие.
+      disablePointerDismissal={!closeOnBackdrop}
     >
-      <div
-        onClick={closeOnBackdrop ? onClose : undefined}
-        className={`absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
-      />
-      <div
-        style={{ maxWidth }}
-        className={`relative w-full rounded-2xl border border-border bg-card shadow-2xl transition-all duration-200 ${
-          visible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2'
-        }`}
-      >
-        {/* Header */}
-        <div className="flex items-start gap-4 px-6 pb-4 pt-6">
+      <DialogContent style={{ maxWidth }} className="w-full">
+        <DialogHeader className="flex-row items-start gap-4 space-y-0">
           {showIcon && (
             <div
+              aria-hidden="true"
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: cfg.bg, color: cfg.color }}
+              style={{ background: bg, color }}
             >
-              <i className={`ki-filled ${iconClass} text-lg`} />
+              <Icon className="size-5" />
             </div>
           )}
-          <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="text-base font-bold text-foreground">{title}</h3>
+          <div className="min-w-0 flex-1 pt-0.5 text-left">
+            <DialogTitle className="text-base font-bold">{title}</DialogTitle>
             {description && (
-              <div className="mt-1 text-sm leading-6 text-muted-foreground">{description}</div>
+              <DialogDescription className="mt-1 text-sm leading-6">
+                {description}
+              </DialogDescription>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Закрыть"
-            className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <i className="ki-filled ki-cross text-sm" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        {children && <div className="px-6 pb-2">{children}</div>}
+        {children}
 
-        {footer && (
-          <div className="mt-2 flex items-center justify-end gap-2 border-t border-border px-6 py-4">
-            {footer}
-          </div>
-        )}
-      </div>
-    </div>,
-    document.body,
+        {footer && <DialogFooter>{footer}</DialogFooter>}
+      </DialogContent>
+    </Dialog>
   )
 }

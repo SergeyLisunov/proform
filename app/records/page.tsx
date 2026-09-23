@@ -202,8 +202,8 @@ export default function RecordsPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(245,158,11,0.16),_transparent_42%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.16),transparent_42%)]" />
         <div className="relative flex flex-col gap-2">
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-600">
             Персональные рекорды
@@ -276,7 +276,7 @@ export default function RecordsPage() {
               ? Math.abs(delta!) / Math.abs(g.prev.value) * 100
               : null
             return (
-              <li key={g.key} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <li key={g.key} className="rounded-2xl border border-border bg-card p-4 shadow-xs">
                 <div className="flex items-start gap-3">
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
@@ -335,7 +335,7 @@ export default function RecordsPage() {
                             <button
                               type="button"
                               onClick={() => openEdit(r)}
-                              className="rounded px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+                              className="rounded-sm px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
                               title="Изменить"
                             >
                               <i className="ki-filled ki-pencil text-[10px]" />
@@ -343,7 +343,7 @@ export default function RecordsPage() {
                             <button
                               type="button"
                               onClick={() => handleDelete(r.id)}
-                              className="rounded px-1.5 text-[10px] text-rose-500 hover:text-rose-700"
+                              className="rounded-sm px-1.5 text-[10px] text-rose-500 hover:text-rose-700"
                               title="Удалить"
                             >
                               <i className="ki-filled ki-cross text-[10px]" />
@@ -383,7 +383,7 @@ export default function RecordsPage() {
                 <select
                   value={editing.category}
                   onChange={e => setEditing({ ...editing, category: e.target.value as Category })}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 >
                   {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
@@ -396,7 +396,7 @@ export default function RecordsPage() {
                     const m = METRICS.find(x => x.value === e.target.value as Metric)!
                     setEditing({ ...editing, metric: m.value, unit: m.defaultUnit, lower_is_better: m.lowerBetter })
                   }}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 >
                   {METRICS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                 </select>
@@ -407,7 +407,7 @@ export default function RecordsPage() {
                   value={editing.exercise}
                   onChange={e => setEditing({ ...editing, exercise: e.target.value })}
                   placeholder="Например: 5К бег, присед 1ПМ, 100м кроль"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 />
               </div>
               <div>
@@ -420,7 +420,7 @@ export default function RecordsPage() {
                   value={editing.value}
                   onChange={e => setEditing({ ...editing, value: e.target.value })}
                   placeholder="0"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 />
               </div>
               <div>
@@ -429,7 +429,7 @@ export default function RecordsPage() {
                   value={editing.unit}
                   onChange={e => setEditing({ ...editing, unit: e.target.value })}
                   placeholder="кг / км / сек…"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 />
               </div>
               <div>
@@ -438,7 +438,7 @@ export default function RecordsPage() {
                   type="date"
                   value={editing.achieved_at}
                   onChange={e => setEditing({ ...editing, achieved_at: e.target.value })}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 />
               </div>
               <div className="flex items-center">
@@ -459,7 +459,7 @@ export default function RecordsPage() {
                   onChange={e => setEditing({ ...editing, notes: e.target.value })}
                   rows={2}
                   placeholder="Условия, самочувствие, место…"
-                  className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-amber-400"
+                  className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-amber-400"
                 />
               </div>
             </div>

@@ -111,8 +111,8 @@ export default function DiarySearchPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.16),_transparent_42%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.16),transparent_42%)]" />
         <div className="relative flex flex-col gap-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-indigo-600">
             Семантический поиск
@@ -133,7 +133,7 @@ export default function DiarySearchPage() {
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Например: устал после длинных пробежек"
-                className="w-full rounded-full border border-border bg-background py-3 pl-11 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-full border border-border bg-background py-3 pl-11 pr-4 text-sm outline-hidden transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               />
             </div>
             <button
@@ -185,7 +185,7 @@ export default function DiarySearchPage() {
                   <li key={`${h.source_type}:${h.source_id}`}>
                     <Link
                       href={href}
-                      className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:border-indigo-300 hover:shadow-md"
+                      className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-4 shadow-xs transition hover:border-indigo-300 hover:shadow-md"
                     >
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
                         <i
@@ -213,12 +213,12 @@ export default function DiarySearchPage() {
                         {!isNote && (h as WorkoutHit).workout && (
                           <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
                             {(h as WorkoutHit).workout!.activity_duration_min != null && (
-                              <span className="rounded bg-muted px-1.5 py-0.5">
+                              <span className="rounded-sm bg-muted px-1.5 py-0.5">
                                 {(h as WorkoutHit).workout!.activity_duration_min} мин
                               </span>
                             )}
                             {(h as WorkoutHit).workout!.activity_strain != null && (
-                              <span className="rounded bg-muted px-1.5 py-0.5">
+                              <span className="rounded-sm bg-muted px-1.5 py-0.5">
                                 strain {(h as WorkoutHit).workout!.activity_strain}
                               </span>
                             )}

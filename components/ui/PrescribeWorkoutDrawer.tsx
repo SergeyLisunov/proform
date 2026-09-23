@@ -67,8 +67,8 @@ export function PrescribeWorkoutDrawer({
   if (typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex justify-end" onClick={handleClose}>
-      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`}/>
+    <div className="fixed inset-0 z-60 flex justify-end" onClick={handleClose}>
+      <div className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity ${visible ? 'opacity-100' : 'opacity-0'}`}/>
       <div onClick={e => e.stopPropagation()}
         className={`relative z-10 h-full w-full max-w-[440px] bg-background shadow-2xl flex flex-col transition-transform duration-200 ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex items-center justify-between border-b border-border px-5 py-4">

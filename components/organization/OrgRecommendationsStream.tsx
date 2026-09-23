@@ -50,7 +50,7 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
         <p className="text-sm font-bold mb-3">Загрузка рекомендаций…</p>
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+            <div key={i} className="h-12 bg-muted rounded-sm animate-pulse" />
           ))}
         </div>
       </Card>
@@ -101,19 +101,19 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-sm font-bold text-foreground truncate max-w-[160px]">{athleteName}</span>
-                  <span className="rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider"
+                  <span className="rounded-full px-1.5 py-px text-[9px] font-bold uppercase tracking-wider"
                     style={{ background: sev.bg, color: sev.color, border: `1px solid ${sev.border}` }}>
                     {sev.label}
                   </span>
-                  <Badge variant="secondary" size="sm" className="!rounded-full !font-semibold">
+                  <Badge variant="secondary" size="sm" className="rounded-full! font-semibold!">
                     {cat.label}
                   </Badge>
                   {r.acknowledged_by_coach_at ? (
-                    <Badge variant="success" size="sm" className="!rounded-full uppercase tracking-wider">
+                    <Badge variant="success" size="sm" className="rounded-full! uppercase tracking-wider">
                       Тренер ack
                     </Badge>
                   ) : (
-                    <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
+                    <Badge variant="warning" size="sm" className="rounded-full! uppercase tracking-wider">
                       Не ack
                     </Badge>
                   )}

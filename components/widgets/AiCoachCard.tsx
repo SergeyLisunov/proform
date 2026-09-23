@@ -54,7 +54,7 @@ export default function AiCoachCard() {
       <div className="relative p-5 text-white">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
               <i className="ki-filled ki-flash-circle text-[14px] text-amber-300" />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">AI-тренер</span>
@@ -77,9 +77,9 @@ export default function AiCoachCard() {
           <div className="text-xs text-red-200">Не удалось получить рекомендацию. <button onClick={load} className="underline">Повторить</button></div>
         ) : loading && !data ? (
           <div className="space-y-2">
-            <div className="h-3 w-2/3 animate-pulse rounded bg-white/15" />
-            <div className="h-3 w-4/5 animate-pulse rounded bg-white/15" />
-            <div className="h-3 w-1/2 animate-pulse rounded bg-white/15" />
+            <div className="h-3 w-2/3 animate-pulse rounded-sm bg-white/15" />
+            <div className="h-3 w-4/5 animate-pulse rounded-sm bg-white/15" />
+            <div className="h-3 w-1/2 animate-pulse rounded-sm bg-white/15" />
           </div>
         ) : data ? (
           <>

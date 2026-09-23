@@ -33,7 +33,7 @@ interface ValueChipProps {
 
 function ValueChip({ icon: Icon, label }: ValueChipProps) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-foreground shadow-sm">
+    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-foreground shadow-xs">
       <Icon
         aria-hidden="true"
         size={15}
@@ -48,7 +48,7 @@ function ValueChip({ icon: Icon, label }: ValueChipProps) {
 export default function HeroSection() {
   return (
     <section
-      className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(243,87,3,0.12),_transparent_55%),linear-gradient(180deg,_#FFFFFF_0%,_#FEF0E7_100%)]"
+      className="relative w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(243,87,3,0.12),transparent_55%),linear-gradient(180deg,#FFFFFF_0%,#FEF0E7_100%)]"
     >
       <div className="mx-auto flex max-w-4xl flex-col items-center px-5 py-16 text-center sm:px-8 sm:py-24 lg:px-10 lg:py-28">
         {/* Eyebrow chip — shorter copy fits one line на narrow mobile (375px) */}

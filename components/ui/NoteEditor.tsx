@@ -94,7 +94,7 @@ export default function NoteEditor({
           rows={Math.max(minRows, lines.length + 1)}
           className={[
             'w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3',
-            'text-gray-800 leading-6 outline-none transition-colors',
+            'text-gray-800 leading-6 outline-hidden transition-colors',
             'placeholder:text-gray-400 font-mono text-sm',
             readOnly
               ? 'cursor-default bg-gray-50'

@@ -266,8 +266,8 @@ export default async function AdminCommercePage() {
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(22,163,74,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.10),_transparent_28%)]" />
+      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-xs">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(22,163,74,0.10),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(243,87,3,0.10),transparent_28%)]" />
         <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div className="max-w-2xl">
             <div className="mb-3 flex flex-wrap gap-2">
@@ -295,7 +295,7 @@ export default async function AdminCommercePage() {
             <Link
               href="https://yookassa.ru/my"
               target="_blank"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F35703] to-[#D44A02] px-3.5 py-2 text-xs font-semibold text-white shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-[#F35703] to-[#D44A02] px-3.5 py-2 text-xs font-semibold text-white shadow-xs"
             >
               ЮKassa Dashboard →
             </Link>
@@ -312,7 +312,7 @@ export default async function AdminCommercePage() {
           <div className="text-xs text-amber-900">
             <div className="font-semibold">Блоки биллинга недоступны</div>
             <p className="mt-1 text-amber-800">
-              В окружении не задан <code className="rounded bg-amber-100 px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>,
+              В окружении не задан <code className="rounded-sm bg-amber-100 px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>,
               поэтому платежи, инвойсы и разовые услуги не читались. Подписки, MRR и churn ниже — настоящие.
             </p>
           </div>
@@ -326,7 +326,7 @@ export default async function AdminCommercePage() {
           return (
             <div
               key={k.label}
-              className="rounded-2xl border bg-card p-5 shadow-sm"
+              className="rounded-2xl border bg-card p-5 shadow-xs"
               style={{ borderColor: tone.border }}
             >
               <div className="flex items-start justify-between gap-3">
@@ -494,7 +494,7 @@ export default async function AdminCommercePage() {
       </section>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
-        MRR — прогнозный, рассчитан как число активных подписок × номинальная цена тарифа. Настройте цены через переменные окружения <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_PRO</code> и <code className="rounded bg-muted px-1 py-0.5">ADMIN_PRICE_TEAM</code>, либо синхронизируйте ЮKassa-тарифы в БД через таблицу <code className="rounded bg-muted px-1 py-0.5">tariffs</code>.
+        MRR — прогнозный, рассчитан как число активных подписок × номинальная цена тарифа. Настройте цены через переменные окружения <code className="rounded-sm bg-muted px-1 py-0.5">ADMIN_PRICE_PRO</code> и <code className="rounded-sm bg-muted px-1 py-0.5">ADMIN_PRICE_TEAM</code>, либо синхронизируйте ЮKassa-тарифы в БД через таблицу <code className="rounded-sm bg-muted px-1 py-0.5">tariffs</code>.
       </div>
     </div>
   )

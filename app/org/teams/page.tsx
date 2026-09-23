@@ -174,7 +174,7 @@ export default function OrgTeamsPage() {
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); archive(g.id) }}
                     disabled={busyId === g.id}
-                    className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0 hover:!bg-red-50"
+                    className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0 hover:bg-red-50!"
                     title="Архивировать">
                     <i className="ki-filled ki-archive text-xs text-red-500" />
                   </button>
@@ -182,7 +182,7 @@ export default function OrgTeamsPage() {
 
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {ageRange && (
-                    <Badge variant="warning" size="sm" className="!rounded-full uppercase tracking-wider">
+                    <Badge variant="warning" size="sm" className="rounded-full! uppercase tracking-wider">
                       {ageRange}
                     </Badge>
                   )}
@@ -215,9 +215,9 @@ export default function OrgTeamsPage() {
 
       {/* Create Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={() => setShowCreate(false)}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -232,26 +232,26 @@ export default function OrgTeamsPage() {
                 <input value={name} onChange={e => setName(e.target.value)}
                   placeholder="Например: U-12, Senior, Бегуны"
                   maxLength={100}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-none" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-hidden" />
               </div>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Описание (опц.)</label>
                 <textarea value={description} onChange={e => setDescription(e.target.value)}
                   rows={2} maxLength={2000}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-none" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-hidden" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Возраст от</label>
                   <input type="number" min={3} max={120} value={ageMin}
                     onChange={e => setAgeMin(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-none" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-hidden" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Возраст до</label>
                   <input type="number" min={3} max={120} value={ageMax}
                     onChange={e => setAgeMax(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-none" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-violet-400 outline-hidden" />
                 </div>
               </div>
               <div>

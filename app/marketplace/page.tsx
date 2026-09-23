@@ -202,14 +202,14 @@ function MarketplaceInner() {
           <i className="ki-filled ki-magnifier pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground" />
           <input type="search" value={searchInput} onChange={e => setSearchInput(e.target.value)}
             placeholder="Поиск по названию или описанию"
-            className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-sm outline-none focus:border-orange-400" />
+            className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-sm outline-hidden focus:border-orange-400" />
         </div>
         <button type="submit"
           className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 text-sm font-bold whitespace-nowrap">
           Найти
         </button>
         <select value={sort} onChange={e => setFilter('sort', e.target.value === 'newest' ? '' : e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold outline-none focus:border-orange-400">
+          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold outline-hidden focus:border-orange-400">
           <option value="newest">Сначала новые</option>
           <option value="price_asc">Сначала дешевле</option>
           <option value="price_desc">Сначала дороже</option>
@@ -230,7 +230,7 @@ function MarketplaceInner() {
               aria-pressed={verifiedOnly}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-colors ${
                 verifiedOnly
-                  ? 'bg-blue-600 text-white border border-blue-700 shadow-sm'
+                  ? 'bg-blue-600 text-white border border-blue-700 shadow-xs'
                   : 'bg-card text-blue-700 border border-blue-200 hover:bg-blue-50'
               }`}
               title="Показать только верифицированных тренеров"
@@ -330,7 +330,7 @@ function MarketplaceInner() {
               return (
                 <Link key={`feat-${o.kind}-${o.id}`}
                   href={`/marketplace/${o.kind}/${o.id}`}
-                  className="rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col gap-3 no-underline">
+                  className="rounded-2xl border-2 border-amber-200 bg-linear-to-br from-amber-50 to-white p-5 hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col gap-3 no-underline">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="text-base font-bold text-navy-500 line-clamp-2">{o.title}</h3>
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0"

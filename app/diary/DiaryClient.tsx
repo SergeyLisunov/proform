@@ -15,7 +15,7 @@ function DurationHMInput({ valueMin, onChange }: { valueMin: string; onChange: (
   const totalN = Number(valueMin) || 0
   const h = Math.floor(totalN / 60)
   const m = totalN % 60
-  const base = 'w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white'
+  const base = 'w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white'
   function update(hNew: number, mNew: number) {
     const hv = Math.max(0, Number.isFinite(hNew) ? Math.floor(hNew) : 0)
     const mv = Math.max(0, Math.min(59, Number.isFinite(mNew) ? Math.floor(mNew) : 0))
@@ -89,7 +89,7 @@ export default function DiaryClient({ role, userId }: Props) {
   const inp = (field: keyof typeof form, type = 'text', placeholder = '') => (
     <input type={type} placeholder={placeholder} value={String(form[field])}
       onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-      className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white"
+      className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white"
     />
   )
 
@@ -123,7 +123,7 @@ export default function DiaryClient({ role, userId }: Props) {
                 <div>
                   {lbl('Время суток')}
                   <select value={form.workout_time_of_day} onChange={e => setForm(f => ({ ...f, workout_time_of_day: e.target.value }))}
-                    className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB] bg-white">
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] bg-white">
                     {TIME_OF_DAY.map(t => <option key={t}>{t}</option>)}
                   </select>
                 </div>
@@ -157,11 +157,11 @@ export default function DiaryClient({ role, userId }: Props) {
               <div>
                 {lbl('Заметки')}
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="Ощущения, наблюдения..."
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition resize-none" />
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition resize-none" />
               </div>
               <label className="flex items-center gap-2.5 cursor-pointer">
                 <input type="checkbox" checked={form.is_public} onChange={e => setForm(f => ({ ...f, is_public: e.target.checked }))}
-                  className="w-4 h-4 rounded border-[#E2E8F0] text-[#2563EB]" />
+                  className="w-4 h-4 rounded-sm border-[#E2E8F0] text-[#2563EB]" />
                 <span className="text-sm text-slate-600">Сделать тренировку публичной</span>
               </label>
             </div>

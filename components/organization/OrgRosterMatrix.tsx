@@ -80,7 +80,7 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
         <p className="text-sm font-bold mb-3">Загрузка тренеров…</p>
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-10 bg-muted rounded animate-pulse" />
+            <div key={i} className="h-10 bg-muted rounded-sm animate-pulse" />
           ))}
         </div>
       </Card>
@@ -131,12 +131,12 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-semibold text-foreground truncate">{r.coach_name}</span>
                   {overloaded && (
-                    <Badge variant="destructive" size="sm" className="!rounded-full uppercase tracking-wider">
+                    <Badge variant="destructive" size="sm" className="rounded-full! uppercase tracking-wider">
                       Перегружен
                     </Badge>
                   )}
                   {idle && (
-                    <Badge variant="secondary" size="sm" className="!rounded-full uppercase tracking-wider">
+                    <Badge variant="secondary" size="sm" className="rounded-full! uppercase tracking-wider">
                       Без атлетов
                     </Badge>
                   )}

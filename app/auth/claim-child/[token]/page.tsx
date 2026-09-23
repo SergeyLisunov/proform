@@ -66,7 +66,7 @@ export default function ClaimChildPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+    <main className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.14),transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto flex w-full max-w-[480px] flex-col gap-6">
         <Link href="/" className="self-center flex items-center gap-2.5 no-underline">
           <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
@@ -124,7 +124,7 @@ export default function ClaimChildPage({ params }: PageProps) {
                     <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
                     <input type="email" required autoComplete="email" value={email}
                       onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   </div>
                 </div>
 
@@ -141,7 +141,7 @@ export default function ClaimChildPage({ params }: PageProps) {
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); setError('') }}
                       placeholder="••••••••"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-14 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-14 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                     <button type="button" onClick={() => setShowPwd((v) => !v)} aria-label={showPwd ? 'Скрыть' : 'Показать'}
                       className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground hover:bg-orange-50 hover:text-orange-600">
                       {showPwd ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -158,7 +158,7 @@ export default function ClaimChildPage({ params }: PageProps) {
                     <input type={showPwd ? 'text' : 'password'} required autoComplete="new-password"
                       value={confirm} onChange={(e) => { setConfirm(e.target.value); setError('') }}
                       placeholder="••••••••"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   </div>
                 </div>
 

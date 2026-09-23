@@ -81,7 +81,7 @@ const PAINS: PainCard[] = [
 function PainTile({ pain }: { pain: PainCard }) {
   const { icon: Icon, title, description, hue } = pain
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5 shadow-sm sm:p-6">
+    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5 shadow-xs sm:p-6">
       <div
         aria-hidden="true"
         className="flex h-12 w-12 items-center justify-center rounded-2xl sm:h-14 sm:w-14"

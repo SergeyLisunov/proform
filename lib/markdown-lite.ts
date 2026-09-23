@@ -22,7 +22,7 @@ function escapeHtml(s: string): string {
 function renderInline(escaped: string): string {
   return escaped
     // `код` — до жирного/курсива, чтобы ** внутри кода не срабатывал
-    .replace(/`([^`\n]+)`/g, '<code class="rounded bg-muted px-1 py-0.5 text-[0.85em]">$1</code>')
+    .replace(/`([^`\n]+)`/g, '<code class="rounded-sm bg-muted px-1 py-0.5 text-[0.85em]">$1</code>')
     .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
 }

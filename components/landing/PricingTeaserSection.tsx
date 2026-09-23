@@ -43,7 +43,7 @@ const POINTS: PricingPoint[] = [
 export default function PricingTeaserSection() {
   return (
     <section
-      className="w-full bg-gradient-to-br from-orange-50/40 via-white to-orange-50/30 px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
+      className="w-full bg-linear-to-br from-orange-50/40 via-white to-orange-50/30 px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
       aria-labelledby="pricing-teaser-heading"
     >
       <div className="mx-auto max-w-5xl">
@@ -72,7 +72,7 @@ export default function PricingTeaserSection() {
             return (
               <article
                 key={p.title}
-                className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-6 shadow-sm"
+                className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-6 shadow-xs"
               >
                 <div
                   aria-hidden="true"

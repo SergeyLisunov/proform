@@ -84,10 +84,10 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
 
       {/* Legend */}
       <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background:'#2563EB' }} />Тренировка</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background:'#F35703' }} />Соревнование</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs" style={{ background:'#2563EB' }} />Тренировка</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs" style={{ background:'#F35703' }} />Соревнование</span>
         {layer !== 'none' && <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm" style={{ background: CYCLE_STYLES[layer].bg, border: `1.5px solid ${CYCLE_STYLES[layer].border}` }} />
+          <span className="w-3 h-3 rounded-xs" style={{ background: CYCLE_STYLES[layer].bg, border: `1.5px solid ${CYCLE_STYLES[layer].border}` }} />
           Блок {layer}цикла
         </span>}
       </div>
@@ -124,7 +124,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
                   const col = isComp ? '#F35703' : (TYPE_COLOR[w.activity_type??''] ?? '#64748B')
                   return (
                     <div key={w.id} className="mb-0.5 flex items-center gap-1">
-                      <div className="flex-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white truncate" style={{ background: col }}>
+                      <div className="flex-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm text-white truncate" style={{ background: col }}>
                         {w.activity_type ?? (isComp ? 'Соревнование' : 'Тренировка')}
                       </div>
                       {w.activity_strain && (

@@ -64,7 +64,7 @@ const NOT_CARDS: NotCard[] = [
 function NotTile({ card }: { card: NotCard }) {
   const { icon: Icon, alternative, whyNotFit, proformDoes } = card
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-white p-6 transition-colors hover:border-orange-200 hover:shadow-sm">
+    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-white p-6 transition-colors hover:border-orange-200 hover:shadow-xs">
       {/* Strike-through visual */}
       <div className="flex items-center gap-3">
         <div

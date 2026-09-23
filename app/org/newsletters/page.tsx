@@ -165,7 +165,7 @@ export default function OrgNewslettersPage() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(147,51,234,0.12),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(243,87,3,0.1),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(147,51,234,0.12),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(243,87,3,0.1),transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
@@ -196,7 +196,7 @@ export default function OrgNewslettersPage() {
                 </button>
                 <Link
                   href="/org/wall"
-                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-sm transition-all hover:border-violet-200 hover:text-violet-700"
+                  className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-violet-200 hover:text-violet-700"
                 >
                   <i className="ki-filled ki-abstract-45 text-sm" />
                   Перейти к стене
@@ -205,14 +205,14 @@ export default function OrgNewslettersPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[360px]">
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Состояние очереди</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{scheduled.length} заплан. · {drafts.length} чернов.</div>
                 <div className="mt-1 text-2xs text-muted-foreground">
                   {scheduled.length > 0 ? 'Есть активные отправки в очереди' : 'Очередь сейчас свободна'}
                 </div>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Последняя активность</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">
                   {latestNewsletter ? formatDate(latestNewsletter.created_at, { day: 'numeric', month: 'long' }) : 'Нет данных'}
@@ -292,7 +292,7 @@ export default function OrgNewslettersPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {section.items.map(nl => (
-                <Card key={nl.id} className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-sm">
+                <Card key={nl.id} className="p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-xs">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="mb-2 flex items-center gap-2 flex-wrap">
@@ -387,7 +387,7 @@ export default function OrgNewslettersPage() {
                   onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
                   required
                   placeholder="Например: График сборов на следующую неделю"
-                  className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-violet-400"
+                  className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-violet-400"
                 />
               </div>
               <div>
@@ -398,7 +398,7 @@ export default function OrgNewslettersPage() {
                   required
                   rows={6}
                   placeholder="Опишите важную информацию, действия для участников и дедлайны…"
-                  className="w-full resize-none rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-violet-400"
+                  className="w-full resize-none rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-violet-400"
                 />
               </div>
               <div>
@@ -413,7 +413,7 @@ export default function OrgNewslettersPage() {
                         type="checkbox"
                         checked={form[key as keyof typeof form] as boolean}
                         onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))}
-                        className="rounded border-border"
+                        className="rounded-sm border-border"
                       />
                       <span>{label}</span>
                     </label>
@@ -428,7 +428,7 @@ export default function OrgNewslettersPage() {
                   type="datetime-local"
                   value={form.scheduled_at}
                   onChange={e => setForm(f => ({ ...f, scheduled_at: e.target.value }))}
-                  className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-none focus:border-violet-400"
+                  className="w-full rounded-2xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-violet-400"
                 />
                 <p className="mt-1 text-2xs text-muted-foreground">Если дата не задана, рассылку можно сохранить черновиком или отправить сразу.</p>
               </div>

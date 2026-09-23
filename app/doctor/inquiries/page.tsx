@@ -242,7 +242,7 @@ export default function DoctorInquiriesPage() {
                           <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                             Категория
                             <select value={convertCategory} onChange={e => setConvertCategory(e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400">
+                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-hidden focus:border-violet-400">
                               <option value="activity_restriction">Ограничение активности</option>
                               <option value="load_restriction">Ограничение нагрузки</option>
                               <option value="recovery">Восстановление</option>
@@ -255,7 +255,7 @@ export default function DoctorInquiriesPage() {
                           <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                             Тяжесть
                             <select value={convertSeverity} onChange={e => setConvertSeverity(e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400">
+                              className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-hidden focus:border-violet-400">
                               <option value="low">Низкая</option>
                               <option value="moderate">Умеренная</option>
                               <option value="high">Высокая</option>
@@ -267,7 +267,7 @@ export default function DoctorInquiriesPage() {
                           Действует до
                           <input type="date" value={convertValidUntil}
                             onChange={e => setConvertValidUntil(e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-violet-400" />
+                            className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-hidden focus:border-violet-400" />
                         </label>
                         {convertError && (
                           <Alert variant="destructive">{convertError}</Alert>
@@ -300,7 +300,7 @@ export default function DoctorInquiriesPage() {
                       onChange={e => setResponseInputs(prev => ({ ...prev, [i.id]: e.target.value }))}
                       rows={3} maxLength={4000}
                       placeholder="Структурированный ответ: оценка, рекомендация по нагрузке, follow-up"
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400 resize-vertical" />
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400 resize-vertical" />
                     <div className="flex items-center justify-between gap-2 mt-2">
                       <p className="text-[10px] text-muted-foreground">{responseInput.length}/4000 · мин 5 символов</p>
                       <button onClick={() => handleRespond(i.id)} disabled={busyId === i.id || responseInput.trim().length < 5}

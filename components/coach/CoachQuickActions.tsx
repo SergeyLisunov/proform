@@ -109,7 +109,7 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
               <i className="ki-filled ki-arrow-right text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </>
           )
-          const cn = 'group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm flex items-center gap-3 w-full'
+          const cn = 'group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-xs flex items-center gap-3 w-full'
           return a.href ? (
             <Link key={a.label} href={a.href} className={cn} style={{ borderColor: a.border }}>
               {inner}

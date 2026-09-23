@@ -86,7 +86,7 @@ export default function SecuritySection() {
           {PRINCIPLES.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur"
+              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-orange-400">
                 <Icon size={18} />

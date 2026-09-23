@@ -187,7 +187,7 @@ function StepIndicator({ current, role }: { current: Step; role: Role | null }) 
       </div>
 
       <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-border">
-        <div className="h-full rounded-full bg-gradient-to-r from-orange-500 via-amber-400 to-orange-300 transition-all" style={{ width: `${progress}%` }} />
+        <div className="h-full rounded-full bg-linear-to-r from-orange-500 via-amber-400 to-orange-300 transition-all" style={{ width: `${progress}%` }} />
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3">
@@ -456,7 +456,7 @@ export default function RegisterPage() {
   const selectedRoleMeta = ROLES.find((role) => role.value === selectedRole)
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.16),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-6 sm:px-6 lg:px-10">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.16),transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-6 sm:px-6 lg:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[1180px] overflow-hidden rounded-[30px] border border-orange-100/80 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.10)]">
         <div className="relative hidden w-[430px] shrink-0 overflow-hidden bg-zinc-950 lg:flex lg:flex-col">
           <div
@@ -467,7 +467,7 @@ export default function RegisterPage() {
               backgroundSize: '36px 36px',
             }}
           />
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-orange-500 via-amber-400 to-transparent" />
           <div className="absolute right-[-92px] top-[-74px] h-56 w-56 rounded-full bg-orange-500/25 blur-3xl" />
           <div className="absolute bottom-[-120px] left-[-80px] h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
 
@@ -506,7 +506,7 @@ export default function RegisterPage() {
               ].map((item, index) => (
                 <div
                   key={item.label}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
+                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-orange-400">
                     <i className={['ki-filled', index === 0 ? 'ki-user-square' : index === 1 ? 'ki-shield-tick' : 'ki-profile-circle', 'text-[17px]'].join(' ')} />
@@ -706,7 +706,7 @@ export default function RegisterPage() {
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       placeholder="Иван Иванов"
-                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                     />
                   </div>
 
@@ -721,7 +721,7 @@ export default function RegisterPage() {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="you@example.com"
-                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all placeholder:text-muted-foreground/50 focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                     />
                   </div>
 
@@ -742,7 +742,7 @@ export default function RegisterPage() {
                         setPwdError('')
                       }}
                       placeholder="••••••••"
-                      className={`w-full rounded-2xl border bg-background px-4 py-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/50 focus:ring-4 ${
+                      className={`w-full rounded-2xl border bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all placeholder:text-muted-foreground/50 focus:ring-4 ${
                         pwdError
                           ? 'border-red-400 focus:ring-red-200'
                           : 'border-input focus:border-orange-400 focus:ring-orange-500/10'
@@ -820,7 +820,7 @@ export default function RegisterPage() {
                           value={athleteForm.first_name}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, first_name: event.target.value }))}
                           placeholder="Иван"
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         />
                       </div>
                       <div>
@@ -832,7 +832,7 @@ export default function RegisterPage() {
                           value={athleteForm.last_name}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, last_name: event.target.value }))}
                           placeholder="Иванов"
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         />
                       </div>
                       <div>
@@ -844,7 +844,7 @@ export default function RegisterPage() {
                           value={athleteForm.birth_date}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, birth_date: event.target.value }))}
                           max={new Date().toISOString().slice(0, 10)}
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         />
                       </div>
                       <div>
@@ -854,7 +854,7 @@ export default function RegisterPage() {
                         <select
                           value={athleteForm.gender}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, gender: event.target.value }))}
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         >
                           <option value="">— Выбрать —</option>
                           <option value="male">Мужской</option>
@@ -884,7 +884,7 @@ export default function RegisterPage() {
                           value={athleteForm.height_cm}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, height_cm: event.target.value }))}
                           placeholder="175"
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         />
                       </div>
                       <div>
@@ -899,7 +899,7 @@ export default function RegisterPage() {
                           value={athleteForm.weight_kg}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, weight_kg: event.target.value }))}
                           placeholder="70"
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         />
                       </div>
                     </div>
@@ -919,7 +919,7 @@ export default function RegisterPage() {
                         <select
                           value={athleteForm.primary_sport}
                           onChange={(event) => setAthleteForm((form) => ({ ...form, primary_sport: event.target.value }))}
-                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                          className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                         >
                           <option value="">— Выбрать —</option>
                           {SPORTS.map((sport) => (
@@ -1015,7 +1015,7 @@ export default function RegisterPage() {
                             value={athleteForm.weekly_training_hours}
                             onChange={(event) => setAthleteForm((form) => ({ ...form, weekly_training_hours: event.target.value }))}
                             placeholder="8"
-                            className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                            className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                           />
                         </div>
                         <div>
@@ -1027,7 +1027,7 @@ export default function RegisterPage() {
                             value={athleteForm.city}
                             onChange={(event) => setAthleteForm((form) => ({ ...form, city: event.target.value }))}
                             placeholder="Москва"
-                            className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
+                            className="w-full rounded-2xl border border-input bg-background px-3 py-2.5 text-sm outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
                           />
                         </div>
                       </div>
@@ -1093,7 +1093,7 @@ export default function RegisterPage() {
                           'group flex flex-col gap-3 rounded-[24px] border p-4 text-left transition-all',
                           isActive
                             ? 'shadow-[0_10px_30px_rgba(15,23,42,0.08)]'
-                            : 'hover:shadow-sm',
+                            : 'hover:shadow-xs',
                         ].join(' ')}
                         style={{
                           background: isActive ? plan.bg : '#FFFFFF',

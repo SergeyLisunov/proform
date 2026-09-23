@@ -138,7 +138,7 @@ export default function OrgDashboard() {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <section className="relative overflow-hidden rounded-3xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.13),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(37,99,235,0.08),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.13),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_28%)]" />
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div className="max-w-2xl">
@@ -212,12 +212,12 @@ export default function OrgDashboard() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[360px]">
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Последняя активность</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{formatRuDate(latestActivity, { day: 'numeric', month: 'long' })}</div>
                 <div className="mt-1 text-2xs text-muted-foreground">Последняя публикация или рассылка</div>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 p-4 shadow-xs">
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Состояние канала</div>
                 <div className="mt-2 text-lg font-semibold text-foreground">{pinnedCount} закрепл. · {sentNewsletters} отправл.</div>
                 <div className="mt-1 text-2xs text-muted-foreground">
@@ -240,7 +240,7 @@ export default function OrgDashboard() {
       <OrgTeamsOverview orgId={org.id} />
       {/* End Day 11 widgets ↑ */}
 
-      <section className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-sm">
+      <section className="rounded-3xl border border-border bg-card p-4 md:p-5 shadow-xs">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm font-semibold text-navy-500">Быстрые действия</h3>
@@ -281,7 +281,7 @@ export default function OrgDashboard() {
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-sm">
+        <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
           <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border">
             <div>
               <div className="flex items-center gap-2">
@@ -336,7 +336,7 @@ export default function OrgDashboard() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-sm">
+        <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
           <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border">
             <div>
               <div className="flex items-center gap-2">

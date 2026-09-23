@@ -137,7 +137,7 @@ export default function CoachInquiriesPage() {
           </p>
         </div>
         <button onClick={openCreate}
-          className="rounded-2xl bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
+          className="rounded-2xl bg-linear-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
           <i className="ki-filled ki-plus text-sm" />
           Новый запрос
         </button>
@@ -235,9 +235,9 @@ export default function CoachInquiriesPage() {
 
       {/* Create modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={() => setShowCreate(false)}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -256,14 +256,14 @@ export default function CoachInquiriesPage() {
                   <div>
                     <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Атлет *</label>
                     <select value={athleteId} onChange={e => setAthleteId(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400">
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                       {athletes.map(a => <option key={a.id} value={a.id}>{a.name ?? a.id.slice(0, 8)}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Тип вопроса</label>
                     <select value={questionType} onChange={e => setQuestionType(e.target.value as QuestionType)}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400">
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400">
                       {(Object.entries(QUESTION_TYPE_META) as Array<[QuestionType, typeof QUESTION_TYPE_META[QuestionType]]>).map(([k, v]) =>
                         <option key={k} value={k}>{v.label}</option>
                       )}
@@ -291,7 +291,7 @@ export default function CoachInquiriesPage() {
                     <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Вопрос * (мин. 10 символов)</label>
                     <textarea value={question} onChange={e => setQuestion(e.target.value)} rows={5} maxLength={2000}
                       placeholder={QUESTION_TYPE_META[questionType].placeholder}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-violet-400 resize-vertical" />
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-violet-400 resize-vertical" />
                     <p className="mt-1 text-[10px] text-muted-foreground">{question.length}/2000</p>
                   </div>
                   {formError && (

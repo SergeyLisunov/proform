@@ -322,7 +322,7 @@ export default function AdaptivePlanForm() {
   return (
     <div>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-blue-50 via-white to-cyan-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-4">
             <i className="ki-filled ki-focus text-[11px]" /> Бесплатный AI-инструмент
@@ -374,14 +374,14 @@ export default function AdaptivePlanForm() {
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Спорт</label>
               <select value={sport} onChange={e => setSport(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400">
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-blue-400">
                 {SPORT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Уровень</label>
               <select value={level} onChange={e => setLevel(e.target.value as Level)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400">
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-blue-400">
                 {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
               </select>
             </div>
@@ -389,7 +389,7 @@ export default function AdaptivePlanForm() {
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Цель (опц.)</label>
               <input value={goal} onChange={e => setGoal(e.target.value)} maxLength={400}
                 placeholder="Полумарафон за 4 месяца"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400" />
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-blue-400" />
             </div>
           </div>
 
@@ -409,21 +409,21 @@ export default function AdaptivePlanForm() {
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
                   <input value={r.date} onChange={e => updateRow(r.id, { date: e.target.value })}
                     type="date"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400" />
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <input value={r.activity_type} onChange={e => updateRow(r.id, { activity_type: e.target.value })} maxLength={40}
                     placeholder="Бег"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400" />
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <input value={r.duration_min} onChange={e => updateRow(r.id, { duration_min: e.target.value })}
                     type="number" min={0} max={600} placeholder="Мин"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400" />
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <input value={r.perceived_load} onChange={e => updateRow(r.id, { perceived_load: e.target.value })}
                     type="number" min={0} max={10} placeholder="RPE 0-10"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400" />
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <input value={r.recovery_score} onChange={e => updateRow(r.id, { recovery_score: e.target.value })}
                     type="number" min={0} max={100} placeholder="Recovery"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400" />
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <select value={r.felt} onChange={e => updateRow(r.id, { felt: e.target.value as '' | Felt })}
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400">
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400">
                     <option value="">Felt</option>
                     <option value="great">Great</option>
                     <option value="ok">OK</option>
@@ -441,7 +441,7 @@ export default function AdaptivePlanForm() {
               + Тренировка ({rows.length}/30)
             </button>
             <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
-              className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+              className="rounded-lg bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Генерируем план…' : `Получить план (${validRows.length})`}
             </button>
           </div>
@@ -461,7 +461,7 @@ export default function AdaptivePlanForm() {
       {/* ── Result ─────────────────────────────────────────────────────── */}
       {plan && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
-          <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/40 to-white p-5 md:p-6">
+          <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50/40 to-white p-5 md:p-6">
             <h2 className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2"><i className="ki-filled ki-calendar text-xl md:text-2xl" /> Ваш 7-дневный план</h2>
 
             {/* Overview + assessment */}
@@ -510,7 +510,7 @@ export default function AdaptivePlanForm() {
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                        <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">
+                        <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-xs">
                           <i className="ki-filled ki-lock-2 text-[10px]" />
                         </span>
                       </div>
@@ -554,7 +554,7 @@ export default function AdaptivePlanForm() {
                 </p>
                 <input type="email" required placeholder="athlete@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400" />
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-blue-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-blue-500" />
@@ -614,7 +614,7 @@ export default function AdaptivePlanForm() {
 
       {/* ── CTA ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 pb-10">
-        <div className="rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6 md:p-8">
+        <div className="rounded-2xl bg-linear-to-r from-blue-500 to-cyan-500 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Хотите свежий план каждую неделю автоматически?</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
             Sporteo логирует ваши тренировки + Garmin / Whoop / Apple Health.

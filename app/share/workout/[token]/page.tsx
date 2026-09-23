@@ -64,7 +64,7 @@ export default async function SharedWorkoutPage({
   if (!data) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
-        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xs">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
             <i className="ki-filled ki-lock-2 text-[22px]" />
           </div>
@@ -88,7 +88,7 @@ export default async function SharedWorkoutPage({
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-10 px-4">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white py-10 px-4">
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -104,7 +104,7 @@ export default async function SharedWorkoutPage({
         </div>
 
         {/* Athlete card */}
-        <div className="mb-5 flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-5 flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-xs">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-slate-500">
             {data.athlete_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -124,7 +124,7 @@ export default async function SharedWorkoutPage({
         </div>
 
         {/* Workout card */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Тренировка</div>

@@ -146,13 +146,13 @@ export default function WorkoutCommentsDrawer({
 
   const body = (
     <div
-      className="fixed inset-0 z-[9999] flex justify-end"
+      className="fixed inset-0 z-9999 flex justify-end"
       role="dialog"
       aria-modal="true"
       onKeyDown={e => { if (e.key === 'Escape') close() }}
     >
       <div
-        className={`absolute inset-0 bg-slate-900/35 backdrop-blur-sm transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-slate-900/35 backdrop-blur-xs transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
         onClick={close}
       />
       <div
@@ -217,7 +217,7 @@ export default function WorkoutCommentsDrawer({
                         <span className="text-[10px] text-muted-foreground">{fmtDate(c.created_at)}</span>
                       </div>
                       <div
-                        className={`mt-1 inline-block max-w-full whitespace-pre-wrap break-words rounded-2xl px-3 py-2 text-sm ${
+                        className={`mt-1 inline-block max-w-full whitespace-pre-wrap wrap-break-word rounded-2xl px-3 py-2 text-sm ${
                           mine
                             ? 'bg-orange-500 text-white rounded-tr-sm'
                             : 'bg-card border border-border text-foreground rounded-tl-sm'
@@ -266,7 +266,7 @@ export default function WorkoutCommentsDrawer({
               placeholder="Написать комментарий…"
               rows={2}
               maxLength={4000}
-              className="flex-1 resize-none rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-none transition-all focus:border-orange-400"
+              className="flex-1 resize-none rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-hidden transition-all focus:border-orange-400"
             />
             <button
               type="submit"

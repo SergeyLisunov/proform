@@ -264,7 +264,7 @@ export default function ClubAuditForm() {
   return (
     <div>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-emerald-50 via-white to-teal-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-4">
             <i className="ki-filled ki-focus text-[11px] mr-1" />Бесплатный аудит для директоров клубов
@@ -313,12 +313,12 @@ export default function ClubAuditForm() {
                 <label className="text-[11px] font-semibold text-slate-600">Название (опц.)</label>
                 <input value={clubName} onChange={e => setClubName(e.target.value)} maxLength={120}
                   placeholder="Demo Athletic"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Основной спорт</label>
                 <select value={primarySport} onChange={e => setPrimarySport(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {SPORT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
@@ -326,7 +326,7 @@ export default function ClubAuditForm() {
                 <label className="text-[11px] font-semibold text-slate-600">Месячный доход (опц., руб)</label>
                 <input value={revenue} onChange={e => setRevenue(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} step={10000} placeholder="850000"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
@@ -339,19 +339,19 @@ export default function ClubAuditForm() {
                 <label className="text-[11px] font-semibold text-slate-600">Атлетов всего *</label>
                 <input value={totalAthletes} onChange={e => setTotalAthletes(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={1} max={10000} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Активных (платящих) *</label>
                 <input value={activeAthletes} onChange={e => setActiveAthletes(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={10000} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Тренеров *</label>
                 <input value={coachesCount} onChange={e => setCoachesCount(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={1} max={500} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
@@ -364,19 +364,19 @@ export default function ClubAuditForm() {
                 <label className="text-[11px] font-semibold text-slate-600">Ушло за 90 дней</label>
                 <input value={departed90d} onChange={e => setDeparted90d(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={10000} placeholder="0"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Целевых сессий/неделю</label>
                 <input value={sessionsTarget} onChange={e => setSessionsTarget(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={20} step={0.5} placeholder="3"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Фактических сессий/неделю</label>
                 <input value={sessionsActual} onChange={e => setSessionsActual(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={20} step={0.5} placeholder="2.5"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
@@ -388,21 +388,21 @@ export default function ClubAuditForm() {
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Тренировки</label>
                 <select value={trainingTracking} onChange={e => setTrainingTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Биллинг</label>
                 <select value={billingTracking} onChange={e => setBillingTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Мед.допуски</label>
                 <select value={medicalTracking} onChange={e => setMedicalTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -431,7 +431,7 @@ export default function ClubAuditForm() {
 
           <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-slate-200">
             <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
-              className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+              className="rounded-lg bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Анализируем клуб…' : 'Получить audit-отчёт →'}
             </button>
           </div>
@@ -447,7 +447,7 @@ export default function ClubAuditForm() {
       {/* ── Result ─────────────────────────────────────────────────────── */}
       {report && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
-          <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/40 to-white p-5 md:p-6">
+          <div className="rounded-2xl border border-emerald-200 bg-linear-to-br from-emerald-50/40 to-white p-5 md:p-6">
             <h2 className="text-xl md:text-2xl font-bold mb-4 inline-flex items-center gap-2"><i className="ki-filled ki-clipboard" />Audit-отчёт</h2>
 
             {/* Health score hero */}
@@ -503,7 +503,7 @@ export default function ClubAuditForm() {
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-xs">
                           <i className="ki-filled ki-lock-2" />email откроет полный отчёт
                         </span>
                       </div>
@@ -547,7 +547,7 @@ export default function ClubAuditForm() {
                 </p>
                 <input type="email" required placeholder="director@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-emerald-500" />
@@ -603,7 +603,7 @@ export default function ClubAuditForm() {
 
       {/* ── CTA ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 pb-10">
-        <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 md:p-8">
+        <div className="rounded-2xl bg-linear-to-r from-emerald-500 to-teal-600 text-white p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-bold">Все эти метрики автоматически в Org Dashboard</h3>
           <p className="mt-1 text-sm md:text-base opacity-90">
             Sporteo для клубов: KPI tiles, roster matrix с overload highlighting, recommendations stream от спортивных врачей,

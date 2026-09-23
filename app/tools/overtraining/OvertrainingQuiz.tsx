@@ -63,7 +63,7 @@ export default function OvertrainingQuiz() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-rose-50 via-white to-orange-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-rose-50 via-white to-orange-50 border-b border-slate-200">
         <div className="mx-auto max-w-3xl px-5 py-10">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 mb-3">
             <i className="ki-filled ki-pulse text-[11px]" />2 минуты — научный тест
@@ -81,7 +81,7 @@ export default function OvertrainingQuiz() {
       {/* Quiz / Result */}
       <section className="mx-auto max-w-3xl px-5 py-10">
         {!showResult ? (
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-xs">
             {/* Progress */}
             <div className="px-5 pt-4">
               <div className="flex items-center justify-between mb-1.5">
@@ -191,7 +191,7 @@ export default function OvertrainingQuiz() {
                   </p>
                   <input type="email" required placeholder="you@example.com"
                     value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-rose-400" />
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-rose-400" />
                   <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                     <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                       className="mt-0.5 accent-rose-500" />
@@ -207,7 +207,7 @@ export default function OvertrainingQuiz() {
             </div>
 
             {/* Next steps */}
-            <div className="rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white p-6">
+            <div className="rounded-2xl bg-linear-to-r from-rose-500 to-orange-500 text-white p-6">
               <h3 className="text-xl font-bold">Хотите отслеживать состояние автоматически?</h3>
               <p className="mt-1 text-sm opacity-90">
                 В Sporteo ваш тренер и спортивный врач видят ваши ответы каждую неделю и

@@ -186,14 +186,14 @@ export default function DoctorReportPage() {
           <label className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">До</label>
           <input type="date" value={to} onChange={e => setTo(e.target.value)} className="rounded-lg border border-input bg-background px-2 py-1 text-sm" />
           <button onClick={() => loadData()} className="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold hover:bg-accent">Обновить</button>
-          <button onClick={() => window.print()} className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-600">
+          <button onClick={() => window.print()} className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white shadow-xs hover:bg-red-600">
             <i className="ki-filled ki-printer mr-1 text-xs" /> Печать / PDF
           </button>
         </div>
       </div>
 
       {/* Report body */}
-      <article className="report-root mx-auto max-w-[900px] rounded-[20px] border border-border bg-card p-8 shadow-sm print:shadow-none">
+      <article className="report-root mx-auto max-w-[900px] rounded-[20px] border border-border bg-card p-8 shadow-xs print:shadow-none">
         {/* Header */}
         <header className="border-b border-border pb-5">
           <div className="flex items-start justify-between gap-4">

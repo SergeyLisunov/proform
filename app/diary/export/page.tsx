@@ -140,7 +140,7 @@ function ExportInner() {
                       {e.title && <h3 className="text-sm font-semibold mb-1">{e.title}</h3>}
                       <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-slate-800">{e.note}</p>
                       {e.session_data?.key_metrics && (
-                        <pre className="mt-2 rounded bg-slate-50 border border-slate-200 px-3 py-2 text-[11px] font-mono whitespace-pre-wrap">
+                        <pre className="mt-2 rounded-sm bg-slate-50 border border-slate-200 px-3 py-2 text-[11px] font-mono whitespace-pre-wrap">
                           {e.session_data.key_metrics}
                         </pre>
                       )}

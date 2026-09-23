@@ -190,23 +190,23 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
     <div
       aria-modal="true"
       role="dialog"
-      className="fixed inset-0 z-[9999] flex justify-end"
+      className="fixed inset-0 z-9999 flex justify-end"
       onKeyDown={handleKeyDown}
     >
       {/* Backdrop */}
       <div
         onClick={handleClose}
-        className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-[250ms] ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-250 ${visible ? 'opacity-100' : 'opacity-0'}`}
       />
 
       {/* Drawer panel */}
       <div
-        className={`relative w-full max-w-[440px] h-full bg-card border-l border-border shadow-[-8px_0_40px_rgba(0,0,0,0.18)] flex flex-col transition-transform duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`relative w-full max-w-[440px] h-full bg-card border-l border-border shadow-[-8px_0_40px_rgba(0,0,0,0.18)] flex flex-col transition-transform duration-260 ease-in-out ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-gradient-to-br from-amber-50/60 via-card to-card shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-linear-to-br from-amber-50/60 via-card to-card shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
               <i className="ki-filled ki-notepad-edit text-base" />
@@ -235,7 +235,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
             placeholder="Название (необязательно)"
             autoFocus
             maxLength={255}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100 transition-colors"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-hidden focus:border-amber-300 focus:ring-2 focus:ring-amber-100 transition-colors"
           />
           <NoteEditor
             value={content}

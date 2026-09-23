@@ -122,8 +122,8 @@ export default function ChallengesPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-sm md:p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.14),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.1),_transparent_28%)]" />
+      <section className="relative overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-xs md:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_28%)]" />
         <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-700">
@@ -165,7 +165,7 @@ export default function ChallengesPage() {
 
       {/* Create form */}
       {formOpen && canCreate && (
-        <section className="rounded-[20px] border border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[20px] border border-border bg-card p-5 shadow-xs">
           <form className="grid gap-4 md:grid-cols-2" onSubmit={create}>
             <div className="md:col-span-2">
               <label className="text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Название</label>
@@ -175,7 +175,7 @@ export default function ChallengesPage() {
                 onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                 maxLength={160}
                 required
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-emerald-400"
                 placeholder="Июньская беговая сотня"
               />
             </div>
@@ -252,7 +252,7 @@ export default function ChallengesPage() {
       )}
 
       {/* List */}
-      <section className="rounded-[20px] border border-border bg-card p-5 shadow-sm">
+      <section className="rounded-[20px] border border-border bg-card p-5 shadow-xs">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="h-6 w-6 rounded-full border-2 border-emerald-500 border-t-transparent pf-spin" />

@@ -65,7 +65,7 @@ const STEPS: Step[] = [
 function StepCard({ step, isLast }: { step: Step; isLast: boolean }) {
   const { num, icon: Icon, title, body, bullets, hue } = step
   return (
-    <article className="relative flex flex-col gap-5 rounded-3xl border-2 bg-white p-6 shadow-sm sm:p-7" style={{ borderColor: hue.ring }}>
+    <article className="relative flex flex-col gap-5 rounded-3xl border-2 bg-white p-6 shadow-xs sm:p-7" style={{ borderColor: hue.ring }}>
       {/* Number + icon row */}
       <div className="flex items-start justify-between gap-3">
         <div

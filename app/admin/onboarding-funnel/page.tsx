@@ -239,8 +239,8 @@ export default async function OnboardingFunnelPage({
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 pf-enter">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(243,87,3,0.10),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(124,58,237,0.10),_transparent_28%)]" />
+      <section className="relative overflow-hidden rounded-[32px] border border-border bg-card shadow-xs">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.10),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(124,58,237,0.10),transparent_28%)]" />
         <div className="relative flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between md:p-8">
           <div className="max-w-2xl">
             <div className="mb-3 flex flex-wrap gap-2">
@@ -282,7 +282,7 @@ export default async function OnboardingFunnelPage({
           const peak = f.per_step[0] || 1
           return (
             <div key={f.role}
-              className="rounded-[26px] border bg-card p-6 shadow-sm"
+              className="rounded-[26px] border bg-card p-6 shadow-xs"
               style={{ borderColor: meta.border }}>
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
@@ -511,7 +511,7 @@ export default async function OnboardingFunnelPage({
       </Card>
 
       <div className="rounded-2xl border border-dashed border-border bg-background/70 p-4 text-[11px] text-muted-foreground">
-        Funnel выведен из <code className="rounded bg-muted px-1 py-0.5">users.onboarding_state</code> JSONB
+        Funnel выведен из <code className="rounded-sm bg-muted px-1 py-0.5">users.onboarding_state</code> JSONB
         (W6 Migration 066). Backfilled legacy users (Migration 068) исключены из агрегатов выше,
         но видны в drill-down под статусом «Legacy». Step-level event log можно добавить отдельной
         миграцией если нужна point-in-time analytics (когда именно user закрыл tab).

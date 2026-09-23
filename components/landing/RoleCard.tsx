@@ -47,7 +47,7 @@ export default function RoleCard({
 
   return (
     <article
-      className="group flex flex-col rounded-3xl border bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex flex-col rounded-3xl border bg-white p-6 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md"
       style={{ borderColor: accentBorder, borderTopWidth: 3 }}
     >
       {/* Icon + role name */}
@@ -82,7 +82,7 @@ export default function RoleCard({
       {demoHref && (
         <Link
           href={demoHref}
-          className="mt-6 inline-flex items-center justify-center gap-1.5 rounded-xl border bg-white px-3 py-2 text-sm font-semibold no-underline transition-all group-hover:shadow-sm"
+          className="mt-6 inline-flex items-center justify-center gap-1.5 rounded-xl border bg-white px-3 py-2 text-sm font-semibold no-underline transition-all group-hover:shadow-xs"
           style={{ color: accent, borderColor: accentBorder }}
         >
           Открыть demo

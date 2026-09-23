@@ -36,7 +36,7 @@ function Surface({
   className?: string
 }) {
   return (
-    <div className={`overflow-hidden rounded-2xl border border-border bg-card shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-2xl border border-border bg-card shadow-xs ${className}`}>
       {children}
     </div>
   )
@@ -73,7 +73,7 @@ function PeriodSwitch({
   onChange: (value: string) => void
 }) {
   return (
-    <div className="flex items-center gap-1 rounded-2xl border border-border bg-background/80 p-1 shadow-sm">
+    <div className="flex items-center gap-1 rounded-2xl border border-border bg-background/80 p-1 shadow-xs">
       {PERIOD_OPTS.map((period) => (
         <button
           key={period.value}
@@ -81,7 +81,7 @@ function PeriodSwitch({
           onClick={() => onChange(period.value)}
           className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-all ${
             value === period.value
-              ? 'bg-orange-500 text-white shadow-sm'
+              ? 'bg-orange-500 text-white shadow-xs'
               : 'text-muted-foreground hover:bg-accent hover:text-foreground'
           }`}
         >
@@ -106,7 +106,7 @@ function MetricCard({
   hint?: string
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-sm">
+    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
@@ -135,7 +135,7 @@ function InsightCard({
   icon: string
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-sm">
+    <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
       <div className="flex items-start gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent}`}>
           <i className={`ki-filled ${icon} text-base`} />
@@ -198,7 +198,7 @@ function CoachAnalytics() {
       description="Сравнение атлетов, командные метрики и радарные графики доступны на плане Team"
     >
       <div className="flex flex-col gap-6 pf-enter">
-        <Surface className="relative bg-gradient-to-br from-orange-50 via-card to-background p-5 md:p-6">
+        <Surface className="relative bg-linear-to-br from-orange-50 via-card to-background p-5 md:p-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_36%)]" />
           <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
@@ -247,7 +247,7 @@ function CoachAnalytics() {
 
             <div className="flex flex-col gap-3">
               <PeriodSwitch value={period} onChange={setPeriod} />
-              <div className="rounded-2xl border border-border bg-background/80 px-4 py-3 shadow-sm">
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-3 shadow-xs">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   Командный фокус
                 </p>
@@ -477,7 +477,7 @@ function AthleteAnalytics() {
       description="Детальные графики восстановления, нагрузки, сна и зон пульса доступны на плане Pro"
     >
       <div className="flex flex-col gap-6 pf-enter">
-        <Surface className="relative bg-gradient-to-br from-orange-50 via-card to-background p-5 md:p-6">
+        <Surface className="relative bg-linear-to-br from-orange-50 via-card to-background p-5 md:p-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(243,87,3,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(124,58,237,0.08),transparent_36%)]" />
           <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
@@ -526,7 +526,7 @@ function AthleteAnalytics() {
 
             <div className="flex flex-col gap-3">
               <PeriodSwitch value={period} onChange={setPeriod} />
-              <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/80 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-4 rounded-2xl border border-border bg-background/80 px-4 py-3 shadow-xs">
                 <RecoveryRing score={62} size={88} />
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">

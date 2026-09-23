@@ -86,7 +86,7 @@ export default function AdminQuickActions() {
             </div>
           </>
         )
-        const cn = 'group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-sm flex items-center gap-3'
+        const cn = 'group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-xs flex items-center gap-3'
         return a.external ? (
           <a key={a.label} href={a.href} target="_blank" rel="noreferrer noopener" className={cn} style={{ borderColor: a.border }}>
             {inner}

@@ -623,7 +623,7 @@ export default function MessengerPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 pf-enter">
-      <div className="overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-orange-50 via-background to-background shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+      <div className="overflow-hidden rounded-[28px] border border-border bg-linear-to-br from-orange-50 via-background to-background shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
         <div className="flex flex-col gap-5 px-5 py-5 md:px-6 md:py-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -736,7 +736,7 @@ export default function MessengerPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Поиск по имени…"
-          className="w-full rounded-2xl border border-input bg-card text-sm outline-none"
+          className="w-full rounded-2xl border border-input bg-card text-sm outline-hidden"
           style={{ padding: '11px 14px 11px 38px', transition: 'border-color 0.15s' }}
           onFocus={e => e.currentTarget.style.borderColor = '#F35703'}
           onBlur={e => e.currentTarget.style.borderColor = ''}
@@ -757,7 +757,7 @@ export default function MessengerPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-[24px] border border-border bg-card px-6 py-16 text-center shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-3xl">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-orange-50 to-orange-100 text-3xl">
             {search ? <i className="ki-filled ki-search-list text-orange-500 text-2xl" /> : <i className="ki-filled ki-message-text-2 text-orange-500 text-2xl" />}
           </div>
           <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '16px 0 6px', letterSpacing: '-0.02em' }}>

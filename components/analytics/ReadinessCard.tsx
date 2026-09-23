@@ -67,7 +67,7 @@ export function ReadinessCard({ athleteId }: ReadinessCardProps = {}) {
   }, [athleteId])
 
   return (
-    <section className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
       <div className="mb-4 flex flex-col gap-1">
         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600">
           Форма · Готовность · Цели

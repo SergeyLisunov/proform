@@ -237,12 +237,12 @@ export default function PlanEditor({ mode, initial }: Props) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Название *</label>
             <input value={name} onChange={e => setName(e.target.value)} maxLength={160}
               placeholder="Например: Базовая беговая неделя"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
           </div>
           <div className="md:col-span-3">
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Спорт (опц.)</label>
             <select value={sport} onChange={e => setSport(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400">
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400">
               <option value="">—</option>
               {ACTIVITY_TYPE_PRESETS.map(a => <option key={a} value={a}>{ACTIVITY_LABELS[a]}</option>)}
             </select>
@@ -250,7 +250,7 @@ export default function PlanEditor({ mode, initial }: Props) {
           <div className="md:col-span-3">
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Длительность</label>
             <select value={durationWeeks} onChange={e => setDurationWeeks(parseInt(e.target.value, 10))}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400">
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400">
               {[1,2,3,4,6,8,12].map(w => <option key={w} value={w}>{w} {w === 1 ? 'неделя' : w < 5 ? 'недели' : 'недель'}</option>)}
             </select>
           </div>
@@ -258,7 +258,7 @@ export default function PlanEditor({ mode, initial }: Props) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Описание (опц.)</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} maxLength={2000}
               placeholder="Краткое описание плана — для каких атлетов, какая цель"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 resize-vertical" />
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 resize-vertical" />
           </div>
           <div className="md:col-span-12">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -313,34 +313,34 @@ export default function PlanEditor({ mode, initial }: Props) {
                         style={intMeta ? { borderColor: intMeta.border, background: intMeta.bg } : { borderColor: 'var(--border)' }}>
                         <div className="flex items-center justify-between gap-1">
                           <select value={it.activity_type} onChange={e => updateItem(it.uiId, { activity_type: e.target.value })}
-                            className="flex-1 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] font-semibold outline-none">
+                            className="flex-1 rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] font-semibold outline-hidden">
                             {ACTIVITY_TYPE_PRESETS.map(a => <option key={a} value={a}>{ACTIVITY_LABELS[a]}</option>)}
                           </select>
                           <div className="flex gap-0.5 shrink-0">
                             {posInDay > 0 && (
                               <button onClick={() => moveItem(it.uiId, -1)} type="button"
-                                className="w-5 h-5 rounded bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
+                                className="w-5 h-5 rounded-sm bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
                                 title="Выше">↑</button>
                             )}
                             {posInDay < dayItems.length - 1 && (
                               <button onClick={() => moveItem(it.uiId, 1)} type="button"
-                                className="w-5 h-5 rounded bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
+                                className="w-5 h-5 rounded-sm bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
                                 title="Ниже">↓</button>
                             )}
                             <button onClick={() => removeItem(it.uiId)} type="button"
-                              className="w-5 h-5 rounded bg-white border border-red-200 hover:bg-red-50 text-red-600 text-[10px] flex items-center justify-center"
+                              className="w-5 h-5 rounded-sm bg-white border border-red-200 hover:bg-red-50 text-red-600 text-[10px] flex items-center justify-center"
                               title="Удалить"><i className="ki-filled ki-cross" /></button>
                           </div>
                         </div>
                         <input value={it.name} onChange={e => updateItem(it.uiId, { name: e.target.value })} maxLength={160}
                           placeholder="Название (опц.)"
-                          className="w-full rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-none" />
+                          className="w-full rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden" />
                         <div className="grid grid-cols-2 gap-1">
                           <input value={it.duration_min} onChange={e => updateItem(it.uiId, { duration_min: e.target.value })}
                             type="number" min={0} max={600} placeholder="мин"
-                            className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-none" />
+                            className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden" />
                           <select value={it.intensity} onChange={e => updateItem(it.uiId, { intensity: e.target.value as Intensity | '' })}
-                            className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-none">
+                            className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden">
                             <option value="">Intensity</option>
                             <option value="easy">Лёгкая</option>
                             <option value="moderate">Средняя</option>
@@ -350,7 +350,7 @@ export default function PlanEditor({ mode, initial }: Props) {
                         </div>
                         <textarea value={it.notes} onChange={e => updateItem(it.uiId, { notes: e.target.value })}
                           rows={2} placeholder="Заметки (опц.)"
-                          className="w-full rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-none resize-none" />
+                          className="w-full rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden resize-none" />
                       </div>
                     )
                   })
@@ -375,16 +375,16 @@ export default function PlanEditor({ mode, initial }: Props) {
           </button>
         )}
         <button onClick={handleSave} disabled={saving || items.length === 0}
-          className="rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 shadow-md">
+          className="rounded-xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold disabled:opacity-50 shadow-md">
           {saving ? 'Сохраняем…' : mode === 'create' ? 'Создать план' : 'Сохранить'}
         </button>
       </div>
 
       {/* Assign drawer */}
       {showAssign && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={() => setShowAssign(false)}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -407,14 +407,14 @@ export default function PlanEditor({ mode, initial }: Props) {
                   <div>
                     <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Атлет</label>
                     <select value={assignAthleteId} onChange={e => setAssignAthleteId(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400">
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400">
                       {assignAthletes.map(a => <option key={a.id} value={a.id}>{a.name ?? a.id.slice(0, 8)}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Дата старта (первый день плана)</label>
                     <input type="date" value={assignStartDate} onChange={e => setAssignStartDate(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                   </div>
                   <Alert variant="info">
                     Будет создано <strong>{items.length}</strong> тренировок в календаре атлета, начиная с {new Date(assignStartDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}.

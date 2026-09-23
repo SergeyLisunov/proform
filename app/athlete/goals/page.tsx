@@ -210,7 +210,7 @@ export default function AthleteGoalsPage() {
             Прогресс
           </Link>
           <button onClick={openCreate}
-            className="rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
+            className="rounded-xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
             <i className="ki-filled ki-plus text-sm" />
             Создать цель
           </button>
@@ -365,9 +365,9 @@ export default function AthleteGoalsPage() {
 
       {/* Create/Edit modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-8 overflow-y-auto"
+        <div className="fixed inset-0 z-80 flex items-center justify-center px-4 py-8 overflow-y-auto"
           onClick={() => setShowCreate(false)}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" />
           <div onClick={e => e.stopPropagation()}
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
@@ -382,7 +382,7 @@ export default function AthleteGoalsPage() {
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Метрика</label>
                 <select value={metric} onChange={e => applyPreset(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400">
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400">
                   {METRIC_PRESETS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                 </select>
               </div>
@@ -390,20 +390,20 @@ export default function AthleteGoalsPage() {
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Название *</label>
                 <input value={metricLabel} onChange={e => setMetricLabel(e.target.value)} maxLength={160}
                   placeholder="Например: 5к за 23 минуты"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Цель</label>
                   <input value={targetValue} onChange={e => setTargetValue(e.target.value)}
                     type="number" step="0.01" placeholder="23"
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Единица</label>
                   <input value={targetUnit} onChange={e => setTargetUnit(e.target.value)} maxLength={20}
                     placeholder="мин, кг, часов…"
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -411,19 +411,19 @@ export default function AthleteGoalsPage() {
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Сейчас (опц.)</label>
                   <input value={currentValue} onChange={e => setCurrentValue(e.target.value)}
                     type="number" step="0.01" placeholder="25"
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 </div>
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Дедлайн (опц.)</label>
                   <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 </div>
               </div>
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Заметки (опц.)</label>
                 <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} maxLength={400}
                   placeholder="План тренировок, мотивация, контекст…"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-orange-400 resize-vertical" />
+                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 resize-vertical" />
               </div>
               {formError && (
                 <Alert variant="destructive">{formError}</Alert>

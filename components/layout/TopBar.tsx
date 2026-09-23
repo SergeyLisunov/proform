@@ -327,10 +327,10 @@ function NotificationsDrawer({
                 </div>
                 <input type="text" value={formTitle} onChange={e => setFormTitle(e.target.value)}
                   required placeholder="Заголовок *"
-                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:border-orange-400 transition-all" />
+                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-hidden focus:border-orange-400 transition-all" />
                 <textarea value={formBody} onChange={e => setFormBody(e.target.value)}
                   rows={2} placeholder="Текст сообщения (необязательно)…"
-                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:border-orange-400 transition-all resize-none" />
+                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-hidden focus:border-orange-400 transition-all resize-none" />
                 <div className="flex gap-2">
                   <button type="submit" disabled={sending || !formTitle.trim()}
                     className="flex-1 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-2xs font-semibold transition-all disabled:opacity-60">
@@ -399,7 +399,7 @@ function NotificationsDrawer({
                         {!n.is_read && <span className="w-2 h-2 rounded-full bg-orange-500" />}
                         <button
                           onClick={e => archiveNotif(n.id, e)}
-                          className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                          className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
                           title="Скрыть"
                         >
                           <i className="ki-filled ki-cross text-[10px]" />
@@ -505,7 +505,7 @@ export default function TopBar() {
     <>
       <header
         id="header"
-        className={`kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 border-b border-b-border transition-shadow duration-200 ${scrolled ? 'shadow-sm' : 'shadow-none'}`}
+        className={`kt-header fixed top-0 z-10 inset-s-0 inset-e-0 flex items-stretch shrink-0 border-b border-b-border transition-shadow duration-200 ${scrolled ? 'shadow-xs' : 'shadow-none'}`}
         style={{ background: 'var(--card, white)' }}
       >
         <div className="kt-container-fixed flex justify-between items-center px-5 lg:px-8 gap-4 w-full" id="headerContainer">

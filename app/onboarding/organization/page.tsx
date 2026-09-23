@@ -281,7 +281,7 @@ export default function OrgOnboardingPage() {
             <input type="text" value={orgName} onChange={e => setOrgName(e.target.value)}
               placeholder="Sporteo Triathlon Club"
               maxLength={80}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400" />
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400" />
           </div>
 
           <div>
@@ -311,7 +311,7 @@ export default function OrgOnboardingPage() {
             <input type="text" value={sportType} onChange={e => setSportType(e.target.value)}
               placeholder="Например: триатлон, лёгкая атлетика, мультиспорт"
               maxLength={80}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400" />
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400" />
           </div>
         </div>
       )}
@@ -325,7 +325,7 @@ export default function OrgOnboardingPage() {
             <textarea value={description} onChange={e => setDescription(e.target.value)}
               placeholder="Краткая визитка — для атлетов и тренеров. Что отличает вашу организацию?"
               rows={4} maxLength={500}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400 resize-vertical" />
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400 resize-vertical" />
             <p className="mt-1 text-[11px] text-muted-foreground">{description.length}/500</p>
           </div>
 
@@ -336,7 +336,7 @@ export default function OrgOnboardingPage() {
             <input type="text" value={city} onChange={e => setCity(e.target.value)}
               placeholder="Москва"
               maxLength={80}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400" />
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400" />
           </div>
 
           <label className="flex items-start gap-3 p-3 rounded-xl border border-border bg-accent/30 cursor-pointer">
@@ -366,7 +366,7 @@ export default function OrgOnboardingPage() {
               <input type="email" value={e}
                 onChange={ev => { const arr = [...emails]; arr[i] = ev.target.value; setEmails(arr) }}
                 placeholder="athlete@example.com"
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-blue-400" />
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400" />
             </div>
           ))}
           <div className="rounded-xl border border-dashed border-border bg-accent/30 p-3 text-[11px] text-muted-foreground">

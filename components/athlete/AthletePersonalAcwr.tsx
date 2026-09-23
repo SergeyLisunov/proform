@@ -116,7 +116,7 @@ export default function AthletePersonalAcwr({ athleteId }: { athleteId: string }
 
   return (
     <Link href="/tools/acwr"
-      className="block rounded-2xl border bg-card p-5 hover:shadow-sm transition-shadow"
+      className="block rounded-2xl border bg-card p-5 hover:shadow-xs transition-shadow"
       style={{ borderColor: meta.border }}>
       <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
         <div>

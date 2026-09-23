@@ -24,6 +24,7 @@
     "postcss": "^8.5.10"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@hookform/resolvers": "^3.9.1",
     "@sentry/nextjs": "^10.50.0",
     "@supabase/ssr": "^0.10.0",
@@ -31,8 +32,10 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "apexcharts": "^4.7.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^3.6.0",
+    "cn": "^0.4.0",
+    "date-fns": "^4.4.0",
     "grammy": "^1.44.0",
     "lucide-react": "^0.468.0",
     "next": "^16.2.6",
@@ -43,24 +46,25 @@
     "react-easy-crop": "^5.5.7",
     "react-hook-form": "^7.54.2",
     "resend": "^6.12.2",
+    "tailwind-merge": "^3.7.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "^16.2.6",
     "@playwright/test": "^1.59.1",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
-    "autoprefixer": "^10.4.20",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
     "husky": "^9.1.7",
     "knip": "^5.88.1",
     "postcss": "^8.5.10",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vitest": "^3.2.7"
   }

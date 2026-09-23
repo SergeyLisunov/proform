@@ -115,7 +115,7 @@ export default function RegisterAsParentPage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,_rgba(243,87,3,0.14),_transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+    <main className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.14),transparent_32%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_48%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto flex w-full max-w-[520px] flex-col gap-6">
 
         <div className="flex items-center justify-between gap-4">
@@ -191,7 +191,7 @@ export default function RegisterAsParentPage() {
                     <UserIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
                     <input type="text" required autoComplete="name" value={name}
                       onChange={(e) => setName(e.target.value)} placeholder="Анна Иванова"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   </div>
                 </div>
 
@@ -203,7 +203,7 @@ export default function RegisterAsParentPage() {
                     <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
                     <input type="email" required autoComplete="email" value={email}
                       onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                      className="w-full rounded-2xl border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   </div>
                 </div>
 
@@ -220,7 +220,7 @@ export default function RegisterAsParentPage() {
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); setPwdError('') }}
                       placeholder="••••••••"
-                      className={`w-full rounded-2xl border bg-background py-3 pl-11 pr-14 text-sm text-foreground outline-none transition-all focus:ring-4 ${
+                      className={`w-full rounded-2xl border bg-background py-3 pl-11 pr-14 text-sm text-foreground outline-hidden transition-all focus:ring-4 ${
                         pwdError ? 'border-red-400 focus:ring-red-200' : 'border-input focus:border-orange-400 focus:ring-orange-500/10'
                       }`} />
                     <button type="button" onClick={() => setShowPwd((v) => !v)} aria-label={showPwd ? 'Скрыть пароль' : 'Показать пароль'}
@@ -268,7 +268,7 @@ export default function RegisterAsParentPage() {
                   </label>
                   <input type="text" required value={childName} onChange={(e) => setChildName(e.target.value)}
                     placeholder="Миша" maxLength={80}
-                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                 </div>
 
                 <div>
@@ -277,7 +277,7 @@ export default function RegisterAsParentPage() {
                   </label>
                   <input type="date" value={childDob} onChange={(e) => setChildDob(e.target.value)}
                     max={new Date().toISOString().slice(0, 10)}
-                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   <p className="mt-1 text-2xs text-muted-foreground">
                     Поможем подобрать корректные нормы по возрасту в будущем.
                   </p>
@@ -289,7 +289,7 @@ export default function RegisterAsParentPage() {
                   </label>
                   <input type="email" value={childEmail} onChange={(e) => setChildEmail(e.target.value)}
                     placeholder="не обязателен"
-                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
+                    className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-hidden transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10" />
                   <p className="mt-1 text-2xs text-muted-foreground">
                     Если не указать — сгенерируем технический. Позже ребёнок сможет привязать свой
                     email через настройки.

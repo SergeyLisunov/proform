@@ -12,7 +12,7 @@ import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
 
 export default function FinalCtaSection() {
   return (
-    <section className="w-full bg-gradient-to-br from-orange-50 via-white to-orange-50/50 py-20 px-4 sm:px-6 lg:px-10">
+    <section className="w-full bg-linear-to-br from-orange-50 via-white to-orange-50/50 py-20 px-4 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
           Пора навести порядок

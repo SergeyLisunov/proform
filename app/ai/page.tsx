@@ -92,7 +92,7 @@ function Tab({ active, onClick, children, icon }: { active: boolean; onClick: ()
       onClick={onClick}
       className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
         active
-          ? 'bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] text-white shadow-md shadow-purple-500/25'
+          ? 'bg-linear-to-r from-[#7C3AED] to-[#5B21B6] text-white shadow-md shadow-purple-500/25'
           : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
@@ -187,7 +187,7 @@ function AssistantChat() {
         {caps?.upgrade && (
           <Link
             href={caps.upgrade.href}
-            className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md no-underline"
+            className="rounded-xl bg-linear-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:shadow-md no-underline"
           >
             {caps.upgrade.cta}
           </Link>
@@ -212,7 +212,7 @@ function AssistantChat() {
       <button
         type="button"
         onClick={() => window.dispatchEvent(new CustomEvent(ASSISTANT_OPEN_EVENT))}
-        className="rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
+        className="rounded-xl bg-linear-to-r from-[#7C3AED] to-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:shadow-md"
       >
         Открыть AI-помощника
       </button>
@@ -277,8 +277,8 @@ export default function AiHubPage() {
   return (
     <div className="flex flex-col gap-6 pf-page-enter">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-[#E9D5FF] bg-gradient-to-br from-[#FAF5FF] via-white to-[#F0F9FF] p-6 md:p-8">
-        <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-gradient-to-br from-purple-200/50 to-blue-200/40 blur-3xl" />
+      <div className="relative overflow-hidden rounded-3xl border border-[#E9D5FF] bg-linear-to-br from-[#FAF5FF] via-white to-[#F0F9FF] p-6 md:p-8">
+        <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-linear-to-br from-purple-200/50 to-blue-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E9D5FF] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7C3AED]">
@@ -316,7 +316,7 @@ export default function AiHubPage() {
             ))}
           </div>
           <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs text-muted-foreground">
-            <i className="ki-filled ki-information-2 text-xs" /> Подсказка: нажмите <kbd className="mx-1 rounded border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
+            <i className="ki-filled ki-information-2 text-xs" /> Подсказка: нажмите <kbd className="mx-1 rounded-sm border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
             в любом разделе, чтобы быстро вызвать команду или задать вопрос ассистенту.
           </div>
         </>
