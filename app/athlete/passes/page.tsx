@@ -25,6 +25,7 @@ import {
 import { getMyReviewsByCoachIds } from '@/services/coach-reviews.service'
 import AthleteReviewPrompt from '@/components/athlete/AthleteReviewPrompt'
 import { Card, Alert, Accordion } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtDate(iso: string): string {
   try {
@@ -121,7 +122,7 @@ export default function AthletePassesPage() {
           </div>
           <Link href="/marketplace?role=coach"
             className="inline-flex items-center gap-1.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold shadow-md">
-            <i className="ki-filled ki-shop text-sm" />
+            <Icon name="ki-shop" className="text-sm" />
             Купить абонемент
           </Link>
         </div>
@@ -131,7 +132,7 @@ export default function AthletePassesPage() {
       {active.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
-            <i className="ki-filled ki-cup text-2xl" />
+            <Icon name="ki-cup" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">Нет активных абонементов</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -192,11 +193,11 @@ export default function AthletePassesPage() {
                 <div className="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-border">
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>
-                      <i className="ki-filled ki-calendar-2 text-[11px] mr-1" />
+                      <Icon name="ki-calendar-2" className="text-[11px] mr-1" />
                       с {fmtDate(p.starts_at)}
                     </span>
                     <span className={urgentDays ? 'text-orange-700 font-semibold' : ''}>
-                      <i className="ki-filled ki-time text-[11px] mr-1" />
+                      <Icon name="ki-time" className="text-[11px] mr-1" />
                       истекает {fmtDate(p.expires_at)}
                       {urgentDays && days > 0 && <span className="ml-1">· через {days} дн</span>}
                       {days <= 0 && <span className="ml-1">· сегодня</span>}

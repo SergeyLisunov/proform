@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, TimerReset } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
+import { Icon } from '@/components/ui/Icon'
 
 // W18 Day 94 C1 SECURITY FIX:
 // Demo password gate. Previously hardcoded `'proform123'` rendered в UI
@@ -160,7 +161,7 @@ export default function LoginPage() {
             <LanguageToggle />
             <Link href="/" className="flex items-center gap-2.5 no-underline">
               <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
-                <i className="ki-filled ki-abstract-26 text-sm text-white" />
+                <Icon name="ki-abstract-26" className="text-sm text-white" />
               </div>
               <div className="text-right">
                 <div className="pf-num text-lg text-foreground">Sporteo</div>
@@ -207,7 +208,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
               {errorText && (
                 <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                  <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                   <span>{errorText}</span>
                 </div>
               )}

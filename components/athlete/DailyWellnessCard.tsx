@@ -17,6 +17,8 @@ import {
   MOOD_EMOJI, ENERGY_EMOJI, SLEEP_QUALITY_EMOJI, sorenessColor,
   type WellnessCheckin,
 } from '@/services/wellness.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const MOOD_LABELS = ['', 'Ужасно', 'Плохо', 'Норм', 'Хорошо', 'Отлично']
 const ENERGY_LABELS = ['', 'Разбит', 'Низкая', 'Средняя', 'Высокая', 'На пике']
@@ -90,7 +92,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-xs transition-transform group-hover:scale-105"
             style={{ background: 'linear-gradient(135deg,#10B981,#059669)' }}
           >
-            <i className="ki-filled ki-heart text-white text-lg" />
+            <Icon name="ki-heart" className="text-white text-lg" />
           </div>
           <div className="min-w-0 flex-1">
             {today ? (
@@ -106,7 +108,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
                   )}
                   {today.sleep_hours != null && (
                     <span className="flex items-center gap-1 text-sm font-semibold text-slate-700" title="Сон">
-                      <i className="ki-filled ki-moon text-sm text-slate-700" /> {today.sleep_hours} ч
+                      <Icon name="ki-moon" className="text-sm text-slate-700" /> {today.sleep_hours} ч
                     </span>
                   )}
                   {today.soreness != null && (
@@ -136,7 +138,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
             )}
           </div>
           <div className="relative shrink-0">
-            <i className={`ki-filled ${today ? 'ki-pencil' : 'ki-arrow-right'} text-emerald-600 text-base`} />
+            <Icon name={today ? 'ki-pencil' : 'ki-arrow-right'} className="text-emerald-600 text-base" />
             {prompt && (
               <span className="absolute -top-1 -right-1 inline-flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
@@ -161,7 +163,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
       <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-100/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-emerald-100">
-            <i className="ki-filled ki-heart text-base text-emerald-600" />
+            <Icon name="ki-heart" className="text-base text-emerald-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500 leading-none">Самочувствие сегодня</h3>
@@ -169,9 +171,9 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
           </div>
         </div>
         <button onClick={() => setOpen(false)}
-          className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+          className={buttonVariants({ variant: 'ghost', size: 'icon-xs' })}
           title="Свернуть">
-          <i className="ki-filled ki-cross text-xs text-muted-foreground" />
+          <Icon name="ki-cross" className="text-xs text-muted-foreground" />
         </button>
       </div>
 

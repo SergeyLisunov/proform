@@ -13,6 +13,7 @@
  * patient. Остальным ролям кнопка не рендерится.
  */
 import { ASSISTANT_OPEN_EVENT, type AssistantOpenDetail } from './FloatingAssistant'
+import { Icon } from '@/components/ui/Icon'
 
 interface AskAiButtonProps {
   viewerRole: string | null | undefined
@@ -43,7 +44,7 @@ export default function AskAiButton({ viewerRole, athleteId, athleteName }: AskA
       onClick={openAssistant}
       className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-3.5 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
     >
-      <i className="ki-filled ki-message-question text-[13px]" />
+      <Icon name="ki-message-question" className="text-[13px]" />
       Спросить AI об этом спортсмене
     </button>
   )

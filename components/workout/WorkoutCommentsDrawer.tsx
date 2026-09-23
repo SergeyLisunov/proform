@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type Author = {
   id: string
@@ -172,7 +173,7 @@ export default function WorkoutCommentsDrawer({
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground"
             aria-label="Закрыть"
           >
-            <i className="ki-filled ki-cross text-[13px]" />
+            <Icon name="ki-cross" className="text-[13px]" />
           </button>
         </div>
 
@@ -184,7 +185,7 @@ export default function WorkoutCommentsDrawer({
             </div>
           ) : comments.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-background/60 py-10 text-center">
-              <i className="ki-filled ki-messages text-[18px] text-muted-foreground" />
+              <Icon name="ki-messages" className="text-[18px] text-muted-foreground" />
               <p className="text-xs text-muted-foreground">Пока нет комментариев</p>
               <p className="text-2xs text-muted-foreground/70">Оставьте заметку тренеру или врачу.</p>
             </div>
@@ -203,7 +204,7 @@ export default function WorkoutCommentsDrawer({
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={c.author.avatar_url} alt="" className="h-8 w-8 rounded-xl object-cover" />
                       ) : (
-                        <i className="ki-filled ki-user text-[13px]" />
+                        <Icon name="ki-user" className="text-[13px]" />
                       )}
                     </div>
                     <div className={`flex min-w-0 flex-1 flex-col ${mine ? 'items-end' : 'items-start'}`}>
@@ -277,7 +278,7 @@ export default function WorkoutCommentsDrawer({
               {sending ? (
                 <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent pf-spin" />
               ) : (
-                <i className="ki-filled ki-paper-plane text-[14px]" />
+                <Icon name="ki-paper-plane" className="text-[14px]" />
               )}
             </button>
           </div>

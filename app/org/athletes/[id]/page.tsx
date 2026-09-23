@@ -27,6 +27,9 @@ import Link from 'next/link'
 import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { createClient } from '@/lib/supabase/client'
 import { Card, Alert, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 interface AthleteProfile {
   id: string
@@ -195,7 +198,7 @@ export default function OrgAthletePage() {
   if (forbidden || !profile || !counts || !org) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Атлет не найден или нет доступа</p>
         <Link href="/org" className="text-xs text-orange-600 hover:underline">← Назад в управление</Link>
       </div>
@@ -232,14 +235,14 @@ export default function OrgAthletePage() {
           </div>
           <div className="mt-1 text-sm text-muted-foreground flex items-center gap-3 flex-wrap">
             {profile.sport && <span>{profile.sport}</span>}
-            {profile.city && <span className="inline-flex items-center gap-1.5"><i className="ki-filled ki-pin text-xs" />{profile.city}</span>}
+            {profile.city && <span className="inline-flex items-center gap-1.5"><Icon name="ki-pin" className="text-xs" />{profile.city}</span>}
             {profile.active_in_org_since && (
               <span>В организации с {new Date(profile.active_in_org_since).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}</span>
             )}
           </div>
         </div>
-        <Link href="/org" className="kt-btn kt-btn-sm kt-btn-outline gap-2">
-          <i className="ki-filled ki-arrow-left text-xs" />
+        <Link href="/org" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
+          <Icon name="ki-arrow-left" className="text-xs" />
           В управление
         </Link>
       </Card>
@@ -271,7 +274,7 @@ function Tile({ label, value, icon, color, bg }: { label: string; value: number;
           <div className="pf-num mt-2 text-2xl leading-none text-foreground font-bold">{value}</div>
         </div>
         <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: bg }}>
-          <i className={`ki-filled ${icon}`} style={{ color, fontSize: 16 }} />
+          <Icon name={icon} style={{ color, fontSize: 16 }} />
         </div>
       </div>
     </Card>
@@ -282,7 +285,7 @@ function ContextCard({ title, items, emptyHint, icon, color }: { title: string; 
   return (
     <Card className="p-4 rounded-2xl">
       <div className="flex items-center gap-2 mb-2">
-        <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
+        <Icon name={icon} className="text-sm" style={{ color }} />
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
       </div>
       {items.length === 0 ? (

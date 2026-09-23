@@ -11,6 +11,7 @@
 import Link from 'next/link'
 import TrackedCtaLink from '@/components/analytics/TrackedCtaLink'
 import { SporteoLogo } from "@/components/ui/SporteoLogo"
+import { Icon } from '@/components/ui/Icon'
 
 interface StickyNavProps {
   /** When the visitor is signed in, show a single "Открыть кабинет" CTA
@@ -43,7 +44,7 @@ export default function StickyNav({ isAuthed = false }: StickyNavProps) {
               className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-orange-600"
             >
               Открыть кабинет
-              <i className="ki-filled ki-arrow-right text-xs" />
+              <Icon name="ki-arrow-right" className="text-xs" />
             </Link>
           ) : (
             <>

@@ -14,6 +14,7 @@
  * passes navigation handlers in.
  */
 import type { ReactNode } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 export interface WizardStep {
   key:         string
@@ -56,7 +57,7 @@ export default function WizardShell({
           <div className="flex items-center justify-between gap-3 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em]"
               style={{ background: `${accentColor}1A`, color: accentColor, border: `1px solid ${accentColor}33` }}>
-              <i className="ki-filled ki-rocket text-[10px]" />
+              <Icon name="ki-rocket" className="text-[10px]" />
               Старт · {roleLabel}
             </span>
             <span className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">

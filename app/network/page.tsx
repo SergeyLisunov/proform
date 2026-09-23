@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type Mode = 'contacts' | 'find'
 type FindType = 'people' | 'coach' | 'doctor' | 'organization'
@@ -127,7 +128,7 @@ function PillButton({ active, onClick, children, icon, accent }: { active: boole
         boxShadow: active ? `0 4px 12px ${color}40` : 'none',
       }}
     >
-      {icon && <i className={`ki-filled ${icon} text-[11px]`} />}
+      {icon && <Icon name={icon} className="text-[11px]" />}
       {children}
     </button>
   )
@@ -184,7 +185,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
-        <i className="ki-filled ki-magnifier text-muted-foreground" />
+        <Icon name="ki-magnifier" className="text-muted-foreground" />
         <input
           value={q}
           onChange={e => setQ(e.target.value)}
@@ -225,7 +226,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
               </div>
               <div className="shrink-0">
                 {status === 'active' ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16A34A]"><i className="ki-filled ki-check text-[11px]" /> в связях</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16A34A]"><Icon name="ki-check" className="text-[11px]" /> в связях</span>
                 ) : status === 'pending' || status === 'pending_outgoing' ? (
                   <span className="text-[11px] font-semibold text-[#F35703]">Ожидает</span>
                 ) : status === 'pending_incoming' ? (
@@ -276,11 +277,11 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
-          <i className="ki-filled ki-magnifier text-muted-foreground" />
+          <Icon name="ki-magnifier" className="text-muted-foreground" />
           <input value={q} onChange={e => setQ(e.target.value)} placeholder={type === 'organization' ? 'Название, вид спорта…' : 'Имя, специализация…'} className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
         <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
-          <i className="ki-filled ki-map text-muted-foreground" />
+          <Icon name="ki-map" className="text-muted-foreground" />
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Город" className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
       </div>
@@ -305,7 +306,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
                     <div className="text-[11px] text-muted-foreground truncate">{[o.org_type, o.sport_type].filter(Boolean).join(' · ') || 'Организация'}</div>
                   </div>
                 </div>
-                {o.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><i className="ki-filled ki-pin text-[11px]" /> {o.city}</div>}
+                {o.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><Icon name="ki-pin" className="text-[11px]" /> {o.city}</div>}
                 {o.members_count ? <div className="text-[11px] text-muted-foreground">{o.members_count} участников</div> : null}
               </Link>
             )
@@ -325,7 +326,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
                   <div className="text-[11px] text-muted-foreground truncate">{spec || (isCoach ? 'Тренер' : 'Врач')}</div>
                 </div>
               </div>
-              {u.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><i className="ki-filled ki-pin text-[11px]" /> {u.city}</div>}
+              {u.city && <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground"><Icon name="ki-pin" className="text-[11px]" /> {u.city}</div>}
               {price ? (
                 <div className="text-[12px] font-semibold" style={{ color: accent }}>{price} {currency} / {isCoach ? 'час' : 'консультация'}</div>
               ) : null}
@@ -505,7 +506,7 @@ function NetworkPageInner() {
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
-            <i className="ki-filled ki-people text-[11px]" />
+            <Icon name="ki-people" className="text-[11px]" />
             Сеть
           </span>
           <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">Контакты и поиск</h1>
@@ -526,7 +527,7 @@ function NetworkPageInner() {
           onClick={() => setInviteOpen(true)}
           className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
         >
-          <i className="ki-filled ki-sms text-xs"/>
+          <Icon name="ki-sms" className="text-xs" />
           Пригласить по email
         </button>
       </div>

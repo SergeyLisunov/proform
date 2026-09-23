@@ -14,6 +14,7 @@ import {
   type WorkoutPlan,
 } from '@/services/workout-plans.service'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 export default function CoachPlansPage() {
   const { user, loading: userLoading } = useUser()
@@ -56,7 +57,7 @@ export default function CoachPlansPage() {
   if (!user || (user.role !== 'coach')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ тренера</p>
         <Link href="/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">
           ← На главную
@@ -78,7 +79,7 @@ export default function CoachPlansPage() {
         </div>
         <Link href="/coach/plans/new"
           className="inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md no-underline">
-          <i className="ki-filled ki-plus text-sm" />
+          <Icon name="ki-plus" className="text-sm" />
           Создать план
         </Link>
       </div>
@@ -87,7 +88,7 @@ export default function CoachPlansPage() {
       {plans.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
-            <i className="ki-filled ki-calendar-tick text-2xl" />
+            <Icon name="ki-calendar-tick" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">У вас пока нет планов</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -133,7 +134,7 @@ export default function CoachPlansPage() {
                 disabled={busyId === p.id}
                 className="absolute top-3 right-3 w-7 h-7 rounded-lg border border-border bg-background hover:bg-red-50 hover:border-red-200 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                 title="Архивировать">
-                <i className="ki-filled ki-archive text-xs" />
+                <Icon name="ki-archive" className="text-xs" />
               </button>
             </Card>
           ))}

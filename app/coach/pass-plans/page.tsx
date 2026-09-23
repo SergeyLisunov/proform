@@ -28,6 +28,7 @@ import {
   type CoachPassPlan, type PassServiceType,
 } from '@/services/coach-pass-plans.service'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type FilterTab = 'active' | 'archived' | 'all'
 
@@ -215,7 +216,7 @@ export default function CoachPassPlansPage() {
   if (!user || (user.role !== 'coach')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ тренера</p>
         <Link href="/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">← На главную</Link>
       </div>
@@ -236,7 +237,7 @@ export default function CoachPassPlansPage() {
         </div>
         <button onClick={openCreate}
           className="rounded-2xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
-          <i className="ki-filled ki-plus text-sm" />
+          <Icon name="ki-plus" className="text-sm" />
           Создать абонемент
         </button>
       </div>
@@ -263,7 +264,7 @@ export default function CoachPassPlansPage() {
       {filtered.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
-            <i className="ki-filled ki-cup text-2xl" />
+            <Icon name="ki-cup" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'archived' ? 'В архиве пусто' : 'Абонементов пока нет'}
@@ -357,7 +358,7 @@ export default function CoachPassPlansPage() {
                 {editor.mode === 'create' ? 'Новый абонемент' : 'Редактировать абонемент'}
               </h3>
               <button onClick={closeEditor} className="rounded-lg p-1.5 hover:bg-muted text-muted-foreground" aria-label="Закрыть">
-                <i className="ki-filled ki-cross text-xs" />
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4 max-h-[70vh] overflow-y-auto">

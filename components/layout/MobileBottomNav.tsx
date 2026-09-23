@@ -22,6 +22,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
 import { usePlan } from '@/lib/hooks/usePlan'
 import { filterSidebarForRole, type MenuItem } from '@/lib/sidebar/config'
+import { Icon } from '@/components/ui/Icon'
 
 const MAX_TABS = 5
 
@@ -96,8 +97,9 @@ export default function MobileBottomNav() {
                 className="flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-semibold transition-colors"
                 style={{ color: isActive ? '#F35703' : 'var(--muted-foreground)' }}
               >
-                <i
-                  className={`ki-filled ${t.icon} text-[18px]`}
+                <Icon
+                  name={t.icon}
+                  className="text-[18px]"
                   style={{ color: isActive ? '#F35703' : 'var(--muted-foreground)' }}
                 />
                 <span className="block max-w-full truncate px-1">{t.label}</span>

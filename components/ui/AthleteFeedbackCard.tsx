@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Icon } from '@/components/ui/Icon'
 
 const WorkoutCommentsDrawer = dynamic(
   () => import('@/components/workout/WorkoutCommentsDrawer'),
@@ -107,7 +108,7 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center">
-              <i className="ki-filled ki-message-text-2 text-sm" style={{ color: '#D44A02' }} />
+              <Icon name="ki-message-text-2" className="text-sm" style={{ color: '#D44A02' }} />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Обратная связь</p>
@@ -134,7 +135,7 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
                 {r.body && <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{r.body}</p>}
                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">{fmtRelative(r.created_at)}</p>
               </div>
-              <i className="ki-filled ki-right text-xs text-slate-400 shrink-0 mt-1.5" />
+              <Icon name="ki-right" className="text-xs text-slate-400 shrink-0 mt-1.5" />
             </button>
           ))}
         </div>

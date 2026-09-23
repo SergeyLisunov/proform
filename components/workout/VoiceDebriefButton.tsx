@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type Debrief = {
   mood: number
@@ -106,7 +107,7 @@ export default function VoiceDebriefButton({
           }`}
           title={stage === 'recording' ? 'Остановить запись' : 'Записать голосовой дебриф'}
         >
-          <i className={`ki-filled ${stage === 'recording' ? 'ki-abstract-8' : 'ki-message-text-2'} text-sm`} />
+          <Icon name={stage === 'recording' ? 'ki-abstract-8' : 'ki-message-text-2'} className="text-sm" />
         </button>
         <div className="min-w-0 flex-1">
           <div className="text-xs font-bold text-foreground">
@@ -134,7 +135,7 @@ export default function VoiceDebriefButton({
             <ul className="space-y-1">
               {result.key_takeaways.map((t, i) => (
                 <li key={i} className="flex items-start gap-1.5 text-xs text-foreground">
-                  <i className="ki-filled ki-check-circle mt-[2px] text-[10px] text-emerald-500" />
+                  <Icon name="ki-check-circle" className="mt-[2px] text-[10px] text-emerald-500" />
                   <span>{t}</span>
                 </li>
               ))}

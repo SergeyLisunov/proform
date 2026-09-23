@@ -25,6 +25,8 @@ import {
   LEVEL_META, type SkillLevel, type OrgGroup,
 } from '@/services/org-groups.service'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -223,7 +225,7 @@ export default function TeamDetailPage() {
   if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
@@ -233,7 +235,7 @@ export default function TeamDetailPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
-          <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
+          <Icon name="ki-information-2" className="text-4xl text-muted-foreground mb-3 block" />
           <h2 className="text-lg font-semibold text-navy-500">Команда не найдена</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Возможно, команда была архивирована или у вас нет доступа.
@@ -259,7 +261,7 @@ export default function TeamDetailPage() {
       <div>
         <Link href="/org/teams"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           К командам
         </Link>
       </div>
@@ -287,7 +289,7 @@ export default function TeamDetailPage() {
                 </span>
               )}
               <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-violet-50 text-violet-700 border border-violet-200">
-                <i className="ki-filled ki-people text-[10px] mr-1" />
+                <Icon name="ki-people" className="text-[10px] mr-1" />
                 {members.length} атлет{plural(members.length, 'ов', '', 'а')}
               </span>
             </div>
@@ -300,12 +302,12 @@ export default function TeamDetailPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <button onClick={() => setShowEdit(true)}
               className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-50 transition">
-              <i className="ki-filled ki-pencil text-sm" />
+              <Icon name="ki-pencil" className="text-sm" />
               Редактировать
             </button>
             <button onClick={archive} disabled={archiving}
               className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 transition">
-              <i className="ki-filled ki-archive text-sm" />
+              <Icon name="ki-archive" className="text-sm" />
               {archiving ? 'Архивируем…' : 'Архивировать'}
             </button>
           </div>
@@ -324,7 +326,7 @@ export default function TeamDetailPage() {
 
         {members.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-4 py-8 text-center">
-            <i className="ki-filled ki-people text-3xl text-muted-foreground mb-2 block" />
+            <Icon name="ki-people" className="text-3xl text-muted-foreground mb-2 block" />
             <p className="text-sm text-foreground font-semibold">В команде ещё нет атлетов</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Добавьте первого атлета из списка ниже.
@@ -351,7 +353,7 @@ export default function TeamDetailPage() {
                   <button onClick={() => removeMember(m.id)} disabled={busyAthleteId === m.id}
                     title="Убрать из команды"
                     className="w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 flex items-center justify-center shrink-0">
-                    <i className="ki-filled ki-cross text-xs" />
+                    <Icon name="ki-cross" className="text-xs" />
                   </button>
                 </div>
               )
@@ -387,7 +389,7 @@ export default function TeamDetailPage() {
         ) : (
           <div className="space-y-3">
             <div className="relative">
-              <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
+              <Icon name="ki-magnifier" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Поиск по имени…"
                 className="w-full rounded-2xl border border-border bg-background pl-9 pr-4 py-2.5 text-sm outline-hidden focus:border-violet-400" />
@@ -411,7 +413,7 @@ export default function TeamDetailPage() {
                       <span className="text-sm font-semibold text-foreground truncate flex-1">
                         {a.name ?? '—'}
                       </span>
-                      <i className={`ki-filled ${busy ? 'ki-loading pf-spin' : 'ki-plus'} text-sm text-violet-600 shrink-0`} />
+                      <Icon name={busy ? 'ki-loading pf-spin' : 'ki-plus'} className="text-sm text-violet-600 shrink-0" />
                     </button>
                   )
                 })}
@@ -430,8 +432,8 @@ export default function TeamDetailPage() {
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Редактирование команды</h3>
-              <button onClick={() => setShowEdit(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-xs" />
+              <button onClick={() => setShowEdit(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4">

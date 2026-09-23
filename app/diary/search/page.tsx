@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { useToast } from '@/lib/hooks/useToast'
 import { Badge, type BadgeVariant } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type NoteData = { id: string; title: string | null; content: string; note_date: string }
 type WorkoutData = {
@@ -126,7 +127,7 @@ export default function DiarySearchPage() {
           </p>
           <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-center">
             <div className="relative flex-1">
-              <i className="ki-filled ki-magnifier absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Icon name="ki-magnifier" className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={query}
@@ -188,9 +189,7 @@ export default function DiarySearchPage() {
                       className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-4 shadow-xs transition hover:border-indigo-300 hover:shadow-md"
                     >
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
-                        <i
-                          className={`ki-filled ${isNote ? 'ki-notepad-edit text-[18px] text-amber-500' : 'ki-flash-circle text-[18px] text-emerald-500'}`}
-                        />
+                        <Icon name={isNote ? 'ki-notepad-edit text-[18px] text-amber-500' : 'ki-flash-circle text-[18px] text-emerald-500'} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">

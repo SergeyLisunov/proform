@@ -19,6 +19,7 @@ import { createClient } from '@/lib/supabase/client'
 import { listMyGoals, STATUS_META as GOAL_STATUS_META, type AthleteGoal } from '@/services/athlete-goals.service'
 import { countMyActivePasses } from '@/services/athlete-passes.service'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface PrescribedWorkout {
   id:                    string
@@ -109,7 +110,7 @@ export default function AthleteDashboardPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Войдите в аккаунт</p>
         <Link href="/auth/login?next=/athlete/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">
           → Войти
@@ -175,7 +176,7 @@ export default function AthleteDashboardPage() {
 
           {workouts.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-border bg-accent/30 px-4 py-8 text-center">
-              <i className="ki-filled ki-calendar-tick text-3xl text-muted-foreground mb-2 block" />
+              <Icon name="ki-calendar-tick" className="text-3xl text-muted-foreground mb-2 block" />
               <p className="text-sm text-foreground font-semibold">На неделе нет prescribed тренировок</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Когда тренер назначит план — он появится здесь и в календаре.
@@ -210,11 +211,11 @@ export default function AthleteDashboardPage() {
                     </div>
                     <div className="shrink-0">
                       {w.completion_status === 'completed' ? (
-                        <i className="ki-filled ki-check-circle text-[12px] text-emerald-700" />
+                        <Icon name="ki-check-circle" className="text-[12px] text-emerald-700" />
                       ) : w.completion_status === 'skipped' ? (
-                        <i className="ki-filled ki-double-right text-[12px] text-red-700" />
+                        <Icon name="ki-double-right" className="text-[12px] text-red-700" />
                       ) : isPast ? (
-                        <i className="ki-filled ki-time text-[12px] text-amber-700" />
+                        <Icon name="ki-time" className="text-[12px] text-amber-700" />
                       ) : null}
                     </div>
                   </li>
@@ -244,7 +245,7 @@ export default function AthleteDashboardPage() {
 
           {goals.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-border bg-accent/30 px-4 py-6 text-center">
-              <i className="ki-filled ki-flag text-2xl text-muted-foreground mb-2 block" />
+              <Icon name="ki-flag" className="text-2xl text-muted-foreground mb-2 block" />
               <Link href="/athlete/goals" className="text-sm text-orange-600 font-semibold hover:underline no-underline">
                 + Создать первую цель
               </Link>
@@ -261,7 +262,7 @@ export default function AthleteDashboardPage() {
                       <h3 className="text-sm font-bold text-navy-500 line-clamp-2">{g.metric_label}</h3>
                       <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5 inline-flex items-center"
                         style={{ background: GOAL_STATUS_META.active.bg, color: GOAL_STATUS_META.active.color }}>
-                        <i className="ki-filled ki-focus text-[11px]" />
+                        <Icon name="ki-focus" className="text-[11px]" />
                       </span>
                     </div>
                     {g.target_value !== null && (
@@ -299,7 +300,7 @@ export default function AthleteDashboardPage() {
                       {r.title ?? 'Рекомендация'}
                       {/* Schema W5 Day 27: doctor_id NOT NULL → all recs are from doctor. */}
                       <span className="ml-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                        · <i className="ki-filled ki-pulse text-[11px]" /> Врач
+                        · <Icon name="ki-pulse" className="text-[11px]" /> Врач
                       </span>
                     </div>
                     {r.body && <div className="text-[12px] text-muted-foreground line-clamp-2 mt-0.5">{r.body}</div>}
@@ -328,7 +329,7 @@ function QuickLink({ href, icon, color, bg, border, label }: {
   return (
     <Link href={href} className="rounded-2xl border-2 p-3 hover:-translate-y-0.5 hover:shadow-md transition-all no-underline flex items-center gap-3"
       style={{ background: bg, borderColor: border }}>
-      <i className={`ki-filled ${icon} text-xl`} style={{ color }} />
+      <Icon name={icon} className="text-xl" style={{ color }} />
       <span className="text-sm font-bold" style={{ color }}>{label}</span>
     </Link>
   )

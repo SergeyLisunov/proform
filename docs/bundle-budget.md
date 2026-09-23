@@ -163,6 +163,8 @@ new route exceeds.
 | 2026-05-28 (W20 Day 1) | Next 15 upgrade | 176 | 0 | Metadata routes (sitemap/robots/opengraph) budget 20→115 kB: Next 15 attributes shared framework baseline (~103 kB) as First Load JS (Next 14 reported 0). `/pricing` now 170/180 kB (94%, near limit) from React 19 baseline shift. |
 | 2026-05-28 (W21 Day 1) | Next 16 metric rewrite | n/a (2 metrics) | 0 | Per-route parsing dropped (Next 16 removed stdout sizes + no app-build-manifest). New: shared First Load baseline 527/650 kB + total chunks 3762/4600 kB, measured from build-manifest.json + on-disk chunks. Layer 7 gate restored. |
 
+| 2026-09-23 (Metronic → ReUI) | Дизайн-система | n/a (2 metrics) | 1 → bump | Total chunks 4798/4600 → бюджет поднят до 5100. Причина роста: lucide-react 32 kB (словарь из 142 иконок заменил иконочный шрифт) + @base-ui/react 68 kB (Dialog с focus trap). Взамен со страницы ушли 648 kB — keenicons CSS 227 kB и шрифт 421 kB, оба блокировали рендер; стили Metronic сжаты 498→61 kB и переведены из runtime @import url() в сборочный импорт. Итог по CSS: 853 kB в два круга → 223 kB в один. Запас 6% выбран узким намеренно. |
+
 ## Related
 
 - W13 Day 64 — `audit-duplicate-exports.sh` (Layer 3 sibling)

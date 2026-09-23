@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Icon } from '@/components/ui/Icon'
 
 type Cmd = {
   id: string
@@ -102,7 +103,7 @@ export default function CommandPalette() {
         className="relative w-[620px] max-w-[95vw] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_32px_80px_rgba(0,0,0,0.24)]"
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <i className="ki-filled ki-magnifier text-[16px] text-muted-foreground" />
+          <Icon name="ki-magnifier" className="text-[16px] text-muted-foreground" />
           <input
             ref={inputRef}
             value={q}
@@ -130,7 +131,7 @@ export default function CommandPalette() {
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background"
                 style={{ color: c.iconColor ?? '#64748B' }}
               >
-                <i className={`ki-filled ${c.icon} text-[13px]`} />
+                <Icon name={c.icon} className="text-[13px]" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-foreground">{c.title}</div>

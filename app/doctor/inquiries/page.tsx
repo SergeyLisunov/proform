@@ -16,6 +16,7 @@ import {
   QUESTION_TYPE_META, URGENCY_META, STATUS_META,
   type InquiryWithUsers,
 } from '@/services/doctor-inquiries.service'
+import { Icon } from '@/components/ui/Icon'
 
 type FilterTab = 'pending' | 'answered' | 'all'
 
@@ -126,7 +127,7 @@ export default function DoctorInquiriesPage() {
   if (!user || user.role !== 'doctor') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ врача</p>
         <Link href="/dashboard" className="text-sm text-violet-600 font-semibold hover:underline">← На главную</Link>
       </div>
@@ -167,7 +168,7 @@ export default function DoctorInquiriesPage() {
       {filtered.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
-            <i className="ki-filled ki-message-question text-2xl" />
+            <Icon name="ki-message-question" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'pending' ? 'Нет ожидающих запросов' : filter === 'answered' ? 'История ответов пуста' : 'Запросов нет'}
@@ -230,7 +231,7 @@ export default function DoctorInquiriesPage() {
                   <div className="mb-2">
                     {convertedMap[i.id] ? (
                       <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-800 flex items-center gap-2">
-                        <i className="ki-filled ki-check-circle text-sm" />
+                        <Icon name="ki-check-circle" className="text-sm" />
                         <span>Создана рекомендация: <strong>{convertedMap[i.id].title}</strong></span>
                       </div>
                     ) : convertOpenId === i.id ? (
@@ -286,7 +287,7 @@ export default function DoctorInquiriesPage() {
                     ) : (
                       <button onClick={() => openConvertForm(i.id)}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 px-3 py-1.5 text-xs font-semibold">
-                        <i className="ki-filled ki-plus text-xs" />
+                        <Icon name="ki-plus" className="text-xs" />
                         Сохранить как ограничение
                       </button>
                     )}

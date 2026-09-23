@@ -10,6 +10,7 @@
  * established athletes).
  */
 import Link from 'next/link'
+import { Icon } from '@/components/ui/Icon'
 
 interface AthleteDiscoverCTAProps {
   hasNoConnections: boolean
@@ -33,14 +34,14 @@ export default function AthleteDiscoverCTA({ hasNoConnections }: AthleteDiscover
             href="/marketplace?verified=1&sort=rating_desc"
             className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-xs no-underline"
           >
-            <i className="ki-filled ki-verify text-sm" />
+            <Icon name="ki-verify" className="text-sm" />
             Verified тренеры
           </Link>
           <Link
             href="/marketplace?sort=rating_desc"
             className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-orange-200 bg-card hover:bg-orange-50 text-orange-700 px-4 py-2.5 text-sm font-bold no-underline"
           >
-            <i className="ki-filled ki-shop text-sm" />
+            <Icon name="ki-shop" className="text-sm" />
             Открыть marketplace
           </Link>
         </div>

@@ -20,6 +20,8 @@ import {
   type RecommendationCategory, type RecommendationSeverity,
   type RecommendationVisibility,
 } from '@/services/recommendations.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const CATEGORIES: RecommendationCategory[] = [
   'load_restriction','activity_restriction','recovery','observation',
@@ -102,8 +104,8 @@ export default function RecommendationForm({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-rose-700">Медицинская рекомендация</p>
             <h3 className="text-lg font-semibold text-navy-500">Для пациента: {athleteName}</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs" />
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -131,7 +133,7 @@ export default function RecommendationForm({
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 text-[11px] font-semibold transition ${
                       selected ? 'ring-2 ring-rose-300 border-rose-400 bg-rose-50' : 'border-border bg-background hover:border-rose-200'
                     }`}>
-                    <i className={`ki-filled ${meta.icon} text-base`} style={{ color: meta.color }} />
+                    <Icon name={meta.icon} className="text-base" style={{ color: meta.color }} />
                     <span className="text-center leading-tight">{meta.label}</span>
                   </button>
                 )

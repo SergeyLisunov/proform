@@ -17,6 +17,8 @@ import {
   type AthleteGoal, type GoalStatus,
 } from '@/services/athlete-goals.service'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type FilterTab = 'all' | GoalStatus
 
@@ -176,7 +178,7 @@ export default function AthleteGoalsPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Войдите в аккаунт</p>
         <Link href="/auth/login?next=/athlete/goals" className="text-sm text-orange-600 font-semibold hover:underline">
           → Войти
@@ -206,12 +208,12 @@ export default function AthleteGoalsPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link href="/athlete/progress"
             className="rounded-xl border border-border bg-background hover:bg-muted px-3 py-1.5 text-sm font-semibold no-underline inline-flex items-center gap-1.5">
-            <i className="ki-filled ki-chart-line-up text-sm" />
+            <Icon name="ki-chart-line-up" className="text-sm" />
             Прогресс
           </Link>
           <button onClick={openCreate}
             className="rounded-xl bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
-            <i className="ki-filled ki-plus text-sm" />
+            <Icon name="ki-plus" className="text-sm" />
             Создать цель
           </button>
         </div>
@@ -242,7 +244,7 @@ export default function AthleteGoalsPage() {
       {filtered.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-4">
-            <i className="ki-filled ki-flag text-2xl" />
+            <Icon name="ki-flag" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'active'
@@ -309,7 +311,7 @@ export default function AthleteGoalsPage() {
 
                 {g.target_date && (
                   <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
-                    <i className="ki-filled ki-calendar text-[11px]" />
+                    <Icon name="ki-calendar" className="text-[11px]" />
                     Дедлайн: {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </div>
                 )}
@@ -324,12 +326,12 @@ export default function AthleteGoalsPage() {
                     <>
                       <button onClick={() => openEdit(g)} disabled={busyId === g.id}
                         className="rounded-lg border border-border bg-background hover:bg-muted px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
-                        <i className="ki-filled ki-pencil text-[11px]" />
+                        <Icon name="ki-pencil" className="text-[11px]" />
                         Edit
                       </button>
                       <button onClick={() => handleAchieve(g.id)} disabled={busyId === g.id}
                         className="rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
-                        <i className="ki-filled ki-check text-[11px]" />
+                        <Icon name="ki-check" className="text-[11px]" />
                         Достигнуто
                       </button>
                       <button onClick={() => handleAbandon(g.id)} disabled={busyId === g.id}
@@ -340,21 +342,21 @@ export default function AthleteGoalsPage() {
                   )}
                   {g.status === 'achieved' && (
                     <span className="text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
-                      <i className="ki-filled ki-check text-[11px]" />
+                      <Icon name="ki-check" className="text-[11px]" />
                       Достигнуто {g.achieved_at ? new Date(g.achieved_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}
                     </span>
                   )}
                   {g.status === 'abandoned' && (
                     <button onClick={() => handleReactivate(g.id)} disabled={busyId === g.id}
                       className="rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 text-[11px] font-semibold inline-flex items-center gap-1">
-                      <i className="ki-filled ki-arrows-circle text-[11px]" />
+                      <Icon name="ki-arrows-circle" className="text-[11px]" />
                       Вернуть
                     </button>
                   )}
                   <button onClick={() => handleDelete(g.id)} disabled={busyId === g.id}
                     className="rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 text-[11px] font-semibold inline-flex items-center"
                     title="Удалить">
-                    <i className="ki-filled ki-trash text-[11px]" />
+                    <Icon name="ki-trash" className="text-[11px]" />
                   </button>
                 </div>
               </Card>
@@ -374,8 +376,8 @@ export default function AthleteGoalsPage() {
               <h3 className="text-lg font-semibold text-navy-500">
                 {editingId ? 'Редактировать цель' : 'Новая цель'}
               </h3>
-              <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-xs" />
+              <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4 max-h-[70vh] overflow-y-auto">

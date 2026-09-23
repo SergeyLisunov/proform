@@ -14,6 +14,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface ChildLink {
   child_id: string
@@ -152,7 +153,7 @@ export default async function ParentNotesPage() {
       {notes.length === 0 ? (
         <Card className="rounded-[28px] p-12 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-400 shadow-xs">
-            <i className="ki-filled ki-notepad-edit text-3xl" />
+            <Icon name="ki-notepad-edit" className="text-3xl" />
           </div>
           <h2 className="mt-5 text-lg font-semibold text-foreground">Заметок ещё нет</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -193,7 +194,7 @@ export default async function ParentNotesPage() {
                   </p>
                 )}
                 <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                  <i className="ki-filled ki-user text-[10px]" />
+                  <Icon name="ki-user" className="text-[10px]" />
                   Про {n.child_name}
                 </div>
               </Card>

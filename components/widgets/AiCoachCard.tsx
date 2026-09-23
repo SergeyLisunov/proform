@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 type Suggestion = {
   headline: string
@@ -55,7 +56,7 @@ export default function AiCoachCard() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-              <i className="ki-filled ki-flash-circle text-[14px] text-amber-300" />
+              <Icon name="ki-flash-circle" className="text-[14px] text-amber-300" />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">AI-тренер</span>
           </div>
@@ -65,7 +66,7 @@ export default function AiCoachCard() {
             title="Пересчитать"
             className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition"
           >
-            <i className={`ki-filled ki-arrows-circle text-[12px] text-white ${loading ? 'animate-spin' : ''}`} />
+            <Icon name={loading ? 'animate-spin' : ''} className="text-[12px] text-white" />
           </button>
         </div>
 
@@ -103,7 +104,7 @@ export default function AiCoachCard() {
               <ul className="mt-3 space-y-1">
                 {data.tips.slice(0, 3).map((t, i) => (
                   <li key={i} className="flex items-start gap-1.5 text-[12px] text-white/80">
-                    <i className="ki-filled ki-check-circle mt-[2px] text-[10px] text-emerald-300" />
+                    <Icon name="ki-check-circle" className="mt-[2px] text-[10px] text-emerald-300" />
                     <span>{t}</span>
                   </li>
                 ))}

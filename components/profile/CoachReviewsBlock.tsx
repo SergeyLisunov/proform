@@ -22,6 +22,8 @@ import {
   replyToReview,
   type CoachReviewWithAuthor, type CoachReview, type ReviewSummary,
 } from '@/services/coach-reviews.service'
+import { Icon } from '@/components/ui/Icon'
+import { Star } from 'lucide-react'
 
 interface CoachReviewsBlockProps {
   coachId: string
@@ -51,7 +53,11 @@ function StarRating({
             style={{ color: filled ? '#F59E0B' : '#D1D5DB', background: 'none', border: 'none', padding: 0 }}
             aria-label={`${i + 1} звезда`}
           >
-            <i className={`${filled ? 'ki-solid' : 'ki-outline'} ki-star`} />
+            {/* Заливка звезды раньше задавалась начертанием шрифта
+                (ki-solid против ki-outline). У Lucide это проп fill, поэтому
+                здесь прямой импорт Star, а не общий Icon: он заливкой не
+                управляет. */}
+            <Star className="size-[1em]" fill={filled ? 'currentColor' : 'none'} aria-hidden />
           </button>
         )
       })}
@@ -213,7 +219,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
               display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
             }}
           >
-            <i className={`ki-filled ${myReview ? 'ki-pencil' : 'ki-star'} text-xs`} />
+            <Icon name={myReview ? 'ki-pencil' : 'ki-star'} className="text-xs" />
             {myReview ? 'Изменить мой отзыв' : 'Оставить отзыв'}
           </button>
         )}
@@ -263,7 +269,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                 opacity: saving ? 0.7 : 1, display: 'inline-flex', alignItems: 'center', gap: 6,
               }}
             >
-              {saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full pf-spin" /> Сохраняю…</> : <><i className="ki-filled ki-check text-xs" /> Сохранить</>}
+              {saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full pf-spin" /> Сохраняю…</> : <><Icon name="ki-check" className="text-xs" /> Сохранить</>}
             </button>
             <button
               type="button"
@@ -287,7 +293,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                   marginLeft: 'auto',
                 }}
               >
-                <i className="ki-filled ki-trash text-xs" style={{ marginRight: 4 }} />Удалить
+                <Icon name="ki-trash" className="text-xs" style={{ marginRight: 4 }} />Удалить
               </button>
             )}
           </div>
@@ -353,7 +359,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 10, fontWeight: 700, color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        <i className="ki-filled ki-message-text text-[10px]" style={{ marginRight: 4 }} />
+                        <Icon name="ki-message-text" className="text-[10px]" style={{ marginRight: 4 }} />
                         Ответ тренера
                       </span>
                       <span style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>
@@ -431,7 +437,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                     }}
                   >
-                    <i className="ki-filled ki-message-text text-xs" />
+                    <Icon name="ki-message-text" className="text-xs" />
                     Ответить атлету
                   </button>
                 )}
@@ -450,7 +456,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
           fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
           boxShadow: '0 4px 16px rgba(0,0,0,0.16)',
         }}>
-          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-4'} text-sm`} />
+          <Icon name={toast.ok ? 'ki-check-circle' : 'ki-information-4'} className="text-sm" />
           {toast.msg}
         </div>
       )}

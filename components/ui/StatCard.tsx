@@ -1,3 +1,5 @@
+import { Icon } from '@/components/ui/Icon'
+
 interface StatCardProps {
   label: string
   value: string | number
@@ -24,8 +26,9 @@ export function StatCard({ label, value, unit, icon, iconColor, iconBg, sub, del
           className={`w-9 h-9 rounded-lg flex items-center justify-center ${useTailwindBg ? iconBg : ''}`}
           style={useTailwindBg ? undefined : { background: iconColor + '15' }}
         >
-          <i
-            className={`ki-filled ${icon} text-base ${useTailwindBg ? '' : ''}`}
+          <Icon
+            name={icon}
+            className="text-base"
             style={useTailwindBg ? undefined : { color: iconColor }}
           />
         </div>

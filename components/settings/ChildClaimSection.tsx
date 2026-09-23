@@ -11,6 +11,7 @@
  */
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { Icon } from '@/components/ui/Icon'
 
 interface Props {
   myUserId: string | null
@@ -75,7 +76,7 @@ export default function ChildClaimSection({ myUserId }: Props) {
           width: 44, height: 44, borderRadius: 14, background: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-          <i className="ki-filled ki-key text-base" style={{ color: '#F35703' }} />
+          <Icon name="ki-key" className="text-base" style={{ color: '#F35703' }} />
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -96,7 +97,7 @@ export default function ChildClaimSection({ myUserId }: Props) {
               onClick={requestClaim}
               className="mt-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
             >
-              <i className="ki-filled ki-message-text-2 text-xs" />
+              <Icon name="ki-message-text-2" className="text-xs" />
               Попросить родителя
             </button>
           )}

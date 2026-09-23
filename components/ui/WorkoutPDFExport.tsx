@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { getErrorMessage } from '@/lib/utils/errors'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 // ── Типы ──────────────────────────────────────────────────────────────────────
 type Workout = {
@@ -432,15 +434,15 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
         <div style={{ padding:'20px 24px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0 }}>
           <div style={{ display:'flex',alignItems:'center',gap:12 }}>
             <div style={{ width:38,height:38,borderRadius:10,background:'linear-gradient(135deg,#F35703,#D44A02)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
-              <i className="ki-filled ki-file-down text-white text-base" />
+              <Icon name="ki-file-down" className="text-white text-base" />
             </div>
             <div>
               <p style={{ fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:2 }}>Экспорт данных</p>
               <h2 style={{ fontSize:19,fontWeight:800,color:'var(--foreground)',letterSpacing:'-0.02em',lineHeight:1 }}>Отчёт PDF</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
 
@@ -519,7 +521,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   const [y,m] = manualMonth.split('-').map(Number)
                   const prev = m === 1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,'0')}`
                   setManualMonth(prev)
-                }} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><i className="ki-filled ki-left text-xs"/></button>
+                }} className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}><Icon name="ki-left" className="text-xs" /></button>
                 <span style={{ fontSize:15,fontWeight:700,color:'var(--foreground)' }}>
                   {MONTHS_RU[manualCalendar.month-1]} {manualCalendar.year}
                 </span>
@@ -527,7 +529,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   const [y,m] = manualMonth.split('-').map(Number)
                   const next = m === 12 ? `${y+1}-01` : `${y}-${String(m+1).padStart(2,'0')}`
                   setManualMonth(next)
-                }} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><i className="ki-filled ki-right text-xs"/></button>
+                }} className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}><Icon name="ki-right" className="text-xs" /></button>
               </div>
 
               {/* Month controls */}
@@ -659,7 +661,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
         <div style={{ padding:'16px 24px',borderTop:'1px solid var(--border)',flexShrink:0,display:'flex',flexDirection:'column',gap:10 }}>
           {workouts.length === 0 && !loading && (
             <div style={{ display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,background:'#FEF9C3',border:'1px solid #FDE047',fontSize:12,color:'#854D0E' }}>
-              <i className="ki-filled ki-information-4 shrink-0" />
+              <Icon name="ki-information-4" className="shrink-0" />
               Нет тренировок за выбранный период. Выберите другой диапазон.
             </div>
           )}
@@ -675,7 +677,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
               {generating ? (
                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Генерация…</>
               ) : (
-                <><i className="ki-filled ki-file-down text-sm" />Скачать PDF ({workouts.length} трен.)</>
+                <><Icon name="ki-file-down" className="text-sm" />Скачать PDF ({workouts.length} трен.)</>
               )}
             </button>
             <button onClick={handleClose}

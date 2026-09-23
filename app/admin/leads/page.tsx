@@ -22,6 +22,7 @@ import {
   getConversionFunnel,
   type LeadSource,
 } from '@/services/admin-leads.service'
+import { Icon } from '@/components/ui/Icon'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -115,7 +116,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
         </div>
         <Link href="/dashboard"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           На главную
         </Link>
       </div>
@@ -245,18 +246,18 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                         <td className="py-2 pr-3 text-xs">
                           {r.email_dispatched_at ? (
                             <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
-                              <i className="ki-filled ki-check text-xs" /> {new Date(r.email_dispatched_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                              <Icon name="ki-check" className="text-xs" /> {new Date(r.email_dispatched_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                             </span>
                           ) : r.email_attempts >= 3 ? (
-                            <span className="text-red-700 inline-flex items-center gap-1"><i className="ki-filled ki-cross text-xs" /> Failed</span>
+                            <span className="text-red-700 inline-flex items-center gap-1"><Icon name="ki-cross" className="text-xs" /> Failed</span>
                           ) : (
-                            <span className="text-cyan-700 inline-flex items-center gap-1"><i className="ki-filled ki-time text-xs" /> Pending</span>
+                            <span className="text-cyan-700 inline-flex items-center gap-1"><Icon name="ki-time" className="text-xs" /> Pending</span>
                           )}
                         </td>
                         <td className="py-2 pr-3 text-xs">
                           {r.converted_at ? (
                             <span className="text-violet-700 font-semibold inline-flex items-center gap-1" title={r.user_name ? `${r.user_name} (${r.user_role ?? 'user'})` : 'Signup detected'}>
-                              <i className="ki-filled ki-focus text-xs" /> {r.user_role ? r.user_role.slice(0, 3).toUpperCase() : 'USR'} · {new Date(r.converted_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                              <Icon name="ki-focus" className="text-xs" /> {r.user_role ? r.user_role.slice(0, 3).toUpperCase() : 'USR'} · {new Date(r.converted_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                             </span>
                           ) : (
                             <span className="text-muted-foreground">—</span>

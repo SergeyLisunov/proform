@@ -9,6 +9,7 @@ import DevicesSection from '@/components/settings/DevicesSection'
 import { Alert } from '@/components/ui/metronic'
 import { CountryFlag } from '@/components/ui/CountryFlag'
 import { getErrorMessage } from '@/lib/utils/errors'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -223,7 +224,7 @@ function SectionHeader({ icon, color, title }: { icon: string; color: string; ti
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
       <div style={{ width: 32, height: 32, borderRadius: 10, background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <i className={`ki-filled ${icon} text-sm`} style={{ color }} />
+        <Icon name={icon} className="text-sm" style={{ color }} />
       </div>
       <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>
         {title}
@@ -319,7 +320,7 @@ function PasswordCard() {
         onFocus={e => (e.target.style.borderColor = '#7C3AED')}
         onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
       <button type="button" onClick={onToggle} style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted-foreground)', padding:0 }}>
-        <i className={`ki-filled ${show ? 'ki-eye-slash' : 'ki-eye'} text-sm`} />
+        <Icon name={show ? 'ki-eye-slash' : 'ki-eye'} className="text-sm" />
       </button>
     </div>
   )
@@ -329,7 +330,7 @@ function PasswordCard() {
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           <div style={{ width:32, height:32, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-            <i className="ki-filled ki-lock text-sm" style={{ color:'#7C3AED' }} />
+            <Icon name="ki-lock" className="text-sm" style={{ color:'#7C3AED' }} />
           </div>
           <div>
             <div style={{ fontSize:12, fontWeight:800, color:'var(--foreground)', textTransform:'uppercase', letterSpacing:'0.1em' }}>СМЕНА ПАРОЛЯ</div>
@@ -341,7 +342,7 @@ function PasswordCard() {
           background: open ? '#F5F3FF' : 'var(--card)', color:'#7C3AED',
           fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.15s',
         }}>
-          <i className={`ki-filled ${open ? 'ki-up' : 'ki-down'} text-xs`} />
+          <Icon name={open ? 'ki-up' : 'ki-down'} className="text-xs" />
           {open ? 'Свернуть' : 'Изменить'}
         </button>
       </div>
@@ -361,10 +362,10 @@ function PasswordCard() {
                 </div>
                 <div style={{ fontSize:11, fontWeight:600, color:strengthColor }}>{strengthLabel}</div>
                 <div style={{ fontSize:10, color:'var(--muted-foreground)', marginTop:4, display:'flex', gap:10, flexWrap:'wrap' }}>
-                  <span style={{ color: newPw.length>=8 ? '#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />8+ символов</span>
-                  <span style={{ color: /[A-Z]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Заглавная буква</span>
-                  <span style={{ color: /[0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Цифра</span>
-                  <span style={{ color: /[^A-Za-z0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><i className="ki-filled ki-check" style={{ fontSize: 10, marginRight: 4 }} />Спецсимвол</span>
+                  <span style={{ color: newPw.length>=8 ? '#16A34A':'var(--muted-foreground)' }}><Icon name="ki-check" style={{ fontSize: 10, marginRight: 4 }} />8+ символов</span>
+                  <span style={{ color: /[A-Z]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><Icon name="ki-check" style={{ fontSize: 10, marginRight: 4 }} />Заглавная буква</span>
+                  <span style={{ color: /[0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><Icon name="ki-check" style={{ fontSize: 10, marginRight: 4 }} />Цифра</span>
+                  <span style={{ color: /[^A-Za-z0-9]/.test(newPw)?'#16A34A':'var(--muted-foreground)' }}><Icon name="ki-check" style={{ fontSize: 10, marginRight: 4 }} />Спецсимвол</span>
                 </div>
               </div>
             )}
@@ -374,7 +375,7 @@ function PasswordCard() {
             {pwInput(confirmPw, setConfirm, 'Повторите новый пароль', showOld, () => setShowOld(s=>!s))}
             {confirmPw && newPw && (
               <div style={{ marginTop:6, fontSize:11, fontWeight:600, color: confirmPw===newPw?'#16A34A':'#DC2626', display:'flex', alignItems:'center', gap:5 }}>
-                <i className={`ki-filled ${confirmPw===newPw?'ki-check-circle':'ki-cross-circle'} text-xs`} />
+                <Icon name={confirmPw===newPw?'ki-check-circle':'ki-cross-circle'} className="text-xs" />
                 {confirmPw===newPw ? 'Пароли совпадают' : 'Пароли не совпадают'}
               </div>
             )}
@@ -385,7 +386,7 @@ function PasswordCard() {
               background: msg.type==='ok'?'#F0FDF4':'#FEF2F2',
               color: msg.type==='ok'?'#15803D':'#DC2626',
               border: `1px solid ${msg.type==='ok'?'#BBF7D0':'#FECACA'}` }}>
-              <i className={`ki-filled ${msg.type==='ok'?'ki-check-circle':'ki-information-4'} text-sm`} />
+              <Icon name={msg.type==='ok'?'ki-check-circle':'ki-information-4'} className="text-sm" />
               {msg.text}
             </div>
           )}
@@ -399,7 +400,7 @@ function PasswordCard() {
             boxShadow: newPw&&newPw===confirmPw&&!saving ? '0 2px 8px rgba(124,58,237,0.3)' : 'none',
             transition:'all 0.15s',
           }}>
-            {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><i className="ki-filled ki-lock text-sm" />Сохранить новый пароль</>}
+            {saving ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</> : <><Icon name="ki-lock" className="text-sm" />Сохранить новый пароль</>}
           </button>
         </div>
       )}
@@ -661,7 +662,7 @@ export default function SettingsPage() {
               ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--muted-foreground)'
               ;(e.currentTarget as HTMLAnchorElement).style.background = 'var(--card)'
             }}>
-            <i className="ki-filled ki-left" style={{ fontSize: 13 }} />
+            <Icon name="ki-left" style={{ fontSize: 13 }} />
           </Link>
           <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
             Настройки
@@ -704,7 +705,7 @@ export default function SettingsPage() {
                 boxShadow: active ? '0 1px 6px rgba(0,0,0,0.08)' : 'none',
                 transition: 'all 0.15s',
               }}>
-              <i className={`ki-filled ${t.icon}`} style={{ fontSize: 14, color: active ? t.color : 'var(--muted-foreground)' }} />
+              <Icon name={t.icon} style={{ fontSize: 14, color: active ? t.color : 'var(--muted-foreground)' }} />
               <span className="hidden sm:inline">{t.label}</span>
             </button>
           )
@@ -765,7 +766,7 @@ export default function SettingsPage() {
                       display: 'flex', alignItems: 'center', gap: 6,
                     }}
                   >
-                    <i className="ki-filled ki-picture text-xs" />
+                    <Icon name="ki-picture" className="text-xs" />
                     {uploadingAvatar ? 'Загрузка…' : 'Выбрать файл'}
                   </button>
                   {avatarUrl && (
@@ -833,10 +834,10 @@ export default function SettingsPage() {
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
                   )}
                   {nicknameStatus === 'available' && (
-                    <i className="ki-filled ki-check-circle absolute right-3 top-1/2 -translate-y-1/2 text-sm text-green-600" />
+                    <Icon name="ki-check-circle" className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-green-600" />
                   )}
                   {(nicknameStatus === 'taken' || nicknameStatus === 'invalid') && (
-                    <i className="ki-filled ki-cross-circle absolute right-3 top-1/2 -translate-y-1/2 text-sm text-red-600" />
+                    <Icon name="ki-cross-circle" className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-red-600" />
                   )}
                 </div>
                 {nicknameStatus === 'taken' && <p style={{ marginTop: 5, fontSize: 11, color: '#DC2626', fontWeight: 600 }}>Этот никнейм уже занят</p>}
@@ -987,7 +988,7 @@ export default function SettingsPage() {
             <SectionHeader icon="ki-people" color="#0284C7" title="Клуб / Организация" />
             <Field label="Клуб или спортивная организация" hint="Название клуба, команды или организации, к которой вы относитесь">
               <div style={{ position: 'relative' }}>
-                <i className="ki-filled ki-people" style={{
+                <Icon name="ki-people" style={{
                   position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
                   color: 'var(--muted-foreground)', fontSize: 14, pointerEvents: 'none',
                 }} />
@@ -1051,7 +1052,7 @@ export default function SettingsPage() {
               ].map(h => (
                 <div key={h.label} style={{ padding: '10px 14px', borderRadius: 12, background: h.color + '0D', border: `1px solid ${h.color}25` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <i className={`ki-filled ${h.icon} text-xs`} style={{ color: h.color }} />
+                    <Icon name={h.icon} className="text-xs" style={{ color: h.color }} />
                     <span style={{ fontSize: 11, fontWeight: 700, color: h.color }}>{h.label}</span>
                   </div>
                   <p style={{ fontSize: 10, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.5 }}>{h.hint}</p>
@@ -1121,7 +1122,7 @@ export default function SettingsPage() {
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEE2E2' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEF2F2' }}
                 onClick={() => setShowDeleteModal(true)}>
-                <i className="ki-filled ki-trash text-sm" />Удалить аккаунт
+                <Icon name="ki-trash" className="text-sm" />Удалить аккаунт
               </button>
             </div>
           </Card>
@@ -1152,9 +1153,9 @@ export default function SettingsPage() {
           {saving ? (
             <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Сохранение…</>
           ) : saved ? (
-            <><i className="ki-filled ki-check text-sm" />Сохранено</>
+            <><Icon name="ki-check" className="text-sm" />Сохранено</>
           ) : (
-            <><i className="ki-filled ki-check text-sm" />Сохранить изменения</>
+            <><Icon name="ki-check" className="text-sm" />Сохранить изменения</>
           )}
         </button>
         {saved && (
@@ -1164,7 +1165,7 @@ export default function SettingsPage() {
         )}
         {saveError && (
           <span style={{ fontSize: 13, color: '#DC2626', fontWeight: 600, animation: 'fadeIn 0.3s ease', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <i className="ki-filled ki-information-4 text-sm" />
+            <Icon name="ki-information-4" className="text-sm" />
             {saveError}
           </span>
         )}
@@ -1178,7 +1179,7 @@ export default function SettingsPage() {
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '28px 24px', width: '100%', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <div style={{ width: 42, height: 42, borderRadius: 12, background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className="ki-filled ki-trash text-xl text-red-500" />
+              <Icon name="ki-trash" className="text-xl text-red-500" />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Необратимо</p>

@@ -12,6 +12,9 @@ import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
 import { createDiaryEntry } from '@/services/coach-diary.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 
@@ -138,7 +141,7 @@ function StatTile({
           {hint && <p className="mt-1.5 text-2xs leading-5 text-muted-foreground">{hint}</p>}
         </div>
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-          <i className={`ki-filled ${icon} text-base`} />
+          <Icon name={icon} className="text-base" />
         </div>
       </div>
     </div>
@@ -193,7 +196,7 @@ function AthleteCard({
               className="inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
               style={{ background: rr.bg, color: rr.text, borderColor: rr.border }}
             >
-              <i className={`ki-filled ${rr.icon} text-[9px]`} />
+              <Icon name={rr.icon} className="text-[9px]" />
               {RISK_LABELS[athlete.risk]}
             </span>
           </div>
@@ -388,7 +391,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold"
                 style={{ background: rr.bg, color: rr.text, borderColor: rr.border }}
               >
-                <i className={`ki-filled ${rr.icon} text-[10px]`} />
+                <Icon name={rr.icon} className="text-[10px]" />
                 {athlete.risk}
               </span>
             </div>
@@ -402,17 +405,17 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 onClick={() => setCommentOpen(true)}
-                className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
               >
-                <i className="ki-filled ki-message-text text-xs" />
+                <Icon name="ki-message-text" className="text-xs" />
                 Комментарий
               </button>
               <Link
                 href="/coach/passes"
-                className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 no-underline"
+                className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 no-underline')}
                 title="Списать сессию с активного абонемента"
               >
-                <i className="ki-filled ki-tag text-xs" />
+                <Icon name="ki-tag" className="text-xs" />
                 Отметить сессию
               </Link>
             </div>
@@ -434,7 +437,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                   : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
               ].join(' ')}
             >
-              <i className={`ki-filled ${item.icon} text-xs`} />
+              <Icon name={item.icon} className="text-xs" />
               {item.label}
             </button>
           ))}
@@ -501,7 +504,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                         className="flex items-center gap-3 rounded-2xl border px-3 py-2.5"
                         style={{ background: meta.bg, borderColor: meta.border }}
                       >
-                        <i className={`ki-filled ${item.icon} text-sm`} style={{ color: meta.text }} />
+                        <Icon name={item.icon} className="text-sm" style={{ color: meta.text }} />
                         <div className="min-w-0">
                           <div className="text-2xs font-semibold" style={{ color: meta.text }}>
                             {item.label}
@@ -547,7 +550,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             />
             {athlete.recentWorkouts.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 rounded-[24px] border border-border bg-background/75 py-10 text-center">
-                <i className="ki-filled ki-calendar text-2xl text-muted-foreground/40" />
+                <Icon name="ki-calendar" className="text-2xl text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">Тренировок пока нет</p>
               </div>
             ) : (
@@ -609,7 +612,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             />
             {athlete.recentWorkouts.filter(w => w.description).length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 rounded-[24px] border border-border bg-background/75 py-10 text-center">
-                <i className="ki-filled ki-notepad-edit text-2xl text-muted-foreground/40" />
+                <Icon name="ki-notepad-edit" className="text-2xl text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">Заметок пока нет</p>
               </div>
             ) : (
@@ -695,10 +698,10 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               </div>
               <button
                 onClick={() => { setCommentOpen(false); setCError(null) }}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
                 aria-label="Закрыть"
               >
-                <i className="ki-filled ki-cross text-sm" />
+                <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>
             <div className="flex flex-col gap-3">
@@ -735,13 +738,13 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 <button
                   onClick={onSubmitComment}
                   disabled={cSaving}
-                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                 >
                   {cSaving ? 'Сохраняю…' : 'Сохранить'}
                 </button>
                 <button
                   onClick={() => { setCommentOpen(false); setCError(null) }}
-                  className="kt-btn kt-btn-outline"
+                  className={buttonVariants({ variant: 'outline' })}
                 >
                   Отмена
                 </button>
@@ -754,7 +757,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
       {/* Toast after save */}
       {cToast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2 max-w-md bg-emerald-600 text-white">
-          <i className="ki-filled ki-check-circle text-sm" />
+          <Icon name="ki-check-circle" className="text-sm" />
           {cToast}
         </div>
       )}
@@ -868,7 +871,7 @@ export default function AthletesPage() {
     return (
       <Card className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-6 py-10 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-          <i className="ki-filled ki-lock-2 text-2xl text-red-400" />
+          <Icon name="ki-lock-2" className="text-2xl text-red-400" />
         </div>
         <div>
           <p className="text-sm font-semibold text-foreground">Доступ ограничен</p>
@@ -926,18 +929,18 @@ export default function AthletesPage() {
               {activeFiltersCount > 0 && (
                 <button
                   onClick={() => router.push('/athletes')}
-                  className="kt-btn kt-btn-outline gap-2"
+                  className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
                   title="Сбросить все фильтры"
                 >
-                  <i className="ki-filled ki-cross-circle text-xs" />
+                  <Icon name="ki-cross-circle" className="text-xs" />
                   Сбросить ({activeFiltersCount})
                 </button>
               )}
               <Link
                 href="/network?tab=find&type=people"
-                className="kt-btn kt-btn-primary gap-2 no-underline"
+                className={cn(buttonVariants(), 'gap-2 no-underline')}
               >
-                <i className="ki-filled ki-plus text-sm" />
+                <Icon name="ki-plus" className="text-sm" />
                 Добавить атлета
               </Link>
             </div>
@@ -960,7 +963,7 @@ export default function AthletesPage() {
                     </div>
                   </div>
                   <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${item.tone}`}>
-                    <i className={`ki-filled ${item.icon} text-base`} />
+                    <Icon name={item.icon} className="text-base" />
                   </div>
                 </div>
               </div>
@@ -1088,13 +1091,13 @@ export default function AthletesPage() {
               </div>
             ) : athletes.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-                <i className="ki-filled ki-people text-2xl text-muted-foreground/40" />
+                <Icon name="ki-people" className="text-2xl text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">Атлетов пока нет</p>
                 <p className="text-2xs text-muted-foreground/60">Пригласите атлета через раздел Связи</p>
               </div>
             ) : filteredAthletes.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-                <i className="ki-filled ki-filter text-2xl text-muted-foreground/40" />
+                <Icon name="ki-filter" className="text-2xl text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">По выбранным фильтрам никого нет</p>
                 <button
                   onClick={() => router.push('/athletes')}

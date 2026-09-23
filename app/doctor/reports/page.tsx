@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Icon } from '@/components/ui/Icon'
 
 type AthleteUser = {
   id: string
@@ -102,7 +103,7 @@ export default async function DoctorReportsPage() {
                 </div>
                 <div className="mt-3 flex items-center justify-between text-[11px] font-semibold text-[#DC2626]">
                   <span>Открыть отчёт</span>
-                  <i className="ki-filled ki-arrow-right text-[10px]" />
+                  <Icon name="ki-arrow-right" className="text-[10px]" />
                 </div>
               </Link>
             )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 /**
  * Button that starts a checkout session for a coach_pass_plan and
@@ -63,7 +64,7 @@ export default function BuyPassButton({
         className={className
           ?? 'inline-flex items-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50'}
       >
-        <i className="ki-filled ki-credit-cart text-xs"/>
+        <Icon name="ki-credit-cart" className="text-xs" />
         {busy ? 'Переходим к оплате…' : (children ?? (priceLabel ? `Купить за ${priceLabel}` : 'Купить абонемент'))}
       </button>
       {error && (

@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -84,7 +85,7 @@ export default function CoachRestrictionsCard({ athleteIds }: { athleteIds: stri
       <div className="flex items-center justify-between border-b border-border bg-amber-50/60 px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
-            <i className="ki-filled ki-shield-cross text-sm" />
+            <Icon name="ki-shield-cross" className="text-sm" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">Ограничения от врача</h3>

@@ -5,6 +5,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { ASSISTANT_OPEN_EVENT } from '@/components/assistant/FloatingAssistant'
 import { fetchCapabilities } from '@/lib/ai/assistant/client'
 import type { AssistantCapabilities } from '@/lib/ai/assistant/types'
+import { Icon } from '@/components/ui/Icon'
 
 type TabKey = 'hub' | 'assistant' | 'week' | 'video' | 'voice' | 'coach' | 'diary-search'
 
@@ -96,7 +97,7 @@ function Tab({ active, onClick, children, icon }: { active: boolean; onClick: ()
           : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
-      <i className={`ki-filled ${icon} text-[13px]`} />
+      <Icon name={icon} className="text-[13px]" />
       {children}
     </button>
   )
@@ -112,7 +113,7 @@ function FeatureCard({ f, onOpen }: { f: Feature; onOpen: (f: Feature) => void }
     >
       <div className="flex items-start justify-between gap-3">
         <div style={{ width: 44, height: 44, borderRadius: 14, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <i className={`ki-filled ${f.icon} text-base`} style={{ color: f.color }} />
+          <Icon name={f.icon} className="text-base" style={{ color: f.color }} />
         </div>
         {f.badge && (
           <span
@@ -129,7 +130,7 @@ function FeatureCard({ f, onOpen }: { f: Feature; onOpen: (f: Feature) => void }
       </div>
       <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold" style={{ color: f.color }}>
         Открыть
-        <i className="ki-filled ki-right text-[11px] transition-transform group-hover:translate-x-0.5" />
+        <Icon name="ki-right" className="text-[11px] transition-transform group-hover:translate-x-0.5" />
       </div>
     </button>
   )
@@ -176,7 +177,7 @@ function AssistantChat() {
     return (
       <div className={shell} style={{ minHeight: 420 }}>
         <div style={{ width: 56, height: 56, borderRadius: 18, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <i className="ki-filled ki-lock-2 text-xl text-muted-foreground" />
+          <Icon name="ki-lock-2" className="text-xl text-muted-foreground" />
         </div>
         <div>
           <div className="text-base font-semibold text-foreground">AI-помощник недоступен</div>
@@ -199,7 +200,7 @@ function AssistantChat() {
   return (
     <div className={shell} style={{ minHeight: 420 }}>
       <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <i className="ki-filled ki-message-programming text-xl" style={{ color: '#7C3AED' }} />
+        <Icon name="ki-message-programming" className="text-xl" style={{ color: '#7C3AED' }} />
       </div>
       <div>
         <div className="text-base font-semibold text-foreground">AI-помощник всегда под рукой</div>
@@ -240,12 +241,12 @@ function CoachToolsPanel({ role }: { role: string | undefined }) {
           className="flex flex-col gap-2 rounded-2xl border border-[#E2E8F0] bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md"
         >
           <div style={{ width: 40, height: 40, borderRadius: 12, background: t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <i className={`ki-filled ${t.icon} text-sm`} style={{ color: t.color }} />
+            <Icon name={t.icon} className="text-sm" style={{ color: t.color }} />
           </div>
           <div className="text-sm font-semibold text-foreground mt-1">{t.title}</div>
           <div className="text-[12px] leading-5 text-muted-foreground">{t.subtitle}</div>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: t.color }}>
-            Перейти <i className="ki-filled ki-right text-[10px]" />
+            Перейти <Icon name="ki-right" className="text-[10px]" />
           </div>
         </Link>
       ))}
@@ -282,7 +283,7 @@ export default function AiHubPage() {
         <div className="relative flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E9D5FF] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7C3AED]">
-              <i className="ki-filled ki-message-programming text-[11px]" />
+              <Icon name="ki-message-programming" className="text-[11px]" />
               Sporteo AI
             </span>
             <span className="inline-flex items-center rounded-full border border-[#BAE6FD] bg-[#F0F9FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0EA5E9]">
@@ -316,7 +317,7 @@ export default function AiHubPage() {
             ))}
           </div>
           <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-xs text-muted-foreground">
-            <i className="ki-filled ki-information-2 text-xs" /> Подсказка: нажмите <kbd className="mx-1 rounded-sm border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
+            <Icon name="ki-information-2" className="text-xs" /> Подсказка: нажмите <kbd className="mx-1 rounded-sm border border-[#E2E8F0] bg-white px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
             в любом разделе, чтобы быстро вызвать команду или задать вопрос ассистенту.
           </div>
         </>

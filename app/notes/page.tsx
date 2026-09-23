@@ -5,6 +5,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import NoteEditor from '@/components/ui/NoteEditor'
 import { createClient } from '@/lib/supabase/client'
 import type { Note, NoteAttachment } from '@/services/notes.service'
+import { Icon } from '@/components/ui/Icon'
 
 type AttachType = 'image' | 'document'
 
@@ -287,7 +288,7 @@ export default function NotesPage() {
           onClick={startNew}
           className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
         >
-          <i className="ki-filled ki-plus text-sm" />
+          <Icon name="ki-plus" className="text-sm" />
           Новая заметка
         </button>
       </div>
@@ -299,7 +300,7 @@ export default function NotesPage() {
           {/* Search */}
           <div className="px-3 py-3 border-b border-border shrink-0">
             <div className="relative">
-              <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
+              <Icon name="ki-magnifier" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
               <input
                 type="text"
                 value={searchInput}
@@ -318,7 +319,7 @@ export default function NotesPage() {
               </div>
             ) : notes.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <i className="ki-filled ki-notepad-edit text-3xl text-muted-foreground/40 block mb-2" />
+                <Icon name="ki-notepad-edit" className="text-3xl text-muted-foreground/40 block mb-2" />
                 <p className="text-sm text-muted-foreground">
                   {search ? 'Ничего не найдено' : 'Нет заметок'}
                 </p>
@@ -342,7 +343,7 @@ export default function NotesPage() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         {(note.attachments?.length ?? 0) > 0 && (
                           <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground/60">
-                            <i className="ki-filled ki-paper-clip text-[10px]" />
+                            <Icon name="ki-paper-clip" className="text-[10px]" />
                             {note.attachments!.length}
                           </span>
                         )}
@@ -419,7 +420,7 @@ export default function NotesPage() {
                               className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px] hover:border-orange-300 hover:bg-orange-50 transition-colors no-underline"
                               title={att.name}
                             >
-                              <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                              <Icon name="ki-document" className="text-muted-foreground text-sm shrink-0" />
                               <div className="min-w-0">
                                 <div className="text-[11px] text-foreground truncate">{att.name}</div>
                                 <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
@@ -432,7 +433,7 @@ export default function NotesPage() {
                             className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground/85 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                             aria-label="Удалить вложение"
                           >
-                            <i className="ki-filled ki-cross text-[9px]" />
+                            <Icon name="ki-cross" className="text-[9px]" />
                           </button>
                         </div>
                       ))}
@@ -451,13 +452,13 @@ export default function NotesPage() {
                               )}
                               {f.error && (
                                 <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center">
-                                  <i className="ki-filled ki-information-4 text-white text-xs" />
+                                  <Icon name="ki-information-4" className="text-white text-xs" />
                                 </div>
                               )}
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px]">
-                              <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                              <Icon name="ki-document" className="text-muted-foreground text-sm shrink-0" />
                               <div className="min-w-0">
                                 <div className="text-[11px] text-foreground truncate">{f.name}</div>
                                 <div className="text-[10px] text-muted-foreground">{fmtSize(f.size)}</div>
@@ -473,7 +474,7 @@ export default function NotesPage() {
                             className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground/85 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                             aria-label="Удалить файл"
                           >
-                            <i className="ki-filled ki-cross text-[9px]" />
+                            <Icon name="ki-cross" className="text-[9px]" />
                           </button>
                         </div>
                       ))}
@@ -499,7 +500,7 @@ export default function NotesPage() {
                                text-muted-foreground hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500
                                transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    <i className="ki-filled ki-paper-clip text-[14px]" />
+                    <Icon name="ki-paper-clip" className="text-[14px]" />
                   </button>
                   {!isNew && (
                     deleteConfirm ? (
@@ -513,7 +514,7 @@ export default function NotesPage() {
                         onClick={() => setDeleteConfirm(true)}
                         className="text-xs text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1"
                       >
-                        <i className="ki-filled ki-trash text-xs" />
+                        <Icon name="ki-trash" className="text-xs" />
                         Удалить
                       </button>
                     )
@@ -538,7 +539,7 @@ export default function NotesPage() {
                       </>
                     ) : (
                       <>
-                        <i className="ki-filled ki-check text-xs" />
+                        <Icon name="ki-check" className="text-xs" />
                         Сохранить
                       </>
                     )}
@@ -558,7 +559,7 @@ export default function NotesPage() {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
               <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mb-4">
-                <i className="ki-filled ki-notepad-edit text-3xl text-orange-400" />
+                <Icon name="ki-notepad-edit" className="text-3xl text-orange-400" />
               </div>
               <h3 className="text-base font-semibold text-navy-500 mb-1">Выберите заметку</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -568,7 +569,7 @@ export default function NotesPage() {
                 onClick={startNew}
                 className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
-                <i className="ki-filled ki-plus text-sm" />
+                <Icon name="ki-plus" className="text-sm" />
                 Новая заметка
               </button>
             </div>

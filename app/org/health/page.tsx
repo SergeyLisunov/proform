@@ -21,6 +21,7 @@ import {
   getOrgHealthSnapshot,
   type OrgHealthSnapshot, type RiskBucket,
 } from '@/services/org-snapshot.service'
+import { Icon } from '@/components/ui/Icon'
 
 const RISK_META: Record<RiskBucket, { label: string; color: string; bg: string }> = {
   low:      { label: 'В норме',  color: '#16A34A', bg: '#F0FDF4' },
@@ -101,7 +102,7 @@ export default function OrgHealthPage() {
   if (!snapshot) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-3 px-4 text-center">
-        <i className="ki-filled ki-office-bag text-3xl text-muted-foreground mb-1" />
+        <Icon name="ki-office-bag" className="text-3xl text-muted-foreground mb-1" />
         <p className="text-sm font-semibold text-foreground">Health Snapshot недоступен</p>
         <p className="text-xs text-muted-foreground max-w-md">
           Вы не привязаны к организации. Создайте организацию или попросите owner'а добавить вас в состав.
@@ -125,7 +126,7 @@ export default function OrgHealthPage() {
       <div className="mb-1 print-hide">
         <Link href="/org"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           К организации
         </Link>
       </div>
@@ -160,7 +161,7 @@ export default function OrgHealthPage() {
               className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-bold shadow-xs"
               title="Скопировать ссылку — recipient видит ту же страницу, если у него доступ к организации"
             >
-              <i className="ki-filled ki-copy text-sm" />
+              <Icon name="ki-copy" className="text-sm" />
               Поделиться отчётом
             </button>
             <button
@@ -168,7 +169,7 @@ export default function OrgHealthPage() {
               className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-blue-200 bg-card hover:bg-blue-50 text-blue-700 px-4 py-2.5 text-sm font-bold"
               title="Открывает диалог печати браузера — выберите «Сохранить как PDF»"
             >
-              <i className="ki-filled ki-printer text-sm" />
+              <Icon name="ki-printer" className="text-sm" />
               Скачать PDF
             </button>
           </div>
@@ -190,7 +191,7 @@ export default function OrgHealthPage() {
                 <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">{s.label}</div>
               </div>
               <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${s.bg}`}>
-                <i className={`ki-filled ${s.icon} text-base`} />
+                <Icon name={s.icon} className="text-base" />
               </div>
             </div>
           </Card>
@@ -366,7 +367,7 @@ export default function OrgHealthPage() {
       {/* Toast */}
       {shareToast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2 max-w-md bg-blue-600 text-white">
-          <i className="ki-filled ki-check-circle text-sm" />
+          <Icon name="ki-check-circle" className="text-sm" />
           {shareToast}
         </div>
       )}

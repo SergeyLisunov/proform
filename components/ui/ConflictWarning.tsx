@@ -5,6 +5,7 @@ import {
   formatConflictTime,
   type Conflict,
 } from '@/services/calendar-conflicts.service'
+import { Icon } from '@/components/ui/Icon'
 
 type Color = 'orange' | 'red' | 'purple'
 
@@ -48,7 +49,7 @@ export function ConflictWarning({
   return (
     <div className={`rounded-xl border ${c.border} ${c.bg} p-3`}>
       <div className={`flex items-center gap-2 ${c.text} text-xs font-semibold mb-2`}>
-        <i className="ki-filled ki-information-2 text-sm" />
+        <Icon name="ki-information-2" className="text-sm" />
         <span>{title} ({conflicts.length})</span>
       </div>
       <ul className="space-y-1.5">
@@ -81,7 +82,7 @@ export function GroupConflictWarning({
   return (
     <div className={`rounded-xl border ${c.border} ${c.bg} p-3`}>
       <div className={`flex items-center gap-2 ${c.text} text-xs font-semibold mb-2`}>
-        <i className="ki-filled ki-information-2 text-sm" />
+        <Icon name="ki-information-2" className="text-sm" />
         <span>Пересечения у {affected.length} участник(ов)</span>
       </div>
       <ul className="space-y-2">

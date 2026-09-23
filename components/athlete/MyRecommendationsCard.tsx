@@ -19,6 +19,7 @@ import {
   CATEGORY_META, SEVERITY_META, type Recommendation,
 } from '@/services/recommendations.service'
 import { Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface Props {
   athleteId: string
@@ -77,7 +78,7 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
       <div className="flex items-center justify-between border-b border-blue-100 px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-blue-100">
-            <i className="ki-filled ki-heart-circle text-base text-blue-600" />
+            <Icon name="ki-heart-circle" className="text-base text-blue-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-blue-900 leading-none">Рекомендации от врача</h3>
@@ -95,7 +96,7 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
             <div key={r.id} className="flex items-start gap-3 px-4 py-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
                 style={{ background: sev.bg, border: `1px solid ${sev.border}`, color: sev.color }}>
-                <i className={`ki-filled ${cat.icon} text-sm`} />
+                <Icon name={cat.icon} className="text-sm" />
               </div>
 
               <div className="min-w-0 flex-1">
@@ -126,7 +127,7 @@ export default function MyRecommendationsCard({ athleteId }: Props) {
                   onClick={() => acknowledge(r.id)}
                   disabled={busyId === r.id}
                   className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 text-[11px] font-bold disabled:opacity-50">
-                  {busyId === r.id ? '…' : <><i className="ki-filled ki-check text-[11px]" />Понятно</>}
+                  {busyId === r.id ? '…' : <><Icon name="ki-check" className="text-[11px]" />Понятно</>}
                 </button>
               ) : (
                 <Badge variant="success" size="sm" className="shrink-0 uppercase tracking-wider">

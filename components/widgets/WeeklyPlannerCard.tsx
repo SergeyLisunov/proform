@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { PaywallBanner, type Plan as PlanTier } from '@/components/ui/Paywall'
+import { Icon } from '@/components/ui/Icon'
 
 type Day = {
   day_offset: number
@@ -113,7 +114,7 @@ export default function WeeklyPlannerCard() {
       <div className="flex items-center justify-between px-5 py-4 border-b border-purple-100/80">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-purple-100">
-            <i className="ki-filled ki-calendar-tick text-[14px] text-purple-600" />
+            <Icon name="ki-calendar-tick" className="text-[14px] text-purple-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500 leading-none">План на неделю</h3>
@@ -131,7 +132,7 @@ export default function WeeklyPlannerCard() {
         )}
         {applied && (
           <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-2xs font-bold text-emerald-700 border border-emerald-200">
-            <i className="ki-filled ki-check text-2xs" /> В календаре
+            <Icon name="ki-check" className="text-2xs" /> В календаре
           </span>
         )}
       </div>
@@ -189,7 +190,7 @@ export default function WeeklyPlannerCard() {
                     <ul className="space-y-0.5">
                       {plan.warnings.map((w, i) => (
                         <li key={i} className="flex gap-1.5 text-xs text-amber-900">
-                          <i className="ki-filled ki-information-2 mt-[2px] text-[10px]" />
+                          <Icon name="ki-information-2" className="mt-[2px] text-[10px]" />
                           <span>{w}</span>
                         </li>
                       ))}
@@ -209,7 +210,7 @@ export default function WeeklyPlannerCard() {
                           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
                           style={{ background: s.bg, color: s.color }}
                         >
-                          <i className={`ki-filled ${s.icon} text-[12px]`} />
+                          <Icon name={s.icon} className="text-[12px]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">

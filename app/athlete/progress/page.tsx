@@ -18,6 +18,7 @@ import {
   STATUS_META, type ProgressStats, type AthleteGoal,
 } from '@/services/athlete-goals.service'
 import { Card, ChartCard, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 export default function AthleteProgressPage() {
   const { user, loading: userLoading } = useUser()
@@ -68,7 +69,7 @@ export default function AthleteProgressPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Войдите в аккаунт</p>
         <Link href="/auth/login?next=/athlete/progress" className="text-sm text-orange-600 font-semibold hover:underline">
           → Войти
@@ -93,7 +94,7 @@ export default function AthleteProgressPage() {
         </div>
         <Link href="/athlete/goals"
           className="rounded-xl border border-border bg-background hover:bg-muted px-3 py-1.5 text-sm font-semibold no-underline inline-flex items-center gap-1.5">
-          <i className="ki-filled ki-flag text-sm" />
+          <Icon name="ki-flag" className="text-sm" />
           К целям
         </Link>
       </div>
@@ -227,7 +228,7 @@ export default function AthleteProgressPage() {
 
         {activeGoals.length === 0 ? (
           <div className="rounded-xl border-2 border-dashed border-border bg-accent/30 px-4 py-8 text-center">
-            <i className="ki-filled ki-flag text-2xl text-muted-foreground mb-2 block" />
+            <Icon name="ki-flag" className="text-2xl text-muted-foreground mb-2 block" />
             <Link href="/athlete/goals"
               className="text-sm text-orange-600 font-semibold hover:underline no-underline">
               + Создать первую цель
@@ -245,7 +246,7 @@ export default function AthleteProgressPage() {
                     <h4 className="text-sm font-bold text-foreground line-clamp-2">{g.metric_label}</h4>
                     <span className="text-[10px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5 inline-flex items-center"
                       style={{ background: STATUS_META.active.bg, color: STATUS_META.active.color }}>
-                      <i className="ki-filled ki-focus text-[10px]" />
+                      <Icon name="ki-focus" className="text-[10px]" />
                     </span>
                   </div>
                   {g.target_value !== null && (
@@ -261,7 +262,7 @@ export default function AthleteProgressPage() {
                   )}
                   {g.target_date && (
                     <div className="text-[10px] text-muted-foreground mt-1.5 inline-flex items-center gap-1">
-                      <i className="ki-filled ki-calendar text-[10px]" />
+                      <Icon name="ki-calendar" className="text-[10px]" />
                       {new Date(g.target_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                     </div>
                   )}

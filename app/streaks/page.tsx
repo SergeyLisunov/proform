@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useToast } from '@/lib/hooks/useToast'
+import { Icon } from '@/components/ui/Icon'
 
 type Workout = {
   event_date: string
@@ -216,7 +217,7 @@ export default function StreaksPage() {
           </div>
           <h1 className="pf-num inline-flex items-center gap-2 text-[28px] leading-tight text-navy-500">
             {stats ? (
-              <><i className="ki-filled ki-flash-circle text-orange-600" />Серия {stats.currentStreak} {stats.currentStreak === 1 ? 'день' :
+              <><Icon name="ki-flash-circle" className="text-orange-600" />Серия {stats.currentStreak} {stats.currentStreak === 1 ? 'день' :
                 stats.currentStreak < 5 ? 'дня' : 'дней'}</>
             ) : 'Загрузка…'}
           </h1>
@@ -300,7 +301,7 @@ export default function StreaksPage() {
                     }`}
                     style={{ background: `${b.color}22` }}
                   >
-                    <i className={`ki-filled ${b.icon} text-[22px]`} style={{ color: b.color }} />
+                    <Icon name={b.icon} className="text-[22px]" style={{ color: b.color }} />
                   </div>
                   <div className="min-w-0">
                     <div className={`text-sm font-bold ${b.earned ? 'text-foreground' : 'text-muted-foreground'}`}>
@@ -338,7 +339,7 @@ function KPI({
     <div className="rounded-2xl border border-border bg-card p-3 shadow-xs">
       <div className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `${color}18` }}>
-          <i className={`ki-filled ${icon} text-[14px]`} style={{ color }} />
+          <Icon name={icon} className="text-[14px]" style={{ color }} />
         </div>
         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</div>
       </div>

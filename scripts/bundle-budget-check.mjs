@@ -51,10 +51,15 @@ const CHUNKS_DIR = join(NEXT_DIR, 'static', 'chunks')
  * Budgets in kB (RAW on-disk). Calibrated W21 Day 1 on Next 16.2.6:
  *   - shared baseline measured 527 kB → budget 650 (~23% headroom)
  *   - total chunks measured 3762 kB → budget 4600 (~22% headroom)
+ *   - 2026-09-23: 4798 kB → budget 5100 (~6% headroom). Дизайн-система:
+ *     lucide-react 32 kB (словарь иконок вместо шрифта Metronic) +
+ *     @base-ui/react 68 kB (Dialog с focus trap). Взамен со страницы ушли
+ *     648 kB CSS и шрифта, блокировавших рендер. Запас сознательно узкий:
+ *     следующий рост должен потребовать разговора, а не молчаливого bump.
  * Bump deliberately + document when a justified dependency lands.
  */
 const SHARED_BASELINE_KB = 650
-const TOTAL_CHUNKS_KB = 4600
+const TOTAL_CHUNKS_KB = 5100
 
 function runBuild() {
   console.log('Running `next build --webpack`...\n')

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
+import { Icon } from '@/components/ui/Icon'
 
 type Notification = {
   id: string
@@ -109,7 +110,7 @@ export default function NotificationsPage() {
             width: 36, height: 36, borderRadius: 10, border: '1.5px solid var(--border)',
             background: 'var(--card)', color: 'var(--muted-foreground)', textDecoration: 'none', marginBottom: 14,
           }}>
-            <i className="ki-filled ki-left" style={{ fontSize: 13 }} />
+            <Icon name="ki-left" style={{ fontSize: 13 }} />
           </Link>
           <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>Центр уведомлений</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -140,7 +141,7 @@ export default function NotificationsPage() {
             }}>
             {markingAll
               ? <><div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />Отмечаем…</>
-              : <><i className="ki-filled ki-check-circle text-xs" />Прочитать все</>
+              : <><Icon name="ki-check-circle" className="text-xs" />Прочитать все</>
             }
           </button>
         )}
@@ -169,7 +170,7 @@ export default function NotificationsPage() {
         </div>
       ) : visible.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted-foreground)' }}>
-          <i className="ki-filled ki-notification-on text-4xl block mb-3" style={{ color: 'var(--border)' }} />
+          <Icon name="ki-notification-on" className="text-4xl block mb-3" style={{ color: 'var(--border)' }} />
           <p style={{ fontSize: 14, fontWeight: 600 }}>
             {filter === 'unread' ? 'Нет непрочитанных уведомлений' : 'Уведомлений пока нет'}
           </p>
@@ -198,7 +199,7 @@ export default function NotificationsPage() {
                   background: meta.bg, border: `1px solid ${meta.color}22`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <i className={`ki-filled ${meta.icon} text-sm`} style={{ color: meta.color }} />
+                  <Icon name={meta.icon} className="text-sm" style={{ color: meta.color }} />
                 </div>
 
                 {/* Content */}
@@ -240,7 +241,7 @@ export default function NotificationsPage() {
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FEF2F2'; (e.currentTarget as HTMLButtonElement).style.color = '#DC2626' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--muted-foreground)' }}
                 >
-                  <i className="ki-filled ki-cross text-[10px]" />
+                  <Icon name="ki-cross" className="text-[10px]" />
                 </button>
               </div>
             )

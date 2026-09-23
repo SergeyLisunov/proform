@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 export default function PassportShareBar({
   url, displayName,
@@ -29,7 +30,7 @@ export default function PassportShareBar({
     <div className="mx-auto max-w-5xl px-5 -mt-4">
       <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-slate-200 bg-white shadow-xs px-4 py-2.5">
         <div className="flex items-center gap-2 text-xs text-slate-500 min-w-0">
-          <i className="ki-filled ki-paper-clip hidden sm:inline text-sm" />
+          <Icon name="ki-paper-clip" className="hidden sm:inline text-sm" />
           <code className="font-mono text-[11px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-sm truncate max-w-[320px]">
             {url}
           </code>
@@ -37,7 +38,7 @@ export default function PassportShareBar({
         <div className="flex items-center gap-2">
           <button onClick={copy}
             className="rounded-lg border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 inline-flex items-center gap-1">
-            {copied ? <><i className="ki-filled ki-check text-xs" /> Скопировано</> : 'Скопировать'}
+            {copied ? <><Icon name="ki-check" className="text-xs" /> Скопировано</> : 'Скопировать'}
           </button>
           <button onClick={nativeShare}
             className="rounded-lg bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 text-xs font-semibold">

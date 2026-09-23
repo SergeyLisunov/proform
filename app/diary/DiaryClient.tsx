@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
+import { Icon } from '@/components/ui/Icon'
 
 const ACTIVITY_TYPES = ['Бег','Велоспорт','Плавание','Силовые','HIIT','CrossFit','Йога','Ходьба','Другое']
 const TIME_OF_DAY = ['Утро','День','Вечер','Ночь']
@@ -98,7 +99,7 @@ export default function DiaryClient({ role, userId }: Props) {
       <button onClick={() => setOpen(true)}
         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
         style={{ background: '#F35703' }}>
-        <i className="ki-filled ki-plus text-base" />
+        <Icon name="ki-plus" className="text-base" />
         {role === 'coach' ? 'Новое наблюдение' : 'Добавить тренировку'}
       </button>
 
@@ -111,7 +112,7 @@ export default function DiaryClient({ role, userId }: Props) {
                 <p className="text-xs text-slate-400 mt-0.5">Все поля совместимы с WHOOP</p>
               </div>
               <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
-                <i className="ki-filled ki-cross text-lg" />
+                <Icon name="ki-cross" className="text-lg" />
               </button>
             </div>
             <div className="p-6 flex flex-col gap-4">

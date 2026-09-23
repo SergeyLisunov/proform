@@ -23,6 +23,9 @@ import {
   assignAthleteToCoach, listCoachAthleteLinks,
   type CoachAthleteLink,
 } from '@/services/admin-assignments.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 function getSB() {
   return createBrowserClient(
@@ -470,7 +473,7 @@ export default function AdminPage() {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-          <i className="ki-filled ki-shield-cross text-2xl text-red-400" />
+          <Icon name="ki-shield-cross" className="text-2xl text-red-400" />
         </div>
         <div className="text-center">
           <p className="text-sm font-semibold text-foreground">Доступ запрещён</p>
@@ -526,21 +529,21 @@ export default function AdminPage() {
                   onClick={() => { setShowAssign(true); void loadLinks() }}
                   className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] transition-transform hover:-translate-y-0.5"
                 >
-                  <i className="ki-filled ki-people text-sm" />
+                  <Icon name="ki-people" className="text-sm" />
                   Назначить атлета
                 </button>
                 <Link
                   href="/admin/orgs"
                   className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-orange-200 hover:text-orange-700"
                 >
-                  <i className="ki-filled ki-office-bag text-sm" />
+                  <Icon name="ki-office-bag" className="text-sm" />
                   Управление организациями
                 </Link>
                 <Link
                   href="/admin/commerce"
                   className="inline-flex items-center gap-2 rounded-[14px] border border-green-200 bg-green-50/80 px-4 py-2.5 text-sm font-semibold text-green-700 no-underline shadow-xs transition-all hover:bg-green-100"
                 >
-                  <i className="ki-filled ki-chart-line-up text-sm" />
+                  <Icon name="ki-chart-line-up" className="text-sm" />
                   Коммерция · MRR
                 </Link>
               </div>
@@ -582,7 +585,7 @@ export default function AdminPage() {
               <div
                 style={{ width: 44, height: 44, borderRadius: 14, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
               >
-                <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
+                <Icon name={item.icon} className="text-base" style={{ color: item.color }} />
               </div>
             </div>
           </Card>
@@ -611,7 +614,7 @@ export default function AdminPage() {
                 >
                   <div className="flex items-center gap-2">
                     <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${tab === t.id ? 'bg-white text-orange-600' : 'bg-accent text-muted-foreground'}`}>
-                      <i className={`ki-filled ${t.icon} text-sm`} />
+                      <Icon name={t.icon} className="text-sm" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-2sm font-semibold text-foreground">{t.label}</div>
@@ -659,7 +662,7 @@ export default function AdminPage() {
                       onClick={() => setShowInviteModal(true)}
                       className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-100"
                     >
-                      <i className="ki-filled ki-plus text-xs" />
+                      <Icon name="ki-plus" className="text-xs" />
                       Новый пользователь
                     </button>
                   </div>
@@ -674,7 +677,7 @@ export default function AdminPage() {
                       </div>
                     ) : users.length === 0 ? (
                       <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
-                        <i className="ki-filled ki-people mb-2 block text-3xl text-muted-foreground" />
+                        <Icon name="ki-people" className="mb-2 block text-3xl text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">Пользователей не найдено.</p>
                       </div>
                     ) : users.map(userItem => {
@@ -717,7 +720,7 @@ export default function AdminPage() {
                               title="Редактирование чужого профиля из админки не реализовано — пользователь правит данные сам в /settings"
                               className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-xl border border-border bg-background text-muted-foreground opacity-60"
                             >
-                              <i className="ki-filled ki-pencil text-xs" />
+                              <Icon name="ki-pencil" className="text-xs" />
                             </button>
                             <select
                               value={userItem.role}
@@ -845,7 +848,7 @@ export default function AdminPage() {
                   </div>
                 ) : verCoaches.length === 0 ? (
                   <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
-                    <i className="ki-filled ki-people text-3xl text-muted-foreground mb-2 block" />
+                    <Icon name="ki-people" className="text-3xl text-muted-foreground mb-2 block" />
                     <p className="text-sm text-muted-foreground">Тренеров пока нет в базе.</p>
                   </div>
                 ) : (
@@ -887,8 +890,8 @@ export default function AdminPage() {
                             {busy
                               ? <><div className="w-3 h-3 border-2 border-current/40 border-t-current rounded-full pf-spin" /> Обновляю…</>
                               : c.is_verified
-                                ? <><i className="ki-filled ki-cross text-xs" /> Снять</>
-                                : <><i className="ki-filled ki-verify text-xs" /> Верифицировать</>}
+                                ? <><Icon name="ki-cross" className="text-xs" /> Снять</>
+                                : <><Icon name="ki-verify" className="text-xs" /> Верифицировать</>}
                           </button>
                         </div>
                       )
@@ -943,7 +946,7 @@ export default function AdminPage() {
                     </div>
                   ) : athleteOptions.length === 0 ? (
                     <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
-                      <i className="ki-filled ki-lock mb-2 block text-3xl text-muted-foreground" />
+                      <Icon name="ki-lock" className="mb-2 block text-3xl text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">Атлетов в базе пока нет.</p>
                     </div>
                   ) : (
@@ -986,7 +989,7 @@ export default function AdminPage() {
                     disabled={auditLoading}
                     className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-orange-200 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <i className="ki-filled ki-arrows-circle text-xs" />
+                    <Icon name="ki-arrows-circle" className="text-xs" />
                     {auditLoading ? 'Обновляю…' : 'Обновить'}
                   </button>
                   <button
@@ -994,7 +997,7 @@ export default function AdminPage() {
                     title="Экспорт журнала в CSV не реализован"
                     className="inline-flex cursor-not-allowed items-center gap-2 rounded-[14px] border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground opacity-60"
                   >
-                    <i className="ki-filled ki-abstract-26 text-xs" />
+                    <Icon name="ki-abstract-26" className="text-xs" />
                     Экспорт CSV
                   </button>
                 </div>
@@ -1011,7 +1014,7 @@ export default function AdminPage() {
                     </div>
                   ) : auditEntries.length === 0 ? (
                     <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-10 text-center">
-                      <i className="ki-filled ki-notepad-edit mb-2 block text-3xl text-muted-foreground" />
+                      <Icon name="ki-notepad-edit" className="mb-2 block text-3xl text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">В audit_logs нет записей.</p>
                       <p className="mt-1 text-2xs text-muted-foreground">
                         Журнал заполняется только привилегированными операциями (смена роли, назначение тренера).
@@ -1124,7 +1127,7 @@ export default function AdminPage() {
                     disabled={dbPing.state === 'checking'}
                     className="mt-4 inline-flex items-center gap-2 rounded-[14px] border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:border-orange-200 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <i className="ki-filled ki-arrows-circle text-xs" />
+                    <Icon name="ki-arrows-circle" className="text-xs" />
                     {dbPing.state === 'checking' ? 'Проверяю…' : 'Проверить связь'}
                   </button>
                 </div>
@@ -1172,9 +1175,9 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
               >
-                <i className="ki-filled ki-cross text-sm" />
+                <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>
 
@@ -1234,7 +1237,7 @@ export default function AdminPage() {
                         : `Распознано: ${parsedBulkEmails.length}${parsedBulkEmails.length > 50 ? ' (превышает лимит 50)' : ''}`}
                     </span>
                     {parsedBulkEmails.length > 50 && (
-                      <span className="text-red-600 font-semibold inline-flex items-center gap-1"><i className="ki-filled ki-information-2 text-xs" /> обрежется до 50</span>
+                      <span className="text-red-600 font-semibold inline-flex items-center gap-1"><Icon name="ki-information-2" className="text-xs" /> обрежется до 50</span>
                     )}
                   </div>
                 </div>
@@ -1321,7 +1324,7 @@ export default function AdminPage() {
                   <button
                     onClick={onSubmitBulkInvite}
                     disabled={bulkSaving || parsedBulkEmails.length === 0}
-                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                    className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                   >
                     {bulkSaving
                       ? 'Отправляю…'
@@ -1331,14 +1334,14 @@ export default function AdminPage() {
                   <button
                     onClick={onSubmitInvite}
                     disabled={inviteSaving}
-                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                    className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                   >
                     {inviteSaving ? 'Отправляю…' : 'Отправить приглашение'}
                   </button>
                 )}
                 <button
                   onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
-                  className="kt-btn kt-btn-outline"
+                  className={buttonVariants({ variant: 'outline' })}
                 >
                   {bulkResults ? 'Закрыть' : 'Отмена'}
                 </button>
@@ -1356,8 +1359,8 @@ export default function AdminPage() {
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Операции доступа</div>
                 <h3 className="pf-num mt-2 text-xl text-navy-500">Назначить атлета тренеру</h3>
               </div>
-              <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-sm" />
+              <button onClick={() => setShowAssign(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>
             {/* Ревизия P1: селекты получили value/onChange и реальные списки,
@@ -1427,11 +1430,11 @@ export default function AdminPage() {
                   onClick={() => void handleAssign()}
                   disabled={!assignAthlete || !assignCoach || assigning}
                   title={!assignAthlete || !assignCoach ? 'Выберите атлета и тренера' : 'Создать связь тренер↔спортсмен'}
-                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                 >
                   {assigning ? 'Назначаю…' : 'Назначить'}
                 </button>
-                <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                <button onClick={() => setShowAssign(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
               </div>
             </div>
           </div>

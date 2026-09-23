@@ -26,6 +26,7 @@ import {
   loadMyOnboarding, patchMyOnboarding, markOnboardingComplete,
   type OrgWizardData,
 } from '@/services/onboarding.service'
+import { Icon } from '@/components/ui/Icon'
 
 const ACCENT = '#2563EB'   // blue — matches organization role tint
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -296,7 +297,7 @@ export default function OrgOnboardingPage() {
                     className={`rounded-2xl border-2 px-3 py-3 text-sm font-semibold transition flex flex-col items-center gap-1 ${
                       sel ? 'border-blue-400 bg-blue-50 text-blue-700' : 'border-border bg-background hover:border-blue-200 text-foreground'
                     }`}>
-                    <i className={`ki-filled ${t.icon} text-xl`} />
+                    <Icon name={t.icon} className="text-xl" />
                     <span className="text-[12px]">{t.label}</span>
                   </button>
                 )

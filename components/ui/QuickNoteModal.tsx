@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import NoteEditor from './NoteEditor'
 import { createClient } from '@/lib/supabase/client'
 import type { Note, NoteAttachment } from '@/services/notes.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface QuickNoteModalProps {
   noteDate: string
@@ -209,7 +210,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
         <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-linear-to-br from-amber-50/60 via-card to-card shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
-              <i className="ki-filled ki-notepad-edit text-base" />
+              <Icon name="ki-notepad-edit" className="text-base" />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Новая заметка</p>
@@ -222,7 +223,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
             aria-label="Закрыть"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
           >
-            <i className="ki-filled ki-cross text-sm" />
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
 
@@ -260,13 +261,13 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
                       )}
                       {f.error && (
                         <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center">
-                          <i className="ki-filled ki-information-4 text-white text-xs" />
+                          <Icon name="ki-information-4" className="text-white text-xs" />
                         </div>
                       )}
                     </div>
                   ) : (
                     <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[160px]">
-                      <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                      <Icon name="ki-document" className="text-muted-foreground text-sm shrink-0" />
                       <div className="min-w-0">
                         <div className="text-[11px] text-foreground truncate">{f.name}</div>
                         <div className="text-[10px] text-muted-foreground">{fmtSize(f.size)}</div>
@@ -281,7 +282,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
                     onClick={() => removeFile(f.tempId)}
                     className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-foreground/80 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                   >
-                    <i className="ki-filled ki-cross text-[9px]" />
+                    <Icon name="ki-cross" className="text-[9px]" />
                   </button>
                 </div>
               ))}
@@ -304,7 +305,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
                          text-muted-foreground hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600
                          transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <i className="ki-filled ki-paper-clip text-[14px]" />
+              <Icon name="ki-paper-clip" className="text-[14px]" />
             </button>
             <span className="text-[11px] text-muted-foreground hidden sm:block">⌘↵ сохранить</span>
           </div>
@@ -335,7 +336,7 @@ export default function QuickNoteModal({ noteDate, onClose, onSaved }: QuickNote
                 </>
               ) : (
                 <>
-                  <i className="ki-filled ki-check text-xs" />
+                  <Icon name="ki-check" className="text-xs" />
                   Сохранить
                 </>
               )}

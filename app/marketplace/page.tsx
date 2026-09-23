@@ -32,6 +32,7 @@ import { getReviewSummaries } from '@/services/coach-reviews.service'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
 const TYPE_OPTIONS: ServiceType[] = [
@@ -180,7 +181,7 @@ function MarketplaceInner() {
       <div className="mb-6">
         <Link href="/dashboard"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           На главную
         </Link>
       </div>
@@ -199,7 +200,7 @@ function MarketplaceInner() {
       {/* Search + Sort row — W6 Day 32 */}
       <form onSubmit={submitSearch} className="flex items-stretch gap-2 mb-4">
         <div className="relative flex-1">
-          <i className="ki-filled ki-magnifier pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground" />
+          <Icon name="ki-magnifier" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground" />
           <input type="search" value={searchInput} onChange={e => setSearchInput(e.target.value)}
             placeholder="Поиск по названию или описанию"
             className="w-full rounded-xl border border-border bg-background pl-9 pr-3 py-2.5 text-sm outline-hidden focus:border-orange-400" />
@@ -221,7 +222,7 @@ function MarketplaceInner() {
       <Card className="p-4 mb-6 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
-            <i className="ki-filled ki-filter text-sm text-muted-foreground" />
+            <Icon name="ki-filter" className="text-sm text-muted-foreground" />
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Фильтры</span>
             {/* W9 Day 46: verified-only toggle */}
             <button
@@ -235,7 +236,7 @@ function MarketplaceInner() {
               }`}
               title="Показать только верифицированных тренеров"
             >
-              <i className="ki-filled ki-verify text-xs" />
+              <Icon name="ki-verify" className="text-xs" />
               {verifiedOnly ? 'Только Verified' : 'Только Verified'}
             </button>
           </div>
@@ -317,7 +318,7 @@ function MarketplaceInner() {
       {!loading && featured.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <i className="ki-solid ki-star text-xl text-amber-400" />
+            <Icon name="ki-star" className="text-xl text-amber-400" />
             <h2 className="text-lg font-bold text-navy-500">Рекомендуем</h2>
             <Badge variant="warning" size="sm" className="uppercase tracking-[0.18em]">
               Featured
@@ -347,7 +348,7 @@ function MarketplaceInner() {
                           title={`${ratings.get(o.seller_id)!.review_count} отзывов`}
                           className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 px-1.5 py-0.5 text-[10px] font-bold shrink-0"
                         >
-                          <i className="ki-solid ki-star text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                          <Icon name="ki-star" className="text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
                           <span className="font-normal opacity-70">·{ratings.get(o.seller_id)!.review_count}</span>
                         </span>
                       )}
@@ -375,7 +376,7 @@ function MarketplaceInner() {
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-16 text-center">
           {verifiedOnly ? (
             <>
-              <i className="ki-filled ki-verify text-4xl text-blue-500 mb-3 block" />
+              <Icon name="ki-verify" className="text-4xl text-blue-500 mb-3 block" />
               <h3 className="text-lg font-semibold text-navy-500">Verified-тренеров пока нет</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                 Программа верификации только запускается. Снимите фильтр, чтобы увидеть всех доступных тренеров.
@@ -389,7 +390,7 @@ function MarketplaceInner() {
             </>
           ) : (
             <>
-              <i className="ki-filled ki-shop text-4xl text-muted-foreground mb-3 block" />
+              <Icon name="ki-shop" className="text-4xl text-muted-foreground mb-3 block" />
               <h3 className="text-lg font-semibold text-navy-500">Услуг по вашему запросу пока нет</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                 Попробуйте сбросить фильтры или вернуться позже — каталог обновляется регулярно.
@@ -465,7 +466,7 @@ function MarketplaceInner() {
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {isFeatured && (
                               <Badge variant="warning" size="sm" className="uppercase tracking-wider">
-                                <i className="ki-solid ki-star text-[10px] mr-0.5" /> Featured
+                                <Icon name="ki-star" className="text-[10px] mr-0.5" /> Featured
                               </Badge>
                             )}
                             {isNew && (
@@ -515,7 +516,7 @@ function MarketplaceInner() {
                                       title={`${ratings.get(o.seller_id)!.review_count} отзывов · среднее ${ratings.get(o.seller_id)!.avg_rating.toFixed(1)}`}
                                       className="text-[10px] font-bold text-amber-700"
                                     >
-                                      <i className="ki-solid ki-star text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
+                                      <Icon name="ki-star" className="text-[10px]" /> {ratings.get(o.seller_id)!.avg_rating.toFixed(1)}
                                       <span className="font-normal text-muted-foreground"> ({ratings.get(o.seller_id)!.review_count})</span>
                                     </span>
                                   )}

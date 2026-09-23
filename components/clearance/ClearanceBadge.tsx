@@ -14,6 +14,7 @@
  */
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { Icon } from '@/components/ui/Icon'
 
 export type ClearanceStatus = 'full' | 'limited' | 'light_only' | 'banned'
 
@@ -100,7 +101,7 @@ export default function ClearanceBadge(props: Props) {
     }}>
       {m.dot
         ? <span style={{ display: 'inline-block', height: 8, width: 8, borderRadius: 999, background: m.dot }} />
-        : <i className="ki-filled ki-time" style={{ fontSize: fs }} />}
+        : <Icon name="ki-time" style={{ fontSize: fs }} />}
       <span>{m.label}</span>
       {showNote && current.valid_until && !current.review_needed && (
         <span style={{ fontWeight: 500, opacity: 0.75, marginLeft: 4 }}>

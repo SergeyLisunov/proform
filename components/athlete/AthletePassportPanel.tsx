@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 /**
  * Виджет на дашборде атлета: управление публичностью «Паспорта атлета»
@@ -83,7 +84,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
-            <i className="ki-filled ki-credit-cart text-[10px]" /> Паспорт атлета
+            <Icon name="ki-credit-cart" className="text-[10px]" /> Паспорт атлета
           </span>
           <h3 className="pf-num text-xl font-bold text-navy-500 mt-2">
             {profilePublic ? 'Ваш профиль открыт для всех' : 'Сделай профиль публичным'}
@@ -114,7 +115,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
             <code className="font-mono text-[11px] text-foreground flex-1 truncate">{url}</code>
             <button onClick={copy}
               className="rounded-lg border border-border bg-background hover:bg-muted px-2.5 py-1 text-[11px] font-semibold">
-              {copied ? <><i className="ki-filled ki-check text-[11px]" /> Скопировано</> : 'Скопировать'}
+              {copied ? <><Icon name="ki-check" className="text-[11px]" /> Скопировано</> : 'Скопировать'}
             </button>
             <button onClick={share}
               className="rounded-lg bg-orange-500 hover:bg-orange-600 text-white px-2.5 py-1 text-[11px] font-semibold">

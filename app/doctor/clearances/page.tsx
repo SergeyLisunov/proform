@@ -18,6 +18,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface Row {
   athlete_id:    string
@@ -108,7 +109,7 @@ export default async function DoctorClearancesPage() {
       {sorted.length === 0 ? (
         <Card className="rounded-[28px] p-12 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-400 shadow-xs">
-            <i className="ki-filled ki-shield-tick text-3xl" />
+            <Icon name="ki-shield-tick" className="text-3xl" />
           </div>
           <h2 className="mt-5 text-lg font-semibold text-foreground">Пока нет выставленных допусков</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -144,7 +145,7 @@ export default async function DoctorClearancesPage() {
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     {r.review_needed ? (
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-slate-700">
-                        <i className="ki-filled ki-time text-2xs text-slate-500" />требуется review
+                        <Icon name="ki-time" className="text-2xs text-slate-500" />требуется review
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-2xs font-bold"

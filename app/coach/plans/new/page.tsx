@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import PlanEditor from '../PlanEditor'
+import { Icon } from '@/components/ui/Icon'
 
 export default function NewPlanPage() {
   const { user, loading: userLoading } = useUser()
@@ -30,7 +31,7 @@ export default function NewPlanPage() {
   if (!allowed) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ тренера</p>
         <Link href="/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">
           ← На главную

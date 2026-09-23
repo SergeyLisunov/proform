@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isSubscriptionActive } from '@/lib/plans'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 export const dynamic = 'force-dynamic'
 
@@ -308,7 +309,7 @@ export default async function AdminCommercePage() {
           означают «не смогли прочитать», а не «выручки нет». */}
       {!admin && (
         <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <i className="ki-filled ki-information-2 mt-0.5 text-base text-amber-600" />
+          <Icon name="ki-information-2" className="mt-0.5 text-base text-amber-600" />
           <div className="text-xs text-amber-900">
             <div className="font-semibold">Блоки биллинга недоступны</div>
             <p className="mt-1 text-amber-800">
@@ -339,7 +340,7 @@ export default async function AdminCommercePage() {
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                   style={{ background: tone.bg }}
                 >
-                  <i className={`ki-filled ${k.icon} text-base`} style={{ color: tone.color }} />
+                  <Icon name={k.icon} className="text-base" style={{ color: tone.color }} />
                 </div>
               </div>
             </div>
@@ -356,7 +357,7 @@ export default async function AdminCommercePage() {
           </div>
           {upcomingCancel > 0 && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-              <i className="ki-filled ki-information-2" />
+              <Icon name="ki-information-2" />
               {upcomingCancel} отменяются в конце периода
             </span>
           )}

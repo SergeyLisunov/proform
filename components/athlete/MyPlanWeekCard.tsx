@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
 import { setPrescribedCompletion, type CompletionStatus } from '@/services/prescribed-workouts.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface PlanRow {
   id: string
@@ -72,7 +73,7 @@ export default function MyPlanWeekCard({ athleteId }: { athleteId: string }) {
       <div className="flex items-center justify-between gap-2.5 border-b border-border px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
-            <i className="ki-filled ki-calendar-8 text-sm" />
+            <Icon name="ki-calendar-8" className="text-sm" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">План на неделю</h3>

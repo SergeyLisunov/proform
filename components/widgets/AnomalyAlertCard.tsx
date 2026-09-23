@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 type Alert = {
   severity: 'info' | 'warning' | 'critical'
@@ -70,7 +71,7 @@ export default function AnomalyAlertCard() {
       <div className="flex items-center justify-between px-5 py-4 border-b border-rose-100/80">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-rose-100">
-            <i className="ki-filled ki-shield-tick text-[14px] text-rose-600" />
+            <Icon name="ki-shield-tick" className="text-[14px] text-rose-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500 leading-none">Аномалии</h3>
@@ -93,7 +94,7 @@ export default function AnomalyAlertCard() {
             title="Пересчитать"
             className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-accent transition"
           >
-            <i className={`ki-filled ki-arrows-circle text-[12px] text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
+            <Icon name={loading ? 'animate-spin' : ''} className="text-[12px] text-muted-foreground" />
           </button>
         </div>
       </div>
@@ -113,7 +114,7 @@ export default function AnomalyAlertCard() {
             <p className="text-sm leading-relaxed text-foreground">{data.summary}</p>
             {data.alerts.length === 0 ? (
               <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
-                <i className="ki-filled ki-check-circle text-emerald-600" />
+                <Icon name="ki-check-circle" className="text-emerald-600" />
                 <span className="text-xs font-semibold text-emerald-900">Значимых аномалий не обнаружено</span>
               </div>
             ) : (
@@ -126,7 +127,7 @@ export default function AnomalyAlertCard() {
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
                         style={{ background: sev.bg, color: sev.text }}
                       >
-                        <i className={`ki-filled ${TYPE_ICON[a.type]} text-[13px]`} />
+                        <Icon name={TYPE_ICON[a.type]} className="text-[13px]" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
@@ -140,7 +141,7 @@ export default function AnomalyAlertCard() {
                         </div>
                         <div className="mt-0.5 text-xs text-foreground">{a.detail}</div>
                         <div className="mt-1 flex items-start gap-1 text-2xs text-muted-foreground">
-                          <i className="ki-filled ki-arrow-right mt-[2px] text-[9px] text-orange-500" />
+                          <Icon name="ki-arrow-right" className="mt-[2px] text-[9px] text-orange-500" />
                           <span>{a.action}</span>
                         </div>
                       </div>

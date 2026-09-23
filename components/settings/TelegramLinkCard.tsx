@@ -14,6 +14,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface LinkState {
   linked: boolean
@@ -65,7 +66,7 @@ export default function TelegramLinkCard({ userId }: { userId: string }) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
-            <i className="ki-filled ki-message-text-2 text-lg" />
+            <Icon name="ki-message-text-2" className="text-lg" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">Telegram-бот</h3>
@@ -85,7 +86,7 @@ export default function TelegramLinkCard({ userId }: { userId: string }) {
                 className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-sky-500 px-3 py-1.5 text-2xs font-semibold text-white hover:bg-sky-600"
               >
                 Открыть бота и подтвердить
-                <i className="ki-filled ki-arrow-up-right text-[10px]" />
+                <Icon name="ki-arrow-up-right" className="text-[10px]" />
               </a>
             )}
             {deepLink && !state.linked && (

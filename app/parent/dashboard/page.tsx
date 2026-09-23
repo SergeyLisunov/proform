@@ -21,6 +21,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { Card } from '@/components/ui/metronic'
 import ClaimLinkButton from './ClaimLinkButton'
 import ClearanceBadge from '@/components/clearance/ClearanceBadge'
+import { Icon } from '@/components/ui/Icon'
 
 interface ChildLink {
   child_id: string
@@ -118,7 +119,7 @@ export default async function ParentDashboardPage() {
         </header>
         <Card className="rounded-[28px] p-12 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-400 shadow-xs">
-            <i className="ki-filled ki-people text-3xl" />
+            <Icon name="ki-people" className="text-3xl" />
           </div>
           <h2 className="mt-5 text-lg font-semibold text-foreground">Здесь будут ваши дети</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -129,7 +130,7 @@ export default async function ParentDashboardPage() {
             href="/network"
             className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-700 transition-all hover:bg-orange-50"
           >
-            <i className="ki-filled ki-arrow-right text-sm" />
+            <Icon name="ki-arrow-right" className="text-sm" />
             Перейти в «Сеть»
           </Link>
         </Card>

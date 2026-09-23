@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { getMyReferralStats, type ReferralStats } from '@/services/referrals.service'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 /**
  * Панель «Приглашай и получай Pro» для дашборда тренера.
@@ -28,7 +29,7 @@ export default function ReferralPanel({
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
-            <i className="ki-filled ki-gift text-[11px]" />
+            <Icon name="ki-gift" className="text-[11px]" />
             Реферальная программа
           </span>
           <h3 className="pf-num text-xl font-bold text-navy-500 mt-2">
@@ -41,7 +42,7 @@ export default function ReferralPanel({
         </div>
         <button onClick={() => setOpen(true)}
           className="rounded-xl bg-orange-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-orange-600">
-          <i className="ki-filled ki-sms text-xs mr-1"/>
+          <Icon name="ki-sms" className="text-xs mr-1" />
           Пригласить по email
         </button>
       </div>

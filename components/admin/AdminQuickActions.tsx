@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Icon } from '@/components/ui/Icon'
 
 interface QuickAction {
   href: string
@@ -75,12 +76,12 @@ export default function AdminQuickActions() {
           <>
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: a.bg, color: a.color }}>
-              <i className={`ki-filled ${a.icon} text-lg`} />
+              <Icon name={a.icon} className="text-lg" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-bold text-foreground truncate flex items-center gap-1">
                 {a.label}
-                {a.external && <i className="ki-filled ki-exit-right-corner text-[9px] text-muted-foreground" />}
+                {a.external && <Icon name="ki-exit-right-corner" className="text-[9px] text-muted-foreground" />}
               </div>
               <div className="text-[11px] text-muted-foreground truncate">{a.hint}</div>
             </div>

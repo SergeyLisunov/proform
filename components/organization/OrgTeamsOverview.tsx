@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { listOrgGroups, LEVEL_META, type OrgGroupWithCounts } from '@/services/org-groups.service'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
   const [groups, setGroups]   = useState<OrgGroupWithCounts[]>([])
@@ -42,7 +43,7 @@ export default function OrgTeamsOverview({ orgId }: { orgId: string }) {
   if (groups.length === 0) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/30 p-6 text-center">
-        <i className="ki-filled ki-people text-3xl text-violet-500 mb-2 block" />
+        <Icon name="ki-people" className="text-3xl text-violet-500 mb-2 block" />
         <p className="text-sm font-semibold text-foreground">Команд пока нет</p>
         <p className="text-xs text-muted-foreground mt-1">Группируйте атлетов по возрасту и уровню.</p>
         <Link href="/org/teams"

@@ -12,6 +12,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { renderMarkdownLite } from '@/lib/markdown-lite'
+import { Icon } from '@/components/ui/Icon'
 
 type DemoRole = 'athlete' | 'coach' | 'doctor' | 'organization'
 
@@ -113,7 +114,7 @@ export default function DemoAssistantPage() {
                 ? 'border-orange-400 bg-orange-50 shadow-xs'
                 : 'border-border bg-card hover:border-orange-200'
             }`}>
-            <i className={`ki-filled ${r.icon} text-lg ${role === r.key ? 'text-orange-500' : 'text-muted-foreground'}`} />
+            <Icon name={r.icon} className={`text-lg ${role === r.key ? 'text-orange-500' : 'text-muted-foreground'}`} />
             <div className="mt-1.5 text-sm font-bold text-foreground">{r.title}</div>
             <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{r.blurb}</div>
           </button>
@@ -190,7 +191,7 @@ export default function DemoAssistantPage() {
                   />
                   <button onClick={() => send(input)} disabled={loading || !input.trim()}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-40">
-                    <i className="ki-filled ki-paper-plane text-[13px]" />
+                    <Icon name="ki-paper-plane" className="text-[13px]" />
                   </button>
                 </div>
                 <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">

@@ -13,6 +13,7 @@ import { getOrgContext } from '@/lib/org/org-context'
 import { isPlatformAdmin } from '@/lib/permissions'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 export default async function OrgAnalyticsPage() {
   const ctx = await getOrgContext()
@@ -24,7 +25,7 @@ export default async function OrgAnalyticsPage() {
   if (!orgId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-3 text-center">
-        <i className="ki-filled ki-office-bag text-3xl text-muted-foreground" />
+        <Icon name="ki-office-bag" className="text-3xl text-muted-foreground" />
         <p className="text-sm font-semibold text-foreground">Клуб не найден</p>
         <p className="text-xs text-muted-foreground max-w-md">
           Вы не управляете ни одной организацией — аналитику показывать не по чему.
@@ -89,7 +90,7 @@ export default async function OrgAnalyticsPage() {
           <Card key={k.label} className="p-4 rounded-2xl">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: `${k.color}18` }}>
-                <i className={`ki-filled ${k.icon} text-[14px]`} style={{ color: k.color }} />
+                <Icon name={k.icon} className="text-[14px]" style={{ color: k.color }} />
               </div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{k.label}</div>
             </div>
@@ -127,7 +128,7 @@ export default async function OrgAnalyticsPage() {
           <Card className="p-5 rounded-2xl hover:border-[#16A34A] hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0FDF4]">
-                <i className="ki-filled ki-teacher text-[16px] text-[#16A34A]" />
+                <Icon name="ki-teacher" className="text-[16px] text-[#16A34A]" />
               </div>
               <div>
                 <div className="text-sm font-bold text-foreground">Список тренеров</div>
@@ -140,7 +141,7 @@ export default async function OrgAnalyticsPage() {
           <Card className="p-5 rounded-2xl hover:border-[#F35703] hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FEF0E7]">
-                <i className="ki-filled ki-abstract-26 text-[16px] text-[#F35703]" />
+                <Icon name="ki-abstract-26" className="text-[16px] text-[#F35703]" />
               </div>
               <div>
                 <div className="text-sm font-bold text-foreground">Список атлетов</div>
@@ -153,7 +154,7 @@ export default async function OrgAnalyticsPage() {
           <Card className="p-5 rounded-2xl hover:border-[#7C3AED] hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F3FF]">
-                <i className="ki-filled ki-message-text-2 text-[16px] text-[#7C3AED]" />
+                <Icon name="ki-message-text-2" className="text-[16px] text-[#7C3AED]" />
               </div>
               <div>
                 <div className="text-sm font-bold text-foreground">Стена и анонсы</div>

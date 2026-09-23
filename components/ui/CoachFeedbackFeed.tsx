@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Icon } from '@/components/ui/Icon'
 
 const WorkoutCommentsDrawer = dynamic(
   () => import('@/components/workout/WorkoutCommentsDrawer'),
@@ -139,11 +140,11 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
-        <i className="ki-filled ki-message-text-2 text-2xl text-slate-300" />
+        <Icon name="ki-message-text-2" className="text-2xl text-slate-300" />
         <p className="text-sm font-medium text-slate-600 mt-2">Нет тренировок атлетов</p>
         <p className="text-xs text-slate-400 mt-1">Пригласите атлетов в сеть — здесь появятся их последние тренировки для обратной связи.</p>
         <Link href="/network" className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-orange-600 hover:underline">
-          Перейти в сеть <i className="ki-filled ki-arrow-right" style={{ fontSize: 10 }} />
+          Перейти в сеть <Icon name="ki-arrow-right" style={{ fontSize: 10 }} />
         </Link>
       </div>
     )
@@ -180,10 +181,8 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: r.i_commented ? '#F0FDF4' : '#FEF0E7' }}
               >
-                <i
-                  className={`ki-filled ${r.i_commented ? 'ki-check-circle' : 'ki-abstract-26'} text-sm`}
-                  style={{ color: r.i_commented ? '#16A34A' : '#D44A02' }}
-                />
+                <Icon name={r.i_commented ? 'ki-check-circle' : 'ki-abstract-26'} className="text-sm"
+                  style={{ color: r.i_commented ? '#16A34A' : '#D44A02' }} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -201,7 +200,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
               <div className="flex items-center gap-2 shrink-0">
                 {r.comments_count > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                    <i className="ki-filled ki-message-text-2" style={{ fontSize: 9 }} />
+                    <Icon name="ki-message-text-2" style={{ fontSize: 9 }} />
                     {r.comments_count}
                   </span>
                 )}
@@ -209,7 +208,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
                   onClick={() => setOpenFor({ id: r.id, title: r.name ?? r.activity_type ?? 'Тренировка' })}
                   className="inline-flex items-center gap-1 rounded-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 text-[11px] font-semibold transition-colors"
                 >
-                  <i className="ki-filled ki-message-text-2" style={{ fontSize: 10 }} />
+                  <Icon name="ki-message-text-2" style={{ fontSize: 10 }} />
                   {r.i_commented ? 'Открыть' : 'Ответить'}
                 </button>
               </div>
@@ -217,7 +216,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
           ))}
           {filtered.length === 0 && (
             <div className="inline-flex w-full items-center justify-center gap-1.5 px-5 py-6 text-center text-xs text-slate-400">
-              Все тренировки прокомментированы <i className="ki-filled ki-focus text-xs" />
+              Все тренировки прокомментированы <Icon name="ki-focus" className="text-xs" />
             </div>
           )}
         </div>

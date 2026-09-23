@@ -12,6 +12,9 @@ import { WorkoutLimitBadge } from '@/components/ui/Paywall'
 import dynamic from 'next/dynamic'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'), { ssr: false })
 
@@ -351,7 +354,7 @@ function AnalyticsBlock({ workouts }: { workouts: Workout[] }) {
         ].map(s => (
           <div key={s.label} className="p-4 flex flex-col gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
-              <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
+              <Icon name={s.icon} className="text-sm" style={{ color: s.color }} />
             </div>
             <div>
               <div className="pf-num text-2xl text-foreground leading-none">{s.value}</div>
@@ -546,7 +549,7 @@ function ViewEditDrawer({
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border"
                 style={{ background: ac.bg, borderColor: ac.border }}
               >
-                <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
+                <Icon name={ac.icon} className="text-sm" style={{ color: ac.text }} />
               </div>
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
@@ -560,7 +563,7 @@ function ViewEditDrawer({
                 </div>
               </div>
             </div>
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><i className="ki-filled ki-cross text-sm" /></button>
+            <button onClick={handleClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
         </div>
 
@@ -600,7 +603,7 @@ function ViewEditDrawer({
                     className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border bg-white/80 shadow-xs"
                     style={{ borderColor: ac.border }}
                   >
-                    <i className={`ki-filled ${ac.icon} text-lg`} style={{ color: ac.text }} />
+                    <Icon name={ac.icon} className="text-lg" style={{ color: ac.text }} />
                   </div>
                 </div>
 
@@ -665,7 +668,7 @@ function ViewEditDrawer({
                     return (
                       <button key={at.value} type="button" onClick={() => setForm(f=>({...f,activity_type:at.value}))}
                         style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:'10px 8px',borderRadius:16,border:`1.5px solid ${sel?cfg.border:'var(--border)'}`,background:sel?cfg.bg:'transparent',cursor:'pointer',transition:'all 0.15s' }}>
-                        <i className={`ki-filled ${at.icon} text-base`} style={{ color:sel?cfg.text:'var(--muted-foreground)' }} />
+                        <Icon name={at.icon} className="text-base" style={{ color:sel?cfg.text:'var(--muted-foreground)' }} />
                         <span style={{ fontSize:10,fontWeight:600,color:sel?cfg.text:'var(--muted-foreground)' }}>{at.value}</span>
                       </button>
                     )
@@ -751,28 +754,28 @@ function ViewEditDrawer({
         <div style={{ padding:'16px 24px',borderTop:'1px solid var(--border)',display:'flex',gap:10,flexShrink:0 }}>
           {mode === 'view' ? (
             <>
-              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary" style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
-                <i className="ki-filled ki-pencil text-xs" />Редактировать
+              <button onClick={() => setMode('edit')} className={buttonVariants()} style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+                <Icon name="ki-pencil" className="text-xs" />Редактировать
               </button>
               {!confirmDel ? (
                 <button onClick={() => setConfirmDel(true)} style={{ padding:'8px 14px',borderRadius:10,border:'1px solid #fecaca',background:'transparent',color:'#ef4444',cursor:'pointer',fontSize:13,fontWeight:600 }}>
-                  <i className="ki-filled ki-trash text-sm" />
+                  <Icon name="ki-trash" className="text-sm" />
                 </button>
               ) : (
                 <>
                   <button onClick={handleDelete} disabled={deleting} style={{ padding:'8px 14px',borderRadius:10,background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:13,fontWeight:600,opacity:deleting?0.6:1 }}>
                     {deleting ? '...' : 'Удалить'}
                   </button>
-                  <button onClick={() => setConfirmDel(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                  <button onClick={() => setConfirmDel(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
                 </>
               )}
             </>
           ) : (
             <>
-              <button onClick={handleSave} disabled={saving} className="kt-btn kt-btn-primary" style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
-                {saving ? <><i className="ki-filled ki-loading animate-spin text-xs" /> Сохранение…</> : <><i className="ki-filled ki-check text-xs" /> Сохранить</>}
+              <button onClick={handleSave} disabled={saving} className={buttonVariants()} style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+                {saving ? <><Icon name="ki-loading" className="animate-spin text-xs" /> Сохранение…</> : <><Icon name="ki-check" className="text-xs" /> Сохранить</>}
               </button>
-              <button onClick={() => setMode('view')} className="kt-btn kt-btn-outline">Отмена</button>
+              <button onClick={() => setMode('view')} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
             </>
           )}
         </div>
@@ -888,7 +891,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 Сначала сохраните главное: тип, дату и нагрузку. Остальные метрики можно быстро добавить сразу в этом же потоке.
               </p>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><i className="ki-filled ki-cross text-sm" /></button>
+            <button onClick={onClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <div
             className="mt-4 rounded-[24px] border p-4"
@@ -902,7 +905,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border"
                 style={{ background: selectedCfg.bg, borderColor: selectedCfg.border }}
               >
-                <i className={`ki-filled ${selectedCfg.icon} text-base`} style={{ color: selectedCfg.text }} />
+                <Icon name={selectedCfg.icon} className="text-base" style={{ color: selectedCfg.text }} />
               </div>
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Текущий шаблон</div>
@@ -946,7 +949,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                         background: sel ? ac.bg : 'transparent',
                       }}
                     >
-                      <i className={`ki-filled ${at.icon} text-base`} style={{ color: sel ? ac.text : 'var(--muted-foreground)' }} />
+                      <Icon name={at.icon} className="text-base" style={{ color: sel ? ac.text : 'var(--muted-foreground)' }} />
                       <span className="text-[11px] font-semibold" style={{ color: sel ? ac.text : 'var(--muted-foreground)' }}>
                         {at.value}
                       </span>
@@ -1125,8 +1128,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
-                <button type="submit" disabled={saving} className="kt-btn kt-btn-primary min-w-[176px] justify-center">
+                <button type="button" onClick={onClose} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
+                <button type="submit" disabled={saving} className={cn(buttonVariants(), 'min-w-[176px] justify-center')}>
                   {saving ? 'Сохранение…' : 'Сохранить тренировку'}
                 </button>
               </div>
@@ -1301,14 +1304,14 @@ function AthleteDiary() {
             </div>
             <div className="flex flex-col gap-2.5">
               <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)] transition-transform hover:-translate-y-px">
-                <i className="ki-filled ki-plus text-sm" />
+                <Icon name="ki-plus" className="text-sm" />
                 Новая тренировка
               </button>
               <button
                 onClick={() => setShowPDF(true)}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:text-slate-800"
               >
-                <i className="ki-filled ki-file-down text-sm" />
+                <Icon name="ki-file-down" className="text-sm" />
                 Экспорт PDF
               </button>
             </div>
@@ -1339,16 +1342,16 @@ function AthleteDiary() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex items-center gap-1 rounded-2xl border border-border bg-background p-1">
               <button onClick={() => setView('list')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='list'?'bg-orange-50 text-orange-600 shadow-xs':'text-muted-foreground'}`}>
-                <i className="ki-filled ki-row-horizontal mr-1.5 text-sm" />
+                <Icon name="ki-row-horizontal" className="mr-1.5 text-sm" />
                 Список
               </button>
               <button onClick={() => setView('grid')} className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${view==='grid'?'bg-orange-50 text-orange-600 shadow-xs':'text-muted-foreground'}`}>
-                <i className="ki-filled ki-element-11 mr-1.5 text-sm" />
+                <Icon name="ki-element-11" className="mr-1.5 text-sm" />
                 Сетка
               </button>
             </div>
             <button onClick={() => setShowDrawer(true)} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-100">
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Новая тренировка
             </button>
           </div>
@@ -1393,7 +1396,7 @@ function AthleteDiary() {
       {filtered.length === 0 ? (
         <div className="rounded-[28px] border border-border bg-card px-6 py-16 text-center shadow-xs">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[20px] bg-orange-50 text-orange-500">
-            <i className="ki-filled ki-calendar text-2xl" />
+            <Icon name="ki-calendar" className="text-2xl" />
           </div>
           <div className="mt-4 text-lg font-semibold text-foreground">
             {workouts.length === 0 ? 'История тренировок пока пуста' : 'По этому фильтру тренировок пока нет'}
@@ -1405,7 +1408,7 @@ function AthleteDiary() {
           </p>
           <div className="mt-5 flex justify-center">
             <button onClick={() => setShowDrawer(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(243,87,3,0.28)]">
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Добавить тренировку
             </button>
           </div>
@@ -1440,7 +1443,7 @@ function AthleteDiary() {
                       className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-white hover:shadow-xs sm:p-5"
                     >
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
-                        <i className={`ki-filled ${ac.icon} text-base`} style={{ color:ac.text }} />
+                        <Icon name={ac.icon} className="text-base" style={{ color:ac.text }} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
@@ -1499,7 +1502,7 @@ function AthleteDiary() {
                             нет strain
                           </div>
                         )}
-                        <i className="ki-filled ki-right text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                        <Icon name="ki-right" className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                       </div>
                     </button>
                   )
@@ -1522,7 +1525,7 @@ function AthleteDiary() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
-                    <i className={`ki-filled ${ac.icon} text-base`} style={{ color:ac.text }} />
+                    <Icon name={ac.icon} className="text-base" style={{ color:ac.text }} />
                   </div>
                   <div className="flex items-center gap-2">
                     {w.mood != null && w.mood >= 0 && <span className="text-base leading-none">{MOODS[w.mood]}</span>}
@@ -1606,7 +1609,7 @@ function AthleteDiary() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-9999 bg-foreground text-background text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 pf-enter">
-          <i className="ki-filled ki-check-circle text-green-400" />Тренировка сохранена
+          <Icon name="ki-check-circle" className="text-green-400" />Тренировка сохранена
         </div>
       )}
     </div>

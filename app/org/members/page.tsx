@@ -8,6 +8,8 @@ import { useDialog } from '@/lib/hooks/useDialog'
 import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 // Этап 7a — расширили локальный MemberRole до DB-полного набора (CHECK
 // 053 разрешает 6 значений). До этого `'athlete' | 'coach'` молча
@@ -116,15 +118,15 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: 'linear-gradient(135deg,#F35703,#D44A02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ki-filled ki-people text-white text-base" />
+              <Icon name="ki-people" className="text-white text-base" />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Организация</p>
               <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', lineHeight: 1 }}>Добавить участника</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
 
@@ -144,7 +146,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
                     background: sel ? cfg.bg : 'transparent', cursor: 'pointer', transition: 'all 0.15s',
                   }}>
                     <div style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cfg.bg, border: `1px solid ${cfg.border}`, flexShrink: 0 }}>
-                      <i className={`ki-filled ${cfg.icon} text-sm`} style={{ color: cfg.color }} />
+                      <Icon name={cfg.icon} className="text-sm" style={{ color: cfg.color }} />
                     </div>
                     <div style={{ textAlign: 'left' }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: sel ? cfg.color : 'var(--foreground)' }}>{cfg.label}</div>
@@ -169,7 +171,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
             <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 5 }}>Пользователь должен быть зарегистрирован в Sporteo</p>
             {err && (
               <div style={{ marginTop: 8, padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
+                <Icon name="ki-information-4" className="shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
                 {err}
               </div>
             )}
@@ -177,7 +179,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
 
           {/* Инфо */}
           <div style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--accent)', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-            <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
+            <Icon name="ki-information-4" className="shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
             <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.55 }}>
               После добавления участник сразу получит доступ к разделам организации согласно своей роли.
             </p>
@@ -195,7 +197,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
           }}>
             {saving
               ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Добавление…</>
-              : <><i className="ki-filled ki-check text-sm" />Добавить участника</>}
+              : <><Icon name="ki-check" className="text-sm" />Добавить участника</>}
           </button>
           <button onClick={handleClose} style={{ padding: '12px 18px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             Отмена
@@ -247,7 +249,7 @@ function AssignCoachModal({ athlete, coaches, onClose, onLinked }: {
             <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Назначить тренера</p>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>{athlete.user_name}</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" className="text-sm" /></button>
         </div>
         <div style={{ padding: '14px 22px' }}>
           {coaches.length === 0 ? (
@@ -402,7 +404,7 @@ export default function OrgMembersPage() {
 
   if (!canManage) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-      <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+      <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
       <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       <p className="text-2sm text-muted-foreground">Раздел доступен владельцу клуба и его администраторам.</p>
     </div>
@@ -444,14 +446,14 @@ export default function OrgMembersPage() {
               onClick={() => setShowInvite(true)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(243,87,3,0.28)] transition-all hover:-translate-y-0.5"
             >
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Добавить участника
             </button>
             <button
               onClick={() => setShowBulkImport(true)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 text-sm font-bold text-blue-700 shadow-xs transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
             >
-              <i className="ki-filled ki-cloud-add text-sm" />
+              <Icon name="ki-cloud-add" className="text-sm" />
               Импорт CSV
             </button>
           </div>
@@ -473,7 +475,7 @@ export default function OrgMembersPage() {
                 <div
                   style={{ width: 40, height: 40, borderRadius: 14, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                 >
-                  <i className={`ki-filled ${s.icon} text-base`} style={{ color: s.color }} />
+                  <Icon name={s.icon} className="text-base" style={{ color: s.color }} />
                 </div>
               </div>
             </div>
@@ -494,7 +496,7 @@ export default function OrgMembersPage() {
                 onClick={() => { setSearch(''); setRoleFilter('all'); setStatusFilter('all') }}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-all hover:border-orange-200 hover:text-orange-600"
               >
-                <i className="ki-filled ki-cross text-xs" />
+                <Icon name="ki-cross" className="text-xs" />
                 Сбросить фильтры
               </button>
             )}
@@ -503,7 +505,7 @@ export default function OrgMembersPage() {
           <div className="rounded-[24px] border border-border bg-background/70 p-3">
             <div className="flex flex-col gap-3">
               <div className="relative">
-                <i className="ki-filled ki-magnifier absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
+                <Icon name="ki-magnifier" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
                 <input
                   type="text"
                   value={search}
@@ -570,7 +572,7 @@ export default function OrgMembersPage() {
       {filtered.length === 0 ? (
         <Card className="rounded-[28px] px-6 py-16 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#FFF0E5,#FEF0E7)] text-orange-400 shadow-xs">
-            <i className="ki-filled ki-people text-3xl" />
+            <Icon name="ki-people" className="text-3xl" />
           </div>
           <p className="mt-5 text-lg font-semibold text-foreground">
             {members.length === 0 ? 'Участников пока нет. Добавьте первого!' : 'Никто не подходит под фильтры'}
@@ -585,7 +587,7 @@ export default function OrgMembersPage() {
               onClick={() => setShowInvite(true)}
               className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-5 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(243,87,3,0.28)] transition-all hover:-translate-y-0.5"
             >
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Добавить участника
             </button>
           )}
@@ -630,7 +632,7 @@ export default function OrgMembersPage() {
 
                   <div className="hidden lg:block">
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: rc.bg, color: rc.color, border: `1px solid ${rc.border}` }}>
-                      <i className={`ki-filled ${rc.icon} text-[10px]`} />{rc.label}
+                      <Icon name={rc.icon} className="text-[10px]" />{rc.label}
                     </span>
                   </div>
 
@@ -644,31 +646,31 @@ export default function OrgMembersPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-start' }} className="lg:justify-end">
                     {m.member_role === 'athlete' && m.status === 'active' && (
                       <button onClick={() => setAssignAthlete(m)} title="Назначить тренера" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-fasten text-xs" />
+                        <Icon name="ki-fasten" className="text-xs" />
                       </button>
                     )}
                     {canDelegateAdmin && m.member_role === 'coach' && m.status === 'active' && m.user_id !== orgId && (
                       <button onClick={() => changeMemberRole(m.id, 'org_admin')} title="Сделать админом" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #A7F3D0', background: '#ECFDF5', color: '#0F766E', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-shield-tick text-xs" />
+                        <Icon name="ki-shield-tick" className="text-xs" />
                       </button>
                     )}
                     {canDelegateAdmin && m.member_role === 'org_admin' && m.status === 'active' && (
                       <button onClick={() => changeMemberRole(m.id, 'coach')} title="Снять с админа" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FEF3C7', background: '#FFFBEB', color: '#B45309', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-shield-cross text-xs" />
+                        <Icon name="ki-shield-cross" className="text-xs" />
                       </button>
                     )}
                     {m.status === 'active' && (
                       <button onClick={() => changeStatus(m.id, 'suspended')} title="Заморозить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FBC1A0', background: '#FEF0E7', color: '#F35703', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-minus-circle text-xs" />
+                        <Icon name="ki-minus-circle" className="text-xs" />
                       </button>
                     )}
                     {(m.status === 'suspended' || m.status === 'pending') && (
                       <button onClick={() => changeStatus(m.id, 'active')} title="Активировать" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #BBF7D0', background: '#F0FDF4', color: '#16A34A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                        <i className="ki-filled ki-check text-xs" />
+                        <Icon name="ki-check" className="text-xs" />
                       </button>
                     )}
                     <button onClick={async () => { if (await confirm('Удалить участника из организации?')) changeStatus(m.id, 'removed') }} title="Удалить" style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
-                      <i className="ki-filled ki-trash text-xs" />
+                      <Icon name="ki-trash" className="text-xs" />
                     </button>
                   </div>
                 </div>
@@ -708,7 +710,7 @@ export default function OrgMembersPage() {
 
       {toast && (
         <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'var(--foreground)', color: 'var(--background)', fontSize: 13, fontWeight: 600, padding: '10px 20px', borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 8 }} className="pf-enter">
-          <i className="ki-filled ki-check-circle text-green-400" />{toast}
+          <Icon name="ki-check-circle" className="text-green-400" />{toast}
         </div>
       )}
     </div>

@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getErrorMessage } from '@/lib/utils/errors'
+import { Icon } from '@/components/ui/Icon'
 
 // ── UTM attribution (Sprint W5 Day 23 / PR #39) ───────────────────────
 // Reads UTM params from URL on mount and passes them to signUp() options.data.
@@ -213,7 +214,7 @@ function StepIndicator({ current, role }: { current: Step; role: Role | null }) 
                   isDone || isActive ? 'bg-orange-500 text-white' : 'bg-border text-muted-foreground',
                 ].join(' ')}
               >
-                {isDone ? <i className="ki-filled ki-check text-[11px]" /> : index + 1}
+                {isDone ? <Icon name="ki-check" className="text-[11px]" /> : index + 1}
               </div>
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-foreground">{step.label}</div>
@@ -473,7 +474,7 @@ export default function RegisterPage() {
 
           <div className="relative flex items-center gap-3 px-10 pb-0 pt-10">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-500/30">
-              <i className="ki-filled ki-abstract-26 text-[16px] text-white" />
+              <Icon name="ki-abstract-26" className="text-[16px] text-white" />
             </div>
             <div>
               <div className="pf-num text-[24px] tracking-wide text-white">Sporteo</div>
@@ -509,7 +510,7 @@ export default function RegisterPage() {
                   className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-orange-400">
-                    <i className={['ki-filled', index === 0 ? 'ki-user-square' : index === 1 ? 'ki-shield-tick' : 'ki-profile-circle', 'text-[17px]'].join(' ')} />
+                    <Icon name={index === 0 ? 'ki-user-square' : index === 1 ? 'ki-shield-tick' : 'ki-profile-circle'} className="text-[17px]" />
                   </div>
                   <div>
                     <div className="text-sm font-medium text-white">{item.label}</div>
@@ -538,7 +539,7 @@ export default function RegisterPage() {
           <div className="mb-8 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 lg:hidden">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-500/20">
-                <i className="ki-filled ki-abstract-26 text-sm text-white" />
+                <Icon name="ki-abstract-26" className="text-sm text-white" />
               </div>
               <div>
                 <div className="pf-num text-2xl text-foreground">Sporteo</div>
@@ -589,7 +590,7 @@ export default function RegisterPage() {
                           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border"
                           style={{ background: role.bg, borderColor: role.border }}
                         >
-                          <i className={`ki-filled ${role.icon} text-[18px]`} style={{ color: role.text }} />
+                          <Icon name={role.icon} className="text-[18px]" style={{ color: role.text }} />
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -600,7 +601,7 @@ export default function RegisterPage() {
                             </div>
                             {isActive && (
                               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500 text-white">
-                                <i className="ki-filled ki-check text-[11px]" />
+                                <Icon name="ki-check" className="text-[11px]" />
                               </div>
                             )}
                           </div>
@@ -618,7 +619,7 @@ export default function RegisterPage() {
                     className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Продолжить
-                    <i className="ki-filled ki-right text-xs" />
+                    <Icon name="ki-right" className="text-xs" />
                   </button>
                 </div>
 
@@ -643,7 +644,7 @@ export default function RegisterPage() {
                   onClick={() => setStep('role')}
                   className="mb-5 inline-flex items-center gap-1.5 text-2xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <i className="ki-filled ki-left text-[10px]" />
+                  <Icon name="ki-left" className="text-[10px]" />
                   Назад к выбору роли
                 </button>
 
@@ -659,7 +660,7 @@ export default function RegisterPage() {
 
                 {error && (
                   <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{error}</span>
                   </div>
                 )}
@@ -667,7 +668,7 @@ export default function RegisterPage() {
                 {existingEmail && (
                   <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
                     <div className="flex items-start gap-2.5">
-                      <i className="ki-filled ki-information-4 mt-0.5 text-amber-500" />
+                      <Icon name="ki-information-4" className="mt-0.5 text-amber-500" />
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-amber-900">Этот email уже зарегистрирован</p>
                         <p className="mt-1 text-2sm leading-relaxed text-amber-800">
@@ -680,7 +681,7 @@ export default function RegisterPage() {
                             className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-3 py-2 text-2sm font-semibold text-white no-underline transition-colors hover:bg-orange-600"
                           >
                             Войти
-                            <i className="ki-filled ki-right text-[10px]" />
+                            <Icon name="ki-right" className="text-[10px]" />
                           </Link>
                           <Link
                             href="/auth/forgot"
@@ -779,7 +780,7 @@ export default function RegisterPage() {
                     ) : (
                       <>
                         {selectedRole === 'athlete' ? 'Продолжить' : 'Создать аккаунт'}
-                        <i className="ki-filled ki-right text-xs" />
+                        <Icon name="ki-right" className="text-xs" />
                       </>
                     )}
                   </button>
@@ -799,7 +800,7 @@ export default function RegisterPage() {
 
                 {athleteError && (
                   <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{athleteError}</span>
                   </div>
                 )}
@@ -962,7 +963,7 @@ export default function RegisterPage() {
                                   </div>
                                   {isActive && (
                                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500 text-white">
-                                      <i className="ki-filled ki-check text-[10px]" />
+                                      <Icon name="ki-check" className="text-[10px]" />
                                     </div>
                                   )}
                                 </div>
@@ -1047,7 +1048,7 @@ export default function RegisterPage() {
                         </>
                       ) : (
                         <>
-                          <i className="ki-filled ki-check text-xs" />
+                          <Icon name="ki-check" className="text-xs" />
                           Сохранить и войти
                         </>
                       )}
@@ -1076,7 +1077,7 @@ export default function RegisterPage() {
 
                 {planError && (
                   <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{planError}</span>
                   </div>
                 )}
@@ -1112,7 +1113,7 @@ export default function RegisterPage() {
                               className="flex h-7 w-7 items-center justify-center rounded-full text-white"
                               style={{ background: plan.accent }}
                             >
-                              <i className="ki-filled ki-check text-[11px]" />
+                              <Icon name="ki-check" className="text-[11px]" />
                             </div>
                           )}
                         </div>
@@ -1120,7 +1121,7 @@ export default function RegisterPage() {
                         <ul className="flex flex-col gap-1.5 text-2xs text-foreground">
                           {plan.features.map((f) => (
                             <li key={f} className="flex items-start gap-2">
-                              <i className="ki-filled ki-check-circle mt-0.5 text-[11px]" style={{ color: plan.accent }} />
+                              <Icon name="ki-check-circle" className="mt-0.5 text-[11px]" style={{ color: plan.accent }} />
                               <span>{f}</span>
                             </li>
                           ))}
@@ -1145,7 +1146,7 @@ export default function RegisterPage() {
                     ) : (
                       <>
                         Завершить регистрацию
-                        <i className="ki-filled ki-right text-xs" />
+                        <Icon name="ki-right" className="text-xs" />
                       </>
                     )}
                   </button>
@@ -1156,7 +1157,7 @@ export default function RegisterPage() {
             {step === 'done' && (
               <div className="pf-enter flex flex-col items-center gap-5 py-6 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 border border-green-200">
-                  <i className="ki-filled ki-check-circle text-3xl text-green-500" />
+                  <Icon name="ki-check-circle" className="text-3xl text-green-500" />
                 </div>
                 <div>
                   <div className="mb-2 inline-flex items-center rounded-full border border-green-200 bg-green-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-green-700">
@@ -1185,7 +1186,7 @@ export default function RegisterPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white no-underline transition-all hover:bg-orange-600"
                   >
                     Войти в Sporteo
-                    <i className="ki-filled ki-right text-xs" />
+                    <Icon name="ki-right" className="text-xs" />
                   </Link>
                   {pendingPaidPlan && (
                     <Link

@@ -20,6 +20,9 @@ import { createBrowserClient } from '@supabase/ssr'
 import { Card, Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
 import { useDialog } from '@/lib/hooks/useDialog'
 import type { Database } from '@/types/database'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 type SubRow = Database['public']['Tables']['subscriptions']['Row']
 type TariffRow = Database['public']['Tables']['tariffs']['Row']
@@ -161,8 +164,8 @@ export default function BillingPage() {
           </div>
 
           <Link href="/pricing"
-            className="kt-btn kt-btn-sm gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0">
-            <i className="ki-filled ki-arrow-up-right text-xs" />
+            className={cn(buttonVariants({ size: 'sm' }), 'gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0')}>
+            <Icon name="ki-arrow-up-right" className="text-xs" />
             Сменить тариф
           </Link>
         </div>
@@ -205,7 +208,7 @@ export default function BillingPage() {
           {sub.cancel_at_period_end ? (
             <>
               <div className="flex items-start gap-3 mb-3">
-                <i className="ki-filled ki-information-2 text-base text-amber-600 mt-0.5" />
+                <Icon name="ki-information-2" className="text-base text-amber-600 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="text-sm font-bold text-navy-500">Подписка будет отменена</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-snug">
@@ -238,7 +241,7 @@ export default function BillingPage() {
       {/* Free tier upgrade prompt */}
       {(!sub || (tariff?.price_cents === 0)) && (
         <section className="rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/30 p-6 text-center">
-          <i className="ki-filled ki-rocket text-3xl text-orange-500 mb-2 block" />
+          <Icon name="ki-rocket" className="text-3xl text-orange-500 mb-2 block" />
           <h3 className="text-base font-bold text-navy-500">Хотите больше?</h3>
           <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
             Pro-тарифы открывают AI-coach, безлимитные тренировки, мессенджер с тренером и продвинутую аналитику.
@@ -246,7 +249,7 @@ export default function BillingPage() {
           <Link href="/pricing"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 text-sm font-bold no-underline">
             Посмотреть тарифы
-            <i className="ki-filled ki-arrow-right text-xs" />
+            <Icon name="ki-arrow-right" className="text-xs" />
           </Link>
         </section>
       )}

@@ -13,6 +13,8 @@ import { createClient } from '@/lib/supabase/client'
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type Athlete = { id: string; name: string }
 
@@ -247,8 +249,8 @@ export function CoachSessionDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тренерское занятие</p>
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новое занятие'}</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -349,7 +351,7 @@ export function CoachSessionDrawer({
           </button>
           {initial && (
             <button onClick={handleDelete} className="px-3 py-2.5 rounded-xl border border-border text-red-500 text-sm hover:bg-red-50 transition-colors">
-              <i className="ki-filled ki-trash text-xs"/>
+              <Icon name="ki-trash" className="text-xs" />
             </button>
           )}
         </div>
@@ -420,8 +422,8 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тарифы</p>
             <h3 className="text-lg font-semibold text-navy-500">Абонементы (шаблоны)</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -442,10 +444,10 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button onClick={()=>setEditing(p)} className="w-7 h-7 rounded-lg border border-border hover:bg-muted flex items-center justify-center">
-                    <i className="ki-filled ki-pencil text-[11px]"/>
+                    <Icon name="ki-pencil" className="text-[11px]" />
                   </button>
                   <button onClick={()=>removePlan(p.id)} className="w-7 h-7 rounded-lg border border-border hover:bg-red-50 text-red-500 flex items-center justify-center">
-                    <i className="ki-filled ki-trash text-[11px]"/>
+                    <Icon name="ki-trash" className="text-[11px]" />
                   </button>
                 </div>
               </div>
@@ -497,7 +499,7 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
           <button onClick={()=>setEditing({ title:'', total_sessions:8, period_days:30, price_cents:0, currency:'RUB', is_active:true })}
             disabled={!!editing}
             className="w-full rounded-xl bg-orange-500 text-white px-4 py-2.5 text-sm font-semibold hover:bg-orange-600 disabled:opacity-50">
-            <i className="ki-filled ki-plus text-xs mr-1"/>
+            <Icon name="ki-plus" className="text-xs mr-1" />
             Создать тариф
           </button>
         </div>
@@ -619,8 +621,8 @@ export function IssuePassDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Абонемент</p>
             <h3 className="text-lg font-semibold text-navy-500">Выдать атлету</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -745,7 +747,7 @@ export function IssuePassDrawer({
                       <option value="cancelled">отменён</option>
                     </select>
                     <button onClick={()=>handleRemovePass(p.id)} className="w-6 h-6 rounded-md border border-border text-red-500 hover:bg-red-50 flex items-center justify-center">
-                      <i className="ki-filled ki-trash text-[10px]"/>
+                      <Icon name="ki-trash" className="text-[10px]" />
                     </button>
                   </div>
                 ))}

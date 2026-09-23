@@ -5,6 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { Alert } from '@/components/ui/metronic'
 import ClearanceSection from './ClearanceSection'
 import { canViewMedicalReport, type GlobalRole } from '@/lib/permissions'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -146,7 +147,7 @@ export default function DoctorReportPage() {
     return (
       <main className="flex min-h-screen items-center justify-center p-6">
         <div className="max-w-sm rounded-2xl border border-border bg-card p-6 text-center">
-          <i className="ki-filled ki-shield-cross text-3xl text-red-500" />
+          <Icon name="ki-shield-cross" className="text-3xl text-red-500" />
           <h1 className="mt-3 text-lg font-bold text-navy-500">Доступ ограничен</h1>
           <p className="mt-1 text-sm text-muted-foreground">Отчёт доступен только для роли doctor или admin.</p>
           <button onClick={() => router.back()} className="mt-4 rounded-xl border border-border px-4 py-2 text-sm font-semibold">Назад</button>
@@ -178,7 +179,7 @@ export default function DoctorReportPage() {
       {/* Toolbar — hidden when printing */}
       <div className="no-print mx-auto mb-4 flex max-w-[900px] flex-wrap items-center justify-between gap-3 px-4">
         <button onClick={() => router.back()} className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground hover:bg-accent">
-          <i className="ki-filled ki-arrow-left text-xs" /> Назад
+          <Icon name="ki-arrow-left" className="text-xs" /> Назад
         </button>
         <div className="flex items-center gap-2">
           <label className="text-2xs font-bold uppercase tracking-widest text-muted-foreground">От</label>
@@ -187,7 +188,7 @@ export default function DoctorReportPage() {
           <input type="date" value={to} onChange={e => setTo(e.target.value)} className="rounded-lg border border-input bg-background px-2 py-1 text-sm" />
           <button onClick={() => loadData()} className="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold hover:bg-accent">Обновить</button>
           <button onClick={() => window.print()} className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white shadow-xs hover:bg-red-600">
-            <i className="ki-filled ki-printer mr-1 text-xs" /> Печать / PDF
+            <Icon name="ki-printer" className="mr-1 text-xs" /> Печать / PDF
           </button>
         </div>
       </div>
@@ -200,7 +201,7 @@ export default function DoctorReportPage() {
             <div>
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
-                  <i className="ki-filled ki-heart text-red-600 text-sm" />
+                  <Icon name="ki-heart" className="text-red-600 text-sm" />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-red-700">Sporteo · Медицинский отчёт</span>
               </div>

@@ -21,6 +21,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { parseCsv, isValidEmail } from '@/lib/csv/parse'
 import { Accordion } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type MemberRole = 'athlete' | 'coach'
 
@@ -166,15 +168,15 @@ export function BulkImportDrawer({ onClose, onComplete }: {
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: 'linear-gradient(135deg,#2563EB,#1E40AF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ki-filled ki-cloud-add text-white text-base" />
+              <Icon name="ki-cloud-add" className="text-white text-base" />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Импорт CSV</p>
               <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', lineHeight: 1 }}>Массовое приглашение</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
 
@@ -198,7 +200,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
                         background: sel ? cfg.bg : 'transparent', cursor: 'pointer', transition: 'all 0.15s',
                       }}>
                         <div style={{ width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cfg.bg, border: `1px solid ${cfg.border}`, flexShrink: 0 }}>
-                          <i className={`ki-filled ${cfg.icon} text-sm`} style={{ color: cfg.color }} />
+                          <Icon name={cfg.icon} className="text-sm" style={{ color: cfg.color }} />
                         </div>
                         <div style={{ textAlign: 'left' }}>
                           <div style={{ fontSize: 13, fontWeight: 700, color: sel ? cfg.color : 'var(--foreground)' }}>{cfg.label}</div>
@@ -264,7 +266,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
                           <span style={{ color: 'var(--muted-foreground)', fontFamily: 'monospace', width: 28, flexShrink: 0, fontSize: 10 }}>
                             #{r.raw_line}
                           </span>
-                          <i className={`ki-filled ${ok ? 'ki-check-circle' : 'ki-cross-circle'}`} style={{ fontSize: 12, color: ok ? '#16A34A' : '#DC2626', flexShrink: 0 }} />
+                          <Icon name={ok ? 'ki-check-circle' : 'ki-cross-circle'} style={{ fontSize: 12, color: ok ? '#16A34A' : '#DC2626', flexShrink: 0 }} />
                           <span style={{ fontFamily: 'monospace', color: 'var(--foreground)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {r.email}
                           </span>
@@ -303,14 +305,14 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               {/* Error */}
               {err && (
                 <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
+                  <Icon name="ki-information-4" className="shrink-0" style={{ color: '#DC2626', marginTop: 1 }} />
                   {err}
                 </div>
               )}
 
               {/* Info */}
               <div style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--accent)', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <i className="ki-filled ki-information-4 shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
+                <Icon name="ki-information-4" className="shrink-0" style={{ color: '#2563EB', marginTop: 1 }} />
                 <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: 0, lineHeight: 1.55 }}>
                   Каждый получит письмо со ссылкой-приглашением. Если у пользователя ещё нет аккаунта — он зарегистрируется по той же ссылке, и связь установится автоматически.
                 </p>
@@ -327,7 +329,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               background: 'linear-gradient(135deg,#16A34A,#15803D)', color: 'white',
               fontSize: 14, fontWeight: 700, boxShadow: '0 2px 8px rgba(22,163,74,0.35)',
             }}>
-              <i className="ki-filled ki-check text-sm mr-2" />Готово
+              <Icon name="ki-check" className="text-sm mr-2" />Готово
             </button>
           ) : (
             <>
@@ -341,7 +343,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               }}>
                 {busy
                   ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправляю…</>
-                  : <><i className="ki-filled ki-paper-plane text-sm" />Отправить {preview ? `(${preview.valid})` : ''}</>}
+                  : <><Icon name="ki-paper-plane" className="text-sm" />Отправить {preview ? `(${preview.valid})` : ''}</>}
               </button>
               <button onClick={handleClose} style={{ padding: '12px 18px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--muted-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                 Отмена
@@ -370,7 +372,7 @@ function ResultPanel({ result }: { result: ApiResponse }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Hero */}
       <div style={{ padding: '20px', borderRadius: 18, background: 'linear-gradient(135deg,#F0FDF4,#DCFCE7)', border: '1px solid #BBF7D0', textAlign: 'center' }}>
-        <i className="ki-filled ki-sms" style={{ fontSize: 28, color: '#15803D' }} />
+        <Icon name="ki-sms" style={{ fontSize: 28, color: '#15803D' }} />
         <h3 style={{ fontSize: 18, fontWeight: 800, color: '#15803D', margin: '8px 0 4px' }}>
           {s.email_sent === s.invited && s.invited > 0 ? 'Все письма отправлены' : `Отправлено ${s.email_sent} из ${s.invited}`}
         </h3>
@@ -388,7 +390,7 @@ function ResultPanel({ result }: { result: ApiResponse }) {
                 <div style={{ fontSize: 22, fontWeight: 800, color: t.color }} className="pf-num">{t.value}</div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: t.color, marginTop: 2 }}>{t.label}</div>
               </div>
-              <i className={`ki-filled ${t.icon}`} style={{ fontSize: 22, color: t.color }} />
+              <Icon name={t.icon} style={{ fontSize: 22, color: t.color }} />
             </div>
           </div>
         ))}

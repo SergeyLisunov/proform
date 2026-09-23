@@ -1,6 +1,4 @@
-@import url('/assets/vendors/keenicons/styles.bundle.css') layer(base);
-@import url('/assets/css/core.bundle.css') layer(base);
-@import url('/assets/css/styles.css') layer(base);
+@import './legacy-metronic.css' layer(base);
 
 @import 'tailwindcss';
 

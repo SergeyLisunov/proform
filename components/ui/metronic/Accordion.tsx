@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 export interface AccordionItem {
   id: string
@@ -53,13 +54,13 @@ export function Accordion({ items, defaultOpenIds = [], allowMultiple = false, c
               aria-expanded={isOpen}
               className="kt-accordion-toggle flex w-full items-center gap-3 px-5 py-4 text-start hover:bg-muted/40 transition-colors"
             >
-              {item.icon && <i className={`ki-filled ${item.icon} text-base text-[#F35703]`} aria-hidden />}
+              {item.icon && <Icon name={item.icon} className="text-base text-[#F35703]" />}
               <span className="kt-accordion-title flex-1 text-sm font-semibold text-foreground">{item.title}</span>
-              <i
-                className={`ki-filled ki-down kt-accordion-indicator text-xs text-muted-foreground transition-transform duration-200 ${
+              <Icon
+                name="ki-down"
+                className={`kt-accordion-indicator text-xs text-muted-foreground transition-transform duration-200 ${
                   isOpen ? 'rotate-180' : ''
                 }`}
-                aria-hidden
               />
             </button>
             <div

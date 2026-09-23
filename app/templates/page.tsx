@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useToast } from '@/lib/hooks/useToast'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
 
 type Author = { id: string; name: string | null; nickname: string | null; avatar_url: string | null }
 
@@ -302,7 +303,7 @@ export default function TemplatesPage() {
         ) : templates.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-background/60 py-16 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-              <i className="ki-filled ki-notepad-edit text-[20px]" />
+              <Icon name="ki-notepad-edit" className="text-[20px]" />
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">Шаблонов пока нет</p>

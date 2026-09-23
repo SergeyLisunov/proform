@@ -15,6 +15,9 @@ import {
 } from '@/components/workout/WorkoutDrawers'
 import { Card, ChartCard, Badge } from '@/components/ui/metronic'
 import ClearanceBadge from '@/components/clearance/ClearanceBadge'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -123,7 +126,7 @@ function HeroAvatar({ avatarUrl, name, userId, onAvatarUpdate }: {
         {uploading
           ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           : <>
-              <i className="ki-filled ki-picture text-white text-sm" />
+              <Icon name="ki-picture" className="text-white text-sm" />
               <span className="text-white text-[9px] font-bold mt-0.5">Изменить</span>
             </>
         }
@@ -245,7 +248,7 @@ function SocialIcons({ data, onEdit }: { data: SocialData; onEdit: () => void })
           b.style.borderColor = '#CBD5E1'; b.style.color = '#CBD5E1'; b.style.background = 'transparent'
         }}
       >
-        <i className="ki-filled ki-pencil" style={{ fontSize: 9 }} />
+        <Icon name="ki-pencil" style={{ fontSize: 9 }} />
         {filled.length > 0 ? 'Изменить' : '+ добавить'}
       </button>
     </div>
@@ -293,8 +296,8 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
             <p style={{ fontSize: 10, fontWeight: 700, color: '#F35703', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Профиль</p>
             <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>Социальные сети</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-sm" />
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
         {/* Fields */}
@@ -313,10 +316,10 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
             </div>
           ))}
           <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-            <button onClick={save} disabled={saving} className="kt-btn kt-btn-primary flex-1">
+            <button onClick={save} disabled={saving} className={cn(buttonVariants(), 'flex-1')}>
               {saving ? 'Сохранение…' : 'Сохранить'}
             </button>
-            <button onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
+            <button onClick={onClose} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
           </div>
         </div>
       </div>
@@ -397,7 +400,7 @@ function TrainingWidget({
       <div className="flex items-center justify-between px-5 py-4 border-b border-orange-100/80 shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-orange-100">
-            <i className="ki-filled ki-abstract-26 text-[14px] text-orange-500" />
+            <Icon name="ki-abstract-26" className="text-[14px] text-orange-500" />
           </div>
           <h3 className="text-sm font-bold text-navy-500">Тренировки</h3>
         </div>
@@ -432,7 +435,7 @@ function TrainingWidget({
                     className="flex flex-1 min-w-0 items-center gap-3 bg-transparent text-left cursor-pointer"
                   >
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(w.activity_type).bg }}>
-                      <i className={`ki-filled ${getAC(w.activity_type).icon} text-xs`} style={{ color: getAC(w.activity_type).text }} />
+                      <Icon name={getAC(w.activity_type).icon} className="text-xs" style={{ color: getAC(w.activity_type).text }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-foreground truncate">
@@ -455,7 +458,7 @@ function TrainingWidget({
                     title="Комментарии"
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
                   >
-                    <i className="ki-filled ki-messages text-[13px]" />
+                    <Icon name="ki-messages" className="text-[13px]" />
                   </button>
                   <button
                     type="button"
@@ -467,7 +470,7 @@ function TrainingWidget({
                     {sharing === w.id ? (
                       <div className="h-3.5 w-3.5 rounded-full border-2 border-blue-500 border-t-transparent pf-spin" />
                     ) : (
-                      <i className="ki-filled ki-share text-[13px]" />
+                      <Icon name="ki-share" className="text-[13px]" />
                     )}
                   </button>
                 </div>
@@ -499,7 +502,7 @@ function TrainingWidget({
                   className="w-full text-left flex items-center gap-3 px-5 py-3 hover:bg-accent/50 transition-colors cursor-pointer last:pb-4"
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: getAC(ev.activity_type).bg }}>
-                    <i className={`ki-filled ${getAC(ev.activity_type).icon} text-xs`} style={{ color: getAC(ev.activity_type).text }} />
+                    <Icon name={getAC(ev.activity_type).icon} className="text-xs" style={{ color: getAC(ev.activity_type).text }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-foreground truncate">{ev.title}</div>
@@ -550,13 +553,13 @@ function QuickAddWorkoutCard({ onClick }: { onClick: () => void }) {
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-md transition-transform group-hover:scale-105"
           style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)' }}
         >
-          <i className="ki-filled ki-plus text-white text-lg" />
+          <Icon name="ki-plus" className="text-white text-lg" />
         </div>
         <span className="min-w-0 flex-1 text-base font-extrabold leading-none text-foreground truncate">
           Добавить тренировку
         </span>
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 border border-white/90 shadow-xs transition-transform group-hover:translate-x-1">
-          <i className="ki-filled ki-arrow-right text-orange-500 text-base" />
+          <Icon name="ki-arrow-right" className="text-orange-500 text-base" />
         </div>
       </div>
     </button>
@@ -799,7 +802,7 @@ function AthleteDash({ userId, name }: { userId: string; name: string }) {
                     className="w-8 h-8 rounded-xl flex items-center justify-center"
                     style={{ background: s.bg }}
                   >
-                    <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
+                    <Icon name={s.icon} className="text-sm" style={{ color: s.color }} />
                   </div>
                   <span className="pf-num text-xl font-black text-foreground leading-none">{s.value}</span>
                   <span style={{ fontSize:9, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.3, whiteSpace:'pre-line', textAlign:'center' }}>
@@ -1030,7 +1033,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
             <div className="flex items-center justify-between">
               <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
-                <i className={`ki-filled ${c.icon} text-base`} />
+                <Icon name={c.icon} className="text-base" />
               </div>
             </div>
             <span className="pf-num text-4xl text-foreground">{c.value}</span>
@@ -1073,7 +1076,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
             </div>
           ) : athletes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
-              <i className="ki-filled ki-people text-2xl text-muted-foreground/30" />
+              <Icon name="ki-people" className="text-2xl text-muted-foreground/30" />
               <p className="text-2sm text-muted-foreground">Атлетов пока нет</p>
             </div>
           ) : (
@@ -1115,7 +1118,7 @@ function CoachDash({ userId, name }: { userId: string; name: string }) {
                         </div>
                       </div>
                     )}
-                    <i className={`ki-filled ${statusIcon} text-base ${statusColor} shrink-0`} />
+                    <Icon name={statusIcon} className={`text-base ${statusColor} shrink-0`} />
                   </div>
                 )
               })}
@@ -1189,7 +1192,7 @@ function AdminDash({ name }: { name: string }) {
             <div className="flex items-center justify-between">
               <span className="text-2sm text-muted-foreground font-medium">{c.label}</span>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.bg}`}>
-                <i className={`ki-filled ${c.icon} text-base`} />
+                <Icon name={c.icon} className="text-base" />
               </div>
             </div>
             <span className="pf-num text-4xl text-foreground">{c.value}</span>
@@ -1203,8 +1206,8 @@ function AdminDash({ name }: { name: string }) {
           оживления богатого AdminDashboard (P0 PR-3). */}
 
       <div className="flex justify-center">
-        <Link href="/admin" className="kt-btn kt-btn-primary gap-2">
-          <i className="ki-filled ki-setting-2 text-sm" />
+        <Link href="/admin" className={cn(buttonVariants(), 'gap-2')}>
+          <Icon name="ki-setting-2" className="text-sm" />
           Перейти в Admin Panel
         </Link>
       </div>
@@ -1225,14 +1228,14 @@ function ParentCabinetBanner() {
     >
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white">
-          <i className="ki-filled ki-people text-base" />
+          <Icon name="ki-people" className="text-base" />
         </div>
         <div className="min-w-0">
           <div className="text-sm font-bold text-navy-500">Кабинет родителя</div>
           <div className="text-2xs text-muted-foreground">К вашему аккаунту подключены дети — расписание, допуски и прогресс здесь</div>
         </div>
       </div>
-      <i className="ki-filled ki-arrow-right shrink-0 text-orange-600" />
+      <Icon name="ki-arrow-right" className="shrink-0 text-orange-600" />
     </Link>
   )
 }

@@ -23,6 +23,8 @@ import {
   type Intensity, type WorkoutPlanFull, type AthleteOption,
 } from '@/services/workout-plans.service'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type Mode = 'create' | 'edit'
 
@@ -225,7 +227,7 @@ export default function PlanEditor({ mode, initial }: Props) {
       <div>
         <Link href="/coach/plans"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           К планам
         </Link>
       </div>
@@ -300,7 +302,7 @@ export default function PlanEditor({ mode, initial }: Props) {
                   <button onClick={() => addItem(dayIdx)} type="button"
                     className="w-7 h-7 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 flex items-center justify-center"
                     title="Добавить тренировку">
-                    <i className="ki-filled ki-plus text-xs" />
+                    <Icon name="ki-plus" className="text-xs" />
                   </button>
                 </div>
                 {dayItems.length === 0 ? (
@@ -329,7 +331,7 @@ export default function PlanEditor({ mode, initial }: Props) {
                             )}
                             <button onClick={() => removeItem(it.uiId)} type="button"
                               className="w-5 h-5 rounded-sm bg-white border border-red-200 hover:bg-red-50 text-red-600 text-[10px] flex items-center justify-center"
-                              title="Удалить"><i className="ki-filled ki-cross" /></button>
+                              title="Удалить"><Icon name="ki-cross" /></button>
                           </div>
                         </div>
                         <input value={it.name} onChange={e => updateItem(it.uiId, { name: e.target.value })} maxLength={160}
@@ -370,7 +372,7 @@ export default function PlanEditor({ mode, initial }: Props) {
         {mode === 'edit' && (
           <button onClick={openAssignDrawer} type="button"
             className="rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-4 py-2.5 text-sm font-bold">
-            <i className="ki-filled ki-paper-plane text-sm mr-1.5" />
+            <Icon name="ki-paper-plane" className="text-sm mr-1.5" />
             Назначить атлету
           </button>
         )}
@@ -389,8 +391,8 @@ export default function PlanEditor({ mode, initial }: Props) {
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Назначить атлету</h3>
-              <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-xs" />
+              <button onClick={() => setShowAssign(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4">

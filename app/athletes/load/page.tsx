@@ -11,6 +11,7 @@ import {
 } from '@/services/acwr.service'
 import AdaptivePlanModal from '@/components/coach/AdaptivePlanModal'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const ZONE_ORDER: AcwrZone[] = ['danger', 'monitor', 'optimal', 'detraining', 'no_data']
 
@@ -39,7 +40,7 @@ export default function AthleteLoadPage() {
   if (user.role !== 'coach') {
     return (
       <Card className="max-w-xl mx-auto mt-12 p-8 text-center">
-        <i className="ki-filled ki-lock text-3xl text-muted-foreground block mb-3" />
+        <Icon name="ki-lock" className="text-3xl text-muted-foreground block mb-3" />
         <h1 className="text-lg font-bold text-navy-500 mb-1">Доступно только тренерам</h1>
         <p className="text-sm text-muted-foreground">Раздел показывает ACWR для атлетов, подключённых к вам.</p>
       </Card>
@@ -57,7 +58,7 @@ export default function AthleteLoadPage() {
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-red-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FECACA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">
-            <i className="ki-filled ki-shield-cross text-[11px]" />
+            <Icon name="ki-shield-cross" className="text-[11px]" />
             Нагрузка
           </span>
           <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">ACWR — риск травмы</h1>
@@ -84,7 +85,7 @@ export default function AthleteLoadPage() {
         <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Атлеты · {rows.length}</p>
           <button onClick={load} className="text-[11px] font-semibold text-orange-600 hover:text-orange-700">
-            <i className="ki-filled ki-arrows-circle text-[10px] mr-1"/>
+            <Icon name="ki-arrows-circle" className="text-[10px] mr-1" />
             Обновить
           </button>
         </div>
@@ -127,7 +128,7 @@ export default function AthleteLoadPage() {
                       className={`rounded-lg px-2 py-1 text-[10px] font-semibold border transition-all ${highlight
                         ? 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700'
                         : 'bg-background text-purple-700 border-purple-200 hover:bg-purple-50'}`}>
-                      <i className="ki-filled ki-message-programming text-[10px] mr-1" />AI-план
+                      <Icon name="ki-message-programming" className="text-[10px] mr-1" />AI-план
                     </button>
                   </div>
                 </div>

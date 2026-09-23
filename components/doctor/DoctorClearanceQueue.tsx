@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -74,7 +75,7 @@ export default function DoctorClearanceQueue() {
       <div className="flex items-center justify-between border-b border-border bg-orange-50/60 px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
-            <i className="ki-filled ki-shield-tick text-sm" />
+            <Icon name="ki-shield-tick" className="text-sm" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">Допуски: требуют пересмотра</h3>

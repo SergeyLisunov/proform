@@ -24,6 +24,7 @@ import {
   SEVERITY_META,
   type Recommendation,
 } from '@/services/recommendations.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface Props {
   athleteId: string
@@ -100,7 +101,7 @@ export default function AthleteMedicalDossier({ athleteId }: Props) {
             return (
               <div key={r.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', borderRadius: 14, background: 'var(--accent)', border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: sev.bg, border: `1px solid ${sev.border}`, color: sev.color }}>
-                  <i className={`ki-filled ${cat.icon} text-sm`} />
+                  <Icon name={cat.icon} className="text-sm" />
                 </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { getPlan, type WorkoutPlanFull } from '@/services/workout-plans.service'
 import PlanEditor from '../PlanEditor'
+import { Icon } from '@/components/ui/Icon'
 
 export default function EditPlanPage() {
   const params = useParams<{ id: string }>()
@@ -47,7 +48,7 @@ export default function EditPlanPage() {
   if (!user || (user.role !== 'coach')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ тренера</p>
         <Link href="/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">
           ← На главную
@@ -60,7 +61,7 @@ export default function EditPlanPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
-          <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
+          <Icon name="ki-information-2" className="text-4xl text-muted-foreground mb-3 block" />
           <h2 className="text-lg font-semibold text-navy-500">План не найден</h2>
           <p className="mt-2 text-sm text-muted-foreground">Возможно, он был архивирован или у вас нет доступа.</p>
           <Link href="/coach/plans"

@@ -17,6 +17,8 @@ import {
   type InquiryWithUsers, type QuestionType, type Urgency, type AthleteOption,
 } from '@/services/doctor-inquiries.service'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type FilterTab = 'all' | 'pending' | 'answered' | 'expired'
 
@@ -118,7 +120,7 @@ export default function CoachInquiriesPage() {
   if (!user || (user.role !== 'coach')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ тренера</p>
         <Link href="/dashboard" className="text-sm text-orange-600 font-semibold hover:underline">← На главную</Link>
       </div>
@@ -138,7 +140,7 @@ export default function CoachInquiriesPage() {
         </div>
         <button onClick={openCreate}
           className="rounded-2xl bg-linear-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white px-5 py-2.5 text-sm font-bold shadow-md inline-flex items-center gap-1.5">
-          <i className="ki-filled ki-plus text-sm" />
+          <Icon name="ki-plus" className="text-sm" />
           Новый запрос
         </button>
       </div>
@@ -167,7 +169,7 @@ export default function CoachInquiriesPage() {
       {filtered.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
-            <i className="ki-filled ki-message-question text-2xl" />
+            <Icon name="ki-message-question" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">
             {filter === 'all' ? 'У вас пока нет запросов' : `Нет запросов в статусе "${STATUS_META[filter as keyof typeof STATUS_META]?.label ?? filter}"`}
@@ -242,8 +244,8 @@ export default function CoachInquiriesPage() {
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Новый запрос врачу</h3>
-              <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-xs" />
+              <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4 max-h-[70vh] overflow-y-auto">

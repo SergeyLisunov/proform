@@ -14,6 +14,8 @@ import {
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { GroupConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 export function useOrgMembers(orgId: string | null) {
   const [members, setMembers] = useState<OrgMember[]>([])
@@ -260,8 +262,8 @@ export function OrgSessionDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Групповое событие</p>
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новое событие'}</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -334,7 +336,7 @@ export function OrgSessionDrawer({
                         on ? 'bg-purple-50 border border-purple-200' : 'bg-muted/30 border border-transparent hover:bg-muted/50'
                       }`}>
                       <div className="w-5 h-5 rounded-full border border-border flex items-center justify-center bg-background">
-                        {on && <i className="ki-filled ki-check text-[10px] text-purple-600"/>}
+                        {on && <Icon name="ki-check" className="text-[10px] text-purple-600" />}
                       </div>
                       <span className="text-xs font-medium text-foreground flex-1 truncate">{m.name}</span>
                       <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
@@ -351,9 +353,9 @@ export function OrgSessionDrawer({
                                                 'bg-muted text-muted-foreground'
                         }`}>
                         {att === 'pending'   ? '?' :
-                         att === 'confirmed' ? <span className="inline-flex items-center gap-0.5"><i className="ki-filled ki-check text-[9px]" /> да</span> :
-                         att === 'attended'  ? <span className="inline-flex items-center"><i className="ki-filled ki-check text-[9px]" /><i className="ki-filled ki-check text-[9px] -ml-1" /></span> :
-                         att === 'absent'    ? <i className="ki-filled ki-cross text-[9px]" /> : '—'}
+                         att === 'confirmed' ? <span className="inline-flex items-center gap-0.5"><Icon name="ki-check" className="text-[9px]" /> да</span> :
+                         att === 'attended'  ? <span className="inline-flex items-center"><Icon name="ki-check" className="text-[9px]" /><Icon name="ki-check" className="text-[9px] -ml-1" /></span> :
+                         att === 'absent'    ? <Icon name="ki-cross" className="text-[9px]" /> : '—'}
                       </button>
                     )}
                   </div>
@@ -442,7 +444,7 @@ export function OrgSessionDrawer({
           </button>
           {initial && (
             <button onClick={handleDelete} className="px-3 py-2.5 rounded-xl border border-border text-red-500 text-sm hover:bg-red-50 transition-colors">
-              <i className="ki-filled ki-trash text-xs"/>
+              <Icon name="ki-trash" className="text-xs" />
             </button>
           )}
         </div>

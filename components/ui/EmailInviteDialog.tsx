@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { sendEmailInvite, type InviteConnectionType } from '@/services/email-invites.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type Role = 'athlete' | 'coach' | 'organization' | 'doctor' | 'admin'
 
@@ -84,8 +86,8 @@ export function EmailInviteDialog({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Приглашение</p>
             <h3 className="text-lg font-semibold text-navy-500">По email</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -93,7 +95,7 @@ export function EmailInviteDialog({
           <div className="px-5 py-6 space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                <i className="ki-filled ki-check text-lg"/>
+                <Icon name="ki-check" className="text-lg" />
               </div>
               <div>
                 <div className="text-sm font-semibold text-foreground">Приглашение отправлено</div>
@@ -116,7 +118,7 @@ export function EmailInviteDialog({
             ) : (
               <>
                 <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-[11px] text-orange-800">
-                  <i className="ki-filled ki-gift text-[11px] text-orange-800" /> <strong>Бонус:</strong> за каждого принявшего — <strong>+1 месяц Pro</strong> вам
+                  <Icon name="ki-gift" className="text-[11px] text-orange-800" /> <strong>Бонус:</strong> за каждого принявшего — <strong>+1 месяц Pro</strong> вам
                   автоматически.
                 </div>
                 <div>

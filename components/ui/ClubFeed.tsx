@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/metronic'
 import { fetchClubFeed, toggleRespect, type ClubFeedItem } from '@/services/club-feed.service'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtDate(iso: string): string {
   return new Date(iso + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
@@ -55,7 +56,7 @@ export function ClubFeed({ userId, userName }: { userId: string; userName: strin
       <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-            <i className="ki-filled ki-people text-sm" />
+            <Icon name="ki-people" className="text-sm" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">Лента клуба</h3>
@@ -80,7 +81,7 @@ export function ClubFeed({ userId, userName }: { userId: string; userName: strin
                 {item.activity_duration_min != null && <span>· {item.activity_duration_min} мин</span>}
                 {item.coach_respect && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 font-semibold text-green-700">
-                    <i className="ki-filled ki-check-circle text-[9px]" />
+                    <Icon name="ki-check-circle" className="text-[9px]" />
                     респект тренера
                   </span>
                 )}
@@ -98,7 +99,7 @@ export function ClubFeed({ userId, userName }: { userId: string; userName: strin
                   : 'border-border bg-background text-muted-foreground hover:border-orange-200 hover:text-orange-600'
               }`}
             >
-              <i className="ki-filled ki-like text-xs" />
+              <Icon name="ki-like" className="text-xs" />
               {item.respects > 0 ? item.respects : ''}
             </button>
           </div>

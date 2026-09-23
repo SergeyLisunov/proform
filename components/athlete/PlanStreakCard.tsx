@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/metronic'
 import { getPlanStreak, type PlanStreak } from '@/services/plan-streak.service'
+import { Icon } from '@/components/ui/Icon'
 
 function cellClass(c: PlanStreak['cells'][number], isCurrent: boolean): string {
   if (c.frozen) return 'bg-info/20 border-info/40'
@@ -50,7 +51,7 @@ export default function PlanStreakCard({ athleteId }: { athleteId: string }) {
       <div className="flex items-center justify-between gap-3 px-5 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
-            <i className="ki-filled ki-flash text-lg" />
+            <Icon name="ki-flash" className="text-lg" />
           </div>
           <div>
             <div className="flex items-baseline gap-2">
@@ -81,7 +82,7 @@ export default function PlanStreakCard({ athleteId }: { athleteId: string }) {
       </div>
       {streak.hadFreeze && (
         <div className="flex items-center gap-2 border-t border-border bg-info/5 px-5 py-2.5 text-2xs text-info">
-          <i className="ki-filled ki-shield-tick text-[11px]" />
+          <Icon name="ki-shield-tick" className="text-[11px]" />
           Серия сохранена: недели без мед-допуска замораживаются, а не сгорают
         </div>
       )}

@@ -35,6 +35,9 @@ import {
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
   type CycleBlock, type CycleType, type CycleDay, type DayType, type UpdateCycleInput,
 } from '@/services/cycles.service'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 function getWS() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -155,7 +158,7 @@ function MetricCard({ label, value, hint, icon, tone, href }: {
   const inner = (
     <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-colors hover:bg-accent/40">
       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-        <i className={`ki-filled ${icon} text-base`} />
+        <Icon name={icon} className="text-base" />
       </div>
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
@@ -210,20 +213,20 @@ function DayCell({ date, day, dayType, cfg, onSelect }: {
       <div onClick={() => setOpen(v => !v)}
         style={{ aspectRatio: '1', borderRadius: 8, border: dayType ? `2px solid ${dcfg!.color}60` : '1.5px solid var(--border)', background: dayType ? dcfg!.bg : 'var(--background)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, transition: 'all 0.12s' }}>
         <span style={{ fontSize: 10, fontWeight: 600, color: dayType ? dcfg!.color : 'var(--foreground)' }}>{day}</span>
-        {dayType && <i className={`ki-filled ${dcfg!.icon}`} style={{ fontSize: 8, color: dcfg!.color }} />}
+        {dayType && <Icon name={dcfg!.icon} style={{ fontSize: 8, color: dcfg!.color }} />}
       </div>
       {open && (
         <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 200, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 140, marginTop: 4 }}>
           {(Object.entries(DAY_TYPE_CFG) as [DayType, typeof DAY_TYPE_CFG[DayType]][]).map(([key, c]) => (
             <button key={key} onClick={() => { onSelect(date, key); setOpen(false) }}
               style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 10px', borderRadius: 8, border: 'none', background: dayType === key ? c.bg : 'transparent', color: c.color, fontSize: 12, fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
-              <i className={`ki-filled ${c.icon}`} style={{ fontSize: 12, flexShrink: 0 }} />{c.label}
+              <Icon name={c.icon} style={{ fontSize: 12, flexShrink: 0 }} />{c.label}
             </button>
           ))}
           {dayType && (
             <button onClick={() => { onSelect(date, dayType); setOpen(false) }}
               style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#94A3B8', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 2, borderTop: '1px solid var(--border)' }}>
-              <i className="ki-filled ki-cross" style={{ fontSize: 10 }} />Убрать метку
+              <Icon name="ki-cross" style={{ fontSize: 10 }} />Убрать метку
             </button>
           )}
         </div>
@@ -338,7 +341,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: viewCfg.bg, border: `1px solid ${viewCfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className="ki-filled ki-abstract-26" style={{ color: viewCfg.text, fontSize: 16 }} />
+              <Icon name="ki-abstract-26" style={{ color: viewCfg.text, fontSize: 16 }} />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{viewCfg.label}</p>
@@ -347,12 +350,12 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             {mode === 'view' && (
-              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline" style={{ gap: 6 }}>
-                <i className="ki-filled ki-pencil" style={{ fontSize: 12 }} />Изменить
+              <button onClick={() => setMode('edit')} className={buttonVariants({ variant: 'outline', size: 'sm' })} style={{ gap: 6 }}>
+                <Icon name="ki-pencil" style={{ fontSize: 12 }} />Изменить
               </button>
             )}
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross" style={{ fontSize: 14 }} />
+            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+              <Icon name="ki-cross" style={{ fontSize: 14 }} />
             </button>
           </div>
         </div>
@@ -411,7 +414,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                       if (!count) return null
                       return (
                         <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}20` }}>
-                          <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 16, flexShrink: 0 }} />
+                          <Icon name={c.icon} style={{ color: c.color, fontSize: 16, flexShrink: 0 }} />
                           <div>
                             <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "var(--pf-font-sans)" }}>{count}</div>
                             <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
@@ -434,7 +437,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
               ) : (
                 <button onClick={() => setConfirmDelete(true)}
                   style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, border: '1.5px solid #FECACA', background: '#FEF2F2', color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
-                  <i className="ki-filled ki-trash" style={{ fontSize: 14 }} />Удалить цикл
+                  <Icon name="ki-trash" style={{ fontSize: 14 }} />Удалить цикл
                 </button>
               )}
             </div>
@@ -503,7 +506,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {(Object.entries(DAY_TYPE_CFG) as [DayType, typeof DAY_TYPE_CFG[DayType]][]).map(([key, c]) => (
                   <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, background: c.bg, border: `1px solid ${c.color}30`, fontSize: 11, fontWeight: 600, color: c.color }}>
-                    <i className={`ki-filled ${c.icon}`} style={{ fontSize: 10 }} />{c.label}
+                    <Icon name={c.icon} style={{ fontSize: 10 }} />{c.label}
                   </span>
                 ))}
               </div>
@@ -523,7 +526,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                     if (!count) return null
                     return (
                       <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}25` }}>
-                        <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
+                        <Icon name={c.icon} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: c.color }}>{count} дн.</div>
                           <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
@@ -541,7 +544,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
             {error && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>
-                <i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}
+                <Icon name="ki-information-4" style={{ flexShrink: 0 }} />{error}
               </div>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
@@ -652,14 +655,14 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: cfg.bg, border: `1px solid ${cfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className="ki-filled ki-abstract-26" style={{ color: cfg.text, fontSize: 16 }} />
+              <Icon name="ki-abstract-26" style={{ color: cfg.text, fontSize: 16 }} />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Тренировочный цикл</p>
               <h2 className="pf-num" style={{ fontSize: 20, color: 'var(--foreground)', lineHeight: 1 }}>Создать цикл</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross" style={{ fontSize: 14 }} /></button>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" style={{ fontSize: 14 }} /></button>
         </div>
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           {[{ id: 'info', label: '1. Параметры' }, { id: 'days', label: '2. Дни цикла' }].map(s => (
@@ -733,7 +736,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {(Object.entries(DAY_TYPE_CFG) as [DayType, typeof DAY_TYPE_CFG[DayType]][]).map(([key, c]) => (
                   <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, background: c.bg, border: `1px solid ${c.color}30`, fontSize: 11, fontWeight: 600, color: c.color }}>
-                    <i className={`ki-filled ${c.icon}`} style={{ fontSize: 10 }} />{c.label}
+                    <Icon name={c.icon} style={{ fontSize: 10 }} />{c.label}
                   </span>
                 ))}
               </div>
@@ -753,7 +756,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
                     if (!count) return null
                     return (
                       <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}25` }}>
-                        <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
+                        <Icon name={c.icon} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: c.color }}>{count} дн.</div>
                           <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
@@ -767,7 +770,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
           )}
         </div>
         <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
-          {error && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}><i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}</div>}
+          {error && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}><Icon name="ki-information-4" style={{ flexShrink: 0 }} />{error}</div>}
           <div style={{ display: 'flex', gap: 8 }}>
             {step === 'info' ? (
               <button onClick={() => { if (!label.trim()) { setError('Введите название'); return } setError(''); setStep('days') }}
@@ -959,7 +962,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
               style={{ borderLeft: ccfgDisplay?`3px solid ${ccfgDisplay.text}`:undefined, background: isSel ? undefined : cellBg }}>
               {day&&<>
                 <div className={['w-7 h-7 rounded-lg flex items-center justify-center text-2sm font-semibold mb-1 mx-auto', isT?'bg-orange-500 text-white':isSel?'bg-orange-100 text-orange-600':'text-foreground'].join(' ')}>{day}</div>
-                {cdcfgDisplay&&<div className="mb-0.5 px-1 py-0.5 rounded-sm text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfgDisplay.bg,color:cdcfgDisplay.color}}><i className={`ki-filled ${cdcfgDisplay.icon} text-[8px]`}/>{cdcfgDisplay.label.slice(0,8)}</div>}
+                {cdcfgDisplay&&<div className="mb-0.5 px-1 py-0.5 rounded-sm text-[9px] font-bold flex items-center gap-0.5" style={{background:cdcfgDisplay.bg,color:cdcfgDisplay.color}}><Icon name={cdcfgDisplay.icon} className="text-[8px]" />{cdcfgDisplay.label.slice(0,8)}</div>}
                 {dayWksDisplay.slice(0,2).map(w => {
                   const ac = getActivityCfg(w.activity_type)
                   return <div
@@ -971,7 +974,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
                     style={{background:ac.bg,color:ac.color}}
                     title="Перетащите для переноса"
                   >
-                    <i className={`ki-filled ${ac.icon} text-[9px] shrink-0`}/>{(w.name??w.activity_type??'').slice(0,10)}{w.activity_strain!=null&&<span className="ml-auto font-bold">{Number(w.activity_strain).toFixed(0)}</span>}
+                    <Icon name={ac.icon} className="text-[9px] shrink-0" />{(w.name??w.activity_type??'').slice(0,10)}{w.activity_strain!=null&&<span className="ml-auto font-bold">{Number(w.activity_strain).toFixed(0)}</span>}
                   </div>
                 })}
                 {dayWksDisplay.length>2&&<div className="text-[10px] text-muted-foreground px-1.5">+{dayWksDisplay.length-2} трен.</div>}
@@ -984,7 +987,7 @@ function MonthView({ year, month, onSelect, selected, savedEvents, monthWorkouts
                   style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}
                   title="Перетащите для переноса"
                 ><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:meta?.color??'#64748B'}}/>{ev.title.slice(0,10)}</div> })}
-                {notesByDate[ds] && <div className="flex items-center gap-0.5 px-1 mt-0.5"><i className="ki-filled ki-notepad-edit text-[8px] text-amber-400"/><span className="text-[9px] text-amber-500 font-medium">заметка</span></div>}
+                {notesByDate[ds] && <div className="flex items-center gap-0.5 px-1 mt-0.5"><Icon name="ki-notepad-edit" className="text-[8px] text-amber-400" /><span className="text-[9px] text-amber-500 font-medium">заметка</span></div>}
               </>}
             </div>
           })}
@@ -1028,23 +1031,23 @@ function WeekView({ weekStart, onSelect, selected, savedEvents, monthWorkouts, c
             <div className="text-2xs text-muted-foreground uppercase tracking-widest">{DAYS_SHORT[di]}</div>
             <div className={`pf-num text-2xl ${isT?'text-orange-500':'text-foreground'}`}>{d.getDate()}</div>
           </div>
-          {cdcfgD&&<div className="mb-1.5 px-1.5 py-1 rounded-lg text-2xs font-semibold flex items-center gap-1" style={{background:cdcfgD.bg,color:cdcfgD.color}}><i className={`ki-filled ${cdcfgD.icon} text-[10px]`}/>{cdcfgD.label}</div>}
+          {cdcfgD&&<div className="mb-1.5 px-1.5 py-1 rounded-lg text-2xs font-semibold flex items-center gap-1" style={{background:cdcfgD.bg,color:cdcfgD.color}}><Icon name={cdcfgD.icon} className="text-[10px]" />{cdcfgD.label}</div>}
           {inCD&&!cdcfgD&&ccfgD&&<div className="mb-1 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border truncate" style={{background:ccfgD.bg,color:ccfgD.text,borderColor:ccfgD.border}}>{inCD.label.slice(0,12)}</div>}
           {wksDisplay.slice(0,2).map(w=>{
             const ac=getActivityCfg(w.activity_type)
             const zones=[w.hr_zone_1_min??0,w.hr_zone_2_min??0,w.hr_zone_3_min??0,w.hr_zone_4_min??0,w.hr_zone_5_min??0]
             return <div key={w.id} className="mb-1.5">
               <div className="px-2 py-1 rounded-lg text-[10px] font-semibold mb-0.5 flex items-center gap-1" style={{background:ac.bg,color:ac.color}}>
-                <i className={`ki-filled ${ac.icon} text-[9px]`}/>{(w.name??w.activity_type??'Тренировка').slice(0,10)}
+                <Icon name={ac.icon} className="text-[9px]" />{(w.name??w.activity_type??'Тренировка').slice(0,10)}
                 {w.activity_strain!=null&&<span className="ml-auto font-bold">{Number(w.activity_strain).toFixed(1)}</span>}
               </div>
               {zones.some(z=>z>0)&&<ZoneBar zones={zones} height={14}/>}
             </div>
           })}
           {wksDisplay.length>2&&<div className="text-[10px] text-muted-foreground">+{wksDisplay.length-2} трен.</div>}
-          {compsDisplay.map(ev=><div key={ev.id} className="px-2 py-1 rounded-lg text-2xs font-semibold mb-0.5 flex items-center gap-1" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}><i className="ki-filled ki-medal-star text-[9px]"/>{ev.title.slice(0,12)}</div>)}
-          {otherDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded-sm text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><i className={`ki-filled ${meta?.icon??'ki-calendar'} text-[9px]`}/>{ev.title.slice(0,12)}</div> })}
-          {isEmpty&&<div className="flex items-center justify-center h-12 text-muted-foreground/30"><i className="ki-filled ki-minus text-xs"/></div>}
+          {compsDisplay.map(ev=><div key={ev.id} className="px-2 py-1 rounded-lg text-2xs font-semibold mb-0.5 flex items-center gap-1" style={{background:EVENT_COLORS.competition.bg,color:EVENT_COLORS.competition.text}}><Icon name="ki-medal-star" className="text-[9px]" />{ev.title.slice(0,12)}</div>)}
+          {otherDisplay.slice(0,1).map(ev=>{ const meta=EVENT_TYPES.find(t=>t.value===ev.event_type); return <div key={ev.id} className="mt-1 px-1.5 py-0.5 rounded-sm text-[9px] font-semibold truncate flex items-center gap-1" style={{background:(meta?.color??'#64748B')+'18',color:meta?.color??'#64748B'}}><Icon name={meta?.icon??'ki-calendar'} className="text-[9px]" />{ev.title.slice(0,12)}</div> })}
+          {isEmpty&&<div className="flex items-center justify-center h-12 text-muted-foreground/30"><Icon name="ki-minus" className="text-xs" /></div>}
         </div>
       })}
     </div>
@@ -1097,7 +1100,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
           <div className="rounded-2xl border px-4 py-3" style={{ background: cdcfg.bg, borderColor: cdcfg.color + '40' }}>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: cdcfg.color + '16' }}>
-                <i className={`ki-filled ${cdcfg.icon} text-base`} style={{ color: cdcfg.color }} />
+                <Icon name={cdcfg.icon} className="text-base" style={{ color: cdcfg.color }} />
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: cdcfg.color }}>Тип дня</p>
@@ -1133,7 +1136,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                       </div>
                       <div className="flex items-center gap-1 text-[11px] font-bold" style={{ color: cc.text }}>
                         {passed}/{total}
-                        <i className="ki-filled ki-right text-[10px]" />
+                        <Icon name="ki-right" className="text-[10px]" />
                       </div>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-white/60">
@@ -1160,7 +1163,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                 return (
                   <div key={w.id} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:bg-accent/30">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: ac.bg }}>
-                      <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.color }} />
+                      <Icon name={ac.icon} className="text-sm" style={{ color: ac.color }} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -1204,7 +1207,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                     className="group flex items-start gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-orange-200 hover:bg-orange-50/40 cursor-pointer"
                   >
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
-                      <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
+                      <Icon name={meta?.icon ?? 'ki-calendar'} className="text-xs" style={{ color: meta?.color ?? '#64748B' }} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -1217,9 +1220,9 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); onDeleteEvent(ev.id) }}
-                      className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0"
+                      className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'opacity-0 transition-opacity group-hover:opacity-100 shrink-0')}
                     >
-                      <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                      <Icon name="ki-trash" className="text-xs text-muted-foreground" />
                     </button>
                   </div>
                 )
@@ -1251,26 +1254,26 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
             onClick={() => onAddNote(dateStr)}
             className="flex items-center gap-1.5 text-2xs text-amber-500 hover:text-amber-600 transition-colors mt-1"
           >
-            <i className="ki-filled ki-notepad-edit text-xs" />Добавить заметку
+            <Icon name="ki-notepad-edit" className="text-xs" />Добавить заметку
           </button>
         )}
 
         {isEmpty && dayNotes.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/50 px-4 py-10 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-              <i className="ki-filled ki-calendar text-2xl" />
+              <Icon name="ki-calendar" className="text-2xl" />
             </div>
             <p className="mt-4 text-sm font-semibold text-foreground">Нет событий на этот день</p>
             <p className="mt-1 max-w-[18rem] text-2xs leading-5 text-muted-foreground">
               Добавьте тренировку, встречу или заметку, чтобы день появился в календарной ленте.
             </p>
-            <button onClick={() => onAddEvent(dateStr)} className="mt-4 kt-btn kt-btn-sm kt-btn-primary gap-1.5">
-              <i className="ki-filled ki-plus text-xs" />Добавить событие
+            <button onClick={() => onAddEvent(dateStr)} className={cn(buttonVariants({ size: 'sm' }), 'mt-4 gap-1.5')}>
+              <Icon name="ki-plus" className="text-xs" />Добавить событие
             </button>
           </div>
         ) : (
-          <button onClick={() => onAddEvent(dateStr)} className="mt-auto kt-btn kt-btn-sm kt-btn-outline gap-1.5 w-full justify-center">
-            <i className="ki-filled ki-plus text-xs" />Добавить событие
+          <button onClick={() => onAddEvent(dateStr)} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-auto gap-1.5 w-full justify-center')}>
+            <Icon name="ki-plus" className="text-xs" />Добавить событие
           </button>
         )}
       </div>
@@ -1308,13 +1311,13 @@ function RsvpBlock({ status, onSet }: { status: AttendanceStatus; onSet: (next: 
           onClick={()=>click('confirmed')}
           disabled={!!busy || status === 'confirmed'}
           style={{flex:1,padding:'10px 0',borderRadius:10,background:status==='confirmed'?'#16A34A':'#F0FDF4',color:status==='confirmed'?'#fff':'#16A34A',fontSize:13,fontWeight:600,border:status==='confirmed'?'none':'1.5px solid #BBF7D0',cursor:busy?'not-allowed':'pointer',opacity:busy?0.6:1}}>
-          <i className="ki-filled ki-check" style={{marginRight:6,fontSize:12}}/>Буду
+          <Icon name="ki-check" style={{marginRight:6,fontSize:12}} />Буду
         </button>
         <button
           onClick={()=>click('declined')}
           disabled={!!busy || status === 'declined'}
           style={{flex:1,padding:'10px 0',borderRadius:10,background:status==='declined'?'#DC2626':'#FEF2F2',color:status==='declined'?'#fff':'#DC2626',fontSize:13,fontWeight:600,border:status==='declined'?'none':'1.5px solid #FECACA',cursor:busy?'not-allowed':'pointer',opacity:busy?0.6:1}}>
-          <i className="ki-filled ki-cross" style={{marginRight:6,fontSize:12}}/>Не смогу
+          <Icon name="ki-cross" style={{marginRight:6,fontSize:12}} />Не смогу
         </button>
       </div>
     </div>
@@ -1465,16 +1468,16 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
       <div style={{position:'relative',width:'100%',maxWidth:440,height:'100%',backgroundColor:'var(--card)',boxShadow:'-8px 0 40px rgba(0,0,0,0.18)',display:'flex',flexDirection:'column',transform:visible?'translateX(0)':'translateX(100%)',transition:'transform 0.26s cubic-bezier(0.4,0,0.2,1)'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 24px 16px',borderBottom:'1px solid var(--border)'}}>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            {selType&&<div style={{width:36,height:36,borderRadius:10,background:selType.color+'18',display:'flex',alignItems:'center',justifyContent:'center'}}><i className={`ki-filled ${selType.icon}`} style={{color:selType.color,fontSize:16}}/></div>}
+            {selType&&<div style={{width:36,height:36,borderRadius:10,background:selType.color+'18',display:'flex',alignItems:'center',justifyContent:'center'}}><Icon name={selType.icon} style={{color:selType.color,fontSize:16}} /></div>}
             <div><p style={{fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:1}}>Календарь</p>
             <h2 className="pf-num" style={{fontSize:22,color:'var(--foreground)',lineHeight:1}}>{drawerMode==='create'?'Добавить событие':drawerMode==='edit'?'Редактировать':(initialEvent?.title??'Событие')}</h2></div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross" style={{fontSize:14}}/></button>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" style={{fontSize:14}} /></button>
         </div>
         <div style={{flex:1,overflowY:'auto',padding:'20px 24px 24px'}}>
           {drawerMode==='view'&&initialEvent&&(
             <div style={{display:'flex',flexDirection:'column',gap:16}}>
-              {selType&&<div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'6px 12px',borderRadius:20,background:selType.color+'12',border:`1.5px solid ${selType.color}30`,alignSelf:'flex-start'}}><i className={`ki-filled ${selType.icon}`} style={{color:selType.color,fontSize:12}}/><span style={{fontSize:12,fontWeight:700,color:selType.color}}>{selType.label}</span></div>}
+              {selType&&<div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'6px 12px',borderRadius:20,background:selType.color+'12',border:`1.5px solid ${selType.color}30`,alignSelf:'flex-start'}}><Icon name={selType.icon} style={{color:selType.color,fontSize:12}} /><span style={{fontSize:12,fontWeight:700,color:selType.color}}>{selType.label}</span></div>}
               <div style={{display:'flex',flexDirection:'column',gap:12}}>
                 <InfoBlock label="Название" value={initialEvent.title}/>
                 <InfoBlock label="Дата" value={parseLocalDate(initialEvent.event_date ?? initialEvent.start_date).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}/>
@@ -1497,19 +1500,19 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
                 </div>
               ):(
                 <div style={{display:'flex',gap:8,paddingTop:4}}>
-                  <button onClick={()=>setDrawerMode('edit')} style={{flex:1,padding:'11px 0',borderRadius:12,background:'#F35703',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:'pointer'}}><i className="ki-filled ki-pencil" style={{marginRight:6,fontSize:12}}/>Изменить</button>
-                  <button onClick={()=>setConfirmDelete(true)} style={{padding:'11px 14px',borderRadius:12,background:'#FEF2F2',color:'#DC2626',fontSize:14,fontWeight:600,border:'1.5px solid #FECACA',cursor:'pointer'}}><i className="ki-filled ki-trash" style={{fontSize:14}}/></button>
+                  <button onClick={()=>setDrawerMode('edit')} style={{flex:1,padding:'11px 0',borderRadius:12,background:'#F35703',color:'#fff',fontSize:14,fontWeight:600,border:'none',cursor:'pointer'}}><Icon name="ki-pencil" style={{marginRight:6,fontSize:12}} />Изменить</button>
+                  <button onClick={()=>setConfirmDelete(true)} style={{padding:'11px 14px',borderRadius:12,background:'#FEF2F2',color:'#DC2626',fontSize:14,fontWeight:600,border:'1.5px solid #FECACA',cursor:'pointer'}}><Icon name="ki-trash" style={{fontSize:14}} /></button>
                 </div>
               )}
             </div>
           )}
           {(drawerMode==='create'||drawerMode==='edit')&&(
             <>
-              {error&&<div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,marginBottom:16,background:'#FEF2F2',border:'1px solid #FECACA',fontSize:13,color:'#DC2626'}}><i className="ki-filled ki-information-4" style={{color:'#EF4444',flexShrink:0}}/>{error}</div>}
+              {error&&<div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderRadius:12,marginBottom:16,background:'#FEF2F2',border:'1px solid #FECACA',fontSize:13,color:'#DC2626'}}><Icon name="ki-information-4" style={{color:'#EF4444',flexShrink:0}} />{error}</div>}
               <form onSubmit={drawerMode==='edit'?handleUpdate:handleCreate} style={{display:'flex',flexDirection:'column',gap:18}}>
                 <div><label style={labelStyle}>Тип события</label>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
-                  {EVENT_TYPES.map(t=>{const a=form.event_type===t.value;return(<button key={t.value} type="button" onClick={()=>setForm(f=>({...f,event_type:t.value}))} style={{display:'flex',alignItems:'center',gap:6,padding:'8px 10px',borderRadius:10,border:a?`2px solid ${t.color}`:'1.5px solid var(--border)',background:a?t.color+'12':'var(--background)',color:a?t.color:'var(--muted-foreground)',fontSize:11,fontWeight:600,cursor:'pointer'}}><i className={`ki-filled ${t.icon}`} style={{fontSize:12,color:a?t.color:'var(--muted-foreground)',flexShrink:0}}/>{t.label}</button>)})}
+                  {EVENT_TYPES.map(t=>{const a=form.event_type===t.value;return(<button key={t.value} type="button" onClick={()=>setForm(f=>({...f,event_type:t.value}))} style={{display:'flex',alignItems:'center',gap:6,padding:'8px 10px',borderRadius:10,border:a?`2px solid ${t.color}`:'1.5px solid var(--border)',background:a?t.color+'12':'var(--background)',color:a?t.color:'var(--muted-foreground)',fontSize:11,fontWeight:600,cursor:'pointer'}}><Icon name={t.icon} style={{fontSize:12,color:a?t.color:'var(--muted-foreground)',flexShrink:0}} />{t.label}</button>)})}
                 </div></div>
                 <div><label style={labelStyle}>Название *</label><input ref={titleRef} type="text" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required placeholder="Утренняя пробежка…" style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
                 <div><label style={labelStyle}>Дата</label><input type="date" value={form.event_date} onChange={e=>setForm(f=>({...f,event_date:e.target.value}))} required style={inputStyle} onFocus={e=>(e.target.style.borderColor='#F35703')} onBlur={e=>(e.target.style.borderColor='var(--border)')}/></div>
@@ -1998,7 +2001,7 @@ export default function CalendarPage() {
                 <Link href={diaryPeriodLink()} className="no-underline group">
                   <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                      <i className="ki-filled ki-abstract-26 text-base" />
+                      <Icon name="ki-abstract-26" className="text-base" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Тренировки</p>
@@ -2007,7 +2010,7 @@ export default function CalendarPage() {
                       </div>
                       <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
                         {kpiLabel()}
-                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Icon name="ki-right" className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
                       </p>
                     </div>
                   </div>
@@ -2016,7 +2019,7 @@ export default function CalendarPage() {
                 <Link href={`/competitions?${periodRangeParams()}`} className="no-underline group">
                   <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
-                      <i className="ki-filled ki-medal-star text-base" />
+                      <Icon name="ki-medal-star" className="text-base" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Соревнования</p>
@@ -2025,7 +2028,7 @@ export default function CalendarPage() {
                       </div>
                       <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
                         {kpiLabel()}
-                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Icon name="ki-right" className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
                       </p>
                     </div>
                   </div>
@@ -2034,7 +2037,7 @@ export default function CalendarPage() {
                 <Link href={`/cycles?${periodRangeParams()}`} className="no-underline group">
                   <div className="flex h-full items-start gap-3 rounded-2xl border border-border bg-background/75 p-4 transition-all hover:border-orange-200 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                      <i className="ki-filled ki-abstract-45 text-base" />
+                      <Icon name="ki-abstract-45" className="text-base" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Циклы</p>
@@ -2043,7 +2046,7 @@ export default function CalendarPage() {
                       </div>
                       <p className="mt-1.5 text-2xs leading-5 text-muted-foreground flex items-center gap-1">
                         {kpiLabel()}
-                        <i className="ki-filled ki-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Icon name="ki-right" className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" />
                       </p>
                     </div>
                   </div>
@@ -2063,9 +2066,9 @@ export default function CalendarPage() {
                 {showCycles && (
                   <button
                     onClick={() => setShowAddCycle(true)}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
-                    <i className="ki-filled ki-abstract-26 text-xs" />
+                    <Icon name="ki-abstract-26" className="text-xs" />
                     Создать цикл
                   </button>
                 )}
@@ -2073,23 +2076,23 @@ export default function CalendarPage() {
                   <>
                     <button
                       onClick={() => { setSessionDrawerInit({ date: selected ?? _today, session: null }); setShowSessionDrawer(true) }}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
-                      <i className="ki-filled ki-calendar-tick text-xs" />
+                      <Icon name="ki-calendar-tick" className="text-xs" />
                       Занятие
                     </button>
                     <button
                       onClick={() => setShowPlansManager(true)}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
-                      <i className="ki-filled ki-discount text-xs" />
+                      <Icon name="ki-discount" className="text-xs" />
                       Тарифы
                     </button>
                     <button
                       onClick={() => { setIssuePassForAthlete(null); setShowIssuePass(true) }}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
-                      <i className="ki-filled ki-price-tag text-xs" />
+                      <Icon name="ki-price-tag" className="text-xs" />
                       Абонемент
                     </button>
                   </>
@@ -2097,26 +2100,26 @@ export default function CalendarPage() {
                 {isDoctor && (
                   <button
                     onClick={() => { setCheckupDrawerInit({ date: selected ?? _today, checkup: null }); setShowCheckupDrawer(true) }}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
-                    <i className="ki-filled ki-heart text-xs" />
+                    <Icon name="ki-heart" className="text-xs" />
                     Медосмотр
                   </button>
                 )}
                 {isOrg && (
                   <button
                     onClick={() => { setOrgDrawerInit({ date: selected ?? _today, session: null }); setShowOrgSessionDrawer(true) }}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
-                    <i className="ki-filled ki-people text-xs" />
+                    <Icon name="ki-people" className="text-xs" />
                     Событие команды
                   </button>
                 )}
                 <button
                   onClick={() => openAddEvent(selected ?? undefined)}
-                  className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
+                  className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5')}
                 >
-                  <i className="ki-filled ki-plus text-xs" />
+                  <Icon name="ki-plus" className="text-xs" />
                   Добавить событие
                 </button>
               </div>
@@ -2170,7 +2173,7 @@ export default function CalendarPage() {
                   <div className="text-2xs font-bold uppercase tracking-[0.16em]" style={{ color: cc.text }}>{c.label}</div>
                   <div className="mt-0.5 text-[10px] text-muted-foreground">{c.start_date} → {c.end_date} · {passed}/{total} дн.</div>
                 </div>
-                <i className="ki-filled ki-right text-[10px]" style={{ color: cc.text }} />
+                <Icon name="ki-right" className="text-[10px]" style={{ color: cc.text }} />
               </button>
             )
           })}
@@ -2188,12 +2191,12 @@ export default function CalendarPage() {
               ))}
             </div>
             <div className="flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2">
-              <button onClick={prevPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-left text-xs" /></button>
+              <button onClick={prevPeriod} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-left" className="text-xs" /></button>
               <div className="min-w-[160px] text-center pf-num text-lg text-foreground">{periodLabel()}</div>
-              <button onClick={nextPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-right text-xs" /></button>
+              <button onClick={nextPeriod} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-right" className="text-xs" /></button>
             </div>
-            <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
-              <i className="ki-filled ki-calendar text-xs" />
+            <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}>
+              <Icon name="ki-calendar" className="text-xs" />
               Сегодня
             </button>
           </div>
@@ -2294,7 +2297,7 @@ export default function CalendarPage() {
                   className="group flex items-center gap-3 rounded-2xl border border-border bg-background/70 px-3 py-2.5 transition-all hover:border-orange-200 hover:bg-orange-50/40 cursor-pointer"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: (meta?.color ?? '#64748B') + '18' }}>
-                    <i className={`ki-filled ${meta?.icon ?? 'ki-calendar'} text-xs`} style={{ color: meta?.color ?? '#64748B' }} />
+                    <Icon name={meta?.icon ?? 'ki-calendar'} className="text-xs" style={{ color: meta?.color ?? '#64748B' }} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -2308,8 +2311,8 @@ export default function CalendarPage() {
                   <span className="shrink-0 text-[11px] text-muted-foreground">
                     {parseLocalDate(ev.event_date ?? ev.start_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}{ev.start_time && ` · ${ev.start_time}`}
                   </span>
-                  <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0">
-                    <i className="ki-filled ki-trash text-xs text-muted-foreground" />
+                  <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'opacity-0 transition-opacity group-hover:opacity-100 shrink-0')}>
+                    <Icon name="ki-trash" className="text-xs text-muted-foreground" />
                   </button>
                 </div>
               )

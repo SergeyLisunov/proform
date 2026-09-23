@@ -20,6 +20,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
 import { pooledZTest } from '@/lib/stats/ztest'
+import { Icon } from '@/components/ui/Icon'
 
 export const dynamic = 'force-dynamic'
 
@@ -220,7 +221,7 @@ export default async function AbTestsPage() {
                     <td className="py-3 pr-3 pf-num text-xs">
                       <span className={`rounded-full px-2 py-0.5 inline-flex items-center gap-1 ${insufficient ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
                         {s.sampleSize}
-                        <i className={`ki-filled ${insufficient ? 'ki-information-4' : 'ki-check'} text-xs`} />
+                        <Icon name={insufficient ? 'ki-information-4' : 'ki-check'} className="text-xs" />
                       </span>
                     </td>
                     <td className="py-3 pr-3 text-xs">
@@ -231,10 +232,10 @@ export default async function AbTestsPage() {
                           return <span className="rounded-full bg-muted text-muted-foreground border border-border px-2 py-0.5">Нужно 100+</span>
                         }
                         if (v.label === 'a_wins') {
-                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A лучше <i className="ki-filled ki-check text-xs" /></span>
+                          return <span className="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>A лучше <Icon name="ki-check" className="text-xs" /></span>
                         }
                         if (v.label === 'b_wins') {
-                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B лучше <i className="ki-filled ki-check text-xs" /></span>
+                          return <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 inline-flex items-center gap-1" title={`p=${v.ztest.pValue.toFixed(3)}, z=${v.ztest.z.toFixed(2)}`}>B лучше <Icon name="ki-check" className="text-xs" /></span>
                         }
                         return <span className="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5" title={`p=${v.ztest.pValue.toFixed(3)}, not significant`}>Неоднозначно</span>
                       })()}

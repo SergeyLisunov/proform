@@ -18,6 +18,7 @@ import {
   DEMO_WEEKLY,
   recoveryColor,
 } from '@/lib/utils/data'
+import { Icon } from '@/components/ui/Icon'
 
 const PERIOD_OPTS = [
   { label: '7д', value: '7d' },
@@ -114,7 +115,7 @@ function MetricCard({
           {hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
         </div>
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-          <i className={`ki-filled ${icon} text-base`} />
+          <Icon name={icon} className="text-base" />
         </div>
       </div>
     </div>
@@ -138,7 +139,7 @@ function InsightCard({
     <div className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
       <div className="flex items-start gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent}`}>
-          <i className={`ki-filled ${icon} text-base`} />
+          <Icon name={icon} className="text-base" />
         </div>
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
@@ -706,7 +707,7 @@ function AthleteAnalytics() {
 
                 return (
                   <div key={index} className="flex items-center gap-3 px-5 py-3">
-                    <i className={`ki-filled ${competition.status === 'completed' ? 'ki-flag' : 'ki-focus'} text-base text-muted-foreground`} />
+                    <Icon name={competition.status === 'completed' ? 'ki-flag' : 'ki-focus'} className="text-base text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold text-foreground">{competition.name}</div>
                       <div className="text-2xs text-muted-foreground">
@@ -753,7 +754,7 @@ function AnalyticsComingSoon() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 border border-orange-100">
-        <i className="ki-filled ki-chart-line-up text-3xl text-orange-400" />
+        <Icon name="ki-chart-line-up" className="text-3xl text-orange-400" />
       </div>
       <div>
         <h1 className="pf-num text-2xl text-navy-500">Аналитика готовится</h1>
@@ -768,7 +769,7 @@ function AnalyticsComingSoon() {
         className="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600 no-underline"
       >
         Перейти в дневник
-        <i className="ki-filled ki-arrow-right text-sm" />
+        <Icon name="ki-arrow-right" className="text-sm" />
       </a>
     </div>
   )

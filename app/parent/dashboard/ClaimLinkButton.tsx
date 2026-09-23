@@ -10,6 +10,8 @@
  */
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 interface Props {
   childId:   string
@@ -63,7 +65,7 @@ export default function ClaimLinkButton({ childId, childName }: Props) {
         title="Выдать ребёнку ссылку для самостоятельного входа"
         className="inline-flex items-center gap-1.5 rounded-xl border border-orange-200 bg-orange-50 px-3 py-1.5 text-2xs font-semibold text-orange-700 transition-colors hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <i className="ki-filled ki-key text-[10px]" />
+        <Icon name="ki-key" className="text-[10px]" />
         {loading ? 'Выдаём…' : 'Выдать доступ'}
       </button>
 
@@ -80,8 +82,8 @@ export default function ClaimLinkButton({ childId, childName }: Props) {
                 <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Ссылка для входа</p>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>{childName}</h3>
               </div>
-              <button onClick={() => setOpen(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-sm" />
+              <button onClick={() => setOpen(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+                <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>
             <div style={{ padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -97,7 +99,7 @@ export default function ClaimLinkButton({ childId, childName }: Props) {
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={copy}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
-                  <i className="ki-filled ki-copy text-xs" />
+                  <Icon name="ki-copy" className="text-xs" />
                   {copied ? 'Скопировано!' : 'Скопировать ссылку'}
                 </button>
                 <button onClick={() => setOpen(false)}
