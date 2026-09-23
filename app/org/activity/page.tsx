@@ -22,6 +22,7 @@ import {
 } from '@/services/org-activity.service'
 import { ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 export const dynamic = 'force-dynamic'
 
@@ -113,7 +114,7 @@ export default async function OrgActivityPage() {
             <span key={t}
               className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"
               style={{ background: m.bg, color: m.color, borderColor: m.border }}>
-              <i className={`ki-filled ${m.icon}`} />
+              <Icon name={m.icon} />
               {m.label} · <span className="pf-num">{counts[t]}</span>
             </span>
           )
@@ -145,7 +146,7 @@ export default async function OrgActivityPage() {
       {events.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-4">
-            <i className="ki-filled ki-people text-2xl" />
+            <Icon name="ki-people" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">Пока тихо</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -169,7 +170,7 @@ export default async function OrgActivityPage() {
                 {/* Icon */}
                 <div className="relative z-10 shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
                   style={{ background: m.bg, border: `2px solid ${ringColor}`, color: m.color }}>
-                  <i className={`ki-filled ${m.icon} text-lg`} />
+                  <Icon name={m.icon} className="text-lg" />
                 </div>
                 {/* Body */}
                 <div className="flex-1 min-w-0 rounded-2xl border border-border bg-card px-4 py-3">

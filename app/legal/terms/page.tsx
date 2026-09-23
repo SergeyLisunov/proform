@@ -10,6 +10,7 @@
  */
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Icon } from '@/components/ui/Icon'
 
 export const metadata: Metadata = {
   title: 'Условия использования',
@@ -37,7 +38,7 @@ export default function TermsPage() {
           href="/"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground no-underline transition"
         >
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           На главную
         </Link>
       </div>
@@ -54,7 +55,7 @@ export default function TermsPage() {
         </p>
 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          <strong className="inline-flex items-center gap-1.5"><i className="ki-filled ki-information-2 text-sm" /> Holding-страница.</strong> Полный документ Terms of Service проходит правовую
+          <strong className="inline-flex items-center gap-1.5"><Icon name="ki-information-2" className="text-sm" /> Holding-страница.</strong> Полный документ Terms of Service проходит правовую
           экспертизу. Используйте платформу с пониманием изложенных ниже базовых правил. Финальная
           редакция будет опубликована до выхода из закрытого бета-тестирования.
         </div>

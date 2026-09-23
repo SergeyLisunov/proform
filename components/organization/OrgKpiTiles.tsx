@@ -23,6 +23,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface Tile {
   label: string
@@ -157,7 +158,7 @@ export default function OrgKpiTiles({ orgId }: { orgId: string }) {
             </div>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: t.bg }}>
-              <i className={`ki-filled ${t.icon}`} style={{ color: t.color, fontSize: 18 }} />
+              <Icon name={t.icon} style={{ color: t.color, fontSize: 18 }} />
             </div>
           </div>
         )

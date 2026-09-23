@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
+import { Icon } from '@/components/ui/Icon'
 
 type TariffRow = Database['public']['Tables']['tariffs']['Row']
 
@@ -165,7 +166,7 @@ export default function PricingPage() {
       <div className="mb-6">
         <Link href="/dashboard"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           На главную
         </Link>
       </div>
@@ -183,7 +184,7 @@ export default function PricingPage() {
 
       {error && (
         <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 max-w-xl mx-auto">
-          <i className="ki-filled ki-shield-cross mr-2" />
+          <Icon name="ki-shield-cross" className="mr-2" />
           {error}
         </div>
       )}
@@ -198,7 +199,7 @@ export default function PricingPage() {
         return (
           <section key={group.key} className="mb-10">
             <div className="flex items-center gap-2.5 mb-4">
-              <i className={`ki-filled ${group.icon} text-2xl`} style={{ color: group.color }} />
+              <Icon name={group.icon} className="text-2xl" style={{ color: group.color }} />
               <h2 className="text-xl font-bold text-navy-500">Для роли: {group.label}</h2>
             </div>
 
@@ -216,7 +217,7 @@ export default function PricingPage() {
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                         <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
                           style={{ background: 'linear-gradient(135deg,#F35703,#D44A02)', color: 'white', boxShadow: '0 4px 12px rgba(212,74,2,0.4)' }}>
-                          <i className="ki-solid ki-star text-[10px]" /> Популярный
+                          <Icon name="ki-star" className="text-[10px]" /> Популярный
                         </span>
                       </div>
                     )}
@@ -245,7 +246,7 @@ export default function PricingPage() {
                     {t.trial_days > 0 && !isFree && (
                       <div className="mb-3 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider self-start"
                         style={{ background: '#FEF0E7', color: '#D44A02', border: '1px solid #FBC1A0' }}>
-                        <i className="ki-filled ki-gift text-[11px]" /> Trial {t.trial_days} дней
+                        <Icon name="ki-gift" className="text-[11px]" /> Trial {t.trial_days} дней
                       </div>
                     )}
 
@@ -258,7 +259,7 @@ export default function PricingPage() {
                     <ul className="space-y-1.5 flex-1 mb-4">
                       {t.features.map(f => (
                         <li key={f} className="flex items-start gap-2 text-xs text-foreground">
-                          <i className="ki-filled ki-check text-[10px] mt-1 shrink-0" style={{ color: group.color }} />
+                          <Icon name="ki-check" className="text-[10px] mt-1 shrink-0" style={{ color: group.color }} />
                           <span className="leading-snug">{f}</span>
                         </li>
                       ))}

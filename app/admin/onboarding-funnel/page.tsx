@@ -21,6 +21,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 export const dynamic = 'force-dynamic'
 
@@ -326,7 +327,7 @@ export default async function OnboardingFunnelPage({
                 })}
                 <div className="pt-2 mt-1 border-t border-border">
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="inline-flex items-center gap-1 font-bold text-foreground"><i className="ki-filled ki-check" /> Completed</span>
+                    <span className="inline-flex items-center gap-1 font-bold text-foreground"><Icon name="ki-check" /> Completed</span>
                     <span className="pf-num font-bold" style={{ color: meta.accent }}>
                       {f.completed}
                     </span>
@@ -420,7 +421,7 @@ export default async function OnboardingFunnelPage({
         {/* Table */}
         {paginated.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
-            <i className="ki-filled ki-filter text-2xl text-muted-foreground/40 mb-2 block" />
+            <Icon name="ki-filter" className="text-2xl text-muted-foreground/40 mb-2 block" />
             <p className="text-sm text-muted-foreground">По выбранным фильтрам никого нет</p>
           </div>
         ) : (

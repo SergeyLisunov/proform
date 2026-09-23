@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { listInjuries, BODY_PART_LABELS, SEVERITY_LABELS, type Injury } from '@/services/injuries.service'
 import { Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface PassRow {
   id: string
@@ -63,7 +64,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
                 isActive ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'
               }`}>
               <span className={`inline-flex items-center ${isActive ? 'text-red-600' : 'text-orange-600'}`}>
-                <i className={`ki-filled ${isActive ? 'ki-shield-cross' : 'ki-arrows-circle'} text-[13px]`} />
+                <Icon name={isActive ? 'ki-shield-cross' : 'ki-arrows-circle'} className="text-[13px]" />
               </span>
               <span>
                 <strong className="text-foreground">{part}</strong>
@@ -80,7 +81,7 @@ export default function AthleteActiveAlerts({ athleteId }: { athleteId: string }
           return (
             <Link key={p.id} href="/calendar"
               className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-[12px] hover:shadow-xs transition-shadow">
-              <span className="inline-flex items-center text-purple-600"><i className="ki-filled ki-time text-[13px]" /></span>
+              <span className="inline-flex items-center text-purple-600"><Icon name="ki-time" className="text-[13px]" /></span>
               <span>
                 <strong className="text-foreground">{p.title ?? 'Абонемент'}</strong>
                 <span className="text-muted-foreground"> · {remaining} занятий до {expires}</span>

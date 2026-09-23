@@ -8,6 +8,7 @@ import { useDialog } from '@/lib/hooks/useDialog'
 import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/services/wall.service'
 import type { WallPost, PostType, PostVisibility } from '@/types/org.types'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: string; accent: string; panel: string }> = {
   announcement: {
@@ -161,7 +162,7 @@ export default function OrgWallPage() {
   if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
@@ -208,14 +209,14 @@ export default function OrgWallPage() {
                   onClick={() => setShowCreate(true)}
                   className="inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] transition-transform hover:-translate-y-0.5"
                 >
-                  <i className="ki-filled ki-plus text-sm" />
+                  <Icon name="ki-plus" className="text-sm" />
                   Новая публикация
                 </button>
                 <Link
                   href="/org/newsletters"
                   className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-orange-200 hover:text-orange-700"
                 >
-                  <i className="ki-filled ki-sms text-sm" />
+                  <Icon name="ki-sms" className="text-sm" />
                   Перейти к рассылкам
                 </Link>
               </div>
@@ -251,7 +252,7 @@ export default function OrgWallPage() {
                 <div className="mt-2 text-2xs text-muted-foreground">{item.hint}</div>
               </div>
               <div style={{ width: 44, height: 44, borderRadius: 14, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
+                <Icon name={item.icon} className="text-base" style={{ color: item.color }} />
               </div>
             </div>
           </Card>
@@ -264,7 +265,7 @@ export default function OrgWallPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                  <i className="ki-filled ki-pin text-sm" />
+                  <Icon name="ki-pin" className="text-sm" />
                 </span>
                 <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Закрепленные публикации</span>
               </div>
@@ -301,7 +302,7 @@ export default function OrgWallPage() {
         {feed.length === 0 && pinned.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-border bg-accent/30 px-6 py-14 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-              <i className="ki-filled ki-abstract-45 text-2xl" />
+              <Icon name="ki-abstract-45" className="text-2xl" />
             </div>
             <div className="mt-4 text-base font-semibold text-foreground">Публикаций пока нет</div>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -311,7 +312,7 @@ export default function OrgWallPage() {
               onClick={() => setShowCreate(true)}
               className="mt-5 inline-flex items-center gap-2 rounded-[14px] border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-700 shadow-xs transition-all hover:bg-orange-50"
             >
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Создать первую публикацию
             </button>
           </div>
@@ -336,7 +337,7 @@ export default function OrgWallPage() {
                   <p className="mt-2 text-2sm text-muted-foreground">Подготовьте анонс, новость, событие или результат для участников клуба.</p>
                 </div>
                 <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                  <i className="ki-filled ki-cross text-sm" />
+                  <Icon name="ki-cross" className="text-sm" />
                 </button>
               </div>
             </div>
@@ -441,12 +442,12 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
           <div className="mb-3 flex items-center gap-2 flex-wrap">
             {post.is_pinned && (
               <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-2xs font-semibold text-orange-700">
-                <i className="ki-filled ki-pin text-[10px]" />
+                <Icon name="ki-pin" className="text-[10px]" />
                 Закреплено
               </span>
             )}
             <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold ${typeMeta.badge}`}>
-              <i className={`ki-filled ${typeMeta.icon} text-[10px]`} />
+              <Icon name={typeMeta.icon} className="text-[10px]" />
               {typeMeta.label}
             </span>
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-2xs font-medium ${visibilityMeta.badge}`}>
@@ -454,7 +455,7 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
             </span>
             {post.event_date && (
               <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-2xs text-muted-foreground">
-                <i className="ki-filled ki-calendar text-[10px]" />
+                <Icon name="ki-calendar" className="text-[10px]" />
                 {formatDate(post.event_date, { day: 'numeric', month: 'long' })}
               </span>
             )}
@@ -468,14 +469,14 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
             title={post.is_pinned ? 'Открепить' : 'Закрепить'}
             className={`kt-btn kt-btn-xs kt-btn-icon ${post.is_pinned ? 'kt-btn-primary' : 'kt-btn-outline'}`}
           >
-            <i className="ki-filled ki-pin text-xs" />
+            <Icon name="ki-pin" className="text-xs" />
           </button>
           <button
             onClick={onDelete}
             title="Удалить"
             className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline hover:bg-red-50! hover:border-red-200! hover:text-red-600!"
           >
-            <i className="ki-filled ki-trash text-xs" />
+            <Icon name="ki-trash" className="text-xs" />
           </button>
         </div>
       </div>
@@ -485,7 +486,7 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
           <span>{visibilityMeta.hint}</span>
         </div>
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: typeMeta.panel }}>
-          <i className={`ki-filled ${typeMeta.icon} text-xs`} style={{ color: typeMeta.accent }} />
+          <Icon name={typeMeta.icon} className="text-xs" style={{ color: typeMeta.accent }} />
         </span>
       </div>
     </Card>

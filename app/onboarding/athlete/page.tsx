@@ -24,6 +24,7 @@ import {
   type AthleteWizardData,
 } from '@/services/onboarding.service'
 import { createGoal } from '@/services/athlete-goals.service'
+import { Icon } from '@/components/ui/Icon'
 
 const SPORTS: Array<{ key: string; label: string }> = [
   { key: 'running',    label: 'Бег' },
@@ -213,7 +214,7 @@ export default function AthleteOnboardingPage() {
                 }`}>
                 <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
                   style={{ borderColor: sel ? ACCENT : 'var(--border)', background: sel ? ACCENT : 'transparent' }}>
-                  {sel && <i className="ki-filled ki-check text-[10px] text-white" />}
+                  {sel && <Icon name="ki-check" className="text-[10px] text-white" />}
                 </span>
                 <span className="font-semibold">{g.label}</span>
               </button>
@@ -226,7 +227,7 @@ export default function AthleteOnboardingPage() {
             <div className="flex items-center gap-3 mb-2">
               <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
                 style={{ borderColor: goalKey === 'custom' ? ACCENT : 'var(--border)', background: goalKey === 'custom' ? ACCENT : 'transparent' }}>
-                {goalKey === 'custom' && <i className="ki-filled ki-check text-[10px] text-white" />}
+                {goalKey === 'custom' && <Icon name="ki-check" className="text-[10px] text-white" />}
               </span>
               <span className="font-semibold">Своя цель</span>
             </div>

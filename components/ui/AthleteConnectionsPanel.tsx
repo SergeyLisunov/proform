@@ -14,6 +14,7 @@ import {
   listMyGroupSessionsAsMember, getMyOrganization, SESSION_TYPE_LABELS,
   type GroupSession, type AttendanceStatus,
 } from '@/services/org-sessions.service'
+import { Icon } from '@/components/ui/Icon'
 
 function today(): string { return new Date().toISOString().slice(0, 10) }
 function in30(): string { return new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10) }
@@ -96,9 +97,9 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
 
   const attLabel: Record<AttendanceStatus, { node: React.ReactNode; cls: string }> = {
     pending:   { node: '?',                                                                                 cls: 'bg-slate-100 text-slate-500' },
-    confirmed: { node: <><i className="ki-filled ki-check" /> буду</>,                                       cls: 'bg-blue-100 text-blue-700' },
-    attended:  { node: <i className="ki-filled ki-double-check" />,                                          cls: 'bg-green-100 text-green-700' },
-    absent:    { node: <i className="ki-filled ki-cross" />,                                                 cls: 'bg-red-100 text-red-700' },
+    confirmed: { node: <><Icon name="ki-check" /> буду</>,                                       cls: 'bg-blue-100 text-blue-700' },
+    attended:  { node: <Icon name="ki-double-check" />,                                          cls: 'bg-green-100 text-green-700' },
+    absent:    { node: <Icon name="ki-cross" />,                                                 cls: 'bg-red-100 text-red-700' },
     declined:  { node: '—',                                                                                 cls: 'bg-slate-200 text-slate-600' },
   }
 

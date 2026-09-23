@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { PaywallBanner, type Plan } from '@/components/ui/Paywall'
+import { Icon } from '@/components/ui/Icon'
 
 type AthleteItem = {
   athlete_id: string
@@ -67,7 +68,7 @@ export default function CoachBriefingCard() {
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: '#FEF0E7' }}>
-            <i className="ki-filled ki-rocket text-[14px] text-orange-500" />
+            <Icon name="ki-rocket" className="text-[14px] text-orange-500" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500 leading-none">Утренний брифинг</h3>
@@ -80,7 +81,7 @@ export default function CoachBriefingCard() {
           title="Пересчитать"
           className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-accent transition"
         >
-          <i className={`ki-filled ki-arrows-circle text-[12px] text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
+          <Icon name={loading ? 'animate-spin' : ''} className="text-[12px] text-muted-foreground" />
         </button>
       </div>
 
@@ -112,7 +113,7 @@ export default function CoachBriefingCard() {
                 <ul className="space-y-1">
                   {data.priorities.map((p, i) => (
                     <li key={i} className="flex gap-1.5 text-xs font-semibold text-foreground">
-                      <i className="ki-filled ki-arrow-right mt-[2px] text-[10px] text-orange-500" />
+                      <Icon name="ki-arrow-right" className="mt-[2px] text-[10px] text-orange-500" />
                       <span>{p}</span>
                     </li>
                   ))}
@@ -148,7 +149,7 @@ export default function CoachBriefingCard() {
                         </div>
                         <div className="mt-0.5 text-xs text-foreground">{a.headline}</div>
                         <div className="mt-1 flex items-start gap-1 text-2xs text-muted-foreground">
-                          <i className="ki-filled ki-flash-circle mt-[2px] text-[9px] text-orange-500" />
+                          <Icon name="ki-flash-circle" className="mt-[2px] text-[9px] text-orange-500" />
                           <span>{a.action}</span>
                         </div>
                       </div>

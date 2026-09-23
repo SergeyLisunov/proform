@@ -11,6 +11,7 @@ import {
   type Injury, type InjurySide, type InjurySeverity, type InjuryMechanism, type InjuryStatus,
 } from '@/services/injuries.service'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type AthleteOption = { id: string; name: string }
 
@@ -99,7 +100,7 @@ export default function InjuriesPage() {
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FECACA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">
-              <i className="ki-filled ki-heart-circle text-[11px]" />
+              <Icon name="ki-heart-circle" className="text-[11px]" />
               Травмы
             </span>
             <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500 mt-2">Журнал травм</h1>
@@ -109,7 +110,7 @@ export default function InjuriesPage() {
           </div>
           <button onClick={() => setShowForm(v => !v)}
             className="rounded-xl bg-red-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-red-600">
-            <i className="ki-filled ki-plus text-xs mr-1"/>
+            <Icon name="ki-plus" className="text-xs mr-1" />
             {showForm ? 'Скрыть форму' : 'Записать травму'}
           </button>
         </div>
@@ -145,7 +146,7 @@ export default function InjuriesPage() {
             Записи · {rows.length}
           </p>
           <button onClick={load} className="text-[11px] font-semibold text-orange-600 hover:text-orange-700">
-            <i className="ki-filled ki-arrows-circle text-[10px] mr-1"/>Обновить
+            <Icon name="ki-arrows-circle" className="text-[10px] mr-1" />Обновить
           </button>
         </div>
         {loading && rows.length === 0 ? (
@@ -321,7 +322,7 @@ function InjuryRow({
     <div className="px-5 py-4 flex items-start gap-3">
       <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
         style={{ background: sevColor.bg, color: sevColor.text, border: `1px solid ${sevColor.border}` }}>
-        <i className="ki-filled ki-heart-circle text-lg"/>
+        <Icon name="ki-heart-circle" className="text-lg" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2 flex-wrap">

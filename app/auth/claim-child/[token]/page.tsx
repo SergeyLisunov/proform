@@ -13,6 +13,7 @@
 import { type FormEvent, use, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
+import { Icon } from '@/components/ui/Icon'
 
 function validatePassword(pwd: string): string {
   if (pwd.length < 8) return 'Минимум 8 символов'
@@ -70,7 +71,7 @@ export default function ClaimChildPage({ params }: PageProps) {
       <div className="mx-auto flex w-full max-w-[480px] flex-col gap-6">
         <Link href="/" className="self-center flex items-center gap-2.5 no-underline">
           <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
-            <i className="ki-filled ki-abstract-26 text-sm text-white" />
+            <Icon name="ki-abstract-26" className="text-sm text-white" />
           </div>
           <div className="text-right">
             <div className="pf-num text-lg text-foreground">Sporteo</div>
@@ -111,7 +112,7 @@ export default function ClaimChildPage({ params }: PageProps) {
               <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
                 {error && (
                   <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{error}</span>
                   </div>
                 )}

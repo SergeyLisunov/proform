@@ -5,6 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const DoctorHeroBar         = dynamic(() => import('@/components/doctor/DoctorHeroBar'),         { ssr: false })
 const DoctorQuickActions    = dynamic(() => import('@/components/doctor/DoctorQuickActions'),    { ssr: false })
@@ -207,7 +208,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
             </div>
           ) : notes.length === 0 ? (
             <div className="flex flex-col items-center gap-1 py-6 text-center text-muted-foreground">
-              <i className="ki-filled ki-notification-on text-[18px]" />
+              <Icon name="ki-notification-on" className="text-[18px]" />
               <p className="text-xs">Новых уведомлений нет</p>
             </div>
           ) : (
@@ -216,7 +217,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
                 <div key={n.id} className="rounded-xl border border-border bg-background px-2.5 py-2">
                   <div className="flex items-start gap-2">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
-                      <i className="ki-filled ki-notepad-edit text-[12px]" />
+                      <Icon name="ki-notepad-edit" className="text-[12px]" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[12px] font-semibold text-foreground">{n.title}</div>
@@ -254,7 +255,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
         ) : recentPatients.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-background/60 py-10 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500">
-              <i className="ki-filled ki-heart-circle text-[20px]" />
+              <Icon name="ki-heart-circle" className="text-[20px]" />
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">Пока нет пациентов</p>
@@ -279,7 +280,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.user.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover" />
                     ) : (
-                      <i className="ki-filled ki-user text-[15px]" />
+                      <Icon name="ki-user" className="text-[15px]" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -299,7 +300,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
                   <Link href={`/doctor/report/${p.user.id}`}
                     title="Медицинский отчёт · PDF"
                     className="flex h-8 items-center gap-1 rounded-lg border border-red-200 bg-white px-2 text-[11px] font-bold text-red-700 hover:bg-red-50">
-                    <i className="ki-filled ki-document text-[12px]" />
+                    <Icon name="ki-document" className="text-[12px]" />
                     Отчёт
                   </Link>
                 )}

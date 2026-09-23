@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from 'react'
 import NoteEditor from './NoteEditor'
 import { createClient } from '@/lib/supabase/client'
 import type { NoteAttachment } from '@/services/notes.service'
+import { Icon } from '@/components/ui/Icon'
 
 type AttachType = 'image' | 'document'
 
@@ -207,13 +208,13 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
                   )}
                   {f.error && (
                     <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center">
-                      <i className="ki-filled ki-information-4 text-white text-xs" />
+                      <Icon name="ki-information-4" className="text-white text-xs" />
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[130px]">
-                  <i className="ki-filled ki-document text-muted-foreground text-sm shrink-0" />
+                  <Icon name="ki-document" className="text-muted-foreground text-sm shrink-0" />
                   <div className="min-w-0">
                     <div className="text-[11px] text-foreground truncate">{f.name}</div>
                     <div className="text-[10px] text-muted-foreground">{fmtSize(f.size)}</div>
@@ -229,7 +230,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
                 className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-foreground/80 text-background rounded-full
                            flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
               >
-                <i className="ki-filled ki-cross text-[9px]" />
+                <Icon name="ki-cross" className="text-[9px]" />
               </button>
             </div>
           ))}
@@ -240,7 +241,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
               className="w-14 h-14 rounded-lg border border-dashed border-border text-muted-foreground/60
                          hover:border-orange-300 hover:text-orange-400 transition-colors flex items-center justify-center"
             >
-              <i className="ki-filled ki-plus text-lg" />
+              <Icon name="ki-plus" className="text-lg" />
             </button>
           )}
         </div>
@@ -261,7 +262,7 @@ export default function QuickNoteWidget({ userId, onSaved }: QuickNoteWidgetProp
                        text-muted-foreground hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500
                        transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <i className="ki-filled ki-paper-clip text-[14px]" />
+            <Icon name="ki-paper-clip" className="text-[14px]" />
           </button>
           {files.length === 0 && content.length === 0 && (
             <span className="text-[11px] text-muted-foreground/60 truncate hidden sm:block">

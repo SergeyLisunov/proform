@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { listOrgRecommendations, CATEGORY_META, SEVERITY_META, type OrgRecommendationView } from '@/services/recommendations.service'
 import { createClient } from '@/lib/supabase/client'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
   const [recs, setRecs]       = useState<OrgRecommendationView[]>([])
@@ -60,7 +61,7 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
   if (recs.length === 0) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border bg-emerald-50/30 p-6 text-center">
-        <i className="ki-filled ki-check-circle text-3xl text-emerald-500 mb-2 block" />
+        <Icon name="ki-check-circle" className="text-3xl text-emerald-500 mb-2 block" />
         <p className="text-sm font-semibold text-foreground">Активных медицинских рекомендаций нет</p>
         <p className="text-xs text-muted-foreground mt-1">Пациенты в норме.</p>
       </div>
@@ -95,7 +96,7 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
             <div key={r.id} className="flex items-start gap-3 px-5 py-3">
               <div className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center"
                 style={{ background: sev.bg, border: `1px solid ${sev.border}`, color: sev.color }}>
-                <i className={`ki-filled ${cat.icon} text-sm`} />
+                <Icon name={cat.icon} className="text-sm" />
               </div>
 
               <div className="min-w-0 flex-1">
@@ -122,7 +123,7 @@ export default function OrgRecommendationsStream({ orgId }: { orgId: string }) {
                   <div className="mt-0.5 text-[12px] text-foreground/90 truncate">{r.title}</div>
                 ) : (
                   <div className="mt-0.5 inline-flex items-center gap-1 text-[12px] italic text-muted-foreground">
-                    <i className="ki-filled ki-lock-2 text-[12px]" /> содержание скрыто (не org_full visibility)
+                    <Icon name="ki-lock-2" className="text-[12px]" /> содержание скрыто (не org_full visibility)
                   </div>
                 )}
                 <div className="mt-1 text-[10px] text-muted-foreground">

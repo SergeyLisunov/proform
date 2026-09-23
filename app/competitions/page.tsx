@@ -9,6 +9,7 @@ import {
   EVENT_TYPES, type CalendarEvent, type EventType,
 } from '@/services/calendar.service'
 import { Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function parseLocalDate(s: string | null | undefined): Date {
   // Calendar events from the DB allow nullable event_date; treat null as
@@ -147,7 +148,7 @@ function CompetitionDrawer({
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: '#FEF0E7', border: '1px solid #FBC1A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ki-filled ki-medal-star" style={{ color: '#F35703', fontSize: 16 }} />
+              <Icon name="ki-medal-star" style={{ color: '#F35703', fontSize: 16 }} />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>Соревнование</p>
@@ -159,11 +160,11 @@ function CompetitionDrawer({
           <div style={{ display: 'flex', gap: 6 }}>
             {mode === 'view' && competition && (
               <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline" style={{ gap: 6 }}>
-                <i className="ki-filled ki-pencil" style={{ fontSize: 12 }} />Изменить
+                <Icon name="ki-pencil" style={{ fontSize: 12 }} />Изменить
               </button>
             )}
             <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross" style={{ fontSize: 14 }} />
+              <Icon name="ki-cross" style={{ fontSize: 14 }} />
             </button>
           </div>
         </div>
@@ -173,7 +174,7 @@ function CompetitionDrawer({
           {mode === 'view' && competition && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ padding: 16, borderRadius: 14, background: '#FEF0E7', border: '1px solid #FBC1A0' }}>
-                <div style={{ lineHeight: 1 }}><i className="ki-filled ki-medal-star" style={{ fontSize: 28, color: '#F35703' }} /></div>
+                <div style={{ lineHeight: 1 }}><Icon name="ki-medal-star" style={{ fontSize: 28, color: '#F35703' }} /></div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 700, color: 'var(--foreground)' }}>{competition.title}</div>
                 <div style={{ marginTop: 4, fontSize: 13, color: 'var(--muted-foreground)' }}>{fmtDate(competition.event_date)}</div>
               </div>
@@ -195,7 +196,7 @@ function CompetitionDrawer({
                 </div>
               ) : (
                 <button onClick={() => setConfirmDelete(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, border: '1.5px solid #FECACA', background: '#FEF2F2', color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
-                  <i className="ki-filled ki-trash" style={{ fontSize: 14 }} />Удалить
+                  <Icon name="ki-trash" style={{ fontSize: 14 }} />Удалить
                 </button>
               )}
             </div>
@@ -206,7 +207,7 @@ function CompetitionDrawer({
             <>
               {error && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, marginBottom: 16, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 13, color: '#DC2626' }}>
-                  <i className="ki-filled ki-information-4" style={{ color: '#EF4444', flexShrink: 0 }} />{error}
+                  <Icon name="ki-information-4" style={{ color: '#EF4444', flexShrink: 0 }} />{error}
                 </div>
               )}
               <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -327,7 +328,7 @@ function CompetitionsContent() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
-                    <i className="ki-filled ki-medal-star text-base" />
+                    <Icon name="ki-medal-star" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Всего</p>
@@ -339,7 +340,7 @@ function CompetitionsContent() {
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
-                    <i className="ki-filled ki-arrow-up text-base" />
+                    <Icon name="ki-arrow-up" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Предстоящих</p>
@@ -351,7 +352,7 @@ function CompetitionsContent() {
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-600">
-                    <i className="ki-filled ki-arrow-down text-base" />
+                    <Icon name="ki-arrow-down" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Прошедших</p>
@@ -368,11 +369,11 @@ function CompetitionsContent() {
                 onClick={() => setShowCreate(true)}
                 className="kt-btn kt-btn-primary gap-2"
               >
-                <i className="ki-filled ki-plus text-xs" />
+                <Icon name="ki-plus" className="text-xs" />
                 Добавить старт
               </button>
               <Link href="/calendar" className="kt-btn kt-btn-outline gap-2 no-underline justify-center">
-                <i className="ki-filled ki-calendar text-xs" />
+                <Icon name="ki-calendar" className="text-xs" />
                 Календарь
               </Link>
             </div>
@@ -412,7 +413,7 @@ function CompetitionsContent() {
                   <div className="mt-0.5 text-2xs text-muted-foreground">{fmtDate(c.event_date)}</div>
                   {c.notes && <div className="mt-1 truncate text-[11px] text-muted-foreground">{c.notes}</div>}
                 </div>
-                <i className="ki-filled ki-right text-xs text-orange-400 opacity-0 transition-opacity group-hover:opacity-100" />
+                <Icon name="ki-right" className="text-xs text-orange-400 opacity-0 transition-opacity group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -444,7 +445,7 @@ function CompetitionsContent() {
                   <div className="mt-0.5 text-2xs text-muted-foreground">{fmtDate(c.event_date)}</div>
                   {c.notes && <div className="mt-1 truncate text-[11px] text-muted-foreground">{c.notes}</div>}
                 </div>
-                <i className="ki-filled ki-right text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                <Icon name="ki-right" className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -455,14 +456,14 @@ function CompetitionsContent() {
         <SurfaceFrame className="p-12">
           <div className="flex flex-col items-center text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-              <i className="ki-filled ki-medal-star text-3xl" />
+              <Icon name="ki-medal-star" className="text-3xl" />
             </div>
             <p className="mt-4 text-base font-semibold text-foreground">Нет соревнований</p>
             <p className="mt-1 max-w-xs text-sm text-muted-foreground">
               Добавьте первый старт, чтобы отслеживать результаты и готовиться к соревнованиям.
             </p>
             <button onClick={() => setShowCreate(true)} className="mt-5 kt-btn kt-btn-primary gap-2">
-              <i className="ki-filled ki-plus text-xs" />Добавить старт
+              <Icon name="ki-plus" className="text-xs" />Добавить старт
             </button>
           </div>
         </SurfaceFrame>

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import { useOrgContext } from '@/lib/hooks/useOrgContext'
+import { Icon } from '@/components/ui/Icon'
 
 // Sprint W2 Day 11 — management widgets (dynamic-loaded to avoid bloating
 // initial bundle and to keep org owners with empty data fast).
@@ -95,7 +96,7 @@ export default function OrgDashboard() {
   if (!canManage) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 pf-enter">
       <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <i className="ki-filled ki-office-bag text-2xl" style={{ color: '#2563EB' }} />
+        <Icon name="ki-office-bag" className="text-2xl" style={{ color: '#2563EB' }} />
       </div>
       <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       <p className="text-2sm text-muted-foreground">Раздел доступен владельцу клуба и его администраторам.</p>
@@ -105,7 +106,7 @@ export default function OrgDashboard() {
   if (!org) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 pf-enter">
       <div style={{ width: 56, height: 56, borderRadius: 16, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <i className="ki-filled ki-office-bag text-2xl text-slate-400" />
+        <Icon name="ki-office-bag" className="text-2xl text-slate-400" />
       </div>
       <p className="text-sm font-semibold text-foreground">Организация не найдена</p>
       <p className="text-2sm text-muted-foreground">Профиль организации не удалось загрузить.</p>
@@ -146,12 +147,12 @@ export default function OrgDashboard() {
                 <span className="text-2xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Командный центр организации</span>
                 {org.is_verified && (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 999, fontSize: 10, fontWeight: 700, background: '#EFF6FF', color: '#2563EB', border: '1px solid #BFDBFE' }}>
-                    <i className="ki-filled ki-verify text-xs" />
+                    <Icon name="ki-verify" className="text-xs" />
                     Проверено
                   </span>
                 )}
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 999, fontSize: 10, fontWeight: 700, background: '#F8FAFC', color: '#475569', border: '1px solid #E2E8F0' }}>
-                  <i className="ki-filled ki-fasten text-xs" />
+                  <Icon name="ki-fasten" className="text-xs" />
                   /{org.org_slug}
                 </span>
               </div>
@@ -171,7 +172,7 @@ export default function OrgDashboard() {
                   color: 'var(--foreground)', fontSize: 13, fontWeight: 700,
                   boxShadow: '0 8px 24px rgba(15,23,42,0.06)',
                 }}>
-                  <i className="ki-filled ki-exit-right-corner" style={{ fontSize: 13 }} />
+                  <Icon name="ki-exit-right-corner" style={{ fontSize: 13 }} />
                   Публичная страница
                 </Link>
                 <Link href="/org/wall" style={{
@@ -182,7 +183,7 @@ export default function OrgDashboard() {
                   color: 'white', fontSize: 13, fontWeight: 700,
                   boxShadow: '0 10px 24px rgba(243,87,3,0.26)',
                 }}>
-                  <i className="ki-filled ki-plus" style={{ fontSize: 14 }} />
+                  <Icon name="ki-plus" style={{ fontSize: 14 }} />
                   Новая публикация
                 </Link>
                 {/* W7 Day 37: cross-cutting activity feed */}
@@ -193,7 +194,7 @@ export default function OrgDashboard() {
                   background: 'rgba(239,246,255,0.85)',
                   color: '#1D4ED8', fontSize: 13, fontWeight: 700,
                 }}>
-                  <i className="ki-filled ki-rocket" style={{ fontSize: 14 }} />
+                  <Icon name="ki-rocket" style={{ fontSize: 14 }} />
                   Лента событий
                 </Link>
                 {/* W11 Day 54: org health snapshot one-pager */}
@@ -205,7 +206,7 @@ export default function OrgDashboard() {
                   color: 'white', fontSize: 13, fontWeight: 700,
                   boxShadow: '0 10px 24px rgba(37,99,235,0.22)',
                 }}>
-                  <i className="ki-filled ki-chart-pie-simple" style={{ fontSize: 14 }} />
+                  <Icon name="ki-chart-pie-simple" style={{ fontSize: 14 }} />
                   Health Snapshot
                 </Link>
               </div>
@@ -268,13 +269,13 @@ export default function OrgDashboard() {
                 el.style.boxShadow = 'none'
               }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: action.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <i className={`ki-filled ${action.icon} text-sm`} style={{ color: action.color }} />
+                <Icon name={action.icon} className="text-sm" style={{ color: action.color }} />
               </div>
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-foreground">{action.label}</div>
                 <div className="text-2xs text-muted-foreground mt-0.5">{action.meta}</div>
               </div>
-              <i className="ki-filled ki-right text-xs text-muted-foreground ml-auto" />
+              <Icon name="ki-right" className="text-xs text-muted-foreground ml-auto" />
             </Link>
           ))}
         </div>
@@ -298,7 +299,7 @@ export default function OrgDashboard() {
             {posts.length === 0 ? (
               <div className="px-5 py-12 text-center">
                 <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FEF0E7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                  <i className="ki-filled ki-abstract-45 text-2xl" style={{ color: '#F35703' }} />
+                  <Icon name="ki-abstract-45" className="text-2xl" style={{ color: '#F35703' }} />
                 </div>
                 <p className="text-sm font-semibold text-foreground">Публикаций пока нет</p>
                 <p className="text-2xs text-muted-foreground mt-1">Добавьте первую новость, чтобы наполнить ленту организации.</p>
@@ -314,7 +315,7 @@ export default function OrgDashboard() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {p.is_pinned && (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 7px', borderRadius: 999, background: '#FEF3C7', color: '#B45309', border: '1px solid #FDE68A', fontSize: 10, fontWeight: 700 }}>
-                          <i className="ki-filled ki-pin" style={{ fontSize: 11 }} />
+                          <Icon name="ki-pin" style={{ fontSize: 11 }} />
                           Закреплено
                         </span>
                       )}
@@ -352,7 +353,7 @@ export default function OrgDashboard() {
           {newsletters.length === 0 ? (
             <div className="px-5 py-12 text-center">
               <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                <i className="ki-filled ki-sms text-2xl" style={{ color: '#9333EA' }} />
+                <Icon name="ki-sms" className="text-2xl" style={{ color: '#9333EA' }} />
               </div>
               <p className="text-sm font-semibold text-foreground">Рассылок пока нет</p>
               <p className="text-2xs text-muted-foreground mt-1">Запустите первое сообщение, чтобы держать участников в курсе.</p>
@@ -367,7 +368,7 @@ export default function OrgDashboard() {
                 return (
                   <div key={nl.id} className="px-5 py-4 flex items-start gap-4 hover:bg-accent/30 transition-colors">
                     <div style={{ width: 42, height: 42, borderRadius: 14, background: '#FAF5FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <i className="ki-filled ki-sms text-sm" style={{ color: '#9333EA' }} />
+                      <Icon name="ki-sms" className="text-sm" style={{ color: '#9333EA' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-foreground leading-snug truncate">{nl.subject}</div>
@@ -384,7 +385,7 @@ export default function OrgDashboard() {
                     </div>
                     {nl.status === 'sent' && (
                       <Link href={`/org/newsletters/${nl.id}/stats`} style={{ color: '#2563EB', textDecoration: 'none', flexShrink: 0, marginTop: 1 }} title="Статистика">
-                        <i className="ki-filled ki-chart-line-up text-sm" />
+                        <Icon name="ki-chart-line-up" className="text-sm" />
                       </Link>
                     )}
                   </div>

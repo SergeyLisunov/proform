@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
 
 type Challenge = {
   id: string
@@ -241,7 +242,7 @@ export default function ChallengeDetailPage() {
                       className={`border-t border-border ${mine ? 'bg-emerald-50/60' : ''}`}
                     >
                       <td className="px-3 py-2.5 font-bold text-foreground">
-                        {i < 3 ? <i className="ki-filled ki-medal-star text-lg leading-none" style={{ color: medalColors[i] }} /> : i + 1}
+                        {i < 3 ? <Icon name="ki-medal-star" className="text-lg leading-none" style={{ color: medalColors[i] }} /> : i + 1}
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-2.5">

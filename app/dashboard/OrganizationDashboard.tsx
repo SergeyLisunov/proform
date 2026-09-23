@@ -5,6 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const OrgHeroBar       = dynamic(() => import('@/components/organization/OrgHeroBar'),       { ssr: false })
 const OrgQuickActions  = dynamic(() => import('@/components/organization/OrgQuickActions'),  { ssr: false })
@@ -88,12 +89,12 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
         </div>
         <Card className="p-10 text-center">
           <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-            <i className="ki-filled ki-office-bag text-2xl" style={{ color: '#2563EB' }} />
+            <Icon name="ki-office-bag" className="text-2xl" style={{ color: '#2563EB' }} />
           </div>
           <p className="text-sm font-semibold text-foreground">Профиль организации не заполнен</p>
           <p className="text-xs text-muted-foreground mt-1">Заполните данные, чтобы получить полноценный дашборд.</p>
           <Link href="/settings" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-semibold text-[#2563EB]">
-            <i className="ki-filled ki-setting-2" />
+            <Icon name="ki-setting-2" />
             Перейти в настройки
           </Link>
         </Card>
@@ -149,7 +150,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         {p.is_pinned && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]"><i className="ki-filled ki-pin text-[10px]" /> закреп</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]"><Icon name="ki-pin" className="text-[10px]" /> закреп</span>
                         )}
                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
                           {p.post_type}
@@ -209,7 +210,7 @@ export default function OrganizationDashboard({ userId, name }: { userId: string
           </p>
           <Link href="/org" className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-xs">
             Открыть /org
-            <i className="ki-filled ki-right text-xs" />
+            <Icon name="ki-right" className="text-xs" />
           </Link>
         </div>
       </Alert>

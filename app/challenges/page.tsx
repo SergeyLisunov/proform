@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
+import { Icon } from '@/components/ui/Icon'
 
 type Challenge = {
   id: string
@@ -260,7 +261,7 @@ export default function ChallengesPage() {
         ) : list.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-background/60 py-16 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500">
-              <i className="ki-filled ki-crown text-[20px]" />
+              <Icon name="ki-crown" className="text-[20px]" />
             </div>
             <p className="text-sm font-semibold text-foreground">Челленджей пока нет</p>
             <p className="text-2xs text-muted-foreground">

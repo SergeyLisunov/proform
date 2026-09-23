@@ -21,6 +21,7 @@ import {
   type QuestionType,
   type Urgency,
 } from '@/services/doctor-inquiries.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface AskDoctorButtonProps {
   athleteId:   string
@@ -39,7 +40,7 @@ export default function AskDoctorButton({ athleteId, athleteName, className, onS
         className={className
           ?? 'inline-flex items-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 px-3.5 py-2 text-xs font-semibold transition'}
       >
-        <i className="ki-filled ki-message-question text-sm" />
+        <Icon name="ki-message-question" className="text-sm" />
         Спросить врача
       </button>
 
@@ -118,14 +119,14 @@ function InquiryDrawer({ athleteId, athleteName, onClose, onSubmitted }: DrawerP
             </p>
           </div>
           <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-muted text-muted-foreground" aria-label="Закрыть">
-            <i className="ki-filled ki-cross text-sm" />
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
 
         {done ? (
           <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col items-center text-center gap-3">
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <i className="ki-filled ki-check-circle text-2xl" />
+              <Icon name="ki-check-circle" className="text-2xl" />
             </div>
             <h4 className="text-base font-semibold text-foreground">Запрос отправлен</h4>
             <p className="text-sm text-muted-foreground max-w-xs">

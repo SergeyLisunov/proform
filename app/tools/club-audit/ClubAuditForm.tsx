@@ -13,6 +13,7 @@
  */
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Types (mirror server) ────────────────────────────────────────────
 
@@ -267,7 +268,7 @@ export default function ClubAuditForm() {
       <section className="bg-linear-to-br from-emerald-50 via-white to-teal-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-4">
-            <i className="ki-filled ki-focus text-[11px] mr-1" />Бесплатный аудит для директоров клубов
+            <Icon name="ki-focus" className="text-[11px] mr-1" />Бесплатный аудит для директоров клубов
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
             Где теряете <span className="text-emerald-600">управляемость</span> в клубе
@@ -422,7 +423,7 @@ export default function ClubAuditForm() {
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200'
                     }`}>
-                    <i className={`ki-filled ${p.icon} text-xs mr-1`} />{p.label}
+                    <Icon name={p.icon} className="text-xs mr-1" />{p.label}
                   </button>
                 )
               })}
@@ -448,7 +449,7 @@ export default function ClubAuditForm() {
       {report && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
           <div className="rounded-2xl border border-emerald-200 bg-linear-to-br from-emerald-50/40 to-white p-5 md:p-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-4 inline-flex items-center gap-2"><i className="ki-filled ki-clipboard" />Audit-отчёт</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4 inline-flex items-center gap-2"><Icon name="ki-clipboard" />Audit-отчёт</h2>
 
             {/* Health score hero */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
@@ -471,7 +472,7 @@ export default function ClubAuditForm() {
                 <p className="text-sm text-slate-800 leading-relaxed">{report.summary}</p>
                 {report.estimated_revenue_at_risk && (
                   <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800">
-                    <i className="ki-filled ki-dollar text-sm" />{report.estimated_revenue_at_risk}
+                    <Icon name="ki-dollar" className="text-sm" />{report.estimated_revenue_at_risk}
                   </div>
                 )}
               </div>
@@ -498,13 +499,13 @@ export default function ClubAuditForm() {
                       <p className="text-[13px] text-slate-700 mb-2"><strong className="text-slate-900">Сейчас:</strong> {r.current_state}</p>
                       <p className="text-[13px] text-slate-700"><strong className="text-slate-900">Действие:</strong> {r.recommended_action}</p>
                       {r.proform_helps_with && (
-                        <p className="mt-2 text-[12px] text-emerald-700 italic inline-flex items-center gap-1.5"><i className="ki-filled ki-information-2 not-italic" />{r.proform_helps_with}</p>
+                        <p className="mt-2 text-[12px] text-emerald-700 italic inline-flex items-center gap-1.5"><Icon name="ki-information-2" className="not-italic" />{r.proform_helps_with}</p>
                       )}
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-xs">
-                          <i className="ki-filled ki-lock-2" />email откроет полный отчёт
+                          <Icon name="ki-lock-2" />email откроет полный отчёт
                         </span>
                       </div>
                     )}
@@ -519,7 +520,7 @@ export default function ClubAuditForm() {
                 {report.top_3_priorities.length > 0 && (
                   <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 mb-3">
                     <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-800 mb-2">
-                      <i className="ki-filled ki-focus" />Top-3 приоритеты на 30 дней
+                      <Icon name="ki-focus" />Top-3 приоритеты на 30 дней
                     </div>
                     <ol className="space-y-1.5 text-sm text-slate-800">
                       {report.top_3_priorities.map((p, i) => (
@@ -543,7 +544,7 @@ export default function ClubAuditForm() {
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/40">
                 <p className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 mb-2.5">
-                  <i className="ki-filled ki-lock-2" />Открыть полный audit-отчёт ({report.risk_areas.length} risk areas + Top-3 приоритеты + Next Steps)
+                  <Icon name="ki-lock-2" />Открыть полный audit-отчёт ({report.risk_areas.length} risk areas + Top-3 приоритеты + Next Steps)
                 </p>
                 <input type="email" required placeholder="director@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
@@ -564,7 +565,7 @@ export default function ClubAuditForm() {
             {phase === 'submitted' && (
               <div className="mt-5 p-4 rounded-xl border border-green-200 bg-green-50">
                 <p className="inline-flex items-center gap-1.5 text-sm font-bold text-green-800">
-                  <i className="ki-filled ki-check-circle" />Полный отчёт открыт выше.
+                  <Icon name="ki-check-circle" />Полный отчёт открыт выше.
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите видеть эти метрики автоматически в реальном времени?
@@ -586,15 +587,15 @@ export default function ClubAuditForm() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как считается health score</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-chart-simple" />Churn rate</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-chart-simple" />Churn rate</div>
               Если &gt;15% за 90 дней → -18 points. &gt;30% → -30. Retention — главный driver.
             </div>
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-element-equal" />Coach load</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-element-equal" />Coach load</div>
               Sweet-spot 12-15 атлетов на тренера. Перегруз (&gt;25) и недозагрузка (&lt;5) одинаково плохи.
             </div>
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-setting-2" />Tracking methods</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-setting-2" />Tracking methods</div>
               Paper / WhatsApp / none = высокий риск потери данных. Single источник истины снимает 70% хаоса.
             </div>
           </div>

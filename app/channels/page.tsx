@@ -20,6 +20,7 @@ import {
   markChannelRead, canPostToChannel, toggleCongrats,
   CHANNEL_ICON, type MyChannel, type ChannelPost,
 } from '@/services/club-channels.service'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtWhen(iso: string): string {
   const d = new Date(iso)
@@ -112,7 +113,7 @@ export default function ChannelsPage() {
   if (!me || channels.length === 0) {
     return (
       <div className="pf-enter mx-auto max-w-3xl px-4 py-12 text-center">
-        <i className="ki-filled ki-messages mb-3 block text-3xl text-muted-foreground" />
+        <Icon name="ki-messages" className="mb-3 block text-3xl text-muted-foreground" />
         <h1 className="text-lg font-bold text-navy-500">Каналы клуба</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Каналы появятся, когда вы состоите в клубе (или ваш ребёнок занимается в секции).
@@ -141,7 +142,7 @@ export default function ChannelsPage() {
         <Card className="flex min-h-[480px] flex-col overflow-hidden">
           {active && (
             <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
-              <i className={`ki-filled ${CHANNEL_ICON[active.key]} text-base text-orange-500`} />
+              <Icon name={CHANNEL_ICON[active.key]} className="text-base text-orange-500" />
               <h2 className="text-sm font-bold text-navy-500">{active.title}</h2>
               <span className="ml-auto text-2xs text-muted-foreground">
                 {active.kind === 'broadcast' ? 'объявления' : 'обсуждение'}
@@ -161,7 +162,7 @@ export default function ChannelsPage() {
             ) : posts.map(p => (
               <div key={p.id} className={`px-5 py-3.5 ${p.is_pinned ? 'bg-warning/5' : ''}`}>
                 <div className="mb-1 flex items-center gap-2 text-2xs text-muted-foreground">
-                  {p.is_pinned && <i className="ki-filled ki-pin text-[10px] text-warning" />}
+                  {p.is_pinned && <Icon name="ki-pin" className="text-[10px] text-warning" />}
                   <span className="font-semibold text-foreground">
                     {p.kind === 'system_record' ? 'Sporteo' : p.author_name ?? 'Участник'}
                   </span>
@@ -182,7 +183,7 @@ export default function ChannelsPage() {
                         : 'border-border text-muted-foreground hover:bg-muted'
                     }`}
                   >
-                    <i className="ki-filled ki-like text-[11px]" />
+                    <Icon name="ki-like" className="text-[11px]" />
                     {p.reacted_by_me ? 'Поздравили' : 'Поздравить'}
                   </button>
                   {p.my_post_congrats !== null && p.my_post_congrats > 0 && (
@@ -238,7 +239,7 @@ function ChannelGroup({ title, items, activeId, onSelect }: {
             ch.id === activeId ? 'bg-orange-50 font-semibold text-orange-700' : 'hover:bg-muted/50'
           }`}
         >
-          <i className={`ki-filled ${CHANNEL_ICON[ch.key]} text-sm ${ch.id === activeId ? 'text-orange-500' : 'text-muted-foreground'}`} />
+          <Icon name={CHANNEL_ICON[ch.key]} className={`text-sm ${ch.id === activeId ? 'text-orange-500' : 'text-muted-foreground'}`} />
           <span className="min-w-0 flex-1 truncate">{ch.title}</span>
           {ch.unread > 0 && (
             <span className="rounded-full bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white">

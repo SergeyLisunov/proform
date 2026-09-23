@@ -8,6 +8,7 @@ import { getNewsletter, getNewsletterStats } from '@/services/newsletter.service
 import type { Newsletter, NewsletterStats } from '@/types/org.types'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 function formatDate(value: string | null, options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }) {
   if (!value) return '—'
@@ -73,7 +74,7 @@ export default function NewsletterStatsPage() {
   if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
@@ -82,7 +83,7 @@ export default function NewsletterStatsPage() {
   if (foreignOrg) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Рассылка принадлежит другому клубу</p>
         <p className="max-w-sm text-center text-2sm text-muted-foreground">
           Статистика доступна только по рассылкам того клуба, которым вы управляете.
@@ -97,7 +98,7 @@ export default function NewsletterStatsPage() {
   if (!newsletter) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-information-4 text-3xl text-slate-400" />
+        <Icon name="ki-information-4" className="text-3xl text-slate-400" />
         <p className="text-sm font-semibold text-foreground">Рассылка не найдена</p>
       </div>
     )
@@ -121,7 +122,7 @@ export default function NewsletterStatsPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <Link href="/org/newsletters" className="mb-4 inline-flex items-center gap-2 text-2sm text-muted-foreground transition-colors hover:text-foreground">
-                <i className="ki-filled ki-left text-xs" />
+                <Icon name="ki-left" className="text-xs" />
                 К рассылкам
               </Link>
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -172,7 +173,7 @@ export default function NewsletterStatsPage() {
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
                 style={{ background: c.bg }}
               >
-                <i className={`ki-filled ${c.icon} text-base`} style={{ color: c.color }} />
+                <Icon name={c.icon} className="text-base" style={{ color: c.color }} />
               </div>
             </div>
           </Card>

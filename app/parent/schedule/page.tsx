@@ -17,6 +17,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface ChildLink {
   child_id: string
@@ -168,7 +169,7 @@ export default async function ParentSchedulePage() {
       {days.length === 0 ? (
         <Card className="rounded-[28px] p-12 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-400 shadow-xs">
-            <i className="ki-filled ki-calendar text-3xl" />
+            <Icon name="ki-calendar" className="text-3xl" />
           </div>
           <h2 className="mt-5 text-lg font-semibold text-foreground">Ближайших событий нет</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -199,7 +200,7 @@ export default async function ParentSchedulePage() {
                         {activityChip(ev.activity_type)}
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        <i className="ki-filled ki-user mr-1 text-[10px]" />
+                        <Icon name="ki-user" className="mr-1 text-[10px]" />
                         {ev.child_name}
                       </span>
                     </div>

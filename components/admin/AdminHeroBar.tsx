@@ -1,4 +1,5 @@
 'use client'
+import { Icon } from '@/components/ui/Icon'
 
 interface AdminHeroStats {
   totalUsers: number
@@ -28,7 +29,7 @@ export default function AdminHeroBar({ stats }: { stats: AdminHeroStats }) {
       <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-5 lg:gap-8">
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-purple-700 mb-1 inline-flex items-center gap-1">
-            <i className="ki-filled ki-setting-2 text-[10px]" /> Администрирование · {today}
+            <Icon name="ki-setting-2" className="text-[10px]" /> Администрирование · {today}
           </p>
           <h1 className="pf-num text-3xl md:text-4xl text-navy-500 leading-tight">
             Обзор платформы

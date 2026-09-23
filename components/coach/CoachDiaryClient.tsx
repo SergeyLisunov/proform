@@ -16,6 +16,7 @@ import { DIARY_TEMPLATES, type DiaryTemplate } from '@/lib/coach-diary/templates
 import { DiaryHeatmap } from '@/components/coach/DiaryHeatmap'
 import { Card, Badge, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
+import { Icon } from '@/components/ui/Icon'
 
 type AthleteOpt = { id: string; name: string }
 
@@ -152,7 +153,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600">
-              <i className="ki-filled ki-notepad-edit text-[11px]" />
+              <Icon name="ki-notepad-edit" className="text-[11px]" />
               Рабочий журнал
             </span>
             <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500 mt-2">Дневник тренера</h1>
@@ -164,17 +165,17 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setAiOpen(true)}
               className="rounded-xl border border-purple-200 bg-purple-50 text-purple-700 px-4 py-2.5 text-sm font-semibold hover:bg-purple-100">
-              <i className="ki-filled ki-star text-xs mr-1" />
+              <Icon name="ki-star" className="text-xs mr-1" />
               Обзор недели (AI)
             </button>
             <Link href={pdfHref} target="_blank"
               className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold hover:bg-muted">
-              <i className="ki-filled ki-printer text-xs mr-1" />
+              <Icon name="ki-printer" className="text-xs mr-1" />
               Экспорт PDF
             </Link>
             <button onClick={() => { setCreating(true); setEditing(null); setTemplate(null) }}
               className="rounded-xl bg-orange-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-orange-600">
-              <i className="ki-filled ki-plus text-xs mr-1" />
+              <Icon name="ki-plus" className="text-xs mr-1" />
               Новая запись
             </button>
           </div>
@@ -208,7 +209,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
                 ...(active ? { boxShadow: `0 0 0 2px ${meta.color}` } : {}),
               }}>
               <div className="flex items-center gap-2">
-                <i className={`ki-filled ${meta.icon} text-lg`} style={{ color: meta.color }} />
+                <Icon name={meta.icon} className="text-lg" style={{ color: meta.color }} />
                 <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: meta.color }}>
                   {meta.label}
                 </span>
@@ -219,7 +220,7 @@ export default function CoachDiaryClient({ coachId }: { coachId: string }) {
         })}
         <Card className="p-3">
           <div className="flex items-center gap-2">
-            <i className="ki-filled ki-calendar-tick text-lg text-muted-foreground" />
+            <Icon name="ki-calendar-tick" className="text-lg text-muted-foreground" />
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Впереди</span>
           </div>
           <div className="pf-num text-2xl mt-1 text-foreground">{counts.upcoming}</div>
@@ -369,7 +370,7 @@ function FilterPill({
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 p-12 text-center">
-      <i className="ki-filled ki-notepad-edit text-5xl text-muted-foreground/40 block mb-3" />
+      <Icon name="ki-notepad-edit" className="text-5xl text-muted-foreground/40 block mb-3" />
       <h3 className="text-base font-semibold text-navy-500">Пока нет записей</h3>
       <p className="text-sm text-muted-foreground mt-1 mb-5">
         Начните вести журнал — наблюдения, разборы, планы.
@@ -403,7 +404,7 @@ function EntryCard({
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
           style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
-          <i className={`ki-filled ${meta.icon} text-lg`} />
+          <Icon name={meta.icon} className="text-lg" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -428,13 +429,13 @@ function EntryCard({
             {entry.calendar_event_id && (
               <Link href="/calendar"
                 className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200 inline-flex items-center gap-1 hover:bg-green-100">
-                <i className="ki-filled ki-calendar-tick text-[10px]" />
+                <Icon name="ki-calendar-tick" className="text-[10px]" />
                 В календаре
               </Link>
             )}
             {entry.is_shared_with_athlete && (
               <Badge variant="info" size="sm">
-                <i className="ki-filled ki-eye text-[10px]" />
+                <Icon name="ki-eye" className="text-[10px]" />
                 Видит атлет
               </Badge>
             )}
@@ -451,14 +452,14 @@ function EntryCard({
             <button onClick={onToggleShare}
               className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
               title={entry.is_shared_with_athlete ? 'Скрыть от атлета' : 'Поделиться с атлетом'}>
-              <i className={`ki-filled ${entry.is_shared_with_athlete ? 'ki-eye' : 'ki-eye-slash'} text-xs ${entry.is_shared_with_athlete ? 'text-blue-500' : 'text-muted-foreground'}`} />
+              <Icon name={entry.is_shared_with_athlete ? 'ki-eye' : 'ki-eye-slash'} className={`text-xs ${entry.is_shared_with_athlete ? 'text-blue-500' : 'text-muted-foreground'}`} />
             </button>
           )}
           <button onClick={onEdit} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost" title="Редактировать">
-            <i className="ki-filled ki-pencil text-xs text-muted-foreground" />
+            <Icon name="ki-pencil" className="text-xs text-muted-foreground" />
           </button>
           <button onClick={onDelete} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost hover:bg-red-50!" title="Удалить">
-            <i className="ki-filled ki-trash text-xs text-red-500" />
+            <Icon name="ki-trash" className="text-xs text-red-500" />
           </button>
         </div>
       </div>
@@ -504,7 +505,7 @@ function EntryCard({
             <a key={i} href={att.url} target="_blank" rel="noreferrer"
               className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 hover:border-orange-300 hover:bg-orange-50 transition-colors"
               title={att.name}>
-              <i className={`ki-filled ${att.type === 'image' ? 'ki-picture' : 'ki-document'} text-muted-foreground text-sm shrink-0`} />
+              <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
               <div className="min-w-0">
                 <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
                 <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
@@ -603,7 +604,7 @@ function AiWeeklySummaryModal({ onClose }: { onClose: () => void }) {
               <option value={30}>30 дней</option>
             </select>
             <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross text-xs" />
+              <Icon name="ki-cross" className="text-xs" />
             </button>
           </div>
         </div>
@@ -859,7 +860,7 @@ function EntryDrawer({
             </h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs" />
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -876,7 +877,7 @@ function EntryDrawer({
                     onClick={() => onPickTemplate(t)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium hover:border-orange-300 hover:bg-orange-50 transition-colors"
                     title={t.description}>
-                    <i className={`ki-filled ${t.icon} text-[11px] text-muted-foreground`} />
+                    <Icon name={t.icon} className="text-[11px] text-muted-foreground" />
                     {t.name}
                   </button>
                 ))}
@@ -895,7 +896,7 @@ function EntryDrawer({
                   <button key={t} type="button" onClick={() => setType(t)}
                     className={`rounded-lg border p-2 text-center transition-all ${on ? 'ring-2 ring-offset-1' : 'hover:-translate-y-0.5'}`}
                     style={{ background: on ? m.bg : 'transparent', borderColor: m.border, color: m.color, ...(on ? { boxShadow: `0 0 0 2px ${m.color}` } : {}) }}>
-                    <i className={`ki-filled ${m.icon} text-base`} />
+                    <Icon name={m.icon} className="text-base" />
                     <div className="text-[10px] font-semibold mt-1 leading-tight">{m.label}</div>
                   </button>
                 )
@@ -938,7 +939,7 @@ function EntryDrawer({
                       : 'border-border bg-background text-muted-foreground hover:border-orange-300 hover:text-orange-600'
                   }`}
                   title={dict.state === 'listening' ? 'Остановить запись' : 'Диктовать запись'}>
-                  <i className={`ki-filled ${dict.state === 'listening' ? 'ki-message-text-2' : 'ki-message-text-2'} text-xs`} />
+                  <Icon name={dict.state === 'listening' ? 'ki-message-text-2' : 'ki-message-text-2'} className="text-xs" />
                   {dict.state === 'listening' ? 'Слушаю…' : 'Диктовать'}
                 </button>
               )}
@@ -1091,7 +1092,7 @@ function EntryDrawer({
           {type === 'schedule' && (
             <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4]/60 p-3 space-y-3">
               <div className="flex items-center gap-2">
-                <i className="ki-filled ki-calendar-tick text-[#16A34A]" />
+                <Icon name="ki-calendar-tick" className="text-[#16A34A]" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#15803D]">
                   Попадает в календарь автоматически
                 </p>
@@ -1145,7 +1146,7 @@ function EntryDrawer({
                       className="w-16 h-16 rounded-lg object-cover border border-border" />
                   ) : (
                     <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[180px]">
-                      <i className="ki-filled ki-document text-muted-foreground text-sm" />
+                      <Icon name="ki-document" className="text-muted-foreground text-sm" />
                       <div className="min-w-0">
                         <div className="text-[11px] truncate">{att.name}</div>
                         <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
@@ -1155,7 +1156,7 @@ function EntryDrawer({
                   <button type="button"
                     onClick={() => setAttachments(prev => prev.filter((_, x) => x !== i))}
                     className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-foreground/85 text-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i className="ki-filled ki-cross text-[9px]" />
+                    <Icon name="ki-cross" className="text-[9px]" />
                   </button>
                 </div>
               ))}
@@ -1166,7 +1167,7 @@ function EntryDrawer({
                 {uploading ? (
                   <div className="w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <i className="ki-filled ki-paper-clip text-base" />
+                  <Icon name="ki-paper-clip" className="text-base" />
                 )}
               </button>
               <input ref={fileInputRef} type="file" multiple className="hidden"
@@ -1187,7 +1188,7 @@ function EntryDrawer({
                   Атлет получит уведомление и сможет прочитать запись.
                 </div>
               </div>
-              <i className="ki-filled ki-eye text-blue-500" />
+              <Icon name="ki-eye" className="text-blue-500" />
             </label>
           )}
 

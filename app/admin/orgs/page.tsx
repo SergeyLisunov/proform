@@ -6,6 +6,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import { getAllOrgs, verifyOrg } from '@/services/org.service'
 import type { Organization } from '@/types/org.types'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const SPORT_LABELS: Record<string, string> = {
   athletics: 'Лёгкая атлетика', swimming: 'Плавание', cycling: 'Велоспорт',
@@ -76,7 +77,7 @@ export default function AdminOrgsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
-          <i className="ki-filled ki-shield-cross text-2xl text-red-400" />
+          <Icon name="ki-shield-cross" className="text-2xl text-red-400" />
         </div>
         <p className="text-sm font-semibold text-foreground">Требуются права администратора</p>
         <p className="text-2sm text-muted-foreground">У вас нет доступа к этому разделу.</p>
@@ -88,7 +89,7 @@ export default function AdminOrgsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
-          <i className="ki-filled ki-information-4 text-2xl text-red-400" />
+          <Icon name="ki-information-4" className="text-2xl text-red-400" />
         </div>
         <p className="text-sm font-semibold text-foreground">Не удалось загрузить организации</p>
         <p className="text-2sm text-muted-foreground">{loadError}</p>
@@ -183,7 +184,7 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
           <span className="text-sm font-semibold text-foreground truncate">{org.org_name}</span>
           {org.is_verified && (
             <Badge variant="info" size="sm">
-              <i className="ki-filled ki-verify text-xs" />
+              <Icon name="ki-verify" className="text-xs" />
               Проверено
             </Badge>
           )}
@@ -214,13 +215,13 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
             </>
           ) : (
             <>
-              <i className="ki-filled ki-verify text-xs" />
+              <Icon name="ki-verify" className="text-xs" />
               Верифицировать
             </>
           )}
         </button>
       ) : (
-        <span className="inline-flex items-center gap-1 text-2xs text-green-600 font-semibold shrink-0"><i className="ki-filled ki-check text-2xs" />Проверено</span>
+        <span className="inline-flex items-center gap-1 text-2xs text-green-600 font-semibold shrink-0"><Icon name="ki-check" className="text-2xs" />Проверено</span>
       )}
     </div>
   )

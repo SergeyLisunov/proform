@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 export type AlertVariant = 'primary' | 'success' | 'warning' | 'destructive' | 'info'
 
@@ -24,7 +25,7 @@ export function Alert({ children, variant = 'info', title, icon, className = '' 
   const v = VARIANT[variant]
   return (
     <div className={`kt-alert kt-alert-${variant} flex items-start gap-3 rounded-xl border px-4 py-3 ${v.wrap} ${className}`} role="alert">
-      <i className={`ki-filled ${icon ?? v.defaultIcon} kt-alert-icon mt-0.5 text-base ${v.icon}`} aria-hidden />
+      <Icon name={icon ?? v.defaultIcon} className={`kt-alert-icon mt-0.5 text-base ${v.icon}`} />
       <div className="kt-alert-content min-w-0 flex-1">
         {title && <p className="kt-alert-title text-sm font-semibold">{title}</p>}
         <div className="kt-alert-description text-xs leading-relaxed opacity-90">{children}</div>

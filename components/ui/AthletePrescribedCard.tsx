@@ -6,6 +6,7 @@ import {
   setPrescribedCompletion,
   type PrescribedWorkout,
 } from '@/services/prescribed-workouts.service'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
@@ -71,7 +72,7 @@ export default function AthletePrescribedCard({ athleteId }: { athleteId: string
               }`}>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
-                  <i className="ki-filled ki-book text-base"/>
+                  <Icon name="ki-book" className="text-base" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
@@ -91,7 +92,7 @@ export default function AthletePrescribedCard({ athleteId }: { athleteId: string
                     <div className="mt-2 flex gap-1.5">
                       <button disabled={busy[w.id]} onClick={() => handleStatus(w.id, 'completed')}
                         className="inline-flex items-center gap-1 rounded-md bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 text-[10px] font-semibold disabled:opacity-50">
-                        <i className="ki-filled ki-check text-[9px]"/>
+                        <Icon name="ki-check" className="text-[9px]" />
                         Сделано
                       </button>
                       <button disabled={busy[w.id]} onClick={() => handleStatus(w.id, 'skipped')}
@@ -105,7 +106,7 @@ export default function AthletePrescribedCard({ athleteId }: { athleteId: string
                   )}
                   {status === 'completed' && (
                     <div className="mt-2 text-[10px] font-semibold text-green-700">
-                      <i className="ki-filled ki-check-circle text-[10px] mr-1"/>
+                      <Icon name="ki-check-circle" className="text-[10px] mr-1" />
                       Отмечено выполненным
                     </div>
                   )}

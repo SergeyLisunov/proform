@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getOrgBySlug } from '@/services/org.service'
 import { getPublicWallPosts } from '@/services/wall.service'
 import type { Organization, WallPost, PostType } from '@/types/org.types'
+import { Icon } from '@/components/ui/Icon'
 
 const POST_TYPE_BADGE: Record<PostType, string> = {
   announcement: 'bg-blue-50 text-blue-600 border border-blue-200',
@@ -55,7 +56,7 @@ export default function OrgPublicPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-5 bg-background p-6">
         <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
-          <i className="ki-filled ki-office-bag text-2xl text-slate-400" />
+          <Icon name="ki-office-bag" className="text-2xl text-slate-400" />
         </div>
         <div className="text-center">
           <h1 className="pf-num text-3xl text-navy-500 mb-2">Организация не найдена</h1>
@@ -85,7 +86,7 @@ export default function OrgPublicPage() {
                 <h1 className="pf-num text-3xl text-navy-500 leading-tight">{org!.org_name}</h1>
                 {org!.is_verified && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">
-                    <i className="ki-filled ki-verify text-xs" />
+                    <Icon name="ki-verify" className="text-xs" />
                     Проверено
                   </span>
                 )}
@@ -93,13 +94,13 @@ export default function OrgPublicPage() {
               <div className="flex items-center gap-3 flex-wrap">
                 {org!.sport_type && (
                   <span className="inline-flex items-center gap-1 text-2sm text-muted-foreground">
-                    <i className="ki-filled ki-abstract-26 text-xs" />
+                    <Icon name="ki-abstract-26" className="text-xs" />
                     {SPORT_LABELS[org!.sport_type] ?? org!.sport_type}
                   </span>
                 )}
                 {org!.city && (
                   <span className="inline-flex items-center gap-1 text-2sm text-muted-foreground">
-                    <i className="ki-filled ki-geolocation text-xs" />
+                    <Icon name="ki-geolocation" className="text-xs" />
                     {org!.city}
                   </span>
                 )}
@@ -115,7 +116,7 @@ export default function OrgPublicPage() {
         {pinned.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <i className="ki-filled ki-pin text-sm text-navy-500" />
+              <Icon name="ki-pin" className="text-sm text-navy-500" />
               <h2 className="text-sm font-semibold text-navy-500 uppercase tracking-wider">Закреплено</h2>
             </div>
             <div className="flex flex-col gap-3">
@@ -163,7 +164,7 @@ function PublicPostCard({ post }: { post: WallPost }) {
             </span>
             {post.event_date && (
               <span className="text-2xs text-muted-foreground flex items-center gap-1">
-                <i className="ki-filled ki-calendar text-xs" />
+                <Icon name="ki-calendar" className="text-xs" />
                 {new Date(post.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
               </span>
             )}

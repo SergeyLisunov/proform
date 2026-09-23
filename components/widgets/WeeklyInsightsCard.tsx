@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 type Insights = {
   summary: string
@@ -41,7 +42,7 @@ export default function WeeklyInsightsCard() {
       <div className="flex items-center justify-between px-5 py-4 border-b border-indigo-100/80">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-indigo-100">
-            <i className="ki-filled ki-chart-line-up text-[14px] text-indigo-600" />
+            <Icon name="ki-chart-line-up" className="text-[14px] text-indigo-600" />
           </div>
           <h3 className="text-sm font-bold text-navy-500">Неделя в цифрах</h3>
         </div>
@@ -51,7 +52,7 @@ export default function WeeklyInsightsCard() {
           title="Пересчитать"
           className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-accent transition"
         >
-          <i className={`ki-filled ki-arrows-circle text-[12px] text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
+          <Icon name={loading ? 'animate-spin' : ''} className="text-[12px] text-muted-foreground" />
         </button>
       </div>
 
@@ -89,7 +90,7 @@ export default function WeeklyInsightsCard() {
                 <ul className="space-y-1">
                   {data.highlights.map((h, i) => (
                     <li key={i} className="flex gap-1.5 text-xs text-foreground">
-                      <i className="ki-filled ki-check-circle mt-[2px] text-[10px] text-emerald-500" />
+                      <Icon name="ki-check-circle" className="mt-[2px] text-[10px] text-emerald-500" />
                       <span>{h}</span>
                     </li>
                   ))}
@@ -103,7 +104,7 @@ export default function WeeklyInsightsCard() {
                 <ul className="space-y-1">
                   {data.warnings.map((w, i) => (
                     <li key={i} className="flex gap-1.5 text-xs text-foreground">
-                      <i className="ki-filled ki-information-2 mt-[2px] text-[10px] text-amber-500" />
+                      <Icon name="ki-information-2" className="mt-[2px] text-[10px] text-amber-500" />
                       <span>{w}</span>
                     </li>
                   ))}

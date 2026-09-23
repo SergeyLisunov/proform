@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card, Alert } from '@/components/ui/metronic'
 import Calculator from './Calculator'
+import { Icon } from '@/components/ui/Icon'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +45,7 @@ export default async function LandingAbPage() {
           href="/admin"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground no-underline transition hover:text-foreground"
         >
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           Admin
         </Link>
       </div>

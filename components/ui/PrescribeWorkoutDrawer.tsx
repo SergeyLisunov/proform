@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { prescribeWorkout } from '@/services/prescribed-workouts.service'
+import { Icon } from '@/components/ui/Icon'
 
 type Athlete = { id: string; name: string }
 
@@ -77,7 +78,7 @@ export function PrescribeWorkoutDrawer({
             <h3 className="text-lg font-semibold text-navy-500">Назначить</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 

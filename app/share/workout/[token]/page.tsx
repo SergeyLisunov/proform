@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
+import { Icon } from '@/components/ui/Icon'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -66,7 +67,7 @@ export default async function SharedWorkoutPage({
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
         <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xs">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-            <i className="ki-filled ki-lock-2 text-[22px]" />
+            <Icon name="ki-lock-2" className="text-[22px]" />
           </div>
           <h1 className="mt-4 text-xl font-bold text-navy-500">Ссылка недействительна</h1>
           <p className="mt-2 text-sm text-slate-600">
@@ -94,7 +95,7 @@ export default async function SharedWorkoutPage({
         <div className="mb-8 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-900">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 text-white">
-              <i className="ki-filled ki-abstract-26 text-[13px]" />
+              <Icon name="ki-abstract-26" className="text-[13px]" />
             </span>
             Sporteo
           </Link>
@@ -110,7 +111,7 @@ export default async function SharedWorkoutPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={data.athlete_avatar} alt="" className="h-14 w-14 object-cover" />
             ) : (
-              <i className="ki-filled ki-user text-[20px]" />
+              <Icon name="ki-user" className="text-[20px]" />
             )}
           </div>
           <div className="min-w-0 flex-1">
@@ -178,7 +179,7 @@ export default async function SharedWorkoutPage({
             className="mt-3 inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
           >
             Создать свой дневник
-            <i className="ki-filled ki-arrow-right text-[12px]" />
+            <Icon name="ki-arrow-right" className="text-[12px]" />
           </Link>
         </div>
       </div>

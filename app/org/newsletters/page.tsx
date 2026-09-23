@@ -7,6 +7,7 @@ import { useDialog } from '@/lib/hooks/useDialog'
 import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewsletter } from '@/services/newsletter.service'
 import type { Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
   draft: {
@@ -156,7 +157,7 @@ export default function OrgNewslettersPage() {
   if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
@@ -191,14 +192,14 @@ export default function OrgNewslettersPage() {
                   onClick={() => setShowCreate(true)}
                   className="inline-flex items-center gap-2 rounded-[14px] border border-violet-200 bg-[linear-gradient(135deg,#9333EA,#7C3AED)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(124,58,237,0.26)] transition-transform hover:-translate-y-0.5"
                 >
-                  <i className="ki-filled ki-plus text-sm" />
+                  <Icon name="ki-plus" className="text-sm" />
                   Новая рассылка
                 </button>
                 <Link
                   href="/org/wall"
                   className="inline-flex items-center gap-2 rounded-[14px] border border-border bg-background/80 px-4 py-2.5 text-sm font-semibold text-foreground no-underline shadow-xs transition-all hover:border-violet-200 hover:text-violet-700"
                 >
-                  <i className="ki-filled ki-abstract-45 text-sm" />
+                  <Icon name="ki-abstract-45" className="text-sm" />
                   Перейти к стене
                 </Link>
               </div>
@@ -236,7 +237,7 @@ export default function OrgNewslettersPage() {
                 <div className="mt-2 text-2xs text-muted-foreground">{item.hint}</div>
               </div>
               <div style={{ width: 44, height: 44, borderRadius: 14, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <i className={`ki-filled ${item.icon} text-base`} style={{ color: item.color }} />
+                <Icon name={item.icon} className="text-base" style={{ color: item.color }} />
               </div>
             </div>
           </Card>
@@ -278,7 +279,7 @@ export default function OrgNewslettersPage() {
           {section.items.length === 0 ? (
             <div className="rounded-[24px] border border-dashed border-border bg-accent/30 px-5 py-10 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
-                <i className="ki-filled ki-sms text-xl" />
+                <Icon name="ki-sms" className="text-xl" />
               </div>
               <div className="mt-4 text-base font-semibold text-foreground">{section.emptyMsg}</div>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -297,7 +298,7 @@ export default function OrgNewslettersPage() {
                     <div className="flex-1 min-w-0">
                       <div className="mb-2 flex items-center gap-2 flex-wrap">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold ${STATUS_META[nl.status].badge}`}>
-                          <i className={`ki-filled ${STATUS_META[nl.status].icon} text-[10px]`} />
+                          <Icon name={STATUS_META[nl.status].icon} className="text-[10px]" />
                           {STATUS_META[nl.status].label}
                         </span>
                         <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-1 text-2xs font-medium text-muted-foreground">
@@ -314,7 +315,7 @@ export default function OrgNewslettersPage() {
                           disabled={sending === nl.id}
                           className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 disabled:opacity-50"
                         >
-                          <i className={`ki-filled ${sending === nl.id ? 'ki-arrows-circle' : 'ki-paper-plane'} text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
+                          <Icon name={sending === nl.id ? 'ki-arrows-circle' : 'ki-paper-plane'} className={`text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
                           {sending === nl.id ? 'Отправка…' : 'Отправить'}
                         </button>
                       )}
@@ -323,7 +324,7 @@ export default function OrgNewslettersPage() {
                           href={`/org/newsletters/${nl.id}/stats`}
                           className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
                         >
-                          <i className="ki-filled ki-chart-line-up text-xs" />
+                          <Icon name="ki-chart-line-up" className="text-xs" />
                           Статистика
                         </Link>
                       )}
@@ -350,7 +351,7 @@ export default function OrgNewslettersPage() {
                       className="inline-flex h-8 w-8 items-center justify-center rounded-xl"
                       style={{ background: STATUS_META[nl.status].bg }}
                     >
-                      <i className={`ki-filled ${STATUS_META[nl.status].icon} text-xs`} style={{ color: STATUS_META[nl.status].accent }} />
+                      <Icon name={STATUS_META[nl.status].icon} className="text-xs" style={{ color: STATUS_META[nl.status].accent }} />
                     </span>
                   </div>
                 </Card>
@@ -374,7 +375,7 @@ export default function OrgNewslettersPage() {
                   <p className="mt-2 text-2sm text-muted-foreground">Подготовьте сообщение для атлетов, тренеров или всей организации в одном редакторе.</p>
                 </div>
                 <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                  <i className="ki-filled ki-cross text-sm" />
+                  <Icon name="ki-cross" className="text-sm" />
                 </button>
               </div>
             </div>

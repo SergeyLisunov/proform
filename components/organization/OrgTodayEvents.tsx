@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type GroupSession = {
   id: string
@@ -144,7 +145,7 @@ export default function OrgTodayEvents({ orgId }: { orgId: string }) {
                   </div>
                 </div>
                 <Badge variant="info" size="sm" className="rounded-full! shrink-0 inline-flex items-center gap-1">
-                  <i className="ki-filled ki-people text-[11px]" />
+                  <Icon name="ki-people" className="text-[11px]" />
                   {s.participantCount}
                 </Badge>
               </div>

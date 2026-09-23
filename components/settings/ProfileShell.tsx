@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useRef } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 type Tab = { id: string; label: string; icon: string; color: string }
 
@@ -45,7 +46,7 @@ export function ProfileShell(props: {
           title="Вернуться на главную"
           className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-card text-muted-foreground no-underline transition-colors hover:border-orange-400 hover:bg-orange-50 hover:text-orange-500"
         >
-          <i className="ki-filled ki-left text-[13px]" />
+          <Icon name="ki-left" className="text-[13px]" />
         </Link>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
@@ -103,7 +104,7 @@ export function ProfileShell(props: {
               }`}
               style={active ? { color: t.color } : undefined}
             >
-              <i className={`ki-filled ${t.icon} text-[14px]`} />
+              <Icon name={t.icon} className="text-[14px]" />
               <span className="whitespace-nowrap">{t.label}</span>
             </button>
           )
@@ -114,7 +115,7 @@ export function ProfileShell(props: {
       <section className="rounded-[24px] border border-border bg-card p-6 shadow-xs">
         <div className="mb-4 flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50">
-            <i className="ki-filled ki-picture text-base text-orange-500" />
+            <Icon name="ki-picture" className="text-base text-orange-500" />
           </div>
           <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
             Фото профиля
@@ -127,7 +128,7 @@ export function ProfileShell(props: {
               <img src={props.avatarUrl} alt="" className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-2xl text-muted-foreground">
-                <i className="ki-filled ki-user" />
+                <Icon name="ki-user" />
               </div>
             )}
           </div>
@@ -152,7 +153,7 @@ export function ProfileShell(props: {
                 onClick={() => fileRef.current?.click()}
                 className="flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-600 hover:bg-orange-100 disabled:opacity-50"
               >
-                <i className="ki-filled ki-picture text-xs" />
+                <Icon name="ki-picture" className="text-xs" />
                 {props.uploadingAvatar ? 'Загрузка…' : 'Выбрать файл'}
               </button>
               {props.avatarUrl && (
@@ -178,7 +179,7 @@ export function ProfileShell(props: {
           {props.saveError ? (
             <span className="text-red-600">{props.saveError}</span>
           ) : props.saved ? (
-            <span className="inline-flex items-center gap-1.5 text-emerald-600">Сохранено <i className="ki-filled ki-check" /></span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600">Сохранено <Icon name="ki-check" /></span>
           ) : (
             'Не забудьте сохранить изменения'
           )}
@@ -216,7 +217,7 @@ export function FormSection({
           className="flex h-8 w-8 items-center justify-center rounded-xl"
           style={{ background: iconBg }}
         >
-          <i className={`ki-filled ${icon} text-base`} style={{ color: iconColor }} />
+          <Icon name={icon} className="text-base" style={{ color: iconColor }} />
         </div>
         <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
           {title}

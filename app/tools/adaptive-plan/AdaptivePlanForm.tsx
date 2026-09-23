@@ -13,6 +13,7 @@
  */
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Types (mirror server-side AdaptivePlanInput / Preview) ───────────
 
@@ -325,7 +326,7 @@ export default function AdaptivePlanForm() {
       <section className="bg-linear-to-br from-blue-50 via-white to-cyan-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-4">
-            <i className="ki-filled ki-focus text-[11px]" /> Бесплатный AI-инструмент
+            <Icon name="ki-focus" className="text-[11px]" /> Бесплатный AI-инструмент
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
             Free 7-day Adaptive Plan — <span className="text-blue-600">персональный план</span> за 60 секунд
@@ -462,7 +463,7 @@ export default function AdaptivePlanForm() {
       {plan && (
         <section id="result-section" className="mx-auto max-w-5xl px-5 pb-10">
           <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50/40 to-white p-5 md:p-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2"><i className="ki-filled ki-calendar text-xl md:text-2xl" /> Ваш 7-дневный план</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2"><Icon name="ki-calendar" className="text-xl md:text-2xl" /> Ваш 7-дневный план</h2>
 
             {/* Overview + assessment */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
@@ -502,7 +503,7 @@ export default function AdaptivePlanForm() {
                       <span className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
                         style={{ background: 'white', color: meta.color, border: `1px solid ${meta.border}` }}>
                         {meta.marker.type === 'icon'
-                          ? <i className={`ki-filled ${meta.marker.icon} text-[9px]`} />
+                          ? <Icon name={meta.marker.icon} className="text-[9px]" />
                           : <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.marker.dot }} />}
                         {meta.label}
                       </span>
@@ -511,7 +512,7 @@ export default function AdaptivePlanForm() {
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
                         <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-xs">
-                          <i className="ki-filled ki-lock-2 text-[10px]" />
+                          <Icon name="ki-lock-2" className="text-[10px]" />
                         </span>
                       </div>
                     )}
@@ -531,7 +532,7 @@ export default function AdaptivePlanForm() {
                 {plan.red_flags.length > 0 && (
                   <div className="rounded-xl border border-orange-200 bg-orange-50/40 p-4">
                     <div className="text-[10px] font-bold uppercase tracking-wider text-orange-700 mb-2 flex items-center gap-1.5">
-                      <i className="ki-filled ki-information-2 text-[10px]" /> На что обратить внимание
+                      <Icon name="ki-information-2" className="text-[10px]" /> На что обратить внимание
                     </div>
                     <ul className="space-y-1 text-sm text-slate-800">
                       {plan.red_flags.map((rf, i) => (
@@ -550,7 +551,7 @@ export default function AdaptivePlanForm() {
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/40">
                 <p className="text-sm font-bold text-slate-800 mb-2.5 flex items-center gap-2">
-                  <i className="ki-filled ki-lock-2 text-sm" /> Открыть полный план (все 7 дней + логика + red flags)
+                  <Icon name="ki-lock-2" className="text-sm" /> Открыть полный план (все 7 дней + логика + red flags)
                 </p>
                 <input type="email" required placeholder="athlete@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
@@ -571,7 +572,7 @@ export default function AdaptivePlanForm() {
             {phase === 'submitted' && (
               <div className="mt-5 p-4 rounded-xl border border-green-200 bg-green-50">
                 <p className="text-sm font-bold text-green-800 flex items-center gap-2">
-                  <i className="ki-filled ki-check-circle text-sm" /> Готово! Полный план открыт выше.
+                  <Icon name="ki-check-circle" className="text-sm" /> Готово! Полный план открыт выше.
                 </p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите чтобы план обновлялся каждую неделю автоматически?
@@ -594,17 +595,17 @@ export default function AdaptivePlanForm() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как работает Adaptive Plan</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-chart-simple" /> ACWR + recovery</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><Icon name="ki-chart-simple" /> ACWR + recovery</div>
               План учитывает соотношение острой к хронической нагрузке (Gabbett, 2016)
               и среднее восстановление за 4 недели.
             </div>
             <div>
-              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-element-equal" /> Принцип балансa</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><Icon name="ki-element-equal" /> Принцип балансa</div>
               Sweet-spot структура: 1-2 hard + 2-3 moderate + 1-2 easy + 1-2 rest
               в неделю. Минимум 1 день полного отдыха.
             </div>
             <div>
-              <div className="font-bold mb-1 flex items-center gap-1.5"><i className="ki-filled ki-message-programming" /> Gemma 4</div>
+              <div className="font-bold mb-1 flex items-center gap-1.5"><Icon name="ki-message-programming" /> Gemma 4</div>
               AI читает историю, применяет правила (deload / ramp-up / sweet-spot)
               и формулирует action items по каждому дню.
             </div>

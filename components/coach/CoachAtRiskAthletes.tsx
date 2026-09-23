@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { computeCoachAthletesAcwr, ACWR_ZONE_META, type AthleteAcwr } from '@/services/acwr.service'
 import { Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface RiskRow {
   athleteId: string
@@ -139,7 +140,7 @@ export default function CoachAtRiskAthletes({ coachId }: { coachId: string }) {
     <div className="rounded-2xl border border-red-200 bg-red-50/30 p-5">
       <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <div>
-          <p className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.22em] text-red-700"><i className="ki-filled ki-information-2 text-[10px]" />Внимание</p>
+          <p className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.22em] text-red-700"><Icon name="ki-information-2" className="text-[10px]" />Внимание</p>
           <h3 className="text-base font-bold text-navy-500">Требуют вмешательства — {rows.length}</h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {summary.danger > 0 && <span>ACWR {summary.danger} · </span>}
@@ -170,7 +171,7 @@ export default function CoachAtRiskAthletes({ coachId }: { coachId: string }) {
                 ))}
               </div>
             </div>
-            <i className="ki-filled ki-arrow-right text-xs text-muted-foreground shrink-0" />
+            <Icon name="ki-arrow-right" className="text-xs text-muted-foreground shrink-0" />
           </Link>
         ))}
       </div>

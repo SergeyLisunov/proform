@@ -10,6 +10,7 @@ import {
   CYCLE_TYPE_CFG, DAY_TYPE_CFG,
   type CycleBlock, type CycleType, type CycleDay, type DayType, type UpdateCycleInput,
 } from '@/services/cycles.service'
+import { Icon } from '@/components/ui/Icon'
 
 function parseLocalDate(s: string): Date { return new Date(s + 'T00:00:00') }
 function todayISO(): string {
@@ -72,20 +73,20 @@ function DayCell({ date, day, dayType, cfg, onSelect }: {
       <div onClick={() => setOpen(v => !v)}
         style={{ aspectRatio: '1', borderRadius: 8, border: dayType ? `2px solid ${dcfg!.color}60` : '1.5px solid var(--border)', background: dayType ? dcfg!.bg : 'var(--background)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, transition: 'all 0.12s' }}>
         <span style={{ fontSize: 10, fontWeight: 600, color: dayType ? dcfg!.color : 'var(--foreground)' }}>{day}</span>
-        {dayType && <i className={`ki-filled ${dcfg!.icon}`} style={{ fontSize: 8, color: dcfg!.color }} />}
+        {dayType && <Icon name={dcfg!.icon} style={{ fontSize: 8, color: dcfg!.color }} />}
       </div>
       {open && (
         <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 200, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 140, marginTop: 4 }}>
           {(Object.entries(DAY_TYPE_CFG) as [DayType, typeof DAY_TYPE_CFG[DayType]][]).map(([key, c]) => (
             <button key={key} onClick={() => { onSelect(date, key); setOpen(false) }}
               style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 10px', borderRadius: 8, border: 'none', background: dayType === key ? c.bg : 'transparent', color: c.color, fontSize: 12, fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
-              <i className={`ki-filled ${c.icon}`} style={{ fontSize: 12, flexShrink: 0 }} />{c.label}
+              <Icon name={c.icon} style={{ fontSize: 12, flexShrink: 0 }} />{c.label}
             </button>
           ))}
           {dayType && (
             <button onClick={() => { onSelect(date, dayType); setOpen(false) }}
               style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#94A3B8', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 2, borderTop: '1px solid var(--border)' }}>
-              <i className="ki-filled ki-cross" style={{ fontSize: 10 }} />Убрать метку
+              <Icon name="ki-cross" style={{ fontSize: 10 }} />Убрать метку
             </button>
           )}
         </div>
@@ -197,7 +198,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: viewCfg.bg, border: `1px solid ${viewCfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className="ki-filled ki-abstract-26" style={{ color: viewCfg.text, fontSize: 16 }} />
+              <Icon name="ki-abstract-26" style={{ color: viewCfg.text, fontSize: 16 }} />
             </div>
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{viewCfg.label}</p>
@@ -207,11 +208,11 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           <div style={{ display: 'flex', gap: 6 }}>
             {mode === 'view' && (
               <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline" style={{ gap: 6 }}>
-                <i className="ki-filled ki-pencil" style={{ fontSize: 12 }} />Изменить
+                <Icon name="ki-pencil" style={{ fontSize: 12 }} />Изменить
               </button>
             )}
             <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross" style={{ fontSize: 14 }} />
+              <Icon name="ki-cross" style={{ fontSize: 14 }} />
             </button>
           </div>
         </div>
@@ -269,7 +270,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                       if (!count) return null
                       return (
                         <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}20` }}>
-                          <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 16, flexShrink: 0 }} />
+                          <Icon name={c.icon} style={{ color: c.color, fontSize: 16, flexShrink: 0 }} />
                           <div>
                             <div style={{ fontSize: 16, fontWeight: 700, color: c.color, fontFamily: "var(--pf-font-sans)" }}>{count}</div>
                             <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
@@ -292,7 +293,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
               ) : (
                 <button onClick={() => setConfirmDelete(true)}
                   style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, border: '1.5px solid #FECACA', background: '#FEF2F2', color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
-                  <i className="ki-filled ki-trash" style={{ fontSize: 14 }} />Удалить цикл
+                  <Icon name="ki-trash" style={{ fontSize: 14 }} />Удалить цикл
                 </button>
               )}
             </div>
@@ -361,7 +362,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {(Object.entries(DAY_TYPE_CFG) as [DayType, typeof DAY_TYPE_CFG[DayType]][]).map(([key, c]) => (
                   <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, background: c.bg, border: `1px solid ${c.color}30`, fontSize: 11, fontWeight: 600, color: c.color }}>
-                    <i className={`ki-filled ${c.icon}`} style={{ fontSize: 10 }} />{c.label}
+                    <Icon name={c.icon} style={{ fontSize: 10 }} />{c.label}
                   </span>
                 ))}
               </div>
@@ -381,7 +382,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                     if (!count) return null
                     return (
                       <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: c.bg, border: `1px solid ${c.color}25` }}>
-                        <i className={`ki-filled ${c.icon}`} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
+                        <Icon name={c.icon} style={{ color: c.color, fontSize: 14, flexShrink: 0 }} />
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: c.color }}>{count} дн.</div>
                           <div style={{ fontSize: 10, color: 'var(--muted-foreground)' }}>{c.label}</div>
@@ -399,7 +400,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
             {error && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #FECACA', fontSize: 12, color: '#DC2626' }}>
-                <i className="ki-filled ki-information-4" style={{ flexShrink: 0 }} />{error}
+                <Icon name="ki-information-4" style={{ flexShrink: 0 }} />{error}
               </div>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
@@ -416,7 +417,7 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
                   </button>
                   <button onClick={handleSave} disabled={saving}
                     style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: saving ? cfg.border : cfg.text, color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                    {saving ? 'Сохранение…' : <><i className="ki-filled ki-check" style={{ fontSize: 14 }} />Сохранить изменения</>}
+                    {saving ? 'Сохранение…' : <><Icon name="ki-check" style={{ fontSize: 14 }} />Сохранить изменения</>}
                   </button>
                 </>
               )}
@@ -516,7 +517,7 @@ function CyclesContent() {
                     <div className="h-full rounded-full" style={{ width: `${pct}%`, background: cc.text, transition: 'width 0.4s ease' }} />
                   </div>
                 </div>
-                <i className="ki-filled ki-right text-xs opacity-0 transition-opacity group-hover:opacity-100" style={{ color: cc.text }} />
+                <Icon name="ki-right" className="text-xs opacity-0 transition-opacity group-hover:opacity-100" style={{ color: cc.text }} />
               </button>
             )
           })}
@@ -542,7 +543,7 @@ function CyclesContent() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                    <i className="ki-filled ki-abstract-45 text-base" />
+                    <Icon name="ki-abstract-45" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Всего</p>
@@ -552,7 +553,7 @@ function CyclesContent() {
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
-                    <i className="ki-filled ki-abstract-26 text-base" />
+                    <Icon name="ki-abstract-26" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Активных</p>
@@ -562,7 +563,7 @@ function CyclesContent() {
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <i className="ki-filled ki-calendar text-base" />
+                    <Icon name="ki-calendar" className="text-base" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Предстоящих</p>
@@ -574,11 +575,11 @@ function CyclesContent() {
             </div>
             <div className="flex flex-col gap-3 xl:w-[200px] xl:shrink-0">
               <Link href="/calendar" className="kt-btn kt-btn-primary gap-2 no-underline justify-center">
-                <i className="ki-filled ki-calendar text-xs" />
+                <Icon name="ki-calendar" className="text-xs" />
                 Открыть календарь
               </Link>
               <Link href="/calendar#create-cycle" className="kt-btn kt-btn-outline gap-2 no-underline justify-center">
-                <i className="ki-filled ki-plus text-xs" />
+                <Icon name="ki-plus" className="text-xs" />
                 Создать цикл
               </Link>
             </div>
@@ -601,14 +602,14 @@ function CyclesContent() {
         <SurfaceFrame className="p-12">
           <div className="flex flex-col items-center text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500">
-              <i className="ki-filled ki-abstract-45 text-3xl" />
+              <Icon name="ki-abstract-45" className="text-3xl" />
             </div>
             <p className="mt-4 text-base font-semibold text-foreground">Нет циклов</p>
             <p className="mt-1 max-w-xs text-sm text-muted-foreground">
               Создайте первый тренировочный цикл в календаре, чтобы структурировать подготовку.
             </p>
             <Link href="/calendar" className="mt-5 kt-btn kt-btn-primary gap-2 no-underline">
-              <i className="ki-filled ki-calendar text-xs" />Открыть календарь
+              <Icon name="ki-calendar" className="text-xs" />Открыть календарь
             </Link>
           </div>
         </SurfaceFrame>

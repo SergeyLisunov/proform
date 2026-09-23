@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, User as UserIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { Icon } from '@/components/ui/Icon'
 
 type Step = 'parent' | 'child' | 'done'
 
@@ -128,7 +129,7 @@ export default function RegisterAsParentPage() {
           </Link>
           <Link href="/" className="flex items-center gap-2.5 no-underline">
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 shadow-md shadow-orange-500/20">
-              <i className="ki-filled ki-abstract-26 text-sm text-white" />
+              <Icon name="ki-abstract-26" className="text-sm text-white" />
             </div>
             <div className="text-right">
               <div className="pf-num text-lg text-foreground">Sporteo</div>
@@ -153,7 +154,7 @@ export default function RegisterAsParentPage() {
                     done   ? 'bg-green-500 text-white' :
                              'bg-muted text-muted-foreground',
                   ].join(' ')}>
-                    {done ? <i className="ki-filled ki-check text-[10px]" /> : i + 1}
+                    {done ? <Icon name="ki-check" className="text-[10px]" /> : i + 1}
                   </div>
                   {i < 2 && <span className="h-px w-6 bg-border" />}
                 </div>
@@ -178,7 +179,7 @@ export default function RegisterAsParentPage() {
               <form onSubmit={handleParentSubmit} className="mt-7 flex flex-col gap-4">
                 {error && (
                   <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{error}</span>
                   </div>
                 )}
@@ -257,7 +258,7 @@ export default function RegisterAsParentPage() {
               <form onSubmit={handleChildSubmit} className="mt-7 flex flex-col gap-4">
                 {error && (
                   <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <i className="ki-filled ki-information-4 mt-0.5 text-red-400" />
+                    <Icon name="ki-information-4" className="mt-0.5 text-red-400" />
                     <span>{error}</span>
                   </div>
                 )}
@@ -317,7 +318,7 @@ export default function RegisterAsParentPage() {
           {step === 'done' && (
             <div className="flex flex-col items-center gap-5 py-2 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-green-200 bg-green-50">
-                <i className="ki-filled ki-check-circle text-3xl text-green-500" />
+                <Icon name="ki-check-circle" className="text-3xl text-green-500" />
               </div>
               <div>
                 <h1 className="pf-num text-[30px] leading-none text-navy-500">Готово!</h1>

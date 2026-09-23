@@ -6,6 +6,7 @@ import {
   OT_QUESTIONS, OT_LEVEL_META, scoreOvertraining,
   type OvertrainingLevel,
 } from '@/lib/overtraining/scoring'
+import { Icon } from '@/components/ui/Icon'
 
 export default function OvertrainingQuiz() {
   const [idx, setIdx] = useState(0)
@@ -66,7 +67,7 @@ export default function OvertrainingQuiz() {
       <section className="bg-linear-to-br from-rose-50 via-white to-orange-50 border-b border-slate-200">
         <div className="mx-auto max-w-3xl px-5 py-10">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 mb-3">
-            <i className="ki-filled ki-pulse text-[11px]" />2 минуты — научный тест
+            <Icon name="ki-pulse" className="text-[11px]" />2 минуты — научный тест
           </div>
           <h1 className="text-3xl md:text-4xl font-bold leading-tight">
             Тест на перетренированность
@@ -187,7 +188,7 @@ export default function OvertrainingQuiz() {
               {!sent && result!.recommendations.length > 2 && (
                 <form onSubmit={handleSubmit} className="mt-4 p-4 rounded-xl border border-dashed border-slate-300 bg-slate-50">
                   <p className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
-                    <i className="ki-filled ki-lock-2 text-xs" />Открыть все {result!.recommendations.length} рекомендаций + PDF-чек-лист
+                    <Icon name="ki-lock-2" className="text-xs" />Открыть все {result!.recommendations.length} рекомендаций + PDF-чек-лист
                   </p>
                   <input type="email" required placeholder="you@example.com"
                     value={email} onChange={e => setEmail(e.target.value)}

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/metronic'
 import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 import { useToast } from '@/lib/hooks/useToast'
 import { checkPersonalRecords, RECORD_LABEL, formatRecordValue } from '@/services/personal-records.service'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -227,7 +228,7 @@ function FormBody({
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border"
             style={{ background: ac.bg, borderColor: ac.border }}
           >
-            <i className={`ki-filled ${ac.icon} text-base`} style={{ color: ac.text }} />
+            <Icon name={ac.icon} className="text-base" style={{ color: ac.text }} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Текущий шаблон</div>
@@ -256,7 +257,7 @@ function FormBody({
                   background: sel ? cfg.bg : 'transparent',
                 }}
               >
-                <i className={`ki-filled ${cfg.icon} text-base`} style={{ color: sel ? cfg.text : 'var(--muted-foreground)' }} />
+                <Icon name={cfg.icon} className="text-base" style={{ color: sel ? cfg.text : 'var(--muted-foreground)' }} />
                 <span className="text-[11px] font-semibold" style={{ color: sel ? cfg.text : 'var(--muted-foreground)' }}>{t}</span>
               </button>
             )
@@ -552,7 +553,7 @@ export function WorkoutAddDrawer({
             </p>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
-            <i className="ki-filled ki-cross text-sm" />
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
       </div>
@@ -766,7 +767,7 @@ export function WorkoutEditDrawer({
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border"
               style={{ background: ac.bg, borderColor: ac.border }}
             >
-              <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
+              <Icon name={ac.icon} className="text-sm" style={{ color: ac.text }} />
             </div>
             <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -781,7 +782,7 @@ export function WorkoutEditDrawer({
             </div>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
-            <i className="ki-filled ki-cross text-sm" />
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
       </div>
@@ -823,14 +824,14 @@ export function WorkoutEditDrawer({
         {mode === 'view' ? (
           <>
             <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary flex-1 justify-center gap-2">
-              <i className="ki-filled ki-pencil text-xs" /> Редактировать
+              <Icon name="ki-pencil" className="text-xs" /> Редактировать
             </button>
             {!confirmDel ? (
               <button
                 onClick={() => setConfirmDel(true)}
                 className="px-4 rounded-xl border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 transition"
               >
-                <i className="ki-filled ki-trash text-sm" />
+                <Icon name="ki-trash" className="text-sm" />
               </button>
             ) : (
               <>
@@ -1018,7 +1019,7 @@ export function CalendarEventEditDrawer({
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border"
               style={{ background: ac.bg, borderColor: ac.border }}
             >
-              <i className={`ki-filled ${ac.icon} text-sm`} style={{ color: ac.text }} />
+              <Icon name={ac.icon} className="text-sm" style={{ color: ac.text }} />
             </div>
             <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -1031,7 +1032,7 @@ export function CalendarEventEditDrawer({
             </div>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
-            <i className="ki-filled ki-cross text-sm" />
+            <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
       </div>
@@ -1079,14 +1080,14 @@ export function CalendarEventEditDrawer({
         {mode === 'view' ? (
           <>
             <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary flex-1 justify-center gap-2">
-              <i className="ki-filled ki-pencil text-xs" /> Редактировать
+              <Icon name="ki-pencil" className="text-xs" /> Редактировать
             </button>
             {!confirmDel ? (
               <button
                 onClick={() => setConfirmDel(true)}
                 className="px-4 rounded-xl border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 transition"
               >
-                <i className="ki-filled ki-trash text-sm" />
+                <Icon name="ki-trash" className="text-sm" />
               </button>
             ) : (
               <>

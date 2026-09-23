@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
 import { RECORD_LABEL, formatRecordValue, type RecordKind } from '@/services/personal-records.service'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -54,7 +55,7 @@ export default function PersonalRecordsCard({ athleteId }: { athleteId: string }
     <Card className="overflow-hidden">
       <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-          <i className="ki-filled ki-medal-star text-sm" />
+          <Icon name="ki-medal-star" className="text-sm" />
         </div>
         <div>
           <h3 className="text-sm font-bold text-navy-500">Мои рекорды</h3>
@@ -65,7 +66,7 @@ export default function PersonalRecordsCard({ athleteId }: { athleteId: string }
         {rows.map(r => (
           <div key={r.kind} className="flex flex-col gap-1 px-5 py-4">
             <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wide text-muted-foreground">
-              <i className={`ki-filled ${KIND_ICON[r.kind]} text-[11px] text-violet-500`} />
+              <Icon name={KIND_ICON[r.kind]} className="text-[11px] text-violet-500" />
               {RECORD_LABEL[r.kind]}
             </div>
             <div className="pf-num text-2xl text-foreground">{formatRecordValue(r.kind, Number(r.value))}</div>

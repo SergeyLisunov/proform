@@ -15,6 +15,7 @@ import {
   CHANNELS, type NotificationChannel, type NotificationPrefs,
 } from '@/services/notification-prefs.service'
 import TelegramLinkCard from '@/components/settings/TelegramLinkCard'
+import { Icon } from '@/components/ui/Icon'
 
 const CATEGORY_META = {
   core:          { label: 'Основные',         description: 'Регулярные сводки — выключайте если не нужно' },
@@ -74,7 +75,7 @@ export default function NotificationSettingsPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Войдите в аккаунт</p>
         <Link href="/auth/login?next=/settings/notifications" className="text-sm text-orange-600 font-semibold hover:underline">
           → Войти
@@ -121,7 +122,7 @@ export default function NotificationSettingsPage() {
                 const isBusy = saving === ch.key
                 return (
                   <label key={ch.key} className="flex items-start gap-3 rounded-xl border border-border bg-background p-3 cursor-pointer hover:bg-accent/30 transition">
-                    <i className={`ki-filled ${ch.icon} text-base text-muted-foreground mt-0.5`} />
+                    <Icon name={ch.icon} className="text-base text-muted-foreground mt-0.5" />
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold text-foreground">{ch.label}</div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">{ch.description}</div>

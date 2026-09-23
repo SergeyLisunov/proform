@@ -16,6 +16,7 @@
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -79,7 +80,7 @@ export function OrgWallFeed({ userId }: { userId: string }) {
       <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-            <i className="ki-filled ki-office-bag text-sm" />
+            <Icon name="ki-office-bag" className="text-sm" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500">Новости клуба</h3>
@@ -92,7 +93,7 @@ export function OrgWallFeed({ userId }: { userId: string }) {
           <div key={p.id} className="px-5 py-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-1.5">
-                {p.is_pinned && <i className="ki-filled ki-pin shrink-0 text-[11px] text-orange-500" />}
+                {p.is_pinned && <Icon name="ki-pin" className="shrink-0 text-[11px] text-orange-500" />}
                 <span className="truncate text-sm font-semibold text-foreground">{p.title}</span>
               </div>
               <span className="shrink-0 text-2xs text-muted-foreground">{fmtDate(p.created_at)}</span>

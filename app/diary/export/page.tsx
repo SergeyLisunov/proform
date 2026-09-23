@@ -8,6 +8,7 @@ import {
   listDiaryEntries, ENTRY_TYPE_META, RISK_LABELS, CATEGORY_LABELS, MOOD_EMOJI,
   type DiaryEntry,
 } from '@/services/coach-diary.service'
+import { Icon } from '@/components/ui/Icon'
 
 /**
  * Печатная версия дневника тренера. Открывается как обычная страница
@@ -82,7 +83,7 @@ function ExportInner() {
         </div>
         <button onClick={() => window.print()}
           className="rounded-xl bg-orange-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-orange-600">
-          <i className="ki-filled ki-printer text-xs mr-1" />
+          <Icon name="ki-printer" className="text-xs mr-1" />
           Печать / PDF
         </button>
       </div>

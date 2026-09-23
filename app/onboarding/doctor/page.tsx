@@ -27,6 +27,7 @@ import {
   loadMyOnboarding, patchMyOnboarding, markOnboardingComplete,
   type DoctorWizardData,
 } from '@/services/onboarding.service'
+import { Icon } from '@/components/ui/Icon'
 
 const ACCENT = '#7C3AED'   // violet — matches doctor role tint in /doctor/inquiries
 
@@ -191,7 +192,7 @@ export default function DoctorOnboardingPage() {
                 className={`rounded-2xl border-2 px-4 py-3 text-left transition w-full flex items-start gap-3 ${
                   sel ? 'border-violet-400 bg-violet-50' : 'border-border bg-background hover:border-violet-200'
                 }`}>
-                <i className={`ki-filled ${s.icon} text-2xl shrink-0`} />
+                <Icon name={s.icon} className="text-2xl shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold text-foreground">{s.label}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{s.hint}</div>

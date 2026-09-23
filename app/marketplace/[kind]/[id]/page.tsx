@@ -18,6 +18,7 @@ import {
   type Offering, type OfferingKind,
 } from '@/services/marketplace.service'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtPrice(cents: number, currency: string): string {
   if (cents === 0) return 'Бесплатно'
@@ -111,7 +112,7 @@ export default function OfferingDetailPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
-          <i className="ki-filled ki-information-2 text-4xl text-muted-foreground mb-3 block" />
+          <Icon name="ki-information-2" className="text-4xl text-muted-foreground mb-3 block" />
           <h2 className="text-lg font-semibold text-navy-500">Услуга не найдена</h2>
           <p className="mt-2 text-sm text-muted-foreground">Возможно, продавец отключил её или её больше нет в каталоге.</p>
           <Link href="/marketplace"
@@ -132,7 +133,7 @@ export default function OfferingDetailPage() {
       <div>
         <Link href="/marketplace"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition no-underline">
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           В каталог
         </Link>
       </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { PaywallBanner, type Plan as PlanTier } from '@/components/ui/Paywall'
 import { Card, Alert } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface Suggestion {
   workout_id: string
@@ -118,7 +119,7 @@ export default function AdaptivePlanModal({
             <h3 className="text-lg font-semibold text-navy-500">{athleteName}</h3>
           </div>
           <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs" />
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 

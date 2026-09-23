@@ -11,6 +11,7 @@ import {
 import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflicts.service'
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
 
 export function useDoctorPatients(doctorId: string | null) {
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -189,7 +190,7 @@ export function MedicalCheckupDrawer({
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новый осмотр'}</h3>
           </div>
           <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-            <i className="ki-filled ki-cross text-xs"/>
+            <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
 
@@ -302,7 +303,7 @@ export function MedicalCheckupDrawer({
           </button>
           {initial && (
             <button onClick={handleDelete} className="px-3 py-2.5 rounded-xl border border-border text-red-500 text-sm hover:bg-red-50 transition-colors">
-              <i className="ki-filled ki-trash text-xs"/>
+              <Icon name="ki-trash" className="text-xs" />
             </button>
           )}
         </div>

@@ -20,6 +20,7 @@ import {
   LEVEL_META, type SkillLevel, type OrgGroupWithCounts,
 } from '@/services/org-groups.service'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -108,7 +109,7 @@ export default function OrgTeamsPage() {
   if (!canManage || !org) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <i className="ki-filled ki-shield-cross text-3xl text-red-400" />
+        <Icon name="ki-shield-cross" className="text-3xl text-red-400" />
         <p className="text-sm font-semibold text-foreground">Требуется доступ к управлению клубом</p>
       </div>
     )
@@ -130,7 +131,7 @@ export default function OrgTeamsPage() {
           <button
             onClick={() => setShowCreate(true)}
             className="inline-flex items-center gap-2 rounded-[14px] bg-[linear-gradient(135deg,#9333EA,#7C3AED)] px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:opacity-95">
-            <i className="ki-filled ki-plus text-sm" />
+            <Icon name="ki-plus" className="text-sm" />
             Новая команда
           </button>
         </div>
@@ -140,7 +141,7 @@ export default function OrgTeamsPage() {
       {groups.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-border bg-accent/30 px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 mb-4">
-            <i className="ki-filled ki-people text-2xl" />
+            <Icon name="ki-people" className="text-2xl" />
           </div>
           <h3 className="text-lg font-semibold text-navy-500">Команд пока нет</h3>
           <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
@@ -176,7 +177,7 @@ export default function OrgTeamsPage() {
                     disabled={busyId === g.id}
                     className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0 hover:bg-red-50!"
                     title="Архивировать">
-                    <i className="ki-filled ki-archive text-xs text-red-500" />
+                    <Icon name="ki-archive" className="text-xs text-red-500" />
                   </button>
                 </div>
 
@@ -223,7 +224,7 @@ export default function OrgTeamsPage() {
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Новая команда</h3>
               <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                <i className="ki-filled ki-cross text-xs" />
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
             <div className="px-5 py-5 space-y-4">

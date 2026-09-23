@@ -12,6 +12,7 @@
  * Tooltip explains the meaning. No interactivity — display-only.
  */
 import type { CSSProperties } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 interface VerifiedBadgeProps {
   size?:     'sm' | 'md' | 'lg'
@@ -45,7 +46,7 @@ export default function VerifiedBadge({ size = 'sm', tooltip, className, style }
           ...style,
         }}
       >
-        <i className="ki-filled ki-verify text-[10px]" />
+        <Icon name="ki-verify" className="text-[10px]" />
       </span>
     )
   }
@@ -70,7 +71,7 @@ export default function VerifiedBadge({ size = 'sm', tooltip, className, style }
           ...style,
         }}
       >
-        <i className="ki-filled ki-verify text-xs" />
+        <Icon name="ki-verify" className="text-xs" />
         Verified
       </span>
     )
@@ -94,7 +95,7 @@ export default function VerifiedBadge({ size = 'sm', tooltip, className, style }
         ...style,
       }}
     >
-      <i className="ki-filled ki-verify text-[11px]" />
+      <Icon name="ki-verify" className="text-[11px]" />
       Verified
     </span>
   )

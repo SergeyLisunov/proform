@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
 import { ENTRY_TYPE_META, type DiaryEntryType } from '@/services/coach-diary.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface SharedNote {
   id: string
@@ -49,7 +50,7 @@ export default function CoachNotesCard({ athleteId }: { athleteId: string }) {
     <Card className="overflow-hidden">
       <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-          <i className="ki-filled ki-notepad-edit text-sm" />
+          <Icon name="ki-notepad-edit" className="text-sm" />
         </div>
         <div>
           <h3 className="text-sm font-bold text-navy-500">Заметки тренера</h3>
@@ -67,7 +68,7 @@ export default function CoachNotesCard({ athleteId }: { athleteId: string }) {
                     className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold"
                     style={{ color: meta.color, backgroundColor: meta.bg, border: `1px solid ${meta.border}` }}
                   >
-                    <i className={`ki-filled ${meta.icon} text-[10px]`} />
+                    <Icon name={meta.icon} className="text-[10px]" />
                     {meta.label}
                   </span>
                 )}

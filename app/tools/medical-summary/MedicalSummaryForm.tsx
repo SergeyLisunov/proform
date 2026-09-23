@@ -16,6 +16,7 @@
  */
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Types (mirror server) ────────────────────────────────────────────
 
@@ -255,7 +256,7 @@ export default function MedicalSummaryForm() {
       <section className="bg-linear-to-br from-violet-50 via-white to-fuchsia-50 border-b border-slate-200">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-violet-700 mb-4">
-            <i className="ki-filled ki-pulse text-[11px]" />
+            <Icon name="ki-pulse" className="text-[11px]" />
             Бесплатный инструмент для sport medicine
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
@@ -274,7 +275,7 @@ export default function MedicalSummaryForm() {
 
           {/* Persistent disclaimer */}
           <div className="mt-6 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900 leading-relaxed">
-            <strong className="inline-flex items-center gap-1.5"><i className="ki-filled ki-information-4 text-xs" /> AI-сгенерированный draft, НЕ диагноз.</strong> Этот инструмент создаёт structured template для clinical reference только.
+            <strong className="inline-flex items-center gap-1.5"><Icon name="ki-information-4" className="text-xs" /> AI-сгенерированный draft, НЕ диагноз.</strong> Этот инструмент создаёт structured template для clinical reference только.
             Все clinical decisions должны быть приняты licensed practitioner после полной evaluation.
             Не используйте автономно для acute / emergency situations — direct medical attention.
           </div>
@@ -477,19 +478,19 @@ export default function MedicalSummaryForm() {
           <div className="rounded-2xl border border-violet-200 bg-linear-to-br from-violet-50/40 to-white p-5 md:p-6">
             {/* Disclaimer at top */}
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 mb-5 text-xs text-amber-900 leading-relaxed">
-              <strong className="inline-flex items-center gap-1.5"><i className="ki-filled ki-information-4 text-xs" /> AI-generated draft. NOT a diagnosis.</strong> Все clinical decisions требуют review licensed practitioner.
+              <strong className="inline-flex items-center gap-1.5"><Icon name="ki-information-4" className="text-xs" /> AI-generated draft. NOT a diagnosis.</strong> Все clinical decisions требуют review licensed practitioner.
               Confidence level отчёта: <strong>{summary.confidence.toUpperCase()}</strong>
               {summary.confidence === 'low' && ' — низкая уверенность из-за ограниченной info; рассмотрите дополнительные findings.'}
             </div>
 
-            <h2 className="text-xl md:text-2xl font-bold mb-4 inline-flex items-center gap-2"><i className="ki-filled ki-clipboard text-xl" /> Assessment Template</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4 inline-flex items-center gap-2"><Icon name="ki-clipboard" className="text-xl" /> Assessment Template</h2>
 
             {/* Triage hero */}
             <div className="rounded-2xl border-2 p-5 mb-5"
               style={{ background: TRIAGE_META[summary.triage].bg, borderColor: TRIAGE_META[summary.triage].color }}>
               <div className="flex items-start gap-4">
                 <div className="text-4xl" style={{ color: TRIAGE_META[summary.triage].color }}>
-                  <i className={`ki-filled ${TRIAGE_META[summary.triage].icon}`} />
+                  <Icon name={TRIAGE_META[summary.triage].icon} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: TRIAGE_META[summary.triage].color }}>
@@ -507,7 +508,7 @@ export default function MedicalSummaryForm() {
             {/* Red flags (if any) */}
             {summary.red_flags.length > 0 && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-4 mb-5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-red-800 mb-2 inline-flex items-center gap-1.5"><i className="ki-filled ki-notification-bing text-xs" /> Red flags identified</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-red-800 mb-2 inline-flex items-center gap-1.5"><Icon name="ki-notification-bing" className="text-xs" /> Red flags identified</h3>
                 <ul className="space-y-1.5 text-sm text-red-900">
                   {summary.red_flags.map((rf, i) => (
                     <li key={i} className="flex gap-2">
@@ -520,7 +521,7 @@ export default function MedicalSummaryForm() {
             )}
 
             {/* Differential */}
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 inline-flex items-center gap-1.5"><i className="ki-filled ki-message-programming text-sm" /> Differential considerations</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 inline-flex items-center gap-1.5"><Icon name="ki-message-programming" className="text-sm" /> Differential considerations</h3>
             <div className="space-y-2 mb-5">
               {summary.differential.map((d, i) => {
                 const meta = LIKELIHOOD_META[d.likelihood]
@@ -540,7 +541,7 @@ export default function MedicalSummaryForm() {
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
                         <span className="text-[11px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-xs inline-flex items-center gap-1.5">
-                          <i className="ki-filled ki-lock-2 text-[11px]" />
+                          <Icon name="ki-lock-2" className="text-[11px]" />
                           email откроет
                         </span>
                       </div>
@@ -553,7 +554,7 @@ export default function MedicalSummaryForm() {
             {/* Recommended next steps */}
             {showFullReport && (
               <>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 inline-flex items-center gap-1.5"><i className="ki-filled ki-pulse text-sm" /> Recommended next steps</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 inline-flex items-center gap-1.5"><Icon name="ki-pulse" className="text-sm" /> Recommended next steps</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
                   {summary.recommended_next_steps.imaging_suggested && (
                     <NextStepCard label="Imaging" value={summary.recommended_next_steps.imaging_suggested} />
@@ -568,7 +569,7 @@ export default function MedicalSummaryForm() {
                 {/* Patient education */}
                 {summary.patient_education.length > 0 && (
                   <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 mb-5">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-blue-800 mb-2 inline-flex items-center gap-1.5"><i className="ki-filled ki-book text-xs" /> Patient education points</h3>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-blue-800 mb-2 inline-flex items-center gap-1.5"><Icon name="ki-book" className="text-xs" /> Patient education points</h3>
                     <ul className="space-y-1.5 text-sm text-slate-800">
                       {summary.patient_education.map((p, i) => (
                         <li key={i} className="flex gap-2">
@@ -593,7 +594,7 @@ export default function MedicalSummaryForm() {
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-violet-300 bg-violet-50/40">
                 <p className="text-sm font-bold text-slate-800 mb-2.5 inline-flex items-center gap-1.5">
-                  <i className="ki-filled ki-lock-2 text-sm" />
+                  <Icon name="ki-lock-2" className="text-sm" />
                   Открыть полный assessment ({summary.differential.length} differential + next steps + patient education)
                 </p>
                 <input type="email" required placeholder="doctor@example.com"
@@ -614,7 +615,7 @@ export default function MedicalSummaryForm() {
 
             {phase === 'submitted' && (
               <div className="mt-5 p-4 rounded-xl border border-green-200 bg-green-50">
-                <p className="text-sm font-bold text-green-800 inline-flex items-center gap-1.5"><i className="ki-filled ki-check text-sm" /> Полный assessment template открыт выше.</p>
+                <p className="text-sm font-bold text-green-800 inline-flex items-center gap-1.5"><Icon name="ki-check" className="text-sm" /> Полный assessment template открыт выше.</p>
                 <p className="mt-1 text-xs text-green-700">
                   Хотите вести медицинскую документацию атлетов в одной системе?
                   Sporteo для врачей: structured recommendations с visibility levels (athlete only / coach only / org_full),
@@ -636,16 +637,16 @@ export default function MedicalSummaryForm() {
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как работает Medical Summary Demo</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-notification-bing text-sm" /> Triage cascading rules</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-notification-bing" className="text-sm" /> Triage cascading rules</div>
               Pain ≥9 OR red-flag keywords (chest pain, syncope) → red_flag.
               Triple-positive exam → urgent_referral. Acute load increase → restricted.
             </div>
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-message-programming text-sm" /> Differential weighting</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-message-programming" className="text-sm" /> Differential weighting</div>
               Onset (acute / sub-acute / chronic) определяет likely categories: strain → tendinopathy → overuse pathology.
             </div>
             <div>
-              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><i className="ki-filled ki-chart-simple text-sm" /> Confidence scoring</div>
+              <div className="font-bold mb-1 inline-flex items-center gap-1.5"><Icon name="ki-chart-simple" className="text-sm" /> Confidence scoring</div>
               Уровень уверенности зависит от полноты exam findings. Низкая уверенность = recommend дополнительные tests.
             </div>
           </div>

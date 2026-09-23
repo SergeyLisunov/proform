@@ -36,6 +36,7 @@ import type {
   AssistantCapabilities, ConversationSummary, AssistantMessage, AssistantContextType,
 } from '@/lib/ai/assistant/types'
 import { RESERVED_TOP_LEVEL_SLUGS, PUBLIC_APP_SLUGS } from '@/lib/routes/reserved-slugs'
+import { Icon } from '@/components/ui/Icon'
 
 export const ASSISTANT_OPEN_EVENT = 'sporteo-assistant:open'
 
@@ -305,7 +306,7 @@ export default function FloatingAssistant() {
           className="fixed bottom-24 right-4 z-9996 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_12px_40px_rgba(243,87,3,0.45)] transition hover:scale-105 focus:outline-hidden focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 lg:bottom-6 lg:right-6"
           style={{ background: 'linear-gradient(135deg,#F35703 0%,#D44A02 60%,#7C3AED 130%)' }}
         >
-          <i className="ki-filled ki-message-question text-xl text-white" />
+          <Icon name="ki-message-question" className="text-xl text-white" />
         </button>
       )}
 
@@ -338,7 +339,7 @@ export default function FloatingAssistant() {
                   title="История диалогов"
                   aria-label="История диалогов"
                 >
-                  <i className="ki-filled ki-time text-[12px] text-white/80" />
+                  <Icon name="ki-time" className="text-[12px] text-white/80" />
                 </button>
               )}
               {(messages.length > 0 || activeConv) && !streaming && (
@@ -348,7 +349,7 @@ export default function FloatingAssistant() {
                   title="Новый диалог"
                   aria-label="Новый диалог"
                 >
-                  <i className="ki-filled ki-plus text-[12px] text-white/80" />
+                  <Icon name="ki-plus" className="text-[12px] text-white/80" />
                 </button>
               )}
               <button
@@ -357,7 +358,7 @@ export default function FloatingAssistant() {
                 title="Закрыть"
                 aria-label="Закрыть AI-помощника"
               >
-                <i className="ki-filled ki-cross text-[12px] text-white" />
+                <Icon name="ki-cross" className="text-[12px] text-white" />
               </button>
             </div>
           </div>
@@ -415,7 +416,7 @@ export default function FloatingAssistant() {
                     className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-red-50 hover:text-red-600 group-hover:flex"
                     aria-label="Удалить диалог"
                   >
-                    <i className="ki-filled ki-trash text-[11px]" />
+                    <Icon name="ki-trash" className="text-[11px]" />
                   </button>
                 </div>
               ))}
@@ -507,13 +508,13 @@ export default function FloatingAssistant() {
                     <button onClick={stop}
                       className="flex h-9 items-center gap-1.5 rounded-xl bg-slate-700 px-3 text-xs font-semibold text-white hover:bg-slate-800"
                       aria-label="Остановить генерацию">
-                      <i className="ki-filled ki-cross text-[11px]" /> Стоп
+                      <Icon name="ki-cross" className="text-[11px]" /> Стоп
                     </button>
                   ) : (
                     <button onClick={() => send(input)} disabled={!input.trim()}
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-40"
                       aria-label="Отправить">
-                      <i className="ki-filled ki-paper-plane text-[13px]" />
+                      <Icon name="ki-paper-plane" className="text-[13px]" />
                     </button>
                   )}
                 </div>

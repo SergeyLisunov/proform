@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useToast } from '@/lib/hooks/useToast'
 import { useDialog } from '@/lib/hooks/useDialog'
+import { Icon } from '@/components/ui/Icon'
 
 type Category = 'run' | 'bike' | 'swim' | 'strength' | 'other'
 type Metric = 'time' | 'distance' | 'weight' | 'reps' | 'duration' | 'power'
@@ -235,7 +236,7 @@ export default function RecordsPage() {
                     filter === c.value ? 'bg-amber-500 text-white' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <i className={`ki-filled ${c.icon}`} style={{ color: filter === c.value ? '#fff' : c.color }} />
+                  <Icon name={c.icon} style={{ color: filter === c.value ? '#fff' : c.color }} />
                   {c.label}
                 </button>
               ))}
@@ -245,7 +246,7 @@ export default function RecordsPage() {
               onClick={openNew}
               className="ml-auto rounded-full bg-amber-500 px-4 py-2 text-xs font-bold text-white hover:bg-amber-600"
             >
-              <i className="ki-filled ki-plus mr-1" />
+              <Icon name="ki-plus" className="mr-1" />
               Новый рекорд
             </button>
           </div>
@@ -282,7 +283,7 @@ export default function RecordsPage() {
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                     style={{ background: `${cat.color}18` }}
                   >
-                    <i className={`ki-filled ${cat.icon} text-[18px]`} style={{ color: cat.color }} />
+                    <Icon name={cat.icon} className="text-[18px]" style={{ color: cat.color }} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -295,7 +296,7 @@ export default function RecordsPage() {
                     onClick={() => openEdit(g.best)}
                     className="rounded-lg border border-border bg-card px-2 py-1 text-[10px] font-bold text-muted-foreground hover:bg-accent"
                   >
-                    <i className="ki-filled ki-pencil text-[10px]" />
+                    <Icon name="ki-pencil" className="text-[10px]" />
                   </button>
                 </div>
                 <div className="mt-3 flex items-end gap-2">
@@ -310,7 +311,7 @@ export default function RecordsPage() {
                           : 'border-rose-200 bg-rose-50 text-rose-700'
                       }`}
                     >
-                      <i className={`ki-filled ${delta > 0 ? 'ki-arrow-up' : 'ki-arrow-down'} mr-1`} />
+                      <Icon name={delta > 0 ? 'ki-arrow-up' : 'ki-arrow-down'} className="mr-1" />
                       {deltaPct.toFixed(1)}%
                     </span>
                   )}
@@ -338,7 +339,7 @@ export default function RecordsPage() {
                               className="rounded-sm px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
                               title="Изменить"
                             >
-                              <i className="ki-filled ki-pencil text-[10px]" />
+                              <Icon name="ki-pencil" className="text-[10px]" />
                             </button>
                             <button
                               type="button"
@@ -346,7 +347,7 @@ export default function RecordsPage() {
                               className="rounded-sm px-1.5 text-[10px] text-rose-500 hover:text-rose-700"
                               title="Удалить"
                             >
-                              <i className="ki-filled ki-cross text-[10px]" />
+                              <Icon name="ki-cross" className="text-[10px]" />
                             </button>
                           </div>
                         </li>
@@ -373,7 +374,7 @@ export default function RecordsPage() {
                 onClick={() => setEditing(null)}
                 className="rounded-full border border-border bg-card px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
               >
-                <i className="ki-filled ki-cross text-xs" />
+                <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>
 

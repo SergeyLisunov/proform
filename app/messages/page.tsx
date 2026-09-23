@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 type ChatUser = { id: string; name: string; email: string; role: string }
 type ChatType = 'direct' | 'group' | 'org_channel'
@@ -134,11 +135,11 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
               </h3>
             </div>
             <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross text-sm" />
+              <Icon name="ki-cross" className="text-sm" />
             </button>
           </div>
           <div style={{ position: 'relative' }}>
-            <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
+            <Icon name="ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..."
               style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
               onFocus={e => e.currentTarget.style.borderColor = '#F35703'}
@@ -169,7 +170,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
               {creating === u.id
                 ? <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
                 : <div style={{ width: 28, height: 28, borderRadius: 8, background: '#fef0e7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className="ki-filled ki-arrow-right text-orange-500 text-xs" />
+                    <Icon name="ki-arrow-right" className="text-orange-500 text-xs" />
                   </div>
               }
             </button>
@@ -268,7 +269,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
             ? <Avatar name={chat.other_user.name || chat.other_user.email} size={46} ring />
             : (() => { const ic = chatIcon(chat.type)!; return (
                 <div style={{ width: 46, height: 46, borderRadius: '50%', flexShrink: 0, background: ic.bg, border: `1.5px solid ${ic.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <i className={`ki-filled ${ic.icon}`} style={{ color: ic.color, fontSize: 20 }} />
+                  <Icon name={ic.icon} style={{ color: ic.color, fontSize: 20 }} />
                 </div>
               )})()
           }
@@ -289,7 +290,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
           </div>
           <button onClick={onClose}
             style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-            <i className="ki-filled ki-cross text-muted-foreground text-sm" />
+            <Icon name="ki-cross" className="text-muted-foreground text-sm" />
           </button>
         </div>
 
@@ -302,7 +303,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
           ) : messages.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: 20, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <i className="ki-filled ki-message-text-2" style={{ color, fontSize: 28 }} />
+                <Icon name="ki-message-text-2" style={{ color, fontSize: 28 }} />
               </div>
               <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--foreground)' }}>Начните диалог</div>
               <div style={{ fontSize: 13, color: 'var(--muted-foreground)', textAlign: 'center', maxWidth: 240, lineHeight: 1.5 }}>
@@ -341,7 +342,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
                           </div>
                           <div style={{ fontSize: 10, color: 'var(--muted-foreground)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 3, justifyContent: isMe ? 'flex-end' : 'flex-start', paddingLeft: isMe ? 0 : 4, paddingRight: isMe ? 4 : 0 }}>
                             {fmtTime(m.created_at)}
-                            {isMe && <i className={`ki-filled ${m.is_read ? 'ki-check-circle text-blue-400' : 'ki-check text-muted-foreground'} text-[10px]`} />}
+                            {isMe && <Icon name={m.is_read ? 'ki-check-circle text-blue-400' : 'ki-check text-muted-foreground'} className="text-[10px]" />}
                           </div>
                         </div>
                       </div>
@@ -382,7 +383,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
             }}>
             {sending
               ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              : <i className="ki-filled ki-paper-plane text-sm" style={{ color: text.trim() ? 'white' : 'var(--muted-foreground)' }} />
+              : <Icon name="ki-paper-plane" className="text-sm" style={{ color: text.trim() ? 'white' : 'var(--muted-foreground)' }} />
             }
           </button>
         </div>
@@ -437,7 +438,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
               <p style={{ fontSize: 10, fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новая группа</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать группу</h3>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <input value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="Название группы…"
             style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 14, fontWeight: 600, outline: 'none', boxSizing: 'border-box', marginBottom: 10 }}
@@ -445,7 +446,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
             onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
           />
           <div style={{ position: 'relative' }}>
-            <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
+            <Icon name="ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Найти участника…"
               style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
               onFocus={e => e.currentTarget.style.borderColor = '#9333ea'}
@@ -469,7 +470,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
                   <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{u.role === 'coach' ? 'Тренер' : u.role === 'organization' ? 'Организация' : 'Атлет'}</div>
                 </div>
                 <div style={{ width: 22, height: 22, borderRadius: 6, border: sel ? 'none' : '1.5px solid var(--border)', background: sel ? '#9333ea' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
-                  {sel && <i className="ki-filled ki-check text-white" style={{ fontSize: 11 }} />}
+                  {sel && <Icon name="ki-check" className="text-white" style={{ fontSize: 11 }} />}
                 </div>
               </button>
             )
@@ -515,7 +516,7 @@ function NewChannelModal({ currentUser, onClose, onCreated }: {
               <p style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Канал организации</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать канал</h3>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <input value={channelName} onChange={e => setChannelName(e.target.value)} placeholder="Название канала…"
             autoFocus
@@ -644,7 +645,7 @@ export default function MessengerPage() {
                 style={{ width: 40, height: 40, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', flexShrink: 0, transition: 'all 0.15s' }}
                 className="hover:bg-orange-50 hover:border-orange-200"
               >
-                <i className="ki-filled ki-arrow-left text-muted-foreground text-sm" />
+                <Icon name="ki-arrow-left" className="text-muted-foreground text-sm" />
               </Link>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2.5">
@@ -675,22 +676,22 @@ export default function MessengerPage() {
                   </div>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
-                  <i className={`ki-filled ${hasUnread ? 'ki-notification-on' : 'ki-message-text-2'} text-xl`} />
+                  <Icon name={hasUnread ? 'ki-notification-on' : 'ki-message-text-2'} className="text-xl" />
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2 flex-1 justify-center">
-                <i className="ki-filled ki-message-add text-sm" />
+                <Icon name="ki-message-add" className="text-sm" />
                 Новый чат
               </button>
               <button onClick={() => setShowNewGroup(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать группу">
-                <i className="ki-filled ki-people text-sm text-purple-600" />
+                <Icon name="ki-people" className="text-sm text-purple-600" />
                 Группа
               </button>
               {user?.role === 'organization' && (
                 <button onClick={() => setShowNewChannel(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать канал">
-                  <i className="ki-filled ki-abstract-26 text-sm text-blue-600" />
+                  <Icon name="ki-abstract-26" className="text-sm text-blue-600" />
                   Канал
                 </button>
               )}
@@ -705,7 +706,7 @@ export default function MessengerPage() {
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{activeChats}</div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-              <i className="ki-filled ki-message-text-2 text-sm" />
+              <Icon name="ki-message-text-2" className="text-sm" />
             </div>
           </div>
         </Card>
@@ -714,7 +715,7 @@ export default function MessengerPage() {
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{totalUnread}</div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-              <i className="ki-filled ki-notification-on text-sm" />
+              <Icon name="ki-notification-on" className="text-sm" />
             </div>
           </div>
         </Card>
@@ -723,14 +724,14 @@ export default function MessengerPage() {
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="pf-num text-[30px] leading-none text-foreground">{visibleChats}</div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <i className="ki-filled ki-abstract-26 text-sm" />
+              <Icon name="ki-abstract-26" className="text-sm" />
             </div>
           </div>
         </Card>
       </div>
 
       <div className="relative max-w-md">
-        <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 14 }} />
+        <Icon name="ki-magnifier" style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 14 }} />
         <input
           type="text"
           value={search}
@@ -758,7 +759,7 @@ export default function MessengerPage() {
       ) : filtered.length === 0 ? (
         <div className="rounded-[24px] border border-border bg-card px-6 py-16 text-center shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-orange-50 to-orange-100 text-3xl">
-            {search ? <i className="ki-filled ki-search-list text-orange-500 text-2xl" /> : <i className="ki-filled ki-message-text-2 text-orange-500 text-2xl" />}
+            {search ? <Icon name="ki-search-list" className="text-orange-500 text-2xl" /> : <Icon name="ki-message-text-2" className="text-orange-500 text-2xl" />}
           </div>
           <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '16px 0 6px', letterSpacing: '-0.02em' }}>
             {search ? 'Ничего не найдено' : 'Пока нет сообщений'}
@@ -768,7 +769,7 @@ export default function MessengerPage() {
           </p>
           {!search && (
             <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2">
-              <i className="ki-filled ki-plus text-sm" />
+              <Icon name="ki-plus" className="text-sm" />
               Создать первый чат
             </button>
           )}
@@ -797,7 +798,7 @@ export default function MessengerPage() {
                       {isDirect && c.other_user
                         ? <Avatar name={c.other_user.name || c.other_user.email} size={48} ring={c.unread_count > 0} />
                         : <div style={{ width: 48, height: 48, borderRadius: '50%', background: ic!.bg, border: `1.5px solid ${ic!.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <i className={`ki-filled ${ic!.icon}`} style={{ color: ic!.color, fontSize: 22 }} />
+                            <Icon name={ic!.icon} style={{ color: ic!.color, fontSize: 22 }} />
                           </div>
                       }
                       {c.unread_count > 0 && (
@@ -881,7 +882,7 @@ export default function MessengerPage() {
                             </span>
                           )}
                           <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#F35703,#D44A02)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transform: 'translateX(-4px)', transition: 'all 0.2s' }} className="group-hover:opacity-100 group-hover:translate-x-0">
-                            <i className="ki-filled ki-arrow-right text-white text-xs" />
+                            <Icon name="ki-arrow-right" className="text-white text-xs" />
                           </div>
                         </div>
                       </div>

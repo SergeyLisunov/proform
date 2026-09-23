@@ -14,6 +14,7 @@
 import Link from 'next/link'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface CoachReputationCardProps {
   isVerified:        boolean
@@ -71,7 +72,7 @@ export default function CoachReputationCard({
             <span className="pf-num text-2xl font-bold text-foreground">
               {avgRating !== null ? avgRating.toFixed(1) : '—'}
             </span>
-            {avgRating !== null && <i className="ki-solid ki-star text-amber-500" />}
+            {avgRating !== null && <Icon name="ki-star" className="text-amber-500" />}
           </div>
           <p className="text-[11px] text-muted-foreground">
             {reviewCount > 0

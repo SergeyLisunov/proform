@@ -14,6 +14,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { loadForWorkout } from '@/lib/analytics'
+import { Icon } from '@/components/ui/Icon'
 
 function sb() {
   return createBrowserClient(
@@ -91,7 +92,7 @@ export default function TrainingLoadWidget({ userId }: { userId: string }) {
       <div className="flex items-center justify-between px-5 py-4 border-b border-sky-100/80">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-xs ring-1 ring-sky-100">
-            <i className="ki-filled ki-chart-line-up text-[14px] text-sky-600" />
+            <Icon name="ki-chart-line-up" className="text-[14px] text-sky-600" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-navy-500 leading-none">Тренировочная нагрузка</h3>

@@ -12,6 +12,7 @@ import { filterSidebarForRole } from '@/lib/sidebar/config'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
 import { usePlan } from '@/lib/hooks/usePlan'
 import MobileBottomNav from './MobileBottomNav'
+import { Icon } from '@/components/ui/Icon'
 
 const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
   athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
@@ -185,7 +186,7 @@ export default function Sidebar() {
         onClick={closeMobile}
         className="lg:hidden absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-xs transition-colors hover:border-orange-200 hover:text-orange-600"
       >
-        <i className="ki-filled ki-cross text-base" />
+        <Icon name="ki-cross" className="text-base" />
       </button>
       <div
         className="kt-sidebar-header flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
@@ -272,7 +273,7 @@ export default function Sidebar() {
                                 : 'border-border/70 bg-muted/40 text-muted-foreground group-hover:border-border group-hover:bg-background group-hover:text-foreground',
                             ].join(' ')}
                           >
-                            <i className={`ki-filled ${item.icon} text-[15px]`} />
+                            <Icon name={item.icon} className="text-[15px]" />
                           </span>
 
                           <span className="kt-menu-title min-w-0 flex-1 text-[15px] leading-5 wrap-break-word">
@@ -284,7 +285,7 @@ export default function Sidebar() {
                               {badgeVal > 99 ? '99+' : badgeVal}
                             </span>
                           ) : active ? (
-                            <i className="ki-filled ki-right shrink-0 text-[12px] text-orange-400" />
+                            <Icon name="ki-right" className="shrink-0 text-[12px] text-orange-400" />
                           ) : null}
                         </Link>
                       </div>
@@ -328,7 +329,7 @@ export default function Sidebar() {
             href="/"
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground no-underline transition-all hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
           >
-            <i className="ki-filled ki-home-2 text-sm shrink-0" />
+            <Icon name="ki-home-2" className="text-sm shrink-0" />
             <span>На главную</span>
           </Link>
 
@@ -344,7 +345,7 @@ export default function Sidebar() {
               </>
             ) : (
               <>
-                <i className="ki-filled ki-exit-right text-sm shrink-0" />
+                <Icon name="ki-exit-right" className="text-sm shrink-0" />
                 <span>Выйти</span>
               </>
             )}

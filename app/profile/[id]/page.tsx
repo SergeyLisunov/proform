@@ -11,6 +11,7 @@ import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
 import AskAiButton from '@/components/assistant/AskAiButton'
+import { Icon } from '@/components/ui/Icon'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FEF0E7' },
@@ -248,7 +249,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           width: 36, height: 36, borderRadius: 10, border: '1.5px solid var(--border)',
           background: 'var(--card)', color: 'var(--muted-foreground)', cursor: 'pointer',
         }}>
-          <i className="ki-filled ki-left" style={{ fontSize: 13 }} />
+          <Icon name="ki-left" style={{ fontSize: 13 }} />
         </button>
       </div>
 
@@ -288,17 +289,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             <div style={{ display: 'flex', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
               {(profile.primary_sport || profile.sport) && (
                 <span style={{ fontSize: 12, color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <i className="ki-filled ki-abstract-26 text-[11px]" />{profile.primary_sport || profile.sport}
+                  <Icon name="ki-abstract-26" className="text-[11px]" />{profile.primary_sport || profile.sport}
                 </span>
               )}
               {profile.city && (
                 <span style={{ fontSize: 12, color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <i className="ki-filled ki-geolocation text-[11px]" />{profile.city}{profile.country ? `, ${profile.country}` : ''}
+                  <Icon name="ki-geolocation" className="text-[11px]" />{profile.city}{profile.country ? `, ${profile.country}` : ''}
                 </span>
               )}
               {profile.club && (
                 <span style={{ fontSize: 12, color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <i className="ki-filled ki-people text-[11px]" />{profile.club}
+                  <Icon name="ki-people" className="text-[11px]" />{profile.club}
                 </span>
               )}
             </div>
@@ -310,7 +311,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               {connectionStatus === 'active' ? (
                 <>
                   <Badge variant="success" size="lg">
-                    <i className="ki-filled ki-check-circle text-sm" />Связаны
+                    <Icon name="ki-check-circle" className="text-sm" />Связаны
                   </Badge>
                   {/* W6 Day 28: coach → athlete drawer to ask doctor */}
                   {user && user.role === 'coach' && profile.role === 'athlete' && (
@@ -327,7 +328,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                   background: '#FEF0E7', color: '#F35703', border: '1.5px solid #FBC1A0',
                   cursor: 'pointer',
                 }}>
-                  <i className="ki-filled ki-time text-sm" />Ожидает · Отозвать
+                  <Icon name="ki-time" className="text-sm" />Ожидает · Отозвать
                 </button>
               ) : (
                 <button onClick={handleConnect} disabled={acting} style={{
@@ -338,7 +339,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                   boxShadow: '0 3px 12px rgba(243,87,3,0.3)',
                 }}>
                   {acting ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправка…</>
-                    : <><i className="ki-filled ki-users text-sm" />Пригласить</>}
+                    : <><Icon name="ki-users" className="text-sm" />Пригласить</>}
                 </button>
               )}
             </div>
@@ -350,7 +351,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               border: '1.5px solid var(--border)', background: 'var(--card)',
               color: 'var(--foreground)', textDecoration: 'none',
             }}>
-              <i className="ki-filled ki-pencil text-sm" />Редактировать
+              <Icon name="ki-pencil" className="text-sm" />Редактировать
             </Link>
           )}
         </div>
@@ -432,7 +433,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         <Card className="p-5 flex gap-4 flex-wrap items-center">
           {profile.accepts_new_athletes === true && (
             <Badge variant="success" size="lg">
-              <i className="ki-filled ki-check-circle text-xs" /> Принимает новых атлетов
+              <Icon name="ki-check-circle" className="text-xs" /> Принимает новых атлетов
             </Badge>
           )}
           {profile.hourly_rate != null && (
@@ -455,7 +456,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
           boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
         }}>
-          <i className={`ki-filled ${toast.ok ? 'ki-check-circle' : 'ki-information-4'} text-sm`} />
+          <Icon name={toast.ok ? 'ki-check-circle' : 'ki-information-4'} className="text-sm" />
           {toast.msg}
         </div>
       )}
@@ -516,7 +517,7 @@ function SocialLink({ href, icon, label, color }: { href: string; icon: string; 
       borderRadius: 12, border: `1px solid ${color}33`, background: `${color}0D`,
       color, fontSize: 12, fontWeight: 600, textDecoration: 'none',
     }}>
-      <i className={`ki-filled ${icon} text-[12px]`} />{label}
+      <Icon name={icon} className="text-[12px]" />{label}
     </a>
   )
 }
@@ -599,7 +600,7 @@ function DoctorProfile({ profile }: { profile: Profile }) {
         <FactRow label="Стоимость консультации" value={profile.consultation_fee != null ? `${profile.consultation_fee} ${profile.currency ?? 'RUB'}` : null} />
         {profile.emergency_contact && (
           <Badge variant="destructive" size="md" className="w-fit">
-            <i className="ki-filled ki-bandage text-[11px]" /> Принимает экстренные случаи
+            <Icon name="ki-bandage" className="text-[11px]" /> Принимает экстренные случаи
           </Badge>
         )}
         {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки приёма</p><ChipRow items={langs} /></div>}

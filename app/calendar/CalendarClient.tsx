@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface Workout { id: string; event_date: string; activity_type: string | null; event_type: string; activity_strain: number | null; is_public: boolean }
 interface CycleBlock { id: string; start_date: string; end_date: string; cycle_type: string; label: string | null; color: string }
@@ -70,14 +71,14 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
             ))}
           </div>
           <button onClick={prev} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-slate-500 hover:bg-slate-50 transition bg-white">
-            <i className="ki-filled ki-left text-sm" />
+            <Icon name="ki-left" className="text-sm" />
           </button>
           <button onClick={() => { setMonth(today.getMonth()); setYear(today.getFullYear()) }}
             className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-slate-600 hover:bg-slate-50 transition bg-white">
             Сегодня
           </button>
           <button onClick={next} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-slate-500 hover:bg-slate-50 transition bg-white">
-            <i className="ki-filled ki-right text-sm" />
+            <Icon name="ki-right" className="text-sm" />
           </button>
         </div>
       </div>

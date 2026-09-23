@@ -8,6 +8,7 @@ import {
   listMyDeviceConnections, setPrimaryDevice, disconnectDevice, triggerSync,
   type DeviceConnection,
 } from '@/services/devices.service'
+import { Icon } from '@/components/ui/Icon'
 
 /**
  * Секция «Устройства» в настройках профиля. Три карточки: Garmin, Whoop,
@@ -179,7 +180,7 @@ export default function DevicesSection() {
                         setBusy(b => ({ ...b, [meta.id]: false }))
                       }}
                       className="rounded-lg bg-orange-500 text-white hover:bg-orange-600 px-2.5 py-1.5 text-[11px] font-semibold disabled:opacity-50">
-                      <i className="ki-filled ki-arrows-circle text-[10px] mr-1" />
+                      <Icon name="ki-arrows-circle" className="text-[10px] mr-1" />
                       {busy[meta.id] ? 'Синхронизация…' : 'Синхронизировать'}
                     </button>
                     <button disabled={!!busy[meta.id]}
@@ -196,7 +197,7 @@ export default function DevicesSection() {
                 ) : meta.comingSoon ? (
                   <div className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-amber-800"
                     title="Интеграция ждёт одобрения Garmin Health API Partner Program. Подключить пока нельзя — мы не показываем фейковые данные.">
-                    <i className="ki-filled ki-information-2 text-[14px]" />
+                    <Icon name="ki-information-2" className="text-[14px]" />
                     <span className="text-[12px] font-bold uppercase tracking-wider">Скоро</span>
                   </div>
                 ) : meta.connectMode === 'oauth' ? (

@@ -8,6 +8,7 @@
  *
  * Для '', 'OTHER' и неизвестных кодов — нейтральный значок геолокации.
  */
+import { Icon } from '@/components/ui/Icon'
 const FLAG_CODES = new Set(['ru', 'by', 'kz', 'ua', 'us', 'de', 'fr', 'gb'])
 
 interface CountryFlagProps {
@@ -20,10 +21,7 @@ export function CountryFlag({ code, className }: CountryFlagProps) {
   const c = (code ?? '').trim().toLowerCase()
   if (!FLAG_CODES.has(c)) {
     return (
-      <i
-        className={`ki-filled ki-geolocation text-muted-foreground ${className ?? ''}`}
-        aria-hidden="true"
-      />
+      <Icon name="ki-geolocation" className={`text-muted-foreground ${className ?? ''}`} />
     )
   }
   return (

@@ -7,6 +7,7 @@ import {
 } from '@/services/devices.service'
 import { providerMeta } from '@/lib/integrations/providers'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 function fmtSync(iso: string | null): string {
   if (!iso) return 'ещё не было'
@@ -51,7 +52,7 @@ export default function AthleteDeviceStatus({ athleteId }: { athleteId: string }
             <div className="text-sm font-semibold text-foreground">Подключите носимое устройство</div>
             <div className="text-[11px] text-muted-foreground">Garmin, WHOOP или Apple Health — метрики будут считаться сами.</div>
           </div>
-          <i className="ki-filled ki-arrow-right text-xs text-muted-foreground" />
+          <Icon name="ki-arrow-right" className="text-xs text-muted-foreground" />
         </div>
       </Link>
     )

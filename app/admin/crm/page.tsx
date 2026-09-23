@@ -9,6 +9,7 @@ import {
   AUDIT_ACTION_LABEL,
   type AuditLogEntry,
 } from '@/services/admin-audit.service'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type CRMUser = {
@@ -218,7 +219,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                 </>
               )}
             </div>
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><i className="ki-filled ki-cross text-sm" /></button>
+            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
           </div>
         </div>
 
@@ -250,7 +251,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                 ].map(s => (
                   <div key={s.label} style={{ background: 'var(--accent)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
+                      <Icon name={s.icon} className="text-sm" style={{ color: s.color }} />
                     </div>
                     <div>
                       <div className="pf-num" style={{ fontSize: 18, fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>{s.value}</div>
@@ -335,7 +336,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                   placeholder="Заметка по пользователю…"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 resize-none" />
                 <button onClick={addNote} disabled={!note.trim() || savingNote} className="kt-btn kt-btn-primary mt-2 gap-2">
-                  <i className="ki-filled ki-plus text-xs" />{savingNote ? 'Сохранение…' : 'Добавить заметку'}
+                  <Icon name="ki-plus" className="text-xs" />{savingNote ? 'Сохранение…' : 'Добавить заметку'}
                 </button>
               </div>
               {/* Notes list */}
@@ -447,7 +448,7 @@ export default function AdminCRMPage() {
           <h2 className="pf-num text-[34px] text-navy-500 leading-none">CRM</h2>
         </div>
         <button onClick={() => load()} className="kt-btn kt-btn-outline gap-2">
-          <i className="ki-filled ki-arrows-circle text-sm" />Обновить
+          <Icon name="ki-arrows-circle" className="text-sm" />Обновить
         </button>
       </div>
 
@@ -464,7 +465,7 @@ export default function AdminCRMPage() {
         ].map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-3">
             <div style={{ width: 34, height: 34, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className={`ki-filled ${s.icon} text-sm`} style={{ color: s.color }} />
+              <Icon name={s.icon} className="text-sm" style={{ color: s.color }} />
             </div>
             <div>
               <div className="pf-num" style={{ fontSize: 22, fontWeight: 800, color: 'var(--foreground)', lineHeight: 1 }}>{s.value}</div>
@@ -478,7 +479,7 @@ export default function AdminCRMPage() {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Search */}
         <div style={{ position: 'relative', flex: '1', minWidth: 200, maxWidth: 320 }}>
-          <i className="ki-filled ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
+          <Icon name="ki-magnifier" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }} />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по имени или email…"
             className="w-full rounded-xl border border-input text-sm outline-hidden bg-card focus:border-orange-400"
             style={{ padding: '10px 12px 10px 34px' }} />

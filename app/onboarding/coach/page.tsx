@@ -21,6 +21,7 @@ import {
   loadMyOnboarding, patchMyOnboarding, markOnboardingComplete,
   type CoachWizardData,
 } from '@/services/onboarding.service'
+import { Icon } from '@/components/ui/Icon'
 
 const ACCENT = '#16A34A'   // green — matches coach role tint in ROLE_META
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -186,7 +187,7 @@ export default function CoachOnboardingPage() {
               disabled={inviteSent} />
             {inviteSent && (
               <p className="mt-1 text-[11px] text-emerald-700 font-semibold inline-flex items-center gap-1">
-                <i className="ki-filled ki-check text-[11px]" /> Приглашение отправлено
+                <Icon name="ki-check" className="text-[11px]" /> Приглашение отправлено
               </p>
             )}
           </div>
@@ -208,7 +209,7 @@ export default function CoachOnboardingPage() {
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <i className="ki-filled ki-calendar-2 text-lg" />
+                <Icon name="ki-calendar-2" className="text-lg" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-foreground">Coach Builder · /coach/plans</div>
@@ -227,7 +228,7 @@ export default function CoachOnboardingPage() {
           <div className="rounded-2xl border border-violet-200 bg-violet-50/40 p-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
-                <i className="ki-filled ki-message-question text-lg" />
+                <Icon name="ki-message-question" className="text-lg" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-foreground">Doctor inquiries · /coach/inquiries</div>
@@ -243,7 +244,7 @@ export default function CoachOnboardingPage() {
           <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
-                <i className="ki-filled ki-shop text-lg" />
+                <Icon name="ki-shop" className="text-lg" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-foreground">Coach Services · /coach/services</div>
@@ -263,7 +264,7 @@ export default function CoachOnboardingPage() {
           <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                <i className="ki-filled ki-cup text-lg" />
+                <Icon name="ki-cup" className="text-lg" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-foreground">Pass plans · /coach/pass-plans</div>

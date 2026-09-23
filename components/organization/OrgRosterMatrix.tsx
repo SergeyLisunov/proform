@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, Badge } from '@/components/ui/metronic'
+import { Icon } from '@/components/ui/Icon'
 
 interface RosterRow {
   coach_id: string
@@ -90,7 +91,7 @@ export default function OrgRosterMatrix({ orgId }: { orgId: string }) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border bg-accent/30 p-6 text-center">
-        <i className="ki-filled ki-shield-tick text-3xl text-muted-foreground mb-2 block" />
+        <Icon name="ki-shield-tick" className="text-3xl text-muted-foreground mb-2 block" />
         <p className="text-sm font-semibold text-foreground">У организации нет активных тренеров</p>
         <Link href="/org/coaches"
           className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-orange-600 hover:underline">

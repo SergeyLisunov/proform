@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getAthletePassport } from '@/services/athlete-public.service'
 import PassportShareBar from './PassportShareBar'
+import { Icon } from '@/components/ui/Icon'
 
 export const revalidate = 300 // 5 минут
 
@@ -154,7 +155,7 @@ export default async function AthletePassportPage(
       {p.personal_records.length > 0 && (
         <section className="mx-auto max-w-5xl px-5 pb-8">
           <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-3">
-            <i className="ki-filled ki-medal-star text-slate-500" /> Личные рекорды
+            <Icon name="ki-medal-star" className="text-slate-500" /> Личные рекорды
           </p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {p.personal_records.map(r => (

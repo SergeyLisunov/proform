@@ -16,6 +16,7 @@
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { upsertReview } from '@/services/coach-reviews.service'
+import { Icon } from '@/components/ui/Icon'
 
 interface AthleteReviewPromptProps {
   coachId:        string
@@ -43,7 +44,7 @@ function StarRating({
             style={{ color: filled ? '#F59E0B' : '#D1D5DB', background: 'none', border: 'none', padding: 0 }}
             aria-label={`${i + 1} звезда`}
           >
-            <i className={`${filled ? 'ki-solid' : 'ki-outline'} ki-star`} />
+            <Icon name={filled ? 'ki-solid' : 'ki-outline'} />
           </button>
         )
       })}
@@ -105,7 +106,7 @@ export default function AthleteReviewPrompt({
               onClick={() => setExpanded(true)}
               className="inline-flex items-center gap-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 text-xs font-bold shadow-xs"
             >
-              <i className="ki-filled ki-star text-xs" />
+              <Icon name="ki-star" className="text-xs" />
               Оставить отзыв
             </button>
             <button
@@ -152,7 +153,7 @@ export default function AthleteReviewPrompt({
             >
               {saving
                 ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full pf-spin" /> Сохраняю…</>
-                : <><i className="ki-filled ki-check text-xs" /> Опубликовать</>}
+                : <><Icon name="ki-check" className="text-xs" /> Опубликовать</>}
             </button>
             <button
               type="button"

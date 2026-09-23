@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
+import { Icon } from '@/components/ui/Icon'
 
 // ── типы ──────────────────────────────────────────────────────────────────────
 
@@ -116,7 +117,7 @@ function MobileMenuToggle() {
       onClick={toggle}
       className="kt-btn kt-btn-icon kt-btn-ghost lg:hidden"
     >
-      <i className={`ki-filled ${open ? 'ki-cross' : 'ki-burger-menu-2'} text-base`} />
+      <Icon name={open ? 'ki-cross' : 'ki-burger-menu-2'} className="text-base" />
     </button>
   )
 }
@@ -300,7 +301,7 @@ function NotificationsDrawer({
               </button>
             )}
             <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-              <i className="ki-filled ki-cross text-sm" />
+              <Icon name="ki-cross" className="text-sm" />
             </button>
           </div>
         </div>
@@ -311,7 +312,7 @@ function NotificationsDrawer({
             {!showForm ? (
               <button onClick={() => setShowForm(true)}
                 className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-orange-300 hover:text-foreground hover:bg-orange-50/30 transition-all text-2sm">
-                <i className="ki-filled ki-plus text-sm" />
+                <Icon name="ki-plus" className="text-sm" />
                 Отправить объявление атлетам
               </button>
             ) : (
@@ -320,7 +321,7 @@ function NotificationsDrawer({
                   {(['comment', 'announcement'] as const).map(t => (
                     <button key={t} type="button" onClick={() => setFormType(t)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-2xs font-semibold border transition-all ${formType === t ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-border text-muted-foreground'}`}>
-                      <i className={`ki-filled ${t === 'comment' ? 'ki-message-text-2' : 'ki-notification-bing'} text-2xs`} />
+                      <Icon name={t === 'comment' ? 'ki-message-text-2' : 'ki-notification-bing'} className="text-2xs" />
                       {t === 'comment' ? 'Комментарий' : 'Объявление'}
                     </button>
                   ))}
@@ -369,7 +370,7 @@ function NotificationsDrawer({
             </div>
           ) : displayed.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-              <i className="ki-filled ki-notification-on text-3xl text-muted-foreground/20 mb-3 block" />
+              <Icon name="ki-notification-on" className="text-3xl text-muted-foreground/20 mb-3 block" />
               <p className="text-2sm text-muted-foreground">
                 {tab === 'unread' ? 'Нет непрочитанных уведомлений' : 'Уведомлений пока нет'}
               </p>
@@ -387,7 +388,7 @@ function NotificationsDrawer({
                   {/* Тип иконка */}
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
                     style={{ background: color + '15', border: `1px solid ${color}25` }}>
-                    <i className={`ki-filled ${icon} text-xs`} style={{ color }} />
+                    <Icon name={icon} className="text-xs" style={{ color }} />
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -402,7 +403,7 @@ function NotificationsDrawer({
                           className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
                           title="Скрыть"
                         >
-                          <i className="ki-filled ki-cross text-[10px]" />
+                          <Icon name="ki-cross" className="text-[10px]" />
                         </button>
                       </div>
                     </div>
@@ -497,7 +498,7 @@ export default function TopBar() {
           : user.role === 'admin' ? 'Админ'
           : 'Орг'}
       </span>
-      <i className="ki-filled ki-pencil text-[10px] opacity-40" style={{ color: rc.text }} />
+      <Icon name="ki-pencil" className="text-[10px] opacity-40" style={{ color: rc.text }} />
     </div>
   ) : null
 
@@ -528,7 +529,7 @@ export default function TopBar() {
               className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background border border-border hover:border-orange-300 hover:bg-orange-50/40 transition-all no-underline group"
               title="Открыть календарь"
             >
-              <i className="ki-filled ki-calendar text-xs text-muted-foreground group-hover:text-orange-500 transition-colors" />
+              <Icon name="ki-calendar" className="text-xs text-muted-foreground group-hover:text-orange-500 transition-colors" />
               <span className="text-2xs text-muted-foreground group-hover:text-foreground transition-colors">{date}</span>
             </Link>
 
@@ -545,7 +546,7 @@ export default function TopBar() {
               className="kt-btn kt-btn-icon kt-btn-ghost relative"
               title="Уведомления"
             >
-              <i className="ki-filled ki-notification-on text-base" />
+              <Icon name="ki-notification-on" className="text-base" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
                   {unreadCount > 99 ? '99+' : unreadCount}

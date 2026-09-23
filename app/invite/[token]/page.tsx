@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Icon } from '@/components/ui/Icon'
 
 type ApiOk = {
   ok: true
@@ -87,7 +88,7 @@ export default function InvitePage() {
       <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center">
           <div className="w-14 h-14 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
-            <i className="ki-filled ki-information-2 text-2xl"/>
+            <Icon name="ki-information-2" className="text-2xl" />
           </div>
           <h1 className="text-xl font-bold text-navy-500 mb-2">{msg[state.error] ?? 'Ошибка'}</h1>
           <p className="text-sm text-muted-foreground mb-6">Свяжитесь с тем, кто отправил вам это приглашение, чтобы получить новую ссылку.</p>
@@ -105,7 +106,7 @@ export default function InvitePage() {
       <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center">
           <div className="w-14 h-14 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
-            <i className="ki-filled ki-check-circle text-2xl"/>
+            <Icon name="ki-check-circle" className="text-2xl" />
           </div>
           <h1 className="text-xl font-bold text-navy-500 mb-2">Связь установлена</h1>
           <p className="text-sm text-muted-foreground">Переходим к списку подключений…</p>

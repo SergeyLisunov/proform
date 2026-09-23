@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { Icon } from '@/components/ui/Icon'
 
 const PrescribeWorkoutDrawer = dynamic(
   () => import('@/components/ui/PrescribeWorkoutDrawer').then(m => m.PrescribeWorkoutDrawer),
@@ -100,13 +101,13 @@ export default function CoachQuickActions({ coachId, athletes }: CoachQuickActio
             <>
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: a.bg, color: a.color }}>
-                <i className={`ki-filled ${a.icon} text-lg`} />
+                <Icon name={a.icon} className="text-lg" />
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <div className="text-sm font-bold text-foreground truncate">{a.label}</div>
                 <div className="text-[11px] text-muted-foreground truncate">{a.hint}</div>
               </div>
-              <i className="ki-filled ki-arrow-right text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <Icon name="ki-arrow-right" className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </>
           )
           const cn = 'group rounded-2xl border bg-card p-3 sm:p-4 transition-all hover:-translate-y-0.5 hover:shadow-xs flex items-center gap-3 w-full'

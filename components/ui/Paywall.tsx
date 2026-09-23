@@ -4,6 +4,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useDialog } from '@/lib/hooks/useDialog'
 import Link from 'next/link'
+import { Icon } from '@/components/ui/Icon'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 export type Plan = 'free' | 'pro' | 'team'
@@ -223,7 +224,7 @@ export function PricingModal({
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <i className="ki-filled ki-cross text-muted-foreground text-sm" />
+              <Icon name="ki-cross" className="text-muted-foreground text-sm" />
             </button>
             {trigger && TRIGGER_MESSAGES[trigger] && (
               <div style={{
@@ -291,7 +292,7 @@ export function PricingModal({
                     {p.features.map(f => (
                       <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                         <div style={{ width: 16, height: 16, borderRadius: '50%', background: p.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <i className="ki-filled ki-check text-[9px]" style={{ color: p.color }} />
+                          <Icon name="ki-check" className="text-[9px]" style={{ color: p.color }} />
                         </div>
                         <span style={{ fontSize: 12, color: 'var(--foreground)', lineHeight: 1.4 }}>{f}</span>
                       </div>
@@ -299,7 +300,7 @@ export function PricingModal({
                     {p.limitations.map(f => (
                       <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                         <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <i className="ki-filled ki-cross text-[9px] text-muted-foreground" />
+                          <Icon name="ki-cross" className="text-[9px] text-muted-foreground" />
                         </div>
                         <span style={{ fontSize: 12, color: 'var(--muted-foreground)', lineHeight: 1.4 }}>{f}</span>
                       </div>
@@ -384,7 +385,7 @@ export function PaywallBanner({
           background: plan.color + '15',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
         }}>
-          <i className="ki-filled ki-lock-2" style={{ color: plan.color }} />
+          <Icon name="ki-lock-2" style={{ color: plan.color }} />
         </div>
 
         {/* Text */}
@@ -441,12 +442,12 @@ export function WorkoutLimitBadge() {
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'all 0.15s',
       }} className="hover:opacity-80">
-        <i className="ki-filled ki-information-4 text-sm" />
+        <Icon name="ki-information-4" className="text-sm" />
         {isEmpty
           ? 'Лимит тренировок исчерпан — перейдите на Pro'
           : `Осталось тренировок: ${workoutsLeft} — перейдите на Pro`
         }
-        <i className="ki-filled ki-arrow-right text-xs" />
+        <Icon name="ki-arrow-right" className="text-xs" />
       </div>
 
       {showPricing && (
@@ -536,7 +537,7 @@ export function PricingPage() {
           color: 'var(--muted-foreground)', fontSize: 13, fontWeight: 600,
           textDecoration: 'none', transition: 'all 0.15s',
         }}>
-          <i className="ki-filled ki-arrow-left text-sm" />
+          <Icon name="ki-arrow-left" className="text-sm" />
           На главную
         </a>
       </div>
@@ -571,7 +572,7 @@ export function PricingPage() {
                   textTransform: 'uppercase', letterSpacing: '0.1em',
                   boxShadow: `0 4px 12px ${p.color}50`,
                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                }}><i className="ki-solid ki-star text-[9px]" /> Популярный</div>
+                }}><Icon name="ki-star" className="text-[9px]" /> Популярный</div>
               )}
 
               <div className="pf-heading-sm" style={{ color: p.color, marginBottom: 4 }}>{p.name}</div>
@@ -588,7 +589,7 @@ export function PricingPage() {
                 {p.features.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <div style={{ width: 18, height: 18, borderRadius: '50%', background: p.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                      <i className="ki-filled ki-check text-[10px]" style={{ color: p.color }} />
+                      <Icon name="ki-check" className="text-[10px]" style={{ color: p.color }} />
                     </div>
                     <span style={{ fontSize: 13, color: 'var(--foreground)' }}>{f}</span>
                   </div>
@@ -596,7 +597,7 @@ export function PricingPage() {
                 {p.limitations.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                      <i className="ki-filled ki-cross text-[10px] text-muted-foreground" />
+                      <Icon name="ki-cross" className="text-[10px] text-muted-foreground" />
                     </div>
                     <span style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>{f}</span>
                   </div>
