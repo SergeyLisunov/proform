@@ -47,7 +47,7 @@ export default function StaticPageShell({
         className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.10),transparent_36%),linear-gradient(180deg,#FFFFFF_0%,#FEF0E7_100%)]"
       >
         {/* Top bar — back + mini-logo */}
-        <header className="border-b border-orange-100/60 bg-white/70 backdrop-blur-xs">
+        <header className="border-b border-orange-100/60 bg-card/70 backdrop-blur-xs">
           <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
             <Link
               href="/"
@@ -68,7 +68,7 @@ export default function StaticPageShell({
 
         {/* Article */}
         <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
-          <article className="rounded-3xl border border-border bg-white p-6 shadow-xs md:p-10">
+          <article className="rounded-3xl border border-border bg-card p-6 shadow-xs md:p-10">
             {eyebrow && (
               <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
                 {eyebrow}

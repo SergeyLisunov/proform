@@ -244,7 +244,7 @@ function buildComparisonCue(
 function getComparisonCueClasses(direction: ComparisonDirection): string {
   if (direction === 'up') return 'border-orange-200 bg-orange-50 text-orange-700'
   if (direction === 'down') return 'border-sky-200 bg-sky-50 text-sky-700'
-  return 'border-slate-200 bg-slate-50 text-slate-600'
+  return 'border-border bg-muted text-slate-600'
 }
 
 // ── ANALYTICS BLOCK ────────────────────────────────────────────────────────────
@@ -1264,7 +1264,7 @@ function AthleteDiary() {
               <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-orange-700">
                 Дневник атлета
               </span>
-              <span className="inline-flex items-center rounded-full border border-border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              <span className="inline-flex items-center rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                 Быстрое добавление
               </span>
             </div>
@@ -1274,17 +1274,17 @@ function AthleteDiary() {
               Добавляйте тренировку сразу после сессии, фиксируйте самочувствие и держите историю нагрузки под рукой в одном рабочем пространстве.
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
+              <div className="rounded-2xl border border-border bg-card/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">За 7 дней</div>
                 <div className="mt-2 pf-num text-[28px] leading-none text-foreground">{recentCount}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">тренировок за последнюю неделю</div>
               </div>
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
+              <div className="rounded-2xl border border-border bg-card/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Общий объем</div>
                 <div className="mt-2 text-xl font-semibold text-foreground">{totalMinutes ? fmtDuration(totalMinutes) : '—'}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">суммарное время по сохраненным записям</div>
               </div>
-              <div className="rounded-2xl border border-border bg-white/85 p-4 shadow-xs">
+              <div className="rounded-2xl border border-border bg-card/85 p-4 shadow-xs">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Основной тип</div>
                 <div className="mt-2 text-xl font-semibold text-foreground">{topActivity}</div>
                 <div className="mt-2 text-2xs text-muted-foreground">
@@ -1294,7 +1294,7 @@ function AthleteDiary() {
             </div>
           </div>
 
-          <div className="flex w-full max-w-[340px] flex-col gap-3 rounded-[26px] border border-border bg-white/85 p-4 shadow-xs">
+          <div className="flex w-full max-w-[340px] flex-col gap-3 rounded-[26px] border border-border bg-card/85 p-4 shadow-xs">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Быстрый старт</div>
               <div className="mt-2 text-base font-semibold text-foreground">Сохраните тренировку, пока ощущения свежие</div>
@@ -1309,7 +1309,7 @@ function AthleteDiary() {
               </button>
               <button
                 onClick={() => setShowPDF(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:text-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:text-foreground"
               >
                 <Icon name="ki-file-down" className="text-sm" />
                 Экспорт PDF
@@ -1440,7 +1440,7 @@ function AthleteDiary() {
                       key={w.id}
                       type="button"
                       onClick={() => setSelectedWorkout(w)}
-                      className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-white hover:shadow-xs sm:p-5"
+                      className="group flex w-full items-start gap-4 rounded-[24px] border border-border bg-background/80 p-4 text-left transition-all hover:border-orange-200 hover:bg-card hover:shadow-xs sm:p-5"
                     >
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border" style={{ background:ac.bg,borderColor:ac.border }}>
                         <Icon name={ac.icon} className="text-base" style={{ color:ac.text }} />
@@ -1476,12 +1476,12 @@ function AthleteDiary() {
                                   </span>
                                 ))
                               ) : (
-                                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                                <span className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-slate-600">
                                   нет общих метрик для сравнения
                                 </span>
                               )
                             ) : (
-                              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                              <span className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-slate-600">
                                 первая запись этого типа
                               </span>
                             )}
@@ -1562,12 +1562,12 @@ function AthleteDiary() {
                           </span>
                         ))
                       ) : (
-                        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                        <span className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-slate-600">
                           нет общих метрик
                         </span>
                       )
                     ) : (
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                      <span className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-slate-600">
                         первая запись этого типа
                       </span>
                     )}

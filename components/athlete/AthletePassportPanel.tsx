@@ -110,7 +110,7 @@ export default function AthletePassportPanel({ userId }: { userId: string }) {
 
       {profilePublic && (
         <>
-          <div className="mt-4 flex items-center gap-2 flex-wrap rounded-xl bg-white border border-border px-3 py-2">
+          <div className="mt-4 flex items-center gap-2 flex-wrap rounded-xl bg-card border border-border px-3 py-2">
             <span className="text-[11px] text-muted-foreground">Ссылка:</span>
             <code className="font-mono text-[11px] text-foreground flex-1 truncate">{url}</code>
             <button onClick={copy}

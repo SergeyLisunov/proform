@@ -72,7 +72,7 @@ export default function PricingTeaserSection() {
             return (
               <article
                 key={p.title}
-                className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-6 shadow-xs"
+                className="flex flex-col gap-3 rounded-3xl border border-border bg-card p-6 shadow-xs"
               >
                 <div
                   aria-hidden="true"
@@ -90,7 +90,7 @@ export default function PricingTeaserSection() {
         </div>
 
         {/* CTA — to /pricing for full tariff table */}
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-orange-200 bg-white p-6 text-center sm:flex-row sm:justify-between sm:gap-6 sm:text-left">
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-orange-200 bg-card p-6 text-center sm:flex-row sm:justify-between sm:gap-6 sm:text-left">
           <div className="flex-1">
             <p className="text-base font-bold text-foreground">
               Сколько это для вашего клуба?

@@ -64,12 +64,12 @@ const NOT_CARDS: NotCard[] = [
 function NotTile({ card }: { card: NotCard }) {
   const { icon: Icon, alternative, whyNotFit, proformDoes } = card
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-white p-6 transition-colors hover:border-orange-200 hover:shadow-xs">
+    <article className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-card p-6 transition-colors hover:border-orange-200 hover:shadow-xs">
       {/* Strike-through visual */}
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
-          className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600"
+          className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted text-slate-600"
         >
           <Icon size={22} strokeWidth={2} />
           {/* Diagonal strike-through */}

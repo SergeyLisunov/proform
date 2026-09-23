@@ -74,7 +74,7 @@ export default function DoctorActiveInjuries() {
           const part = BODY_PART_LABELS[inj.body_part] ?? inj.body_part
           return (
             <Link key={inj.id} href="/injuries"
-              className="flex items-center gap-3 rounded-xl border border-border bg-white px-3 py-2.5 hover:border-red-300 transition-colors">
+              className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 hover:border-red-300 transition-colors">
               <div className="w-9 h-9 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-semibold text-xs shrink-0">
                 {inj.athlete_name.charAt(0).toUpperCase()}
               </div>

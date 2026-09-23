@@ -137,7 +137,7 @@ export default async function AthletePassportPage(
       {/* Stats */}
       {p.stats && (
         <section className="mx-auto max-w-5xl px-5 py-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground mb-3">
             За последние 90 дней
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -154,21 +154,21 @@ export default async function AthletePassportPage(
       {/* Personal records */}
       {p.personal_records.length > 0 && (
         <section className="mx-auto max-w-5xl px-5 pb-8">
-          <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-3">
-            <Icon name="ki-medal-star" className="text-slate-500" /> Личные рекорды
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground mb-3">
+            <Icon name="ki-medal-star" className="text-muted-foreground" /> Личные рекорды
           </p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {p.personal_records.map(r => (
-              <div key={r.id} className="rounded-xl border border-slate-200 bg-white p-4">
+              <div key={r.id} className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600">
                     {r.category ?? 'PR'}
                   </span>
                 </div>
-                <div className="text-lg font-bold text-slate-900">{r.exercise ?? r.metric ?? '—'}</div>
+                <div className="text-lg font-bold text-foreground">{r.exercise ?? r.metric ?? '—'}</div>
                 <div className="pf-num text-2xl font-bold text-orange-600 mt-1">{fmtPRValue(r)}</div>
                 {r.achieved_at && (
-                  <div className="text-[11px] text-slate-500 mt-1">
+                  <div className="text-[11px] text-muted-foreground mt-1">
                     {new Date(r.achieved_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </div>
                 )}
@@ -181,20 +181,20 @@ export default async function AthletePassportPage(
       {/* Recent workouts */}
       {p.workouts_public && p.recent_workouts.length > 0 && (
         <section className="mx-auto max-w-5xl px-5 pb-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground mb-3">
             Последние тренировки
           </p>
-          <div className="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100">
+          <div className="rounded-xl border border-border bg-card divide-y divide-slate-100">
             {p.recent_workouts.map(w => (
               <div key={w.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold">
+                <div className="w-9 h-9 rounded-lg bg-muted text-slate-700 flex items-center justify-center text-xs font-bold">
                   {new Date(w.event_date + 'T00:00:00').toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-slate-900 truncate">
+                  <div className="text-sm font-semibold text-foreground truncate">
                     {w.name ?? w.activity_type ?? 'Тренировка'}
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-[11px] text-muted-foreground">
                     {w.duration_min ? `${w.duration_min} мин` : ''}
                     {w.duration_min && w.strain ? ' · ' : ''}
                     {w.strain ? `strain ${w.strain}` : ''}
@@ -209,7 +209,7 @@ export default async function AthletePassportPage(
       {/* Social links */}
       {(p.social.instagram || p.social.telegram || p.social.youtube || p.social.tiktok || p.social.website) && (
         <section className="mx-auto max-w-5xl px-5 pb-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground mb-3">
             Найти в сети
           </p>
           <div className="flex flex-wrap gap-2">
@@ -242,8 +242,8 @@ export default async function AthletePassportPage(
 
 function StatTile({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{label}</div>
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="pf-num text-2xl font-bold mt-1" style={{ color: accent }}>{value}</div>
     </div>
   )
@@ -251,9 +251,9 @@ function StatTile({ label, value, accent }: { label: string; value: string; acce
 
 function SocialChip({ label, host }: { label: string; host: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600">
-      <strong className="text-slate-900">{label}</strong>
-      <span className="text-slate-400">·</span>
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-xs text-slate-600">
+      <strong className="text-foreground">{label}</strong>
+      <span className="text-muted-foreground">·</span>
       {host}
     </span>
   )

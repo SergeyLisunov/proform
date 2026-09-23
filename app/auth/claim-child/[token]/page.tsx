@@ -79,7 +79,7 @@ export default function ClaimChildPage({ params }: PageProps) {
           </div>
         </Link>
 
-        <div className="rounded-[28px] border border-orange-100/80 bg-white px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
+        <div className="rounded-[28px] border border-orange-100/80 bg-card px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
           {done ? (
             <div className="flex flex-col items-center gap-5 py-2 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-green-200 bg-green-50">

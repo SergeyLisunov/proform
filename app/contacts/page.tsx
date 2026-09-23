@@ -35,7 +35,7 @@ interface ContactBlockProps {
 
 function ContactBlock({ icon: Icon, title, email, description }: ContactBlockProps) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 transition-colors hover:border-orange-200">
+    <div className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-orange-200">
       <div className="flex items-start gap-3">
         <div
           aria-hidden="true"

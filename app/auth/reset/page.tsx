@@ -175,7 +175,7 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
 
-        <div className="rounded-[28px] border border-orange-100/80 bg-white px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
+        <div className="rounded-[28px] border border-orange-100/80 bg-card px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
           {phase === 'verifying' && (
             <div className="flex flex-col items-center gap-4 py-8 text-center">
               <span className="pf-spin h-8 w-8 rounded-full border-2 border-orange-500 border-t-transparent" />

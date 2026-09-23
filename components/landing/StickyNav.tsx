@@ -21,7 +21,7 @@ interface StickyNavProps {
 
 export default function StickyNav({ isAuthed = false }: StickyNavProps) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-white/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-card/80 backdrop-blur-lg">
       <nav
         aria-label="Главная навигация"
         className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-10"

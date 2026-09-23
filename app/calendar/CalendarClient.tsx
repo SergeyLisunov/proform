@@ -56,7 +56,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Календарь</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Календарь</p>
           <h2 className="pf-num text-3xl text-navy-500 mt-0.5">{MONTHS[month]} {year}</h2>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -70,21 +70,21 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
               </button>
             ))}
           </div>
-          <button onClick={prev} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-slate-500 hover:bg-slate-50 transition bg-white">
+          <button onClick={prev} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-muted-foreground hover:bg-muted transition bg-card">
             <Icon name="ki-left" className="text-sm" />
           </button>
           <button onClick={() => { setMonth(today.getMonth()); setYear(today.getFullYear()) }}
-            className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-slate-600 hover:bg-slate-50 transition bg-white">
+            className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-slate-600 hover:bg-muted transition bg-card">
             Сегодня
           </button>
-          <button onClick={next} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-slate-500 hover:bg-slate-50 transition bg-white">
+          <button onClick={next} className="w-9 h-9 rounded-xl border border-[#E2E8F0] flex items-center justify-center text-muted-foreground hover:bg-muted transition bg-card">
             <Icon name="ki-right" className="text-sm" />
           </button>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 flex-wrap text-xs text-slate-500">
+      <div className="flex items-center gap-4 flex-wrap text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs" style={{ background:'#2563EB' }} />Тренировка</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs" style={{ background:'#F35703' }} />Соревнование</span>
         {layer !== 'none' && <span className="flex items-center gap-1.5">
@@ -98,7 +98,7 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
         {/* Day headers */}
         <div className="grid grid-cols-7 bg-[#F8FAFC] border-b border-[#E2E8F0]">
           {WDAYS.map(d => (
-            <div key={d} className="py-2.5 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">{d}</div>
+            <div key={d} className="py-2.5 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{d}</div>
           ))}
         </div>
         {/* Cells */}
@@ -129,15 +129,15 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
                         {w.activity_type ?? (isComp ? 'Соревнование' : 'Тренировка')}
                       </div>
                       {w.activity_strain && (
-                        <span className="text-[8px] text-slate-400">{w.activity_strain.toFixed(0)}</span>
+                        <span className="text-[8px] text-muted-foreground">{w.activity_strain.toFixed(0)}</span>
                       )}
                     </div>
                   )
                 })}
-                {ws.length > 2 && <div className="text-[9px] text-slate-400">+{ws.length - 2} ещё</div>}
+                {ws.length > 2 && <div className="text-[9px] text-muted-foreground">+{ws.length - 2} ещё</div>}
                 {/* Strain mini bar */}
                 {ws.length > 0 && ws[0].activity_strain && (
-                  <div className="mt-1 h-1 bg-slate-100 rounded-full">
+                  <div className="mt-1 h-1 bg-muted rounded-full">
                     <div className="h-full rounded-full" style={{ width: `${Math.min(ws[0].activity_strain/21*100,100)}%`, background: TYPE_COLOR[ws[0].activity_type??''] ?? '#64748B' }} />
                   </div>
                 )}
@@ -155,12 +155,12 @@ export default function CalendarClient({ userId, workouts, cycleBlocks, year: in
             return (
               <div key={b.id} className="rounded-xl p-3" style={{ background: cs.bg, border: `1.5px solid ${cs.border}` }}>
                 <div className="text-xs font-bold mb-1" style={{ color: cs.text }}>{b.label ?? 'Блок '+b.cycle_type}</div>
-                <div className="text-xs text-slate-500">{b.start_date} → {b.end_date}</div>
+                <div className="text-xs text-muted-foreground">{b.start_date} → {b.end_date}</div>
               </div>
             )
           })}
           {cycleBlocks.filter(b => b.cycle_type === layer).length === 0 && (
-            <div className="col-span-4 text-center py-4 text-sm text-slate-400">Блоки цикла не заданы для этого месяца.</div>
+            <div className="col-span-4 text-center py-4 text-sm text-muted-foreground">Блоки цикла не заданы для этого месяца.</div>
           )}
         </div>
       )}

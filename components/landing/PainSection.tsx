@@ -9,7 +9,7 @@
  * Placement: сразу после Hero, до AntiPositioning. Cause activation
  * перед differentiation.
  *
- * Visual: light bg-slate-50, persona-coded pain icons, no emojis (avoid
+ * Visual: light bg-muted, persona-coded pain icons, no emojis (avoid
  * playful tone). Footer hint pre-bridges к solution.
  */
 import {
@@ -81,7 +81,7 @@ const PAINS: PainCard[] = [
 function PainTile({ pain }: { pain: PainCard }) {
   const { icon: Icon, title, description, hue } = pain
   return (
-    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5 shadow-xs sm:p-6">
+    <article className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6">
       <div
         aria-hidden="true"
         className="flex h-12 w-12 items-center justify-center rounded-2xl sm:h-14 sm:w-14"
@@ -102,7 +102,7 @@ function PainTile({ pain }: { pain: PainCard }) {
 export default function PainSection() {
   return (
     <section
-      className="w-full bg-slate-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
+      className="w-full bg-muted px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
       aria-labelledby="pain-heading"
     >
       <div className="mx-auto max-w-7xl">

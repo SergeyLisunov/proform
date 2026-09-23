@@ -103,11 +103,11 @@ const NOTIF_COLORS: Record<string, string> = {
 }
 
 // ── mobile menu toggle ────────────────────────────────────────────────────────
-// Uses MobileMenuProvider context (lib/hooks/useMobileMenu) instead of
-// Metronic's data-kt-drawer-toggle, which never wired up reliably under
-// Next.js hydration. The previous implementation rendered a button with
-// `data-kt-drawer-toggle="#sidebar"` and trusted core.bundle.js to install
-// click handlers — it didn't, leaving the burger inert on every mobile load.
+// Работает на контексте MobileMenuProvider (lib/hooks/useMobileMenu).
+// Прежняя разметка вешала на кнопку data-kt-drawer-toggle="#sidebar" и
+// полагалась на скрипт Metronic, который должен был навесить обработчики
+// после гидратации. Он этого не делал — бургер был мёртвым на каждой
+// мобильной загрузке. Сам скрипт удалён из проекта в сентябре 2026.
 function MobileMenuToggle() {
   const { open, toggle } = useMobileMenu()
   return (

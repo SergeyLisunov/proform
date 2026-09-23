@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
   draft: {
     label: 'Черновик',
-    badge: 'bg-slate-100 text-slate-600 border border-slate-200',
+    badge: 'bg-muted text-slate-600 border border-border',
     icon: 'ki-note-2',
     accent: '#64748B',
     bg: '#F8FAFC',

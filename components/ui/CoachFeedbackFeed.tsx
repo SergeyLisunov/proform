@@ -129,9 +129,9 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
   if (loading) {
     return (
       <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-5 w-40 animate-pulse rounded-sm bg-slate-100 mb-3" />
+        <div className="h-5 w-40 animate-pulse rounded-sm bg-muted mb-3" />
         <div className="space-y-2">
-          {[0, 1, 2].map(i => <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-50" />)}
+          {[0, 1, 2].map(i => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted" />)}
         </div>
       </div>
     )
@@ -142,7 +142,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
       <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
         <Icon name="ki-message-text-2" className="text-2xl text-slate-300" />
         <p className="text-sm font-medium text-slate-600 mt-2">Нет тренировок атлетов</p>
-        <p className="text-xs text-slate-400 mt-1">Пригласите атлетов в сеть — здесь появятся их последние тренировки для обратной связи.</p>
+        <p className="text-xs text-muted-foreground mt-1">Пригласите атлетов в сеть — здесь появятся их последние тренировки для обратной связи.</p>
         <Link href="/network" className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-orange-600 hover:underline">
           Перейти в сеть <Icon name="ki-arrow-right" style={{ fontSize: 10 }} />
         </Link>
@@ -155,7 +155,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
       <div className="rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Обратная связь</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Обратная связь</p>
             <h3 className="text-base font-semibold text-navy-500 mt-0.5">Последние тренировки атлетов</h3>
           </div>
           <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
             )}
             <button
               onClick={() => setFilter(f => f === 'all' ? 'uncommented' : 'all')}
-              className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 border border-border rounded-full px-2.5 py-1"
+              className="text-[11px] font-semibold text-muted-foreground hover:text-foreground border border-border rounded-full px-2.5 py-1"
             >
               {filter === 'all' ? 'Без ответа' : 'Все'}
             </button>
@@ -176,7 +176,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
 
         <div className="divide-y divide-border">
           {filtered.slice(0, 10).map(r => (
-            <div key={r.id} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50/70 transition-colors">
+            <div key={r.id} className="px-5 py-3 flex items-center gap-3 hover:bg-muted/70 transition-colors">
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: r.i_commented ? '#F0FDF4' : '#FEF0E7' }}
@@ -186,12 +186,12 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-slate-900 truncate">{r.athlete_name}</span>
-                  <span className="text-xs text-slate-400">·</span>
-                  <span className="text-xs text-slate-500">{fmtDate(r.event_date)}</span>
+                  <span className="text-sm font-semibold text-foreground truncate">{r.athlete_name}</span>
+                  <span className="text-xs text-muted-foreground">·</span>
+                  <span className="text-xs text-muted-foreground">{fmtDate(r.event_date)}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-slate-500 truncate">
+                  <span className="text-xs text-muted-foreground truncate">
                     {r.name || r.activity_type || 'Тренировка'}
                     {r.activity_duration_min ? ` · ${fmtDur(r.activity_duration_min)}` : ''}
                   </span>
@@ -199,7 +199,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {r.comments_count > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-slate-600">
                     <Icon name="ki-message-text-2" style={{ fontSize: 9 }} />
                     {r.comments_count}
                   </span>
@@ -215,7 +215,7 @@ export default function CoachFeedbackFeed({ coachId }: { coachId: string }) {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="inline-flex w-full items-center justify-center gap-1.5 px-5 py-6 text-center text-xs text-slate-400">
+            <div className="inline-flex w-full items-center justify-center gap-1.5 px-5 py-6 text-center text-xs text-muted-foreground">
               Все тренировки прокомментированы <Icon name="ki-focus" className="text-xs" />
             </div>
           )}

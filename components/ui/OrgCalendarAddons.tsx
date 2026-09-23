@@ -424,7 +424,7 @@ export function OrgSessionDrawer({
                   className={`px-2 py-1.5 text-[11px] font-semibold rounded-lg border transition-all ${
                     status === s
                       ? s === 'completed' ? 'border-green-400 bg-green-50 text-green-700'
-                      : s === 'cancelled' ? 'border-slate-400 bg-slate-100 text-slate-600'
+                      : s === 'cancelled' ? 'border-slate-400 bg-muted text-slate-600'
                                           : 'border-purple-400 bg-purple-50 text-purple-700'
                       : 'border-border bg-background text-muted-foreground hover:border-purple-200'
                   }`}>

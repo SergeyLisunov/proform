@@ -48,7 +48,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
             height={185}
           />
         ) : (
-          <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
+          <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">Данных пока нет</div>
         )}
       </ChartCard>
 
@@ -57,7 +57,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
         title="Восстановление и ВСР"
         subtitle="7-дневные биометрики WHOOP"
         toolbar={
-          <div className="flex gap-3 text-xs text-slate-500">
+          <div className="flex gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded-sm inline-block bg-green-500" />Восстановление %</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded-sm inline-block bg-blue-500 border-dashed border-t border-blue-500" />ВСР мс</span>
           </div>
@@ -74,7 +74,7 @@ export default function AthleteCharts({ weeklyData, daily7 }: Props) {
             height={185}
           />
         ) : (
-          <div className="flex items-center justify-center h-40 text-sm text-slate-400">Данных пока нет</div>
+          <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">Данных пока нет</div>
         )}
       </ChartCard>
     </div>

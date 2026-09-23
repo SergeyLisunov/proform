@@ -157,7 +157,7 @@ export default function CoachAtRiskAthletes({ coachId }: { coachId: string }) {
       <div className="space-y-1.5">
         {rows.map(r => (
           <Link key={r.athleteId} href={`/athletes/${r.athleteId}`}
-            className="flex items-center gap-3 rounded-xl bg-white border border-border px-3 py-2.5 hover:border-red-300 transition-colors">
+            className="flex items-center gap-3 rounded-xl bg-card border border-border px-3 py-2.5 hover:border-red-300 transition-colors">
             <div className="w-9 h-9 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-semibold text-xs shrink-0">
               {r.name.charAt(0).toUpperCase()}
             </div>

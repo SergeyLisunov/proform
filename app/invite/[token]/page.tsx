@@ -71,8 +71,8 @@ export default function InvitePage() {
 
   if (!state) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-sm text-slate-500">Загружаем приглашение…</div>
+      <main className="min-h-screen flex items-center justify-center bg-muted">
+        <div className="text-sm text-muted-foreground">Загружаем приглашение…</div>
       </main>
     )
   }
@@ -85,7 +85,7 @@ export default function InvitePage() {
       revoked:   'Приглашение отозвано',
     }
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <main className="min-h-screen flex items-center justify-center bg-muted px-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center">
           <div className="w-14 h-14 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
             <Icon name="ki-information-2" className="text-2xl" />
@@ -103,7 +103,7 @@ export default function InvitePage() {
 
   if (claimResult?.ok) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <main className="min-h-screen flex items-center justify-center bg-muted px-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center">
           <div className="w-14 h-14 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
             <Icon name="ki-check-circle" className="text-2xl" />
@@ -116,7 +116,7 @@ export default function InvitePage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-10">
+    <main className="min-h-screen flex items-center justify-center bg-muted px-4 py-10">
       <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-600 mb-3">Sporteo · Приглашение</p>
         <h1 className="text-2xl font-bold text-navy-500 mb-1">Вас приглашают</h1>

@@ -48,7 +48,7 @@ const BLOCKS: TrustBlock[] = [
 function TrustTile({ block }: { block: TrustBlock }) {
   const { icon: Icon, title, description } = block
   return (
-    <article className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-6">
+    <article className="flex flex-col gap-3 rounded-3xl border border-border bg-card p-6">
       <div
         aria-hidden="true"
         className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"

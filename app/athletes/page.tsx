@@ -474,7 +474,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                       { label: 'Контроль', value: athlete.risk === 'low' ? 'Дрейф нагрузки' : 'Дрейф восстановления' },
                       { label: 'Цель', value: athlete.recovery >= 70 ? 'Рост' : 'Стабилизация' },
                     ].map((item) => (
-                      <div key={item.label} className="rounded-xl border border-orange-100 bg-white/80 p-3">
+                      <div key={item.label} className="rounded-xl border border-orange-100 bg-card/80 p-3">
                         <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</div>
                         <div className="mt-1 text-sm font-semibold text-foreground">{item.value}</div>
                       </div>
@@ -952,7 +952,7 @@ export default function AthletesPage() {
               { label: 'Средняя готовность', value: `${averageRecovery}%`, icon: 'ki-abstract-26', tone: 'bg-emerald-50 text-emerald-600' },
               { label: 'В зоне риска', value: riskCount, icon: 'ki-information-4', tone: 'bg-orange-50 text-orange-600' },
               { label: 'Готовы сейчас', value: readyCount, icon: 'ki-check-circle', tone: 'bg-violet-50 text-violet-600' },
-              { label: 'Сессии', value: totalSessions, icon: 'ki-calendar', tone: 'bg-slate-50 text-slate-600' },
+              { label: 'Сессии', value: totalSessions, icon: 'ki-calendar', tone: 'bg-muted text-slate-600' },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-border bg-background/75 p-4 shadow-xs">
                 <div className="flex items-start justify-between gap-3">

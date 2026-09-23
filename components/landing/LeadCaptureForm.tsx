@@ -391,7 +391,7 @@ export default function LeadCaptureForm({ onSuccess }: LeadCaptureFormProps) {
       </div>
 
       {/* Consent */}
-      <label className="flex items-start gap-3 rounded-2xl border border-border bg-slate-50 p-3 text-xs text-muted-foreground">
+      <label className="flex items-start gap-3 rounded-2xl border border-border bg-muted p-3 text-xs text-muted-foreground">
         <input
           type="checkbox"
           checked={data.consent}

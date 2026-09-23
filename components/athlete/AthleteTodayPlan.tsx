@@ -107,9 +107,9 @@ export default function AthleteTodayPlan({ athleteId }: { athleteId: string }) {
             <div key={w.id}
               className={`rounded-xl border p-3 ${
                 status === 'completed' ? 'border-green-200 bg-green-50/40' :
-                status === 'skipped'   ? 'border-slate-200 bg-slate-50' :
+                status === 'skipped'   ? 'border-border bg-muted' :
                 overdue                ? 'border-red-200 bg-red-50/40' :
-                                         'border-border bg-white'
+                                         'border-border bg-card'
               }`}>
               <div className="flex items-start gap-3">
                 <div className="rounded-lg bg-orange-100 text-orange-700 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider shrink-0">

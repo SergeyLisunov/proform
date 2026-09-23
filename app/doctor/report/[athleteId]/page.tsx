@@ -168,7 +168,13 @@ export default function DoctorReportPage() {
       {/* Print-specific styles */}
       <style jsx global>{`
         @media print {
-          nav, header, .no-print, [data-kt-theme="true"] > aside, [data-kt-theme="true"] > header { display: none !important; }
+          /* Раньше здесь стояло [data-kt-theme="true"] > aside, и селектор был
+             мёртвым дважды: атрибут висел на <html>, которому <aside> не
+             прямой потомок, да и сайдбар размечен как <div id="sidebar">, а не
+             <aside>. То есть при печати врачебного отчёта боковая панель на
+             странице оставалась. Сам атрибут ставил Metronic-скрипт, которого
+             больше нет. */
+          nav, header, #sidebar, .no-print { display: none !important; }
           main { padding: 0 !important; }
           body { background: white !important; }
           .report-root { box-shadow: none !important; border: none !important; }

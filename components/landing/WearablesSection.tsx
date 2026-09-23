@@ -9,7 +9,7 @@
  *
  * Roadmap items честно разделяют: что уже работает ≠ что в работе.
  *
- * Visual: light grey background (bg-slate-50) для consistency с
+ * Visual: light grey background (bg-muted) для consistency с
  * WorkflowSection.
  */
 import { Activity, CheckCircle2, Clock, Smartphone, Watch } from 'lucide-react'
@@ -46,7 +46,7 @@ const STATUS_META: Record<RoadmapItem['status'], { label: string; color: string;
 
 export default function WearablesSection() {
   return (
-    <section className="w-full bg-slate-50 py-20 px-4 sm:px-6 lg:px-10">
+    <section className="w-full bg-muted py-20 px-4 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="max-w-3xl">
@@ -76,7 +76,7 @@ export default function WearablesSection() {
           ].map(({ icon: Icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 rounded-2xl border border-border bg-white px-4 py-3 shadow-xs"
+              className="flex items-center gap-2.5 rounded-2xl border border-border bg-card px-4 py-3 shadow-xs"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                 <Icon size={18} strokeWidth={2} />
@@ -98,7 +98,7 @@ export default function WearablesSection() {
               return (
                 <div
                   key={item.label}
-                  className="rounded-2xl border border-border bg-white p-5"
+                  className="rounded-2xl border border-border bg-card p-5"
                 >
                   <div
                     className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-2xs font-bold uppercase tracking-wider"

@@ -98,7 +98,7 @@ export default function NewsletterStatsPage() {
   if (!newsletter) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Icon name="ki-information-4" className="text-3xl text-slate-400" />
+        <Icon name="ki-information-4" className="text-3xl text-muted-foreground" />
         <p className="text-sm font-semibold text-foreground">Рассылка не найдена</p>
       </div>
     )
@@ -213,7 +213,7 @@ export default function NewsletterStatsPage() {
             </div>
             <span className="pf-num text-3xl text-green-600">{deliveryRate}%</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-3 rounded-full bg-green-500 transition-all duration-500"
               style={{ width: `${deliveryRate}%` }}
@@ -230,7 +230,7 @@ export default function NewsletterStatsPage() {
             </div>
             <span className="pf-num text-3xl text-orange-600">{openRate}%</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-3 rounded-full bg-orange-500 transition-all duration-500"
               style={{ width: `${openRate}%` }}
