@@ -6,6 +6,8 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 // ── типы ──────────────────────────────────────────────────────────────────────
 
@@ -115,7 +117,7 @@ function MobileMenuToggle() {
       aria-expanded={open}
       aria-controls="sidebar"
       onClick={toggle}
-      className="kt-btn kt-btn-icon kt-btn-ghost lg:hidden"
+      className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'lg:hidden')}
     >
       <Icon name={open ? 'ki-cross' : 'ki-burger-menu-2'} className="text-base" />
     </button>
@@ -300,7 +302,7 @@ function NotificationsDrawer({
                 Прочитать все
               </button>
             )}
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
               <Icon name="ki-cross" className="text-sm" />
             </button>
           </div>
@@ -543,7 +545,7 @@ export default function TopBar() {
             {/* Колокольчик → открывает drawer уведомлений */}
             <button
               onClick={() => setShowNotif(true)}
-              className="kt-btn kt-btn-icon kt-btn-ghost relative"
+              className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'relative')}
               title="Уведомления"
             >
               <Icon name="ki-notification-on" className="text-base" />

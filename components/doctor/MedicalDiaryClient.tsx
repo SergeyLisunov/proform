@@ -18,6 +18,8 @@ import {
 } from '@/services/medical-diary.service'
 import { DiaryHeatmap } from '@/components/coach/DiaryHeatmap'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const ENTRY_TYPES: MedicalEntryType[] = [
   'consultation', 'rehab_progress', 'prescription', 'lab_results',
@@ -510,21 +512,21 @@ function EntryCard({
           {entry.athlete_id && (
             <>
               <button onClick={onToggleShare}
-                className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-xs' })}
                 title={entry.is_shared_with_athlete ? 'Скрыть от пациента' : 'Поделиться с пациентом'}>
                 <Icon name={entry.is_shared_with_athlete ? 'ki-eye' : 'ki-eye-slash'} className={`text-xs ${entry.is_shared_with_athlete ? 'text-blue-500' : 'text-muted-foreground'}`} />
               </button>
               <button onClick={onToggleShareCoach}
-                className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-xs' })}
                 title={entry.is_shared_with_coach ? 'Скрыть от тренера' : 'Передать тренеру (ограничение)'}>
                 <Icon name={entry.is_shared_with_coach ? 'text-orange-500' : 'text-muted-foreground'} className="text-xs" />
               </button>
             </>
           )}
-          <button onClick={onEdit} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost" title="Редактировать">
+          <button onClick={onEdit} className={buttonVariants({ variant: 'ghost', size: 'icon-xs' })} title="Редактировать">
             <Icon name="ki-pencil" className="text-xs text-muted-foreground" />
           </button>
-          <button onClick={onDelete} className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost hover:bg-red-50!" title="Удалить">
+          <button onClick={onDelete} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'hover:bg-red-50!')} title="Удалить">
             <Icon name="ki-trash" className="text-xs text-red-500" />
           </button>
         </div>
@@ -875,7 +877,7 @@ function EntryDrawer({
               {initial ? 'Редактировать запись' : 'Новая запись'}
             </h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

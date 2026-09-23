@@ -24,6 +24,8 @@ import {
   type CoachAthleteLink,
 } from '@/services/admin-assignments.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 function getSB() {
   return createBrowserClient(
@@ -1173,7 +1175,7 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
               >
                 <Icon name="ki-cross" className="text-sm" />
               </button>
@@ -1322,7 +1324,7 @@ export default function AdminPage() {
                   <button
                     onClick={onSubmitBulkInvite}
                     disabled={bulkSaving || parsedBulkEmails.length === 0}
-                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                    className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                   >
                     {bulkSaving
                       ? 'Отправляю…'
@@ -1332,14 +1334,14 @@ export default function AdminPage() {
                   <button
                     onClick={onSubmitInvite}
                     disabled={inviteSaving}
-                    className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                    className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                   >
                     {inviteSaving ? 'Отправляю…' : 'Отправить приглашение'}
                   </button>
                 )}
                 <button
                   onClick={() => { setShowInviteModal(false); setInviteError(null); setBulkResults(null) }}
-                  className="kt-btn kt-btn-outline"
+                  className={buttonVariants({ variant: 'outline' })}
                 >
                   {bulkResults ? 'Закрыть' : 'Отмена'}
                 </button>
@@ -1357,7 +1359,7 @@ export default function AdminPage() {
                 <div className="text-2xs font-semibold uppercase tracking-[0.18em] text-orange-700">Операции доступа</div>
                 <h3 className="pf-num mt-2 text-xl text-navy-500">Назначить атлета тренеру</h3>
               </div>
-              <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+              <button onClick={() => setShowAssign(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                 <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>
@@ -1428,11 +1430,11 @@ export default function AdminPage() {
                   onClick={() => void handleAssign()}
                   disabled={!assignAthlete || !assignCoach || assigning}
                   title={!assignAthlete || !assignCoach ? 'Выберите атлета и тренера' : 'Создать связь тренер↔спортсмен'}
-                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                 >
                   {assigning ? 'Назначаю…' : 'Назначить'}
                 </button>
-                <button onClick={() => setShowAssign(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                <button onClick={() => setShowAssign(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
               </div>
             </div>
           </div>

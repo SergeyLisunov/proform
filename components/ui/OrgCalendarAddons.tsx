@@ -15,6 +15,7 @@ import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflic
 import { GroupConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 export function useOrgMembers(orgId: string | null) {
   const [members, setMembers] = useState<OrgMember[]>([])
@@ -261,7 +262,7 @@ export function OrgSessionDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Групповое событие</p>
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новое событие'}</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

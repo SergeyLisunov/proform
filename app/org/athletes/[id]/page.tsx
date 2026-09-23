@@ -28,6 +28,8 @@ import { useOrgContext } from '@/lib/hooks/useOrgContext'
 import { createClient } from '@/lib/supabase/client'
 import { Card, Alert, Badge } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 interface AthleteProfile {
   id: string
@@ -239,7 +241,7 @@ export default function OrgAthletePage() {
             )}
           </div>
         </div>
-        <Link href="/org" className="kt-btn kt-btn-sm kt-btn-outline gap-2">
+        <Link href="/org" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}>
           <Icon name="ki-arrow-left" className="text-xs" />
           В управление
         </Link>

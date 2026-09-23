@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 export default function Error({
   error,
@@ -30,11 +32,11 @@ export default function Error({
         )}
       </div>
       <div className="flex items-center gap-3">
-        <button onClick={reset} className="kt-btn kt-btn-primary gap-2">
+        <button onClick={reset} className={cn(buttonVariants(), 'gap-2')}>
           <Icon name="ki-arrows-circle" className="text-sm" />
           Попробовать снова
         </button>
-        <a href="/dashboard" className="kt-btn kt-btn-outline gap-2">
+        <a href="/dashboard" className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}>
           <Icon name="ki-home" className="text-sm" />
           На главную
         </a>

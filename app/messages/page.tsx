@@ -5,6 +5,8 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 type ChatUser = { id: string; name: string; email: string; role: string }
 type ChatType = 'direct' | 'group' | 'org_channel'
@@ -134,7 +136,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
                 Выбери собеседника
               </h3>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
               <Icon name="ki-cross" className="text-sm" />
             </button>
           </div>
@@ -438,7 +440,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
               <p style={{ fontSize: 10, fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Новая группа</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать группу</h3>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
+            <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <input value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="Название группы…"
             style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', fontSize: 14, fontWeight: 600, outline: 'none', boxSizing: 'border-box', marginBottom: 10 }}
@@ -516,7 +518,7 @@ function NewChannelModal({ currentUser, onClose, onCreated }: {
               <p style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Канал организации</p>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', margin: '2px 0 0' }}>Создать канал</h3>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
+            <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <input value={channelName} onChange={e => setChannelName(e.target.value)} placeholder="Название канала…"
             autoFocus
@@ -681,16 +683,16 @@ export default function MessengerPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2 flex-1 justify-center">
+              <button onClick={() => setShowNew(true)} className={cn(buttonVariants(), 'gap-2 flex-1 justify-center')}>
                 <Icon name="ki-message-add" className="text-sm" />
                 Новый чат
               </button>
-              <button onClick={() => setShowNewGroup(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать группу">
+              <button onClick={() => setShowNewGroup(true)} className={cn(buttonVariants({ variant: 'secondary' }), 'gap-2 flex-1 justify-center')} title="Создать группу">
                 <Icon name="ki-people" className="text-sm text-purple-600" />
                 Группа
               </button>
               {user?.role === 'organization' && (
-                <button onClick={() => setShowNewChannel(true)} className="kt-btn kt-btn-light gap-2 flex-1 justify-center" title="Создать канал">
+                <button onClick={() => setShowNewChannel(true)} className={cn(buttonVariants({ variant: 'secondary' }), 'gap-2 flex-1 justify-center')} title="Создать канал">
                   <Icon name="ki-abstract-26" className="text-sm text-blue-600" />
                   Канал
                 </button>
@@ -768,7 +770,7 @@ export default function MessengerPage() {
             {search ? 'Попробуйте изменить запрос или очистить фильтр.' : 'Создайте первый чат, чтобы начать переписку с тренером или атлетом.'}
           </p>
           {!search && (
-            <button onClick={() => setShowNew(true)} className="kt-btn kt-btn-primary gap-2">
+            <button onClick={() => setShowNew(true)} className={cn(buttonVariants(), 'gap-2')}>
               <Icon name="ki-plus" className="text-sm" />
               Создать первый чат
             </button>

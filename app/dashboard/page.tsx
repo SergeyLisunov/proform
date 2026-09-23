@@ -16,6 +16,8 @@ import {
 import { Card, ChartCard, Badge } from '@/components/ui/metronic'
 import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -294,7 +296,7 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
             <p style={{ fontSize: 10, fontWeight: 700, color: '#F35703', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Профиль</p>
             <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>Социальные сети</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -314,10 +316,10 @@ function SocialEditModal({ userId, data, onClose, onSaved }: {
             </div>
           ))}
           <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-            <button onClick={save} disabled={saving} className="kt-btn kt-btn-primary flex-1">
+            <button onClick={save} disabled={saving} className={cn(buttonVariants(), 'flex-1')}>
               {saving ? 'Сохранение…' : 'Сохранить'}
             </button>
-            <button onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
+            <button onClick={onClose} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
           </div>
         </div>
       </div>
@@ -1204,7 +1206,7 @@ function AdminDash({ name }: { name: string }) {
           оживления богатого AdminDashboard (P0 PR-3). */}
 
       <div className="flex justify-center">
-        <Link href="/admin" className="kt-btn kt-btn-primary gap-2">
+        <Link href="/admin" className={cn(buttonVariants(), 'gap-2')}>
           <Icon name="ki-setting-2" className="text-sm" />
           Перейти в Admin Panel
         </Link>

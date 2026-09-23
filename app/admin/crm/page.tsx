@@ -10,6 +10,8 @@ import {
   type AuditLogEntry,
 } from '@/services/admin-audit.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type CRMUser = {
@@ -219,7 +221,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                 </>
               )}
             </div>
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
+            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
         </div>
 
@@ -335,7 +337,7 @@ function UserDrawer({ userId, adminId, onClose }: { userId: string; adminId: str
                 <textarea value={note} onChange={e => setNote(e.target.value)} rows={3}
                   placeholder="Заметка по пользователю…"
                   className="w-full rounded-xl border border-input px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 resize-none" />
-                <button onClick={addNote} disabled={!note.trim() || savingNote} className="kt-btn kt-btn-primary mt-2 gap-2">
+                <button onClick={addNote} disabled={!note.trim() || savingNote} className={cn(buttonVariants(), 'mt-2 gap-2')}>
                   <Icon name="ki-plus" className="text-xs" />{savingNote ? 'Сохранение…' : 'Добавить заметку'}
                 </button>
               </div>
@@ -447,7 +449,7 @@ export default function AdminCRMPage() {
           <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Администрирование</p>
           <h2 className="pf-num text-[34px] text-navy-500 leading-none">CRM</h2>
         </div>
-        <button onClick={() => load()} className="kt-btn kt-btn-outline gap-2">
+        <button onClick={() => load()} className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}>
           <Icon name="ki-arrows-circle" className="text-sm" />Обновить
         </button>
       </div>

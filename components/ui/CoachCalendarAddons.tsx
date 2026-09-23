@@ -14,6 +14,7 @@ import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflic
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type Athlete = { id: string; name: string }
 
@@ -248,7 +249,7 @@ export function CoachSessionDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тренерское занятие</p>
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новое занятие'}</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
@@ -421,7 +422,7 @@ export function PassPlansManager({ coachId, onClose }: { coachId: string; onClos
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тарифы</p>
             <h3 className="text-lg font-semibold text-navy-500">Абонементы (шаблоны)</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
@@ -620,7 +621,7 @@ export function IssuePassDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Абонемент</p>
             <h3 className="text-lg font-semibold text-navy-500">Выдать атлету</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

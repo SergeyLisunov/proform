@@ -18,6 +18,7 @@ import {
   type WellnessCheckin,
 } from '@/services/wellness.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const MOOD_LABELS = ['', 'Ужасно', 'Плохо', 'Норм', 'Хорошо', 'Отлично']
 const ENERGY_LABELS = ['', 'Разбит', 'Низкая', 'Средняя', 'Высокая', 'На пике']
@@ -170,7 +171,7 @@ export default function DailyWellnessCard({ athleteId }: { athleteId: string }) 
           </div>
         </div>
         <button onClick={() => setOpen(false)}
-          className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost"
+          className={buttonVariants({ variant: 'ghost', size: 'icon-xs' })}
           title="Свернуть">
           <Icon name="ki-cross" className="text-xs text-muted-foreground" />
         </button>

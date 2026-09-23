@@ -21,6 +21,8 @@ import {
 } from '@/services/org-groups.service'
 import { Card, Badge } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -175,7 +177,7 @@ export default function OrgTeamsPage() {
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); archive(g.id) }}
                     disabled={busyId === g.id}
-                    className="kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0 hover:bg-red-50!"
+                    className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'shrink-0 hover:bg-red-50!')}
                     title="Архивировать">
                     <Icon name="ki-archive" className="text-xs text-red-500" />
                   </button>
@@ -223,7 +225,7 @@ export default function OrgTeamsPage() {
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Новая команда</h3>
-              <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+              <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                 <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>

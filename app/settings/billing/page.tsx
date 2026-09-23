@@ -21,6 +21,8 @@ import { Card, Badge, Alert, type BadgeVariant } from '@/components/ui/metronic'
 import { useDialog } from '@/lib/hooks/useDialog'
 import type { Database } from '@/types/database'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 type SubRow = Database['public']['Tables']['subscriptions']['Row']
 type TariffRow = Database['public']['Tables']['tariffs']['Row']
@@ -162,7 +164,7 @@ export default function BillingPage() {
           </div>
 
           <Link href="/pricing"
-            className="kt-btn kt-btn-sm gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0">
+            className={cn(buttonVariants({ size: 'sm' }), 'gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0')}>
             <Icon name="ki-arrow-up-right" className="text-xs" />
             Сменить тариф
           </Link>

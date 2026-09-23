@@ -6,6 +6,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 // ── Типы ──────────────────────────────────────────────────────────────────────
 type Workout = {
@@ -440,7 +441,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
               <h2 style={{ fontSize:19,fontWeight:800,color:'var(--foreground)',letterSpacing:'-0.02em',lineHeight:1 }}>Отчёт PDF</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -520,7 +521,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   const [y,m] = manualMonth.split('-').map(Number)
                   const prev = m === 1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,'0')}`
                   setManualMonth(prev)
-                }} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><Icon name="ki-left" className="text-xs" /></button>
+                }} className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}><Icon name="ki-left" className="text-xs" /></button>
                 <span style={{ fontSize:15,fontWeight:700,color:'var(--foreground)' }}>
                   {MONTHS_RU[manualCalendar.month-1]} {manualCalendar.year}
                 </span>
@@ -528,7 +529,7 @@ export default function WorkoutPDFExport({ onClose }: { onClose: () => void }) {
                   const [y,m] = manualMonth.split('-').map(Number)
                   const next = m === 12 ? `${y+1}-01` : `${y}-${String(m+1).padStart(2,'0')}`
                   setManualMonth(next)
-                }} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"><Icon name="ki-right" className="text-xs" /></button>
+                }} className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}><Icon name="ki-right" className="text-xs" /></button>
               </div>
 
               {/* Month controls */}

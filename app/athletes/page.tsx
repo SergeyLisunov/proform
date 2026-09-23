@@ -13,6 +13,8 @@ import { createBrowserClient } from '@supabase/ssr'
 import type { Workout } from '@/services/workouts.service'
 import { createDiaryEntry } from '@/services/coach-diary.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const ApexChart = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 
@@ -403,14 +405,14 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 onClick={() => setCommentOpen(true)}
-                className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
               >
                 <Icon name="ki-message-text" className="text-xs" />
                 Комментарий
               </button>
               <Link
                 href="/coach/passes"
-                className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 no-underline"
+                className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 no-underline')}
                 title="Списать сессию с активного абонемента"
               >
                 <Icon name="ki-tag" className="text-xs" />
@@ -696,7 +698,7 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
               </div>
               <button
                 onClick={() => { setCommentOpen(false); setCError(null) }}
-                className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
                 aria-label="Закрыть"
               >
                 <Icon name="ki-cross" className="text-sm" />
@@ -736,13 +738,13 @@ function AthleteDetail({ athlete }: { athlete: Athlete }) {
                 <button
                   onClick={onSubmitComment}
                   disabled={cSaving}
-                  className="kt-btn kt-btn-primary flex-1 disabled:opacity-60"
+                  className={cn(buttonVariants(), 'flex-1 disabled:opacity-60')}
                 >
                   {cSaving ? 'Сохраняю…' : 'Сохранить'}
                 </button>
                 <button
                   onClick={() => { setCommentOpen(false); setCError(null) }}
-                  className="kt-btn kt-btn-outline"
+                  className={buttonVariants({ variant: 'outline' })}
                 >
                   Отмена
                 </button>
@@ -927,7 +929,7 @@ export default function AthletesPage() {
               {activeFiltersCount > 0 && (
                 <button
                   onClick={() => router.push('/athletes')}
-                  className="kt-btn kt-btn-outline gap-2"
+                  className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
                   title="Сбросить все фильтры"
                 >
                   <Icon name="ki-cross-circle" className="text-xs" />
@@ -936,7 +938,7 @@ export default function AthletesPage() {
               )}
               <Link
                 href="/network?tab=find&type=people"
-                className="kt-btn kt-btn-primary gap-2 no-underline"
+                className={cn(buttonVariants(), 'gap-2 no-underline')}
               >
                 <Icon name="ki-plus" className="text-sm" />
                 Добавить атлета

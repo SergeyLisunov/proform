@@ -9,6 +9,7 @@ import { BulkImportDrawer } from './BulkImportDrawer'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 // Этап 7a — расширили локальный MemberRole до DB-полного набора (CHECK
 // 053 разрешает 6 значений). До этого `'athlete' | 'coach'` молча
@@ -124,7 +125,7 @@ function InviteDrawer({ orgId, onClose, onInvited }: {
               <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', lineHeight: 1 }}>Добавить участника</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -248,7 +249,7 @@ function AssignCoachModal({ athlete, coaches, onClose, onLinked }: {
             <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Назначить тренера</p>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>{athlete.user_name}</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" className="text-sm" /></button>
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" className="text-sm" /></button>
         </div>
         <div style={{ padding: '14px 22px' }}>
           {coaches.length === 0 ? (

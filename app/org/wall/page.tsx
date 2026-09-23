@@ -9,6 +9,8 @@ import { getWallPosts, createWallPost, togglePin, softDeletePost } from '@/servi
 import type { WallPost, PostType, PostVisibility } from '@/types/org.types'
 import { Card, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const POST_TYPE_META: Record<PostType, { label: string; badge: string; icon: string; accent: string; panel: string }> = {
   announcement: {
@@ -336,7 +338,7 @@ export default function OrgWallPage() {
                   <h3 className="pf-num mt-2 text-[28px] leading-none text-navy-500">Новая публикация</h3>
                   <p className="mt-2 text-2sm text-muted-foreground">Подготовьте анонс, новость, событие или результат для участников клуба.</p>
                 </div>
-                <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+                <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                   <Icon name="ki-cross" className="text-sm" />
                 </button>
               </div>
@@ -414,7 +416,7 @@ export default function OrgWallPage() {
                   <button type="submit" disabled={saving} className="flex-1 rounded-[14px] border border-orange-200 bg-[linear-gradient(135deg,#F35703,#D44A02)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(243,87,3,0.26)] disabled:opacity-60">
                     {saving ? 'Сохранение…' : 'Опубликовать'}
                   </button>
-                  <button type="button" onClick={() => setShowCreate(false)} className="kt-btn kt-btn-outline">
+                  <button type="button" onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'outline' })}>
                     Отмена
                   </button>
                 </div>
@@ -467,14 +469,14 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
           <button
             onClick={onPin}
             title={post.is_pinned ? 'Открепить' : 'Закрепить'}
-            className={`kt-btn kt-btn-xs kt-btn-icon ${post.is_pinned ? 'kt-btn-primary' : 'kt-btn-outline'}`}
+            className={buttonVariants({ variant: post.is_pinned ? 'default' : 'outline', size: 'icon-xs' })}
           >
             <Icon name="ki-pin" className="text-xs" />
           </button>
           <button
             onClick={onDelete}
             title="Удалить"
-            className="kt-btn kt-btn-xs kt-btn-icon kt-btn-outline hover:bg-red-50! hover:border-red-200! hover:text-red-600!"
+            className={cn(buttonVariants({ variant: 'outline', size: 'icon-xs' }), 'hover:bg-red-50! hover:border-red-200! hover:text-red-600!')}
           >
             <Icon name="ki-trash" className="text-xs" />
           </button>

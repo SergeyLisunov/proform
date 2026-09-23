@@ -11,6 +11,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 interface Props {
   childId:   string
@@ -81,7 +82,7 @@ export default function ClaimLinkButton({ childId, childName }: Props) {
                 <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Ссылка для входа</p>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--foreground)', margin: '3px 0 0' }}>{childName}</h3>
               </div>
-              <button onClick={() => setOpen(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+              <button onClick={() => setOpen(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                 <Icon name="ki-cross" className="text-sm" />
               </button>
             </div>

@@ -22,6 +22,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 export const dynamic = 'force-dynamic'
 
@@ -496,13 +497,13 @@ export default async function OnboardingFunnelPage({
             <div className="flex gap-2">
               {page > 0 && (
                 <Link href={buildHref({ page: String(page - 1) })}
-                  className="kt-btn kt-btn-outline kt-btn-sm">
+                  className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                   ← Назад
                 </Link>
               )}
               {hasMore && (
                 <Link href={buildHref({ page: String(page + 1) })}
-                  className="kt-btn kt-btn-primary kt-btn-sm">
+                  className={buttonVariants({ size: 'sm' })}>
                   Дальше →
                 </Link>
               )}

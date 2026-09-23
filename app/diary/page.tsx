@@ -13,6 +13,8 @@ import dynamic from 'next/dynamic'
 import { Card, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const WorkoutPDFExport = dynamic(() => import('@/components/ui/WorkoutPDFExport'), { ssr: false })
 
@@ -561,7 +563,7 @@ function ViewEditDrawer({
                 </div>
               </div>
             </div>
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><Icon name="ki-cross" className="text-sm" /></button>
+            <button onClick={handleClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
         </div>
 
@@ -752,7 +754,7 @@ function ViewEditDrawer({
         <div style={{ padding:'16px 24px',borderTop:'1px solid var(--border)',display:'flex',gap:10,flexShrink:0 }}>
           {mode === 'view' ? (
             <>
-              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary" style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+              <button onClick={() => setMode('edit')} className={buttonVariants()} style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
                 <Icon name="ki-pencil" className="text-xs" />Редактировать
               </button>
               {!confirmDel ? (
@@ -764,16 +766,16 @@ function ViewEditDrawer({
                   <button onClick={handleDelete} disabled={deleting} style={{ padding:'8px 14px',borderRadius:10,background:'#ef4444',color:'white',border:'none',cursor:'pointer',fontSize:13,fontWeight:600,opacity:deleting?0.6:1 }}>
                     {deleting ? '...' : 'Удалить'}
                   </button>
-                  <button onClick={() => setConfirmDel(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                  <button onClick={() => setConfirmDel(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
                 </>
               )}
             </>
           ) : (
             <>
-              <button onClick={handleSave} disabled={saving} className="kt-btn kt-btn-primary" style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+              <button onClick={handleSave} disabled={saving} className={buttonVariants()} style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
                 {saving ? <><Icon name="ki-loading" className="animate-spin text-xs" /> Сохранение…</> : <><Icon name="ki-check" className="text-xs" /> Сохранить</>}
               </button>
-              <button onClick={() => setMode('view')} className="kt-btn kt-btn-outline">Отмена</button>
+              <button onClick={() => setMode('view')} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
             </>
           )}
         </div>
@@ -889,7 +891,7 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 Сначала сохраните главное: тип, дату и нагрузку. Остальные метрики можно быстро добавить сразу в этом же потоке.
               </p>
             </div>
-            <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0"><Icon name="ki-cross" className="text-sm" /></button>
+            <button onClick={onClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}><Icon name="ki-cross" className="text-sm" /></button>
           </div>
           <div
             className="mt-4 rounded-[24px] border p-4"
@@ -1126,8 +1128,8 @@ function AddWorkoutDrawer({ open, onClose, userId, onCreated }: {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <button type="button" onClick={onClose} className="kt-btn kt-btn-outline">Отмена</button>
-                <button type="submit" disabled={saving} className="kt-btn kt-btn-primary min-w-[176px] justify-center">
+                <button type="button" onClick={onClose} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
+                <button type="submit" disabled={saving} className={cn(buttonVariants(), 'min-w-[176px] justify-center')}>
                   {saving ? 'Сохранение…' : 'Сохранить тренировку'}
                 </button>
               </div>

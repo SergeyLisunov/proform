@@ -7,6 +7,7 @@ import { getOrgBySlug } from '@/services/org.service'
 import { getPublicWallPosts } from '@/services/wall.service'
 import type { Organization, WallPost, PostType } from '@/types/org.types'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const POST_TYPE_BADGE: Record<PostType, string> = {
   announcement: 'bg-blue-50 text-blue-600 border border-blue-200',
@@ -62,7 +63,7 @@ export default function OrgPublicPage() {
           <h1 className="pf-num text-3xl text-navy-500 mb-2">Организация не найдена</h1>
           <p className="text-muted-foreground text-sm">Страница <code className="font-mono text-orange-600">/{orgSlug}</code> не существует.</p>
         </div>
-        <Link href="/auth/login" className="kt-btn kt-btn-primary">Перейти в Sporteo</Link>
+        <Link href="/auth/login" className={buttonVariants()}>Перейти в Sporteo</Link>
       </div>
     )
   }

@@ -7,6 +7,8 @@ import { getAllOrgs, verifyOrg } from '@/services/org.service'
 import type { Organization } from '@/types/org.types'
 import { Card, Badge } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const SPORT_LABELS: Record<string, string> = {
   athletics: 'Лёгкая атлетика', swimming: 'Плавание', cycling: 'Велоспорт',
@@ -93,7 +95,7 @@ export default function AdminOrgsPage() {
         </div>
         <p className="text-sm font-semibold text-foreground">Не удалось загрузить организации</p>
         <p className="text-2sm text-muted-foreground">{loadError}</p>
-        <button onClick={retry} className="kt-btn kt-btn-sm kt-btn-primary">Повторить</button>
+        <button onClick={retry} className={buttonVariants({ size: 'sm' })}>Повторить</button>
       </div>
     )
   }
@@ -206,7 +208,7 @@ function OrgRow({ org, verifying, onVerify }: { org: Organization; verifying: bo
         <button
           onClick={onVerify}
           disabled={verifying}
-          className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 shrink-0"
+          className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 shrink-0')}
         >
           {verifying ? (
             <>

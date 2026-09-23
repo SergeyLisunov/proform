@@ -36,6 +36,8 @@ import {
   type CycleBlock, type CycleType, type CycleDay, type DayType, type UpdateCycleInput,
 } from '@/services/cycles.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 function getWS() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -348,11 +350,11 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             {mode === 'view' && (
-              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline" style={{ gap: 6 }}>
+              <button onClick={() => setMode('edit')} className={buttonVariants({ variant: 'outline', size: 'sm' })} style={{ gap: 6 }}>
                 <Icon name="ki-pencil" style={{ fontSize: 12 }} />Изменить
               </button>
             )}
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
               <Icon name="ki-cross" style={{ fontSize: 14 }} />
             </button>
           </div>
@@ -660,7 +662,7 @@ function CycleCreateDrawer({ initialDate, userId, onClose, onCreated }: {
               <h2 className="pf-num" style={{ fontSize: 20, color: 'var(--foreground)', lineHeight: 1 }}>Создать цикл</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" style={{ fontSize: 14 }} /></button>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" style={{ fontSize: 14 }} /></button>
         </div>
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           {[{ id: 'info', label: '1. Параметры' }, { id: 'days', label: '2. Дни цикла' }].map(s => (
@@ -1218,7 +1220,7 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); onDeleteEvent(ev.id) }}
-                      className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0"
+                      className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'opacity-0 transition-opacity group-hover:opacity-100 shrink-0')}
                     >
                       <Icon name="ki-trash" className="text-xs text-muted-foreground" />
                     </button>
@@ -1265,12 +1267,12 @@ function DetailPanel({ dateStr, savedEvents, monthWorkouts, cycles, cycleDaysMap
             <p className="mt-1 max-w-[18rem] text-2xs leading-5 text-muted-foreground">
               Добавьте тренировку, встречу или заметку, чтобы день появился в календарной ленте.
             </p>
-            <button onClick={() => onAddEvent(dateStr)} className="mt-4 kt-btn kt-btn-sm kt-btn-primary gap-1.5">
+            <button onClick={() => onAddEvent(dateStr)} className={cn(buttonVariants({ size: 'sm' }), 'mt-4 gap-1.5')}>
               <Icon name="ki-plus" className="text-xs" />Добавить событие
             </button>
           </div>
         ) : (
-          <button onClick={() => onAddEvent(dateStr)} className="mt-auto kt-btn kt-btn-sm kt-btn-outline gap-1.5 w-full justify-center">
+          <button onClick={() => onAddEvent(dateStr)} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-auto gap-1.5 w-full justify-center')}>
             <Icon name="ki-plus" className="text-xs" />Добавить событие
           </button>
         )}
@@ -1470,7 +1472,7 @@ function AddEventDrawer({ initialDate, ownerId, onClose, onCreated, mode = 'crea
             <div><p style={{fontSize:10,fontWeight:700,color:'var(--muted-foreground)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:1}}>Календарь</p>
             <h2 className="pf-num" style={{fontSize:22,color:'var(--foreground)',lineHeight:1}}>{drawerMode==='create'?'Добавить событие':drawerMode==='edit'?'Редактировать':(initialEvent?.title??'Событие')}</h2></div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-cross" style={{fontSize:14}} /></button>
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-cross" style={{fontSize:14}} /></button>
         </div>
         <div style={{flex:1,overflowY:'auto',padding:'20px 24px 24px'}}>
           {drawerMode==='view'&&initialEvent&&(
@@ -2064,7 +2066,7 @@ export default function CalendarPage() {
                 {showCycles && (
                   <button
                     onClick={() => setShowAddCycle(true)}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
                     <Icon name="ki-abstract-26" className="text-xs" />
                     Создать цикл
@@ -2074,21 +2076,21 @@ export default function CalendarPage() {
                   <>
                     <button
                       onClick={() => { setSessionDrawerInit({ date: selected ?? _today, session: null }); setShowSessionDrawer(true) }}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
                       <Icon name="ki-calendar-tick" className="text-xs" />
                       Занятие
                     </button>
                     <button
                       onClick={() => setShowPlansManager(true)}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
                       <Icon name="ki-discount" className="text-xs" />
                       Тарифы
                     </button>
                     <button
                       onClick={() => { setIssuePassForAthlete(null); setShowIssuePass(true) }}
-                      className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                     >
                       <Icon name="ki-price-tag" className="text-xs" />
                       Абонемент
@@ -2098,7 +2100,7 @@ export default function CalendarPage() {
                 {isDoctor && (
                   <button
                     onClick={() => { setCheckupDrawerInit({ date: selected ?? _today, checkup: null }); setShowCheckupDrawer(true) }}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
                     <Icon name="ki-heart" className="text-xs" />
                     Медосмотр
@@ -2107,7 +2109,7 @@ export default function CalendarPage() {
                 {isOrg && (
                   <button
                     onClick={() => { setOrgDrawerInit({ date: selected ?? _today, session: null }); setShowOrgSessionDrawer(true) }}
-                    className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                   >
                     <Icon name="ki-people" className="text-xs" />
                     Событие команды
@@ -2115,7 +2117,7 @@ export default function CalendarPage() {
                 )}
                 <button
                   onClick={() => openAddEvent(selected ?? undefined)}
-                  className="kt-btn kt-btn-sm kt-btn-primary gap-1.5"
+                  className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5')}
                 >
                   <Icon name="ki-plus" className="text-xs" />
                   Добавить событие
@@ -2189,11 +2191,11 @@ export default function CalendarPage() {
               ))}
             </div>
             <div className="flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2">
-              <button onClick={prevPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-left" className="text-xs" /></button>
+              <button onClick={prevPeriod} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-left" className="text-xs" /></button>
               <div className="min-w-[160px] text-center pf-num text-lg text-foreground">{periodLabel()}</div>
-              <button onClick={nextPeriod} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"><Icon name="ki-right" className="text-xs" /></button>
+              <button onClick={nextPeriod} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}><Icon name="ki-right" className="text-xs" /></button>
             </div>
-            <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className="kt-btn kt-btn-sm kt-btn-outline gap-1.5">
+            <button onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth()); setSelected(_today); setView('month') }} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}>
               <Icon name="ki-calendar" className="text-xs" />
               Сегодня
             </button>
@@ -2309,7 +2311,7 @@ export default function CalendarPage() {
                   <span className="shrink-0 text-[11px] text-muted-foreground">
                     {parseLocalDate(ev.event_date ?? ev.start_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}{ev.start_time && ` · ${ev.start_time}`}
                   </span>
-                  <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className="opacity-0 transition-opacity group-hover:opacity-100 kt-btn kt-btn-xs kt-btn-icon kt-btn-ghost shrink-0">
+                  <button onClick={e => { e.stopPropagation(); handleDeleteEvent(ev.id) }} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-xs' }), 'opacity-0 transition-opacity group-hover:opacity-100 shrink-0')}>
                     <Icon name="ki-trash" className="text-xs text-muted-foreground" />
                   </button>
                 </div>

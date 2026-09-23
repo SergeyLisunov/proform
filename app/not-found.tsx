@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 export default function NotFound() {
   return (
@@ -15,11 +17,11 @@ export default function NotFound() {
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="kt-btn kt-btn-primary gap-2">
+        <Link href="/dashboard" className={cn(buttonVariants(), 'gap-2')}>
           <Icon name="ki-home" className="text-sm" />
           На главную
         </Link>
-        <Link href="javascript:history.back()" className="kt-btn kt-btn-outline gap-2">
+        <Link href="javascript:history.back()" className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}>
           <Icon name="ki-left" className="text-sm" />
           Назад
         </Link>

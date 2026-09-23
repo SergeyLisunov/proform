@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { prescribeWorkout } from '@/services/prescribed-workouts.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type Athlete = { id: string; name: string }
 
@@ -77,7 +78,7 @@ export function PrescribeWorkoutDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тренировка для атлета</p>
             <h3 className="text-lg font-semibold text-navy-500">Назначить</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

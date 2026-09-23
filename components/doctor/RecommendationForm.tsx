@@ -21,6 +21,7 @@ import {
   type RecommendationVisibility,
 } from '@/services/recommendations.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 const CATEGORIES: RecommendationCategory[] = [
   'load_restriction','activity_restriction','recovery','observation',
@@ -103,7 +104,7 @@ export default function RecommendationForm({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-rose-700">Медицинская рекомендация</p>
             <h3 className="text-lg font-semibold text-navy-500">Для пациента: {athleteName}</h3>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={onClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

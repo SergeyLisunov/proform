@@ -8,6 +8,8 @@ import { getNewsletters, createNewsletter, updateNewsletterStatus, sendNewslette
 import type { Newsletter, NewsletterStatus, OrgMemberRole } from '@/types/org.types'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 const STATUS_META: Record<NewsletterStatus, { label: string; badge: string; icon: string; accent: string; bg: string }> = {
   draft: {
@@ -313,7 +315,7 @@ export default function OrgNewslettersPage() {
                         <button
                           onClick={() => handleSend(nl.id)}
                           disabled={sending === nl.id}
-                          className="kt-btn kt-btn-sm kt-btn-primary gap-1.5 disabled:opacity-50"
+                          className={cn(buttonVariants({ size: 'sm' }), 'gap-1.5 disabled:opacity-50')}
                         >
                           <Icon name={sending === nl.id ? 'ki-arrows-circle' : 'ki-paper-plane'} className={`text-xs ${sending === nl.id ? 'animate-spin' : ''}`} />
                           {sending === nl.id ? 'Отправка…' : 'Отправить'}
@@ -322,7 +324,7 @@ export default function OrgNewslettersPage() {
                       {nl.status === 'sent' && (
                         <Link
                           href={`/org/newsletters/${nl.id}/stats`}
-                          className="kt-btn kt-btn-sm kt-btn-outline gap-1.5"
+                          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
                         >
                           <Icon name="ki-chart-line-up" className="text-xs" />
                           Статистика
@@ -374,7 +376,7 @@ export default function OrgNewslettersPage() {
                   <h3 className="pf-num mt-2 text-[28px] leading-none text-navy-500">Новая рассылка</h3>
                   <p className="mt-2 text-2sm text-muted-foreground">Подготовьте сообщение для атлетов, тренеров или всей организации в одном редакторе.</p>
                 </div>
-                <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+                <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                   <Icon name="ki-cross" className="text-sm" />
                 </button>
               </div>
@@ -440,7 +442,7 @@ export default function OrgNewslettersPage() {
                 <button
                   onClick={() => handleSave('draft')}
                   disabled={saving || !form.subject || !form.body}
-                  className="kt-btn kt-btn-outline flex-1"
+                  className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}
                 >
                   {saving && saveAction === 'draft' ? 'Сохранение…' : 'Сохранить черновик'}
                 </button>
@@ -448,7 +450,7 @@ export default function OrgNewslettersPage() {
                   <button
                     onClick={() => handleSave('schedule')}
                     disabled={saving || !form.subject || !form.body}
-                    className="kt-btn kt-btn-outline flex-1"
+                    className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}
                   >
                     {saving && saveAction === 'schedule' ? 'Планирование…' : 'Запланировать'}
                   </button>

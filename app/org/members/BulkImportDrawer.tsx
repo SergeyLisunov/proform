@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import { parseCsv, isValidEmail } from '@/lib/csv/parse'
 import { Accordion } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type MemberRole = 'athlete' | 'coach'
 
@@ -174,7 +175,7 @@ export function BulkImportDrawer({ onClose, onComplete }: {
               <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', lineHeight: 1 }}>Массовое приглашение</h2>
             </div>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>

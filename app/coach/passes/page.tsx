@@ -25,6 +25,7 @@ import {
 } from '@/services/athlete-passes.service'
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 function fmtDate(iso: string): string {
   try {
@@ -249,7 +250,7 @@ export default function CoachPassesPage() {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setConfirming(null)}
-                className="kt-btn kt-btn-outline"
+                className={buttonVariants({ variant: 'outline' })}
               >
                 Отмена
               </button>

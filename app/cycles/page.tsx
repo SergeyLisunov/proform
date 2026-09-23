@@ -11,6 +11,8 @@ import {
   type CycleBlock, type CycleType, type CycleDay, type DayType, type UpdateCycleInput,
 } from '@/services/cycles.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 function parseLocalDate(s: string): Date { return new Date(s + 'T00:00:00') }
 function todayISO(): string {
@@ -207,11 +209,11 @@ function CycleDetailDrawer({ cycle, userId, onClose, onUpdated, onDeleted }: {
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             {mode === 'view' && (
-              <button onClick={() => setMode('edit')} className="kt-btn kt-btn-sm kt-btn-outline" style={{ gap: 6 }}>
+              <button onClick={() => setMode('edit')} className={buttonVariants({ variant: 'outline', size: 'sm' })} style={{ gap: 6 }}>
                 <Icon name="ki-pencil" style={{ fontSize: 12 }} />Изменить
               </button>
             )}
-            <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
               <Icon name="ki-cross" style={{ fontSize: 14 }} />
             </button>
           </div>
@@ -574,11 +576,11 @@ function CyclesContent() {
               </div>
             </div>
             <div className="flex flex-col gap-3 xl:w-[200px] xl:shrink-0">
-              <Link href="/calendar" className="kt-btn kt-btn-primary gap-2 no-underline justify-center">
+              <Link href="/calendar" className={cn(buttonVariants(), 'gap-2 no-underline justify-center')}>
                 <Icon name="ki-calendar" className="text-xs" />
                 Открыть календарь
               </Link>
-              <Link href="/calendar#create-cycle" className="kt-btn kt-btn-outline gap-2 no-underline justify-center">
+              <Link href="/calendar#create-cycle" className={cn(buttonVariants({ variant: 'outline' }), 'gap-2 no-underline justify-center')}>
                 <Icon name="ki-plus" className="text-xs" />
                 Создать цикл
               </Link>
@@ -608,7 +610,7 @@ function CyclesContent() {
             <p className="mt-1 max-w-xs text-sm text-muted-foreground">
               Создайте первый тренировочный цикл в календаре, чтобы структурировать подготовку.
             </p>
-            <Link href="/calendar" className="mt-5 kt-btn kt-btn-primary gap-2 no-underline">
+            <Link href="/calendar" className={cn(buttonVariants(), 'mt-5 gap-2 no-underline')}>
               <Icon name="ki-calendar" className="text-xs" />Открыть календарь
             </Link>
           </div>

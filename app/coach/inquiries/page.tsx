@@ -18,6 +18,7 @@ import {
 } from '@/services/doctor-inquiries.service'
 import { Card, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 type FilterTab = 'all' | 'pending' | 'answered' | 'expired'
 
@@ -243,7 +244,7 @@ export default function CoachInquiriesPage() {
             className="relative z-10 w-full max-w-md rounded-2xl bg-background shadow-2xl border border-border">
             <div className="border-b border-border px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-navy-500">Новый запрос врачу</h3>
-              <button onClick={() => setShowCreate(false)} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+              <button onClick={() => setShowCreate(false)} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
                 <Icon name="ki-cross" className="text-xs" />
               </button>
             </div>

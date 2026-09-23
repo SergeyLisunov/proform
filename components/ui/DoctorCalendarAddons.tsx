@@ -12,6 +12,7 @@ import { findAthleteConflicts, type Conflict } from '@/services/calendar-conflic
 import { ConflictWarning } from '@/components/ui/ConflictWarning'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
 
 export function useDoctorPatients(doctorId: string | null) {
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -189,7 +190,7 @@ export function MedicalCheckupDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Медосмотр</p>
             <h3 className="text-lg font-semibold text-navy-500">{initial ? 'Редактировать' : 'Новый осмотр'}</h3>
           </div>
-          <button onClick={handleClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>

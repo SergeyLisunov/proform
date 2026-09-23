@@ -10,6 +10,8 @@ import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 import { useToast } from '@/lib/hooks/useToast'
 import { checkPersonalRecords, RECORD_LABEL, formatRecordValue } from '@/services/personal-records.service'
 import { Icon } from '@/components/ui/Icon'
+import { buttonVariants } from '@/components/reui/button'
+import { cn } from '@/lib/utils'
 
 // ── Константы ────────────────────────────────────────────────────────────────
 export const ACTIVITY_CONFIG: Record<string, { icon: string; bg: string; border: string; text: string }> = {
@@ -552,7 +554,7 @@ export function WorkoutAddDrawer({
               Запись попадёт в дневник и календарь.
             </p>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
+          <button onClick={onClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -572,8 +574,8 @@ export function WorkoutAddDrawer({
           )}
         </div>
         <div className="border-t border-border bg-card px-6 py-4 flex gap-2">
-          <button type="button" onClick={onClose} className="kt-btn kt-btn-outline flex-1">Отмена</button>
-          <button type="submit" disabled={saving} className="kt-btn kt-btn-primary flex-1 min-w-[160px] justify-center">
+          <button type="button" onClick={onClose} className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}>Отмена</button>
+          <button type="submit" disabled={saving} className={cn(buttonVariants(), 'flex-1 min-w-[160px] justify-center')}>
             {saving ? 'Сохранение…' : needsOverride ? 'Сохранить с override…' : 'Сохранить'}
           </button>
         </div>
@@ -781,7 +783,7 @@ export function WorkoutEditDrawer({
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
+          <button onClick={onClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -823,7 +825,7 @@ export function WorkoutEditDrawer({
       <div className="border-t border-border bg-card px-6 py-4 flex gap-2">
         {mode === 'view' ? (
           <>
-            <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary flex-1 justify-center gap-2">
+            <button onClick={() => setMode('edit')} className={cn(buttonVariants(), 'flex-1 justify-center gap-2')}>
               <Icon name="ki-pencil" className="text-xs" /> Редактировать
             </button>
             {!confirmDel ? (
@@ -841,14 +843,14 @@ export function WorkoutEditDrawer({
                 >
                   {deleting ? '…' : 'Удалить'}
                 </button>
-                <button onClick={() => setConfirmDel(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                <button onClick={() => setConfirmDel(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
               </>
             )}
           </>
         ) : (
           <>
-            <button onClick={() => setMode('view')} className="kt-btn kt-btn-outline flex-1">Отмена</button>
-            <button onClick={handleSave} disabled={saving} className="kt-btn kt-btn-primary flex-1 justify-center">
+            <button onClick={() => setMode('view')} className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}>Отмена</button>
+            <button onClick={handleSave} disabled={saving} className={cn(buttonVariants(), 'flex-1 justify-center')}>
               {saving ? 'Сохранение…' : 'Сохранить'}
             </button>
           </>
@@ -1031,7 +1033,7 @@ export function CalendarEventEditDrawer({
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0">
+          <button onClick={onClose} className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'shrink-0')}>
             <Icon name="ki-cross" className="text-sm" />
           </button>
         </div>
@@ -1079,7 +1081,7 @@ export function CalendarEventEditDrawer({
       <div className="border-t border-border bg-card px-6 py-4 flex gap-2">
         {mode === 'view' ? (
           <>
-            <button onClick={() => setMode('edit')} className="kt-btn kt-btn-primary flex-1 justify-center gap-2">
+            <button onClick={() => setMode('edit')} className={cn(buttonVariants(), 'flex-1 justify-center gap-2')}>
               <Icon name="ki-pencil" className="text-xs" /> Редактировать
             </button>
             {!confirmDel ? (
@@ -1097,14 +1099,14 @@ export function CalendarEventEditDrawer({
                 >
                   {deleting ? '…' : 'Удалить'}
                 </button>
-                <button onClick={() => setConfirmDel(false)} className="kt-btn kt-btn-outline">Отмена</button>
+                <button onClick={() => setConfirmDel(false)} className={buttonVariants({ variant: 'outline' })}>Отмена</button>
               </>
             )}
           </>
         ) : (
           <>
-            <button onClick={() => setMode('view')} className="kt-btn kt-btn-outline flex-1">Отмена</button>
-            <button onClick={handleSave} disabled={saving} className="kt-btn kt-btn-primary flex-1 justify-center">
+            <button onClick={() => setMode('view')} className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}>Отмена</button>
+            <button onClick={handleSave} disabled={saving} className={cn(buttonVariants(), 'flex-1 justify-center')}>
               {saving ? 'Сохранение…' : 'Сохранить'}
             </button>
           </>
