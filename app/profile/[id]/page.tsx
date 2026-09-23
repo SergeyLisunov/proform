@@ -12,6 +12,7 @@ import { Card, Badge } from '@/components/ui/metronic'
 import { getErrorMessage } from '@/lib/utils/errors'
 import AskAiButton from '@/components/assistant/AskAiButton'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
   athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FEF0E7' },
@@ -268,7 +269,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {profile.avatar_url
-              ? <img src={profile.avatar_url} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <AvatarImage src={profile.avatar_url} alt={displayName} sizes="96px" />
               : <span style={{ fontSize: 28, fontWeight: 800, color: roleMeta.color }}>{displayName[0]?.toUpperCase()}</span>
             }
           </div>

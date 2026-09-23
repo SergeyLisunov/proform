@@ -24,6 +24,7 @@ import {
 } from '@/services/coach-reviews.service'
 import { Icon } from '@/components/ui/Icon'
 import { Star } from 'lucide-react'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 interface CoachReviewsBlockProps {
   coachId: string
@@ -330,7 +331,7 @@ export default function CoachReviewsBlock({ coachId, summary }: CoachReviewsBloc
                     }}>
                       {r.athlete_avatar_url
                         // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={r.athlete_avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ? <AvatarImage src={r.athlete_avatar_url} alt="" sizes="40px" />
                         : (r.athlete_name ?? r.athlete_nickname ?? '?').charAt(0).toUpperCase()}
                     </div>
                     <div style={{ minWidth: 0 }}>

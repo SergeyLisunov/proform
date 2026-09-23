@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { getAthletePassport } from '@/services/athlete-public.service'
 import PassportShareBar from './PassportShareBar'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 export const revalidate = 300 // 5 минут
 
@@ -96,9 +97,8 @@ export default async function AthletePassportPage(
           <div className="flex items-start gap-5 flex-wrap">
             <div className="shrink-0">
               {p.avatar_url ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={p.avatar_url} alt={p.display_name}
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-2xl object-cover border-4 border-white/20 shadow-xl" />
+                <AvatarImage src={p.avatar_url} alt={p.display_name} sizes="(min-width: 768px) 128px, 96px"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-white/20 shadow-xl" />
               ) : (
                 <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-white/20 text-white flex items-center justify-center text-4xl font-bold border-4 border-white/20">
                   {p.display_name.charAt(0).toUpperCase()}

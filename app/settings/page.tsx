@@ -10,6 +10,7 @@ import { Alert } from '@/components/ui/metronic'
 import { CountryFlag } from '@/components/ui/CountryFlag'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -732,7 +733,7 @@ export default function SettingsPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {avatarUrl
-                    ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <AvatarImage src={avatarUrl} alt="" sizes="128px" />
                     : <span style={{ fontSize: 28, fontWeight: 800, color: 'white' }}>
                         {(form.first_name || user?.name || '?')[0]?.toUpperCase()}
                       </span>

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type Author = {
   id: string
@@ -202,7 +203,7 @@ export default function WorkoutCommentsDrawer({
                     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${mine ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'}`}>
                       {c.author?.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={c.author.avatar_url} alt="" className="h-8 w-8 rounded-xl object-cover" />
+                        <AvatarImage src={c.author.avatar_url} alt="" className="h-8 w-8 rounded-xl" sizes="32px" />
                       ) : (
                         <Icon name="ki-user" className="text-[13px]" />
                       )}

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 /* eslint-disable @next/next/no-img-element */
 interface SporteoLogoProps {
   /** Visual size preset (logo height in px: sm 20 · md 28 · lg 40). */
@@ -26,14 +27,14 @@ export function SporteoLogo({ size = 'md', iconOnly = false, onDark = false, cla
 
   if (iconOnly) {
     return (
-      <img src="/sporteo-mark.png" alt="Sporteo" width={markW} height={h} className={`inline-block align-middle ${className}`} />
+      <Image src="/sporteo-mark.png" alt="Sporteo" width={markW} height={h} priority className={`inline-block align-middle ${className}`} />
     )
   }
 
   if (onDark) {
     return (
       <span className={`inline-flex items-center gap-2 ${className}`} aria-label="Sporteo">
-        <img src="/sporteo-mark.png" alt="" width={markW} height={h} className="inline-block align-middle" />
+        <Image src="/sporteo-mark.png" alt="" width={markW} height={h} priority className="inline-block align-middle" />
         <span className="font-extrabold leading-none tracking-wider text-white" style={{ fontSize: Math.round(h * 0.66) }}>
           SPORTEO
         </span>
@@ -42,7 +43,7 @@ export function SporteoLogo({ size = 'md', iconOnly = false, onDark = false, cla
   }
 
   return (
-    <img
+    <Image
       src="/sporteo-logo.png"
       alt="Sporteo"
       width={Math.round(h * LOGO_RATIO)}

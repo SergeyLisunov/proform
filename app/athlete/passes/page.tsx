@@ -26,6 +26,7 @@ import { getMyReviewsByCoachIds } from '@/services/coach-reviews.service'
 import AthleteReviewPrompt from '@/components/athlete/AthleteReviewPrompt'
 import { Card, Alert, Accordion } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 function fmtDate(iso: string): string {
   try {
@@ -162,7 +163,7 @@ export default function AthletePassesPage() {
                         <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700 overflow-hidden shrink-0">
                           {p.coach_avatar_url
                             // eslint-disable-next-line @next/next/no-img-element
-                            ? <img src={p.coach_avatar_url} alt="" className="w-full h-full object-cover" />
+                            ? <AvatarImage src={p.coach_avatar_url} alt="" />
                             : (p.coach_name ?? '?').charAt(0).toUpperCase()}
                         </div>
                         <Link href={`/profile/${p.coach_id}`} className="text-xs text-muted-foreground hover:text-orange-600 truncate">

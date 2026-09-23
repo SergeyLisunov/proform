@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const DoctorHeroBar         = dynamic(() => import('@/components/doctor/DoctorHeroBar'),         { ssr: false })
 const DoctorQuickActions    = dynamic(() => import('@/components/doctor/DoctorQuickActions'),    { ssr: false })
@@ -278,7 +279,7 @@ export default function DoctorDashboard({ userId, name }: { userId: string; name
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 overflow-hidden">
                     {p.user?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.user.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover" />
+                      <AvatarImage src={p.user.avatar_url} alt="" className="h-10 w-10 rounded-xl" sizes="40px" />
                     ) : (
                       <Icon name="ki-user" className="text-[15px]" />
                     )}

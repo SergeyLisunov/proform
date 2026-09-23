@@ -33,6 +33,7 @@ import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { Card, Badge, ChartCard } from '@/components/ui/metronic'
 import ApexChart from '@/components/charts/ApexChart'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const ROLE_OPTIONS: SellerRole[] = ['coach', 'doctor', 'specialist']
 const TYPE_OPTIONS: ServiceType[] = [
@@ -502,7 +503,7 @@ function MarketplaceInner() {
                               <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700 overflow-hidden shrink-0">
                                 {seller.avatar_url
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
+                                  ? <AvatarImage src={seller.avatar_url} alt="" />
                                   : (seller.name ?? '?').charAt(0).toUpperCase()}
                               </div>
                               <div className="flex flex-col min-w-0">

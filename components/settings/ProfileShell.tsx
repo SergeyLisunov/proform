@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useRef } from 'react'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type Tab = { id: string; label: string; icon: string; color: string }
 
@@ -125,7 +126,7 @@ export function ProfileShell(props: {
           <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-border bg-muted">
             {props.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={props.avatarUrl} alt="" className="h-full w-full object-cover" />
+              <AvatarImage src={props.avatarUrl} alt="" sizes="96px" />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-2xl text-muted-foreground">
                 <Icon name="ki-user" />
