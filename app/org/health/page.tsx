@@ -22,6 +22,7 @@ import {
   type OrgHealthSnapshot, type RiskBucket,
 } from '@/services/org-snapshot.service'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const RISK_META: Record<RiskBucket, { label: string; color: string; bg: string }> = {
   low:      { label: 'В норме',  color: '#16A34A', bg: '#F0FDF4' },
@@ -331,7 +332,7 @@ export default function OrgHealthPage() {
                 <div className="w-9 h-9 rounded-2xl bg-orange-100 flex items-center justify-center text-sm font-bold text-orange-700 overflow-hidden shrink-0">
                   {c.coach_avatar_url
                     // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={c.coach_avatar_url} alt="" className="w-full h-full object-cover" />
+                    ? <AvatarImage src={c.coach_avatar_url} alt="" />
                     : (c.coach_name ?? '?').charAt(0).toUpperCase()}
                 </div>
                 <Link href={`/profile/${c.coach_id}`} className="flex-1 min-w-0 text-sm font-semibold text-foreground hover:text-orange-700 truncate no-underline">

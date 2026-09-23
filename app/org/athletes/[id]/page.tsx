@@ -30,6 +30,7 @@ import { Card, Alert, Badge } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 interface AthleteProfile {
   id: string
@@ -220,8 +221,7 @@ export default function OrgAthletePage() {
       <Card className="rounded-3xl p-6 flex items-start gap-5 flex-wrap">
         <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-700 shrink-0 overflow-hidden">
           {profile.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+            <AvatarImage src={profile.avatar_url} alt="" />
           ) : initials}
         </div>
         <div className="min-w-0 flex-1">

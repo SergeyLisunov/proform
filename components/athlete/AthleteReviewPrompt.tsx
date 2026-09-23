@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { upsertReview } from '@/services/coach-reviews.service'
 import { Icon } from '@/components/ui/Icon'
 import { Star } from 'lucide-react'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 interface AthleteReviewPromptProps {
   coachId:        string
@@ -87,7 +88,7 @@ export default function AthleteReviewPrompt({
           <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-sm font-bold text-amber-700 overflow-hidden shrink-0">
             {coachAvatarUrl
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={coachAvatarUrl} alt="" className="w-full h-full object-cover" />
+              ? <AvatarImage src={coachAvatarUrl} alt="" />
               : initial}
           </div>
           <div className="min-w-0 flex-1">

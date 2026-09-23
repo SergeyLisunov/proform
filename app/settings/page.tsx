@@ -10,6 +10,7 @@ import { Alert } from '@/components/ui/metronic'
 import { CountryFlag } from '@/components/ui/CountryFlag'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 // ── Supabase ───────────────────────────────────────────────────────────────────
 function getSB() {
@@ -732,7 +733,7 @@ export default function SettingsPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {avatarUrl
-                    ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <AvatarImage src={avatarUrl} alt="" sizes="128px" />
                     : <span style={{ fontSize: 28, fontWeight: 800, color: 'white' }}>
                         {(form.first_name || user?.name || '?')[0]?.toUpperCase()}
                       </span>
@@ -821,7 +822,7 @@ export default function SettingsPage() {
                   <input
                     value={form.nickname}
                     onChange={e => handleNicknameChange(e.target.value)}
-                    placeholder="username"
+                    placeholder="никнейм"
                     maxLength={30}
                     style={{
                       ...iStyle, paddingLeft: 28,
@@ -880,7 +881,7 @@ export default function SettingsPage() {
                 <div style={{ position: 'relative' }}>
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
                   <input value={form.instagram_url} onChange={e => set('instagram_url')(e.target.value)}
-                    placeholder="username"
+                    placeholder="никнейм"
                     style={{ ...iStyle, paddingLeft: 28 }}
                     onFocus={e => (e.target.style.borderColor = '#0284C7')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
@@ -890,7 +891,7 @@ export default function SettingsPage() {
                 <div style={{ position: 'relative' }}>
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
                   <input value={form.telegram_url} onChange={e => set('telegram_url')(e.target.value)}
-                    placeholder="username"
+                    placeholder="никнейм"
                     style={{ ...iStyle, paddingLeft: 28 }}
                     onFocus={e => (e.target.style.borderColor = '#0284C7')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
@@ -907,7 +908,7 @@ export default function SettingsPage() {
                 <div style={{ position: 'relative' }}>
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted-foreground)', fontSize: 13 }}>@</span>
                   <input value={form.tiktok_url} onChange={e => set('tiktok_url')(e.target.value)}
-                    placeholder="username"
+                    placeholder="никнейм"
                     style={{ ...iStyle, paddingLeft: 28 }}
                     onFocus={e => (e.target.style.borderColor = '#0284C7')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border)')} />

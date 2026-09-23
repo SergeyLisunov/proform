@@ -26,6 +26,7 @@ import {
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 function getSB() {
   return createBrowserClient(
@@ -861,7 +862,7 @@ export default function AdminPage() {
                           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-sm font-bold pf-num text-foreground overflow-hidden">
                             {c.avatar_url
                               // eslint-disable-next-line @next/next/no-img-element
-                              ? <img src={c.avatar_url} alt="" className="w-full h-full object-cover" />
+                              ? <AvatarImage src={c.avatar_url} alt="" />
                               : getInitials(c.name ?? c.nickname ?? '?')}
                           </div>
                           <div className="min-w-0 flex-1">

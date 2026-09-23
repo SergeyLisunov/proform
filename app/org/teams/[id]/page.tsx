@@ -27,6 +27,7 @@ import {
 import { Card, Badge } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced', 'pro', 'recreational']
 
@@ -341,7 +342,7 @@ export default function TeamDetailPage() {
                   <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-700 overflow-hidden shrink-0">
                     {m.avatar_url
                       // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={m.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ? <AvatarImage src={m.avatar_url} alt="" />
                       : initials || '?'}
                   </div>
                   <div className="min-w-0 flex-1">

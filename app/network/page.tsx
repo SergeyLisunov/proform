@@ -6,6 +6,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
 import { Card, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type Mode = 'contacts' | 'find'
 type FindType = 'people' | 'coach' | 'doctor' | 'organization'
@@ -96,7 +97,7 @@ function Avatar({ url, name, role, size = 44 }: { url?: string | null; name: str
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {url
-        ? <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ? <AvatarImage src={url} alt="" sizes="64px" />
         : <span style={{ fontSize: size * 0.38, fontWeight: 800, color: rm.color }}>
             {name[0]?.toUpperCase() ?? '?'}
           </span>

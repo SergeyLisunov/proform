@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type AthleteUser = {
   id: string
@@ -90,7 +91,7 @@ export default async function DoctorReportsPage() {
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-2xl border border-border overflow-hidden shrink-0 bg-[#FEF2F2] flex items-center justify-center">
                     {a.avatar_url
-                      ? <img src={a.avatar_url} alt="" className="h-full w-full object-cover" />
+                      ? <AvatarImage src={a.avatar_url} alt="" sizes="48px" />
                       : <span className="text-sm font-bold text-[#DC2626]">{initials}</span>
                     }
                   </div>

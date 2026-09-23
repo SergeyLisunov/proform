@@ -7,6 +7,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useToast } from '@/lib/hooks/useToast'
 import { useDialog } from '@/lib/hooks/useDialog'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type Challenge = {
   id: string
@@ -227,7 +228,7 @@ export default function ChallengeDetailPage() {
                   <th className="px-3 py-2.5 text-left">#</th>
                   <th className="px-3 py-2.5 text-left">Атлет</th>
                   <th className="px-3 py-2.5 text-right">Минут</th>
-                  <th className="px-3 py-2.5 text-right">Strain</th>
+                  <th className="px-3 py-2.5 text-right">Нагрузка</th>
                   <th className="px-3 py-2.5 text-right">Трен-к</th>
                   <th className="px-3 py-2.5 text-right">Балл</th>
                 </tr>
@@ -249,7 +250,7 @@ export default function ChallengeDetailPage() {
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted text-xs font-bold text-foreground">
                             {r.user_avatar ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={r.user_avatar} alt="" className="h-8 w-8 object-cover" />
+                              <AvatarImage src={r.user_avatar} alt="" className="h-8 w-8" sizes="32px" />
                             ) : (
                               (displayName(r)[0] ?? '?').toUpperCase()
                             )}

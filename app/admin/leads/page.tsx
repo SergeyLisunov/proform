@@ -138,14 +138,14 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
-                <th className="pb-2 pr-4">Source</th>
-                <th className="pb-2 pr-4 text-right">Total</th>
-                <th className="pb-2 pr-4 text-right">Dispatched</th>
-                <th className="pb-2 pr-4 text-right">Converted</th>
-                <th className="pb-2 pr-4 text-right">Paid</th>
+                <th className="pb-2 pr-4">Источник</th>
+                <th className="pb-2 pr-4 text-right">Всего</th>
+                <th className="pb-2 pr-4 text-right">Отправлено</th>
+                <th className="pb-2 pr-4 text-right">Конверсий</th>
+                <th className="pb-2 pr-4 text-right">Оплатили</th>
                 <th className="pb-2 pr-4 text-right">Conv. rate</th>
-                <th className="pb-2 pr-4 text-right">Failed</th>
-                <th className="pb-2">Last lead</th>
+                <th className="pb-2 pr-4 text-right">Ошибок</th>
+                <th className="pb-2">Последний лид</th>
               </tr>
             </thead>
             <tbody>
@@ -219,12 +219,12 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                 <thead>
                   <tr className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
                     <th className="pb-2 pr-3">Email</th>
-                    <th className="pb-2 pr-3">Source</th>
-                    <th className="pb-2 pr-3">Captured</th>
-                    <th className="pb-2 pr-3">Dispatched</th>
-                    <th className="pb-2 pr-3">Converted</th>
-                    <th className="pb-2 pr-3 text-right">Attempts</th>
-                    <th className="pb-2">Payload meta</th>
+                    <th className="pb-2 pr-3">Источник</th>
+                    <th className="pb-2 pr-3">Получен</th>
+                    <th className="pb-2 pr-3">Отправлено</th>
+                    <th className="pb-2 pr-3">Конверсий</th>
+                    <th className="pb-2 pr-3 text-right">Попыток</th>
+                    <th className="pb-2">Метаданные</th>
                   </tr>
                 </thead>
                 <tbody>

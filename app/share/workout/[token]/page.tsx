@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -109,7 +110,7 @@ export default async function SharedWorkoutPage({
           <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-slate-500">
             {data.athlete_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={data.athlete_avatar} alt="" className="h-14 w-14 object-cover" />
+              <AvatarImage src={data.athlete_avatar} alt="" className="h-14 w-14" sizes="56px" />
             ) : (
               <Icon name="ki-user" className="text-[20px]" />
             )}

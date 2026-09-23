@@ -72,7 +72,10 @@ function DialogContent({
           >
             <XIcon
             />
-            <span className="sr-only">Close</span>
+            {/* Единственная наша правка в файле из реестра: подпись для
+                скринридера. Английское «Close» в русском интерфейсе читается
+                вслух как чужеродное. При переустановке компонента вернуть. */}
+            <span className="sr-only">Закрыть</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>

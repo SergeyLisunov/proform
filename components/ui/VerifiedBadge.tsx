@@ -29,7 +29,7 @@ export default function VerifiedBadge({ size = 'sm', tooltip, className, style }
     return (
       <span
         title={title}
-        aria-label="Verified"
+        aria-label="Профиль подтверждён"
         className={className}
         style={{
           display: 'inline-flex',

@@ -280,7 +280,7 @@ export default function OrgOnboardingPage() {
               Название организации *
             </label>
             <input type="text" value={orgName} onChange={e => setOrgName(e.target.value)}
-              placeholder="Sporteo Triathlon Club"
+              placeholder="Клуб триатлона «Волна»"
               maxLength={80}
               className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-hidden focus:border-blue-400" />
           </div>

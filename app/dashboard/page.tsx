@@ -18,6 +18,7 @@ import ClearanceBadge from '@/components/clearance/ClearanceBadge'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
@@ -106,11 +107,11 @@ function HeroAvatar({ avatarUrl, name, userId, onAvatarUpdate }: {
       onClick={() => inputRef.current?.click()}
     >
       {displayUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={displayUrl} alt={name}
-          className="w-[72px] h-[72px] rounded-full object-cover"
-          style={{ border: '3px solid var(--card)' }}
+        // displayUrl может быть blob: — локальное превью только что выбранного
+        // файла. AvatarImage сам отдаст такой случай обычному <img>.
+        <AvatarImage
+          src={displayUrl} alt={name} sizes="72px"
+          className="w-[72px] h-[72px] rounded-full border-[3px] border-card"
         />
       ) : (
         <div
@@ -1177,7 +1178,7 @@ function AdminDash({ name }: { name: string }) {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <div>
-        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
+        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Взгляд администратора</p>
         <h2 className="pf-num text-[36px] text-navy-500 leading-none">Обзор системы</h2>
       </div>
 

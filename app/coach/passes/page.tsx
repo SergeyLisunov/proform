@@ -26,6 +26,7 @@ import {
 import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 function fmtDate(iso: string): string {
   try {
@@ -178,7 +179,7 @@ export default function CoachPassesPage() {
                     <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center text-sm font-bold text-orange-700 overflow-hidden shrink-0">
                       {p.athlete_avatar_url
                         // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={p.athlete_avatar_url} alt="" className="w-full h-full object-cover" />
+                        ? <AvatarImage src={p.athlete_avatar_url} alt="" />
                         : (p.athlete_name ?? p.athlete_nickname ?? '?').charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">

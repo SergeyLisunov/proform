@@ -19,6 +19,7 @@ import {
 } from '@/services/marketplace.service'
 import { Card, Badge, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
+import { AvatarImage } from '@/components/ui/AvatarImage'
 
 function fmtPrice(cents: number, currency: string): string {
   if (cents === 0) return 'Бесплатно'
@@ -193,7 +194,7 @@ export default function OfferingDetailPage() {
           <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-base font-bold text-orange-700 overflow-hidden shrink-0">
             {seller.avatar_url
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
+              ? <AvatarImage src={seller.avatar_url} alt="" />
               : (seller.name ?? '?').charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">

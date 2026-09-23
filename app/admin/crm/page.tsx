@@ -511,9 +511,9 @@ export default function AdminCRMPage() {
         <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
           className="rounded-xl border border-input text-sm outline-hidden bg-card px-3 py-2 focus:border-orange-400">
           <option value="all">Все планы</option>
-          <option value="free">Free</option>
+          <option value="free">Бесплатный</option>
           <option value="pro">Pro</option>
-          <option value="team">Team</option>
+          <option value="team">Команда</option>
         </select>
 
         <span style={{ fontSize: 12, color: 'var(--muted-foreground)', marginLeft: 'auto' }}>

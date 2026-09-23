@@ -313,7 +313,7 @@ export default function ClubAuditForm() {
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Название (опц.)</label>
                 <input value={clubName} onChange={e => setClubName(e.target.value)} maxLength={120}
-                  placeholder="Demo Athletic"
+                  placeholder="Академия «Волна»"
                   className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
