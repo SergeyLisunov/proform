@@ -154,7 +154,7 @@ export default function NoteEditor({
           ))}
           {mathSum !== null && (
             <div className="flex justify-between text-xs font-semibold text-blue-600 px-1 pt-1 border-t border-gray-100">
-              <span>Total</span>
+              <span>Всего</span>
               <span>{formatNum(mathSum)}</span>
             </div>
           )}

@@ -434,7 +434,7 @@ export default async function OnboardingFunnelPage({
                   <th className="text-left py-2 pr-3">Роль</th>
                   <th className="text-left py-2 pr-3">Шаг</th>
                   <th className="text-left py-2 pr-3">Статус</th>
-                  <th className="text-right py-2 pr-3">Started</th>
+                  <th className="text-right py-2 pr-3">Начали</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">

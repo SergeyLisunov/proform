@@ -77,7 +77,7 @@ export default function AnalyticsCharts({ dailyData, weeklyStrain, zonePcts }: P
         {zonePcts.some(p=>p>0) ? (
           <ApexChart type="donut" options={donutOpts} series={zonePcts} height={260} width="100%" />
         ) : (
-          <div className="h-[260px] flex items-center justify-center text-slate-400 text-sm">No zone data available</div>
+          <div className="h-[260px] flex items-center justify-center text-slate-400 text-sm">Нет данных по зонам</div>
         )}
       </ChartCard>
 

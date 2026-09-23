@@ -77,7 +77,7 @@ export default function WeeklyInsightsCard() {
                 <div className="text-base font-extrabold text-foreground pf-num">{data.total_min} мин</div>
               </div>
               <div>
-                <div className="text-muted-foreground">Strain</div>
+                <div className="text-muted-foreground">Нагрузка</div>
                 <div className="text-base font-extrabold text-foreground pf-num">{data.total_strain.toFixed(1)}</div>
               </div>
             </div>

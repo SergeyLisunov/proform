@@ -1177,7 +1177,7 @@ function AdminDash({ name }: { name: string }) {
   return (
     <div className="flex flex-col gap-6 pf-enter">
       <div>
-        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Admin View</p>
+        <p className="text-2xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">Взгляд администратора</p>
         <h2 className="pf-num text-[36px] text-navy-500 leading-none">Обзор системы</h2>
       </div>
 

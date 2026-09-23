@@ -227,7 +227,7 @@ export default function ChallengeDetailPage() {
                   <th className="px-3 py-2.5 text-left">#</th>
                   <th className="px-3 py-2.5 text-left">Атлет</th>
                   <th className="px-3 py-2.5 text-right">Минут</th>
-                  <th className="px-3 py-2.5 text-right">Strain</th>
+                  <th className="px-3 py-2.5 text-right">Нагрузка</th>
                   <th className="px-3 py-2.5 text-right">Трен-к</th>
                   <th className="px-3 py-2.5 text-right">Балл</th>
                 </tr>

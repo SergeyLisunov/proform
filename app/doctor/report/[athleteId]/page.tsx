@@ -295,7 +295,7 @@ export default function DoctorReportPage() {
                         <th className="px-3 py-2 text-left">Дата</th>
                         <th className="px-3 py-2 text-left">Активность</th>
                         <th className="px-3 py-2 text-left">Метка</th>
-                        <th className="px-3 py-2 text-right">Strain</th>
+                        <th className="px-3 py-2 text-right">Нагрузка</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -330,10 +330,10 @@ export default function DoctorReportPage() {
                         <th className="px-2 py-2 text-right">Мин.</th>
                         <th className="px-2 py-2 text-right">ЧСС ср.</th>
                         <th className="px-2 py-2 text-right">ЧСС макс.</th>
-                        <th className="px-2 py-2 text-right">Strain</th>
-                        <th className="px-2 py-2 text-right">Recovery</th>
+                        <th className="px-2 py-2 text-right">Нагрузка</th>
+                        <th className="px-2 py-2 text-right">Восстановление</th>
                         <th className="px-2 py-2 text-right">HRV</th>
-                        <th className="px-2 py-2 text-center">Mood</th>
+                        <th className="px-2 py-2 text-center">Настроение</th>
                       </tr>
                     </thead>
                     <tbody>

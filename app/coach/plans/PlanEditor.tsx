@@ -343,7 +343,7 @@ export default function PlanEditor({ mode, initial }: Props) {
                             className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden" />
                           <select value={it.intensity} onChange={e => updateItem(it.uiId, { intensity: e.target.value as Intensity | '' })}
                             className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden">
-                            <option value="">Intensity</option>
+                            <option value="">Интенсивность</option>
                             <option value="easy">Лёгкая</option>
                             <option value="moderate">Средняя</option>
                             <option value="hard">Высокая</option>

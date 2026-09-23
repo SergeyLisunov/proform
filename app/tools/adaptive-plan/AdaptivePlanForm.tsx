@@ -421,15 +421,15 @@ export default function AdaptivePlanForm() {
                     type="number" min={0} max={10} placeholder="RPE 0-10"
                     className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <input value={r.recovery_score} onChange={e => updateRow(r.id, { recovery_score: e.target.value })}
-                    type="number" min={0} max={100} placeholder="Recovery"
+                    type="number" min={0} max={100} placeholder="Восстановление"
                     className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400" />
                   <select value={r.felt} onChange={e => updateRow(r.id, { felt: e.target.value as '' | Felt })}
                     className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-blue-400">
-                    <option value="">Felt</option>
-                    <option value="great">Great</option>
+                    <option value="">Самочувствие</option>
+                    <option value="great">Отличное</option>
                     <option value="ok">OK</option>
-                    <option value="tired">Tired</option>
-                    <option value="exhausted">Exhausted</option>
+                    <option value="tired">Усталость</option>
+                    <option value="exhausted">Истощение</option>
                   </select>
                 </div>
               </div>
