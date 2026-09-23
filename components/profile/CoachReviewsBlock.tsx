@@ -23,6 +23,7 @@ import {
   type CoachReviewWithAuthor, type CoachReview, type ReviewSummary,
 } from '@/services/coach-reviews.service'
 import { Icon } from '@/components/ui/Icon'
+import { Star } from 'lucide-react'
 
 interface CoachReviewsBlockProps {
   coachId: string
@@ -52,7 +53,11 @@ function StarRating({
             style={{ color: filled ? '#F59E0B' : '#D1D5DB', background: 'none', border: 'none', padding: 0 }}
             aria-label={`${i + 1} звезда`}
           >
-            <Icon name={filled ? 'ki-solid' : 'ki-outline'} />
+            {/* Заливка звезды раньше задавалась начертанием шрифта
+                (ki-solid против ki-outline). У Lucide это проп fill, поэтому
+                здесь прямой импорт Star, а не общий Icon: он заливкой не
+                управляет. */}
+            <Star className="size-[1em]" fill={filled ? 'currentColor' : 'none'} aria-hidden />
           </button>
         )
       })}
