@@ -175,8 +175,6 @@ export default function Sidebar() {
           'lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
-        data-kt-drawer="true"
-        data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0"
       >
       {/* Mobile-only close (×) button. Pinned top-right of the drawer so
           users can dismiss without hunting for the backdrop or burger. */}
@@ -226,13 +224,9 @@ export default function Sidebar() {
       <div className="kt-sidebar-content flex grow py-3 overflow-hidden" id="sidebar_content">
         <div
           className="kt-scrollable-y-hover grow flex flex-col px-4"
-          data-kt-scrollable="true"
-          data-kt-scrollable-dependencies="#sidebar_header"
-          data-kt-scrollable-height="auto"
-          data-kt-scrollable-wrappers="#sidebar_content"
           id="sidebar_scrollable"
         >
-          <div className="kt-menu flex flex-col gap-5 grow" data-kt-menu="true">
+          <div className="kt-menu flex flex-col gap-5 grow">
             {visibleSections.map(section => (
               <div key={section.title} className="space-y-2.5">
                 <div className="px-2">

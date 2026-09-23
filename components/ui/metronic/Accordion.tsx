@@ -20,9 +20,13 @@ interface AccordionProps {
 }
 
 /**
- * Metronic `kt-accordion`, driven by React state (not Metronic's
- * `core.bundle.js`, which only scans the DOM once `afterInteractive` and breaks
- * on re-render). Smooth open/close via the grid-rows 1fr→0fr technique.
+ * Аккордеон на классах `kt-accordion`, управляемый состоянием React.
+ *
+ * Скрипт Metronic сканировал DOM один раз после гидратации и ломался на
+ * перерисовке, поэтому раскрытие с самого начала держалось на useState. В
+ * сентябре 2026 скрипт удалён из проекта — здесь не изменилось ничего, и это
+ * как раз показывает, что он был не нужен. Плавное открытие — приёмом
+ * grid-rows 1fr→0fr.
  */
 export function Accordion({ items, defaultOpenIds = [], allowMultiple = false, className = '' }: AccordionProps) {
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set(defaultOpenIds))
@@ -43,7 +47,6 @@ export function Accordion({ items, defaultOpenIds = [], allowMultiple = false, c
         return (
           <div
             key={item.id}
-            data-kt-accordion-item={item.id}
             className={`kt-accordion-item bg-card border rounded-xl overflow-hidden transition-colors ${
               isOpen ? 'active border-[#F35703]/40' : 'border-border'
             }`}

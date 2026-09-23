@@ -17,12 +17,12 @@ const Ctx = createContext<MobileMenuCtx | null>(null)
 
 /**
  * MobileMenuProvider — single source of truth for the narrow-viewport
- * sidebar drawer. The previous implementation relied on Metronic's
- * `kt-drawer` JS (loaded via core.bundle.js after hydration) to wire up
- * `data-kt-drawer-toggle="#sidebar"` to `<div id="sidebar">`. That
- * vanilla JS does not survive React hydration cleanly — events on the
- * trigger fired before/after React re-rendered the DOM, leaving the
- * burger button non-functional on mobile.
+ * sidebar drawer. Прежняя реализация полагалась на kt-drawer из скрипта
+ * Metronic: он должен был связать data-kt-drawer-toggle="#sidebar" с
+ * <div id="sidebar"> после гидратации. Ванильный JS не переживает
+ * React-гидратацию чисто — события на триггере срабатывали до или после
+ * перерисовки, и бургер на мобильном не работал. Скрипт удалён из проекта
+ * в сентябре 2026; эта реализация от него и не зависела.
  *
  * Replacing with a React context keeps state in the component tree:
  *   - TopBar's burger button calls `toggle()`

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
 import { Montserrat } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -109,8 +108,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="ru"
       className={`${montserrat.variable} h-full light`}
-      data-kt-theme="true"
-      data-kt-theme-mode="light"
     >
       {/* W18 Day 92 CRITICAL BUG FIX:
           Removed `flex h-full` from body className. Metronic template assumes
@@ -129,7 +126,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </MobileMenuProvider>
           </DialogProvider>
         </ToastProvider>
-        <Script src="/assets/js/core.bundle.js" strategy="afterInteractive" />
         {/* W15 Day 76 — Vercel Analytics + Speed Insights.
             SDK auto-disables в development; both products GDPR-aligned
             (cookieless, no PII). Per-event taxonomy: lib/analytics/track.ts */}
