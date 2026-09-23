@@ -60,7 +60,7 @@ const FAQ: FaqItem[] = [
 
 export default function FaqSection() {
   return (
-    <section className="w-full bg-slate-50 py-20 px-4 sm:px-6 lg:px-10">
+    <section className="w-full bg-muted py-20 px-4 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="max-w-3xl">
@@ -81,7 +81,7 @@ export default function FaqSection() {
             <TrackedFaqItem
               key={item.q}
               question={item.q}
-              className="group rounded-2xl border border-border bg-white p-5 shadow-xs transition-all open:shadow-md"
+              className="group rounded-2xl border border-border bg-card p-5 shadow-xs transition-all open:shadow-md"
             >
               <summary className="flex cursor-pointer items-start justify-between gap-3 list-none">
                 <h3 className="text-base font-bold leading-tight text-navy-500">

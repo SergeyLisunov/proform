@@ -86,7 +86,7 @@ const ASSIGNABLE_ROLES = ['athlete', 'coach', 'doctor', 'specialist', 'organizat
 
 const ACTION_BADGE: Record<AuditAction, string> = {
   login: 'bg-blue-50 text-blue-700 border border-blue-200',
-  logout: 'bg-slate-100 text-slate-700 border border-slate-200',
+  logout: 'bg-muted text-slate-700 border border-border',
   create: 'bg-green-50 text-green-700 border border-green-200',
   update: 'bg-orange-50 text-orange-700 border border-orange-200',
   privacy_change: 'bg-violet-50 text-violet-700 border border-violet-200',

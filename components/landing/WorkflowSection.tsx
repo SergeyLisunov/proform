@@ -130,7 +130,7 @@ export default function WorkflowSection() {
   return (
     <section
       id="how-it-works"
-      className="w-full bg-slate-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
+      className="w-full bg-muted px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
       aria-labelledby="workflow-heading"
     >
       <div className="mx-auto max-w-7xl">

@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ru"
-      className={`${montserrat.variable} h-full light`}
+      className={`${montserrat.variable} h-full`}
     >
       {/* W18 Day 92 CRITICAL BUG FIX:
           Removed `flex h-full` from body className. Metronic template assumes

@@ -82,7 +82,7 @@ function VariantInput({
         className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20"
       />
 
-      <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-center">
+      <div className="mt-3 rounded-xl bg-muted px-3 py-2 text-center">
         <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
           CTR
         </div>
@@ -168,7 +168,7 @@ export default function Calculator() {
       {/* Numeric breakdown */}
       {(a.visitors > 0 || b.visitors > 0) && (
         <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
-          <div className="rounded-xl bg-slate-50 px-3 py-2">
+          <div className="rounded-xl bg-muted px-3 py-2">
             <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
               Z-statistic
             </div>
@@ -176,7 +176,7 @@ export default function Calculator() {
               {Number.isFinite(result.z) ? result.z.toFixed(2) : '—'}
             </div>
           </div>
-          <div className="rounded-xl bg-slate-50 px-3 py-2">
+          <div className="rounded-xl bg-muted px-3 py-2">
             <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
               p-value
             </div>
@@ -184,7 +184,7 @@ export default function Calculator() {
               {Number.isFinite(result.pValue) ? result.pValue.toFixed(3) : '—'}
             </div>
           </div>
-          <div className="rounded-xl bg-slate-50 px-3 py-2">
+          <div className="rounded-xl bg-muted px-3 py-2">
             <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
               Confidence
             </div>

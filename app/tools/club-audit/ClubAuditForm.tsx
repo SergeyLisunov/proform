@@ -265,7 +265,7 @@ export default function ClubAuditForm() {
   return (
     <div>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-linear-to-br from-emerald-50 via-white to-teal-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-emerald-50 via-white to-teal-50 border-b border-border">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-4">
             <Icon name="ki-focus" className="text-[11px] mr-1" />Бесплатный аудит для директоров клубов
@@ -288,19 +288,19 @@ export default function ClubAuditForm() {
 
       {/* ── Form ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 py-10">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+        <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
               <h2 className="text-lg font-bold">Ваш клуб</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Все поля приватны — не сохраняются без email confirmation</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Все поля приватны — не сохраняются без email confirmation</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               <button onClick={fillSample} type="button"
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                className="rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-muted">
                 Пример (Demo Athletic, 120 атлетов)
               </button>
               <button onClick={clearAll} type="button"
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                className="rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-muted">
                 Очистить
               </button>
             </div>
@@ -308,18 +308,18 @@ export default function ClubAuditForm() {
 
           {/* Section 1: Club info */}
           <div className="mb-5">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">1. О клубе</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">1. О клубе</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Название (опц.)</label>
                 <input value={clubName} onChange={e => setClubName(e.target.value)} maxLength={120}
                   placeholder="Академия «Волна»"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Основной спорт</label>
                 <select value={primarySport} onChange={e => setPrimarySport(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {SPORT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
@@ -327,83 +327,83 @@ export default function ClubAuditForm() {
                 <label className="text-[11px] font-semibold text-slate-600">Месячный доход (опц., руб)</label>
                 <input value={revenue} onChange={e => setRevenue(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} step={10000} placeholder="850000"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
 
           {/* Section 2: Structure */}
           <div className="mb-5">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">2. Структура (обязательно)</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">2. Структура (обязательно)</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Атлетов всего *</label>
                 <input value={totalAthletes} onChange={e => setTotalAthletes(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={1} max={10000} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Активных (платящих) *</label>
                 <input value={activeAthletes} onChange={e => setActiveAthletes(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={10000} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Тренеров *</label>
                 <input value={coachesCount} onChange={e => setCoachesCount(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={1} max={500} required
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
 
           {/* Section 3: Operations */}
           <div className="mb-5">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">3. Операционные метрики (опц.)</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">3. Операционные метрики (опц.)</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Ушло за 90 дней</label>
                 <input value={departed90d} onChange={e => setDeparted90d(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={10000} placeholder="0"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Целевых сессий/неделю</label>
                 <input value={sessionsTarget} onChange={e => setSessionsTarget(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={20} step={0.5} placeholder="3"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Фактических сессий/неделю</label>
                 <input value={sessionsActual} onChange={e => setSessionsActual(e.target.value === '' ? '' : Number(e.target.value))}
                   type="number" min={0} max={20} step={0.5} placeholder="2.5"
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
               </div>
             </div>
           </div>
 
           {/* Section 4: Tracking methods */}
           <div className="mb-5">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">4. Текущие методы учёта</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">4. Текущие методы учёта</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Тренировки</label>
                 <select value={trainingTracking} onChange={e => setTrainingTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Биллинг</label>
                 <select value={billingTracking} onChange={e => setBillingTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-slate-600">Мед.допуски</label>
                 <select value={medicalTracking} onChange={e => setMedicalTracking(e.target.value as TrackingMethod)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400">
                   {TRACKING_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -412,7 +412,7 @@ export default function ClubAuditForm() {
 
           {/* Section 5: Pain points */}
           <div className="mb-3">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">5. Болевые точки (выберите все, что применимо)</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">5. Болевые точки (выберите все, что применимо)</h3>
             <div className="flex flex-wrap gap-1.5">
               {PAIN_POINTS.map(p => {
                 const sel = painPoints.includes(p.value)
@@ -421,7 +421,7 @@ export default function ClubAuditForm() {
                     className={`rounded-lg border-2 px-3 py-1.5 text-xs font-semibold transition-all ${
                       sel
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200'
+                        : 'border-border bg-card text-slate-600 hover:border-emerald-200'
                     }`}>
                     <Icon name={p.icon} className="text-xs mr-1" />{p.label}
                   </button>
@@ -430,7 +430,7 @@ export default function ClubAuditForm() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 mt-5 pt-4 border-t border-border">
             <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
               className="rounded-lg bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
               {phase === 'analyzing' ? 'Анализируем клуб…' : 'Получить audit-отчёт →'}
@@ -467,9 +467,9 @@ export default function ClubAuditForm() {
                   {HEALTH_META[report.health_label].label}
                 </span>
               </div>
-              <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Резюме</div>
-                <p className="text-sm text-slate-800 leading-relaxed">{report.summary}</p>
+              <div className="md:col-span-2 rounded-2xl border border-border bg-card p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Резюме</div>
+                <p className="text-sm text-foreground leading-relaxed">{report.summary}</p>
                 {report.estimated_revenue_at_risk && (
                   <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800">
                     <Icon name="ki-dollar" className="text-sm" />{report.estimated_revenue_at_risk}
@@ -489,22 +489,22 @@ export default function ClubAuditForm() {
                     style={{ background: meta.bg, borderColor: meta.border }}>
                     <div className={blurred ? 'blur-[5px] select-none pointer-events-none' : ''}>
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h4 className="text-base font-bold text-slate-900">{r.name}</h4>
+                        <h4 className="text-base font-bold text-foreground">{r.name}</h4>
                         <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                           style={{ background: 'white', color: meta.color, border: `1px solid ${meta.border}` }}>
                           <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.dot }} />
                           {r.severity}
                         </span>
                       </div>
-                      <p className="text-[13px] text-slate-700 mb-2"><strong className="text-slate-900">Сейчас:</strong> {r.current_state}</p>
-                      <p className="text-[13px] text-slate-700"><strong className="text-slate-900">Действие:</strong> {r.recommended_action}</p>
+                      <p className="text-[13px] text-slate-700 mb-2"><strong className="text-foreground">Сейчас:</strong> {r.current_state}</p>
+                      <p className="text-[13px] text-slate-700"><strong className="text-foreground">Действие:</strong> {r.recommended_action}</p>
                       {r.proform_helps_with && (
                         <p className="mt-2 text-[12px] text-emerald-700 italic inline-flex items-center gap-1.5"><Icon name="ki-information-2" className="not-italic" />{r.proform_helps_with}</p>
                       )}
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-xs">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-card px-3 py-1.5 rounded-md border border-border shadow-xs">
                           <Icon name="ki-lock-2" />email откроет полный отчёт
                         </span>
                       </div>
@@ -522,7 +522,7 @@ export default function ClubAuditForm() {
                     <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-800 mb-2">
                       <Icon name="ki-focus" />Top-3 приоритеты на 30 дней
                     </div>
-                    <ol className="space-y-1.5 text-sm text-slate-800">
+                    <ol className="space-y-1.5 text-sm text-foreground">
                       {report.top_3_priorities.map((p, i) => (
                         <li key={i} className="flex gap-2">
                           <span className="font-bold text-blue-700">{i + 1}.</span>
@@ -533,9 +533,9 @@ export default function ClubAuditForm() {
                   </div>
                 )}
 
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Next steps на 7-14 дней</div>
-                  <p className="text-sm text-slate-800 leading-relaxed">{report.next_steps}</p>
+                <div className="rounded-xl border border-border bg-card p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Next steps на 7-14 дней</div>
+                  <p className="text-sm text-foreground leading-relaxed">{report.next_steps}</p>
                 </div>
               </>
             )}
@@ -543,12 +543,12 @@ export default function ClubAuditForm() {
             {/* Email gate */}
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/40">
-                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 mb-2.5">
+                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground mb-2.5">
                   <Icon name="ki-lock-2" />Открыть полный audit-отчёт ({report.risk_areas.length} risk areas + Top-3 приоритеты + Next Steps)
                 </p>
                 <input type="email" required placeholder="director@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-emerald-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-emerald-500" />
@@ -583,7 +583,7 @@ export default function ClubAuditForm() {
 
       {/* ── Science section ────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+        <div className="rounded-2xl border border-border bg-muted p-6">
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как считается health score</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
@@ -618,7 +618,7 @@ export default function ClubAuditForm() {
       </section>
 
       {/* ── Cross-link ─────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-5xl px-5 pb-10 text-center text-sm text-slate-500">
+      <div className="mx-auto max-w-5xl px-5 pb-10 text-center text-sm text-muted-foreground">
         Ещё для команды:{' '}
         <Link href="/tools/team-risk" className="text-emerald-700 hover:underline font-semibold">
           Team Risk Snapshot (тренеры)

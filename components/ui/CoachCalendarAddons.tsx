@@ -331,7 +331,7 @@ export function CoachSessionDrawer({
                     status===s
                       ? s==='completed' ? 'border-green-400 bg-green-50 text-green-700'
                       : s==='no_show'   ? 'border-red-400 bg-red-50 text-red-700'
-                      : s==='cancelled' ? 'border-slate-400 bg-slate-100 text-slate-600'
+                      : s==='cancelled' ? 'border-slate-400 bg-muted text-slate-600'
                                         : 'border-orange-400 bg-orange-50 text-orange-700'
                       : 'border-border bg-background text-muted-foreground hover:border-orange-200'
                   }`}>

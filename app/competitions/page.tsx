@@ -353,7 +353,7 @@ function CompetitionsContent() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-border bg-background/75 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-600">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-slate-600">
                     <Icon name="ki-arrow-down" className="text-base" />
                   </div>
                   <div>

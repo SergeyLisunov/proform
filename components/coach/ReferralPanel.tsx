@@ -70,7 +70,7 @@ export default function ReferralPanel({
           <div className="space-y-1">
             {stats.credits.slice(0, 5).map(c => (
               <div key={c.id}
-                className="flex items-center justify-between rounded-lg bg-white border border-border px-3 py-1.5 text-xs">
+                className="flex items-center justify-between rounded-lg bg-card border border-border px-3 py-1.5 text-xs">
                 <span className="text-muted-foreground">
                   {new Date(c.applied_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </span>

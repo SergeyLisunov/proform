@@ -45,7 +45,7 @@ function computeStatus(c: Challenge): 'active' | 'upcoming' | 'finished' {
 const STATUS_STYLE: Record<'active' | 'upcoming' | 'finished', string> = {
   active:   'bg-emerald-50 text-emerald-700 border-emerald-200',
   upcoming: 'bg-blue-50 text-blue-700 border-blue-200',
-  finished: 'bg-slate-100 text-slate-600 border-slate-200',
+  finished: 'bg-muted text-slate-600 border-border',
 }
 
 const STATUS_LABEL: Record<'active' | 'upcoming' | 'finished', string> = {

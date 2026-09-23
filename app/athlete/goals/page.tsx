@@ -302,7 +302,7 @@ export default function AthleteGoalsPage() {
 
                 {progressPct !== null && (
                   <div>
-                    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div className="h-full transition-all" style={{ width: `${progressPct}%`, background: status.color }} />
                     </div>
                     <div className="text-[10px] text-muted-foreground mt-1">{progressPct}% прогресса</div>

@@ -343,7 +343,7 @@ export default function TeamRiskCalculator() {
   return (
     <div>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-linear-to-br from-orange-50 via-white to-rose-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-orange-50 via-white to-rose-50 border-b border-border">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-600 mb-4">
             <Icon name="ki-focus" className="text-orange-600" /> Бесплатный AI-инструмент
@@ -366,15 +366,15 @@ export default function TeamRiskCalculator() {
 
       {/* ── Form ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 py-10">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+        <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="text-lg font-bold">Данные команды</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Минимум 1 атлет, рекомендуем 5-12 для лучшего snapshot</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Минимум 1 атлет, рекомендуем 5-12 для лучшего snapshot</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               <button onClick={fillSample} type="button"
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                className="rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-muted">
                 Пример
               </button>
               <button onClick={() => fileRef.current?.click()} type="button"
@@ -384,7 +384,7 @@ export default function TeamRiskCalculator() {
               <input ref={fileRef} type="file" accept=".csv,.txt,text/csv,text/plain" hidden
                 onChange={e => handleCsvUpload(e.target.files?.[0])} />
               <button onClick={clearAll} type="button"
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                className="rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold hover:bg-muted">
                 Очистить
               </button>
             </div>
@@ -393,26 +393,26 @@ export default function TeamRiskCalculator() {
           {/* Sport + team meta */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Вид спорта</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Вид спорта</label>
               <select value={sport} onChange={e => setSport(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-orange-400">
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-orange-400">
                 {SPORT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Команда (опц.)</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Команда (опц.)</label>
               <input value={teamName} onChange={e => setTeamName(e.target.value)} maxLength={80}
                 placeholder="Например: U-18 Атлет"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
             </div>
           </div>
 
           {/* Athlete rows */}
           <div className="space-y-2.5 mb-3">
             {rows.map((r, idx) => (
-              <div key={r.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3">
+              <div key={r.id} className="rounded-xl border border-border bg-muted/50 p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Атлет #{idx + 1}</span>
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Атлет #{idx + 1}</span>
                   {rows.length > 1 && (
                     <button onClick={() => removeRow(r.id)} type="button"
                       className="text-[11px] font-semibold text-red-600 hover:underline">
@@ -422,23 +422,23 @@ export default function TeamRiskCalculator() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
                   <input value={r.name} onChange={e => updateRow(r.id, { name: e.target.value })} maxLength={80}
-                    placeholder="Имя" className="col-span-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    placeholder="Имя" className="col-span-2 rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                   <input value={r.age} onChange={e => updateRow(r.id, { age: e.target.value })}
                     type="number" min={8} max={80} placeholder="Возраст"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                   <input value={r.training_hours_current_week} onChange={e => updateRow(r.id, { training_hours_current_week: e.target.value })}
                     type="number" min={0} max={60} step={0.5} placeholder="Часы (нед)"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                   <input value={r.training_hours_avg_4w} onChange={e => updateRow(r.id, { training_hours_avg_4w: e.target.value })}
                     type="number" min={0} max={60} step={0.5} placeholder="Avg 4 нед"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                   <input value={r.recovery_score} onChange={e => updateRow(r.id, { recovery_score: e.target.value })}
                     type="number" min={0} max={100} placeholder="Recovery 0-100"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                   <select value={r.mood} onChange={e => updateRow(r.id, { mood: e.target.value as '' | Mood })}
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400">
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400">
                     <option value="">Настроение (опц.)</option>
                     <option value="great">Отлично</option>
                     <option value="ok">Норма</option>
@@ -447,7 +447,7 @@ export default function TeamRiskCalculator() {
                   </select>
                   <input value={r.coach_note} onChange={e => updateRow(r.id, { coach_note: e.target.value })} maxLength={280}
                     placeholder="Заметка тренера (опц.)"
-                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
+                    className="rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-hidden focus:border-orange-400" />
                 </div>
               </div>
             ))}
@@ -455,7 +455,7 @@ export default function TeamRiskCalculator() {
 
           <div className="flex items-center justify-between gap-3">
             <button onClick={addRow} type="button" disabled={rows.length >= 12}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50 disabled:opacity-50">
+              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-semibold hover:bg-muted disabled:opacity-50">
               + Атлет ({rows.length}/12)
             </button>
             <button onClick={handleAnalyze} disabled={!canSubmit || phase !== 'idle'}
@@ -470,7 +470,7 @@ export default function TeamRiskCalculator() {
             </div>
           )}
 
-          <p className="mt-2 text-[10px] text-slate-400">
+          <p className="mt-2 text-[10px] text-muted-foreground">
             CSV-формат: <code>name,age,hours_current,hours_avg_4w,recovery,mood,note</code> · разделитель определяется автоматически
           </p>
         </div>
@@ -501,22 +501,22 @@ export default function TeamRiskCalculator() {
                     style={{ background: meta.bg, borderColor: meta.border }}>
                     <div className={blurred ? 'blur-[5px] select-none pointer-events-none' : ''}>
                       <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className="font-bold text-slate-900 text-sm truncate">{a.name}</span>
+                        <span className="font-bold text-foreground text-sm truncate">{a.name}</span>
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
                           style={{ background: 'white', color: meta.color, border: `1px solid ${meta.border}` }}>
                           <span className="inline-block h-2 w-2 rounded-full" style={{ background: meta.color }} /> {meta.label}
                         </span>
                       </div>
                       <p className="text-[12px] text-slate-700 mb-1.5">
-                        <strong className="text-slate-900">Причина:</strong> {a.reason}
+                        <strong className="text-foreground">Причина:</strong> {a.reason}
                       </p>
                       <p className="text-[12px] text-slate-700">
-                        <strong className="text-slate-900">Действие:</strong> {a.action}
+                        <strong className="text-foreground">Действие:</strong> {a.action}
                       </p>
                     </div>
                     {blurred && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-xs">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-card px-2 py-1 rounded-md border border-border shadow-xs">
                           <Icon name="ki-lock-2" /> email откроет
                         </span>
                       </div>
@@ -532,7 +532,7 @@ export default function TeamRiskCalculator() {
                 <h3 className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-800 mb-2">
                   <Icon name="ki-focus" className="text-blue-800" /> Главные приоритеты на 7-14 дней
                 </h3>
-                <ol className="space-y-1.5 text-sm text-slate-800">
+                <ol className="space-y-1.5 text-sm text-foreground">
                   {snapshot.priorities.map((p, i) => {
                     const blurred = !showAllPriorities && i >= 1
                     return (
@@ -549,12 +549,12 @@ export default function TeamRiskCalculator() {
             {/* Email gate */}
             {phase === 'result' && (
               <form onSubmit={handleEmailSubmit} className="mt-5 p-4 rounded-xl border-2 border-dashed border-orange-300 bg-orange-50/40">
-                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 mb-2.5">
+                <p className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground mb-2.5">
                   <Icon name="ki-lock-2" /> Открыть полный snapshot ({snapshot.athletes.length} атлетов + все приоритеты)
                 </p>
                 <input type="email" required placeholder="coach@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-orange-500" />
@@ -590,7 +590,7 @@ export default function TeamRiskCalculator() {
 
       {/* ── Science section ────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-5 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+        <div className="rounded-2xl border border-border bg-muted p-6">
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как работает Team Risk Snapshot</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
@@ -628,7 +628,7 @@ export default function TeamRiskCalculator() {
       </section>
 
       {/* ── Cross-link ─────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-5xl px-5 pb-10 text-center text-sm text-slate-500">
+      <div className="mx-auto max-w-5xl px-5 pb-10 text-center text-sm text-muted-foreground">
         Ещё для тренеров:{' '}
         <Link href="/tools/acwr" className="text-orange-600 hover:underline font-semibold">
           калькулятор ACWR

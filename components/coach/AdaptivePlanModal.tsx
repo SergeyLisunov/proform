@@ -167,7 +167,7 @@ export default function AdaptivePlanModal({
 
               {/* Suggestions */}
               {data.suggestions.length === 0 ? (
-                <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 text-sm text-slate-600">
+                <div className="rounded-lg bg-muted border border-border p-4 text-sm text-slate-600">
                   На ближайшие 7 дней назначенных тренировок нет.
                 </div>
               ) : (

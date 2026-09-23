@@ -33,7 +33,7 @@ interface ValueChipProps {
 
 function ValueChip({ icon: Icon, label }: ValueChipProps) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-foreground shadow-xs">
+    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-card/80 px-4 py-2 text-sm font-semibold text-foreground shadow-xs">
       <Icon
         aria-hidden="true"
         size={15}
@@ -98,7 +98,7 @@ export default function HeroSection() {
         </p>
 
         {/* Audit modal trigger — soft conversion для не-готовых register */}
-        <div className="mt-10 w-full max-w-lg rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-5 py-5 sm:max-w-none sm:px-7 sm:py-6">
+        <div className="mt-10 w-full max-w-lg rounded-3xl border-2 border-dashed border-orange-200 bg-card/60 px-5 py-5 sm:max-w-none sm:px-7 sm:py-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5 sm:text-left">
             <div
               aria-hidden="true"

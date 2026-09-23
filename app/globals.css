@@ -2,6 +2,13 @@
 
 @import 'tailwindcss';
 
+/* Вариант dark — по классу, а не по системной настройке.
+   В Tailwind v4 `dark:` по умолчанию смотрит на prefers-color-scheme, то есть
+   пользователь не может выбрать тему сам. Переопределяем на класс `.dark` на
+   <html>: тогда выбор хранится в приложении и переключается мгновенно, а
+   системную настройку мы учитываем только как значение по умолчанию. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-pf-sans), Montserrat, system-ui, sans-serif;
   --font-display: var(--font-pf-sans), Montserrat, system-ui, sans-serif;

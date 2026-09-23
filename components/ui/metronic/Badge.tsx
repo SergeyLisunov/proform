@@ -14,7 +14,7 @@ interface BadgeProps {
 
 const VARIANT_TW: Record<BadgeVariant, string> = {
   primary:     'bg-[#FEF0E7] text-orange-600',
-  secondary:   'bg-slate-100 text-slate-600',
+  secondary:   'bg-muted text-slate-600',
   success:     'bg-green-50 text-green-700',
   warning:     'bg-amber-50 text-amber-700',
   destructive: 'bg-red-50 text-red-600',

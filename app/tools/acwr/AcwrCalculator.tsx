@@ -16,7 +16,7 @@ const UNIT_LABELS: Record<Unit, { label: string; hint: string; exampleValues: [n
 function Bar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0
   return (
-    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
       <div className="h-full bg-orange-500 transition-all" style={{ width: `${pct}%` }} />
     </div>
   )
@@ -139,7 +139,7 @@ export default function AcwrCalculator() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-linear-to-br from-orange-50 via-white to-blue-50 border-b border-slate-200">
+      <section className="bg-linear-to-br from-orange-50 via-white to-blue-50 border-b border-border">
         <div className="mx-auto max-w-5xl px-5 py-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-600 mb-4">
             <Icon name="ki-focus" className="text-[11px]" /> Бесплатный инструмент
@@ -159,14 +159,14 @@ export default function AcwrCalculator() {
       <section className="mx-auto max-w-5xl px-5 py-10">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Form */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+          <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-bold">Введите нагрузку</h2>
               <div className="flex gap-1.5">
-                <button onClick={handleFill} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                <button onClick={handleFill} className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-semibold hover:bg-muted">
                   Пример
                 </button>
-                <button onClick={handleClear} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold hover:bg-slate-50">
+                <button onClick={handleClear} className="rounded-md border border-border bg-card px-2 py-1 text-[11px] font-semibold hover:bg-muted">
                   Очистить
                 </button>
               </div>
@@ -178,13 +178,13 @@ export default function AcwrCalculator() {
                 {(['minutes', 'rpe_hours', 'strain'] as Unit[]).map(u => (
                   <button key={u} type="button" onClick={() => setUnit(u)}
                     className={`px-2 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                      unit === u ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-slate-200 bg-white text-slate-600 hover:border-orange-200'
+                      unit === u ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-border bg-white text-slate-600 hover:border-orange-200'
                     }`}>
                     {UNIT_LABELS[u].label}
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-[11px] text-slate-500">{UNIT_LABELS[unit].hint}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">{UNIT_LABELS[unit].hint}</p>
             </div>
 
             <div className="space-y-3">
@@ -199,7 +199,7 @@ export default function AcwrCalculator() {
                       next[i] = Number.isFinite(parsed) ? Math.max(0, parsed) : 0
                       setW(next)
                     }}
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-100" />
+                    className="mt-1 w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-hidden focus:border-orange-400 focus:ring-2 focus:ring-orange-100" />
                 </div>
               ))}
             </div>
@@ -212,18 +212,18 @@ export default function AcwrCalculator() {
               Результат
             </h2>
             <AcwrGauge acwr={result.acwr} zone={result.zone} />
-            <p className="mt-3 text-sm text-slate-800">
+            <p className="mt-3 text-sm text-foreground">
               <strong>{meta.label}.</strong> {meta.tagline}.
             </p>
 
             {result.acwr != null && (
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-lg bg-white border border-slate-200 p-3">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">Острая (7д)</div>
+                <div className="rounded-lg bg-card border border-border p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Острая (7д)</div>
                   <div className="pf-num text-xl font-bold">{result.acute}</div>
                 </div>
-                <div className="rounded-lg bg-white border border-slate-200 p-3">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">Хроническая (28д)</div>
+                <div className="rounded-lg bg-card border border-border p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Хроническая (28д)</div>
                   <div className="pf-num text-xl font-bold">{result.chronic}</div>
                 </div>
               </div>
@@ -234,7 +234,7 @@ export default function AcwrCalculator() {
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Что делать
                 </h3>
-                <ul className="space-y-1.5 text-sm text-slate-800">
+                <ul className="space-y-1.5 text-sm text-foreground">
                   {result.advice.slice(0, sent ? 10 : 2).map((line, i) => (
                     <li key={i} className="flex gap-2">
                       <span style={{ color: meta.color }}>•</span>
@@ -247,13 +247,13 @@ export default function AcwrCalculator() {
 
             {/* Email gate */}
             {!sent && result.acwr != null && result.advice.length > 2 && (
-              <form onSubmit={handleSubmit} className="mt-4 p-4 rounded-xl border border-dashed border-slate-300 bg-white/70">
+              <form onSubmit={handleSubmit} className="mt-4 p-4 rounded-xl border border-dashed border-slate-300 bg-card/70">
                 <p className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
                   <Icon name="ki-lock-2" className="text-xs" /> Разблокировать все {result.advice.length} рекомендаций
                 </p>
                 <input type="email" required placeholder="you@example.com"
                   value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-hidden focus:border-orange-400" />
                 <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
                     className="mt-0.5 accent-orange-500" />
@@ -285,7 +285,7 @@ export default function AcwrCalculator() {
         </div>
 
         {/* Science */}
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+        <div className="mt-8 rounded-2xl border border-border bg-muted p-6">
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Как это работает</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
             <div>
@@ -316,7 +316,7 @@ export default function AcwrCalculator() {
         </div>
 
         {/* Cross-link */}
-        <div className="mt-6 text-center text-sm text-slate-500">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           Можно ещё:{' '}
           <Link href="/tools/overtraining" className="text-orange-600 hover:underline font-semibold">
             пройти тест на перетренированность

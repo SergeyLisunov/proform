@@ -144,8 +144,8 @@ export default async function DoctorClearancesPage() {
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     {r.review_needed ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-slate-700">
-                        <Icon name="ki-time" className="text-2xs text-slate-500" />требуется review
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-muted px-3 py-1 text-2xs font-bold uppercase tracking-wider text-slate-700">
+                        <Icon name="ki-time" className="text-2xs text-muted-foreground" />требуется review
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-2xs font-bold"

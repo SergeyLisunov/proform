@@ -81,7 +81,7 @@ export default function BenefitsSection() {
           {BENEFITS.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="group flex items-start gap-4 rounded-2xl border border-border bg-slate-50/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-xs sm:p-6"
+              className="group flex items-start gap-4 rounded-2xl border border-border bg-muted/60 p-5 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 hover:shadow-xs sm:p-6"
             >
               <div
                 aria-hidden="true"

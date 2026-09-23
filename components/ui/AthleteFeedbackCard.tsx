@@ -91,10 +91,10 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
   if (loading) {
     return (
       <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-5 w-40 animate-pulse rounded-sm bg-slate-100 mb-3" />
+        <div className="h-5 w-40 animate-pulse rounded-sm bg-muted mb-3" />
         <div className="space-y-2">
-          <div className="h-12 animate-pulse rounded-xl bg-slate-50" />
-          <div className="h-12 animate-pulse rounded-xl bg-slate-50" />
+          <div className="h-12 animate-pulse rounded-xl bg-muted" />
+          <div className="h-12 animate-pulse rounded-xl bg-muted" />
         </div>
       </div>
     )
@@ -111,7 +111,7 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
               <Icon name="ki-message-text-2" className="text-sm" style={{ color: '#D44A02' }} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Обратная связь</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Обратная связь</p>
               <h3 className="text-base font-semibold text-navy-500 mt-0.5">Отзывы к тренировкам</h3>
             </div>
           </div>
@@ -127,20 +127,20 @@ export default function AthleteFeedbackCard({ userId }: { userId: string }) {
             <button
               key={r.notification_id}
               onClick={() => { setOpenFor(r.workout_id); if (!r.is_read) markRead(r.notification_id) }}
-              className={`w-full text-left px-5 py-3 flex items-start gap-3 transition-colors ${r.is_read ? 'hover:bg-slate-50' : 'bg-orange-50/40 hover:bg-orange-50'}`}
+              className={`w-full text-left px-5 py-3 flex items-start gap-3 transition-colors ${r.is_read ? 'hover:bg-muted' : 'bg-orange-50/40 hover:bg-orange-50'}`}
             >
               <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${r.is_read ? 'bg-slate-200' : 'bg-orange-500'}`} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{r.title}</p>
-                {r.body && <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{r.body}</p>}
-                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">{fmtRelative(r.created_at)}</p>
+                <p className="text-sm font-semibold text-foreground truncate">{r.title}</p>
+                {r.body && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{r.body}</p>}
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">{fmtRelative(r.created_at)}</p>
               </div>
-              <Icon name="ki-right" className="text-xs text-slate-400 shrink-0 mt-1.5" />
+              <Icon name="ki-right" className="text-xs text-muted-foreground shrink-0 mt-1.5" />
             </button>
           ))}
         </div>
-        <div className="px-5 py-2.5 border-t border-border bg-slate-50/50 rounded-b-2xl">
-          <Link href="/notifications" className="text-[11px] font-semibold text-slate-500 hover:text-slate-900">
+        <div className="px-5 py-2.5 border-t border-border bg-muted/50 rounded-b-2xl">
+          <Link href="/notifications" className="text-[11px] font-semibold text-muted-foreground hover:text-foreground">
             Все уведомления →
           </Link>
         </div>

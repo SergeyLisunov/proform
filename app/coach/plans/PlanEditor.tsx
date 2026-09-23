@@ -315,18 +315,18 @@ export default function PlanEditor({ mode, initial }: Props) {
                         style={intMeta ? { borderColor: intMeta.border, background: intMeta.bg } : { borderColor: 'var(--border)' }}>
                         <div className="flex items-center justify-between gap-1">
                           <select value={it.activity_type} onChange={e => updateItem(it.uiId, { activity_type: e.target.value })}
-                            className="flex-1 rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] font-semibold outline-hidden">
+                            className="flex-1 rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] font-semibold outline-hidden">
                             {ACTIVITY_TYPE_PRESETS.map(a => <option key={a} value={a}>{ACTIVITY_LABELS[a]}</option>)}
                           </select>
                           <div className="flex gap-0.5 shrink-0">
                             {posInDay > 0 && (
                               <button onClick={() => moveItem(it.uiId, -1)} type="button"
-                                className="w-5 h-5 rounded-sm bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
+                                className="w-5 h-5 rounded-sm bg-card border border-border hover:bg-muted text-[10px]"
                                 title="Выше">↑</button>
                             )}
                             {posInDay < dayItems.length - 1 && (
                               <button onClick={() => moveItem(it.uiId, 1)} type="button"
-                                className="w-5 h-5 rounded-sm bg-white border border-slate-200 hover:bg-slate-50 text-[10px]"
+                                className="w-5 h-5 rounded-sm bg-card border border-border hover:bg-muted text-[10px]"
                                 title="Ниже">↓</button>
                             )}
                             <button onClick={() => removeItem(it.uiId)} type="button"
@@ -336,13 +336,13 @@ export default function PlanEditor({ mode, initial }: Props) {
                         </div>
                         <input value={it.name} onChange={e => updateItem(it.uiId, { name: e.target.value })} maxLength={160}
                           placeholder="Название (опц.)"
-                          className="w-full rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden" />
+                          className="w-full rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] outline-hidden" />
                         <div className="grid grid-cols-2 gap-1">
                           <input value={it.duration_min} onChange={e => updateItem(it.uiId, { duration_min: e.target.value })}
                             type="number" min={0} max={600} placeholder="мин"
-                            className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden" />
+                            className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] outline-hidden" />
                           <select value={it.intensity} onChange={e => updateItem(it.uiId, { intensity: e.target.value as Intensity | '' })}
-                            className="rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden">
+                            className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] outline-hidden">
                             <option value="">Интенсивность</option>
                             <option value="easy">Лёгкая</option>
                             <option value="moderate">Средняя</option>
@@ -352,7 +352,7 @@ export default function PlanEditor({ mode, initial }: Props) {
                         </div>
                         <textarea value={it.notes} onChange={e => updateItem(it.uiId, { notes: e.target.value })}
                           rows={2} placeholder="Заметки (опц.)"
-                          className="w-full rounded-sm border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] outline-hidden resize-none" />
+                          className="w-full rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] outline-hidden resize-none" />
                       </div>
                     )
                   })

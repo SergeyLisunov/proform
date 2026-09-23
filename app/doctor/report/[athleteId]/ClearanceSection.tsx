@@ -128,7 +128,7 @@ export default function ClearanceSection({ athleteId }: Props) {
     : null
 
   return (
-    <section className="rounded-2xl border border-orange-100 bg-white p-5 sm:p-6">
+    <section className="rounded-2xl border border-orange-100 bg-card p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-700">Допуск к нагрузке</p>

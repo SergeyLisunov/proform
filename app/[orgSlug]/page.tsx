@@ -56,8 +56,8 @@ export default function OrgPublicPage() {
   if (notFound) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-5 bg-background p-6">
-        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
-          <Icon name="ki-office-bag" className="text-2xl text-slate-400" />
+        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+          <Icon name="ki-office-bag" className="text-2xl text-muted-foreground" />
         </div>
         <div className="text-center">
           <h1 className="pf-num text-3xl text-navy-500 mb-2">Организация не найдена</h1>

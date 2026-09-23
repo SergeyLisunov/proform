@@ -172,7 +172,7 @@ export default function LoginPage() {
         </div>
 
         {/* Auth card */}
-        <div className="rounded-[28px] border border-orange-100/80 bg-white px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
+        <div className="rounded-[28px] border border-orange-100/80 bg-card px-6 py-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-10 sm:py-10">
           {/* Header strip (small visual only — marketing moved to /) */}
           <div className="mb-4 inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.24em] text-orange-700">
             {t('workspace')}
@@ -330,7 +330,7 @@ export default function LoginPage() {
                   return (
                   <div
                     key={account.email}
-                    className={`flex flex-col gap-3 rounded-2xl border border-border bg-white p-3 transition-all sm:flex-row sm:items-center ${account.ring}`}
+                    className={`flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 transition-all sm:flex-row sm:items-center ${account.ring}`}
                   >
                     <button
                       type="button"

@@ -59,12 +59,12 @@ const ROWS: ComparisonRow[] = [
 
 function BeforeCell({ text }: { text: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4">
+    <div className="flex items-start gap-3 rounded-2xl bg-muted p-4">
       <X
         aria-hidden="true"
         size={18}
         strokeWidth={2.5}
-        className="mt-0.5 shrink-0 text-slate-400"
+        className="mt-0.5 shrink-0 text-muted-foreground"
       />
       <p className="text-sm leading-snug text-slate-600">{text}</p>
     </div>
@@ -88,7 +88,7 @@ function AfterCell({ text }: { text: string }) {
 export default function BeforeAfterSection() {
   return (
     <section
-      className="w-full bg-slate-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
+      className="w-full bg-muted px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-24"
       aria-labelledby="before-after-heading"
     >
       <div className="mx-auto max-w-6xl">
@@ -112,7 +112,7 @@ export default function BeforeAfterSection() {
         {/* Comparison header (desktop) */}
         <div className="mt-12 hidden grid-cols-[2fr_1fr_1fr] gap-4 px-2 text-2xs font-bold uppercase tracking-wider lg:grid">
           <div className="text-muted-foreground">Что меняется</div>
-          <div className="text-slate-500">До Sporteo</div>
+          <div className="text-muted-foreground">До Sporteo</div>
           <div className="text-emerald-700">После Sporteo</div>
         </div>
 
@@ -121,7 +121,7 @@ export default function BeforeAfterSection() {
           {ROWS.map((row) => (
             <article
               key={row.topic}
-              className="grid gap-3 rounded-3xl border border-border bg-white p-5 shadow-xs lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-5"
+              className="grid gap-3 rounded-3xl border border-border bg-card p-5 shadow-xs lg:grid-cols-[2fr_1fr_1fr] lg:items-stretch lg:gap-4 lg:p-5"
             >
               {/* Topic */}
               <div className="flex items-center">
@@ -132,7 +132,7 @@ export default function BeforeAfterSection() {
 
               {/* Before — mobile shows «До:» label inline */}
               <div>
-                <p className="mb-2 text-2xs font-bold uppercase tracking-wider text-slate-500 lg:hidden">
+                <p className="mb-2 text-2xs font-bold uppercase tracking-wider text-muted-foreground lg:hidden">
                   До
                 </p>
                 <BeforeCell text={row.before} />

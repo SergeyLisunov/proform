@@ -408,7 +408,7 @@ export default function TeamDetailPage() {
                   return (
                     <button key={a.id} onClick={() => addMember(a.id)} disabled={busy}
                       className="flex items-center gap-3 rounded-2xl border border-border bg-background hover:border-violet-300 hover:bg-violet-50 transition p-2.5 disabled:opacity-50 text-left">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
                         {initials || '?'}
                       </div>
                       <span className="text-sm font-semibold text-foreground truncate flex-1">

@@ -48,7 +48,7 @@ const POST_TYPES: PostType[] = ['announcement', 'event', 'news', 'result']
 const VISIBILITY_META: Record<PostVisibility, { label: string; badge: string; hint: string }> = {
   all: {
     label: 'Публично',
-    badge: 'bg-slate-100 text-slate-600 border border-slate-200',
+    badge: 'bg-muted text-slate-600 border border-border',
     hint: 'Доступно всем посетителям',
   },
   members: {
@@ -436,7 +436,7 @@ function PostCard({ post, onPin, onDelete, pinnedStyle = false }: { post: WallPo
   return (
     <Card className={`p-5 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-xs ${
       pinnedStyle
-        ? 'border-orange-100! bg-white! shadow-[0_12px_28px_rgba(243,87,3,0.08)]'
+        ? 'border-orange-100! bg-card! shadow-[0_12px_28px_rgba(243,87,3,0.08)]'
         : ''
     }`}>
       <div className="flex items-start justify-between gap-4">

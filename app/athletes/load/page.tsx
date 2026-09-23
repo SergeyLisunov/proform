@@ -57,7 +57,7 @@ export default function AthleteLoadPage() {
       <div className="relative overflow-hidden rounded-3xl border border-[#FECACA] bg-linear-to-br from-[#FEF2F2] via-white to-[#FEF0E7] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-red-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FECACA] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FECACA] bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">
             <Icon name="ki-shield-cross" className="text-[11px]" />
             Нагрузка
           </span>

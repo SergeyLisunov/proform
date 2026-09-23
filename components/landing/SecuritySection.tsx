@@ -101,14 +101,14 @@ export default function SecuritySection() {
         <div className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
           <div className="border-b border-white/10 px-5 py-4 sm:px-7">
             <h3 className="text-base font-bold">Кто что видит</h3>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               Полная матрица доступа по ролям. Работает на уровне базы данных через политики Row-Level Security — обойти её нельзя.
             </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-2xs font-bold uppercase tracking-wider text-slate-400">
+                <tr className="text-left text-2xs font-bold uppercase tracking-wider text-muted-foreground">
                   <th className="px-5 py-3 sm:px-7">Роль</th>
                   <th className="px-5 py-3">Видит</th>
                   <th className="px-5 py-3 pr-5 sm:pr-7">Не видит</th>
@@ -119,7 +119,7 @@ export default function SecuritySection() {
                   <tr key={row.role} className="border-t border-white/10 align-top">
                     <td className="px-5 py-4 font-semibold whitespace-nowrap sm:px-7">{row.role}</td>
                     <td className="px-5 py-4 text-emerald-200">{row.sees}</td>
-                    <td className="px-5 py-4 pr-5 text-slate-400 sm:pr-7">{row.doesNotSee}</td>
+                    <td className="px-5 py-4 pr-5 text-muted-foreground sm:pr-7">{row.doesNotSee}</td>
                   </tr>
                 ))}
               </tbody>
@@ -129,7 +129,7 @@ export default function SecuritySection() {
 
         {/* Trust footer */}
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-xs leading-relaxed text-slate-400">
+          <p className="text-xs leading-relaxed text-muted-foreground">
             <span className="font-semibold text-slate-200">Инфраструктура.</span>{' '}
             Шифрование данных ·
             Шифрование при хранении и передаче ·

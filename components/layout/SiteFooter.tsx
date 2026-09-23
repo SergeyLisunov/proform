@@ -39,7 +39,7 @@ const LEGAL_LINKS: FooterLink[] = [
 ]
 
 function renderLink({ href, label, external }: FooterLink) {
-  const cls = 'text-slate-400 no-underline hover:text-white'
+  const cls = 'text-muted-foreground no-underline hover:text-white'
   if (external) {
     return (
       <a key={label} href={href} className={cls}>
@@ -56,7 +56,7 @@ function renderLink({ href, label, external }: FooterLink) {
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-slate-900 px-4 py-10 text-slate-400 sm:px-6 lg:px-10">
+    <footer className="border-t border-border bg-slate-900 px-4 py-10 text-muted-foreground sm:px-6 lg:px-10">
       <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div>
           <SporteoLogo size="md" onDark />
@@ -70,13 +70,13 @@ export default function SiteFooter() {
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {PRIMARY_LINKS.map(renderLink)}
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-slate-500">
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-muted-foreground">
             {LEGAL_LINKS.map(renderLink)}
           </div>
         </div>
       </div>
 
-      <div className="mx-auto mt-6 max-w-7xl border-t border-white/10 pt-4 text-2xs text-slate-500">
+      <div className="mx-auto mt-6 max-w-7xl border-t border-white/10 pt-4 text-2xs text-muted-foreground">
         © {new Date().getFullYear()} Sporteo · Хостинг данных в Supabase
         EU-Central · RLS-политики на каждой таблице
       </div>

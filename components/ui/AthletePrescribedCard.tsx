@@ -66,7 +66,7 @@ export default function AthletePrescribedCard({ athleteId }: { athleteId: string
             <div key={w.id}
               className={`rounded-xl border p-3 ${
                 status === 'completed' ? 'border-green-200 bg-green-50/50' :
-                status === 'skipped'   ? 'border-slate-200 bg-slate-50'    :
+                status === 'skipped'   ? 'border-border bg-muted'    :
                 overdue                ? 'border-red-200 bg-red-50/40'     :
                                          'border-border bg-background'
               }`}>
@@ -111,7 +111,7 @@ export default function AthletePrescribedCard({ athleteId }: { athleteId: string
                     </div>
                   )}
                   {status === 'skipped' && (
-                    <div className="mt-2 text-[10px] font-semibold text-slate-500">
+                    <div className="mt-2 text-[10px] font-semibold text-muted-foreground">
                       Пропущено
                     </div>
                   )}

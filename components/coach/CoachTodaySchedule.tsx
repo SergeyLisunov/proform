@@ -115,7 +115,7 @@ export default function CoachTodaySchedule({ coachId }: { coachId: string }) {
               {dayLabel(d)} · {byDate[d].length}
             </p>
             {byDate[d].map(s => (
-              <div key={s.id} className="flex items-center gap-3 rounded-xl border border-border bg-white px-3 py-2.5">
+              <div key={s.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5">
                 {s.start_time && (
                   <div className="rounded-lg bg-orange-100 text-orange-700 px-2.5 py-1 text-[11px] font-bold tabular-nums shrink-0">
                     {s.start_time.slice(0, 5)}

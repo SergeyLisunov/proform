@@ -30,14 +30,14 @@ function DurationHMInput({ valueMin, onChange }: { valueMin: string; onChange: (
           value={valueMin === '' ? '' : String(h)} placeholder="0"
           onChange={e => update(Number(e.target.value), m)}
           className={`${base} pr-9`} />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">ч</span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">ч</span>
       </div>
       <div className="relative">
         <input type="number" min={0} max={59} inputMode="numeric" aria-label="Минуты"
           value={valueMin === '' ? '' : String(m)} placeholder="0"
           onChange={e => update(h, Number(e.target.value))}
           className={`${base} pr-11`} />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400">мин</span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">мин</span>
       </div>
     </div>
   )
@@ -86,11 +86,11 @@ export default function DiaryClient({ role, userId }: Props) {
     router.refresh()
   }
 
-  const lbl = (text: string) => <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{text}</label>
+  const lbl = (text: string) => <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">{text}</label>
   const inp = (field: keyof typeof form, type = 'text', placeholder = '') => (
     <input type={type} placeholder={placeholder} value={String(form[field])}
       onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-      className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-white"
+      className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition bg-card"
     />
   )
 
@@ -109,9 +109,9 @@ export default function DiaryClient({ role, userId }: Props) {
             <div className="flex items-center justify-between p-6 border-b border-[#F1F5F9]">
               <div>
                 <h3 className="pf-num text-xl text-navy-500">Записать тренировку</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Все поля совместимы с WHOOP</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Все поля совместимы с WHOOP</p>
               </div>
-              <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
+              <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition">
                 <Icon name="ki-cross" className="text-lg" />
               </button>
             </div>
@@ -124,7 +124,7 @@ export default function DiaryClient({ role, userId }: Props) {
                 <div>
                   {lbl('Время суток')}
                   <select value={form.workout_time_of_day} onChange={e => setForm(f => ({ ...f, workout_time_of_day: e.target.value }))}
-                    className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] bg-white">
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm outline-hidden focus:border-[#2563EB] bg-card">
                     {TIME_OF_DAY.map(t => <option key={t}>{t}</option>)}
                   </select>
                 </div>
@@ -167,7 +167,7 @@ export default function DiaryClient({ role, userId }: Props) {
               </label>
             </div>
             <div className="flex gap-3 p-6 pt-0">
-              <button onClick={() => setOpen(false)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
+              <button onClick={() => setOpen(false)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-slate-600 hover:bg-muted transition">
                 Отмена
               </button>
               <button onClick={save} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"

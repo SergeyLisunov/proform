@@ -59,7 +59,7 @@ function ExportInner() {
 
   if (userLoading || loading) {
     return (
-      <main className="p-10 text-sm text-slate-500">
+      <main className="p-10 text-sm text-muted-foreground">
         Готовим отчёт…
       </main>
     )
@@ -74,7 +74,7 @@ function ExportInner() {
   const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a))
 
   return (
-    <main className="mx-auto max-w-[820px] px-8 py-10 bg-white text-slate-900 print:px-0 print:py-0">
+    <main className="mx-auto max-w-[820px] px-8 py-10 bg-white text-foreground print:px-0 print:py-0">
       {/* Print controls — hidden on print */}
       <div className="mb-8 flex items-center justify-between print:hidden">
         <div>
@@ -92,21 +92,21 @@ function ExportInner() {
       <div className="hidden print:block mb-6">
         <p className="text-[10px] font-bold uppercase tracking-widest text-orange-600">Sporteo</p>
         <h1 className="text-xl font-bold">Дневник тренера — {user.name ?? 'без имени'}</h1>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground">
           Период: {fmt(from)} — {fmt(to)}
           {athleteName ? ` · Атлет: ${athleteName}` : ''}
         </p>
       </div>
 
       {entries.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+        <div className="rounded-xl border border-border bg-muted p-8 text-center text-sm text-muted-foreground">
           За выбранный период записей нет.
         </div>
       ) : (
         <div className="space-y-6">
           {dates.map(d => (
             <section key={d} className="break-inside-avoid">
-              <h2 className="text-sm font-bold text-orange-600 border-b border-slate-200 pb-1.5 mb-3">
+              <h2 className="text-sm font-bold text-orange-600 border-b border-border pb-1.5 mb-3">
                 {fmt(d)}
               </h2>
               <div className="space-y-4">
@@ -129,24 +129,24 @@ function ExportInner() {
                           </span>
                         )}
                         {e.category && (
-                          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-600">
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-muted text-slate-600">
                             {CATEGORY_LABELS[e.category]}
                           </span>
                         )}
                         {e.mood && <span className="text-sm">{MOOD_EMOJI[e.mood - 1]}</span>}
                         {e.energy_level && (
-                          <span className="text-[10px] text-slate-500">энергия {e.energy_level}/10</span>
+                          <span className="text-[10px] text-muted-foreground">энергия {e.energy_level}/10</span>
                         )}
                       </div>
                       {e.title && <h3 className="text-sm font-semibold mb-1">{e.title}</h3>}
-                      <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-slate-800">{e.note}</p>
+                      <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-foreground">{e.note}</p>
                       {e.session_data?.key_metrics && (
-                        <pre className="mt-2 rounded-sm bg-slate-50 border border-slate-200 px-3 py-2 text-[11px] font-mono whitespace-pre-wrap">
+                        <pre className="mt-2 rounded-sm bg-muted border border-border px-3 py-2 text-[11px] font-mono whitespace-pre-wrap">
                           {e.session_data.key_metrics}
                         </pre>
                       )}
                       {e.tags && e.tags.length > 0 && (
-                        <p className="mt-2 text-[11px] text-slate-500">
+                        <p className="mt-2 text-[11px] text-muted-foreground">
                           Теги: {e.tags.map(t => `#${t}`).join(' ')}
                         </p>
                       )}
@@ -159,7 +159,7 @@ function ExportInner() {
         </div>
       )}
 
-      <div className="hidden print:block mt-10 pt-4 border-t border-slate-200 text-[10px] text-slate-400 text-center">
+      <div className="hidden print:block mt-10 pt-4 border-t border-border text-[10px] text-muted-foreground text-center">
         Сгенерировано Sporteo · {new Date().toLocaleDateString('ru-RU')}
       </div>
 
@@ -176,7 +176,7 @@ function ExportInner() {
 
 export default function DiaryExportPage() {
   return (
-    <Suspense fallback={<main className="p-10 text-sm text-slate-500">Загружаем…</main>}>
+    <Suspense fallback={<main className="p-10 text-sm text-muted-foreground">Загружаем…</main>}>
       <ExportInner />
     </Suspense>
   )

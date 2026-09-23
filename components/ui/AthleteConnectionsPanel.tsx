@@ -96,7 +96,7 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
   }
 
   const attLabel: Record<AttendanceStatus, { node: React.ReactNode; cls: string }> = {
-    pending:   { node: '?',                                                                                 cls: 'bg-slate-100 text-slate-500' },
+    pending:   { node: '?',                                                                                 cls: 'bg-muted text-muted-foreground' },
     confirmed: { node: <><Icon name="ki-check" /> буду</>,                                       cls: 'bg-blue-100 text-blue-700' },
     attended:  { node: <Icon name="ki-double-check" />,                                          cls: 'bg-green-100 text-green-700' },
     absent:    { node: <Icon name="ki-cross" />,                                                 cls: 'bg-red-100 text-red-700' },
@@ -106,7 +106,7 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* ─── Мой врач ─── */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
+      <div className="card bg-card border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-400">Мой врач</p>
           {!doctor && (
@@ -121,30 +121,30 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
               <div className="h-9 w-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold text-xs">
                 {doctor.name.slice(0, 1)}
               </div>
-              <Link href={`/profile/${doctor.id}`} className="text-sm font-semibold text-slate-800 truncate hover:text-red-600">
+              <Link href={`/profile/${doctor.id}`} className="text-sm font-semibold text-foreground truncate hover:text-red-600">
                 {doctor.name}
               </Link>
             </div>
             <div className="space-y-1 mt-auto">
               {nextCheckup && (
                 <div className="text-[11px] text-slate-600">
-                  <span className="text-slate-400">Ближайший:</span> {CHECKUP_TYPE_LABELS[nextCheckup.checkup_type]} · {nextCheckup.checkup_date}
+                  <span className="text-muted-foreground">Ближайший:</span> {CHECKUP_TYPE_LABELS[nextCheckup.checkup_type]} · {nextCheckup.checkup_date}
                 </div>
               )}
               {lastCheckup && (
-                <div className="text-[11px] text-slate-500">
-                  <span className="text-slate-400">Последний:</span> {CHECKUP_TYPE_LABELS[lastCheckup.checkup_type]} · {lastCheckup.checkup_date}
+                <div className="text-[11px] text-muted-foreground">
+                  <span className="text-muted-foreground">Последний:</span> {CHECKUP_TYPE_LABELS[lastCheckup.checkup_type]} · {lastCheckup.checkup_date}
                 </div>
               )}
             </div>
           </>
         ) : (
-          <p className="text-xs text-slate-400 my-2">Связи с врачом нет. Найдите специалиста в каталоге.</p>
+          <p className="text-xs text-muted-foreground my-2">Связи с врачом нет. Найдите специалиста в каталоге.</p>
         )}
       </div>
 
       {/* ─── Моя команда ─── */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
+      <div className="card bg-card border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-purple-400">Моя команда</p>
           {!org && (
@@ -159,16 +159,16 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
               <div className="h-9 w-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-xs">
                 {org.name.slice(0, 1)}
               </div>
-              <Link href={`/profile/${org.id}`} className="text-sm font-semibold text-slate-800 truncate hover:text-purple-600">
+              <Link href={`/profile/${org.id}`} className="text-sm font-semibold text-foreground truncate hover:text-purple-600">
                 {org.name}
               </Link>
             </div>
             {nextGroup ? (
               <div className="mt-auto space-y-1">
                 <div className="text-[11px] text-slate-600 line-clamp-1">
-                  <span className="text-slate-400">Ближайшее:</span> {nextGroup.title}
+                  <span className="text-muted-foreground">Ближайшее:</span> {nextGroup.title}
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                   <span>{SESSION_TYPE_LABELS[nextGroup.session_type]} · {nextGroup.session_date}</span>
                   <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-semibold ${attLabel[nextGroup.my_attendance].cls}`}>
                     {attLabel[nextGroup.my_attendance].node}
@@ -176,16 +176,16 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
                 </div>
               </div>
             ) : (
-              <p className="text-[11px] text-slate-400 mt-auto">Ближайших событий нет</p>
+              <p className="text-[11px] text-muted-foreground mt-auto">Ближайших событий нет</p>
             )}
           </>
         ) : (
-          <p className="text-xs text-slate-400 my-2">В команде не состоите.</p>
+          <p className="text-xs text-muted-foreground my-2">В команде не состоите.</p>
         )}
       </div>
 
       {/* ─── Мои абонементы ─── */}
-      <div className="card bg-white border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
+      <div className="card bg-card border border-[#E2E8F0] rounded-2xl p-4 flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-400">Мои абонементы</p>
           <Link href="/calendar" className="text-[11px] font-semibold text-orange-500 hover:underline">
@@ -202,9 +202,9 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
                 <div key={p.id}>
                   <div className="flex items-center justify-between text-[11px] mb-0.5">
                     <span className="font-semibold text-slate-700 truncate pr-2">{p.title}</span>
-                    <span className="text-slate-500 shrink-0">{used}/{total}</span>
+                    <span className="text-muted-foreground shrink-0">{used}/{total}</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className={`h-full transition-all ${p.status === 'paused' ? 'bg-slate-400' : 'bg-orange-400'}`}
                       style={{ width: `${pct}%` }}
@@ -214,14 +214,14 @@ export function AthleteConnectionsPanel({ userId }: { userId: string }) {
               )
             })}
             {nextCoachSession && (
-              <div className="mt-2 text-[11px] text-slate-500 border-t border-slate-100 pt-2">
-                <span className="text-slate-400">Ближайшая тренировка:</span> {nextCoachSession.session_date}
+              <div className="mt-2 text-[11px] text-muted-foreground border-t border-border pt-2">
+                <span className="text-muted-foreground">Ближайшая тренировка:</span> {nextCoachSession.session_date}
                 {nextCoachSession.start_time && ` · ${nextCoachSession.start_time.slice(0,5)}`}
               </div>
             )}
           </div>
         ) : (
-          <p className="text-xs text-slate-400 my-2">Активных абонементов нет.</p>
+          <p className="text-xs text-muted-foreground my-2">Активных абонементов нет.</p>
         )}
       </div>
     </div>

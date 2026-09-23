@@ -28,16 +28,16 @@ export default function PassportShareBar({
 
   return (
     <div className="mx-auto max-w-5xl px-5 -mt-4">
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-slate-200 bg-white shadow-xs px-4 py-2.5">
-        <div className="flex items-center gap-2 text-xs text-slate-500 min-w-0">
+      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-border bg-card shadow-xs px-4 py-2.5">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
           <Icon name="ki-paper-clip" className="hidden sm:inline text-sm" />
-          <code className="font-mono text-[11px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-sm truncate max-w-[320px]">
+          <code className="font-mono text-[11px] bg-muted border border-border px-2 py-0.5 rounded-sm truncate max-w-[320px]">
             {url}
           </code>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={copy}
-            className="rounded-lg border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 inline-flex items-center gap-1">
+            className="rounded-lg border border-border bg-card hover:bg-muted px-3 py-1.5 text-xs font-semibold text-slate-700 inline-flex items-center gap-1">
             {copied ? <><Icon name="ki-check" className="text-xs" /> Скопировано</> : 'Скопировать'}
           </button>
           <button onClick={nativeShare}

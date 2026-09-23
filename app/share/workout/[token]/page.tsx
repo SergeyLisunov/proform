@@ -47,10 +47,10 @@ async function fetchShared(token: string): Promise<SharedWorkout | null> {
 function Stat({ label, value, hint }: { label: string; value: string | number | null; hint?: string }) {
   if (value == null || value === '' ) return null
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</div>
-      <div className="mt-1 text-[22px] font-bold leading-tight text-slate-900">{value}</div>
-      {hint && <div className="text-2xs text-slate-500">{hint}</div>}
+    <div className="rounded-2xl border border-border bg-card px-4 py-3">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{label}</div>
+      <div className="mt-1 text-[22px] font-bold leading-tight text-foreground">{value}</div>
+      {hint && <div className="text-2xs text-muted-foreground">{hint}</div>}
     </div>
   )
 }
@@ -65,9 +65,9 @@ export default async function SharedWorkoutPage({
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
-        <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xs">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+      <div className="min-h-screen bg-muted flex items-center justify-center px-6">
+        <div className="max-w-md w-full rounded-3xl border border-border bg-card p-8 text-center shadow-xs">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <Icon name="ki-lock-2" className="text-[22px]" />
           </div>
           <h1 className="mt-4 text-xl font-bold text-navy-500">Ссылка недействительна</h1>
@@ -94,20 +94,20 @@ export default async function SharedWorkoutPage({
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-900">
+          <Link href="/" className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-foreground">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 text-white">
               <Icon name="ki-abstract-26" className="text-[13px]" />
             </span>
             Sporteo
           </Link>
-          <div className="text-2xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+          <div className="text-2xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             Публичная ссылка
           </div>
         </div>
 
         {/* Athlete card */}
-        <div className="mb-5 flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-xs">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-slate-500">
+        <div className="mb-5 flex items-center gap-4 rounded-3xl border border-border bg-card p-5 shadow-xs">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-muted text-muted-foreground">
             {data.athlete_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <AvatarImage src={data.athlete_avatar} alt="" className="h-14 w-14" sizes="56px" />
@@ -116,8 +116,8 @@ export default async function SharedWorkoutPage({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-bold text-slate-900">{data.athlete_name}</div>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="truncate text-lg font-bold text-foreground">{data.athlete_name}</div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {data.athlete_sport && <span>{data.athlete_sport}</span>}
               {data.athlete_sport && <span className="h-1 w-1 rounded-full bg-slate-300" />}
               <span>{eventDateStr}</span>
@@ -126,15 +126,15 @@ export default async function SharedWorkoutPage({
         </div>
 
         {/* Workout card */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-xs">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Тренировка</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Тренировка</div>
               <h1 className="mt-1 text-2xl font-bold leading-tight text-navy-500">
                 {data.name || data.activity_type || 'Тренировка'}
               </h1>
               {data.activity_type && data.name && (
-                <div className="mt-1 text-sm text-slate-500">{data.activity_type}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{data.activity_type}</div>
               )}
             </div>
             {data.activity_duration_min != null && (
@@ -159,9 +159,9 @@ export default async function SharedWorkoutPage({
           </div>
 
           {data.description && (
-            <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Заметки</div>
-              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
+            <div className="mt-6 rounded-2xl bg-muted p-4">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Заметки</div>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                 {data.description}
               </p>
             </div>
@@ -170,7 +170,7 @@ export default async function SharedWorkoutPage({
 
         {/* Footer */}
         <div className="mt-8 flex flex-col items-center gap-2 text-center">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {data.expires_at
               ? `Ссылка действительна до ${new Date(data.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`
               : 'Ссылка без срока действия'}

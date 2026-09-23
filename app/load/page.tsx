@@ -78,7 +78,7 @@ type Zone = { label: string; tone: string; bar: string; text: string; advice: st
 
 function acwrZone(acwr: number | null): Zone {
   if (acwr === null) return {
-    label: '—', tone: 'bg-slate-100 text-slate-600 border-slate-200',
+    label: '—', tone: 'bg-muted text-slate-600 border-border',
     bar: 'bg-slate-300', text: 'text-slate-600',
     advice: 'Недостаточно данных для расчёта. Нужно минимум 28 дней тренировок.',
   }
@@ -106,7 +106,7 @@ function acwrZone(acwr: number | null): Zone {
 
 function monotonyZone(m: number | null): Zone {
   if (m === null || !Number.isFinite(m)) return {
-    label: '—', tone: 'bg-slate-100 text-slate-600 border-slate-200',
+    label: '—', tone: 'bg-muted text-slate-600 border-border',
     bar: 'bg-slate-300', text: 'text-slate-600', advice: 'Недостаточно данных.',
   }
   if (m < 1.5) return {

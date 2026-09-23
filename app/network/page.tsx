@@ -185,7 +185,7 @@ function PeopleSearch({ myRole }: { myRole: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
+      <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-card px-4 py-3 shadow-xs">
         <Icon name="ki-magnifier" className="text-muted-foreground" />
         <input
           value={q}
@@ -277,11 +277,11 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
+        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-card px-4 py-3 shadow-xs">
           <Icon name="ki-magnifier" className="text-muted-foreground" />
           <input value={q} onChange={e => setQ(e.target.value)} placeholder={type === 'organization' ? 'Название, вид спорта…' : 'Имя, специализация…'} className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-xs">
+        <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-card px-4 py-3 shadow-xs">
           <Icon name="ki-map" className="text-muted-foreground" />
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Город" className="flex-1 bg-transparent text-sm outline-hidden" />
         </div>
@@ -398,7 +398,7 @@ function ContactsPanel() {
         <PillButton active={tab === 'outgoing'} onClick={() => setTab('outgoing')} icon="ki-exit-right" accent="#7C3AED">
           Исходящие {counts.outgoing > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.outgoing}</span>}
         </PillButton>
-        <Link href="/connections" className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-white px-3.5 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground">
+        <Link href="/connections" className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-card px-3.5 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground">
           Развёрнуто →
         </Link>
       </div>
@@ -506,7 +506,7 @@ function NetworkPageInner() {
       <div className="relative overflow-hidden rounded-3xl border border-orange-200 bg-linear-to-br from-[#FEF0E7] via-white to-[#EFF6FF] p-6 md:p-8">
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-orange-200/40 blur-3xl" />
         <div className="relative flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#F35703]">
             <Icon name="ki-people" className="text-[11px]" />
             Сеть
           </span>
@@ -526,7 +526,7 @@ function NetworkPageInner() {
         </PillButton>
         <button
           onClick={() => setInviteOpen(true)}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-card px-3.5 py-1.5 text-xs font-semibold text-[#F35703] hover:bg-[#FEF0E7]"
         >
           <Icon name="ki-sms" className="text-xs" />
           Пригласить по email
@@ -540,7 +540,7 @@ function NetworkPageInner() {
 
       {mode === 'find' && (
         <div className="flex flex-col gap-5">
-          <div className="flex flex-wrap gap-2 rounded-2xl border border-[#E2E8F0] bg-white p-2">
+          <div className="flex flex-wrap gap-2 rounded-2xl border border-[#E2E8F0] bg-card p-2">
             <PillButton active={findType === 'people'} onClick={() => selectFindType('people')} icon="ki-user" accent="#64748B">По имени</PillButton>
             <PillButton active={findType === 'coach'} onClick={() => selectFindType('coach')} icon="ki-award" accent="#16A34A">Тренеры</PillButton>
             <PillButton active={findType === 'doctor'} onClick={() => selectFindType('doctor')} icon="ki-heart-circle" accent="#DC2626">Врачи</PillButton>

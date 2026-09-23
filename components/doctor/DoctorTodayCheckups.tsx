@@ -124,7 +124,7 @@ export default function DoctorTodayCheckups({ doctorId }: { doctorId: string }) 
               {dayLabel(d)} · {byDate[d].length}
             </p>
             {byDate[d].map(c => (
-              <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-white px-3 py-2.5">
+              <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5">
                 {c.start_time && (
                   <div className="rounded-lg bg-red-100 text-red-700 px-2.5 py-1 text-[11px] font-bold tabular-nums shrink-0">
                     {c.start_time.slice(0, 5)}

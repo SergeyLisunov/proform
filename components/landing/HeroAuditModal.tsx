@@ -105,10 +105,10 @@ export default function HeroAuditModal({
         ref={dialogRef}
         onClick={handleBackdropClick}
         aria-labelledby="audit-modal-title"
-        className="w-full max-w-2xl rounded-3xl border border-border bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs"
+        className="w-full max-w-2xl rounded-3xl border border-border bg-card p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs"
       >
         {/* Modal header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-white px-6 py-4 sm:px-8">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-card px-6 py-4 sm:px-8">
           <div className="min-w-0 flex-1">
             <p className="text-2xs font-bold uppercase tracking-[0.24em] text-orange-700">
               Бесплатный аудит
@@ -124,7 +124,7 @@ export default function HeroAuditModal({
             type="button"
             onClick={closeModal}
             aria-label="Закрыть"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-muted-foreground transition-colors hover:bg-slate-200 hover:text-foreground"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-slate-200 hover:text-foreground"
           >
             <X size={18} />
           </button>
