@@ -316,14 +316,34 @@ export const PARENT_FAMILY_SECTION: SidebarSection = {
  * Этап 6/7: когда SIDEBAR_CONFIG получит пункты для org_owner/org_admin,
  * можно убрать mapping и оставить только `[role]` — фильтр станет строгим.
  */
-function getRoleMatchSet(role: EffectiveRole | undefined): EffectiveRole[] {
+function getRoleMatchSet(
+  role: EffectiveRole | undefined,
+  globalRole: GlobalRole | undefined,
+): EffectiveRole[] {
   if (!role) return []
-  if (role === 'org_owner' || role === 'org_admin') return [role, 'organization']
+  if (role === 'org_owner' || role === 'org_admin') {
+    // Клубная роль ДОБАВЛЯЕТСЯ к глобальной, а не заменяет её.
+    //
+    // Раньше здесь было `[role, 'organization']`, и тренер, которого владелец
+    // назначил админом клуба, терял из меню «Мои атлеты», «Планы
+    // тренировок», «Шаблоны», «Циклы» и «Дневник тренера», а врач —
+    // «Допуски», «Травмы» и своих пациентов. Назначение админом означает
+    // «ещё и управляет клубом», а не «больше не тренер».
+    const set: EffectiveRole[] = [role, 'organization']
+    if (globalRole && !set.includes(globalRole)) set.push(globalRole)
+    return set
+  }
   return [role]
 }
 
 export function filterSidebarForRole(opts: {
   role:       EffectiveRole | undefined
+  /**
+   * Глобальная роль (users.role). Обязательна, хотя и может быть undefined:
+   * без неё клубная роль вытесняет рабочие разделы тренера и врача. Поле
+   * сделано обязательным намеренно — чтобы новый вызов не мог о нём забыть.
+   */
+  globalRole: GlobalRole | undefined
   childCount: number
   /**
    * Этап 12 — текущий effective plan пользователя. Если undefined (план
@@ -333,7 +353,7 @@ export function filterSidebarForRole(opts: {
    */
   plan?:      Plan
 }): SidebarSection[] {
-  const matchSet = getRoleMatchSet(opts.role)
+  const matchSet = getRoleMatchSet(opts.role, opts.globalRole)
   const planKnown = opts.plan !== undefined
   const sections = SIDEBAR_CONFIG
     .map((section) => ({
@@ -353,7 +373,38 @@ export function filterSidebarForRole(opts: {
     }))
     .filter((section) => section.items.length > 0)
 
-  if (opts.childCount > 0) sections.push(PARENT_FAMILY_SECTION)
+  const deduped = dedupeByHref(sections, opts.globalRole)
 
+  if (opts.childCount > 0) deduped.push(PARENT_FAMILY_SECTION)
+
+  return deduped
+}
+
+/**
+ * Оставляет по одному пункту на адрес.
+ *
+ * Повторы появляются у смешанной роли: тренер-админ клуба собирает пункты
+ * обеих ролей, и /calendar приходит дважды — «Календарь» тренера и
+ * «Расписание клуба». Побеждает пункт ГЛОБАЛЬНОЙ роли: сами страницы
+ * ветвятся по users.role, и тренеру /calendar покажет тренерский вид —
+ * подпись «Расписание клуба» обещала бы не то. Если пункта глобальной роли
+ * среди кандидатов нет — первый по порядку конфига.
+ */
+function dedupeByHref(
+  sections: SidebarSection[],
+  globalRole: GlobalRole | undefined,
+): SidebarSection[] {
+  const winner = new Map<string, string>() // href → id
+  const all = sections.flatMap((s) => s.items)
+  for (const item of all) {
+    const current = winner.get(item.href)
+    if (!current) { winner.set(item.href, item.id); continue }
+    const currentItem = all.find((i) => i.id === current)
+    const ownsGlobal = (i: MenuItem | undefined) =>
+      !!globalRole && !!i?.roles?.includes(globalRole)
+    if (!ownsGlobal(currentItem) && ownsGlobal(item)) winner.set(item.href, item.id)
+  }
   return sections
+    .map((s) => ({ ...s, items: s.items.filter((i) => winner.get(i.href) === i.id) }))
+    .filter((s) => s.items.length > 0)
 }
