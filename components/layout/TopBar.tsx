@@ -4,7 +4,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useUser } from '@/lib/hooks/useUser'
-import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
+import { useUnreadCounts, badgeLabel } from '@/lib/hooks/useUnreadCounts'
+import { roleMeta } from '@/lib/roles'
+import { SidebarTrigger } from '@/components/reui/sidebar'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
@@ -37,14 +39,6 @@ const TITLES: Record<string, { title: string; sub: string }> = {
   '/org/newsletters': { title: 'Рассылки',              sub: 'Рассылка участникам' },
   '/org':             { title: 'Организация',           sub: 'Дашборд организации' },
   '/settings':        { title: 'Профиль атлета',        sub: 'Личные данные и антропометрия' },
-}
-
-const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  athlete:      { bg: '#FEF0E7', text: '#F35703', border: '#FBC1A0' },
-  coach:        { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
-  admin:        { bg: '#F5F3FF', text: '#7C3AED', border: '#DDD6FE' },
-  organization: { bg: '#EFF6FF', text: '#2563EB', border: '#BFDBFE' },
-  doctor:       { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
 }
 
 const NOTIF_ICONS: Record<string, string> = {
@@ -102,27 +96,6 @@ const NOTIF_COLORS: Record<string, string> = {
   pass_session_used:       '#F35703',
 }
 
-// ── mobile menu toggle ────────────────────────────────────────────────────────
-// Работает на контексте MobileMenuProvider (lib/hooks/useMobileMenu).
-// Прежняя разметка вешала на кнопку data-kt-drawer-toggle="#sidebar" и
-// полагалась на скрипт Metronic, который должен был навесить обработчики
-// после гидратации. Он этого не делал — бургер был мёртвым на каждой
-// мобильной загрузке. Сам скрипт удалён из проекта в сентябре 2026.
-function MobileMenuToggle() {
-  const { open, toggle } = useMobileMenu()
-  return (
-    <button
-      type="button"
-      aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
-      aria-expanded={open}
-      aria-controls="sidebar"
-      onClick={toggle}
-      className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'lg:hidden')}
-    >
-      <Icon name={open ? 'ki-cross' : 'ki-burger-menu-2'} className="text-base" />
-    </button>
-  )
-}
 
 // ── supabase helper ────────────────────────────────────────────────────────────
 function sb() {
@@ -434,7 +407,6 @@ export default function TopBar() {
   const pathname   = usePathname()
   const { user }   = useUser()
   const [showNotif, setShowNotif] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -446,61 +418,28 @@ export default function TopBar() {
   const title = meta?.title ?? 'Sporteo'
   const sub   = meta?.sub   ?? ''
   const date  = new Date().toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
-  const rc    = user ? ROLE_COLORS[user.role] : null
+  // Единая карта ролей. Прежний словарь шапки не знал специалиста, и для
+  // него плашка пользователя не рендерилась вовсе.
+  const roleInfo = user ? roleMeta(user.role) : null
 
-  // Счётчик непрочитанных: initial load + Realtime
-  useEffect(() => {
-    if (!user?.id) return
-    const client = sb()
+  // Счётчик берётся из общего провайдера каркаса: раньше шапка и сайдбар
+  // делали одинаковый запрос и держали два одинаковых realtime-канала.
+  const unreadCount = useUnreadCounts().notifications
 
-    const loadCount = async () => {
-      const { count } = await client
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-        .eq('is_archived', false)
-      setUnreadCount(count ?? 0)
-    }
-    loadCount()
-
-    const channel = client
-      .channel(`notif-badge-${user.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`,
-      }, () => { setUnreadCount(prev => prev + 1) })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`,
-      }, () => { loadCount() })
-      .subscribe()
-
-    return () => { client.removeChannel(channel) }
-  }, [user?.id])
-
-  const userPill = user && rc ? (
+  const userPill = user && roleInfo ? (
     <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-all"
-      style={{ background: rc.bg, borderColor: rc.border }}>
+      style={{ background: roleInfo.bg, borderColor: `${roleInfo.text}33` }}>
       <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-        style={{ background: rc.text + '20', color: rc.text, fontFamily: "var(--pf-font-sans)", fontWeight: 700 }}>
+        style={{ background: roleInfo.text + '20', color: roleInfo.text, fontFamily: "var(--pf-font-sans)", fontWeight: 700 }}>
         {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
       </div>
-      <span className="text-2sm font-semibold" style={{ color: rc.text }}>
+      <span className="text-2sm font-semibold" style={{ color: roleInfo.text }}>
         {user.name.split(' ')[0]}
       </span>
-      <span className="text-2xs uppercase font-bold opacity-60" style={{ color: rc.text }}>
-        {user.role === 'athlete' ? 'Атлет'
-          : user.role === 'coach' ? 'Тренер'
-          : user.role === 'doctor' ? 'Врач'
-          : user.role === 'admin' ? 'Админ'
-          : 'Орг'}
+      <span className="text-2xs uppercase font-bold opacity-60" style={{ color: roleInfo.text }}>
+        {roleInfo.short}
       </span>
-      <Icon name="ki-pencil" className="text-[10px] opacity-40" style={{ color: rc.text }} />
+      <Icon name="ki-pencil" className="text-[10px] opacity-40" style={{ color: roleInfo.text }} />
     </div>
   ) : null
 
@@ -508,14 +447,14 @@ export default function TopBar() {
     <>
       <header
         id="header"
-        className={`kt-header fixed top-0 z-10 inset-s-0 inset-e-0 flex items-stretch shrink-0 border-b border-b-border transition-shadow duration-200 ${scrolled ? 'shadow-xs' : 'shadow-none'}`}
-        style={{ background: 'var(--card, white)' }}
+        className={`sticky top-0 z-10 flex h-[70px] items-stretch shrink-0 border-b border-b-border bg-card transition-shadow duration-200 max-lg:h-[60px] ${scrolled ? 'shadow-xs' : 'shadow-none'}`}
       >
-        <div className="kt-container-fixed flex justify-between items-center px-5 lg:px-8 gap-4 w-full" id="headerContainer">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 lg:px-8" id="headerContainer">
 
           {/* Left */}
           <div className="flex items-center gap-3">
-            <MobileMenuToggle />
+            {/* Открывает боковую панель на мобильном; на десктопе она видна всегда. */}
+            <SidebarTrigger className="lg:hidden" aria-label="Открыть меню" />
             <div>
               <h1 className="pf-num text-xl text-navy-500 leading-none">{title}</h1>
               {sub && <p className="text-2xs text-muted-foreground mt-0.5 hidden sm:block">{sub}</p>}
@@ -535,23 +474,18 @@ export default function TopBar() {
               <span className="text-2xs text-muted-foreground group-hover:text-foreground transition-colors">{date}</span>
             </Link>
 
-            {/* WHOOP Live */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-2xs font-bold uppercase tracking-wide"
-              style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', color: '#16A34A' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Live
-            </div>
 
             {/* Колокольчик → открывает drawer уведомлений */}
             <button
               onClick={() => setShowNotif(true)}
               className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'relative')}
               title="Уведомления"
+              aria-label={unreadCount > 0 ? `Уведомления, непрочитанных: ${unreadCount}` : 'Уведомления'}
             >
               <Icon name="ki-notification-on" className="text-base" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {badgeLabel(unreadCount)}
                 </span>
               )}
             </button>

@@ -1,137 +1,76 @@
 'use client'
 
+/**
+ * Боковая панель кабинета на shadcn Sidebar (композиция ReUI app-shell-1).
+ *
+ * Что даёт переход по сравнению с прежней самописной панелью:
+ *   - сворачивание в полосу иконок с подсказками на десктопе (Ctrl/⌘+B);
+ *   - на мобильном — выезжающая панель с захватом фокуса и закрытием по
+ *     Escape вместо самодельного затемнения;
+ *   - стили каркаса больше не зависят от Metronic (kt-sidebar, kt-menu и
+ *     kt-scrollable уходят вместе с этой заменой).
+ *
+ * Что сохранено без изменений: состав меню — тот же filterSidebarForRole с
+ * учётом глобальной и клубной роли и тарифа, бейджи сообщений и уведомлений,
+ * раздел «Семья», выход, ссылка на главную.
+ */
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
-import { useMobileMenu } from '@/lib/hooks/useMobileMenu'
-import { createBrowserClient } from '@supabase/ssr'
-import { SporteoLogo } from "@/components/ui/SporteoLogo"
-import { filterSidebarForRole } from '@/lib/sidebar/config'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
 import { usePlan } from '@/lib/hooks/usePlan'
-import MobileBottomNav from './MobileBottomNav'
+import { useUnreadCounts, badgeLabel } from '@/lib/hooks/useUnreadCounts'
+import { filterSidebarForRole } from '@/lib/sidebar/config'
+import { roleMeta, rolePanelTitle } from '@/lib/roles'
+import { SporteoLogo } from '@/components/ui/SporteoLogo'
 import { Icon } from '@/components/ui/Icon'
+import {
+  Sidebar as SidebarRoot,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from '@/components/reui/sidebar'
 
-const ROLE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-  athlete:      { label: 'Атлет',         bg: '#FEF0E7', text: '#F35703' },
-  coach:        { label: 'Тренер',        bg: '#F0FDF4', text: '#16A34A' },
-  admin:        { label: 'Администратор', bg: '#F5F3FF', text: '#7C3AED' },
-  organization: { label: 'Организация',   bg: '#EFF6FF', text: '#2563EB' },
-  doctor:       { label: 'Доктор',        bg: '#FEF2F2', text: '#DC2626' },
-}
-
-const GUEST_ROLE = { label: 'Гость', bg: '#F8FAFC', text: '#64748B' }
-
-function getSB() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-
-function getRoleMeta(role?: string) {
-  return role && ROLE_LABELS[role] ? ROLE_LABELS[role] : GUEST_ROLE
+/** Активен ли пункт: точное совпадение или вложенная страница раздела. */
+function isActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true
+  // /dashboard — корень кабинета; «вложенными» в него считать нечего.
+  return href !== '/dashboard' && pathname.startsWith(href + '/')
 }
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { user } = useUser()
-  // Mobile drawer wiring — sees the same context as TopBar's burger.
-  // The previous implementation relied on Metronic kt-drawer JS that
-  // never bound under Next hydration, leaving the burger inert.
-  const { open: mobileOpen, close: closeMobile } = useMobileMenu()
-  const [signingOut, setSigningOut] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [notifyCount, setNotifyCount] = useState(0)
-  const roleMeta = getRoleMeta(user?.role)
-
-  useEffect(() => {
-    if (!user || (user.role !== 'athlete' && user.role !== 'coach')) return
-    const sb = getSB()
-    let mounted = true
-
-    async function loadUnread() {
-      const { data: chats } = await sb
-        .from('chats')
-        .select('id')
-        .or(`athlete_id.eq.${user!.id},coach_id.eq.${user!.id}`)
-
-      if (!mounted) return
-      if (!chats?.length) { setUnreadCount(0); return }
-
-      const chatIds = chats.map((c: { id: string }) => c.id)
-      const { count } = await sb
-        .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .in('chat_id', chatIds)
-        .eq('is_read', false)
-        .neq('sender_id', user!.id)
-
-      if (!mounted) return
-      setUnreadCount(count ?? 0)
-    }
-
-    loadUnread()
-
-    const channel = sb
-      .channel('sidebar-unread')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => loadUnread())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, () => loadUnread())
-      .subscribe()
-
-    return () => {
-      mounted = false
-      sb.removeChannel(channel)
-    }
-  }, [user])
-
-  useEffect(() => {
-    if (!user) return
-    const sb = getSB()
-    let mounted = true
-
-    async function loadNotify() {
-      const { count } = await sb
-        .from('notifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user!.id)
-        .eq('is_read', false)
-        .eq('is_archived', false)
-      if (!mounted) return
-      setNotifyCount(count ?? 0)
-    }
-
-    loadNotify()
-
-    const ch = sb
-      .channel('sidebar-notifications')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => loadNotify())
-      .subscribe()
-
-    return () => {
-      mounted = false
-      sb.removeChannel(ch)
-    }
-  }, [user])
-
-  // Этап 2 sidebar-rebuild: используем effectiveRole (через useEffectiveRole hook),
-  // который маппит org_members.member_role='org_owner'/'org_admin' в scoped
-  // org-роль. На этом этапе SIDEBAR_CONFIG ещё не содержит специфичных пунктов
-  // для scoped ролей — filterSidebarForRole внутри fallback'ит scoped role к
-  // 'organization' для backward-compat. Текущие org-владельцы видят тот же
-  // sidebar что и раньше, но путь резолвинга роли теперь явный.
   const { effectiveRole, globalRole } = useEffectiveRole()
-  // Этап 12 — plan gate. Пока план не загрузился, pass undefined, чтобы
-  // filterSidebarForRole не скрывал premium-пункты и не было flicker'а.
+  // Пока тариф не загрузился — undefined: фильтр тогда не прячет платные
+  // пункты, иначе они мигали бы при каждой загрузке.
   const { plan, loading: planLoading } = usePlan()
-  const visibleSections = filterSidebarForRole({
+  const unread = useUnreadCounts()
+  const { isMobile, setOpenMobile } = useSidebar()
+  const [signingOut, setSigningOut] = useState(false)
+
+  const sections = filterSidebarForRole({
     role:       effectiveRole,
     globalRole,
     childCount: user?.childCount ?? 0,
     plan:       planLoading ? undefined : plan,
   })
+  const meta = roleMeta(user?.role)
+
+  // На мобильном панель — выезжающий лист поверх страницы: после перехода
+  // его нужно закрыть, иначе новая страница откроется под ним.
+  const closeOnMobile = () => { if (isMobile) setOpenMobile(false) }
 
   async function signOut() {
     setSigningOut(true)
@@ -145,213 +84,107 @@ export default function Sidebar() {
   }
 
   return (
-    <>
-      {/*
-        Mobile backdrop. Only rendered when drawer is open and viewport is
-        narrow (lg:hidden). Click anywhere outside the drawer dismisses it.
-      */}
-      {mobileOpen && (
-        <button
-          type="button"
-          aria-label="Закрыть меню"
-          onClick={closeMobile}
-          className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-xs lg:hidden"
-        />
-      )}
-      <div
-        id="sidebar"
-        className={[
-          // Explicit `bg-white` (vs `bg-card`) — Metronic's kt-sidebar.css
-          // ships a translucent default that bled the backdrop through
-          // the mobile drawer. Solid white + heavier mobile shadow makes
-          // the surface read as a real sheet on top of dimmed content.
-          'kt-sidebar bg-white border-e border-e-border',
-          'fixed top-0 bottom-0 z-30',
-          'flex flex-col items-stretch shrink-0',
-          'shadow-[0_24px_60px_rgba(15,23,42,0.18)] lg:shadow-[0_12px_40px_rgba(15,23,42,0.04)]',
-          // Slide on mobile, always-visible on lg+. Initial off-screen
-          // position keeps the drawer hidden without `display:none` so
-          // transitions work both directions.
-          'transform transition-transform duration-200 ease-out',
-          'lg:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
-        ].join(' ')}
-      >
-      {/* Mobile-only close (×) button. Pinned top-right of the drawer so
-          users can dismiss without hunting for the backdrop or burger. */}
-      <button
-        type="button"
-        aria-label="Закрыть меню"
-        onClick={closeMobile}
-        className="lg:hidden absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-xs transition-colors hover:border-orange-200 hover:text-orange-600"
-      >
-        <Icon name="ki-cross" className="text-base" />
-      </button>
-      <div
-        className="kt-sidebar-header flex flex-col gap-4 px-4 pt-5 pb-5 shrink-0"
-        id="sidebar_header"
-        style={{ height: 'auto' }}
-      >
-        <Link href="/dashboard" className="flex items-center gap-3 no-underline group rounded-2xl border border-border/70 bg-background/80 px-3 py-3 shadow-xs transition-all hover:border-orange-200 hover:bg-orange-50/70">
-          <div className="min-w-0 flex-1">
-            <SporteoLogo size="md" />
-            <p className="mt-1.5 text-xs text-muted-foreground">Панель атлета и тренера</p>
-          </div>
-        </Link>
-
-        <div className="flex flex-col items-start gap-2.5 rounded-2xl border border-border/60 bg-muted/20 px-3 py-3">
-          <span
-            className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold"
-            style={{
-              backgroundColor: roleMeta.bg,
-              borderColor: `${roleMeta.text}22`,
-              color: roleMeta.text,
-            }}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-current" />
-            {roleMeta.label}
-          </span>
-
-          {user ? (
-            <span className="block w-full pl-0.5 text-[11px] leading-4 text-muted-foreground">
-              {unreadCount > 0 ? `${unreadCount > 99 ? '99+' : unreadCount} новых` : 'Нет новых сообщений'}
-            </span>
-          ) : (
-            <span className="block w-full pl-0.5 text-[11px] leading-4 text-muted-foreground">Гостевой режим</span>
-          )}
-        </div>
-      </div>
-
-      <div className="kt-sidebar-content flex grow py-3 overflow-hidden" id="sidebar_content">
-        <div
-          className="kt-scrollable-y-hover grow flex flex-col px-4"
-          id="sidebar_scrollable"
-        >
-          <div className="kt-menu flex flex-col gap-5 grow">
-            {visibleSections.map(section => (
-              <div key={section.title} className="space-y-2.5">
-                <div className="px-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
-                    {section.title}
-                  </span>
-                </div>
-
-                <div className="space-y-1.5">
-                  {section.items.map(item => {
-                    const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'))
-                    const isMessages = item.href === '/messages'
-                    // item.href type union doesn't include '/notifications' (it's
-                    // gated by role/feature flag and only injected dynamically);
-                    // string-cast keeps the runtime comparison while satisfying
-                    // the literal-union check.
-                    const isNotifications = (item.href as string) === '/notifications'
-                    const badgeVal = isMessages ? unreadCount : isNotifications ? notifyCount : 0
-                    const showBadge = badgeVal > 0
-
-                    return (
-                      <div key={`${item.href}-${item.label}`} className="kt-menu-item">
-                        <Link
-                          href={item.href}
-                          aria-current={active ? 'page' : undefined}
-                          className={[
-                            'kt-menu-link group flex min-h-[56px] items-center gap-3 rounded-2xl border-l-4 px-3 py-3 text-sm font-medium transition-all duration-150',
-                            active
-                              ? 'border-l-orange-500 border-y border-r border-y-orange-100 border-r-orange-100 bg-linear-to-r from-orange-50 via-orange-50/70 to-white text-orange-700 shadow-xs'
-                              : 'border-l-transparent border-y border-r border-y-transparent border-r-transparent text-foreground/75 hover:border-border hover:bg-muted/60 hover:text-foreground',
-                          ].join(' ')}
-                        >
-                          <span
-                            className={[
-                              'flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-colors',
-                              active
-                                ? 'border-orange-200 bg-orange-100/80 text-orange-600'
-                                : 'border-border/70 bg-muted/40 text-muted-foreground group-hover:border-border group-hover:bg-background group-hover:text-foreground',
-                            ].join(' ')}
-                          >
-                            <Icon name={item.icon} className="text-[15px]" />
-                          </span>
-
-                          <span className="kt-menu-title min-w-0 flex-1 text-[15px] leading-5 wrap-break-word">
-                            {item.label}
-                          </span>
-
-                          {showBadge ? (
-                            <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-xs">
-                              {badgeVal > 99 ? '99+' : badgeVal}
-                            </span>
-                          ) : active ? (
-                            <Icon name="ki-right" className="shrink-0 text-[12px] text-orange-400" />
-                          ) : null}
-                        </Link>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 pb-4 pt-3 border-t border-t-border shrink-0">
-        <div className="rounded-3xl border border-border/70 bg-muted/30 p-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Аккаунт
-              </div>
-              <p className="mt-1 text-sm font-semibold text-foreground">
-                {user ? 'Сессия активна' : 'Гостевой доступ'}
-              </p>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                {user ? 'Выход завершит текущую сессию на этом устройстве.' : 'Войдите, чтобы увидеть персональную навигацию.'}
-              </p>
-            </div>
-
-            <span
-              className="inline-flex shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold"
-              style={{
-                backgroundColor: roleMeta.bg,
-                borderColor: `${roleMeta.text}22`,
-                color: roleMeta.text,
-              }}
+    <SidebarRoot collapsible="icon" id="sidebar">
+      <SidebarHeader className="gap-3 px-3 pt-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              tooltip="Главная"
+              onClick={closeOnMobile}
+              render={<Link href="/dashboard" />}
+              className="h-auto py-2"
             >
-              {roleMeta.label}
-            </span>
-          </div>
+              <span className="flex min-w-0 flex-col gap-1 group-data-[collapsible=icon]:hidden">
+                <SporteoLogo size="md" />
+                <span className="truncate text-xs text-muted-foreground">
+                  {rolePanelTitle(user?.role)}
+                </span>
+              </span>
+              {/* В свёрнутом виде вместо логотипа — знак бренда. */}
+              <span className="hidden group-data-[collapsible=icon]:block">
+                <SporteoLogo size="sm" iconOnly />
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-          <Link
-            href="/"
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground no-underline transition-all hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+        {user && (
+          <span
+            className="inline-flex w-fit items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold group-data-[collapsible=icon]:hidden"
+            style={{ backgroundColor: meta.bg, borderColor: `${meta.text}22`, color: meta.text }}
           >
-            <Icon name="ki-home-2" className="text-sm shrink-0" />
-            <span>На главную</span>
-          </Link>
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
+            {meta.label}
+          </span>
+        )}
+      </SidebarHeader>
 
-          <button
-            onClick={signOut}
-            disabled={signingOut}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {signingOut ? (
-              <>
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
-                <span>Выход…</span>
-              </>
-            ) : (
-              <>
-                <Icon name="ki-exit-right" className="text-sm shrink-0" />
-                <span>Выйти</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-    {/* Этап 11 sidebar-rebuild — постоянный нижний bar на mobile. Видим
-        только lg:hidden; берёт топ-item каждой filtered section (max 5).
-        Источник правды — filterSidebarForRole, как и desktop sidebar. */}
-    <MobileBottomNav />
-    </>
+      <SidebarContent>
+        {sections.map(section => (
+          <SidebarGroup key={section.title}>
+            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map(item => {
+                  const active = isActive(pathname, item.href)
+                  // Пункт уведомлений добавляется в меню динамически, и его href
+                  // нет в литеральном типе конфига — отсюда сравнение строкой.
+                  const count =
+                    item.href === '/messages' ? unread.messages
+                    : (item.href as string) === '/notifications' ? unread.notifications
+                    : 0
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        isActive={active}
+                        tooltip={item.label}
+                        onClick={closeOnMobile}
+                        render={<Link href={item.href} aria-current={active ? 'page' : undefined} />}
+                      >
+                        <Icon name={item.icon} />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                      {count > 0 && (
+                        <SidebarMenuBadge
+                          aria-label={`Непрочитанных: ${count}`}
+                          className="bg-primary text-primary-foreground"
+                        >
+                          {badgeLabel(count)}
+                        </SidebarMenuBadge>
+                      )}
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter className="pb-3">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="На сайт" onClick={closeOnMobile} render={<Link href="/" />}>
+              <Icon name="ki-home-2" />
+              <span>На сайт</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Выйти"
+              onClick={signOut}
+              disabled={signingOut}
+              className="hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Icon name={signingOut ? 'ki-loading' : 'ki-exit-right'} className={signingOut ? 'animate-spin' : undefined} />
+              <span>{signingOut ? 'Выход…' : 'Выйти'}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </SidebarRoot>
   )
 }

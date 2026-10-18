@@ -1,16 +1,32 @@
 import Sidebar from '@/components/layout/Sidebar'
 import TopBar from '@/components/layout/TopBar'
+import MobileBottomNav from '@/components/layout/MobileBottomNav'
+import { SidebarInset, SidebarProvider } from '@/components/reui/sidebar'
+import { TooltipProvider } from '@/components/reui/tooltip'
+import { UnreadCountsProvider } from '@/lib/hooks/useUnreadCounts'
 import { cn } from '@/lib/utils'
 
 /**
  * AppShell — каркас кабинета: боковая панель, шапка и область контента.
  *
  * ЗАЧЕМ ОДИН КОМПОНЕНТ. Эта обвязка была скопирована в 26 layout-файлов
- * разделов кабинета, причём в трёх слегка разных вариантах. Копии разошлись
- * не только косметически: в десяти разделах не было отступа снизу под
- * мобильную нижнюю навигацию (она fixed bottom-0 и рендерится на всех
- * разделах), и на телефоне низ страницы уходил под панель. Теперь каркас
- * один, и меняется он в одном месте.
+ * разделов кабинета в трёх вариантах, и копии разошлись: в десяти разделах
+ * не было отступа под мобильную нижнюю навигацию. Теперь каркас один.
+ *
+ * НА ЧЁМ ПОСТРОЕН. shadcn Sidebar в композиции ReUI app-shell-1:
+ * SidebarProvider держит состояние панели (развёрнута, свёрнута в иконки,
+ * открыта на мобильном), SidebarInset — область справа от неё. Раскладку
+ * больше не задают классы Metronic kt-wrapper/kt-header с отступами на
+ * ширину панели: инсет сам занимает оставшееся место.
+ *
+ * Провайдеры:
+ *   - TooltipProvider — подсказки к пунктам свёрнутой панели;
+ *   - UnreadCountsProvider — один счётчик непрочитанного на шапку и панель.
+ *
+ * Состояние «свёрнута/развёрнута» shadcn пишет в cookie, но здесь она
+ * намеренно не читается при серверном рендере: для этого нужен cookies(), и
+ * все 26 разделов, включая отдаваемые статикой, стали бы динамическими.
+ * Поэтому панель открывается развёрнутой.
  */
 export type AppShellVariant = 'padded' | 'flush'
 
@@ -27,33 +43,37 @@ export default function AppShell({
    */
   variant?: AppShellVariant
   /**
-   * Обрезать горизонтальное переполнение контента.
-   *
-   * Десять разделов исторически стояли с overflow-hidden — он пришёл
-   * шаблоном в одном пакете новых страниц, без объяснения. Проверить, не
-   * прикрывает ли он широкие графики, без входа в кабинет нельзя, поэтому
-   * поведение сохранено точно, но через overflow-x-clip: он режет только по
-   * горизонтали и, в отличие от overflow-hidden, не создаёт контейнер
-   * прокрутки — sticky-элементы внутри продолжают работать.
+   * Обрезать горизонтальное переполнение. Десять разделов исторически стояли
+   * с overflow-hidden — он пришёл шаблоном, без объяснения, и проверить, не
+   * прикрывает ли он широкие графики, без входа в кабинет нельзя. Поведение
+   * сохранено, но через overflow-x-clip: он режет только по горизонтали и не
+   * создаёт контейнер прокрутки — sticky внутри продолжает работать.
    */
   clipX?: boolean
 }) {
   return (
-    <div className="flex grow w-full">
-      <Sidebar />
-      <div className={cn('kt-wrapper flex grow flex-col w-full min-w-0', variant === 'flush' && 'overflow-hidden')}>
-        <TopBar />
-        <main
-          className={cn(
-            'grow w-full min-w-0 bg-background',
-            variant === 'padded' && 'px-5 py-6 pb-24 lg:px-8 lg:py-8 lg:pb-8',
-            variant === 'padded' && clipX && 'overflow-x-clip',
-            variant === 'flush' && 'flex flex-col overflow-hidden',
-          )}
-        >
-          {children}
-        </main>
-      </div>
-    </div>
+    <TooltipProvider>
+      <UnreadCountsProvider>
+        <SidebarProvider>
+          <Sidebar />
+          <SidebarInset className={cn('min-w-0', variant === 'flush' && 'overflow-hidden')}>
+            <TopBar />
+            <main
+              className={cn(
+                'grow w-full min-w-0 bg-background',
+                variant === 'padded' && 'px-5 py-6 pb-24 lg:px-8 lg:py-8 lg:pb-8',
+                variant === 'padded' && clipX && 'overflow-x-clip',
+                variant === 'flush' && 'flex flex-col overflow-hidden',
+              )}
+            >
+              {children}
+            </main>
+          </SidebarInset>
+          {/* Нижняя навигация на мобильном: раньше её рендерил сайдбар, теперь
+              она часть каркаса — рядом с отступом, который под неё оставлен. */}
+          <MobileBottomNav />
+        </SidebarProvider>
+      </UnreadCountsProvider>
+    </TooltipProvider>
   )
 }

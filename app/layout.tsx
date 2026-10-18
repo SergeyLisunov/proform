@@ -4,7 +4,6 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import { ToastProvider } from '@/lib/hooks/useToast'
-import { MobileMenuProvider } from '@/lib/hooks/useMobileMenu'
 import { DialogProvider } from '@/lib/hooks/useDialog'
 import ClientOverlays from '@/components/ui/ClientOverlays'
 
@@ -115,15 +114,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           в side-by-side columns на desktop — footer рендерился справа от
           контента, content squashed в narrow centered column.
           Default block layout = main + footer stack vertically correctly.
-          Dashboard pages handle their own sidebar layout internally (Metronic
-          kt-sidebar-* классы продолжают работать как CSS hooks). */}
-      <body className="antialiased text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
+          Каркас кабинета (панель + шапка) — components/layout/AppShell на
+          shadcn Sidebar; классов Metronic на <body> больше нет. */}
+      <body className="antialiased text-base text-foreground bg-background">
         <ToastProvider>
           <DialogProvider>
-            <MobileMenuProvider>
-              {children}
-              <ClientOverlays />
-            </MobileMenuProvider>
+            {children}
+            <ClientOverlays />
           </DialogProvider>
         </ToastProvider>
         {/* W15 Day 76 — Vercel Analytics + Speed Insights.
