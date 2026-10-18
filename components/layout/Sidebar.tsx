@@ -122,12 +122,13 @@ export default function Sidebar() {
   // для scoped ролей — filterSidebarForRole внутри fallback'ит scoped role к
   // 'organization' для backward-compat. Текущие org-владельцы видят тот же
   // sidebar что и раньше, но путь резолвинга роли теперь явный.
-  const { effectiveRole } = useEffectiveRole()
+  const { effectiveRole, globalRole } = useEffectiveRole()
   // Этап 12 — plan gate. Пока план не загрузился, pass undefined, чтобы
   // filterSidebarForRole не скрывал premium-пункты и не было flicker'а.
   const { plan, loading: planLoading } = usePlan()
   const visibleSections = filterSidebarForRole({
     role:       effectiveRole,
+    globalRole,
     childCount: user?.childCount ?? 0,
     plan:       planLoading ? undefined : plan,
   })

@@ -36,7 +36,7 @@ function getSB() {
 export default function MobileBottomNav() {
   const pathname = usePathname()
   const { user } = useUser()
-  const { effectiveRole, loading: roleLoading } = useEffectiveRole()
+  const { effectiveRole, globalRole, loading: roleLoading } = useEffectiveRole()
   // Этап 12 — plan gate (mobile зеркало sidebar gate'а).
   const { plan, loading: planLoading } = usePlan()
   const [childCount, setChildCount] = useState(0)
@@ -62,6 +62,7 @@ export default function MobileBottomNav() {
 
   const sections = filterSidebarForRole({
     role:       effectiveRole,
+    globalRole,
     childCount,
     plan:       planLoading ? undefined : plan,
   })
