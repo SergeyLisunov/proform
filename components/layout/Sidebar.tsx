@@ -16,7 +16,7 @@
  */
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { useEffectiveRole } from '@/lib/hooks/useEffectiveRole'
@@ -72,7 +72,19 @@ export default function Sidebar() {
   // его нужно закрыть, иначе новая страница откроется под ним.
   const closeOnMobile = () => { if (isMobile) setOpenMobile(false) }
 
+  // Закрывать лист и на любую смену адреса, а не только по клику в меню:
+  // жест «назад», переход из уведомления или ссылки на странице. И при смене
+  // режима: открыли меню на планшете в портретной ориентации, повернули в
+  // альбомную (появилась постоянная панель) и обратно — без этого лист
+  // выезжал сам, хотя его никто не открывал. Прежний самописный провайдер
+  // закрывал меню по смене адреса; здесь это поведение сохранено.
+  useEffect(() => { setOpenMobile(false) }, [pathname, isMobile, setOpenMobile])
+
   async function signOut() {
+    // Проп disabled у SidebarMenuButton с подсказкой поглощается триггером
+    // подсказки и до кнопки не доходит, поэтому защита от повторного клика —
+    // здесь, а состояние сообщается через aria-disabled.
+    if (signingOut) return
     setSigningOut(true)
     try {
       await createClient().auth.signOut()
@@ -85,7 +97,21 @@ export default function Sidebar() {
 
   return (
     <SidebarRoot collapsible="icon" id="sidebar">
-      <SidebarHeader className="gap-3 px-3 pt-4">
+      <SidebarHeader className="relative gap-3 px-3 pt-4">
+        {/* Мобильный лист: собственная кнопка закрытия. Стандартная кнопка
+            листа в реестровом компоненте скрыта и подписана по-английски, а
+            без кнопки пользователь скринридера на телефоне не может выйти из
+            меню — Escape там недоступен. */}
+        {isMobile && (
+          <button
+            type="button"
+            onClick={() => setOpenMobile(false)}
+            aria-label="Закрыть меню"
+            className="absolute right-3 top-3 z-10 inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <Icon name="ki-cross" className="text-base" />
+          </button>
+        )}
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -121,45 +147,63 @@ export default function Sidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {sections.map(section => (
-          <SidebarGroup key={section.title}>
-            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map(item => {
-                  const active = isActive(pathname, item.href)
-                  // Пункт уведомлений добавляется в меню динамически, и его href
-                  // нет в литеральном типе конфига — отсюда сравнение строкой.
-                  const count =
-                    item.href === '/messages' ? unread.messages
-                    : (item.href as string) === '/notifications' ? unread.notifications
-                    : 0
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        isActive={active}
-                        tooltip={item.label}
-                        onClick={closeOnMobile}
-                        render={<Link href={item.href} aria-current={active ? 'page' : undefined} />}
-                      >
-                        <Icon name={item.icon} />
-                        <span>{item.label}</span>
-                      </SidebarMenuButton>
-                      {count > 0 && (
-                        <SidebarMenuBadge
-                          aria-label={`Непрочитанных: ${count}`}
-                          className="bg-primary text-primary-foreground"
+        {/* Ориентир «навигация» для скринридера: раньше меню приходилось искать
+            линейным чтением — ни старая, ни новая панель его не размечали. */}
+        <nav aria-label="Основная навигация" className="flex flex-col">
+          {sections.map(section => (
+            <SidebarGroup key={section.title}>
+              <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {section.items.map(item => {
+                    const active = isActive(pathname, item.href)
+                    // Пункт уведомлений добавляется в меню динамически, и его href
+                    // нет в литеральном типе конфига — отсюда сравнение строкой.
+                    const count =
+                      item.href === '/messages' ? unread.messages
+                      : (item.href as string) === '/notifications' ? unread.notifications
+                      : 0
+                    return (
+                      <SidebarMenuItem key={item.id}>
+                        <SidebarMenuButton
+                          isActive={active}
+                          tooltip={count > 0 ? `${item.label}: ${badgeLabel(count)}` : item.label}
+                          onClick={closeOnMobile}
+                          render={<Link href={item.href} aria-current={active ? 'page' : undefined} />}
                         >
-                          {badgeLabel(count)}
-                        </SidebarMenuBadge>
-                      )}
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+                          <Icon name={item.icon} />
+                          <span>{item.label}</span>
+                          {/* Число — в доступном имени ссылки: бейдж лежит вне неё,
+                              и скринридер на фокусе пункта его не произносил. */}
+                          {count > 0 && <span className="sr-only">, непрочитанных: {count}</span>}
+                        </SidebarMenuButton>
+                        {count > 0 && (
+                          <>
+                            <SidebarMenuBadge
+                              aria-hidden="true"
+                              // Базовые классы бейджа красят текст в цвет акцента при
+                              // наведении и на активном пункте — а фон у нас тоже
+                              // оранжевый, и цифра пропадала. Перекрываем оба состояния.
+                              className="bg-primary text-primary-foreground peer-hover/menu-button:text-primary-foreground peer-data-active/menu-button:text-primary-foreground"
+                            >
+                              {badgeLabel(count)}
+                            </SidebarMenuBadge>
+                            {/* В свёрнутой панели бейдж скрыт — оставляем точку на
+                                иконке, иначе о новых сообщениях не сообщало ничто. */}
+                            <span
+                              aria-hidden="true"
+                              className="pointer-events-none absolute right-1 top-1 hidden size-2 rounded-full bg-primary ring-2 ring-sidebar group-data-[collapsible=icon]:block"
+                            />
+                          </>
+                        )}
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+        </nav>
       </SidebarContent>
 
       <SidebarFooter className="pb-3">
@@ -174,7 +218,7 @@ export default function Sidebar() {
             <SidebarMenuButton
               tooltip="Выйти"
               onClick={signOut}
-              disabled={signingOut}
+              aria-disabled={signingOut || undefined}
               className="hover:bg-destructive/10 hover:text-destructive"
             >
               <Icon name={signingOut ? 'ki-loading' : 'ki-exit-right'} className={signingOut ? 'animate-spin' : undefined} />

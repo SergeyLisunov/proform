@@ -302,11 +302,10 @@
     --sporteo-cream: #fbf3ec;
   }
 
-  /* Override Metronic theme primary → Sporteo orange so kt-btn-primary,
-   kt-badge-primary, kt-alert-primary, etc. are on-brand. */
-  :root,
-  [data-kt-theme='true'],
-  .demo1 {
+  /* Брендовый оранжевый Sporteo как --primary. Селекторы
+     [data-kt-theme='true'] и .demo1 убраны: атрибут и класс сняты с <html> и
+     <body> вместе с Metronic, правила под ними больше ничего не задевали. */
+  :root {
     --primary: #f35703;
     --primary-active: #d44a02;
     --primary-foreground: #ffffff;
@@ -415,41 +414,6 @@ body {
 .pf-drawer-footer {
   background: #ffffff !important;
   background-color: #ffffff !important;
-}
-
-.demo1 {
-  --sidebar-transition-duration: 0.3s;
-  --sidebar-transition-timing: ease;
-  --sidebar-width: 280px;
-  --header-height: 70px;
-}
-
-@media (max-width: 64rem) {
-  .demo1 {
-    --header-height: 60px;
-  }
-}
-
-.demo1 .kt-header {
-  height: var(--header-height);
-}
-
-.demo1 .kt-sidebar {
-  width: var(--sidebar-width);
-}
-
-.demo1.kt-header-fixed .kt-wrapper {
-  padding-top: var(--header-height);
-}
-
-@media (min-width: 64rem) {
-  .demo1.kt-sidebar-fixed .kt-wrapper {
-    padding-inline-start: var(--sidebar-width) !important;
-  }
-
-  .demo1.kt-sidebar-fixed.kt-header-fixed .kt-header {
-    inset-inline-start: var(--sidebar-width) !important;
-  }
 }
 
 /* ── Animations ───────────────────────────────────────────────────────────── */

@@ -275,7 +275,7 @@ function NotificationsDrawer({
                 Прочитать все
               </button>
             )}
-            <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+            <button type="button" onClick={handleClose} aria-label="Закрыть уведомления" className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
               <Icon name="ki-cross" className="text-sm" />
             </button>
           </div>
@@ -377,6 +377,7 @@ function NotificationsDrawer({
                           onClick={e => archiveNotif(n.id, e)}
                           className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
                           title="Скрыть"
+                          aria-label="Скрыть уведомление"
                         >
                           <Icon name="ki-cross" className="text-[10px]" />
                         </button>

@@ -1,7 +1,8 @@
 import Sidebar from '@/components/layout/Sidebar'
 import TopBar from '@/components/layout/TopBar'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
-import { SidebarInset, SidebarProvider } from '@/components/reui/sidebar'
+import { SidebarInset } from '@/components/reui/sidebar'
+import { CabinetSidebarProvider } from '@/components/layout/CabinetSidebarProvider'
 import { TooltipProvider } from '@/components/reui/tooltip'
 import { UnreadCountsProvider } from '@/lib/hooks/useUnreadCounts'
 import { cn } from '@/lib/utils'
@@ -23,10 +24,11 @@ import { cn } from '@/lib/utils'
  *   - TooltipProvider — подсказки к пунктам свёрнутой панели;
  *   - UnreadCountsProvider — один счётчик непрочитанного на шапку и панель.
  *
- * Состояние «свёрнута/развёрнута» shadcn пишет в cookie, но здесь она
- * намеренно не читается при серверном рендере: для этого нужен cookies(), и
- * все 26 разделов, включая отдаваемые статикой, стали бы динамическими.
- * Поэтому панель открывается развёрнутой.
+ * Состояние «свёрнута/развёрнута» живёт в хранилище вне React
+ * (CabinetSidebarProvider + lib/hooks/sidebarOpenStore): каркас
+ * перемонтируется при переходе в другой раздел, а свёрнутость сохраняется.
+ * Cookie при серверном рендере не читается — для этого нужен cookies(), и все
+ * 26 разделов, включая отдаваемые статикой, стали бы динамическими.
  */
 export type AppShellVariant = 'padded' | 'flush'
 
@@ -54,9 +56,13 @@ export default function AppShell({
   return (
     <TooltipProvider>
       <UnreadCountsProvider>
-        <SidebarProvider>
+        <CabinetSidebarProvider>
           <Sidebar />
-          <SidebarInset className={cn('min-w-0', variant === 'flush' && 'overflow-hidden')}>
+          {/* Без overflow-hidden на инсете даже у flush: шапка внутри него —
+              sticky, а sticky не работает под предком с overflow-hidden — на
+              /notes шапка с колокольчиком и бургером уезжала за верх экрана.
+              Обрезка остаётся на <main>: он сосед шапки, а не её предок. */}
+          <SidebarInset className="min-w-0">
             <TopBar />
             <main
               className={cn(
@@ -72,7 +78,7 @@ export default function AppShell({
           {/* Нижняя навигация на мобильном: раньше её рендерил сайдбар, теперь
               она часть каркаса — рядом с отступом, который под неё оставлен. */}
           <MobileBottomNav />
-        </SidebarProvider>
+        </CabinetSidebarProvider>
       </UnreadCountsProvider>
     </TooltipProvider>
   )

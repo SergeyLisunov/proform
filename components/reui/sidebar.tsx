@@ -7,6 +7,10 @@
 //      навигация, а при серверном рендере мелькала бы десктопная панель.
 //      Парная правка — MOBILE_BREAKPOINT в lib/hooks/use-mobile.ts.
 //   2. Подписи для скринридера переведены на русский.
+//   3. SidebarInset — <div>, а не <main>. Внутри него AppShell сам рендерит
+//      <main> с контентом, и выходило два вложенных main, а шапка попадала
+//      внутрь внешнего и теряла ориентир «баннер» для скринридера.
+//   4. Сочетание Ctrl/⌘+B не перехватывается в полях ввода.
 
 import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
@@ -104,6 +108,14 @@ function SidebarProvider({
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Не перехватывать сочетание, когда человек печатает: в полях ввода
+      // Ctrl/⌘+B — жирный шрифт в редакторе заметок, а в macOS Ctrl+B ещё и
+      // курсор на символ назад. Без проверки панель сворачивалась посреди
+      // набора текста.
+      const target = event.target as HTMLElement | null
+      if (target && (target.isContentEditable || target.closest('input, textarea, select, [contenteditable="true"]'))) {
+        return
+      }
       if (
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
         (event.metaKey || event.ctrlKey)
@@ -310,9 +322,9 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   )
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+function SidebarInset({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <main
+    <div
       data-slot="sidebar-inset"
       className={cn(
         "relative flex w-full flex-1 flex-col bg-background lg:peer-data-[variant=inset]:m-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow-sm lg:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
