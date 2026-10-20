@@ -6,10 +6,20 @@ export const PUBLIC_BUCKET = 'note-attachments'
 export const PRIVATE_BUCKET = 'medical-private'
 const PUBLIC_MARKER = `/storage/v1/object/public/${PUBLIC_BUCKET}/`
 
-/** Путь объекта в публичном бакете по его публичной ссылке. */
+/** Ссылка ведёт в публичный бакет note-attachments. */
+export function isPublicUrl(url) {
+  return typeof url === 'string' && url.includes(PUBLIC_MARKER)
+}
+
+/** Путь объекта в публичном бакете по его публичной ссылке. null — не
+ *  ссылка на бакет или она не разбирается (битая %-последовательность). */
 export function publicPathFromUrl(url) {
-  const i = typeof url === 'string' ? url.indexOf(PUBLIC_MARKER) : -1
-  return i === -1 ? null : decodeURIComponent(url.slice(i + PUBLIC_MARKER.length).split('?')[0])
+  if (!isPublicUrl(url)) return null
+  try {
+    return decodeURIComponent(url.slice(url.indexOf(PUBLIC_MARKER) + PUBLIC_MARKER.length).split('?')[0])
+  } catch {
+    return null
+  }
 }
 
 const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

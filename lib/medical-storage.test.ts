@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { attachmentHref, buildMedicalPath } from './medical-storage'
+import { attachmentHref, buildMedicalPath, reconcileWithMigrated } from './medical-storage'
 
 const USER = '00000000-0000-0000-0000-0000000000a1'
 
@@ -43,5 +43,26 @@ describe('attachmentHref', () => {
 
   it('старый, ещё не перенесённый файл — прежняя ссылка', () => {
     expect(attachmentHref({ url: 'https://public' }, {})).toBe('https://public')
+  })
+})
+
+describe('reconcileWithMigrated', () => {
+  type Att = { name: string; path?: string; url?: string }
+  const PUBLIC = 'https://x.supabase.co/storage/v1/object/public/note-attachments/auth/med/'
+  it('старая ссылка на уже перенесённый файл заменяется вложением с путём', () => {
+    const current: Att[] = [{ name: 'a', path: `${USER}/med/1-a.pdf` }]
+    const next: Att[] = [{ name: 'a', url: `${PUBLIC}1-a.pdf` }, { name: 'b', path: `${USER}/med/new.pdf` }]
+    expect(reconcileWithMigrated(next, current)).toEqual([
+      { name: 'a', path: `${USER}/med/1-a.pdf` },
+      { name: 'b', path: `${USER}/med/new.pdf` },
+    ])
+  })
+  it('не перенесённая ссылка остаётся как есть', () => {
+    const next: Att[] = [{ name: 'a', url: `${PUBLIC}1-a.pdf` }]
+    expect(reconcileWithMigrated(next, [])).toEqual(next)
+  })
+  it('имя с пробелом в ссылке совпадает с путём', () => {
+    const current: Att[] = [{ name: 'a', path: `${USER}/med/1-a b.pdf` }]
+    expect(reconcileWithMigrated<Att>([{ name: 'a', url: `${PUBLIC}1-a%20b.pdf` }], current)[0].path).toBe(`${USER}/med/1-a b.pdf`)
   })
 })

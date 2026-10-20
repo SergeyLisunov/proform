@@ -139,6 +139,47 @@ describe('медицинские файлы после миграции 117', ()
     expect(succeeded(byAuthor), byAuthor.error).toBe(true)
   })
 
+  it('медицинский файл в публичный бакет больше не загрузить', async () => {
+    db = await createMedicalDb(MIGRATIONS)
+    await db.sys(`INSERT INTO storage.buckets (id, name, public) VALUES ('note-attachments', 'note-attachments', true)`)
+    await db.sys(`CREATE POLICY note_upload ON storage.objects FOR INSERT TO authenticated
+      WITH CHECK (bucket_id = 'note-attachments')`)
+    const med = await db.as('doctorA',
+      `INSERT INTO storage.objects (bucket_id, name) VALUES ('note-attachments', $1)`, [`${doctorA.id}/med/x.pdf`])
+    const health = await db.as('doctorA',
+      `INSERT INTO storage.objects (bucket_id, name) VALUES ('note-attachments', $1)`,
+      [`${doctorA.id}/health-private/apple_health/x.zip`])
+    const note = await db.as('doctorA',
+      `INSERT INTO storage.objects (bucket_id, name) VALUES ('note-attachments', $1)`, [`${doctorA.id}/notes/x.jpg`])
+    expect(med.code).toBe('42501')
+    expect(health.code).toBe('42501')
+    expect(note.error).toBeUndefined()
+  })
+
+  it('новое вложение со ссылкой в публичный бакет запись не принимает', async () => {
+    db = await createMedicalDb(MIGRATIONS)
+    const legacy = JSON.stringify([{ url: 'https://x/storage/v1/object/public/note-attachments/a/med/1.pdf', name: 'a', type: 'document', size: 1 }])
+    const insert = await db.as('doctorA',
+      `INSERT INTO medical_diary (doctor_id, date, note, attachments) VALUES ($1, '2026-10-20', 'старая ссылка', $2)`,
+      [doctorA.id, legacy])
+    expect(insert.code).toBe('42501')
+  })
+
+  it('уже лежащее старое вложение не мешает править запись, новое — мешает', async () => {
+    db = await createMedicalDb(MIGRATIONS)
+    const old = { url: 'https://x/storage/v1/object/public/note-attachments/a/med/1.pdf', name: 'a', type: 'document', size: 1 }
+    await db.sys(`INSERT INTO medical_diary (doctor_id, date, note, attachments) VALUES ($1, '2026-10-20', 'до переноса', $2)`,
+      [doctorA.id, JSON.stringify([old])])
+    const keep = await db.as('doctorA',
+      `UPDATE medical_diary SET note = 'правка', attachments = $1 WHERE note = 'до переноса' RETURNING id`,
+      [JSON.stringify([old, { path: `${doctorA.id}/med/new.pdf`, name: 'b', type: 'document', size: 2 }])])
+    expect(succeeded(keep), keep.error).toBe(true)
+    const add = await db.as('doctorA',
+      `UPDATE medical_diary SET attachments = attachments || $1::jsonb WHERE note = 'правка' RETURNING id`,
+      [JSON.stringify([{ ...old, url: old.url.replace('1.pdf', '2.pdf') }])])
+    expect(add.code).toBe('42501')
+  })
+
   it('миграцию можно применить повторно', async () => {
     db = await createMedicalDb([...MIGRATIONS, '117_private_medical_storage.sql'])
     expect(succeeded(await upload(db, 'doctorA', FILE_A))).toBe(true)

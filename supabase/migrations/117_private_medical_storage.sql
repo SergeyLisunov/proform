@@ -28,6 +28,14 @@
 --
 -- Старые файлы переносит scripts/migrate-medical-attachments.mjs (service
 -- role, по умолчанию — пробный прогон без изменений).
+--
+-- Чтобы после переноса медицинские файлы снова не появились в публичном
+-- бакете (страница, открытая до выкладки, работает на старом коде):
+--   • загрузить в note-attachments файл в медицинскую подпапку (med/,
+--     apple_health/, health-private/) нельзя — ограничивающая политика;
+--   • запись дневника не принимает новое вложение со ссылкой в публичный
+--     бакет — только с путём в закрытом. Уже лежащие старые вложения
+--     остаются, пока их не перенесёт скрипт.
 -- ──────────────────────────────────────────────────────────────────────────
 
 BEGIN;
@@ -71,6 +79,50 @@ CREATE POLICY "medical-private: delete own" ON storage.objects
     bucket_id = 'medical-private'
     AND (storage.foldername(name))[1] = (SELECT public.get_my_user_id())::text
   );
+
+DROP POLICY IF EXISTS "note-attachments: no medical files" ON storage.objects;
+CREATE POLICY "note-attachments: no medical files" ON storage.objects
+  AS RESTRICTIVE FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id <> 'note-attachments'
+    OR coalesce((storage.foldername(name))[2], '') NOT IN ('med', 'apple_health', 'health-private')
+  );
+
+CREATE OR REPLACE FUNCTION public.trg_medical_diary_private_attachments()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_jwt_role text := NULLIF(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role';
+  el         jsonb;
+BEGIN
+  IF v_jwt_role IS NULL OR v_jwt_role NOT IN ('authenticated', 'anon') THEN
+    RETURN NEW;
+  END IF;
+  IF NEW.attachments IS NULL OR jsonb_typeof(NEW.attachments) <> 'array' THEN
+    RETURN NEW;
+  END IF;
+
+  FOR el IN SELECT value FROM jsonb_array_elements(NEW.attachments) LOOP
+    IF el ? 'url' AND NOT el ? 'path'
+       AND (TG_OP = 'INSERT' OR OLD.attachments IS NULL OR NOT OLD.attachments @> jsonb_build_array(el)) THEN
+      RAISE EXCEPTION 'Файл прикрепляется только из закрытого хранилища — обновите страницу'
+        USING ERRCODE = '42501';
+    END IF;
+  END LOOP;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.trg_medical_diary_private_attachments() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS trg_medical_diary_private_attachments ON public.medical_diary;
+CREATE TRIGGER trg_medical_diary_private_attachments
+  BEFORE INSERT OR UPDATE OF attachments ON public.medical_diary
+  FOR EACH ROW EXECUTE FUNCTION public.trg_medical_diary_private_attachments();
 
 COMMIT;
 

@@ -635,54 +635,93 @@ function EntryCard({
   )
 }
 
+type AttachmentState = 'ready' | 'pending' | 'error' | 'unavailable'
+
+/** Что с файлом: ссылка готова, готовится, подпись не удалась (можно
+ *  повторить) или сервер файл не отдаёт (удалён или нет прав). */
+type AttachmentView =
+  | { state: 'ready'; href: string }
+  | { state: Exclude<AttachmentState, 'ready'>; href?: undefined }
+
+function attachmentState(att: MedicalAttachment, signed: SignedUrls): AttachmentView {
+  const href = attachmentHref(att, signed.urls)
+  if (href) return { href, state: 'ready' }
+  if (att.path && signed.failed.has(att.path)) return { state: 'unavailable' }
+  return { state: signed.status === 'error' ? 'error' : 'pending' }
+}
+
+const ATTACHMENT_HINT: Record<Exclude<AttachmentState, 'ready'>, string> = {
+  pending:     'Готовим ссылку…',
+  error:       'Не открылся — повторить',
+  unavailable: 'Файл недоступен',
+}
+
 /** Ссылка на вложение. Пока подписанной ссылки нет — не ссылка, а
  *  подпись о том, что происходит: без этого клик просто ничего не делал. */
 function AttachmentLink({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
-  const href = attachmentHref(att, signed.urls)
+  const view = attachmentState(att, signed)
+  const { state } = view
   const body = (
     <>
       <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
       <div className="min-w-0">
         <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
         <div className="text-[10px] text-muted-foreground">
-          {href ? fmtSize(att.size) : signed.status === 'error' ? 'Не открылся' : 'Готовим ссылку…'}
+          {view.state === 'ready' ? fmtSize(att.size) : ATTACHMENT_HINT[view.state]}
         </div>
       </div>
     </>
   )
   const chip = 'flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5'
-  if (href) {
+  if (view.state === 'ready') {
     return (
-      <a href={href} target="_blank" rel="noreferrer" title={att.name}
+      <a href={view.href} target="_blank" rel="noreferrer" title={att.name}
         className={cn(chip, 'hover:border-red-300 hover:bg-red-50 transition-colors')}>
         {body}
       </a>
     )
   }
-  if (signed.status === 'error') {
+  if (state === 'error') {
     return (
-      <button type="button" onClick={signed.retry} title="Повторить" className={cn(chip, 'hover:border-red-300')}>
+      <button type="button" onClick={signed.retry} aria-label={`${att.name}: не открылся, повторить`}
+        className={cn(chip, 'hover:border-red-300')}>
         {body}
       </button>
     )
   }
-  return <span aria-busy="true" title={att.name} className={cn(chip, 'opacity-70')}>{body}</span>
+  return (
+    <span role="status" aria-live="polite" aria-busy={state === 'pending'} title={att.name}
+      className={cn(chip, 'opacity-70')}>
+      {body}
+    </span>
+  )
 }
 
-/** Превью картинки в форме записи; без подписанной ссылки — заглушка. */
+/** Превью картинки в форме записи; без подписанной ссылки — заглушка с
+ *  тем же состоянием, что у ссылки, и повтором при ошибке. */
 function AttachmentThumb({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
-  const src = attachmentHref(att, signed.urls)
-  if (!src) {
+  const view = attachmentState(att, signed)
+  if (view.state === 'ready') {
     return (
-      <div aria-busy={signed.status !== 'error'} title={att.name}
-        className="w-16 h-16 rounded-lg border border-border bg-muted/30 flex items-center justify-center">
-        <Icon name="ki-picture" className="text-muted-foreground text-base" />
-      </div>
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img src={view.href} alt={att.name} className="w-16 h-16 rounded-lg object-cover border border-border" />
+    )
+  }
+  const { state } = view
+  const box = 'w-16 h-16 rounded-lg border border-border bg-muted/30 flex items-center justify-center'
+  if (state === 'error') {
+    return (
+      <button type="button" onClick={signed.retry} aria-label={`Превью ${att.name} не загрузилось — повторить`}
+        className={cn(box, 'hover:border-red-300')}>
+        <Icon name="ki-arrows-circle" className="text-muted-foreground text-base" />
+      </button>
     )
   }
   return (
-    /* eslint-disable-next-line @next/next/no-img-element */
-    <img src={src} alt={att.name} className="w-16 h-16 rounded-lg object-cover border border-border" />
+    <div role="img" aria-label={`${att.name}: ${ATTACHMENT_HINT[state]}`} aria-busy={state === 'pending'}
+      title={ATTACHMENT_HINT[state]} className={box}>
+      <Icon name={state === 'unavailable' ? 'ki-eye-slash' : 'ki-picture'} className="text-muted-foreground text-base" />
+    </div>
   )
 }
 

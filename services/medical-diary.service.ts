@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { reconcileWithMigrated } from '@/lib/medical-storage'
 import { notify } from './notifications.service'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -306,9 +307,12 @@ export async function updateMedicalEntry(
   const { data: prevRaw } = await (sb as any)
     .from('medical_diary').select('*').eq('id', id).maybeSingle()
   const prev = prevRaw as MedicalEntry | null
+  const body = patch.attachments && prev?.attachments
+    ? { ...patch, attachments: reconcileWithMigrated(patch.attachments, prev.attachments) }
+    : patch
   const { data, error } = await (sb as any)
     .from('medical_diary')
-    .update(patch).eq('id', id).select().single()
+    .update(body).eq('id', id).select().single()
   if (error) { console.warn('[updateMedicalEntry]', error.message); return null }
   const next = data as MedicalEntry
 

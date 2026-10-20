@@ -12,6 +12,9 @@ describe('publicPathFromUrl', () => {
   it('декодирует и отбрасывает параметры', () => {
     expect(publicPathFromUrl(`${BASE}${AUTH}/med/a%20b.pdf?download=1`)).toBe(`${AUTH}/med/a b.pdf`)
   })
+  it('битая %-последовательность — null, а не исключение', () => {
+    expect(publicPathFromUrl(`${BASE}${AUTH}/med/%E0%A4%A.pdf`)).toBeNull()
+  })
   it('чужой бакет и не-строка — null', () => {
     expect(publicPathFromUrl('https://x.supabase.co/storage/v1/object/public/avatars/a.png')).toBeNull()
     expect(publicPathFromUrl(undefined)).toBeNull()

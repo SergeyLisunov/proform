@@ -41,3 +41,26 @@ export function attachmentHref(
   if (att.path) return signed[att.path]
   return att.url
 }
+
+function lastSegment(value: string): string {
+  const raw = value.split('?')[0].split('/').pop() ?? ''
+  try { return decodeURIComponent(raw) } catch { return raw }
+}
+
+/**
+ * Вложения из формы, открытой до переноса файлов скриптом, — к виду
+ * записи сейчас. Старое вложение со ссылкой, чей файл уже перенесён (в
+ * записи лежит вложение с путём и тем же именем файла), заменяется
+ * перенесённым. Иначе сохранение такой формы вернуло бы в запись ссылку
+ * на удалённый публичный файл.
+ */
+export function reconcileWithMigrated<T extends StoredAttachment>(next: readonly T[], current: readonly T[]): T[] {
+  const migrated = new Map<string, T>()
+  for (const att of current) {
+    if (att.path) migrated.set(lastSegment(att.path), att)
+  }
+  return next.map(att => {
+    if (att.path || !att.url) return att
+    return migrated.get(lastSegment(att.url)) ?? att
+  })
+}
