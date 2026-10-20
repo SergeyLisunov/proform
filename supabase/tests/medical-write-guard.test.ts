@@ -9,7 +9,7 @@
  * провал теста, а не «защита сработала». Обычная работа врача, спортсмена и
  * тренера после миграций обязана работать.
  */
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createMedicalDb, USERS, type Db, type QueryOutcome, type UserKey } from './pg-harness'
 
 const FIX = [
@@ -551,6 +551,10 @@ const LEGIT: Scenario[] = [
        VALUES ($1, $2, 'doctor_athlete', 'active') RETURNING id`, [doctorB.id, athleteA2.id]),
   },
 ]
+
+// Каждый тест поднимает свой Postgres в WASM. Под нагрузкой (весь набор
+// параллельно, CI) первый запуск занимает больше стандартных 5 секунд.
+vi.setConfig({ testTimeout: 30_000 })
 
 let db: Db | null = null
 afterEach(async () => { await db?.close(); db = null })

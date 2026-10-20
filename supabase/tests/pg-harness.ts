@@ -26,7 +26,8 @@ function migration(file: string): string {
 /**
  * То, что в проде создано панелью Supabase, а не миграциями репозитория:
  * роли PostgREST, auth.uid(), users, get_my_user_id(), get_my_role(),
- * connections; плюс пустые таблицы, на которые ссылаются миграции.
+ * connections, схема storage; плюс пустые таблицы, на которые ссылаются
+ * миграции.
  *
  * Политика на connections — худший случай: участник связи может делать с
  * ней что угодно. Настоящих политик в репозитории нет, и защита не должна
@@ -75,6 +76,30 @@ CREATE TABLE trainer_athletes (
 CREATE TABLE calendar_events (id uuid PRIMARY KEY DEFAULT gen_random_uuid());
 CREATE TABLE organizations (id uuid PRIMARY KEY DEFAULT gen_random_uuid());
 CREATE TABLE org_members (org_id uuid, user_id uuid, member_role text, status text);
+
+-- Хранилище Supabase: таблицы и foldername() в том виде, в каком на них
+-- опираются политики (storage.objects под RLS, как в проекте).
+CREATE SCHEMA storage;
+GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
+CREATE TABLE storage.buckets (
+  id text PRIMARY KEY, name text NOT NULL, public boolean DEFAULT false, file_size_limit bigint
+);
+CREATE TABLE storage.objects (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  bucket_id text REFERENCES storage.buckets(id),
+  name text NOT NULL,
+  owner_id text,
+  UNIQUE (bucket_id, name)
+);
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON storage.objects TO authenticated, service_role;
+GRANT SELECT ON storage.objects TO anon;
+CREATE FUNCTION storage.foldername(name text) RETURNS text[] LANGUAGE plpgsql AS $$
+DECLARE _parts text[];
+BEGIN
+  _parts := string_to_array(name, '/');
+  RETURN _parts[1:array_length(_parts, 1) - 1];
+END $$;
 `
 
 /** Сам триггер создаёт 076, но остальное в ней — про другие таблицы. */
@@ -112,6 +137,8 @@ export interface Db {
   as(user: UserKey, sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Запрос с действительным JWT, но без строки в users. */
   asUnknownUser(sql: string, params?: unknown[]): Promise<QueryOutcome>
+  /** Запрос без входа — роль anon. */
+  asAnon(sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Запрос серверного кода с service role — без пользователя. */
   asService(sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Подготовка данных в обход RLS. */
@@ -188,6 +215,8 @@ export async function createMedicalDb(migrations: string[] = []): Promise<Db> {
       JSON.stringify({ sub: authIdOf(user), role: 'authenticated' })),
     asUnknownUser: (sql, params = []) => run(pg, ['SET LOCAL ROLE authenticated'], sql, params,
       JSON.stringify({ sub: 'ffffffff-ffff-ffff-ffff-ffffffffffff', role: 'authenticated' })),
+    asAnon: (sql, params = []) => run(pg, ['SET LOCAL ROLE anon'], sql, params,
+      JSON.stringify({ role: 'anon' })),
     asService: (sql, params = []) => run(pg, ['SET LOCAL ROLE service_role'], sql, params),
     sys: (sql, params = []) => run(pg, [], sql, params),
     close: () => pg.close(),

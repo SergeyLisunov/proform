@@ -20,6 +20,9 @@ import { DiaryHeatmap } from '@/components/coach/DiaryHeatmap'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import {
+  MEDICAL_BUCKET, attachmentHref, buildMedicalPath, useSignedUrls, type SignedUrls,
+} from '@/lib/medical-attachments'
 
 const ENTRY_TYPES: MedicalEntryType[] = [
   'consultation', 'rehab_progress', 'prescription', 'lab_results',
@@ -49,6 +52,9 @@ function fmtSize(b: number): string {
 export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
   const { confirm } = useDialog()
   const [entries, setEntries] = useState<MedicalEntry[]>([])
+  // Ссылки на файлы всех записей — одним запросом, а не по запросу на карточку.
+  const allAttachments = useMemo(() => entries.flatMap(e => e.attachments ?? []), [entries])
+  const signed = useSignedUrls(allAttachments)
   const [loading, setLoading] = useState(true)
   const [heatmap, setHeatmap] = useState<Record<string, number>>({})
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -221,6 +227,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
       )}
 
       {/* Entries list */}
+      <AttachmentsAnnouncer signed={signed} />
       <div className="flex flex-col gap-3">
         {loading && entries.length === 0 ? (
           <Card className="p-10 text-center text-xs text-muted-foreground">
@@ -230,7 +237,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
           <EmptyState onCreate={() => { setCreating(true); setEditing(null) }} />
         ) : (
           entries.map(e => (
-            <EntryCard key={e.id} entry={e}
+            <EntryCard key={e.id} entry={e} signed={signed}
               patientName={e.athlete_id ? patientById.get(e.athlete_id) ?? '—' : null}
               onEdit={() => { setEditing(e); setCreating(false) }}
               onToggleShare={async () => {
@@ -438,9 +445,10 @@ function Metric({ label, value, highlight }: { label: string; value: string; hig
 // ── Entry card ─────────────────────────────────────────────────────────────
 
 function EntryCard({
-  entry, patientName, onEdit, onDelete, onToggleShare, onToggleShareCoach,
+  entry, signed, patientName, onEdit, onDelete, onToggleShare, onToggleShareCoach,
 }: {
   entry: MedicalEntry
+  signed: SignedUrls
   patientName: string | null
   onEdit: () => void
   onDelete: () => void
@@ -449,7 +457,6 @@ function EntryCard({
 }) {
   const meta = MED_TYPE_META[entry.entry_type]
   const sev = entry.severity ? SEVERITY_LABELS[entry.severity] : null
-
   return (
     <Card className="p-5 hover:border-red-200 transition-all">
       <div className="flex items-start gap-3 mb-3">
@@ -611,15 +618,7 @@ function EntryCard({
       {entry.attachments && entry.attachments.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {entry.attachments.map((att, i) => (
-            <a key={i} href={att.url} target="_blank" rel="noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 hover:border-red-300 hover:bg-red-50 transition-colors"
-              title={att.name}>
-              <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
-              <div className="min-w-0">
-                <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
-                <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
-              </div>
-            </a>
+            <AttachmentLink key={i} att={att} signed={signed} />
           ))}
         </div>
       )}
@@ -634,6 +633,110 @@ function EntryCard({
         </div>
       )}
     </Card>
+  )
+}
+
+// Сохранение могло не пройти: например, база отклонила вложение со ссылкой
+// в публичное хранилище. Раньше форма закрывалась как ни в чём не бывало.
+const SAVE_FAILED = 'Не удалось сохранить запись. Обновите страницу и попробуйте снова.'
+
+type AttachmentState = 'ready' | 'pending' | 'error' | 'unavailable'
+
+/** Что с файлом: ссылка готова, готовится, подпись не удалась (можно
+ *  повторить) или сервер файл не отдаёт (удалён или нет прав). */
+type AttachmentView =
+  | { state: 'ready'; href: string }
+  | { state: Exclude<AttachmentState, 'ready'>; href?: undefined }
+
+function attachmentState(att: MedicalAttachment, signed: SignedUrls): AttachmentView {
+  const href = attachmentHref(att, signed.urls)
+  if (href) return { href, state: 'ready' }
+  if (att.path && signed.failed.has(att.path)) return { state: 'unavailable' }
+  return { state: signed.status === 'error' ? 'error' : 'pending' }
+}
+
+const ATTACHMENT_HINT: Record<Exclude<AttachmentState, 'ready'>, string> = {
+  pending:     'Готовим ссылку…',
+  error:       'Не открылся — повторить',
+  unavailable: 'Файл недоступен',
+}
+
+/**
+ * Одна живая область на список: экранный диктор узнаёт о сбое ссылок на
+ * файлы один раз, а не от каждого вложения.
+ */
+function AttachmentsAnnouncer({ signed }: { signed: SignedUrls }) {
+  const message = signed.status === 'error'
+    ? 'Не удалось подготовить ссылки на файлы — нажмите на файл, чтобы повторить'
+    : signed.failed.size > 0 ? `Недоступно файлов: ${signed.failed.size}` : ''
+  return <p className="sr-only" aria-live="polite">{message}</p>
+}
+
+/** Ссылка на вложение. Пока подписанной ссылки нет — не ссылка, а
+ *  подпись о том, что происходит: без этого клик просто ничего не делал. */
+function AttachmentLink({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
+  const view = attachmentState(att, signed)
+  const { state } = view
+  const body = (
+    <>
+      <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
+      <div className="min-w-0">
+        <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
+        <div className="text-[10px] text-muted-foreground">
+          {view.state === 'ready' ? fmtSize(att.size) : ATTACHMENT_HINT[view.state]}
+        </div>
+      </div>
+    </>
+  )
+  const chip = 'flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5'
+  if (view.state === 'ready') {
+    return (
+      <a href={view.href} target="_blank" rel="noreferrer" title={att.name}
+        className={cn(chip, 'hover:border-red-300 hover:bg-red-50 transition-colors')}>
+        {body}
+      </a>
+    )
+  }
+  if (state === 'error') {
+    return (
+      <button type="button" onClick={signed.retry} aria-label={`${att.name}: не открылся, повторить`}
+        className={cn(chip, 'hover:border-red-300')}>
+        {body}
+      </button>
+    )
+  }
+  return (
+    <span title={att.name} className={cn(chip, 'opacity-70')}>
+      {body}
+    </span>
+  )
+}
+
+/** Превью картинки в форме записи; без подписанной ссылки — заглушка с
+ *  тем же состоянием, что у ссылки, и повтором при ошибке. */
+function AttachmentThumb({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
+  const view = attachmentState(att, signed)
+  if (view.state === 'ready') {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img src={view.href} alt={att.name} className="w-16 h-16 rounded-lg object-cover border border-border" />
+    )
+  }
+  const { state } = view
+  const box = 'w-16 h-16 rounded-lg border border-border bg-muted/30 flex items-center justify-center'
+  if (state === 'error') {
+    return (
+      <button type="button" onClick={signed.retry} aria-label={`Превью ${att.name} не загрузилось — повторить`}
+        className={cn(box, 'hover:border-red-300')}>
+        <Icon name="ki-arrows-circle" className="text-muted-foreground text-base" />
+      </button>
+    )
+  }
+  return (
+    <div role="img" aria-label={`${att.name}: ${ATTACHMENT_HINT[state]}`}
+      title={ATTACHMENT_HINT[state]} className={box}>
+      <Icon name={state === 'unavailable' ? 'ki-eye-slash' : 'ki-picture'} className="text-muted-foreground text-base" />
+    </div>
   )
 }
 
@@ -748,7 +851,9 @@ function EntryDrawer({
 
   // Attachments
   const [attachments, setAttachments] = useState<MedicalAttachment[]>(initial?.attachments ?? [])
+  const drawerSigned = useSignedUrls(attachments)
   const [uploadErr, setUploadErr] = useState<string | null>(null)
+  const [saveErr, setSaveErr] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -773,21 +878,18 @@ function EntryDrawer({
     setUploading(true)
     try {
       const sb = createClient()
-      const { data: { user } } = await sb.auth.getUser()
-      if (!user) { setUploadErr('Не авторизован'); setUploading(false); return }
       const results: MedicalAttachment[] = []
       for (const f of toUpload) {
         const isImage = /^image\//.test(f.type)
         const maxSize = isImage ? MAX_IMG : MAX_DOC
         if (f.size > maxSize) { setUploadErr(`${f.name}: слишком большой (${fmtSize(f.size)})`); continue }
-        const ext = f.name.split('.').pop() ?? 'bin'
-        const path = `${user.id}/med/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { error: upErr } = await sb.storage.from('note-attachments').upload(path, f, { upsert: false })
+        // Закрытый бакет, папка автора: файл видят только те, кому видна запись.
+        const path = buildMedicalPath(doctorId, f.name)
+        const { error: upErr } = await sb.storage.from(MEDICAL_BUCKET).upload(path, f, { upsert: false })
         if (upErr) { setUploadErr(upErr.message); continue }
-        const { data: { publicUrl } } = sb.storage.from('note-attachments').getPublicUrl(path)
         results.push({
           name: f.name,
-          url: publicUrl,
+          path,
           type: isImage ? 'image' : 'document',
           size: f.size,
           mimeType: f.type,
@@ -798,6 +900,7 @@ function EntryDrawer({
   }
 
   const handleSave = async () => {
+    setSaveErr(null)
     if (!note.trim()) return
     setSaving(true)
     const tags = tagsInput.split(/[,\n]/).map(t => t.trim().replace(/^#/, '')).filter(Boolean)
@@ -855,9 +958,18 @@ function EntryDrawer({
     }
 
     if (initial) {
-      await updateMedicalEntry(initial.id, payload as any)
+      // Вложения — только если их поменяли в форме. Иначе страница, открытая
+      // до переноса файлов в закрытый бакет, записала бы поверх перенесённых
+      // путей старые публичные ссылки.
+      const patch: Record<string, unknown> = { ...payload }
+      if (JSON.stringify(initial.attachments ?? null) === JSON.stringify(payload.attachments)) {
+        delete patch.attachments
+      }
+      const saved = await updateMedicalEntry(initial.id, patch as any)
+      if (!saved) { setSaving(false); setSaveErr(SAVE_FAILED); return }
     } else {
-      await createMedicalEntry(payload as any)
+      const created = await createMedicalEntry(payload as any)
+      if (!created) { setSaving(false); setSaveErr(SAVE_FAILED); return }
     }
     setSaving(false)
     onSaved()
@@ -1221,6 +1333,7 @@ function EntryDrawer({
 
           {/* Attachments */}
           <div>
+            <AttachmentsAnnouncer signed={drawerSigned} />
             <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Вложения · {attachments.length}/{MAX_ATTACH_FILES}
             </label>
@@ -1228,9 +1341,7 @@ function EntryDrawer({
               {attachments.map((att, i) => (
                 <div key={i} className="relative group">
                   {att.type === 'image' ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={att.url} alt={att.name}
-                      className="w-16 h-16 rounded-lg object-cover border border-border" />
+                    <AttachmentThumb att={att} signed={drawerSigned} />
                   ) : (
                     <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[180px]">
                       <Icon name="ki-document" className="text-muted-foreground text-sm" />
@@ -1301,6 +1412,9 @@ function EntryDrawer({
           </div>
         </div>
 
+        {saveErr && (
+          <p role="alert" className="border-t border-border px-5 pt-3 text-xs text-destructive">{saveErr}</p>
+        )}
         <div className="border-t border-border px-5 py-3 flex items-center gap-2">
           <button onClick={handleSave} disabled={saving || !note.trim() || uploading}
             className="flex-1 rounded-xl text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
