@@ -23,6 +23,7 @@ import { AvatarImage } from '@/components/ui/AvatarImage'
 const ApexChart    = dynamic(() => import('@/components/charts/ApexChart'), { ssr: false })
 const QuickNoteWidget = dynamic(() => import('@/components/ui/QuickNoteWidget'), { ssr: false })
 const DoctorDash = dynamic(() => import('./DoctorDashboard'), { ssr: false })
+const SpecialistDash = dynamic(() => import('./SpecialistDashboard'), { ssr: false })
 const OrgDash = dynamic(() => import('./OrganizationDashboard'), { ssr: false })
 const AiCoachCard          = dynamic(() => import('@/components/widgets/AiCoachCard'),          { ssr: false })
 const WeeklyInsightsCard   = dynamic(() => import('@/components/widgets/WeeklyInsightsCard'),   { ssr: false })
@@ -1259,6 +1260,8 @@ export default function DashboardPage() {
   if (!user) return null
 
   if (user.role === 'doctor') return <DoctorDash userId={user.id} name={user.name} />
+  // Без своей ветки специалист проваливался в кабинет спортсмена.
+  if (user.role === 'specialist') return <SpecialistDash userId={user.id} name={user.name} />
   if (user.role === 'organization') return <OrgDash userId={user.id} name={user.name} />
   if (user.role === 'coach') return <CoachDash userId={user.id} name={user.name} />
   // Этап 10 — централизованный helper. Платформенный admin = back-office.

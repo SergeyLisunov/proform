@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getErrorMessage } from '@/lib/utils/errors'
 import { Icon } from '@/components/ui/Icon'
+import { roleMeta } from '@/lib/roles'
 
 // ── UTM attribution (Sprint W5 Day 23 / PR #39) ───────────────────────
 // Reads UTM params from URL on mount and passes them to signUp() options.data.
@@ -45,18 +46,19 @@ function readUtmFromUrl(): UtmCapture {
   }
 }
 
-type Role = 'athlete' | 'coach' | 'organization' | 'doctor'
+type Role = 'athlete' | 'coach' | 'organization' | 'doctor' | 'specialist'
 type Plan = 'free' | 'pro' | 'team'
 type Step = 'role' | 'account' | 'athlete_profile' | 'plan' | 'done'
 
-const ROLES: { value: Role; label: string; desc: string; icon: string; bg: string; text: string; border: string }[] = [
+type RoleCard = { value: Role; label: string; desc: string; icon: string; border: string }
+
+// Фон и цвет — из lib/roles.ts: карточка совпадает с плашкой роли в кабинете.
+const ROLES: (RoleCard & { bg: string; text: string })[] = ([
   {
     value: 'athlete',
     label: 'Атлет',
     desc: 'Веду дневник тренировок, отслеживаю прогресс и восстановление',
     icon: 'ki-abstract-26',
-    bg: '#FEF0E7',
-    text: '#F35703',
     border: '#FBC1A0',
   },
   {
@@ -64,8 +66,6 @@ const ROLES: { value: Role; label: string; desc: string; icon: string; bg: strin
     label: 'Тренер',
     desc: 'Наблюдаю за атлетами, оставляю пометки и управляю нагрузкой',
     icon: 'ki-notepad-edit',
-    bg: '#F0FDF4',
-    text: '#16A34A',
     border: '#BBF7D0',
   },
   {
@@ -73,20 +73,33 @@ const ROLES: { value: Role; label: string; desc: string; icon: string; bg: strin
     label: 'Организация',
     desc: 'Управляю участниками, рассылками и рабочими процессами команды',
     icon: 'ki-office-bag',
-    bg: '#EFF6FF',
-    text: '#2563EB',
     border: '#BFDBFE',
   },
   {
     value: 'doctor',
-    label: 'Доктор',
+    label: 'Врач',
     desc: 'Наблюдаю здоровье и восстановление, оставляю медицинские заметки',
     icon: 'ki-heart-circle',
-    bg: '#FEF2F2',
-    text: '#DC2626',
     border: '#FECACA',
   },
-]
+  {
+    value: 'specialist',
+    label: 'Специалист',
+    desc: 'Физиотерапевт, массажист, нутрициолог, психолог — работаю со спортсменами с их согласия',
+    icon: 'ki-bandage',
+    border: '#BAE6FD',
+  },
+] satisfies RoleCard[]).map(card => ({ ...card, bg: roleMeta(card.value).bg, text: roleMeta(card.value).text }))
+
+function isRole(value: string | null): value is Role {
+  return ROLES.some((role) => role.value === value)
+}
+
+// Число ролей считается из списка — и слово при нём тоже: 1 роль, 4 роли, 5 ролей.
+const ROLE_WORD: Partial<Record<Intl.LDMLPluralRule, string>> = { one: 'роль', few: 'роли' }
+function rolesWord(count: number): string {
+  return ROLE_WORD[new Intl.PluralRules('ru').select(count)] ?? 'ролей'
+}
 
 const PLANS: { value: Plan; label: string; price: string; desc: string; features: string[]; accent: string; bg: string; border: string }[] = [
   {
@@ -256,8 +269,8 @@ export default function RegisterPage() {
       const token = params.get('invite')
       const roleParam = params.get('role')
       if (token && /^[0-9a-f-]{36}$/i.test(token)) setInviteToken(token)
-      if (roleParam && (roleParam === 'athlete' || roleParam === 'coach' || roleParam === 'doctor' || roleParam === 'organization')) {
-        setSelectedRole(roleParam as Role)
+      if (isRole(roleParam)) {
+        setSelectedRole(roleParam)
         setStep('account')
       }
     } catch { /* noop */ }
@@ -501,7 +514,7 @@ export default function RegisterPage() {
 
             <div className="mt-8 grid gap-3">
               {[
-                { label: 'Сначала роль', note: 'Сценарии для атлета, тренера и организации' },
+                { label: 'Сначала роль', note: 'Сценарии для атлета, тренера, врача, специалиста и организации' },
                 { label: 'Понятный шаг аккаунта', note: 'Ясные подсказки по паролю и email' },
                 { label: 'Профиль атлета только по делу', note: 'Опциональные метрики без лишнего шума' },
               ].map((item, index) => (
@@ -523,7 +536,7 @@ export default function RegisterPage() {
 
           <div className="relative grid grid-cols-3 gap-3 border-t border-white/10 px-10 py-7">
             {[
-              { value: '3', label: 'роли' },
+              { value: String(ROLES.length), label: rolesWord(ROLES.length) },
               { value: '1', label: 'поток' },
               { value: '0', label: 'лишних шагов' },
             ].map((item) => (
@@ -578,6 +591,7 @@ export default function RegisterPage() {
                       <button
                         key={role.value}
                         type="button"
+                        aria-pressed={isActive}
                         onClick={() => setSelectedRole(role.value)}
                         className={[
                           'group flex items-start gap-4 rounded-[24px] border p-4 text-left transition-all',

@@ -1,14 +1,12 @@
 import { createClient } from '@/lib/supabase/client'
+import type { ConnectionType } from '@/lib/connections/types'
 
-export type InviteConnectionType =
-  | 'coach_athlete'
-  | 'org_coach'
-  | 'org_athlete'
-  | 'doctor_athlete'
-  | 'coach_doctor'
-  | 'org_doctor'
-  | 'admin_doctor'
-  | 'parent_link'  // athlete → parent/guardian (creates a parent_links row on claim, not a connection)
+/**
+ * Типы связей берутся из lib/connections/types — тот же список проверяют
+ * API и база. parent_link — не связь: при принятии создаётся строка
+ * parent_links (спортсмен → родитель / опекун).
+ */
+export type InviteConnectionType = ConnectionType | 'parent_link'
 
 export type InviteStatus = 'pending' | 'claimed' | 'expired' | 'revoked'
 
@@ -24,17 +22,6 @@ export interface EmailInvite {
   claimed_at: string | null
   expires_at: string
   created_at: string
-}
-
-export const CONNECTION_TYPE_LABELS: Record<InviteConnectionType, string> = {
-  coach_athlete:  'тренер ↔ атлет',
-  org_coach:      'организация ↔ тренер',
-  org_athlete:    'организация ↔ атлет',
-  doctor_athlete: 'врач ↔ атлет',
-  coach_doctor:   'тренер ↔ врач',
-  org_doctor:     'организация ↔ врач',
-  admin_doctor:   'админ ↔ врач',
-  parent_link:    'атлет ↔ родитель / опекун',
 }
 
 /**

@@ -68,6 +68,15 @@ CREATE POLICY conn_participant ON connections FOR ALL
 CREATE FUNCTION get_my_role() RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
   SET search_path = public AS $$ SELECT role FROM users WHERE auth_id = auth.uid() $$;
 
+-- email_invites — только тип связи с CHECK из 090, его правит 119.
+CREATE TABLE email_invites (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  connection_type varchar(30) NOT NULL
+    CONSTRAINT email_invites_connection_type_check CHECK (connection_type IN (
+      'coach_athlete', 'org_coach', 'org_athlete', 'doctor_athlete',
+      'coach_doctor',  'org_doctor', 'admin_doctor', 'parent_link'))
+);
+
 CREATE TABLE trainer_athletes (
   trainer_id uuid, athlete_id uuid, status text, assigned_by uuid, updated_at timestamptz,
   UNIQUE (trainer_id, athlete_id)
@@ -92,6 +101,7 @@ export const USERS = {
   athleteA3: { id: '00000000-0000-0000-0000-0000000000a5', role: 'athlete' },
   athleteB: { id: '00000000-0000-0000-0000-0000000000b2', role: 'athlete' },
   coachA:   { id: '00000000-0000-0000-0000-0000000000a4', role: 'coach' },
+  specialistS: { id: '00000000-0000-0000-0000-0000000000c1', role: 'specialist' },
 } as const
 
 export type UserKey = keyof typeof USERS
@@ -112,10 +122,14 @@ export interface Db {
   as(user: UserKey, sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Запрос с действительным JWT, но без строки в users. */
   asUnknownUser(sql: string, params?: unknown[]): Promise<QueryOutcome>
+  /** Запрос без входа — роль anon. */
+  asAnon(sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Запрос серверного кода с service role — без пользователя. */
   asService(sql: string, params?: unknown[]): Promise<QueryOutcome>
   /** Подготовка данных в обход RLS. */
   sys(sql: string, params?: unknown[]): Promise<QueryOutcome>
+  /** Применить ещё одну миграцию к уже созданной базе. */
+  applyMigration(file: string): Promise<void>
   close(): Promise<void>
 }
 
@@ -188,8 +202,11 @@ export async function createMedicalDb(migrations: string[] = []): Promise<Db> {
       JSON.stringify({ sub: authIdOf(user), role: 'authenticated' })),
     asUnknownUser: (sql, params = []) => run(pg, ['SET LOCAL ROLE authenticated'], sql, params,
       JSON.stringify({ sub: 'ffffffff-ffff-ffff-ffff-ffffffffffff', role: 'authenticated' })),
+    asAnon: (sql, params = []) => run(pg, ['SET LOCAL ROLE anon'], sql, params,
+      JSON.stringify({ role: 'anon' })),
     asService: (sql, params = []) => run(pg, ['SET LOCAL ROLE service_role'], sql, params),
     sys: (sql, params = []) => run(pg, [], sql, params),
+    applyMigration: async file => { await pg.exec(migration(file)) },
     close: () => pg.close(),
   }
 }

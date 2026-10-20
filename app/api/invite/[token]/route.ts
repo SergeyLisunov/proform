@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { CONNECTION_TYPE_ROLES, isConnectionType } from '@/lib/connections/types'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -80,15 +81,6 @@ export async function POST(_req: Request, props: { params: Promise<{ token: stri
   }
 
   // Role check — the signed-in user's role must match the invite's other side.
-  const VALID_COMBOS: Record<string, [string, string]> = {
-    coach_athlete:  ['coach', 'athlete'],
-    org_coach:      ['organization', 'coach'],
-    org_athlete:    ['organization', 'athlete'],
-    doctor_athlete: ['doctor', 'athlete'],
-    coach_doctor:   ['coach', 'doctor'],
-    org_doctor:     ['organization', 'doctor'],
-    admin_doctor:   ['admin', 'doctor'],
-  }
 
   const { data: inviter } = await admin
     .from('users').select('id, role').eq('id', inv.inviter_id).single()
@@ -133,8 +125,11 @@ export async function POST(_req: Request, props: { params: Promise<{ token: stri
     return NextResponse.json({ ok: true, parent_link: true })
   }
 
-  const combo = VALID_COMBOS[inv.connection_type]
-  if (!combo) return NextResponse.json({ ok: false, error: 'invalid_type' }, { status: 400 })
+  const invType: unknown = inv.connection_type
+  if (!isConnectionType(invType)) {
+    return NextResponse.json({ ok: false, error: 'invalid_type' }, { status: 400 })
+  }
+  const combo = CONNECTION_TYPE_ROLES[invType]
   // Determine which side is the recipient (the one that isn't the inviter's role).
   const recipientRole = combo[0] === inviterRole ? combo[1] : combo[0]
   if (myRole !== recipientRole) {

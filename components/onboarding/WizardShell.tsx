@@ -16,6 +16,9 @@
 import type { ReactNode } from 'react'
 import { Icon } from '@/components/ui/Icon'
 
+/** id блока ошибки — поля с ошибкой ссылаются на него через aria-describedby. */
+export const WIZARD_ERROR_ID = 'wizard-error'
+
 export interface WizardStep {
   key:         string
   title:       string
@@ -49,11 +52,12 @@ export default function WizardShell({
   const canAdvance  = step.canAdvance !== false
   const progressPct = Math.round(((currentIndex + 1) / totalSteps) * 100)
 
+  // Фон — токен темы: светлый градиент-литерал оставался светлым и в тёмной теме.
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.10),transparent_28%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_55%,#FFFDF9_100%)] px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.10),transparent_28%),linear-gradient(180deg,#FFF8F1_0%,#FFFFFF_100%)] dark:bg-background dark:bg-[radial-gradient(circle_at_top_left,rgba(243,87,3,0.10),transparent_28%)] px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto w-full max-w-2xl">
         {/* Hero */}
-        <div className="rounded-3xl border border-orange-100/80 bg-card shadow-[0_18px_60px_rgba(15,23,42,0.06)] p-6 md:p-8 mb-4">
+        <div className="rounded-3xl border border-orange-100/80 dark:border-border bg-card shadow-[0_18px_60px_rgba(15,23,42,0.06)] p-6 md:p-8 mb-4">
           <div className="flex items-center justify-between gap-3 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em]"
               style={{ background: `${accentColor}1A`, color: accentColor, border: `1px solid ${accentColor}33` }}>
@@ -71,7 +75,7 @@ export default function WizardShell({
               style={{ width: `${progressPct}%`, background: accentColor }} />
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold text-navy-500 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-navy-500 dark:text-foreground leading-tight">
             {step.title}
           </h1>
           {step.description && (
@@ -85,9 +89,13 @@ export default function WizardShell({
         <div className="rounded-3xl border border-border bg-card shadow-xs p-6 md:p-8">
           {children}
 
-          {error && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
-          )}
+          {/* Область alert есть всегда: текст, появившийся в уже существующей
+              области, читалки объявляют надёжнее, чем новый узел с role. */}
+          <div id={WIZARD_ERROR_ID} role="alert">
+            {error && (
+              <div className="mt-4 rounded-xl border border-destructive/40 bg-background px-3 py-2 text-sm text-destructive">{error}</div>
+            )}
+          </div>
         </div>
 
         {/* Footer nav */}

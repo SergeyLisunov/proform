@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { RESERVED_TOP_LEVEL_SLUGS, PUBLIC_APP_SLUGS } from '@/lib/routes/reserved-slugs'
 import { isAnonymousAllowed } from '@/lib/routes/public-routes'
+import { needsOnboarding } from '@/lib/onboarding/wizard-routes'
 
 /**
  * Middleware — refreshes the Supabase session cookie on every request
@@ -124,18 +125,16 @@ export async function updateSession(request: NextRequest) {
         .maybeSingle()
 
       const me = meRow as { role: string | null; onboarding_state: { completed?: boolean } | null } | null
-      // Skip check for admins (they may have created accounts manually
-      // bypassing the wizard) and for users with missing rows (defensive).
-      if (me && me.role !== 'admin') {
-        const completed = me.onboarding_state?.completed === true
-        if (!completed) {
-          const url = request.nextUrl.clone()
-          url.pathname = '/onboarding'
-          // Preserve original destination so wizard can return there on finish
-          // (future enhancement; current wizards redirect to role home).
-          url.searchParams.set('return_to', `${pathname}${request.nextUrl.search}`)
-          return NextResponse.redirect(url)
-        }
+      // Только роли, у которых есть мастер (lib/onboarding/wizard-routes):
+      // админа и роль без мастера сюда отправлять нельзя — диспетчер
+      // /onboarding вернул бы их на /dashboard, и вход зациклился бы.
+      if (me && needsOnboarding(me.role, me.onboarding_state)) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding'
+        // Preserve original destination so wizard can return there on finish
+        // (future enhancement; current wizards redirect to role home).
+        url.searchParams.set('return_to', `${pathname}${request.nextUrl.search}`)
+        return NextResponse.redirect(url)
       }
     } catch {
       // Fail-open: if the lookup fails, let the user through. Better UX
@@ -153,9 +152,8 @@ export async function updateSession(request: NextRequest) {
         .eq('auth_id', user.id)
         .maybeSingle()
       const me = meRow as { role: string | null; onboarding_state: { completed?: boolean } | null } | null
-      const completed = me?.onboarding_state?.completed === true
       const url = request.nextUrl.clone()
-      url.pathname = (me && me.role !== 'admin' && !completed) ? '/onboarding' : '/dashboard'
+      url.pathname = (me && needsOnboarding(me.role, me.onboarding_state)) ? '/onboarding' : '/dashboard'
       return NextResponse.redirect(url)
     } catch {
       const url = request.nextUrl.clone()

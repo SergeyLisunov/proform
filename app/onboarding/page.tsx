@@ -4,16 +4,16 @@
  *
  * Reads the current user + their onboarding_state:
  *   - completed → /dashboard
- *   - role=athlete or trainer alias → /onboarding/athlete
- *   - role=coach → /onboarding/coach
- *   - role=organization/admin/doctor → fallback to /dashboard for now
- *     (org + doctor wizards land in Sprint W6 Day 31)
+ *   - роль с мастером → её мастер (lib/onboarding/wizard-routes)
+ *   - роль без мастера (admin) → /dashboard: middleware таких сюда не шлёт,
+ *     поэтому круга /dashboard ↔ /onboarding нет
  *   - unauth → /auth/login
  */
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { loadMyOnboarding, isOnboarded } from '@/services/onboarding.service'
+import { wizardPathForRole } from '@/lib/onboarding/wizard-routes'
 
 export default function OnboardingDispatcherPage() {
   const router = useRouter()
@@ -31,12 +31,7 @@ export default function OnboardingDispatcherPage() {
         router.replace('/dashboard')
         return
       }
-      const role = user.role
-      if (role === 'athlete') router.replace('/onboarding/athlete')
-      else if (role === 'coach') router.replace('/onboarding/coach')
-      else if (role === 'organization') router.replace('/onboarding/organization')
-      else if (role === 'doctor') router.replace('/onboarding/doctor')
-      else router.replace('/dashboard')   // admin — skip wizard
+      router.replace(wizardPathForRole(user.role) ?? '/dashboard')
     })()
     return () => { cancelled = true }
   }, [user, loading, router])

@@ -3,6 +3,8 @@
  * Inline styles only (most email clients ignore <style> tags).
  */
 
+import { invitedAsLabel } from '@/lib/connections/types'
+
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
 
 function wrap(title: string, preheader: string, inner: string): string {
@@ -148,31 +150,34 @@ export function renderCoachWeeklyDigest(params: {
 
 // ─── Email invitation ──────────────────────────────────────────────────────
 
-const INVITE_ROLE_LABELS: Record<string, string> = {
-  coach_athlete:  'тренера',
-  org_coach:      'организации',
-  org_athlete:    'организации',
-  doctor_athlete: 'врача',
-  coach_doctor:   'тренера',
-  org_doctor:     'организации',
-  admin_doctor:   'администратора',
-  parent_link:    'родителя / опекуна',
+/**
+ * Кем подключается получатель. Одна связь зовёт разные стороны: специалист
+ * приглашает спортсмена, спортсмен — специалиста, поэтому подпись считается
+ * от роли пригласившего. Без неё роль не называем: общая фраза лучше, чем
+ * «в качестве специалиста» в письме спортсмену.
+ */
+function inviteeRoleLabel(connectionType: string, inviterRole: string | null | undefined): string | null {
+  if (connectionType === 'parent_link') return 'родителя / опекуна'
+  return invitedAsLabel(connectionType, inviterRole)
 }
 
 export function renderInviteEmail(input: {
   inviter_name: string
+  /** users.role пригласившего — от неё зависит, кем подключается получатель. */
+  inviter_role?: string | null
   connection_type: string
   message: string | null
   claim_url: string
   expires_at: string
 }): { subject: string; html: string } {
-  const roleLabel = INVITE_ROLE_LABELS[input.connection_type] ?? 'пользователя'
+  const roleLabel = inviteeRoleLabel(input.connection_type, input.inviter_role)
+  const joinAs = roleLabel ? ` в качестве ${escape(roleLabel)}` : ''
   const subject = `${input.inviter_name} приглашает вас в Sporteo`
   const expiresHuman = new Date(input.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
   const inner = `
     <h1 style="margin:0 0 12px 0;font-size:22px;color:#0F172A">Вас приглашают в Sporteo</h1>
     <p style="margin:0 0 16px 0;color:#334155;font-size:14px;line-height:1.55">
-      <strong>${escape(input.inviter_name)}</strong> приглашает вас подключиться в качестве ${escape(roleLabel)} на платформе Sporteo —
+      <strong>${escape(input.inviter_name)}</strong> приглашает вас подключиться${joinAs} на платформе Sporteo —
       тренировки, медицинские осмотры и командные события в одном месте.
     </p>
     ${input.message ? `

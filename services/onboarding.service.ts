@@ -11,7 +11,7 @@
  */
 import { createClient } from '@/lib/supabase/client'
 
-export type WizardRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'doctor'
+export type WizardRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'doctor' | 'specialist'
 
 export interface AthleteWizardData {
   sport?:  string
@@ -47,6 +47,17 @@ export interface DoctorWizardData {
   emergency_contact?:  boolean
 }
 
+/** Мастер специалиста. Профиль (специализации, опыт, сертификаты) пишется
+ *  в таблицу specialists; здесь — только шаги и согласия. */
+export interface SpecialistWizardData {
+  specialist_types?:  string[]   // physio | massage | nutrition | psychology | other
+  consent_152fz?:     boolean
+  accept_terms?:      boolean
+  scope_ack?:         boolean    // понял границы роли: без диагнозов, рецептов и допуска
+  /** Когда даны согласия — отдельной таблицы согласий нет, дата хранится здесь. */
+  consented_at?:      string
+}
+
 export interface OnboardingState {
   completed?:          boolean
   started_at?:         string
@@ -57,6 +68,7 @@ export interface OnboardingState {
   coach?:              CoachWizardData
   organization?:       OrgWizardData
   doctor?:             DoctorWizardData
+  specialist?:         SpecialistWizardData
 }
 
 /**
@@ -119,10 +131,11 @@ export async function patchMyOnboarding(patch: Partial<OnboardingState>): Promis
     coach:        { ...(prev.coach        ?? {}), ...(patch.coach        ?? {}) },
     organization: { ...(prev.organization ?? {}), ...(patch.organization ?? {}) },
     doctor:       { ...(prev.doctor       ?? {}), ...(patch.doctor       ?? {}) },
+    specialist:   { ...(prev.specialist   ?? {}), ...(patch.specialist   ?? {}) },
   }
 
   // Drop empty sub-objects so the JSON stays tidy.
-  for (const k of ['athlete', 'coach', 'organization', 'doctor'] as const) {
+  for (const k of ['athlete', 'coach', 'organization', 'doctor', 'specialist'] as const) {
     if (next[k] && Object.keys(next[k] as object).length === 0) delete next[k]
   }
 

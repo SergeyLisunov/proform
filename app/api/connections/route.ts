@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rolesMatchConnectionType } from '@/lib/connections/types'
 
 // GET — list my connections
 export async function GET(req: NextRequest) {
@@ -50,17 +51,8 @@ export async function POST(req: NextRequest) {
   const { data: recipient } = await supabase.from('users').select('id, role').eq('id', recipient_id).single()
   if (!recipient) return NextResponse.json({ error: 'Recipient not found' }, { status: 404 })
 
-  const validCombos: Record<string, [string, string]> = {
-    'coach_athlete':  ['coach', 'athlete'],
-    'org_coach':      ['organization', 'coach'],
-    'org_athlete':    ['organization', 'athlete'],
-    'doctor_athlete': ['doctor', 'athlete'],
-    'coach_doctor':   ['coach', 'doctor'],
-    'org_doctor':     ['organization', 'doctor'],
-    'admin_doctor':   ['admin', 'doctor'],
-  }
-  const [roleA, roleB] = validCombos[connection_type] ?? []
-  const rolesMatch = (me.role === roleA && recipient.role === roleB) || (me.role === roleB && recipient.role === roleA)
+  // Тот же список проверяет триггер согласия в базе (115, 119).
+  const rolesMatch = rolesMatchConnectionType(connection_type, me.role, recipient.role)
   if (!rolesMatch) {
     return NextResponse.json({ error: 'Role mismatch for connection_type' }, { status: 422 })
   }

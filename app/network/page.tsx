@@ -1,15 +1,21 @@
 'use client'
 import { Suspense, useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useUser } from '@/lib/hooks/useUser'
 import { EmailInviteDialog } from '@/components/ui/EmailInviteDialog'
 import { Card, Alert } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
 import { AvatarImage } from '@/components/ui/AvatarImage'
+import { roleMeta } from '@/lib/roles'
+import { connectionTypeForRoles, type ConnectionType } from '@/lib/connections/types'
+import { connectionRequestError } from '@/lib/connections/request-errors'
 
 type Mode = 'contacts' | 'find'
-type FindType = 'people' | 'coach' | 'doctor' | 'organization'
+const FIND_TYPES = ['people', 'coach', 'doctor', 'organization'] as const
+type FindType = (typeof FIND_TYPES)[number]
+const CONTACT_TABS = ['active', 'incoming', 'outgoing'] as const
+type ContactsTab = (typeof CONTACT_TABS)[number]
 
 type SearchUser = {
   id: string
@@ -69,12 +75,37 @@ type Connection = {
   recipient: { id: string; name: string | null; nickname: string | null; avatar_url: string | null; role: string; city: string | null }
 }
 
-const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
-  athlete:      { label: 'Атлет',    color: '#F35703', bg: '#FEF0E7' },
-  coach:        { label: 'Тренер',   color: '#16A34A', bg: '#F0FDF4' },
-  organization: { label: 'Орг.',     color: '#2563EB', bg: '#EFF6FF' },
-  doctor:       { label: 'Доктор',   color: '#DC2626', bg: '#FEF2F2' },
-  admin:        { label: 'Админ',    color: '#7C3AED', bg: '#FAF5FF' },
+// Роли, по которым можно отфильтровать поиск людей; '' — все роли.
+const PEOPLE_ROLE_FILTERS = ['', 'athlete', 'coach', 'doctor', 'specialist', 'organization'] as const
+
+// Отказ ставит паузу на сутки (429 too_soon), а поиск показывает такую пару
+// как «нет связи»: без понятной фразы «Пригласить» выглядело бы сломанным.
+
+/**
+ * Вид страницы живёт в адресе: ?tab=find&type=coach — поиск,
+ * ?tab=incoming / ?tab=outgoing — запросы в «Моих контактах». Так кабинет
+ * ведёт прямо к ждущим ответа, а видом можно поделиться ссылкой.
+ */
+function readView(params: { get(name: string): string | null }): { mode: Mode; findType: FindType; contactsTab: ContactsTab } {
+  const tab = params.get('tab') ?? ''
+  const type = params.get('type') ?? ''
+  return {
+    mode: tab === 'find' ? 'find' : 'contacts',
+    findType: (FIND_TYPES as readonly string[]).includes(type) ? type as FindType : 'people',
+    contactsTab: (CONTACT_TABS as readonly string[]).includes(tab) ? tab as ContactsTab : 'active',
+  }
+}
+
+function viewHref(mode: Mode, findType: FindType, contactsTab: ContactsTab): string {
+  const params = new URLSearchParams()
+  if (mode === 'find') {
+    params.set('tab', 'find')
+    params.set('type', findType)
+  } else if (contactsTab !== 'active') {
+    params.set('tab', contactsTab)
+  }
+  const qs = params.toString()
+  return qs ? `/network?${qs}` : '/network'
 }
 
 function displayName(u: { name?: string | null; first_name?: string | null; last_name?: string | null; nickname?: string | null }) {
@@ -88,17 +119,17 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 function Avatar({ url, name, role, size = 44 }: { url?: string | null; name: string; role: string; size?: number }) {
-  const rm = ROLE_META[role] ?? { color: '#64748B', bg: '#F8FAFC' }
+  const rm = roleMeta(role)
   return (
     <div style={{
       width: size, height: size, borderRadius: Math.round(size * 0.28),
-      background: url ? 'transparent' : `${rm.color}20`,
-      border: `1.5px solid ${rm.color}30`, overflow: 'hidden', flexShrink: 0,
+      background: url ? 'transparent' : `${rm.text}20`,
+      border: `1.5px solid ${rm.text}30`, overflow: 'hidden', flexShrink: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {url
         ? <AvatarImage src={url} alt="" sizes="64px" />
-        : <span style={{ fontSize: size * 0.38, fontWeight: 800, color: rm.color }}>
+        : <span style={{ fontSize: size * 0.38, fontWeight: 800, color: rm.text }}>
             {name[0]?.toUpperCase() ?? '?'}
           </span>
       }
@@ -107,9 +138,9 @@ function Avatar({ url, name, role, size = 44 }: { url?: string | null; name: str
 }
 
 function RoleChip({ role }: { role: string }) {
-  const rm = ROLE_META[role] ?? { label: role, color: '#64748B', bg: '#F8FAFC' }
+  const rm = roleMeta(role)
   return (
-    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: rm.bg, color: rm.color, border: `1px solid ${rm.color}22` }}>
+    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: rm.bg, color: rm.text, border: `1px solid ${rm.text}22` }}>
       {rm.label}
     </span>
   )
@@ -121,6 +152,7 @@ function PillButton({ active, onClick, children, icon, accent }: { active: boole
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition-all"
       style={{
         background: active ? color : 'transparent',
@@ -143,6 +175,8 @@ function PeopleSearch({ myRole }: { myRole: string }) {
   const [users, setUsers] = useState<SearchUser[]>([])
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)
+  // Ошибка приглашения — у своей строки: ответ относится к конкретному человеку.
+  const [inviteErrors, setInviteErrors] = useState<Record<string, string>>({})
   const dq = useDebounce(q, 280)
 
   const load = useCallback(async () => {
@@ -160,26 +194,29 @@ function PeopleSearch({ myRole }: { myRole: string }) {
 
   useEffect(() => { load() }, [load])
 
-  const invite = async (u: SearchUser) => {
+  const setInviteError = (userId: string, message: string | null) =>
+    setInviteErrors(prev => {
+      const rest = Object.fromEntries(Object.entries(prev).filter(([key]) => key !== userId))
+      return message ? { ...rest, [userId]: message } : rest
+    })
+
+  const invite = async (u: SearchUser, connection_type: ConnectionType) => {
     setBusy(u.id)
+    setInviteError(u.id, null)
     try {
-      const pair = [myRole, u.role].sort().join('|')
-      const typeMap: Record<string, string> = {
-        'athlete|coach': 'coach_athlete',
-        'athlete|organization': 'org_athlete',
-        'coach|organization': 'org_coach',
-        'athlete|doctor': 'doctor_athlete',
-        'coach|doctor': 'coach_doctor',
-        'doctor|organization': 'org_doctor',
-      }
-      const connection_type = typeMap[pair]
-      if (!connection_type) { setBusy(null); return }
-      await fetch('/api/connections', {
+      const res = await fetch('/api/connections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipient_id: u.id, connection_type }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setInviteError(u.id, connectionRequestError(res.status, body))
+        return
+      }
       await load()
+    } catch {
+      setInviteError(u.id, 'Не удалось отправить запрос')
     } finally { setBusy(null) }
   }
 
@@ -197,9 +234,9 @@ function PeopleSearch({ myRole }: { myRole: string }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {['', 'athlete', 'coach', 'doctor', 'organization'].map(r => (
+        {PEOPLE_ROLE_FILTERS.map(r => (
           <PillButton key={r || 'all'} active={roleFilter === r} onClick={() => setRoleFilter(r)} accent="#F35703">
-            {r === '' ? 'Все роли' : ROLE_META[r]?.label ?? r}
+            {r === '' ? 'Все роли' : roleMeta(r).label}
           </PillButton>
         ))}
       </div>
@@ -211,6 +248,8 @@ function PeopleSearch({ myRole }: { myRole: string }) {
         {users.map(u => {
           const name = displayName(u)
           const status = u.connection_status
+          const connType = connectionTypeForRoles(myRole, u.role)
+          const inviteError = inviteErrors[u.id]
           return (
             <Card key={u.id} className="flex items-center gap-3 p-3">
               <Link href={`/profile/${u.id}`}><Avatar url={u.avatar_url} name={name} role={u.role} /></Link>
@@ -225,22 +264,27 @@ function PeopleSearch({ myRole }: { myRole: string }) {
                   {u.city && <span>{u.city}</span>}
                 </div>
               </div>
-              <div className="shrink-0">
+              <div className="flex shrink-0 flex-col items-end">
                 {status === 'active' ? (
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16A34A]"><Icon name="ki-check" className="text-[11px]" /> в связях</span>
                 ) : status === 'pending' || status === 'pending_outgoing' ? (
                   <span className="text-[11px] font-semibold text-[#F35703]">Ожидает</span>
                 ) : status === 'pending_incoming' ? (
-                  <Link href="/network?tab=contacts" className="text-[11px] font-semibold text-[#F35703]">Ответить →</Link>
-                ) : (
+                  <Link href="/network?tab=incoming" className="text-[11px] font-semibold text-[#F35703]">Ответить →</Link>
+                ) : connType ? (
                   <button
-                    onClick={() => invite(u)}
+                    onClick={() => invite(u, connType)}
                     disabled={busy === u.id}
+                    aria-busy={busy === u.id}
+                    aria-label={`Пригласить: ${name}`}
                     className="rounded-lg bg-linear-to-r from-[#F35703] to-[#D44A02] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
                   >
                     {busy === u.id ? '…' : 'Пригласить'}
                   </button>
-                )}
+                ) : null}
+                <p aria-live="polite" className={`max-w-[160px] text-right text-[11px] font-semibold text-destructive ${inviteError ? 'mt-1' : ''}`}>
+                  {inviteError}
+                </p>
               </div>
             </Card>
           )
@@ -292,7 +336,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
       </Alert>
 
       {loading && <div className="text-sm text-muted-foreground">Загружаю…</div>}
-      {!loading && items.length === 0 && <div className="rounded-2xl border border-dashed border-[#E2E8F0] p-10 text-center text-sm text-muted-foreground">Нет подходящих специалистов</div>}
+      {!loading && items.length === 0 && <div className="rounded-2xl border border-dashed border-[#E2E8F0] p-10 text-center text-sm text-muted-foreground">Никого не найдено</div>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.map(item => {
@@ -314,7 +358,7 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
           }
           const u = item as DirectoryCoach | DirectoryDoctor
           const isCoach = type === 'coach'
-          const name = `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || 'Специалист'
+          const name = `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || roleMeta(type).label
           const spec = isCoach ? (u as DirectoryCoach).specialization : (u as DirectoryDoctor).medical_specialization
           const price = isCoach ? (u as DirectoryCoach).hourly_rate : (u as DirectoryDoctor).consultation_fee
           const currency = (u as DirectoryCoach).currency ?? 'RUB'
@@ -341,10 +385,12 @@ function DirectorySearch({ type }: { type: 'coach' | 'doctor' | 'organization' }
 
 // ─── Contacts sub-panel (lightweight, with deeplink to full /connections) ────
 
-function ContactsPanel() {
+function ContactsPanel({ tab, onTabChange }: { tab: ContactsTab; onTabChange: (tab: ContactsTab) => void }) {
   const [conns, setConns] = useState<Connection[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'active' | 'incoming' | 'outgoing'>('active')
+  // «id:действие» — занята одна кнопка, а не вся строка.
+  const [acting, setActing] = useState<string | null>(null)
+  const [actError, setActError] = useState<string | null>(null)
   const { user } = useUser()
 
   const load = useCallback(async () => {
@@ -378,24 +424,34 @@ function ContactsPanel() {
   }, [conns, my])
 
   const act = async (id: string, action: 'accept' | 'decline' | 'cancel') => {
-    await fetch(`/api/connections/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
-    })
-    await load()
+    setActing(`${id}:${action}`)
+    setActError(null)
+    try {
+      const res = await fetch(`/api/connections/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      if (!res.ok) {
+        setActError(action === 'cancel' ? 'Не удалось отозвать приглашение' : 'Не удалось ответить на запрос')
+        return
+      }
+      await load()
+    } catch {
+      setActError('Не удалось связаться с сервером. Попробуйте ещё раз.')
+    } finally { setActing(null) }
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2">
-        <PillButton active={tab === 'active'} onClick={() => setTab('active')} icon="ki-check-circle" accent="#16A34A">
+        <PillButton active={tab === 'active'} onClick={() => onTabChange('active')} icon="ki-check-circle" accent="#16A34A">
           Активные {counts.active > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.active}</span>}
         </PillButton>
-        <PillButton active={tab === 'incoming'} onClick={() => setTab('incoming')} icon="ki-entrance-right" accent="#F35703">
+        <PillButton active={tab === 'incoming'} onClick={() => onTabChange('incoming')} icon="ki-entrance-right" accent="#F35703">
           Входящие {counts.incoming > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.incoming}</span>}
         </PillButton>
-        <PillButton active={tab === 'outgoing'} onClick={() => setTab('outgoing')} icon="ki-exit-right" accent="#7C3AED">
+        <PillButton active={tab === 'outgoing'} onClick={() => onTabChange('outgoing')} icon="ki-exit-right" accent="#7C3AED">
           Исходящие {counts.outgoing > 0 && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-[10px]">{counts.outgoing}</span>}
         </PillButton>
         <Link href="/connections" className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-card px-3.5 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground">
@@ -403,6 +459,7 @@ function ContactsPanel() {
         </Link>
       </div>
 
+      {actError && <Alert variant="destructive">{actError}</Alert>}
       {loading && <div className="text-sm text-muted-foreground">Загружаю…</div>}
       {!loading && filtered.length === 0 && (
         <div className="rounded-2xl border border-dashed border-[#E2E8F0] p-10 text-center text-sm text-muted-foreground">
@@ -428,11 +485,11 @@ function ContactsPanel() {
               </div>
               {tab === 'incoming' ? (
                 <div className="shrink-0 flex gap-1.5">
-                  <button onClick={() => act(c.id, 'accept')} className="rounded-lg bg-[#16A34A] px-2.5 py-1.5 text-xs font-bold text-white">Принять</button>
-                  <button onClick={() => act(c.id, 'decline')} className="rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground">Откл.</button>
+                  <button onClick={() => act(c.id, 'accept')} disabled={acting?.startsWith(`${c.id}:`)} aria-busy={acting === `${c.id}:accept`} aria-label={`Принять запрос: ${name}`} className="rounded-lg bg-[#16A34A] px-2.5 py-1.5 text-xs font-bold text-white disabled:opacity-50">Принять</button>
+                  <button onClick={() => act(c.id, 'decline')} disabled={acting?.startsWith(`${c.id}:`)} aria-busy={acting === `${c.id}:decline`} aria-label={`Отклонить запрос: ${name}`} className="rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50">Откл.</button>
                 </div>
               ) : tab === 'outgoing' ? (
-                <button onClick={() => act(c.id, 'cancel')} className="shrink-0 rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground">Отозвать</button>
+                <button onClick={() => act(c.id, 'cancel')} disabled={acting === `${c.id}:cancel`} aria-busy={acting === `${c.id}:cancel`} aria-label={`Отозвать приглашение: ${name}`} className="shrink-0 rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50">Отозвать</button>
               ) : (
                 <Link href={`/profile/${other.id}`} className="shrink-0 rounded-lg border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-semibold text-muted-foreground">Профиль →</Link>
               )}
@@ -448,51 +505,28 @@ function ContactsPanel() {
 
 function NetworkPageInner() {
   const { user, loading } = useUser()
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const [mode, setMode] = useState<Mode>('contacts')
-  const [findType, setFindType] = useState<FindType>('people')
+  const { mode, findType, contactsTab } = readView(searchParams)
+  // Раздел поиска, к которому вернуться из «Моих контактов»: в адресе
+  // контактов типа поиска нет.
+  const [lastFindType, setLastFindType] = useState<FindType>(findType)
   const [inviteOpen, setInviteOpen] = useState(false)
 
-  // Hydrate state from URL on mount and whenever the query string changes.
-  useEffect(() => {
-    const tab = searchParams.get('tab')
-    setMode(tab === 'find' ? 'find' : 'contacts')
-    const t = searchParams.get('type') as FindType | null
-    if (t && ['people', 'coach', 'doctor', 'organization'].includes(t)) {
-      setFindType(t)
-    }
-  }, [searchParams])
+  // history.replaceState Next.js сводит с useSearchParams: вид меняется
+  // сразу, без запроса к серверу, как и прежнее локальное состояние.
+  const showView = useCallback((nextMode: Mode, nextType: FindType, nextTab: ContactsTab) => {
+    window.history.replaceState(null, '', viewHref(nextMode, nextType, nextTab))
+  }, [])
 
-  // Push URL back whenever tab / findType changes so the view is shareable.
-  const syncUrl = useCallback(
-    (nextMode: Mode, nextType: FindType) => {
-      const params = new URLSearchParams()
-      if (nextMode === 'find') {
-        params.set('tab', 'find')
-        params.set('type', nextType)
-      }
-      const qs = params.toString()
-      router.replace(qs ? `/network?${qs}` : '/network', { scroll: false })
-    },
-    [router],
-  )
+  const selectMode = (m: Mode) => {
+    if (mode === 'find') setLastFindType(findType)
+    showView(m, mode === 'find' ? findType : lastFindType, 'active')
+  }
 
-  const selectMode = useCallback(
-    (m: Mode) => {
-      setMode(m)
-      syncUrl(m, findType)
-    },
-    [findType, syncUrl],
-  )
-
-  const selectFindType = useCallback(
-    (t: FindType) => {
-      setFindType(t)
-      syncUrl('find', t)
-    },
-    [syncUrl],
-  )
+  const selectFindType = (t: FindType) => {
+    setLastFindType(t)
+    showView('find', t, 'active')
+  }
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[300px]">
@@ -512,7 +546,7 @@ function NetworkPageInner() {
           </span>
           <h1 className="pf-num text-3xl md:text-4xl leading-tight text-navy-500">Контакты и поиск</h1>
           <p className="max-w-2xl text-sm md:text-base text-muted-foreground">
-            Одно место для ваших связей и поиска новых специалистов. Переключайте режимы и ищите удобно — по имени, роли или каталогу.
+            Одно место для ваших связей и поиска тренеров, врачей и специалистов. Переключайте режимы и ищите удобно — по имени, роли или каталогу.
           </p>
         </div>
       </div>
@@ -533,10 +567,12 @@ function NetworkPageInner() {
         </button>
       </div>
       {inviteOpen && (
-        <EmailInviteDialog myRole={user.role as 'athlete' | 'coach' | 'doctor' | 'organization' | 'admin'} onClose={() => setInviteOpen(false)} />
+        <EmailInviteDialog myRole={user.role} onClose={() => setInviteOpen(false)} />
       )}
 
-      {mode === 'contacts' && <ContactsPanel />}
+      {mode === 'contacts' && (
+        <ContactsPanel tab={contactsTab} onTabChange={t => showView('contacts', findType, t)} />
+      )}
 
       {mode === 'find' && (
         <div className="flex flex-col gap-5">

@@ -2,19 +2,11 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { renderInviteEmail } from '@/lib/email/templates'
+import { CONNECTION_TYPE_ROLES, isConnectionType } from '@/lib/connections/types'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const VALID_COMBOS: Record<string, [string, string]> = {
-  coach_athlete:  ['coach', 'athlete'],
-  org_coach:      ['organization', 'coach'],
-  org_athlete:    ['organization', 'athlete'],
-  doctor_athlete: ['doctor', 'athlete'],
-  coach_doctor:   ['coach', 'doctor'],
-  org_doctor:     ['organization', 'doctor'],
-  admin_doctor:   ['admin', 'doctor'],
-}
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://proform-delta.vercel.app'
 const FROM    = process.env.RESEND_FROM ?? 'Sporteo <notifications@proform-delta.vercel.app>'
@@ -60,8 +52,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'role_mismatch' }, { status: 422 })
     }
   } else {
-    const combo = VALID_COMBOS[connection_type]
-    if (!combo) return NextResponse.json({ error: 'invalid_connection_type' }, { status: 400 })
+    if (!isConnectionType(connection_type)) {
+      return NextResponse.json({ error: 'invalid_connection_type' }, { status: 400 })
+    }
+    const combo = CONNECTION_TYPE_ROLES[connection_type]
     if (me.role !== combo[0] && me.role !== combo[1]) {
       return NextResponse.json({ error: 'role_mismatch' }, { status: 422 })
     }
@@ -113,6 +107,7 @@ export async function POST(req: Request) {
       const resend = new Resend(RESEND_API_KEY)
       const { subject, html } = renderInviteEmail({
         inviter_name: displayName(me as any),
+        inviter_role: me.role,
         connection_type,
         message,
         claim_url: claimUrl,
