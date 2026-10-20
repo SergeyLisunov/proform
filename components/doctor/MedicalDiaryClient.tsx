@@ -227,6 +227,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
       )}
 
       {/* Entries list */}
+      <AttachmentsAnnouncer signed={signed} />
       <div className="flex flex-col gap-3">
         {loading && entries.length === 0 ? (
           <Card className="p-10 text-center text-xs text-muted-foreground">
@@ -635,6 +636,10 @@ function EntryCard({
   )
 }
 
+// Сохранение могло не пройти: например, база отклонила вложение со ссылкой
+// в публичное хранилище. Раньше форма закрывалась как ни в чём не бывало.
+const SAVE_FAILED = 'Не удалось сохранить запись. Обновите страницу и попробуйте снова.'
+
 type AttachmentState = 'ready' | 'pending' | 'error' | 'unavailable'
 
 /** Что с файлом: ссылка готова, готовится, подпись не удалась (можно
@@ -654,6 +659,17 @@ const ATTACHMENT_HINT: Record<Exclude<AttachmentState, 'ready'>, string> = {
   pending:     'Готовим ссылку…',
   error:       'Не открылся — повторить',
   unavailable: 'Файл недоступен',
+}
+
+/**
+ * Одна живая область на список: экранный диктор узнаёт о сбое ссылок на
+ * файлы один раз, а не от каждого вложения.
+ */
+function AttachmentsAnnouncer({ signed }: { signed: SignedUrls }) {
+  const message = signed.status === 'error'
+    ? 'Не удалось подготовить ссылки на файлы — нажмите на файл, чтобы повторить'
+    : signed.failed.size > 0 ? `Недоступно файлов: ${signed.failed.size}` : ''
+  return <p className="sr-only" aria-live="polite">{message}</p>
 }
 
 /** Ссылка на вложение. Пока подписанной ссылки нет — не ссылка, а
@@ -690,8 +706,7 @@ function AttachmentLink({ att, signed }: { att: MedicalAttachment; signed: Signe
     )
   }
   return (
-    <span role="status" aria-live="polite" aria-busy={state === 'pending'} title={att.name}
-      className={cn(chip, 'opacity-70')}>
+    <span title={att.name} className={cn(chip, 'opacity-70')}>
       {body}
     </span>
   )
@@ -718,7 +733,7 @@ function AttachmentThumb({ att, signed }: { att: MedicalAttachment; signed: Sign
     )
   }
   return (
-    <div role="img" aria-label={`${att.name}: ${ATTACHMENT_HINT[state]}`} aria-busy={state === 'pending'}
+    <div role="img" aria-label={`${att.name}: ${ATTACHMENT_HINT[state]}`}
       title={ATTACHMENT_HINT[state]} className={box}>
       <Icon name={state === 'unavailable' ? 'ki-eye-slash' : 'ki-picture'} className="text-muted-foreground text-base" />
     </div>
@@ -838,6 +853,7 @@ function EntryDrawer({
   const [attachments, setAttachments] = useState<MedicalAttachment[]>(initial?.attachments ?? [])
   const drawerSigned = useSignedUrls(attachments)
   const [uploadErr, setUploadErr] = useState<string | null>(null)
+  const [saveErr, setSaveErr] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -884,6 +900,7 @@ function EntryDrawer({
   }
 
   const handleSave = async () => {
+    setSaveErr(null)
     if (!note.trim()) return
     setSaving(true)
     const tags = tagsInput.split(/[,\n]/).map(t => t.trim().replace(/^#/, '')).filter(Boolean)
@@ -948,9 +965,11 @@ function EntryDrawer({
       if (JSON.stringify(initial.attachments ?? null) === JSON.stringify(payload.attachments)) {
         delete patch.attachments
       }
-      await updateMedicalEntry(initial.id, patch as any)
+      const saved = await updateMedicalEntry(initial.id, patch as any)
+      if (!saved) { setSaving(false); setSaveErr(SAVE_FAILED); return }
     } else {
-      await createMedicalEntry(payload as any)
+      const created = await createMedicalEntry(payload as any)
+      if (!created) { setSaving(false); setSaveErr(SAVE_FAILED); return }
     }
     setSaving(false)
     onSaved()
@@ -1314,6 +1333,7 @@ function EntryDrawer({
 
           {/* Attachments */}
           <div>
+            <AttachmentsAnnouncer signed={drawerSigned} />
             <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Вложения · {attachments.length}/{MAX_ATTACH_FILES}
             </label>
@@ -1392,6 +1412,9 @@ function EntryDrawer({
           </div>
         </div>
 
+        {saveErr && (
+          <p role="alert" className="border-t border-border px-5 pt-3 text-xs text-destructive">{saveErr}</p>
+        )}
         <div className="border-t border-border px-5 py-3 flex items-center gap-2">
           <button onClick={handleSave} disabled={saving || !note.trim() || uploading}
             className="flex-1 rounded-xl text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50"

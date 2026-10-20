@@ -180,6 +180,19 @@ describe('медицинские файлы после миграции 117', ()
     expect(add.code).toBe('42501')
   })
 
+  it('сохранение из вкладки, открытой до переноса, чинится, а не теряется', async () => {
+    db = await createMedicalDb(MIGRATIONS)
+    const stale = { url: 'https://x/storage/v1/object/public/note-attachments/a/med/1-x.pdf', name: 'a', type: 'document', size: 1 }
+    const moved = { path: `${doctorA.id}/med/1-x.pdf`, name: 'a', type: 'document', size: 1 }
+    await db.sys(`INSERT INTO medical_diary (doctor_id, date, note, attachments) VALUES ($1, '2026-10-20', 'перенесено', $2)`,
+      [doctorA.id, JSON.stringify([moved])])
+    const save = await db.as('doctorA',
+      `UPDATE medical_diary SET note = 'правка из старой вкладки', attachments = $1 WHERE note = 'перенесено' RETURNING attachments`,
+      [JSON.stringify([stale])])
+    expect(save.error).toBeUndefined()
+    expect(save.rows[0]).toEqual({ attachments: [moved] })
+  })
+
   it('миграцию можно применить повторно', async () => {
     db = await createMedicalDb([...MIGRATIONS, '117_private_medical_storage.sql'])
     expect(succeeded(await upload(db, 'doctorA', FILE_A))).toBe(true)

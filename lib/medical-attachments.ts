@@ -17,6 +17,10 @@ export { MEDICAL_BUCKET, attachmentHref, buildMedicalPath } from '@/lib/medical-
  */
 export const SIGNED_URL_TTL_SEC = 10 * 60
 const RENEW_AFTER_MS = SIGNED_URL_TTL_SEC * 1000 * 0.8
+/** Ссылки снимаются чуть раньше конца срока — чтобы не показать истёкшую. */
+const EXPIRE_AFTER_MS = SIGNED_URL_TTL_SEC * 1000 - 30_000
+/** Повтор после неудачной подписи. */
+const RETRY_AFTER_ERROR_MS = 30_000
 /** Сколько путей подписывать одним запросом. */
 const SIGN_CHUNK = 100
 
@@ -70,6 +74,16 @@ export function useSignedUrls(attachments: readonly StoredAttachment[] | null | 
   const [round, setRound] = useState(0)
   const retry = useCallback(() => setRound(r => r + 1), [])
   const signedAt = useRef(0)
+  // Таймеры живут дольше одного прохода эффекта: истечение ссылок должно
+  // сработать, даже если переподпись не удалась.
+  const expireTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const renewRequested = useRef(false)
+
+  useEffect(() => () => {
+    if (expireTimer.current) clearTimeout(expireTimer.current)
+    if (retryTimer.current) clearTimeout(retryTimer.current)
+  }, [])
 
   useEffect(() => {
     if (!key) return
@@ -81,7 +95,10 @@ export function useSignedUrls(attachments: readonly StoredAttachment[] | null | 
       .then(() => signAll(paths))
       .then(result => {
         if (cancelled) return
+        renewRequested.current = false
         signedAt.current = Date.now()
+        if (expireTimer.current) clearTimeout(expireTimer.current)
+        expireTimer.current = setTimeout(() => setUrls({}), EXPIRE_AFTER_MS)
         // Только ссылки текущего набора: убранные файлы не копятся.
         setUrls(prev => {
           const merged: Record<string, string> = {}
@@ -94,15 +111,25 @@ export function useSignedUrls(attachments: readonly StoredAttachment[] | null | 
         setFailed(result.failed.size ? result.failed : NO_FAILED)
         setStatus('ready')
       })
-      .catch(() => { if (!cancelled) setStatus('error') })
+      .catch(() => {
+        if (cancelled) return
+        renewRequested.current = false
+        setStatus('error')
+        if (retryTimer.current) clearTimeout(retryTimer.current)
+        retryTimer.current = setTimeout(() => setRound(r => r + 1), RETRY_AFTER_ERROR_MS)
+      })
     return () => { cancelled = true; clearTimeout(renew) }
   }, [key, round])
 
   useEffect(() => {
     if (!key) return
+    // focus и visibilitychange приходят парой — переподпись одна.
     const onVisible = () => {
-      if (document.visibilityState !== 'visible') return
-      if (Date.now() - signedAt.current > RENEW_AFTER_MS) setRound(r => r + 1)
+      if (document.visibilityState !== 'visible' || renewRequested.current) return
+      if (Date.now() - signedAt.current > RENEW_AFTER_MS) {
+        renewRequested.current = true
+        setRound(r => r + 1)
+      }
     }
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('focus', onVisible)

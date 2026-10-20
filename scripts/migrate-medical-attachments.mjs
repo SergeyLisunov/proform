@@ -39,7 +39,10 @@
  *
  * Требует применённой миграции 117. Запускать, когда врачи не работают,
  * и второй раз после выкладки — на случай записей, сохранённых между
- * проходами. В выводе — id и пути, без имён файлов и содержимого.
+ * проходами. Файлы моложе 15 минут проходы 3–4 откладывают: тогда скрипт
+ * завершается с кодом 3 — повторите запуск через 15 минут, пока «свежих,
+ * отложено» не станет 0. В выводе — id и пути, без имён файлов и
+ * содержимого.
  */
 import { readFileSync, existsSync } from 'node:fs'
 import { join, basename } from 'node:path'
@@ -277,7 +280,7 @@ async function moveUnreferenced(files, destinationOf, referenced, label, counter
     if (referenced.has(f.path)) continue
     if (isFresh(f)) {
       stats.freshSkipped++
-      console.log(`  · ${label}: ${f.path} загружен во время прогона — следующий запуск`)
+      console.log(`  · ${label}: ${f.path} моложе 15 минут — повторите запуск позже`)
       continue
     }
     console.log(`${label}: ${f.path}`)
@@ -340,7 +343,12 @@ async function main() {
     `файлов без ссылок: ${stats.orphanFiles}; в папках без владельца: ${stats.unownedFiles}; ` +
     `свежих, отложено: ${stats.freshSkipped}; чужих путей: ${stats.skippedForeign}; ошибок: ${stats.failed}`)
   if (!APPLY) console.log('Ничего не изменено.')
-  process.exit(stats.failed ? 1 : 0)
+  if (stats.failed) process.exit(1)
+  if (stats.freshSkipped) {
+    console.log('Есть отложенные свежие файлы — повторите запуск через 15 минут.')
+    process.exit(3)
+  }
+  process.exit(0)
 }
 
 main().catch(e => { console.error('ОШИБКА:', e.message); process.exit(1) })

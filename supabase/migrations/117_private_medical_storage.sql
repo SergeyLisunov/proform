@@ -88,6 +88,13 @@ CREATE POLICY "note-attachments: no medical files" ON storage.objects
     OR coalesce((storage.foldername(name))[2], '') NOT IN ('med', 'apple_health', 'health-private')
   );
 
+-- Вложение с публичной ссылкой, файл которого скрипт уже перенёс, — это
+-- сохранение из вкладки, открытой до переноса (на старом или новом коде).
+-- Его не отклоняем, а приводим к перенесённому виду: берём из старой строки
+-- вложение с путём и тем же именем файла (то же правило, что
+-- reconcileWithMigrated в lib/medical-storage). Иначе старая вкладка молча
+-- теряла бы правку заметки или показателей. Отклоняем только ссылку, у
+-- которой нет пары ни среди старых ссылок, ни среди перенесённых файлов.
 CREATE OR REPLACE FUNCTION public.trg_medical_diary_private_attachments()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -97,6 +104,8 @@ AS $$
 DECLARE
   v_jwt_role text := NULLIF(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role';
   el         jsonb;
+  migrated   jsonb;
+  result     jsonb := '[]'::jsonb;
 BEGIN
   IF v_jwt_role IS NULL OR v_jwt_role NOT IN ('authenticated', 'anon') THEN
     RETURN NEW;
@@ -106,13 +115,31 @@ BEGIN
   END IF;
 
   FOR el IN SELECT value FROM jsonb_array_elements(NEW.attachments) LOOP
-    IF el ? 'url' AND NOT el ? 'path'
-       AND (TG_OP = 'INSERT' OR OLD.attachments IS NULL OR NOT OLD.attachments @> jsonb_build_array(el)) THEN
-      RAISE EXCEPTION 'Файл прикрепляется только из закрытого хранилища — обновите страницу'
-        USING ERRCODE = '42501';
+    IF el ? 'url' AND NOT el ? 'path' THEN
+      IF TG_OP = 'UPDATE' AND OLD.attachments IS NOT NULL AND OLD.attachments @> jsonb_build_array(el) THEN
+        result := result || jsonb_build_array(el);
+        CONTINUE;
+      END IF;
+      migrated := NULL;
+      IF TG_OP = 'UPDATE' AND jsonb_typeof(OLD.attachments) = 'array' THEN
+        SELECT o INTO migrated
+        FROM jsonb_array_elements(OLD.attachments) AS o
+        WHERE o ? 'path'
+          AND regexp_replace(o ->> 'path', '^.*/', '')
+            = regexp_replace(split_part(el ->> 'url', '?', 1), '^.*/', '')
+        LIMIT 1;
+      END IF;
+      IF migrated IS NULL THEN
+        RAISE EXCEPTION 'Файл прикрепляется только из закрытого хранилища — обновите страницу'
+          USING ERRCODE = '42501';
+      END IF;
+      result := result || jsonb_build_array(migrated);
+    ELSE
+      result := result || jsonb_build_array(el);
     END IF;
   END LOOP;
 
+  NEW.attachments := result;
   RETURN NEW;
 END;
 $$;
