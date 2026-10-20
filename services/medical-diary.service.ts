@@ -430,7 +430,11 @@ export async function listCoachVisibleMedicalEntries(
 
 export interface DoctorPatient { id: string; name: string }
 
-/** Список пациентов врача — через connections.doctor_athlete active. */
+/**
+ * Список пациентов врача — через connections.doctor_athlete active, и
+ * только спортсмены: о других база писать не разрешит (миграция 114,
+ * has_active_link). То же правило, что listDoctorPatients в doctor.service.
+ */
 export async function listMyPatients(doctorId: string): Promise<DoctorPatient[]> {
   const sb = createClient()
   const { data: connsRaw } = await sb
@@ -444,8 +448,9 @@ export async function listMyPatients(doctorId: string): Promise<DoctorPatient[]>
     ids.add(c.initiator_id === doctorId ? c.recipient_id : c.initiator_id)
   }
   if (ids.size === 0) return []
-  const { data: usersRaw } = await sb.from('users').select('id, name').in('id', [...ids])
-  return ((usersRaw ?? []) as Array<{ id: string; name: string | null }>)
+  const { data: usersRaw } = await sb.from('users').select('id, name, role').in('id', [...ids])
+  return ((usersRaw ?? []) as Array<{ id: string; name: string | null; role: string | null }>)
+    .filter(u => u.role === 'athlete')
     .map(u => ({ id: u.id, name: u.name ?? '—' }))
 }
 

@@ -37,6 +37,12 @@ export interface DoctorPatient {
   name: string
 }
 
+/**
+ * Пациенты врача — те, о ком база разрешит ему писать (миграция 114):
+ * спортсмены с активной связью doctor_athlete. Связи coach_doctor и
+ * org_doctor — с тренером и клубом, а не с пациентом: раньше они тоже
+ * попадали в выбор, и осмотр такому «пациенту» молча не сохранялся.
+ */
 export async function listDoctorPatients(doctorId: string): Promise<DoctorPatient[]> {
   const sb = createClient()
   const { data: connsRaw } = await sb
@@ -44,7 +50,7 @@ export async function listDoctorPatients(doctorId: string): Promise<DoctorPatien
     .select('initiator_id, recipient_id, connection_type, status')
     .or(`initiator_id.eq.${doctorId},recipient_id.eq.${doctorId}`)
     .eq('status', 'active')
-    .in('connection_type', ['doctor_athlete', 'coach_doctor', 'org_doctor'])
+    .eq('connection_type', 'doctor_athlete')
   const conns = (connsRaw ?? []) as Array<{ initiator_id: string; recipient_id: string }>
   const ids = Array.from(new Set(conns.map(c => c.initiator_id === doctorId ? c.recipient_id : c.initiator_id).filter(Boolean)))
   if (ids.length === 0) return []

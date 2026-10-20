@@ -42,6 +42,11 @@ jobs:
         # на каждый последующий merge. Tsc запрещает оба класса bug-ов.
         run: npx tsc --noEmit
 
+      - name: SQL policy tests (PGlite)
+        # Миграции RLS на настоящем Postgres в памяти: атака обязана пройти
+        # без миграции и не пройти с ней. Живая база не нужна.
+        run: npm run test:sql
+
       - name: Next.js build + bundle budget (SWC parity + Layer 7)
         # W13 Day 63: build catches SWC-level duplicate exports / module
         # resolution issues что tsc может пропустить. Same Next.js build что
