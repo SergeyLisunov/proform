@@ -340,6 +340,233 @@ async function main() {
       `не удалось создать тестовую команду: status=${group.status}`)
   }
 
+  // ── 6f. Медзаписи: только свой пациент (P0, миграции 114 и 116) ───────────
+  // Каждая подделка, если прошла, сразу удаляется её же автором: проба не
+  // должна оставлять ложных медзаписей у QA-спортсменов.
+  //
+  // «Закрыто» засчитывается только за отказ по правам (401/403 с кодом
+  // 42501) или за ответ без строк. 400 от схемы, 409 от уникальности или
+  // 500 — не доказательство защиты: такая проверка падает с подробностями.
+  const today = new Date().toISOString().slice(0, 10)
+  const blocked = r => ((r.status === 401 || r.status === 403) && r.body?.code === '42501')
+    || (r.status < 300 && rows(r) === 0)
+  const why = r => `status=${r.status}${r.body?.code ? ` code=${r.body.code}` : ''}`
+  const post = (token, table, payload) => rest(token, table, {
+    method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(payload),
+  })
+  const patch = (token, path, payload) => rest(token, path, { method: 'PATCH', body: JSON.stringify(payload) })
+  const dropIfCreated = async (token, table, r) => {
+    if (rows(r) > 0) await rest(token, `${table}?id=eq.${r.body[0].id}`, { method: 'DELETE' })
+  }
+
+  const forgeCheckup = await post(tokens.doctorBeta, 'medical_checkups', {
+    doctor_id: ids.doctorBeta, athlete_id: ids.athleteAlpha1, checkup_date: today,
+    findings: 'QA-PROBE: чужой пациент',
+  })
+  check('MED-09', 'Врач НЕ может создать осмотр не своему пациенту', 'P0', true,
+    blocked(forgeCheckup), why(forgeCheckup))
+  await dropIfCreated(tokens.doctorBeta, 'medical_checkups', forgeCheckup)
+
+  const athleteCheckup = await post(tokens.athleteAlpha2, 'medical_checkups', {
+    doctor_id: ids.athleteAlpha2, athlete_id: ids.athleteAlpha1, checkup_date: today,
+    findings: 'QA-PROBE: не врач',
+  })
+  check('MED-10', 'Спортсмен НЕ может создать «осмотр» другому спортсмену', 'P0', true,
+    blocked(athleteCheckup), why(athleteCheckup))
+  await dropIfCreated(tokens.athleteAlpha2, 'medical_checkups', athleteCheckup)
+
+  const forgeDiary = await post(tokens.doctorBeta, 'medical_diary', {
+    doctor_id: ids.doctorBeta, athlete_id: ids.athleteAlpha1, date: today,
+    note: 'QA-PROBE: чужой пациент', is_shared_with_coach: true,
+  })
+  check('MED-11', 'Врач НЕ может написать в дневник о не своём пациенте', 'P0', true,
+    blocked(forgeDiary), why(forgeDiary))
+  await dropIfCreated(tokens.doctorBeta, 'medical_diary', forgeDiary)
+
+  const patientCheckup = await post(tokens.athleteAlpha1, 'medical_checkups', {
+    doctor_id: ids.athleteAlpha1, athlete_id: ids.doctorAlpha, checkup_date: today,
+    findings: 'QA-PROBE: пациент о враче',
+  })
+  check('MED-23', 'Пациент НЕ может создать «осмотр» о своём враче', 'P0', true,
+    blocked(patientCheckup), why(patientCheckup))
+  await dropIfCreated(tokens.athleteAlpha1, 'medical_checkups', patientCheckup)
+
+  const ownNote = await post(tokens.doctorBeta, 'medical_diary', {
+    doctor_id: ids.doctorBeta, date: today, note: 'QA-PROBE: личная заметка',
+  })
+  check('MED-12', 'Врач ВСЁ ЕЩЁ пишет личную заметку без спортсмена', 'P1', 1, rows(ownNote), why(ownNote))
+  if (rows(ownNote) === 1) {
+    const noteId = ownNote.body[0].id
+    const repoint = await patch(tokens.doctorBeta, `medical_diary?id=eq.${noteId}`,
+      { athlete_id: ids.athleteAlpha1, is_shared_with_athlete: true })
+    const after = await rest(tokens.doctorBeta, `medical_diary?select=athlete_id&id=eq.${noteId}`)
+    check('MED-13', 'Врач НЕ может перенести заметку на не своего пациента', 'P0', true,
+      rows(after) === 1 && after.body[0].athlete_id == null, `PATCH ${why(repoint)}, строк после: ${rows(after)}`)
+    await rest(tokens.doctorBeta, `medical_diary?id=eq.${noteId}`, { method: 'DELETE' })
+  }
+
+  const ownCheckup = await post(tokens.doctorAlpha, 'medical_checkups', {
+    doctor_id: ids.doctorAlpha, athlete_id: ids.athleteAlpha1, checkup_date: today,
+    findings: 'QA-PROBE: свой пациент',
+  })
+  check('MED-14', 'Врач ВСЁ ЕЩЁ создаёт осмотр своему пациенту', 'P1', 1, rows(ownCheckup), why(ownCheckup))
+  if (rows(ownCheckup) === 1) {
+    const checkupId = ownCheckup.body[0].id
+    const repoint = await patch(tokens.doctorAlpha, `medical_checkups?id=eq.${checkupId}`,
+      { athlete_id: ids.athleteBeta })
+    const after = await rest(tokens.doctorAlpha, `medical_checkups?select=athlete_id&id=eq.${checkupId}`)
+    check('MED-15', 'Врач НЕ может перенести осмотр на не своего пациента', 'P0', true,
+      rows(after) === 1 && after.body[0].athlete_id === ids.athleteAlpha1,
+      `PATCH ${why(repoint)}, строк после: ${rows(after)}`)
+    await rest(tokens.doctorAlpha, `medical_checkups?id=eq.${checkupId}`, { method: 'DELETE' })
+  }
+
+  const docRec = await post(tokens.doctorAlpha, 'recommendations', {
+    organization_id: alphaOrgId, athlete_id: ids.athleteAlpha1, doctor_id: ids.doctorAlpha,
+    title: 'QA-PROBE: вложение врача', category: 'general', severity: 'low',
+    visibility_level: 'coach_and_athlete', status: 'sent',
+  })
+  if (rows(docRec) === 1) {
+    const recId = docRec.body[0].id
+    // Отметка «Понятно» в том же запросе: если PATCH не дошёл до строки
+    // (тренер не связан со спортсменом), проверка не засчитывается.
+    const tamper = await rest(tokens.coachAlpha1, `recommendations?id=eq.${recId}`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({
+        acknowledged_by_coach_at: new Date().toISOString(),
+        attachments: { file: 'QA-PROBE-поддельный-допуск.pdf' }, status: 'cancelled',
+      }),
+    })
+    const after = await rest(tokens.doctorAlpha,
+      `recommendations?select=attachments,status,acknowledged_by_coach_at&id=eq.${recId}`)
+    const row = after.body?.[0]
+    check('REC-01', 'Тренер НЕ может подменить вложение или статус рекомендации врача', 'P0', true,
+      rows(tamper) === 1 && row?.acknowledged_by_coach_at != null
+        && row.attachments == null && row.status !== 'cancelled',
+      `PATCH ${why(tamper)} строк ${rows(tamper)}, после: ${JSON.stringify(row)}`)
+    await rest(tokens.doctorAlpha, `recommendations?id=eq.${recId}`, { method: 'DELETE' })
+  } else {
+    // Не PASS: без рекомендации проверка не выполнена.
+    check('REC-01', 'Тренер НЕ может подменить вложение или статус рекомендации врача', 'P0', true, false,
+      `не удалось создать тестовую рекомендацию: ${why(docRec)}`)
+  }
+
+  // ── 6g. Связи: активной делает только согласие получателя (P0, 115) ──────
+  // Активная doctor_athlete — это доступ к медзаписям (105, 114), поэтому
+  // подделка связи равна подделке медзаписи. Тип doctor_athlete выбран
+  // нарочно: в отличие от coach_athlete, он не запускает синхронизацию
+  // trainer_athletes (085), и случайно прошедшая подделка ничего не выдаст.
+  // У каждой пробы своя пара аккаунтов — остатки одной не мешают другой.
+  //
+  // Запросы на связь шлют QA-спортсменам уведомления (083). Удалить их от
+  // имени врача нельзя — их убирает qa/ralph/seed-cleanup.sql.
+  const activeBetween = async (token, a, b) => rows(await rest(token,
+    `connections?select=id&status=eq.active&or=(and(initiator_id.eq.${a},recipient_id.eq.${b}),` +
+    `and(initiator_id.eq.${b},recipient_id.eq.${a}))`))
+  // Удалить связь пользователь может не иметь права (приложение их не
+  // удаляет, а разрывает) — тогда отменяем и проверяем, что не осталась
+  // активной.
+  const removeConn = async (token, connId) => {
+    await rest(token, `connections?id=eq.${connId}`, { method: 'DELETE' })
+    const left = await rest(token, `connections?select=status&id=eq.${connId}`)
+    if (rows(left) === 0) return
+    await patch(token, `connections?id=eq.${connId}`, { status: 'cancelled' })
+    const final = await rest(token, `connections?select=status&id=eq.${connId}`)
+    const status = final.body?.[0]?.status
+    console.log(status === 'active'
+      ? `🚨 связь ${connId} осталась АКТИВНОЙ — убрать вручную через seed-cleanup.sql`
+      : `⚠️  связь ${connId} не удалилась, статус: ${status}`)
+  }
+  const dropConn = async (token, r) => {
+    if (rows(r) > 0) await removeConn(token, r.body[0].id)
+  }
+
+  const forgeActive = await post(tokens.doctorBeta, 'connections', {
+    initiator_id: ids.doctorBeta, recipient_id: ids.athleteAlpha1,
+    connection_type: 'doctor_athlete', status: 'active',
+  })
+  const forgedActive = await activeBetween(tokens.doctorBeta, ids.doctorBeta, ids.athleteAlpha1)
+  check('CONN-01', 'Врач НЕ может сразу создать активную связь со спортсменом', 'P0', true,
+    blocked(forgeActive) && forgedActive === 0, `${why(forgeActive)}, активных после: ${forgedActive}`)
+  await dropConn(tokens.doctorBeta, forgeActive)
+
+  // Запрос «от имени» спортсмена, где получатель — сам вызывающий: иначе
+  // его отклонила бы любая политика «вставлять могут только стороны», и
+  // проба прошла бы и без 115.
+  const forgeInitiator = await post(tokens.doctorAlpha, 'connections', {
+    initiator_id: ids.athleteBeta, recipient_id: ids.doctorAlpha, connection_type: 'doctor_athlete',
+  })
+  if (rows(forgeInitiator) > 0) {
+    await patch(tokens.doctorAlpha, `connections?id=eq.${forgeInitiator.body[0].id}`, { status: 'active' })
+  }
+  const forgedFromVictim = await activeBetween(tokens.doctorAlpha, ids.athleteBeta, ids.doctorAlpha)
+  check('CONN-02', 'Врач НЕ может создать запрос от имени спортсмена и принять его сам', 'P0', true,
+    blocked(forgeInitiator) && forgedFromVictim === 0, `${why(forgeInitiator)}, активных после: ${forgedFromVictim}`)
+  await dropConn(tokens.doctorAlpha, forgeInitiator)
+
+  let request = await post(tokens.doctorBeta, 'connections', {
+    initiator_id: ids.doctorBeta, recipient_id: ids.athleteAlpha2, connection_type: 'doctor_athlete',
+  })
+  if (rows(request) !== 1) {
+    // Остался запрос от прошлого прогона (отменён, а не удалён) — вернуть
+    // его в pending от имени инициатора, как повторный запрос в
+    // POST /api/connections.
+    request = await rest(tokens.doctorBeta,
+      `connections?initiator_id=eq.${ids.doctorBeta}&recipient_id=eq.${ids.athleteAlpha2}` +
+      `&connection_type=eq.doctor_athlete&status=neq.active`, {
+        method: 'PATCH', headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ status: 'pending', responded_at: null }),
+      })
+  }
+  if (rows(request) === 1) {
+    const connId = request.body[0].id
+    const selfAccept = await patch(tokens.doctorBeta, `connections?id=eq.${connId}`, { status: 'active' })
+    const after = await rest(tokens.doctorBeta, `connections?select=status&id=eq.${connId}`)
+    check('CONN-04', 'Врач НЕ может принять свой же запрос на связь', 'P0', true,
+      rows(after) === 1 && after.body[0].status !== 'active', `PATCH ${why(selfAccept)}`)
+    await removeConn(tokens.doctorBeta, connId)
+  } else {
+    // Не PASS: проверка не выполнена, если запрос не удалось создать.
+    check('CONN-04', 'Врач НЕ может принять свой же запрос на связь', 'P0', true, false,
+      `не удалось создать тестовый запрос: ${why(request)} ${JSON.stringify(request.body)?.slice(0, 80)}`)
+  }
+
+  const fakeDoctor = await post(tokens.coachAlpha1, 'connections', {
+    initiator_id: ids.coachAlpha1, recipient_id: ids.athleteBeta, connection_type: 'doctor_athlete',
+  })
+  check('CONN-06', 'Тренер НЕ может назваться «врачом» в запросе на связь', 'P0', true,
+    blocked(fakeDoctor), why(fakeDoctor))
+  await dropConn(tokens.coachAlpha1, fakeDoctor)
+
+  // Спортсмен A2 прислал запрос врачу Alpha и сам его отменил. Врач не
+  // может вернуть его в pending и принять — нужен новый запрос от врача,
+  // который спортсмен примет или нет.
+  let athleteRequest = await post(tokens.athleteAlpha2, 'connections', {
+    initiator_id: ids.athleteAlpha2, recipient_id: ids.doctorAlpha, connection_type: 'doctor_athlete',
+  })
+  if (rows(athleteRequest) !== 1) {
+    athleteRequest = await rest(tokens.athleteAlpha2,
+      `connections?initiator_id=eq.${ids.athleteAlpha2}&recipient_id=eq.${ids.doctorAlpha}` +
+      `&connection_type=eq.doctor_athlete&status=neq.active`, {
+        method: 'PATCH', headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ status: 'pending', responded_at: null }),
+      })
+  }
+  if (rows(athleteRequest) === 1) {
+    const connId = athleteRequest.body[0].id
+    await patch(tokens.athleteAlpha2, `connections?id=eq.${connId}`, { status: 'cancelled' })
+    const repend = await patch(tokens.doctorAlpha, `connections?id=eq.${connId}`, { status: 'pending' })
+    const accept = await patch(tokens.doctorAlpha, `connections?id=eq.${connId}`, { status: 'active' })
+    const after = await rest(tokens.athleteAlpha2, `connections?select=status&id=eq.${connId}`)
+    check('CONN-11', 'Врач НЕ может сам вернуть и принять отменённый запрос спортсмена', 'P0', true,
+      rows(after) === 1 && after.body[0].status !== 'active',
+      `pending: ${why(repend)}, active: ${why(accept)}, статус после: ${after.body?.[0]?.status}`)
+    await removeConn(tokens.athleteAlpha2, connId)
+  } else {
+    check('CONN-11', 'Врач НЕ может сам вернуть и принять отменённый запрос спортсмена', 'P0', true, false,
+      `не удалось создать запрос спортсмена: ${why(athleteRequest)}`)
+  }
+
   // ── 7. Приватные AI-диалоги ───────────────────────────────────────────────
   const ownerSeesAiConv = await rest(tokens.ownerAlpha, 'ai_conversations?select=id&limit=5')
   check('AI-01', 'Организация НЕ читает чужие AI-диалоги', 'P0', 0, rows(ownerSeesAiConv))

@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:dead": "knip --no-progress",
+    "test:sql": "vitest run supabase/tests",
     "test:e2e": "playwright test",
     "test:e2e:roles": "playwright test --project=roles",
     "test:e2e:mobile": "playwright test --project=mobile",
@@ -53,6 +54,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "^16.2.6",
     "@playwright/test": "^1.59.1",
