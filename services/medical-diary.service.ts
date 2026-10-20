@@ -70,9 +70,16 @@ export interface ScheduleData {
   appointment_type?: string   // 'осмотр' / 'контрольный приём'
 }
 
+/**
+ * Вложение записи. Новые файлы — в закрытом бакете (path, миграция 117);
+ * url — вечная публичная ссылка у старых, до переноса скриптом
+ * scripts/migrate-medical-attachments.mjs. Показ — через
+ * lib/medical-attachments (attachmentHref, useSignedUrls).
+ */
 export interface MedicalAttachment {
   name: string
-  url: string
+  path?: string
+  url?: string
   type: 'image' | 'document'
   size: number
   mimeType?: string

@@ -20,6 +20,9 @@ import { DiaryHeatmap } from '@/components/coach/DiaryHeatmap'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import {
+  MEDICAL_BUCKET, attachmentHref, buildMedicalPath, useSignedUrls, type SignedUrls,
+} from '@/lib/medical-attachments'
 
 const ENTRY_TYPES: MedicalEntryType[] = [
   'consultation', 'rehab_progress', 'prescription', 'lab_results',
@@ -49,6 +52,9 @@ function fmtSize(b: number): string {
 export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
   const { confirm } = useDialog()
   const [entries, setEntries] = useState<MedicalEntry[]>([])
+  // Ссылки на файлы всех записей — одним запросом, а не по запросу на карточку.
+  const allAttachments = useMemo(() => entries.flatMap(e => e.attachments ?? []), [entries])
+  const signed = useSignedUrls(allAttachments)
   const [loading, setLoading] = useState(true)
   const [heatmap, setHeatmap] = useState<Record<string, number>>({})
   const [patients, setPatients] = useState<DoctorPatient[]>([])
@@ -230,7 +236,7 @@ export default function MedicalDiaryClient({ doctorId }: { doctorId: string }) {
           <EmptyState onCreate={() => { setCreating(true); setEditing(null) }} />
         ) : (
           entries.map(e => (
-            <EntryCard key={e.id} entry={e}
+            <EntryCard key={e.id} entry={e} signed={signed}
               patientName={e.athlete_id ? patientById.get(e.athlete_id) ?? '—' : null}
               onEdit={() => { setEditing(e); setCreating(false) }}
               onToggleShare={async () => {
@@ -438,9 +444,10 @@ function Metric({ label, value, highlight }: { label: string; value: string; hig
 // ── Entry card ─────────────────────────────────────────────────────────────
 
 function EntryCard({
-  entry, patientName, onEdit, onDelete, onToggleShare, onToggleShareCoach,
+  entry, signed, patientName, onEdit, onDelete, onToggleShare, onToggleShareCoach,
 }: {
   entry: MedicalEntry
+  signed: SignedUrls
   patientName: string | null
   onEdit: () => void
   onDelete: () => void
@@ -449,7 +456,6 @@ function EntryCard({
 }) {
   const meta = MED_TYPE_META[entry.entry_type]
   const sev = entry.severity ? SEVERITY_LABELS[entry.severity] : null
-
   return (
     <Card className="p-5 hover:border-red-200 transition-all">
       <div className="flex items-start gap-3 mb-3">
@@ -611,15 +617,7 @@ function EntryCard({
       {entry.attachments && entry.attachments.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {entry.attachments.map((att, i) => (
-            <a key={i} href={att.url} target="_blank" rel="noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 hover:border-red-300 hover:bg-red-50 transition-colors"
-              title={att.name}>
-              <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
-              <div className="min-w-0">
-                <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
-                <div className="text-[10px] text-muted-foreground">{fmtSize(att.size)}</div>
-              </div>
-            </a>
+            <AttachmentLink key={i} att={att} signed={signed} />
           ))}
         </div>
       )}
@@ -634,6 +632,57 @@ function EntryCard({
         </div>
       )}
     </Card>
+  )
+}
+
+/** Ссылка на вложение. Пока подписанной ссылки нет — не ссылка, а
+ *  подпись о том, что происходит: без этого клик просто ничего не делал. */
+function AttachmentLink({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
+  const href = attachmentHref(att, signed.urls)
+  const body = (
+    <>
+      <Icon name={att.type === 'image' ? 'ki-picture' : 'ki-document'} className="text-muted-foreground text-sm shrink-0" />
+      <div className="min-w-0">
+        <div className="text-[11px] text-foreground truncate max-w-[160px]">{att.name}</div>
+        <div className="text-[10px] text-muted-foreground">
+          {href ? fmtSize(att.size) : signed.status === 'error' ? 'Не открылся' : 'Готовим ссылку…'}
+        </div>
+      </div>
+    </>
+  )
+  const chip = 'flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5'
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" title={att.name}
+        className={cn(chip, 'hover:border-red-300 hover:bg-red-50 transition-colors')}>
+        {body}
+      </a>
+    )
+  }
+  if (signed.status === 'error') {
+    return (
+      <button type="button" onClick={signed.retry} title="Повторить" className={cn(chip, 'hover:border-red-300')}>
+        {body}
+      </button>
+    )
+  }
+  return <span aria-busy="true" title={att.name} className={cn(chip, 'opacity-70')}>{body}</span>
+}
+
+/** Превью картинки в форме записи; без подписанной ссылки — заглушка. */
+function AttachmentThumb({ att, signed }: { att: MedicalAttachment; signed: SignedUrls }) {
+  const src = attachmentHref(att, signed.urls)
+  if (!src) {
+    return (
+      <div aria-busy={signed.status !== 'error'} title={att.name}
+        className="w-16 h-16 rounded-lg border border-border bg-muted/30 flex items-center justify-center">
+        <Icon name="ki-picture" className="text-muted-foreground text-base" />
+      </div>
+    )
+  }
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img src={src} alt={att.name} className="w-16 h-16 rounded-lg object-cover border border-border" />
   )
 }
 
@@ -748,6 +797,7 @@ function EntryDrawer({
 
   // Attachments
   const [attachments, setAttachments] = useState<MedicalAttachment[]>(initial?.attachments ?? [])
+  const drawerSigned = useSignedUrls(attachments)
   const [uploadErr, setUploadErr] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -773,21 +823,18 @@ function EntryDrawer({
     setUploading(true)
     try {
       const sb = createClient()
-      const { data: { user } } = await sb.auth.getUser()
-      if (!user) { setUploadErr('Не авторизован'); setUploading(false); return }
       const results: MedicalAttachment[] = []
       for (const f of toUpload) {
         const isImage = /^image\//.test(f.type)
         const maxSize = isImage ? MAX_IMG : MAX_DOC
         if (f.size > maxSize) { setUploadErr(`${f.name}: слишком большой (${fmtSize(f.size)})`); continue }
-        const ext = f.name.split('.').pop() ?? 'bin'
-        const path = `${user.id}/med/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { error: upErr } = await sb.storage.from('note-attachments').upload(path, f, { upsert: false })
+        // Закрытый бакет, папка автора: файл видят только те, кому видна запись.
+        const path = buildMedicalPath(doctorId, f.name)
+        const { error: upErr } = await sb.storage.from(MEDICAL_BUCKET).upload(path, f, { upsert: false })
         if (upErr) { setUploadErr(upErr.message); continue }
-        const { data: { publicUrl } } = sb.storage.from('note-attachments').getPublicUrl(path)
         results.push({
           name: f.name,
-          url: publicUrl,
+          path,
           type: isImage ? 'image' : 'document',
           size: f.size,
           mimeType: f.type,
@@ -855,7 +902,14 @@ function EntryDrawer({
     }
 
     if (initial) {
-      await updateMedicalEntry(initial.id, payload as any)
+      // Вложения — только если их поменяли в форме. Иначе страница, открытая
+      // до переноса файлов в закрытый бакет, записала бы поверх перенесённых
+      // путей старые публичные ссылки.
+      const patch: Record<string, unknown> = { ...payload }
+      if (JSON.stringify(initial.attachments ?? null) === JSON.stringify(payload.attachments)) {
+        delete patch.attachments
+      }
+      await updateMedicalEntry(initial.id, patch as any)
     } else {
       await createMedicalEntry(payload as any)
     }
@@ -1228,9 +1282,7 @@ function EntryDrawer({
               {attachments.map((att, i) => (
                 <div key={i} className="relative group">
                   {att.type === 'image' ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={att.url} alt={att.name}
-                      className="w-16 h-16 rounded-lg object-cover border border-border" />
+                    <AttachmentThumb att={att} signed={drawerSigned} />
                   ) : (
                     <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 max-w-[180px]">
                       <Icon name="ki-document" className="text-muted-foreground text-sm" />
