@@ -566,22 +566,26 @@ describe('без миграций 114–116 атаки проходят — те
   })
 })
 
-describe('после миграций 114–116', () => {
+// 119 заменяет функцию триггера согласия из 115 — всё должно держаться и с ней.
+describe.each([
+  ['после миграций 114–116', FIX],
+  ['после миграций 114–116 и 119', [...FIX, '119_specialist_connections.sql']],
+])('%s', (_title, migrations) => {
   it.each(byCode(ATTACKS))('%s закрыта', async (_code, s) => {
-    db = await createMedicalDb(FIX)
+    db = await createMedicalDb(migrations)
     const r = await s.run(db)
     expect(deniedByPolicy(r), `${s.title}: ${r.error ?? `строк ${r.count}`}`).toBe(true)
   })
 
   it.each(byCode(LEGIT))('%s работает', async (_code, s) => {
-    db = await createMedicalDb(FIX)
+    db = await createMedicalDb(migrations)
     const r = await s.run(db)
     expect(r.error, s.title).toBeUndefined()
     expect(r.count, s.title).toBeGreaterThan(0)
   })
 
   it('миграции можно применить повторно', async () => {
-    db = await createMedicalDb([...FIX, ...FIX])
+    db = await createMedicalDb([...migrations, ...migrations])
     const r = await checkup(db, 'doctorA', doctorA.id, athleteA1.id, 'повтор')
     expect(r.error).toBeUndefined()
   })

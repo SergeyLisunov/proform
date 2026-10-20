@@ -68,6 +68,9 @@ export default function DoctorOnboardingPage() {
   useEffect(() => {
     if (userLoading) return
     if (!user) { router.replace('/auth/login'); return }
+    // Мастер только для врача: иначе специалист (или кто угодно) мог пройти
+    // его и получить отметку «онбординг пройден», так и не заполнив свой профиль.
+    if (user.role !== 'doctor') { router.replace('/onboarding'); return }
     let cancelled = false
     void (async () => {
       const state = await loadMyOnboarding()

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterSidebarForRole, type GlobalRole, type EffectiveRole } from './config'
+import { filterSidebarForRole, SIDEBAR_CONFIG, type GlobalRole, type EffectiveRole } from './config'
 
 /**
  * Регрессия: клубная роль не должна отнимать пункты глобальной.
@@ -78,12 +78,67 @@ describe('совпадающий адрес: какая подпись оста�
   })
 })
 
+describe('специалист', () => {
+  // Меню специалиста — только разделы, которые у него уже работают. Пункт,
+  // ведущий на «Доступ ограничен» или в медицинский раздел врача, хуже, чем
+  // отсутствие пункта.
+  const SPECIALIST_ITEMS = ['global.dashboard', 'specialist.messages', 'specialist.notes', 'network.contacts']
+
+  it('видит ровно свой набор пунктов', () => {
+    expect(ids('specialist', 'specialist')).toEqual(SPECIALIST_ITEMS)
+  })
+
+  it('платный тариф не добавляет пунктов', () => {
+    const v = filterSidebarForRole({ role: 'specialist', globalRole: 'specialist', childCount: 0, plan: 'pro' })
+      .flatMap(s => s.items.map(i => i.id))
+    expect(v).toEqual(SPECIALIST_ITEMS)
+  })
+
+  it('мобильная панель: «Сообщения» среди вкладок', () => {
+    // MobileBottomNav берёт первый пункт каждой секции — порядок в конфиге
+    // и решает, что попадёт в нижнюю панель телефона.
+    const tabs = filterSidebarForRole({ role: 'specialist', globalRole: 'specialist', childCount: 0 })
+      .flatMap(s => (s.items[0] ? [s.items[0].id] : []))
+    expect(tabs).toEqual(['global.dashboard', 'specialist.messages', 'network.contacts'])
+  })
+
+  it('не видит ни одного пункта, предназначенного только врачу', () => {
+    const doctorOnly = SIDEBAR_CONFIG
+      .flatMap(s => s.items)
+      .filter(i => i.roles?.length === 1 && i.roles[0] === 'doctor')
+      .map(i => i.id)
+    expect(doctorOnly.length).toBeGreaterThan(0)
+    const v = ids('specialist', 'specialist')
+    for (const id of doctorOnly) expect(v, id).not.toContain(id)
+  })
+
+  it('не получает разделов, которые для него не работают', () => {
+    // /athletes — «Доступ ограничен», /analytics — аналитика спортсмена,
+    // /calendar — календарь тренировок, остальное — разделы врача.
+    const hrefs = filterSidebarForRole({ role: 'specialist', globalRole: 'specialist', childCount: 0 })
+      .flatMap(s => s.items.map(i => i.href))
+    for (const href of ['/athletes', '/analytics', '/calendar', '/doctor/clearances', '/injuries']) {
+      expect(hrefs, href).not.toContain(href)
+    }
+  })
+
+  it('у остальных ролей «Сообщения» и «Заметки» остались на месте', () => {
+    expect(ids('coach', 'coach')).toEqual(expect.arrayContaining(['training.messages', 'training.notes']))
+    expect(ids('doctor', 'doctor')).toEqual(expect.arrayContaining(['training.messages', 'training.notes']))
+    expect(ids('athlete', 'athlete')).toContain('training.messages')
+    for (const role of ['athlete', 'coach', 'doctor'] as const) {
+      expect(ids(role, role).filter(id => id.startsWith('specialist.')), role).toEqual([])
+    }
+  })
+})
+
 describe('меню без повторов', () => {
   // Смешанная роль собирает пункты двух ролей; один и тот же адрес не должен
   // появиться в меню дважды под разными подписями.
   for (const [role, globalRole] of [
     ['org_admin', 'coach'], ['org_admin', 'doctor'], ['org_admin', 'athlete'],
     ['org_owner', 'organization'], ['coach', 'coach'], ['doctor', 'doctor'],
+    ['specialist', 'specialist'],
   ] as const) {
     it(`${globalRole} + ${role}: каждый href встречается один раз`, () => {
       const hrefs = filterSidebarForRole({ role, globalRole, childCount: 0 })

@@ -13,18 +13,17 @@ import { getErrorMessage } from '@/lib/utils/errors'
 import AskAiButton from '@/components/assistant/AskAiButton'
 import { Icon } from '@/components/ui/Icon'
 import { AvatarImage } from '@/components/ui/AvatarImage'
-
-const ROLE_META: Record<string, { label: string; color: string; bg: string }> = {
-  athlete:      { label: 'Атлет',      color: '#F35703', bg: '#FEF0E7' },
-  coach:        { label: 'Тренер',     color: '#16A34A', bg: '#F0FDF4' },
-  organization: { label: 'Организация', color: '#2563EB', bg: '#EFF6FF' },
-  admin:        { label: 'Админ',      color: '#7C3AED', bg: '#F5F3FF' },
-  doctor:       { label: 'Доктор',     color: '#DC2626', bg: '#FEF2F2' },
-}
+import { roleMeta } from '@/lib/roles'
+import { connectionTypeForRoles } from '@/lib/connections/types'
+import { connectionRequestError } from '@/lib/connections/request-errors'
+import { SPECIALIST_FORMATS, SPECIALIST_FORMAT_META, SPECIALIST_TYPE_META, type SpecialistFormat } from '@/lib/specialist'
+import { SPECIALIST_FIELD_LABEL, knownSpecialistTypes } from '@/lib/specialist-form'
+import { ScopeList } from '@/components/specialist/ScopeList'
 
 type Profile = {
   id: string
   nickname: string | null
+  name?: string | null
   first_name: string | null
   last_name: string | null
   role: string
@@ -98,7 +97,15 @@ type Profile = {
   contact_person?: string | null
   address?: string | null
   membership_types?: unknown
+  // specialist — строка specialists приходит, только если профиль публичный;
+  // без неё specialist_types нет вовсе
+  specialist_types?: string[]
+  formats?: string[]
+  accepts_new_clients?: boolean
 }
+
+type ConnectionDirection = 'outgoing' | 'incoming' | null
+type ConnectionAction = 'connect' | 'cancel' | 'accept' | 'decline'
 
 const SESSION_FORMAT_LABELS: Record<string, string> = {
   offline: 'Очно', online: 'Онлайн', home: 'Выезд',
@@ -137,19 +144,14 @@ function asStringList(v: unknown): string[] {
   }).filter(Boolean)
 }
 
-function getConnectionType(myRole: string, theirRole: string): string | null {
-  // Сортируем пару ролей, чтобы логика была симметричной
-  const pair = [myRole, theirRole].sort().join('|')
-  const map: Record<string, string> = {
-    'athlete|coach':        'coach_athlete',
-    'athlete|organization': 'org_athlete',
-    'coach|organization':   'org_coach',
-    'athlete|doctor':       'doctor_athlete',
-    'coach|doctor':         'coach_doctor',
-    'doctor|organization':  'org_doctor',
-    'admin|doctor':         'admin_doctor',
-  }
-  return map[pair] ?? null
+// Отказ ставит паузу на сутки (429 too_soon): без понятной фразы повторное
+// «Пригласить» выглядело бы сломанной кнопкой.
+
+function yearsLabel(n: number): string {
+  const mod10 = n % 10, mod100 = n % 100
+  if (mod10 === 1 && mod100 !== 11) return `${n} год`
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} года`
+  return `${n} лет`
 }
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -159,20 +161,26 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const [profile, setProfile] = useState<Profile | null>(null)
   const [connectionStatus, setConnectionStatus] = useState('none')
   const [connectionId, setConnectionId] = useState<string | null>(null)
+  const [connectionDirection, setConnectionDirection] = useState<ConnectionDirection>(null)
   const [isOwn, setIsOwn] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [acting, setActing] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [acting, setActing] = useState<ConnectionAction | null>(null)
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
   useEffect(() => {
     fetch(`/api/users/${id}`)
-      .then(r => r.json())
-      .then(d => {
+      .then(async r => {
+        if (r.status === 404) return
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        const d = await r.json()
         setProfile(d.profile)
         setConnectionStatus(d.connectionStatus)
         setConnectionId(d.connectionId)
+        setConnectionDirection(d.connectionDirection ?? null)
         setIsOwn(d.isOwn)
       })
+      .catch(() => setLoadFailed(true))
       .finally(() => setLoading(false))
   }, [id])
 
@@ -181,37 +189,61 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     setTimeout(() => setToast(null), 3500)
   }
 
+  function resetConnection() {
+    setConnectionStatus('none'); setConnectionId(null); setConnectionDirection(null)
+  }
+
   async function handleConnect() {
     if (!profile || !user) return
-    const connType = getConnectionType(user.role, profile.role)
+    const connType = connectionTypeForRoles(user.role, profile.role)
     if (!connType) return
-    setActing(true)
+    setActing('connect')
     try {
       const res = await fetch('/api/connections', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipient_id: profile.id, connection_type: connType }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Ошибка')
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) { showToast(connectionRequestError(res.status, data), false); return }
       setConnectionStatus('pending')
       setConnectionId(data.connection?.id ?? null)
+      setConnectionDirection('outgoing')
       showToast('Приглашение отправлено', true)
     } catch (e: unknown) { showToast(getErrorMessage(e), false) }
-    finally { setActing(false) }
+    finally { setActing(null) }
+  }
+
+  // PATCH /api/connections/[id]: отозвать может только отправивший запрос,
+  // принять или отклонить — только получивший; иначе 403, и без проверки
+  // res.ok экран показал бы ложный успех.
+  async function patchConnection(action: 'cancel' | 'accept' | 'decline'): Promise<boolean> {
+    if (!connectionId) return false
+    setActing(action)
+    try {
+      const res = await fetch(`/api/connections/${connectionId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      return res.ok
+    } catch { return false }
+    finally { setActing(null) }
   }
 
   async function handleCancel() {
-    if (!connectionId) return
-    setActing(true)
-    try {
-      await fetch(`/api/connections/${connectionId}`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'cancel' }),
-      })
-      setConnectionStatus('none'); setConnectionId(null)
-      showToast('Приглашение отозвано', true)
-    } catch { showToast('Ошибка', false) }
-    finally { setActing(false) }
+    if (!(await patchConnection('cancel'))) { showToast('Не удалось отозвать приглашение', false); return }
+    resetConnection()
+    showToast('Приглашение отозвано', true)
+  }
+
+  async function handleRespond(action: 'accept' | 'decline') {
+    if (!(await patchConnection(action))) { showToast('Не удалось ответить на запрос', false); return }
+    if (action === 'accept') {
+      setConnectionStatus('active'); setConnectionDirection(null)
+      showToast('Связь установлена', true)
+    } else {
+      resetConnection()
+      showToast('Запрос отклонён', true)
+    }
   }
 
   if (loading) return (
@@ -222,18 +254,23 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   if (!profile) return (
     <div className="flex items-center justify-center min-h-[400px]">
-      <div className="text-center">
-        <p className="text-lg font-semibold text-foreground">Профиль не найден</p>
+      <div className="text-center" role={loadFailed ? 'alert' : undefined}>
+        <p className="text-lg font-semibold text-foreground">{loadFailed ? 'Не удалось загрузить профиль' : 'Профиль не найден'}</p>
+        {loadFailed && <p className="mt-1 text-sm text-muted-foreground">Обновите страницу или попробуйте позже.</p>}
         <Link href="/search" className="mt-4 inline-block text-sm text-orange-500 hover:text-orange-600">← Назад к поиску</Link>
       </div>
     </div>
   )
 
-  const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || profile.nickname || 'Пользователь'
-  const roleMeta = ROLE_META[profile.role] ?? { label: profile.role, color: '#64748B', bg: '#F8FAFC' }
-  const connType = user ? getConnectionType(user.role, profile.role) : null
+  const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || profile.name?.trim() || profile.nickname || 'Пользователь'
+  const rm = roleMeta(profile.role)
+  const connType = user ? connectionTypeForRoles(user.role, profile.role) : null
+  const busy = acting !== null
   // Medical dossier: only a LINKED coach/doctor/organization viewing an
   // athlete sees the recommendations section. Data stays RLS-scoped server-side.
+  // Специалиста здесь нет намеренно, как и в AI-помощнике и готовности ниже:
+  // всё это построено на медданных врача, а медданные специалисту в этом PR
+  // не открываем (только ограничения без медтекста — отдельным PR).
   const canSeeMedicalDossier =
     !isOwn &&
     profile.role === 'athlete' &&
@@ -264,13 +301,13 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           {/* Avatar */}
           <div style={{
             width: 80, height: 80, borderRadius: 20, flexShrink: 0,
-            background: profile.avatar_url ? 'transparent' : `linear-gradient(135deg,${roleMeta.color}40,${roleMeta.color}10)`,
-            border: `2px solid ${roleMeta.color}30`, overflow: 'hidden',
+            background: profile.avatar_url ? 'transparent' : `linear-gradient(135deg,${rm.text}40,${rm.text}10)`,
+            border: `2px solid ${rm.text}30`, overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {profile.avatar_url
               ? <AvatarImage src={profile.avatar_url} alt={displayName} sizes="96px" />
-              : <span style={{ fontSize: 28, fontWeight: 800, color: roleMeta.color }}>{displayName[0]?.toUpperCase()}</span>
+              : <span style={{ fontSize: 28, fontWeight: 800, color: rm.text }}>{displayName[0]?.toUpperCase()}</span>
             }
           </div>
 
@@ -280,8 +317,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--foreground)', margin: 0 }}>{displayName}</h1>
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99,
-                background: roleMeta.bg, color: roleMeta.color, border: `1px solid ${roleMeta.color}22`,
-              }}>{roleMeta.label}</span>
+                background: rm.bg, color: rm.text, border: `1px solid ${rm.text}22`,
+              }}>{rm.label}</span>
               {profile.is_verified && <VerifiedBadge size="md" />}
             </div>
             {profile.nickname && (
@@ -322,24 +359,46 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                     />
                   )}
                 </>
+              ) : connectionStatus === 'pending' && connectionDirection === 'incoming' ? (
+                <>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted-foreground)' }}>Запрос на связь</span>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => handleRespond('accept')} disabled={busy} aria-busy={acting === 'accept'} style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                      background: '#16A34A', color: 'white', border: 'none',
+                      cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.6 : 1,
+                    }}>
+                      <Icon name="ki-check-circle" className="text-sm" />Принять
+                    </button>
+                    <button onClick={() => handleRespond('decline')} disabled={busy} aria-busy={acting === 'decline'} style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                      background: 'var(--card)', color: 'var(--muted-foreground)', border: '1.5px solid var(--border)',
+                      cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.6 : 1,
+                    }}>
+                      Отклонить
+                    </button>
+                  </div>
+                </>
               ) : connectionStatus === 'pending' ? (
-                <button onClick={handleCancel} disabled={acting} style={{
+                <button onClick={handleCancel} disabled={busy} aria-busy={acting === 'cancel'} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700,
                   background: '#FEF0E7', color: '#F35703', border: '1.5px solid #FBC1A0',
-                  cursor: 'pointer',
+                  cursor: busy ? 'not-allowed' : 'pointer',
                 }}>
                   <Icon name="ki-time" className="text-sm" />Ожидает · Отозвать
                 </button>
               ) : (
-                <button onClick={handleConnect} disabled={acting} style={{
+                <button onClick={handleConnect} disabled={busy} aria-busy={acting === 'connect'} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '9px 18px', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: acting ? 'var(--muted)' : 'linear-gradient(135deg,#F35703,#D44A02)',
-                  color: 'white', border: 'none', cursor: acting ? 'not-allowed' : 'pointer',
+                  background: busy ? 'var(--muted)' : 'linear-gradient(135deg,#F35703,#D44A02)',
+                  color: 'white', border: 'none', cursor: busy ? 'not-allowed' : 'pointer',
                   boxShadow: '0 3px 12px rgba(243,87,3,0.3)',
                 }}>
-                  {acting ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправка…</>
+                  {acting === 'connect' ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Отправка…</>
                     : <><Icon name="ki-users" className="text-sm" />Пригласить</>}
                 </button>
               )}
@@ -364,6 +423,15 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           </div>
         )}
       </div>
+
+      {/* Спортсмен решает, пускать ли специалиста: связь — только с его
+          согласия, поэтому рядом с кнопками — что специалист сможет и чего нет. */}
+      {!isOwn && user?.role === 'athlete' && profile.role === 'specialist' && (
+        <SpecialistConsentCard
+          name={displayName}
+          status={connectionStatus === 'pending' && connectionDirection === 'incoming' ? 'incoming' : connectionStatus === 'active' ? 'active' : 'none'}
+        />
+      )}
 
       {/* Stats grid */}
       {(profile.height_cm || profile.weight_kg || profile.weekly_training_hours || profile.fitness_level) && (
@@ -415,6 +483,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       {profile.role === 'coach' && <CoachReviewsBlock coachId={profile.id} summary={null} />}
       {profile.role === 'doctor' && <DoctorProfile profile={profile} />}
       {profile.role === 'organization' && <OrgProfile profile={profile} />}
+      {profile.role === 'specialist' && <SpecialistProfileSection profile={profile} isOwn={isOwn} />}
 
       {/* Socials */}
       {(profile.telegram_url || profile.instagram_url || profile.youtube_url || profile.website_url || profile.whatsapp_url) && (
@@ -434,7 +503,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         <Card className="p-5 flex gap-4 flex-wrap items-center">
           {profile.accepts_new_athletes === true && (
             <Badge variant="success" size="lg">
-              <Icon name="ki-check-circle" className="text-xs" /> Принимает новых атлетов
+              <Icon name="ki-check-circle" className="text-xs" /> Принимает новых спортсменов
             </Badge>
           )}
           {profile.hourly_rate != null && (
@@ -448,7 +517,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Toast */}
       {toast && (
-        <div style={{
+        <div role={toast.ok ? 'status' : 'alert'} style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
           padding: '12px 18px', borderRadius: 14,
           background: toast.ok ? '#F0FDF4' : '#FEF2F2',
@@ -542,7 +611,7 @@ function CoachProfile({ profile }: { profile: Profile }) {
       <SectionCard title="Тренерская деятельность" color="#16A34A" bg="#F0FDF4">
         <FactRow label="Специализация" value={profile.specialization || profile.coach_specialization} />
         <FactRow label="Опыт" value={profile.experience_years ? `${profile.experience_years} лет` : null} />
-        <FactRow label="Атлетов под руководством" value={profile.athletes_count} />
+        <FactRow label="Спортсменов под руководством" value={profile.athletes_count} />
         <FactRow label="Место работы" value={profile.workplace} />
         {sports.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Виды спорта</p><ChipRow items={sports} /></div>}
         {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>Языки</p><ChipRow items={langs} /></div>}
@@ -670,6 +739,97 @@ function OrgProfile({ profile }: { profile: Profile }) {
 
       {memberships.length > 0 && (
         <SectionCard title="Тарифы и членство" color="#8B5CF6" bg="#F5F3FF"><BulletList items={memberships} /></SectionCard>
+      )}
+    </>
+  )
+}
+
+const SPECIALIST_CONSENT_LEAD: Record<'incoming' | 'active' | 'none', string> = {
+  incoming: 'приглашает вас стать клиентом. Связь появится, только если вы примете запрос. Отклонить можно без объяснений — повторный запрос придёт не раньше чем через сутки.',
+  active:   'работает с вами с вашего согласия и в этих границах.',
+  none:     'начнёт работать с вами только после вашего согласия и в этих границах.',
+}
+
+function SpecialistConsentCard({ name, status }: { name: string; status: 'incoming' | 'active' | 'none' }) {
+  const rm = roleMeta('specialist')
+  const title = status === 'incoming' ? 'Запрос на связь' : status === 'active' ? 'Границы работы специалиста' : 'Если подключите специалиста'
+  return (
+    <SectionCard title={title} color={rm.text} bg={rm.bg}>
+      <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.6, margin: 0 }}>
+        <strong>{name}</strong> {SPECIALIST_CONSENT_LEAD[status]}
+      </p>
+      <ScopeList />
+    </SectionCard>
+  )
+}
+
+function specialistCertLines(v: unknown): string[] {
+  if (!Array.isArray(v)) return []
+  return v.flatMap(c => {
+    if (!c || typeof c !== 'object') return []
+    const { name, issuer, year } = c as { name?: unknown; issuer?: unknown; year?: unknown }
+    if (typeof name !== 'string' || !name.trim()) return []
+    const meta = [
+      typeof issuer === 'string' ? issuer.trim() : '',
+      typeof year === 'number' ? String(year) : '',
+    ].filter(Boolean).join(', ')
+    return [meta ? `${name.trim()} — ${meta}` : name.trim()]
+  })
+}
+
+function SpecialistProfileSection({ profile, isOwn }: { profile: Profile; isOwn: boolean }) {
+  const rm = roleMeta('specialist')
+  // Строки specialists нет: чужой профиль скрыт (RLS), свой ещё не создан.
+  if (profile.specialist_types === undefined) {
+    return (
+      <Card className="p-5">
+        <p style={{ fontSize: 13, color: 'var(--muted-foreground)', lineHeight: 1.6, margin: 0 }}>
+          {isOwn
+            ? 'Профиль специалиста ещё не заполнен — специализацию, опыт и формат работы можно указать в настройках.'
+            : 'Специалист пока не открыл подробный профиль — специализация, опыт и сертификаты появятся здесь, когда он сделает его публичным.'}
+        </p>
+      </Card>
+    )
+  }
+
+  const L = SPECIALIST_FIELD_LABEL
+  const types = knownSpecialistTypes(profile.specialist_types).map(t => SPECIALIST_TYPE_META[t].label)
+  const formats = (profile.formats ?? [])
+    .filter((f): f is SpecialistFormat => (SPECIALIST_FORMATS as readonly string[]).includes(f))
+    .map(f => SPECIALIST_FORMAT_META[f].label)
+  const certs = specialistCertLines(profile.certifications)
+  const langs = profile.languages ?? []
+  const place = [profile.city, profile.country].filter(Boolean).join(', ')
+
+  return (
+    <>
+      <SectionCard title="Работа специалиста" color={rm.text} bg={rm.bg}>
+        {isOwn && profile.profile_public === false && (
+          <p style={{ fontSize: 12, color: 'var(--muted-foreground)', lineHeight: 1.5, margin: 0 }}>
+            Профиль виден только вам — открыть его другим можно в настройках.
+          </p>
+        )}
+        {types.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>{L.types}</p><ChipRow items={types} /></div>}
+        <FactRow label={L.mainFocus} value={profile.main_focus} />
+        <FactRow label="Опыт" value={profile.experience_years != null ? yearsLabel(profile.experience_years) : null} />
+        <FactRow label={L.city} value={place} />
+        <FactRow label={L.fee} value={profile.consultation_fee != null ? `${profile.consultation_fee} ${profile.currency ?? 'RUB'}` : null} />
+        {formats.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>{L.formats}</p><ChipRow items={formats} /></div>}
+        {langs.length > 0 && <div><p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 4 }}>{L.languages}</p><ChipRow items={langs} /></div>}
+        {profile.accepts_new_clients === false ? (
+          <Badge variant="secondary" size="md" className="w-fit">Сейчас не берёт новых клиентов</Badge>
+        ) : (
+          <Badge variant="success" size="md" className="w-fit">
+            <Icon name="ki-check-circle" className="text-[11px]" /> Принимает новых клиентов
+          </Badge>
+        )}
+      </SectionCard>
+
+      {(certs.length > 0 || profile.education) && (
+        <SectionCard title={`${L.education} и ${L.certs.toLowerCase()}`} color="#2563EB" bg="#EFF6FF">
+          {profile.education && <p style={{ fontSize: 13, color: 'var(--foreground)', lineHeight: 1.5, margin: 0 }}>{profile.education}</p>}
+          {certs.length > 0 && <BulletList items={certs} />}
+        </SectionCard>
       )}
     </>
   )

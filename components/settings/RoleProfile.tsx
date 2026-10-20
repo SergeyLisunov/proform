@@ -12,8 +12,34 @@ import {
   Select,
   Toggle,
   Chips,
+  inputClass,
 } from './ProfileShell'
+import { Button } from '@/components/reui/button'
 import { CountryFlag } from '@/components/ui/CountryFlag'
+import { Icon } from '@/components/ui/Icon'
+import { roleMeta } from '@/lib/roles'
+import {
+  SPECIALIST_TYPES,
+  SPECIALIST_TYPE_META,
+  SPECIALIST_FORMATS,
+  SPECIALIST_FORMAT_LABEL,
+} from '@/lib/specialist'
+import {
+  MAX_CERTS,
+  SPECIALIST_FIELD_LABEL,
+  cityRequired,
+  digitsOnly,
+  emptySpecialistForm,
+  knownSpecialistTypes,
+  MAX_BIO_LENGTH,
+  specialistFormError,
+  specialistFormFromProfile,
+  toSpecialistInput,
+  type CertRow,
+  type SpecialistForm,
+  type SpecialistFormSection,
+} from '@/lib/specialist-form'
+import { getSpecialistProfile, saveSpecialistProfile } from '@/services/specialist.service'
 
 function getSB() {
   return createBrowserClient(
@@ -22,7 +48,37 @@ function getSB() {
   )
 }
 
-type Role = 'coach' | 'doctor' | 'organization' | 'admin'
+/** Имя для ролей, у которых его нет в своей таблице, — в users.name. */
+async function saveDisplayName(sb: ReturnType<typeof getSB>, userId: string, value: string): Promise<void> {
+  const name = value.trim()
+  if (!name) return
+  const { error } = await sb.from('users').update({ name }).eq('id', userId)
+  if (error) throw new Error('Не удалось сохранить имя. Попробуйте ещё раз.')
+}
+
+// Роли со своей формой профиля. Раньше любая другая роль молча получала
+// форму администратора — теперь незнакомая роль видит нейтральный профиль.
+const PROFILE_ROLES = ['coach', 'doctor', 'specialist', 'organization', 'admin'] as const
+type Role = (typeof PROFILE_ROLES)[number]
+
+function isProfileRole(value: unknown): value is Role {
+  return typeof value === 'string' && (PROFILE_ROLES as readonly string[]).includes(value)
+}
+
+type ProfileCopy = { title: string; subtitle: string; badge: string }
+
+const PROFILE_COPY: Record<Role, ProfileCopy> = {
+  coach:        { title: 'Профиль тренера',        subtitle: 'Расскажите атлетам о своём опыте и специализации', badge: roleMeta('coach').label },
+  doctor:       { title: 'Профиль врача',          subtitle: 'Медицинская специализация, образование и практика', badge: roleMeta('doctor').label },
+  specialist:   { title: 'Профиль специалиста',    subtitle: 'Специализация, опыт и формат работы с клиентами',  badge: roleMeta('specialist').label },
+  organization: { title: 'Профиль организации',    subtitle: 'Информация о клубе, федерации или команде',        badge: roleMeta('organization').label },
+  admin:        { title: 'Профиль администратора', subtitle: 'Служебные настройки и контакты',                   badge: roleMeta('admin').short },
+}
+
+function profileCopy(role: Role | null, rawRole: string | null | undefined): ProfileCopy {
+  if (role) return PROFILE_COPY[role]
+  return { title: 'Профиль', subtitle: 'Имя и фото профиля', badge: roleMeta(rawRole).label }
+}
 
 const GENDERS = [
   { value: '', label: '— Выбрать —' },
@@ -125,6 +181,17 @@ const DOCTOR_SERVICES = [
   { value: 'psych_support',  label: 'Психологическая поддержка' },
 ]
 
+const CURRENCIES = [
+  { value: 'RUB', label: '₽ Рубли' },
+  { value: 'USD', label: '$ Доллары' },
+  { value: 'EUR', label: '€ Евро' },
+  { value: 'KZT', label: '₸ Тенге' },
+]
+
+const SPECIALIST_TYPE_OPTIONS = SPECIALIST_TYPES.map(t => ({ value: t, label: SPECIALIST_TYPE_META[t].label }))
+const SPECIALIST_FORMAT_OPTIONS = SPECIALIST_FORMATS.map(f => ({ value: f, label: SPECIALIST_FORMAT_LABEL[f] }))
+const SPECIALIST_TONE = roleMeta('specialist')
+
 const ORG_TYPES = [
   { value: '',            label: '— Выбрать —' },
   { value: 'club',        label: 'Спортивный клуб' },
@@ -203,6 +270,12 @@ type AdminForm = {
   responsibilities: string[]; work_email: string; on_call: boolean; schedule: string
 }
 
+// Имя живёт в users.name: в таблице specialists его нет.
+type SpecialistSettingsForm = SpecialistForm & { name: string }
+
+/** Роль без своей формы: только имя (users.name) и фото. */
+type GenericForm = { name: string }
+
 const EMPTY_COACH: CoachForm = {
   first_name: '', last_name: '', birth_date: '', gender: '',
   phone: '', city: '', country: '', bio: '',
@@ -245,6 +318,8 @@ const EMPTY_ADMIN: AdminForm = {
   department: '', access_level: '', notes: '',
   responsibilities: [], work_email: '', on_call: false, schedule: '',
 }
+const emptySpecialistSettings = (): SpecialistSettingsForm => ({ ...emptySpecialistForm(), name: '' })
+const EMPTY_GENERIC: GenericForm = { name: '' }
 
 function listFromText(v: string): string[] {
   return v.split(/[,\n]/).map(s => s.trim()).filter(Boolean)
@@ -263,14 +338,14 @@ function listFromText(v: string): string[] {
  * Avatar adds a small fixed weight (5%) so users see immediate progress
  * after uploading a photo.
  */
-function calcCompletion<T extends Record<string, unknown>>(
+function calcCompletion<T extends object>(
   form: T, keys: (keyof T)[], hasAvatar: boolean,
 ): number {
   if (keys.length === 0) return 0
   const total = keys.length
   let filled = 0
   for (const k of keys) {
-    const v = form[k]
+    const v: unknown = form[k]
     if (typeof v === 'string') { if (v.trim() !== '') filled++ }
     else if (Array.isArray(v)) { if (v.length > 0) filled++ }
     else if (v) { filled++ }
@@ -304,6 +379,12 @@ const ADMIN_COMPLETION_KEYS: (keyof AdminForm)[] = [
   'first_name', 'last_name', 'phone', 'city', 'country',
   'department', 'access_level', 'work_email', 'responsibilities',
 ]
+const SPECIALIST_COMPLETION_KEYS: (keyof SpecialistSettingsForm)[] = [
+  'name', 'types', 'mainFocus', 'bio', 'experience',
+  'education', 'certs', 'formats', 'city', 'country',
+  'languages', 'fee',
+]
+const GENERIC_COMPLETION_KEYS: (keyof GenericForm)[] = ['name']
 function textFromList(v: string[] | null | undefined): string {
   return (v ?? []).join(', ')
 }
@@ -320,6 +401,18 @@ function jsonbLinesFromText(v: string): { text: string }[] {
 function textFromJsonbLines(v: unknown): string {
   if (!Array.isArray(v)) return ''
   return v.map(x => (typeof x === 'string' ? x : (x as { text?: string; name?: string })?.text ?? (x as { name?: string })?.name ?? '')).filter(Boolean).join('\n')
+}
+
+// Ключи строк сертификатов — только для React, в базу не идут.
+let certKeySeq = 0
+const nextCertKey = (): string => `cert-${++certKeySeq}`
+
+// Раздел формы с ошибкой → вкладка настроек, где лежат его поля.
+const SPECIALIST_SECTION_TAB: Record<SpecialistFormSection, string> = {
+  specialty:  'specialization',
+  experience: 'experience',
+  work:       'practice',
+  contacts:   'practice',
 }
 
 type TabDef = { id: string; label: string; icon: string; color: string }
@@ -358,25 +451,43 @@ const ADMIN_TABS: TabDef[] = [
   { id: 'contacts',        label: 'Контакты',       icon: 'ki-sms',            color: '#2563EB' },
 ]
 
-export default function RoleProfile({ user }: { user: AppUser }) {
-  const role = user.role as Role
+// Вкладки повторяют разделы формы (specialistFormError): ошибка из раздела
+// открывает ровно ту вкладку, где её можно исправить.
+const SPECIALIST_TABS: TabDef[] = [
+  { id: 'personal',       label: 'Личные данные',      icon: 'ki-profile-circle', color: '#F35703' },
+  { id: 'specialization', label: 'Специализация',      icon: 'ki-abstract-41',    color: SPECIALIST_TONE.text },
+  { id: 'experience',     label: 'Опыт и образование', icon: 'ki-book',           color: '#2563EB' },
+  { id: 'practice',       label: 'Практика',           icon: 'ki-briefcase',      color: '#0D9488' },
+  { id: 'privacy',        label: 'Приватность',        icon: 'ki-shield-tick',    color: '#16A34A' },
+]
 
-  const [tab, setTab] = useState<string>(
-    role === 'coach' ? 'personal' :
-    role === 'doctor' ? 'personal' :
-    role === 'organization' ? 'main' :
-    'personal',
-  )
+const GENERIC_TABS: TabDef[] = [
+  { id: 'personal', label: 'Личные данные', icon: 'ki-profile-circle', color: '#F35703' },
+]
+
+export default function RoleProfile({ user }: { user: AppUser }) {
+  const role: Role | null = isProfileRole(user.role) ? user.role : null
+
+  const [tab, setTab] = useState<string>(role === 'organization' ? 'main' : 'personal')
 
   const [coach, setCoach]   = useState<CoachForm>(EMPTY_COACH)
   const [doctor, setDoctor] = useState<DoctorForm>(EMPTY_DOCTOR)
   const [org, setOrg]       = useState<OrgForm>(EMPTY_ORG)
   const [admin, setAdmin]   = useState<AdminForm>(EMPTY_ADMIN)
+  const [specialist, setSpecialist] = useState<SpecialistSettingsForm>(emptySpecialistSettings)
+  const [generic, setGeneric]       = useState<GenericForm>(EMPTY_GENERIC)
 
   const [loading, setLoading] = useState(true)
+  // Профиль не загрузился — формы нет и сохранять нечего: пустая форма
+  // затёрла бы настоящий профиль.
+  const [loadError, setLoadError] = useState(false)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  // После неудачной попытки сохранить ошибка проверки видна, пока её не
+  // исправят, — а не исчезает через 5 секунд.
+  const [showSpecialistError, setShowSpecialistError] = useState(false)
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -384,26 +495,12 @@ export default function RoleProfile({ user }: { user: AppUser }) {
   const tabs =
     role === 'coach' ? COACH_TABS :
     role === 'doctor' ? DOCTOR_TABS :
+    role === 'specialist' ? SPECIALIST_TABS :
     role === 'organization' ? ORG_TABS :
-    ADMIN_TABS
+    role === 'admin' ? ADMIN_TABS :
+    GENERIC_TABS
 
-  const title =
-    role === 'coach' ? 'Профиль тренера' :
-    role === 'doctor' ? 'Профиль врача' :
-    role === 'organization' ? 'Профиль организации' :
-    'Профиль администратора'
-
-  const subtitle =
-    role === 'coach' ? 'Расскажите атлетам о своём опыте и специализации' :
-    role === 'doctor' ? 'Медицинская специализация, образование и практика' :
-    role === 'organization' ? 'Информация о клубе, федерации или команде' :
-    'Служебные настройки и контакты'
-
-  const roleBadge =
-    role === 'coach' ? 'Тренер' :
-    role === 'doctor' ? 'Врач' :
-    role === 'organization' ? 'Организация' :
-    'Админ'
+  const { title, subtitle, badge: roleBadge } = profileCopy(role, user.role)
 
   // ── Load ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -414,9 +511,11 @@ export default function RoleProfile({ user }: { user: AppUser }) {
         sb.from('users').select('*').eq('id', user.id).maybeSingle(),
       ])
       setAvatarUrl((usr as { avatar_url?: string | null } | null)?.avatar_url ?? null)
+      const userName = (usr as { name?: string | null } | null)?.name ?? ''
 
       if (role === 'coach') {
-        const { data } = await sb.from('coaches').select('*').eq('id', user.id).maybeSingle()
+        const { data, error } = await sb.from('coaches').select('*').eq('id', user.id).maybeSingle()
+        if (error) throw error
         const c = (data ?? {}) as Record<string, unknown>
         setCoach({
           first_name: String(c.first_name ?? (usr as any)?.name?.split(' ')[0] ?? ''),
@@ -451,7 +550,8 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           past_workplaces_text: textFromJsonbLines(c.past_workplaces),
         })
       } else if (role === 'doctor') {
-        const { data } = await sb.from('doctors').select('*').eq('id', user.id).maybeSingle()
+        const { data, error } = await sb.from('doctors').select('*').eq('id', user.id).maybeSingle()
+        if (error) throw error
         const d = (data ?? {}) as Record<string, unknown>
         setDoctor({
           first_name: String(d.first_name ?? (usr as any)?.name?.split(' ')[0] ?? ''),
@@ -487,7 +587,8 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           emergency_contact: Boolean(d.emergency_contact ?? false),
         })
       } else if (role === 'organization') {
-        const { data } = await sb.from('organizations').select('*').eq('id', user.id).maybeSingle()
+        const { data, error } = await sb.from('organizations').select('*').eq('id', user.id).maybeSingle()
+        if (error) throw error
         const o = (data ?? {}) as Record<string, unknown>
         setOrg({
           org_name: String(o.org_name ?? (usr as any)?.name ?? ''),
@@ -516,7 +617,8 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           membership_types_text: textFromJsonbLines(o.membership_types),
         })
       } else if (role === 'admin') {
-        const { data } = await sb.from('admins').select('*').eq('id', user.id).maybeSingle()
+        const { data, error } = await sb.from('admins').select('*').eq('id', user.id).maybeSingle()
+        if (error) throw error
         const a = (data ?? {}) as Record<string, unknown>
         setAdmin({
           first_name: String(a.first_name ?? (usr as any)?.name?.split(' ')[0] ?? ''),
@@ -533,11 +635,25 @@ export default function RoleProfile({ user }: { user: AppUser }) {
           on_call: Boolean(a.on_call ?? false),
           schedule: String(a.schedule ?? ''),
         })
+      } else if (role === 'specialist') {
+        // Бросает при сбое; null — профиля ещё нет, тогда форма пустая.
+        const profile = await getSpecialistProfile(user.id)
+        setSpecialist({ ...specialistFormFromProfile(profile, nextCertKey), name: userName })
+      } else {
+        setGeneric({ name: userName })
       }
-      setLoading(false)
     }
     load()
-  }, [user?.id, role])
+      .then(() => setLoadError(false))
+      .catch(() => setLoadError(true))
+      .finally(() => setLoading(false))
+  }, [user?.id, role, loadAttempt])
+
+  // Флаг загрузки взводит кнопка «Повторить», а не эффект.
+  const retryLoad = useCallback(() => {
+    setLoading(true)
+    setLoadAttempt(n => n + 1)
+  }, [])
 
   // ── Avatar upload ───────────────────────────────────────────────────────
   const handleAvatarUpload = useCallback(async (file: File) => {
@@ -564,18 +680,27 @@ export default function RoleProfile({ user }: { user: AppUser }) {
     } finally {
       setUploadingAvatar(false)
     }
-  }, [user?.id])
+  }, [user.id])
 
   const handleAvatarDelete = useCallback(async () => {
     if (!user?.id) return
     const sb = getSB()
     await sb.from('users').update({ avatar_url: null }).eq('id', user.id)
     setAvatarUrl(null)
-  }, [user?.id])
+  }, [user.id])
 
   // ── Save ────────────────────────────────────────────────────────────────
   const handleSave = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id || loadError) return
+    if (role === 'specialist') {
+      const invalid = specialistFormError(specialist)
+      if (invalid) {
+        setSaveError(null)
+        setShowSpecialistError(true)
+        setTab(SPECIALIST_SECTION_TAB[invalid.section])
+        return
+      }
+    }
     setSaving(true)
     setSaveError(null)
     const sb = getSB()
@@ -713,6 +838,13 @@ export default function RoleProfile({ user }: { user: AppUser }) {
         if (error) throw error
         const fullName = [admin.first_name, admin.last_name].filter(Boolean).join(' ').trim()
         if (fullName) await sb.from('users').update({ name: fullName }).eq('id', user.id)
+      } else if (role === 'specialist') {
+        const result = await saveSpecialistProfile(user.id, toSpecialistInput(specialist))
+        if (!result.ok) throw new Error(result.error)
+        await saveDisplayName(sb, user.id, specialist.name)
+        setShowSpecialistError(false)
+      } else {
+        await saveDisplayName(sb, user.id, generic.name)
       }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
@@ -722,23 +854,51 @@ export default function RoleProfile({ user }: { user: AppUser }) {
     } finally {
       setSaving(false)
     }
-  }, [user?.id, role, coach, doctor, org, admin])
+  }, [user.id, role, loadError, coach, doctor, org, admin, specialist, generic])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" role="status" aria-label="Загрузка профиля">
         <div className="h-6 w-6 rounded-full border-2 border-orange-500 border-t-transparent pf-spin" />
       </div>
     )
   }
+
+  if (loadError) {
+    return (
+      <div className="mx-auto w-full max-w-[980px]">
+        <div
+          role="alert"
+          className="flex flex-col items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-4 sm:flex-row sm:items-center"
+        >
+          <Icon name="ki-information-2" className="text-lg text-destructive" />
+          <div className="flex flex-1 flex-col gap-0.5">
+            <p className="text-sm font-medium text-foreground">Не удалось загрузить профиль</p>
+            <p className="text-xs text-muted-foreground">
+              Проверьте соединение и попробуйте ещё раз. Править профиль можно после загрузки — так сохранённые данные не потеряются.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={retryLoad}>Повторить</Button>
+        </div>
+      </div>
+    )
+  }
+
+  const specialistError = role === 'specialist' && showSpecialistError ? specialistFormError(specialist) : null
 
   // Per-role completion %. Keeps the progress bar in sync with the form
   // state so users see immediate feedback as they type.
   const completionPct =
     role === 'coach' ? calcCompletion(coach, COACH_COMPLETION_KEYS, !!avatarUrl) :
     role === 'doctor' ? calcCompletion(doctor, DOCTOR_COMPLETION_KEYS, !!avatarUrl) :
+    role === 'specialist' ? calcCompletion(
+      // Пустая добавленная строка сертификата ещё не заполнение.
+      { ...specialist, certs: specialist.certs.filter(c => c.name.trim()) },
+      SPECIALIST_COMPLETION_KEYS, !!avatarUrl,
+    ) :
     role === 'organization' ? calcCompletion(org, ORG_COMPLETION_KEYS, !!avatarUrl) :
-    calcCompletion(admin, ADMIN_COMPLETION_KEYS, !!avatarUrl)
+    role === 'admin' ? calcCompletion(admin, ADMIN_COMPLETION_KEYS, !!avatarUrl) :
+    calcCompletion(generic, GENERIC_COMPLETION_KEYS, !!avatarUrl)
 
   return (
     <ProfileShell
@@ -755,13 +915,15 @@ export default function RoleProfile({ user }: { user: AppUser }) {
       onAvatarDelete={handleAvatarDelete}
       saving={saving}
       saved={saved}
-      saveError={saveError}
+      saveError={saveError ?? specialistError?.message ?? null}
       onSave={handleSave}
     >
       {role === 'coach' && <CoachTabs tab={tab} form={coach} set={setCoach} />}
       {role === 'doctor' && <DoctorTabs tab={tab} form={doctor} set={setDoctor} />}
       {role === 'organization' && <OrgTabs tab={tab} form={org} set={setOrg} />}
       {role === 'admin' && <AdminTabs tab={tab} form={admin} set={setAdmin} />}
+      {role === 'specialist' && <SpecialistTabs tab={tab} form={specialist} set={setSpecialist} />}
+      {role === null && <GenericTabs form={generic} set={setGeneric} />}
     </ProfileShell>
   )
 }
@@ -809,7 +971,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
         <Field label="Философия тренировок" full hint="Ваш подход, принципы работы с атлетами">
           <TextArea value={form.coaching_philosophy} onChange={u('coaching_philosophy') as (v: string) => void} rows={4} placeholder="Индивидуальный план, акцент на восстановлении и биомеханике…" />
         </Field>
-        <Field label="Форматы тренировок" full>
+        <Field label="Форматы тренировок" full group>
           <Chips value={form.session_formats} options={SESSION_FORMATS} onChange={u('session_formats') as (v: string[]) => void} />
         </Field>
         <Field label="Достижения" full hint="Каждое с новой строки: награды, титулы, результаты учеников">
@@ -829,12 +991,7 @@ function CoachTabs({ tab, form, set }: { tab: string; form: CoachForm; set: Reac
         <Field label="Под вашим руководством атлетов"><TextInput type="number" value={form.athletes_count} onChange={u('athletes_count') as (v: string) => void} placeholder="12" /></Field>
         <Field label="Ставка за час"><TextInput type="number" value={form.hourly_rate} onChange={u('hourly_rate') as (v: string) => void} placeholder="3000" /></Field>
         <Field label="Валюта">
-          <Select value={form.currency} onChange={u('currency') as (v: string) => void} options={[
-            { value: 'RUB', label: '₽ Рубли' },
-            { value: 'USD', label: '$ Доллары' },
-            { value: 'EUR', label: '€ Евро' },
-            { value: 'KZT', label: '₸ Тенге' },
-          ]} />
+          <Select value={form.currency} onChange={u('currency') as (v: string) => void} options={CURRENCIES} />
         </Field>
       </FormSection>
     )
@@ -908,10 +1065,10 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
   if (tab === 'services') {
     return (
       <FormSection title="Услуги и форматы приёма" icon="ki-abstract-26" iconBg="#E0F2FE" iconColor="#0EA5E9">
-        <Field label="Услуги" full>
+        <Field label="Услуги" full group>
           <Chips value={form.services} options={DOCTOR_SERVICES} onChange={u('services') as (v: string[]) => void} />
         </Field>
-        <Field label="Формат приёма" full>
+        <Field label="Формат приёма" full group>
           <Chips value={form.consultation_formats} options={CONSULTATION_FORMATS} onChange={u('consultation_formats') as (v: string[]) => void} />
         </Field>
         <Field label="Аффилиации / больницы" full hint="Через запятую">
@@ -920,7 +1077,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
         <Field label="Научные публикации" full hint="Каждая с новой строки">
           <TextArea value={form.scientific_publications_text} onChange={u('scientific_publications_text') as (v: string) => void} rows={3} placeholder="«HRV у триатлетов», Журнал СпортМедицины, 2023" />
         </Field>
-        <Field label="Приём экстренных случаев" full>
+        <Field label="Приём экстренных случаев" full group>
           <Toggle
             label="Могу принимать экстренные обращения"
             hint="Спортивные травмы, неотложная помощь"
@@ -950,12 +1107,7 @@ function DoctorTabs({ tab, form, set }: { tab: string; form: DoctorForm; set: Re
         <Field label="Место работы / клиника"><TextInput value={form.workplace} onChange={u('workplace') as (v: string) => void} /></Field>
         <Field label="Стоимость консультации"><TextInput type="number" value={form.consultation_fee} onChange={u('consultation_fee') as (v: string) => void} placeholder="5000" /></Field>
         <Field label="Валюта">
-          <Select value={form.currency} onChange={u('currency') as (v: string) => void} options={[
-            { value: 'RUB', label: '₽ Рубли' },
-            { value: 'USD', label: '$ Доллары' },
-            { value: 'EUR', label: '€ Евро' },
-            { value: 'KZT', label: '₸ Тенге' },
-          ]} />
+          <Select value={form.currency} onChange={u('currency') as (v: string) => void} options={CURRENCIES} />
         </Field>
         <Field label="Telegram"><TextInput value={form.telegram_url} onChange={u('telegram_url') as (v: string) => void} /></Field>
         <Field label="WhatsApp"><TextInput value={form.whatsapp_url} onChange={u('whatsapp_url') as (v: string) => void} placeholder="https://wa.me/…" /></Field>
@@ -1019,7 +1171,7 @@ function OrgTabs({ tab, form, set }: { tab: string; form: OrgForm; set: React.Di
   if (tab === 'membership') {
     return (
       <FormSection title="Услуги и членство" icon="ki-crown" iconBg="#F5F3FF" iconColor="#8B5CF6">
-        <Field label="Предоставляемые услуги" full>
+        <Field label="Предоставляемые услуги" full group>
           <Chips value={form.services} options={ORG_SERVICES} onChange={u('services') as (v: string[]) => void} />
         </Field>
         <Field label="Тарифы / членство" full hint="Каждый тариф с новой строки: название — цена — период">
@@ -1088,7 +1240,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
         <Field label="Департамент"><TextInput value={form.department} onChange={u('department') as (v: string) => void} placeholder="Поддержка / Модерация" /></Field>
         <Field label="Уровень доступа"><Select value={form.access_level} onChange={u('access_level') as (v: string) => void} options={ACCESS_LEVELS} /></Field>
         <Field label="График работы"><TextInput value={form.schedule} onChange={u('schedule') as (v: string) => void} placeholder="Пн-Пт, 10-19 МСК" /></Field>
-        <Field label="Доступность"><div className="flex items-center h-full"><Toggle label="Дежурство on-call" hint="Экстренные инциденты" value={form.on_call} onChange={u('on_call') as (v: boolean) => void} /></div></Field>
+        <Field label="Доступность" group><div className="flex items-center h-full"><Toggle label="Дежурство on-call" hint="Экстренные инциденты" value={form.on_call} onChange={u('on_call') as (v: boolean) => void} /></div></Field>
         <Field label="Внутренние заметки" full><TextArea value={form.notes} onChange={u('notes') as (v: string) => void} rows={4} /></Field>
       </FormSection>
     )
@@ -1097,7 +1249,7 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
   if (tab === 'responsibilities') {
     return (
       <FormSection title="Зоны ответственности" icon="ki-abstract-26" iconBg="#F5F3FF" iconColor="#8B5CF6">
-        <Field label="Направления работы" full>
+        <Field label="Направления работы" full group>
           <Chips value={form.responsibilities} options={ADMIN_RESPONSIBILITIES} onChange={u('responsibilities') as (v: string[]) => void} />
         </Field>
       </FormSection>
@@ -1108,6 +1260,189 @@ function AdminTabs({ tab, form, set }: { tab: string; form: AdminForm; set: Reac
     <FormSection title="Контакты" icon="ki-sms" iconBg="#EFF6FF" iconColor="#2563EB">
       <Field label="Телефон"><TextInput value={form.phone} onChange={u('phone') as (v: string) => void} /></Field>
       <Field label="Рабочий e-mail"><TextInput type="email" value={form.work_email} onChange={u('work_email') as (v: string) => void} placeholder="admin@proform.test" /></Field>
+    </FormSection>
+  )
+}
+
+type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T]
+
+function SpecialistTabs({ tab, form, set }: { tab: string; form: SpecialistSettingsForm; set: React.Dispatch<React.SetStateAction<SpecialistSettingsForm>> }) {
+  const text = (k: KeysOfType<SpecialistSettingsForm, string>) => (v: string) => set(s => ({ ...s, [k]: v }))
+  const flag = (k: KeysOfType<SpecialistSettingsForm, boolean>) => (v: boolean) => set(s => ({ ...s, [k]: v }))
+  const L = SPECIALIST_FIELD_LABEL
+
+  if (tab === 'personal') {
+    return (
+      <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FEF0E7" iconColor="#F35703">
+        <Field label="Имя и фамилия" hint="Так вас увидят клиенты"><TextInput value={form.name} onChange={text('name')} /></Field>
+        <Field label={L.languages} hint="Через запятую"><TextInput value={form.languages} onChange={text('languages')} placeholder="Русский, английский" /></Field>
+        <Field label={L.bio} full><TextArea value={form.bio} onChange={text('bio')} rows={4} maxLength={MAX_BIO_LENGTH} placeholder="С кем работаете, ваш подход, чем можете помочь спортсмену…" /></Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'specialization') {
+    return (
+      <FormSection title="Направление работы" icon="ki-abstract-41" iconBg={SPECIALIST_TONE.bg} iconColor={SPECIALIST_TONE.text}>
+        <Field label={L.types} full group hint="Можно выбрать несколько">
+          <Chips
+            value={form.types}
+            options={SPECIALIST_TYPE_OPTIONS}
+            onChange={v => set(s => ({ ...s, types: knownSpecialistTypes(v) }))}
+          />
+        </Field>
+        {form.types.length > 0 && (
+          <ul className="flex flex-col gap-1 text-xs text-muted-foreground md:col-span-2">
+            {form.types.map(t => (
+              <li key={t}>
+                <span className="font-semibold text-foreground">{SPECIALIST_TYPE_META[t].label}</span> — {SPECIALIST_TYPE_META[t].hint}
+              </li>
+            ))}
+          </ul>
+        )}
+        <Field label={L.mainFocus} full><TextInput value={form.mainFocus} onChange={text('mainFocus')} placeholder="Восстановление после травм, бегуны" /></Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'experience') {
+    return (
+      <FormSection title="Опыт и образование" icon="ki-book" iconBg="#EFF6FF" iconColor="#2563EB">
+        <Field label={L.experience} hint="Полных лет практики">
+          <TextInput value={form.experience} onChange={v => text('experience')(digitsOnly(v, 2))} inputMode="numeric" placeholder="0–70" />
+        </Field>
+        <Field label={L.license} hint="Если есть"><TextInput value={form.license} onChange={text('license')} /></Field>
+        <Field label={L.education} full><TextArea value={form.education} onChange={text('education')} placeholder="Вуз, специальность, год окончания" /></Field>
+        <Field label={L.certs} full group hint="Название обязательно, организация и год — по желанию">
+          <CertificationRows rows={form.certs} onChange={certs => set(s => ({ ...s, certs }))} />
+        </Field>
+      </FormSection>
+    )
+  }
+
+  if (tab === 'practice') {
+    const needCity = cityRequired(form.formats)
+    return (
+      <FormSection title="Практика" icon="ki-briefcase" iconBg="#ECFDF5" iconColor="#0D9488">
+        <Field label={L.formats} full group>
+          <Chips
+            value={form.formats}
+            options={SPECIALIST_FORMAT_OPTIONS}
+            onChange={v => set(s => ({ ...s, formats: SPECIALIST_FORMATS.filter(f => v.includes(f)) }))}
+          />
+        </Field>
+        <Field label={L.city} hint={needCity ? 'Нужен для очных встреч и выездов' : 'Можно не указывать, если работаете только онлайн'}>
+          <TextInput value={form.city} onChange={text('city')} placeholder="Москва" />
+        </Field>
+        <Field label={L.country}>
+          <div className="flex items-center gap-2">
+            <CountryFlag code={form.country} />
+            <div className="min-w-0 flex-1"><Select value={form.country} onChange={text('country')} options={COUNTRIES} /></div>
+          </div>
+        </Field>
+        <Field label={L.fee}><TextInput type="number" value={form.fee} onChange={text('fee')} placeholder="3000" /></Field>
+        <Field label="Валюта"><Select value={form.currency} onChange={text('currency')} options={CURRENCIES} /></Field>
+        <Field label={L.telegram}><TextInput value={form.telegram} onChange={text('telegram')} placeholder="https://t.me/…" /></Field>
+        <Field label={L.website}><TextInput value={form.website} onChange={text('website')} placeholder="https://…" /></Field>
+      </FormSection>
+    )
+  }
+
+  return (
+    <FormSection title="Приватность" icon="ki-shield-tick" iconBg="#ECFDF5" iconColor="#16A34A">
+      <div className="md:col-span-2 flex flex-col gap-3">
+        <Toggle
+          label="Публичный профиль"
+          hint="Профиль будет открыт для всех. Если выключить — его видите только вы"
+          value={form.profilePublic}
+          onChange={flag('profilePublic')}
+        />
+        <Toggle
+          label="Принимаю новых клиентов"
+          hint="Показывать бейдж «доступен для новых клиентов»"
+          value={form.acceptsNewClients}
+          onChange={flag('acceptsNewClients')}
+        />
+      </div>
+    </FormSection>
+  )
+}
+
+function CertificationRows({ rows, onChange }: { rows: CertRow[]; onChange: (rows: CertRow[]) => void }) {
+  const update = (key: string, patch: Partial<Omit<CertRow, 'key'>>) =>
+    onChange(rows.map(r => (r.key === key ? { ...r, ...patch } : r)))
+  const atLimit = rows.length >= MAX_CERTS
+
+  return (
+    <div className="flex flex-col gap-3">
+      {rows.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Пока ни одного сертификата</p>
+      ) : (
+        // На телефоне строка — карточка в рамке: иначе название следующего
+        // сертификата сливается с организацией предыдущего.
+        <ul className="flex flex-col gap-3">
+          {rows.map((r, i) => (
+            <li
+              key={r.key}
+              className="grid grid-cols-[minmax(0,1fr)_76px_auto] gap-2 rounded-xl border border-border p-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_88px_auto] sm:items-center sm:border-0 sm:p-0"
+            >
+              <input
+                aria-label={`Сертификат ${i + 1}: название`}
+                value={r.name}
+                onChange={e => update(r.key, { name: e.target.value })}
+                placeholder="Название"
+                className={`${inputClass} col-span-3 sm:col-span-1`}
+              />
+              <input
+                aria-label={`Сертификат ${i + 1}: кем выдан`}
+                value={r.issuer}
+                onChange={e => update(r.key, { issuer: e.target.value })}
+                placeholder="Кем выдан"
+                className={inputClass}
+              />
+              <input
+                aria-label={`Сертификат ${i + 1}: год`}
+                value={r.year}
+                onChange={e => update(r.key, { year: digitsOnly(e.target.value, 4) })}
+                inputMode="numeric"
+                placeholder="Год"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                aria-label={`Удалить сертификат ${i + 1}`}
+                title="Удалить"
+                onClick={() => onChange(rows.filter(x => x.key !== r.key))}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="ki-trash" className="text-sm" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          disabled={atLimit}
+          onClick={() => onChange([...rows, { key: nextCertKey(), name: '', issuer: '', year: '' }])}
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-600 transition-colors enabled:hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Icon name="ki-plus" className="text-xs" />
+          Добавить сертификат
+        </button>
+        <span className="text-xs text-muted-foreground">{rows.length} из {MAX_CERTS}</span>
+      </div>
+    </div>
+  )
+}
+
+function GenericTabs({ form, set }: { form: GenericForm; set: React.Dispatch<React.SetStateAction<GenericForm>> }) {
+  return (
+    <FormSection title="Личные данные" icon="ki-profile-circle" iconBg="#FEF0E7" iconColor="#F35703">
+      <Field label="Имя и фамилия" full hint="Отдельных настроек профиля для вашей роли пока нет — здесь можно сменить имя и фото">
+        <TextInput value={form.name} onChange={v => set(s => ({ ...s, name: v }))} />
+      </Field>
     </FormSection>
   )
 }

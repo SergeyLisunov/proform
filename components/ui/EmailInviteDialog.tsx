@@ -1,30 +1,35 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { sendEmailInvite, type InviteConnectionType } from '@/services/email-invites.service'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
-
-type Role = 'athlete' | 'coach' | 'organization' | 'doctor' | 'admin'
+import { SPECIALIST_CONNECTION_TYPE } from '@/lib/specialist'
+import type { UserRole } from '@/types/users'
 
 /** Which connection_type options are valid for a given inviter role. */
-const OPTIONS_BY_ROLE: Record<Role, Array<{ value: InviteConnectionType; label: string }>> = {
+const OPTIONS_BY_ROLE: Record<UserRole, Array<{ value: InviteConnectionType; label: string }>> = {
   coach:        [
-    { value: 'coach_athlete', label: 'Атлета'    },
+    { value: 'coach_athlete', label: 'Спортсмена' },
     { value: 'coach_doctor',  label: 'Врача'     },
   ],
   doctor:       [
-    { value: 'doctor_athlete', label: 'Атлета'   },
+    { value: 'doctor_athlete', label: 'Спортсмена' },
     { value: 'coach_doctor',   label: 'Тренера'  },
   ],
   organization: [
-    { value: 'org_athlete', label: 'Атлета'      },
+    { value: 'org_athlete', label: 'Спортсмена'  },
     { value: 'org_coach',   label: 'Тренера'     },
     { value: 'org_doctor',  label: 'Врача'       },
   ],
   admin:        [
     { value: 'admin_doctor', label: 'Врача'      },
+  ],
+  // Специалист связывается только со спортсменом (lib/connections/types),
+  // а тех, с кем работает, называет «клиентами».
+  specialist:   [
+    { value: SPECIALIST_CONNECTION_TYPE, label: 'Клиента (спортсмена)' },
   ],
   athlete:      [
     // P2 tenant refactor #4a — first-class B2C athlete↔personal-trainer link.
@@ -34,6 +39,7 @@ const OPTIONS_BY_ROLE: Record<Role, Array<{ value: InviteConnectionType; label: 
     // without going through an organization.
     { value: 'coach_athlete',  label: 'Тренера'  },
     { value: 'doctor_athlete', label: 'Врача'    },
+    { value: SPECIALIST_CONNECTION_TYPE, label: 'Специалиста' },
     // #4b-iii — athlete invites a parent/guardian. parent_link is NOT a
     // connection_type pair (parent isn't a role); the claim route creates a
     // parent_links row instead of a connections row.
@@ -41,14 +47,23 @@ const OPTIONS_BY_ROLE: Record<Role, Array<{ value: InviteConnectionType; label: 
   ],
 }
 
+// Коды ошибок /api/invite — понятной фразой, а не «Ошибка: role_mismatch».
+const INVITE_ERROR_TEXT: Record<string, string> = {
+  invalid_email:           'Проверьте адрес почты',
+  self_invite_not_allowed: 'Нельзя пригласить самого себя',
+  role_mismatch:           'Вашей роли такое приглашение недоступно',
+  invalid_connection_type: 'Вашей роли такое приглашение недоступно',
+}
+
 export function EmailInviteDialog({
   myRole, onClose, onSent,
 }: {
-  myRole: Role
+  myRole: UserRole
   onClose: () => void
   onSent?: (token: string, url: string) => void
 }) {
   const options = OPTIONS_BY_ROLE[myRole] ?? []
+  const fieldId = useId()
   const [email, setEmail] = useState('')
   const [connType, setConnType] = useState<InviteConnectionType>(options[0]?.value ?? 'coach_athlete')
   const [message, setMessage] = useState('')
@@ -86,7 +101,7 @@ export function EmailInviteDialog({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Приглашение</p>
             <h3 className="text-lg font-semibold text-navy-500">По email</h3>
           </div>
-          <button onClick={handleClose} className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
+          <button onClick={handleClose} aria-label="Закрыть" className={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}>
             <Icon name="ki-cross" className="text-xs" />
           </button>
         </div>
@@ -122,15 +137,15 @@ export function EmailInviteDialog({
                   автоматически.
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Email</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com"
+                  <label htmlFor={`${fieldId}-email`} className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Email</label>
+                  <input id={`${fieldId}-email`} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com"
                     className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"/>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Пригласить как</label>
-                  <div className="mt-1 grid grid-cols-1 gap-1.5">
+                  <span id={`${fieldId}-as`} className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Пригласить как</span>
+                  <div role="group" aria-labelledby={`${fieldId}-as`} className="mt-1 grid grid-cols-1 gap-1.5">
                     {options.map(o => (
-                      <button key={o.value} type="button" onClick={() => setConnType(o.value)}
+                      <button key={o.value} type="button" onClick={() => setConnType(o.value)} aria-pressed={connType === o.value}
                         className={`px-3 py-2 text-xs font-semibold rounded-lg border text-left transition-all ${
                           connType === o.value
                             ? 'border-orange-400 bg-orange-50 text-orange-700'
@@ -142,17 +157,17 @@ export function EmailInviteDialog({
                   </div>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Сообщение (опц.)</label>
-                  <textarea value={message} onChange={e => setMessage(e.target.value)} rows={3}
+                  <label htmlFor={`${fieldId}-message`} className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Сообщение (опц.)</label>
+                  <textarea id={`${fieldId}-message`} value={message} onChange={e => setMessage(e.target.value)} rows={3}
                     placeholder="Пара слов — чтобы получатель понял от кого и зачем."
                     className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none"/>
                 </div>
                 {result && !result.ok && (
-                  <div className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-xs">
-                    Ошибка: {result.error}
+                  <div role="alert" className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-xs">
+                    {INVITE_ERROR_TEXT[result.error] ?? 'Не удалось отправить приглашение. Попробуйте ещё раз.'}
                   </div>
                 )}
-                <button onClick={handleSubmit} disabled={sending || !email.trim() || !connType}
+                <button onClick={handleSubmit} disabled={sending || !email.trim() || !connType} aria-busy={sending}
                   className="w-full rounded-xl bg-orange-500 text-white px-4 py-2.5 text-sm font-semibold hover:bg-orange-600 disabled:opacity-50">
                   {sending ? 'Отправляем…' : 'Отправить приглашение'}
                 </button>

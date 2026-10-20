@@ -12,14 +12,14 @@
  * новых пунктов, никаких consolidate (это этапы 3+). Цель — refactor без
  * regression'ов, готовый фундамент для дальнейших инкрементов.
  *
- * `EffectiveRole` — пока эквивалентен `users.role` (5 глобальных). В будущем
+ * `EffectiveRole` — пока эквивалентен `users.role` (6 глобальных). В будущем
  * (этап 7) расширится до `org_owner`/`org_admin` через резолвинг по
  * `org_members.member_role`; resolver будет жить в `useEffectiveRole` хуке,
  * config — единый источник правды по пунктам.
  */
 
 /** Глобальная роль из public.users.role. */
-export type GlobalRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'doctor'
+export type GlobalRole = 'athlete' | 'coach' | 'organization' | 'admin' | 'doctor' | 'specialist'
 
 /** Производная org-роль из org_members.member_role для активной организации. */
 export type ScopedOrgRole = 'org_owner' | 'org_admin'
@@ -115,6 +115,22 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       { id: 'coach.plans',    href: '/coach/plans', icon: 'ki-notepad-edit', label: 'Планы тренировок', roles: ['coach'] },
     ],
   },
+  // Специалист — своя секция сразу после «Главной», а не «Тренировки»:
+  // тренировок у него нет. «Сообщения» первыми — мобильная панель берёт
+  // первый пункт каждой секции, и переписка с клиентами попадает в неё.
+  // Отдельные id, чтобы порядок у остальных ролей не менялся.
+  //
+  // Только то, что у специалиста уже работает. Нет календаря (он про
+  // тренировки), «Моих атлетов» (/athletes отвечает «Доступ ограничен»),
+  // «Аналитики» (/analytics не тренеру показывает аналитику спортсмена).
+  {
+    id:    'specialist_focus',
+    title: 'Работа с клиентами',
+    items: [
+      { id: 'specialist.messages', href: '/messages', icon: 'ki-message-text-2', label: 'Сообщения', roles: ['specialist'] },
+      { id: 'specialist.notes',    href: '/notes',    icon: 'ki-notepad-edit',   label: 'Заметки',   roles: ['specialist'] },
+    ],
+  },
   // Этап 6a sidebar-rebuild — Owner/Org Admin «Клуб». Главные задачи Owner'а
   // (ростер, тренеры, расписание, аналитика, медконтроль) выводим в первую
   // секцию сразу после «Главная». Используем roles:['organization'] —
@@ -185,7 +201,8 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       { id: 'training.diary_coach',   href: '/diary', icon: 'ki-notepad-edit',  label: 'Дневник тренера',     roles: ['coach'] },
       { id: 'training.diary_doctor',  href: '/diary', icon: 'ki-heart-circle',  label: 'Дневник врача',       roles: ['doctor'] },
       // Notes — рабочий инструмент тренера/врача (комментарии). Athlete не
-      // ведёт публичных заметок отдельно от дневника.
+      // ведёт публичных заметок отдельно от дневника. Специалисту /notes и
+      // /messages выдаёт секция «Работа с клиентами».
       { id: 'training.notes',         href: '/notes',     icon: 'ki-notepad-edit',   label: 'Заметки', roles: ['coach', 'organization', 'doctor'] },
       // Records — motivation; для athlete доступно через будущий /goals consolidate.
       // Пока скрыто (страница /records остаётся доступна по URL). Этап 9: убрали
@@ -216,7 +233,7 @@ export const SIDEBAR_CONFIG: SidebarSection[] = [
       // P2 — клубные каналы: объявления/достижения/тренерская + per-группа.
       // Видимость внутри страницы решает RLS (can_read_channel).
       { id: 'network.channels',  href: '/channels',  icon: 'ki-messages',       label: 'Каналы клуба',    roles: ['athlete', 'coach', 'organization'] },
-      { id: 'network.contacts',  href: '/network',   icon: 'ki-people',         label: 'Сеть и контакты', roles: ['athlete', 'organization', 'doctor'] },
+      { id: 'network.contacts',  href: '/network',   icon: 'ki-people',         label: 'Сеть и контакты', roles: ['athlete', 'organization', 'doctor', 'specialist'] },
       // Coach видит «Мои атлеты» через секцию «Мой кокпит» выше, поэтому здесь
       // dropped из roles чтобы не дублировался. Doctor по-прежнему видит.
       { id: 'network.athletes',  href: '/athletes',  icon: 'ki-abstract-26',    label: 'Мои атлеты',      roles: ['doctor'] },

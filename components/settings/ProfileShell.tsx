@@ -1,10 +1,15 @@
 'use client'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { createContext, useContext, useId, useRef } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { AvatarImage } from '@/components/ui/AvatarImage'
 
 type Tab = { id: string; label: string; icon: string; color: string }
+
+// Field раздаёт id своему контролу: без этого <label> ни с чем не связан,
+// и у полей нет доступного имени для экранного диктора.
+type FieldIds = { controlId: string; hintId?: string }
+const FieldContext = createContext<FieldIds | null>(null)
 
 export function ProfileShell(props: {
   title: string
@@ -97,6 +102,7 @@ export function ProfileShell(props: {
             <button
               key={t.id}
               type="button"
+              aria-pressed={active}
               onClick={() => props.onTabChange(t.id)}
               className={`flex flex-1 min-w-[120px] items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition sm:min-w-[140px] sm:px-4 ${
                 active
@@ -175,8 +181,8 @@ export function ProfileShell(props: {
       {props.children}
 
       {/* Save bar */}
-      <div className="sticky bottom-4 z-30 flex items-center justify-between rounded-2xl border border-border bg-card/90 px-4 py-3 shadow-lg backdrop-blur-sm">
-        <div className="text-xs text-muted-foreground">
+      <div className="sticky bottom-4 z-30 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card/90 px-4 py-3 shadow-lg backdrop-blur-sm">
+        <div role="status" className="min-w-0 text-xs text-muted-foreground">
           {props.saveError ? (
             <span className="text-red-600">{props.saveError}</span>
           ) : props.saved ? (
@@ -189,7 +195,7 @@ export function ProfileShell(props: {
           type="button"
           onClick={props.onSave}
           disabled={props.saving}
-          className="rounded-full bg-orange-500 px-5 py-2 text-sm font-bold text-white transition hover:bg-orange-600 disabled:opacity-50"
+          className="shrink-0 rounded-full bg-orange-500 px-5 py-2 text-sm font-bold text-white transition hover:bg-orange-600 disabled:opacity-50"
         >
           {props.saving ? 'Сохранение…' : 'Сохранить'}
         </button>
@@ -229,19 +235,39 @@ export function FormSection({
   )
 }
 
+const FIELD_LABEL_CLASS = 'mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-muted-foreground'
+
+/**
+ * Подпись поля. Одиночный контрол (TextInput, TextArea, Select) связывается
+ * с подписью сам. group — для набора контролов (Chips, строки сертификатов,
+ * переключатель): подпись становится именем группы, а не <label> в пустоту.
+ */
 export function Field(props: {
   label: string
   hint?: string
   full?: boolean
+  group?: boolean
   children: React.ReactNode
 }) {
+  const id = useId()
+  const labelId = `${id}-label`
+  const hintId = props.hint ? `${id}-hint` : undefined
   return (
-    <div className={props.full ? 'md:col-span-2' : undefined}>
-      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-        {props.label}
-      </label>
-      {props.children}
-      {props.hint && <p className="mt-1 text-[11px] text-muted-foreground">{props.hint}</p>}
+    <div
+      className={props.full ? 'md:col-span-2' : undefined}
+      role={props.group ? 'group' : undefined}
+      aria-labelledby={props.group ? labelId : undefined}
+      aria-describedby={props.group ? hintId : undefined}
+    >
+      {props.group ? (
+        <div id={labelId} className={FIELD_LABEL_CLASS}>{props.label}</div>
+      ) : (
+        <label htmlFor={`${id}-control`} className={FIELD_LABEL_CLASS}>{props.label}</label>
+      )}
+      <FieldContext.Provider value={props.group ? null : { controlId: `${id}-control`, hintId }}>
+        {props.children}
+      </FieldContext.Provider>
+      {props.hint && <p id={hintId} className="mt-1 text-[11px] text-muted-foreground">{props.hint}</p>}
     </div>
   )
 }
@@ -254,10 +280,15 @@ export function TextInput(props: {
   onChange: (v: string) => void
   placeholder?: string
   type?: string
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
 }) {
+  const field = useContext(FieldContext)
   return (
     <input
+      id={field?.controlId}
+      aria-describedby={field?.hintId}
       type={props.type ?? 'text'}
+      inputMode={props.inputMode}
       value={props.value}
       onChange={e => props.onChange(e.target.value)}
       placeholder={props.placeholder}
@@ -271,13 +302,18 @@ export function TextArea(props: {
   onChange: (v: string) => void
   placeholder?: string
   rows?: number
+  maxLength?: number
 }) {
+  const field = useContext(FieldContext)
   return (
     <textarea
+      id={field?.controlId}
+      aria-describedby={field?.hintId}
       value={props.value}
       onChange={e => props.onChange(e.target.value)}
       placeholder={props.placeholder}
       rows={props.rows ?? 3}
+      maxLength={props.maxLength}
       className={`${inputClass} resize-none`}
     />
   )
@@ -288,8 +324,11 @@ export function Select(props: {
   onChange: (v: string) => void
   options: { value: string; label: string }[]
 }) {
+  const field = useContext(FieldContext)
   return (
     <select
+      id={field?.controlId}
+      aria-describedby={field?.hintId}
       value={props.value}
       onChange={e => props.onChange(e.target.value)}
       className={inputClass}
@@ -317,6 +356,7 @@ export function Chips(props: {
           <button
             key={o.value}
             type="button"
+            aria-pressed={active}
             onClick={() => {
               const next = new Set(set)
               if (active) next.delete(o.value); else next.add(o.value)

@@ -43,6 +43,9 @@ export default function CoachOnboardingPage() {
   useEffect(() => {
     if (userLoading) return
     if (!user) { router.replace('/auth/login'); return }
+    // Мастер только для своей роли: иначе специалист (или кто угодно) мог
+    // пройти чужой мастер и получить отметку «онбординг пройден» без своего профиля.
+    if (user.role !== 'coach') { router.replace('/onboarding'); return }
     let cancelled = false
     void (async () => {
       const state = await loadMyOnboarding()

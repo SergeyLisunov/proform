@@ -241,6 +241,7 @@ export async function POST(req: Request) {
       try {
         const { subject, html } = renderInviteEmail({
           inviter_name:    inviterDisplayName,
+          inviter_role:    'organization',
           connection_type,
           message:         message ?? null,
           claim_url:       `${APP_URL}/invite/${token}`,

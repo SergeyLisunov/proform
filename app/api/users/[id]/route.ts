@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+// Публичная часть профиля специалиста. Номер лицензии и служебные даты не
+// отдаём: для решения о связи они не нужны.
+const SPECIALIST_PUBLIC_COLUMNS =
+  'specialist_types, main_focus, bio, experience_years, education, certifications, formats, ' +
+  'city, country, languages, consultation_fee, currency, telegram_url, website_url, ' +
+  'accepts_new_clients, profile_public'
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
@@ -42,11 +49,26 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { data } = await supabase
       .from('organizations').select('*').eq('id', id).maybeSingle()
     roleProfile = (data as Record<string, unknown>) ?? null
+  } else if (profile.role === 'specialist') {
+    // Таблицы specialists нет в сгенерированных типах. RLS отдаёт строку,
+    // только если профиль публичный (или свой) — скрытый профиль приходит
+    // без полей специалиста, и страница так и пишет.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from('specialists').select(SPECIALIST_PUBLIC_COLUMNS).eq('id', id).maybeSingle()
+    if (error) return NextResponse.json({ error: 'server_error' }, { status: 500 })
+    // Пустые поля специалиста не затирают город и «о себе» из users.
+    roleProfile = data
+      ? Object.fromEntries(Object.entries(data as Record<string, unknown>).filter(([, v]) => v !== null))
+      : null
   }
 
   // Connection status between me and this user
   let connectionStatus = 'none'
   let connectionId: string | null = null
+  // Кто ждёт ответа: отозвать запрос может только отправивший, принять —
+  // только получивший (PATCH /api/connections/[id]).
+  let connectionDirection: 'outgoing' | 'incoming' | null = null
   if (me.id !== id) {
     const { data: conn } = await supabase
       .from('connections')
@@ -54,13 +76,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       .or(`and(initiator_id.eq.${me.id},recipient_id.eq.${id}),and(initiator_id.eq.${id},recipient_id.eq.${me.id})`)
       .in('status', ['pending', 'active'])
       .maybeSingle()
-    if (conn) { connectionStatus = conn.status; connectionId = conn.id }
+    if (conn) {
+      connectionStatus = conn.status
+      connectionId = conn.id
+      connectionDirection = conn.initiator_id === me.id ? 'outgoing' : 'incoming'
+    }
   }
 
   return NextResponse.json({
     profile: { ...profile, ...(roleProfile ?? {}) },
     connectionStatus,
     connectionId,
+    connectionDirection,
     isOwn: me.id === id,
   })
 }

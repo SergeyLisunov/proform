@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/metronic'
 import { Icon } from '@/components/ui/Icon'
 import { buttonVariants } from '@/components/reui/button'
 import { cn } from '@/lib/utils'
+import { roleMeta } from '@/lib/roles'
 
 type ChatUser = { id: string; name: string; email: string; role: string }
 type ChatType = 'direct' | 'group' | 'org_channel'
@@ -166,7 +167,7 @@ function NewChatModal({ currentUser, onClose, onCreated }: {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--foreground)' }}>{u.name || u.email}</div>
                 <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 2 }}>
-                  {u.role === 'coach' ? 'Тренер' : 'Атлет'}
+                  {roleMeta(u.role).label}
                 </div>
               </div>
               {creating === u.id
@@ -282,7 +283,7 @@ function ChatModal({ chat, currentUserId, onClose, onUnreadChange }: {
             <div style={{ fontSize: 11, color, fontWeight: 600, marginTop: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
               {chat.type === 'direct' && chat.other_user ? (
                 <><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
-                {chat.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}</>
+                {roleMeta(chat.other_user.role).label}</>
               ) : chat.type === 'group' ? (
                 `Группа · ${chat.member_count ?? '?'} участников`
               ) : (
@@ -469,7 +470,7 @@ function NewGroupModal({ currentUser, onClose, onCreated }: {
                 <Avatar name={u.name || u.email} size={40} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)' }}>{u.name || u.email}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{u.role === 'coach' ? 'Тренер' : u.role === 'organization' ? 'Организация' : 'Атлет'}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>{roleMeta(u.role).label}</div>
                 </div>
                 <div style={{ width: 22, height: 22, borderRadius: 6, border: sel ? 'none' : '1.5px solid var(--border)', background: sel ? '#9333ea' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
                   {sel && <Icon name="ki-check" className="text-white" style={{ fontSize: 11 }} />}
@@ -826,7 +827,7 @@ export default function MessengerPage() {
                           <span style={{ marginTop: 3, fontSize: 11, color, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                             {isDirect && c.other_user ? (
                               <><span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', opacity: 0.8 }} />
-                              {c.other_user.role === 'coach' ? 'Тренер' : 'Атлет'}</>
+                              {roleMeta(c.other_user.role).label}</>
                             ) : c.type === 'group' ? (
                               `Группа · ${c.member_count ?? '?'} участников`
                             ) : (
